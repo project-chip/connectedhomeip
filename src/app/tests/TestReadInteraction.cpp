@@ -31,6 +31,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -47,6 +48,7 @@ SecureSessionMgr gSessionManager;
 Messaging::ExchangeManager gExchangeManager;
 TransportMgr<Transport::UDP> gTransportManager;
 const Transport::AdminId gAdminId = 0;
+message_counter::MessageCounterManager gMessageCounterManager;
 
 namespace app {
 class TestReadInteraction
@@ -154,7 +156,8 @@ void InitializeChip(nlTestSuite * apSuite)
 
     chip::gSystemLayer.Init(nullptr);
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins);
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
+                                     &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = chip::gExchangeManager.Init(&chip::gSessionManager);

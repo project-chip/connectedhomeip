@@ -35,15 +35,19 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
     VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins));
+    ReturnErrorOnFailure(
+        mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
+    ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
     ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
                                                       SecureSessionMgr::PairingDirection::kInitiator, mSrcAdminId));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal,
-                                        SecureSessionMgr::PairingDirection::kResponder, mDestAdminId);
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal,
+                                                      SecureSessionMgr::PairingDirection::kResponder, mDestAdminId));
+
+    return CHIP_NO_ERROR;
 }
 
 // Shutdown all layers, finalize operations
@@ -53,16 +57,36 @@ CHIP_ERROR MessagingContext::Shutdown()
     return IOContext::Shutdown();
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
+void MessagingContext::PresetMessageCounter()
+{
+    SecureSessionHandle localSession = GetSessionLocalToPeer();
+    SecureSessionHandle peerSession = GetSessionPeerToLocal();
+    Transport::PeerConnectionState * localState = GetSecureSessionManager().GetPeerConnectionState(localSession);
+    Transport::PeerConnectionState * peerState = GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    peerState->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(localState->GetSessionMessageCounter().GetLocalMessageCounter().Value());
+    localState->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(peerState->GetSessionMessageCounter().GetLocalMessageCounter().Value());
+}
+
+SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() }, delegate);
+    return { GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() };
+}
+
+SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
+{
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
+}
+
+Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId(), GetAdminId() }, delegate);
+    return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
 }
 
 } // namespace Test

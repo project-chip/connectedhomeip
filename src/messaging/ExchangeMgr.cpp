@@ -89,9 +89,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
 
-    err = mMessageCounterSyncMgr.Init(this);
-    ReturnErrorOnFailure(err);
-
     mState = State::kState_Initialized;
 
     return err;
@@ -99,7 +96,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
-    mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
     for (auto & ec : mContextPool)
@@ -314,34 +310,6 @@ exit:
     {
         ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
     }
-}
-
-CHIP_ERROR ExchangeManager::QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
-
-    // Queue the message as needed for sync with destination node.
-    err = mMessageCounterSyncMgr.AddToReceiveTable(std::move(msgBuf));
-    SuccessOrExit(err);
-
-    // Initiate message counter synchronization if no message counter synchronization is in progress.
-    if (!state->IsMsgCounterSyncInProgress())
-    {
-        SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
-        err = mMessageCounterSyncMgr.SendMsgCounterSyncReq(session);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(ExchangeManager,
-                     "Message counter synchronization for received message, failed to send synchronization request, err = %s",
-                     ErrorStr(err));
-    }
-
-    return err;
 }
 
 ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)

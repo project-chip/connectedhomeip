@@ -59,7 +59,6 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
-    friend class MessageCounterSyncMgr;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -168,10 +167,6 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetAppState(void * state) { mAppState = state; }
-
-    void * GetAppState() const { return mAppState; }
-
     SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
     /*
@@ -189,7 +184,6 @@ private:
     ExchangeDelegateBase * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr   = nullptr;
     ExchangeACL * mExchangeACL       = nullptr;
-    void * mAppState                 = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
@@ -215,12 +209,6 @@ private:
 
     CHIP_ERROR StartResponseTimer();
 
-    /**
-     * A subset of SendMessage functionality that does not perform message
-     * counter sync for group keys.
-     */
-    CHIP_ERROR SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf,
-                               const SendFlags & sendFlags, Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 

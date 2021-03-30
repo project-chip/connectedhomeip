@@ -33,6 +33,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -413,6 +414,7 @@ private:
     SecureSessionMgr * mSessionMgr = nullptr;
 };
 
+message_counter::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -496,10 +498,13 @@ void InitServer(AppDelegate * delegate)
 
     SuccessOrExit(err);
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
+    err =
+        gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeMgr.Init(&gSessions);
+    SuccessOrExit(err);
+    err = gMessageCounterManager.Init(&gExchangeMgr);
     SuccessOrExit(err);
 
 #if CHIP_ENABLE_INTERACTION_MODEL

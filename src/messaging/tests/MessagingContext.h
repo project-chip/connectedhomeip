@@ -18,6 +18,7 @@
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
@@ -45,6 +46,9 @@ public:
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
 
+    // Set message count to skip message counter sync process.
+    void PresetMessageCounter();
+
     static Inet::IPAddress GetAddress()
     {
         Inet::IPAddress addr;
@@ -60,6 +64,10 @@ public:
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
+    message_counter::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
+
+    SecureSessionHandle GetSessionLocalToPeer();
+    SecureSessionHandle GetSessionPeerToLocal();
 
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
@@ -69,6 +77,7 @@ public:
 private:
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
+    message_counter::MessageCounterManager mMessageCounterManager;
 
     Optional<Transport::PeerAddress> mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
