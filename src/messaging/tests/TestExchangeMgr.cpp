@@ -75,6 +75,7 @@ public:
                            System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
+        ec->Close();
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
@@ -102,6 +103,9 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetDestinationNodeId());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerKeyID() == ctx.GetPeerKeyId());
+
+    ec1->Close();
+    ec2->Close();
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
@@ -157,8 +161,10 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a good packet
     ec1->SendMessage(Protocols::Id(VendorId::Common, 0x0001), 0x0001,
                      System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNone));
+                     SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    ec1->Close();
 }
 
 // Test Suite
