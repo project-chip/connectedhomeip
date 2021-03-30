@@ -186,7 +186,8 @@ template("efr32_sdk") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG21_${efr32_board}/config",
         "${efr32_sdk_root}/hardware/kit/MGM21_${efr32_board}/config",
-        "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG21/Include",
+        "${efr32_sdk_root}/platform/Device/SiliconLabs/MGM21/Include",
+        "${efr32_sdk_root}/hardware/module/config",
         "${efr32_sdk_root}/platform/radio/rail_lib/chip/efr32/efr32xg2x",
         "${efr32_sdk_root}/util/third_party/freertos/Source/portable/GCC/ARM_CM3",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/efr32xg21/config",
