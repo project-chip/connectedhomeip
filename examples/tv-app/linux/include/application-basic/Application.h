@@ -19,9 +19,6 @@
 #pragma once
 
 #include "gen/enums.h"
-#include <cstdint>
-#include <string>
-
 struct Application
 {
     char vendorName[32]                  = "";

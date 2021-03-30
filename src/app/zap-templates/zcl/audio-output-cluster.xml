@@ -23,7 +23,9 @@ limitations under the License.
     <define>AUDIO_OUTPUT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
+    <!-- TODO: Convert this to list once it is supported -->
     <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST" type="OCTET_STRING" length="32" writable="false" optional="false">audio output list</attribute>
     <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current audio output</attribute>
 
@@ -41,9 +43,9 @@ limitations under the License.
   </cluster>
 
   <struct name="AudioOutputInfo">
-    <item name="Index" type="INT8U"/>
-    <item name="OutputType" type="AudioOutputType"/>
-    <item name="Name" type="CHAR_STRING"/>
+    <item name="index" type="INT8U"/>
+    <item name="outputType" type="AudioOutputType"/>
+    <item name="name" type="CHAR_STRING"/>
   </struct>
 
   <enum name="AudioOutputType" type="ENUM8">
