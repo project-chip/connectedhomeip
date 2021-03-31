@@ -162,9 +162,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (current_os == "android") {
-      defines += [
-        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\""
-      ]
+      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
     }
   }
 }
