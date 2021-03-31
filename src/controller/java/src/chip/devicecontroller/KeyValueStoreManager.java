@@ -27,14 +27,14 @@ import android.util.Log;
  * Exposes get/set/delete methods to be used by the native C++ JNI Layer.
  */
 public class KeyValueStoreManager {
-  private static final String TAG = PersistentStorage.class.getSimpleName();
+  private static final String TAG = KeyValueStoreManager.class.getSimpleName();
   private static SharedPreferences preferences;
   private static final String PREFERENCE_FILE_KEY = "com.google.chip.KeyValueStore";
 
   public static String get(String key) {
       String value = preferences.getString(key, null);
       if (value == null) {
-        Log.d(TAG, "Key " + key + " not found in shared preferences");
+        Log.d(TAG, "Key '" + key + "' not found in shared preferences");
       }
       return value;
   }
