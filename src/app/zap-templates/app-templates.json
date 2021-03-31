@@ -2,6 +2,7 @@
     "name": "CHIP Application templates",
     "version": "chip-v1",
     "helpers": [
+        "common/ListHelper.js",
         "common/StringHelper.js",
         "templates/app/helper.js",
         "templates/chip/helper.js"
