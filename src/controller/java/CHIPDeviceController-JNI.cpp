@@ -57,7 +57,7 @@ using namespace chip::Controller;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void GetCHIPDevice(JNIEnv * env, long wrapperHandle, int deviceId, Device ** device);
+static void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** device);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
                                      const uint8_t * characteristicData, uint32_t characteristicDataLen);
@@ -276,7 +276,7 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jint deviceId, jint connObj, jlong pinCode)
+JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -301,7 +301,7 @@ JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jint devi
     }
 }
 
-JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jint deviceId)
+JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -320,7 +320,7 @@ JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jint de
     }
 }
 
-JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jint deviceId)
+JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -403,7 +403,7 @@ JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlon
     }
 }
 
-JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jint deviceId)
+JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -435,7 +435,7 @@ JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
     }
 }
 
-void GetCHIPDevice(JNIEnv * env, long wrapperHandle, int deviceId, Device ** chipDevice)
+void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** chipDevice)
 {
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(wrapperHandle);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -452,7 +452,7 @@ void GetCHIPDevice(JNIEnv * env, long wrapperHandle, int deviceId, Device ** chi
     }
 }
 
-JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jint deviceId)
+JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     Device * chipDevice = nullptr;
 
@@ -472,7 +472,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jint
     return env->NewStringUTF(addrStr);
 }
 
-JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jint deviceId, jstring messageObj)
+JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring messageObj)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
@@ -507,7 +507,7 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jint dev
     }
 }
 
-JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jint deviceId, jobject commandObj, jint aValue)
+JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jobject commandObj, jint aValue)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
@@ -563,7 +563,7 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jint dev
     }
 }
 
-JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jint deviceId, jint duration)
+JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
