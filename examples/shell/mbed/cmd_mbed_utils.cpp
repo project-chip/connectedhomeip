@@ -59,31 +59,30 @@ constexpr NodeId kSourceNodeId                = 123654;
 constexpr NodeId kDestinationNodeId           = 111222333;
 constexpr uint32_t kMessageId                 = 18;
 EventFlags socketEvent;
-uint32_t socketMsgReceiveFlag = 1;
+uint32_t socketMsgReceiveFlag           = 0x1;
+uint32_t socketConnectionCompeletedFlag = 0x2;
 
 using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
 void OnTcpMessageSent(Inet::TCPEndPoint * endPoint, uint16_t Length)
 {
-    streamer_printf(streamer_get(), "OnTcpMessageSent \n");
+    streamer_printf(streamer_get(), "INFO: socket message sent\r\n");
 }
 
 void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
 {
     streamer_t * sout = streamer_get();
-    streamer_printf(sout, "OnTcpMessageReceived \n");
-    char data[buffer->DataLength() + 1] = { 0 };
-    strncpy(data, (char *) buffer->Start(), buffer->DataLength());
-    streamer_printf(sout, "Received message \"%s\"\n\r", data);
+
+    streamer_printf(sout, "INFO: socket message received\r\n");
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
     socketEvent.set(socketMsgReceiveFlag);
 }
+
 void OnConnectionCompleted(Inet::TCPEndPoint * endPoint, INET_ERROR error)
 {
-    streamer_printf(streamer_get(), "OnConnectionCompleted \n");
-}
-void OnConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR error)
-{
-    streamer_printf(streamer_get(), "OnConnectionClosed \n");
+    streamer_printf(streamer_get(), "INFO: socket connection completed\r\n");
+    socketEvent.set(socketConnectionCompeletedFlag);
 }
 
 class SocketTransportMgrDelegate : public TransportMgrDelegate
@@ -100,7 +99,7 @@ public:
 
         source.ToString(info, sizeof(info));
         strncpy(msg, (char *) msgBuf->Start(), msgBuf->DataLength());
-        streamer_printf(streamer_get(), "Received message \"%s\" from %s\n\r", msg, info);
+        streamer_printf(streamer_get(), "Received message \"%s\" from %s\r\n", msg, info);
 
         socketEvent.set(socketMsgReceiveFlag);
     }
@@ -448,7 +447,7 @@ int cmd_socket_echo(int argc, char ** argv)
     buffer = PacketBufferHandle::NewWithData(msg, msgLen);
     if (buffer.IsNull())
     {
-        streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
+        streamer_printf(sout, "ERROR: create message buffer failed\r\n");
         ExitNow(error = CHIP_ERROR_INTERNAL;);
     }
 
@@ -502,32 +501,26 @@ exit:
     return error;
 }
 
-int cmd_socket_tcp(int argc, char ** argv)
+int cmd_socket_example(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    char addrStr[16];
-    uint16_t port = 80;
+    INET_ERROR err;
+    TCPEndPoint * endPoint = nullptr;
     IPAddress addr;
+    SocketAddress address;
+    PacketBufferHandle buffer;
 
-    streamer_t * sout    = streamer_get();
-    const char payload[] = "GET / HTTP/1.1\r\n"
-                           "Host: ifconfig.io\r\n"
-                           "Connection: close\r\n"
-                           "\r\n";
+    const uint16_t port   = 80;
+    const char hostname[] = "ifconfig.io";
+    const char msg[]      = "GET / HTTP/1.1\r\n"
+                       "Host: ifconfig.io\r\n"
+                       "Connection: close\r\n"
+                       "\r\n";
+    uint16_t msgLen = sizeof(msg);
 
-    uint16_t payloadLen = sizeof(payload);
-
-    PacketBufferHandle buffer = PacketBufferHandle::NewWithData(payload, payloadLen);
-    if (buffer.IsNull())
-    {
-        streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
-        return false;
-    }
+    streamer_t * sout = streamer_get();
 
     //******************************to be replaced********************************************************
-
-    const char hostname[] = "ifconfig.io";
-    SocketAddress address;
     /* get the host address */
     printf("\nResolve hostname %s\r\n", hostname);
     WiFiInterface * _net = WiFiInterface::get_default_instance();
@@ -538,36 +531,67 @@ int cmd_socket_tcp(int argc, char ** argv)
         return false;
     }
 
-    printf("%s address is %s\r\n", hostname, (address.get_ip_address() ? address.get_ip_address() : "None"));
-
-    IPAddress::FromString(address.get_ip_address(), addr);
     //**************************************************************************************
+    streamer_printf(sout, "INFO: %s IP address is %s\r\n", hostname,
+                    (address.get_ip_address() ? address.get_ip_address() : "None"));
+    IPAddress::FromString(address.get_ip_address(), addr);
 
-    Inet::TCPEndPoint * endPoint;
-    chip::Transport::TcpListenParameters params(&chip::DeviceLayer::InetLayer);
-    error = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
-    if (error != 0)
-        streamer_printf(sout, "ERROR: TCP endpoint not created %d\r\n", error);
+    Transport::TcpListenParameters params(&DeviceLayer::InetLayer);
+    err = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: Create socket failed\r\n");
+        ExitNow(error = err;);
+    }
 
-    endPoint->OnDataSent         = OnTcpMessageSent;
-    endPoint->OnDataReceived     = OnTcpMessageReceived;
-    endPoint->OnConnectComplete  = OnConnectionCompleted;
-    endPoint->OnConnectionClosed = OnConnectionClosed;
+    endPoint->OnDataSent        = OnTcpMessageSent;
+    endPoint->OnDataReceived    = OnTcpMessageReceived;
+    endPoint->OnConnectComplete = OnConnectionCompleted;
 
-    error = endPoint->Connect(addr, port, 0);
-    if (error != 0)
-        streamer_printf(sout, "ERROR: TCP connect error %d \r\n", error);
+    socketEvent.clear();
 
+    streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", address.get_ip_address(), port);
+    err = endPoint->Connect(addr, port, 0);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: socket connect failed\r\n");
+        ExitNow(error = err;);
+    }
+
+    if (socketEvent.wait_all(socketConnectionCompeletedFlag, 5000) & osFlagsError)
+    {
+        streamer_printf(sout, "ERROR: socket connection is not completed\r\n");
+    }
+
+    buffer = PacketBufferHandle::NewWithData(msg, msgLen);
+    if (buffer.IsNull())
+    {
+        streamer_printf(sout, "ERROR: create message buffer failed\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    socketEvent.clear();
+
+    streamer_printf(sout, "INFO: send HTTP message: \r\n%s", msg);
     error = endPoint->Send(std::move(buffer));
-    if (error != 0)
-        streamer_printf(sout, "ERROR: TCP send error %d \r\n", error);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: socket send failed\r\n");
+        ExitNow(error = err;);
+    }
 
     if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
     {
         streamer_printf(sout, "ERROR: socket message does not received\r\n");
         error = CHIP_ERROR_TIMEOUT;
     }
-    endPoint->Close();
+
+exit:
+    if (endPoint != nullptr)
+    {
+        endPoint->Free();
+    }
+
     return error;
 }
 
@@ -674,8 +698,8 @@ static const shell_command_t cmds_socket[] = {
       "socket echo TCP 127.0.0.1 7 Hello" },
     { &cmd_socket_bsd, "bsd",
       "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
-    { &cmd_socket_tcp, "tcp",
-      "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
+    { &cmd_socket_example, "example",
+      "Socket example which sends HTTP request to ifconfig.io and receives a response. Usage: socket example" },
 
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
@@ -689,4 +713,6 @@ void cmd_mbed_utils_init()
     shell_register(&cmds_test_config, 1);
     shell_register(&cmds_network_root, 1);
     shell_register(&cmds_socket_root, 1);
+
+    chip::DeviceLayer::ConnectivityMgrImpl().ProvisionWiFiNetwork("ARMtest", "ARM&chip2021");
 }
