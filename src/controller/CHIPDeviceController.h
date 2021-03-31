@@ -342,7 +342,7 @@ public:
      *   Returns information about discovered devices.
      * @return const DnsSdInfo* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const DnsSdInfo* GetDiscoveredDevice(int idx);
+    const DnsSdInfo * GetDiscoveredDevice(int idx);
 
 private:
     DevicePairingDelegate * mPairingDelegate;

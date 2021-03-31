@@ -91,9 +91,10 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid);
 
-CHIP_ERROR pychip_DeviceController_ParseQRCode(const char* qrCode, SetupPayload* output);
+CHIP_ERROR pychip_DeviceController_ParseQRCode(const char * qrCode, SetupPayload * output);
 
-CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl, uint16_t long_discriminator);
+CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                          uint16_t long_discriminator);
 CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::DeviceCommissioner * devCtrl);
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl);
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
@@ -225,7 +226,7 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
                                    .SetDiscriminator(discriminator));
 }
 
-CHIP_ERROR pychip_DeviceController_ParseQRCode(const char* qrCode, SetupPayload* output)
+CHIP_ERROR pychip_DeviceController_ParseQRCode(const char * qrCode, SetupPayload * output)
 {
     SetupPayload payload;
     QRCodeSetupPayloadParser parser(qrCode);
@@ -236,13 +237,13 @@ CHIP_ERROR pychip_DeviceController_ParseQRCode(const char* qrCode, SetupPayload*
         return err;
     }
     // Python SetupPayload is a simplified version of the C one (only the data members), so add one-by-one to match python.
-    output->version = payload.version;
-    output->vendorID = payload.vendorID;
-    output->productID = payload.productID;
-    output->requiresCustomFlow = payload.requiresCustomFlow;
+    output->version               = payload.version;
+    output->vendorID              = payload.vendorID;
+    output->productID             = payload.productID;
+    output->requiresCustomFlow    = payload.requiresCustomFlow;
     output->rendezvousInformation = payload.rendezvousInformation;
-    output->discriminator = payload.discriminator;
-    output->setUpPINCode = payload.setUpPINCode;
+    output->discriminator         = payload.discriminator;
+    output->setUpPINCode          = payload.setUpPINCode;
     return CHIP_NO_ERROR;
 }
 
@@ -266,7 +267,8 @@ CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::De
     return devCtrl->DiscoverAllCommissioning();
 }
 
-CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl, uint16_t long_discriminator)
+CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
+                                                                          uint16_t long_discriminator)
 {
     return devCtrl->DiscoverCommissioningLongDiscriminator(long_discriminator);
 }

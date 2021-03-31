@@ -131,7 +131,8 @@ DiscoveryType GetDiscoveryTypeFromQname(mdns::Minimal::SerializedQNameIterator i
 
 void ParserDelegateImpl::OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data)
 {
-    if (data.GetType() == mdns::Minimal::QType::PTR) {
+    if (data.GetType() == mdns::Minimal::QType::PTR)
+    {
         ++currIdx;
     }
     if (currIdx < 0 || currIdx >= kNumDnsSdEntries)
