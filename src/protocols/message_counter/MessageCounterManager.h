@@ -27,7 +27,7 @@
 #include <transport/MessageCounterManagerInterface.h>
 
 namespace chip {
-namespace mcsp {
+namespace message_counter {
 
 class ExchangeManager;
 
@@ -36,10 +36,9 @@ class MessageCounterManager : public Messaging::ExchangeDelegate, public Transpo
 public:
     static constexpr uint16_t kChallengeSize = Transport::PeerMessageCounter::kChallengeSize;
     static constexpr uint16_t kCounterSize   = 4;
-    static constexpr uint16_t kSyncRespMsgSize =
-        kChallengeSize + kCounterSize; // The size of the message counter synchronization response message.
-    static constexpr uint32_t kSyncTimeout =
-        500; // The amount of time(in milliseconds) which a peer is given to respond to a message counter synchronization request.
+    static constexpr uint16_t kSyncRespMsgSize = kChallengeSize + kCounterSize;
+    static constexpr uint16_t kMacSize = 16;
+    static constexpr uint32_t kSyncTimeoutMs = 500;
 
     MessageCounterManager() : mExchangeMgr(nullptr) {}
     ~MessageCounterManager() override {}
@@ -178,5 +177,5 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };
 
-} // namespace mcsp
+} // namespace message_counter
 } // namespace chip

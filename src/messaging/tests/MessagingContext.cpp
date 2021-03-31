@@ -23,7 +23,7 @@
 namespace chip {
 namespace Test {
 
-CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, bool useDummyMessageCounter)
+CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport, Transport::MessageCounterManagerInterface * messageCounterManagerInterface)
 {
     ReturnErrorOnFailure(IOContext::Init(suite));
 
@@ -35,21 +35,9 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
     VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    if (useDummyMessageCounter)
-    {
-        ReturnErrorOnFailure(
-            mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mDummyMessageCounterManager));
-    }
-    else
-    {
-        ReturnErrorOnFailure(
-            mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, &mMessageCounterManager));
-    }
+    ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, messageCounterManagerInterface));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
-
-    if (!useDummyMessageCounter)
-        ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
     ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
                                                       SecureSessionMgr::PairingDirection::kInitiator, mSrcAdminId));

@@ -54,6 +54,7 @@ using namespace chip::Protocols;
 using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
+Transport::DummyMessageCounterManager gDummyMessageCounterManager;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -285,7 +286,7 @@ int Initialize(void * aContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr, true);
+    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr, &gDummyMessageCounterManager);
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
