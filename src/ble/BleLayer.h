@@ -265,7 +265,9 @@ public:
         kState_Initialized    = 1
     } mState; ///< [READ-ONLY] Current state
 
-    BleTransportDelegate * mBleTransport;
+    // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
+    void * mAppState                     = nullptr;
+    BleTransportDelegate * mBleTransport = nullptr;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
