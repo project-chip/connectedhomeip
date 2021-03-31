@@ -93,19 +93,17 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
     {
         mState = ConnectionState::NotConnected;
 
-        err = LoadSecureSessionParameters(ResetTransport::kYes);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
         ctxt = mExchangeManager->NewContext(mSecureSession, mExchangeDelegate);
-        err  = ctxt->SendMessage(Protocols::InteractionModel::MsgType::WriteRequest, std::move(resend),
+        err  = ctxt->SendMessage(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(), std::move(resend),
                                 Messaging::SendMessageFlags::kNoAutoRequestAck);
         ctxt->Release();
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
