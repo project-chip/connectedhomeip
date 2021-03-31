@@ -153,6 +153,10 @@ if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     endif()
 endif()
 
+list(APPEND CHIP_CFLAGS 
+    \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
+)
+
 set(SEPARATOR ",")
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
 set(SEPARATOR " ")
@@ -262,6 +266,10 @@ list(APPEND CHIP_INCLUDES
     ${CHIP_ROOT}/config/mbed/mbedtls
     ${CHIP_ROOT}/src/platform/mbed/posix/include
     ${CHIP_ROOT}/src/platform/mbed/net/include
+)
+
+list(APPEND CHIP_DEFINES 
+    __LINUX_ERRNO_EXTENSIONS__=1
 )
 
 target_include_directories(${APP_TARGET} PRIVATE 
