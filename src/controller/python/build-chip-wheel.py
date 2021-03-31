@@ -134,6 +134,7 @@ try:
             'chip.internal',
             'chip.logging',
             'chip.native',
+            'chip.clusters',
             'chip.tlv',
     ]
 
