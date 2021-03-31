@@ -129,6 +129,7 @@ try:
             'chip.ble',
             'chip.ble.commissioning',
             'chip.configuration',
+            'chip.clusters',
             'chip.exceptions',
             'chip.internal',
             'chip.logging',
