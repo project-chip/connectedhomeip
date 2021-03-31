@@ -282,6 +282,8 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
                                      .SetAddressType(chip::Inet::kIPAddressType_IPv4)
                                      .SetListenPort(IM_CLIENT_PORT));
@@ -316,10 +318,10 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        // Wait for response until the Message interval.
+        // TODO(#5496): suspend current thread and wake up on response message.
         while (!MessageIntervalExpired())
         {
-            DriveIO();
+            sleep(1);
         }
 
         // Check if expected response was received.
@@ -340,10 +342,10 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        // Wait for response until the Message interval.
+        // TODO(#5496): suspend current thread and wake up on response message.
         while (!MessageIntervalExpired())
         {
-            DriveIO();
+            sleep(1);
         }
 
         // Check if expected response was received.
