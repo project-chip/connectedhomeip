@@ -60,6 +60,7 @@
 #include <ble/BleApplicationDelegate.h>
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
+#include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleUUID.h>
 
@@ -112,19 +113,6 @@ constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
 constexpr size_t kCapabilitiesResponseLength(kCapabilitiesResponseMagicnumLength + kCapabilitiesResponseL2capMtuLength +
                                              kCapabilitiesResponseSelectedProtocolVersionLength +
                                              kCapabilitiesResponseWindowSizeLength);
-class BleTransportDelegate
-{
-public:
-    virtual ~BleTransportDelegate()                              = default;
-    virtual void OnBleConnectionComplete(BLEEndPoint * endpoint) = 0;
-    virtual void OnBleConnectionError(BLE_ERROR err)             = 0;
-
-    virtual void OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)          = 0;
-    virtual void OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle msg) = 0;
-    virtual void OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)         = 0;
-
-    virtual CHIP_ERROR SetEndPoint(BLEEndPoint * endPoint) = 0;
-};
 
 class BleLayerObject
 {
@@ -133,7 +121,7 @@ class BleLayerObject
 public:
     // Public data members:
     BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
-    BleTransportDelegate * mBleTransport;
+    BleLayerDelegate * mBleTransport;
     void * mAppState; ///< Generic pointer to app-specific data associated with the object.
 
 protected:
@@ -266,8 +254,8 @@ public:
     } mState; ///< [READ-ONLY] Current state
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
-    void * mAppState                     = nullptr;
-    BleTransportDelegate * mBleTransport = nullptr;
+    void * mAppState                 = nullptr;
+    BleLayerDelegate * mBleTransport = nullptr;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;

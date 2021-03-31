@@ -58,7 +58,7 @@ private:
  *        in the Transport::Base (i.e. no header is parsed and processed) and
  *        instead received packets are sent raw via BLE Handler callbacks.
  */
-class DLL_EXPORT BLEBase : public Base, public Ble::BleTransportDelegate
+class DLL_EXPORT BLEBase : public Base, public Ble::BleLayerDelegate
 {
     /**
      *  The State of the BLE connection
