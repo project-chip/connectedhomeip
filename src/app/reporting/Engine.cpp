@@ -117,7 +117,7 @@ CHIP_ERROR Engine::ScheduleRun()
 {
     if (InteractionModelEngine::GetInstance()->GetExchangeManager() != nullptr)
     {
-       return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->ScheduleWork(Run, this);
+        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionMgr()->SystemLayer()->ScheduleWork(Run, this);
     }
     else
     {
