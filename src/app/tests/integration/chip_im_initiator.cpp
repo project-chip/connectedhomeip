@@ -28,7 +28,10 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
+#include <chrono>
+#include <condition_variable>
 #include <core/CHIPCore.h>
+#include <mutex>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <support/ErrorStr.h>
@@ -44,8 +47,8 @@ namespace {
 constexpr size_t kMaxCommandMessageCount = 3;
 constexpr size_t kMaxReadMessageCount    = 0;
 
-// The CHIP Message interval time in milliseconds.
-constexpr int32_t gMessageInterval = 1000;
+// The CHIP Message interval time in seconds.
+constexpr int32_t gMessageInterval = 1;
 
 constexpr chip::Transport::AdminId gAdminId = 0;
 
@@ -84,12 +87,7 @@ uint64_t gReadCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gReadRespCount = 0;
 
-bool MessageIntervalExpired(void)
-{
-    uint64_t now = chip::System::Timer::GetCurrentEpoch();
-
-    return (now >= gLastMessageTime + gMessageInterval);
-}
+std::condition_variable gCond;
 
 CHIP_ERROR SendCommandRequest(void)
 {
@@ -209,6 +207,8 @@ void HandleReadComplete()
 
     printf("Read Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gReadRespCount, gReadCount,
            static_cast<double>(gReadRespCount) * 100 / gReadCount, static_cast<double>(transitTime) / 1000);
+
+    gCond.notify_one();
 }
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate
@@ -263,6 +263,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    std::mutex mtx;
+    std::unique_lock<std::mutex> lck(mtx);
     MockInteractionModelApp mockDelegate;
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
@@ -318,11 +321,8 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        // TODO(#5496): suspend current thread and wake up on response message.
-        while (!MessageIntervalExpired())
-        {
-            sleep(1);
-        }
+        // Suspend current thread and wait for response until gMessageInterval interval.
+        gCond.wait_for(lck, std::chrono::seconds(gMessageInterval));
 
         // Check if expected response was received.
         if (gWaitingForCommandResp)
@@ -342,11 +342,8 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        // TODO(#5496): suspend current thread and wake up on response message.
-        while (!MessageIntervalExpired())
-        {
-            sleep(1);
-        }
+        // Suspend current thread and wait for response until gMessageInterval interval.
+        gCond.wait_for(lck, std::chrono::seconds(gMessageInterval));
 
         // Check if expected response was received.
         if (gWaitingForReadResp)
