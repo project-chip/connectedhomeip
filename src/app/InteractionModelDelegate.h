@@ -90,7 +90,7 @@ public:
      * same command Id
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender, const uint16_t aGeneralCode,
+    virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                              const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId,
                                              const chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t aCommandIndex)
     {

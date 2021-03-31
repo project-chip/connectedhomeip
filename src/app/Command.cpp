@@ -225,8 +225,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode,
-                                  const chip::ClusterId aClusterId)
+CHIP_ERROR Command::AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
@@ -234,7 +233,7 @@ CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, Protocols::Id aPr
     err = statusElementBuilder.Init(mInvokeCommandBuilder.GetWriter());
     SuccessOrExit(err);
 
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode, aProtocolCode)
+    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
 

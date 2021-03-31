@@ -324,7 +324,7 @@ void BuildStatusElement(nlTestSuite * apSuite, StatusElement::Builder & aStatusE
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    aStatusElementBuilder.EncodeStatusElement(1, 2, 3, 4).EndOfStatusElement();
+    aStatusElementBuilder.EncodeStatusElement(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3).EndOfStatusElement();
     err = aStatusElementBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -334,16 +334,15 @@ void ParseStatusElement(nlTestSuite * apSuite, StatusElement::Parser & aStatusEl
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Parser StatusElementParser;
 
-    uint16_t generalCode      = 0;
+    chip::Protocols::SecureChannel::GeneralStatusCode generalCode      = chip::Protocols::SecureChannel::GeneralStatusCode::kFailure;
     uint32_t protocolId       = 0;
     uint16_t protocolCode     = 0;
-    chip::ClusterId clusterId = 0;
 
     err = aStatusElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = aStatusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &clusterId);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && generalCode == 1 && protocolId == 2 && protocolCode == 3 && clusterId == 4);
+    err = aStatusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && static_cast<uint16_t>(generalCode) == static_cast<uint16_t>(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure) && protocolId == 2 && protocolCode == 3);
 }
 
 void BuildAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::Builder & aAttributeStatusElementBuilder)
