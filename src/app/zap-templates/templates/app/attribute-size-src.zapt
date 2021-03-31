@@ -51,23 +51,27 @@
      switch (clusterId)
      {
  {{#chip_server_clusters}}
- {{#if (hasListAttributes)}}
+ {{#if (chip_has_list_attributes)}}
      case {{asHex code 4}}: // {{name}} Cluster
      {
          uint16_t entryOffset = kSizeLengthInBytes;
          switch (am->attributeId)
          {
          {{#chip_server_cluster_attributes}}
-         {{#if (isListAttribute)}}
-             case {{asHex attributeCode 4}}: // {{name}}
+         {{#if isList}}
+             case {{asHex code 4}}: // {{name}}
              {
-               entryLength = {{asListEntryLength}};
+               entryLength = {{size}};
                entryOffset += ((static_cast<uint16_t>(index) - 1u) * entryLength);
-               {{#if isStructItem}}
-               // Struct {{listType}}
-               {{listType}} * entry = reinterpret_cast<{{listType}} *>(write ? src : dest);
+               {{#if isStruct}}
+               // Struct _{{type}}
+               _{{type}} * entry = reinterpret_cast<_{{type}} *>(write ? src : dest);
                {{#chip_attribute_list_entryTypes}}
+               {{#if (isString type)}}
+               copyListMember(write ? dest : (uint8_t *)&entry->{{name}}, write ? (uint8_t *)&entry->{{name}} : src, write, &entryOffset, {{maxLength}}); // {{type}}
+               {{else}}
                copyListMember(write ? dest : (uint8_t *)&entry->{{name}}, write ? (uint8_t *)&entry->{{name}} : src, write, &entryOffset, sizeof(entry->{{name}})); // {{type}}
+               {{/if}}
                {{/chip_attribute_list_entryTypes}}
                {{else}}
                copyListMember(dest, src, write, &entryOffset, entryLength); // {{entryType.type}}
@@ -101,19 +105,19 @@
      switch (clusterId)
      {
  {{#chip_server_clusters}}
- {{#if (hasListAttributes)}}
+ {{#if (chip_has_list_attributes)}}
      case {{asHex code 4}}: // {{name}} Cluster
          switch (attributeId)
          {
          {{#chip_server_cluster_attributes}}
-         {{#if (isListAttribute)}}
-             case {{asHex attributeCode 4}}: // {{name}}
-             {{#if isStructItem}}
-             // Struct {{listType}}
+         {{#if isList}}
+             case {{asHex code 4}}: // {{name}}
+             {{#if isStruct}}
+             // Struct _{{type}}
              {{else}}
              // {{entryType.type}}
              {{/if}}
-             entryLength = {{asListEntryLength}};
+             entryLength = {{size}};
              break;
          {{/if}}
          {{/chip_server_cluster_attributes}}
