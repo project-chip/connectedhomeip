@@ -44,6 +44,12 @@ public:
     PairSoftAP() : PairingCommand("softap", PairingMode::SoftAP) {}
 };
 
+class Ethernet : public PairingCommand
+{
+public:
+    Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet) {}
+};
+
 void registerCommandsPairing(Commands & commands)
 {
     const char * clusterName = "Pairing";
@@ -53,6 +59,7 @@ void registerCommandsPairing(Commands & commands)
         make_unique<PairBypass>(),
         make_unique<PairBle>(),
         make_unique<PairSoftAP>(),
+        make_unique<Ethernet>(),
     };
 
     commands.Register(clusterName, clusterCommands);
