@@ -406,7 +406,7 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
-#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
 Messaging::ExchangeManager gExchangeMgr;
 #endif
 ServerCallback gCallbacks;
@@ -482,14 +482,14 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
+#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
 #else
     gSessions.SetDelegate(&gCallbacks);
 #endif
 
-#if defined(CHIP_APP_USE_INTERACTION_MODEL)
+#if CHIP_ENABLE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
     SuccessOrExit(err);
 #endif

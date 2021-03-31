@@ -63,7 +63,7 @@ source_set("lighting-common") {
     "gen/callback-stub.cpp",
   ]
 
-  if (chip_app_use_interaction_model) {
+  if (chip_enable_interaction_model) {
     sources += [
       "${chip_root}/src/app/util/ember-compatibility-functions.cpp",
       "gen/IMClusterCommandHandler.cpp",
