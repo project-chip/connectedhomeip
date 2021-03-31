@@ -36,6 +36,7 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
 import chip.devicecontroller.PersistentStorage
+import chip.devicecontroller.KeyValueStoreManager
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -50,6 +51,7 @@ class CHIPToolActivity :
     setContentView(R.layout.top_activity)
 
     PersistentStorage.initialize(this);
+    KeyValueStoreManager.initialize(this);
 
     if (savedInstanceState == null) {
       val fragment = SelectActionFragment.newInstance()
