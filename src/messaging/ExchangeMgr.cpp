@@ -108,7 +108,8 @@ CHIP_ERROR ExchangeManager::Shutdown()
     {
         if (ec.GetReferenceCount() > 0)
         {
-            ec.Abort();
+            ChipLogError(ExchangeManager, "Exchange (id: %d) leaked", ec.GetExchangeId());
+            ec.ForceFree();
         }
     }
 
