@@ -80,7 +80,7 @@ public:
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.
      *
-     * @param params        BLE configuration parameters for this transport
+     * @param param        BLE configuration parameters for this transport
      */
     CHIP_ERROR Init(const BleListenParameters & param);
 
