@@ -154,6 +154,7 @@ protected:
     uint8_t mCommandIndex = 0;
 
 private:
+    friend class TestCommandInteraction;
     chip::System::PacketBufferHandle mpBufHandle;
     InvokeCommand::Builder mInvokeCommandBuilder;
     CommandState mState;

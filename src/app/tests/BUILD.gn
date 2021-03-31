@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestMessageDef.cpp",
     "TestReadInteraction.cpp",
+    "TestCommandInteraction.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
