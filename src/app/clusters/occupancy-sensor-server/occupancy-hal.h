@@ -21,16 +21,18 @@
 #include <app/util/basic-types.h>
 
 // enum used to track the type of occupancy sensor being implemented
-typedef enum {
-  HAL_OCCUPANCY_SENSOR_TYPE_PIR = 0x00,
-  HAL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC = 0x01,
-  HAL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC = 0x02,
-  HAL_OCCUPANCY_SENSOR_TYPE_PHYSICAL = 0x03,
+typedef enum
+{
+    HAL_OCCUPANCY_SENSOR_TYPE_PIR                = 0x00,
+    HAL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC         = 0x01,
+    HAL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC = 0x02,
+    HAL_OCCUPANCY_SENSOR_TYPE_PHYSICAL           = 0x03,
 } HalOccupancySensorType;
 
-typedef enum {
-  HAL_OCCUPANCY_STATE_UNOCCUPIED = 0x00,
-  HAL_OCCUPANCY_STATE_OCCUPIED = 0x01,
+typedef enum
+{
+    HAL_OCCUPANCY_STATE_UNOCCUPIED = 0x00,
+    HAL_OCCUPANCY_STATE_OCCUPIED   = 0x01,
 
 } HalOccupancyState;
 

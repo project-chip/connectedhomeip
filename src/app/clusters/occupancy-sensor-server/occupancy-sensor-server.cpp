@@ -58,7 +58,6 @@
 #include <app/reporting/reporting.h>
 #endif
 
-
 using namespace chip;
 
 //------------------------------------------------------------------------------
@@ -91,40 +90,40 @@ static EmberAfPluginReportingEntry defaultConfiguration = {
 //******************************************************************************
 void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint)
 {
-  HalOccupancySensorType deviceType;
+    HalOccupancySensorType deviceType;
 
-  checkForReportingConfig();
-  deviceType = halOccupancyGetSensorType(endpoint);
+    checkForReportingConfig();
+    deviceType = halOccupancyGetSensorType(endpoint);
 
-  emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_SENSOR_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                               (uint8_t *) &deviceType, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_SENSOR_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                          (uint8_t *) &deviceType, ZCL_ENUM8_ATTRIBUTE_TYPE);
 
-  uint8_t deviceTypeBitmap = 0;
-  switch (deviceType) {
+    uint8_t deviceTypeBitmap = 0;
+    switch (deviceType)
+    {
     case HAL_OCCUPANCY_SENSOR_TYPE_PIR:
-      deviceTypeBitmap = EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_PIR;
-      break;
+        deviceTypeBitmap = EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_PIR;
+        break;
 
     case HAL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC:
-      deviceTypeBitmap = EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_ULTRASONIC;
-      break;
+        deviceTypeBitmap = EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_ULTRASONIC;
+        break;
 
     case HAL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC:
-      deviceTypeBitmap = (EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_PIR
-                          | EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_ULTRASONIC);
-      break;
+        deviceTypeBitmap = (EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_PIR | EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_ULTRASONIC);
+        break;
 
     case HAL_OCCUPANCY_SENSOR_TYPE_PHYSICAL:
-      deviceTypeBitmap = EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_PHYSICAL_CONTACT;
-      break;
+        deviceTypeBitmap = EMBER_AF_OCCUPANCY_SENSOR_TYPE_BITMAP_PHYSICAL_CONTACT;
+        break;
 
     default:
-      break;
-  }
-  emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                               (uint8_t *) &deviceTypeBitmap, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+        break;
+    }
+    emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID,
+                          CLUSTER_MASK_SERVER, (uint8_t *) &deviceTypeBitmap, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 
-  emberAfPluginOccupancyClusterServerPostInitCallback(endpoint);
+    emberAfPluginOccupancyClusterServerPostInitCallback(endpoint);
 }
 
 //******************************************************************************
@@ -132,26 +131,29 @@ void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint)
 //******************************************************************************
 void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occupancyState)
 {
-  if (occupancyState == HAL_OCCUPANCY_STATE_OCCUPIED) {
-    emberAfOccupancySensingClusterPrintln("Occupancy detected");
-  } else {
-    emberAfOccupancySensingClusterPrintln("Occupancy no longer detected");
-  }
+    if (occupancyState == HAL_OCCUPANCY_STATE_OCCUPIED)
+    {
+        emberAfOccupancySensingClusterPrintln("Occupancy detected");
+    }
+    else
+    {
+        emberAfOccupancySensingClusterPrintln("Occupancy no longer detected");
+    }
 
-  emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                               (uint8_t *) &occupancyState, ZCL_BITMAP8_ATTRIBUTE_TYPE);
-  // emberAfPluginOccupancySensorServerOccupancyStateChangedCallback(
-  //   endpoint, occupancyState);
+    emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                          (uint8_t *) &occupancyState, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    // emberAfPluginOccupancySensorServerOccupancyStateChangedCallback(
+    //   endpoint, occupancyState);
 }
 
-void emberAfPluginOccupancySensorServerStackStatusCallback(
-  EndpointId endpoint, EmberStatus status)
+void emberAfPluginOccupancySensorServerStackStatusCallback(EndpointId endpoint, EmberStatus status)
 {
-  // On network connect, verify that a reporting entry is set up for the
-  // occupancy sensor
-  if (status == EMBER_NETWORK_UP) {
-    checkForReportingConfig();
-  }
+    // On network connect, verify that a reporting entry is set up for the
+    // occupancy sensor
+    if (status == EMBER_NETWORK_UP)
+    {
+        checkForReportingConfig();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -160,35 +162,35 @@ void emberAfPluginOccupancySensorServerStackStatusCallback(
 static void checkForReportingConfig(void)
 {
 #ifdef EMBER_AF_PLUGIN_REPORTING
-  // uint16_t i;
-  // EmberAfPluginReportingEntry entry;
-  // uint8_t endpoint;
-  // bool existingEntry = false;
+    // uint16_t i;
+    // EmberAfPluginReportingEntry entry;
+    // uint8_t endpoint;
+    // bool existingEntry = false;
 
-  // // On initialization, cycle through the reporting table to determine if a
-  // // reporting table entry has been created for the occupancy state attribute
-  // for (i = 0; i < emAfPluginReportingNumEntries(); i++) {
-  //   emAfPluginReportingGetEntry(i, &entry);
-  //   if ((entry.clusterId == ZCL_OCCUPANCY_SENSING_CLUSTER_ID)
-  //       && (entry.attributeId == ZCL_OCCUPANCY_ATTRIBUTE_ID)
-  //       && (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-  //       && (entry.manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)) {
-  //     existingEntry = true;
-  //   }
-  // }
+    // // On initialization, cycle through the reporting table to determine if a
+    // // reporting table entry has been created for the occupancy state attribute
+    // for (i = 0; i < emAfPluginReportingNumEntries(); i++) {
+    //   emAfPluginReportingGetEntry(i, &entry);
+    //   if ((entry.clusterId == ZCL_OCCUPANCY_SENSING_CLUSTER_ID)
+    //       && (entry.attributeId == ZCL_OCCUPANCY_ATTRIBUTE_ID)
+    //       && (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+    //       && (entry.manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)) {
+    //     existingEntry = true;
+    //   }
+    // }
 
-  // // If no entry is found for the occupancy sensor, a default reporting
-  // // configuration should be created using the plugin defined options.  This
-  // // needs to be done for all endpoints that support an occupancy sensor server.
-  // if (!existingEntry) {
-  //   for (i = 0; i < emberAfEndpointCount(); i++) {
-  //     endpoint = emberAfEndpointFromIndex(i);
-  //     defaultConfiguration.endpoint = endpoint;
-  //     if (emberAfContainsServer(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID)) {
-  //       emAfPluginReportingAppendEntry(&defaultConfiguration);
-  //     }
-  //   }
-  // }
+    // // If no entry is found for the occupancy sensor, a default reporting
+    // // configuration should be created using the plugin defined options.  This
+    // // needs to be done for all endpoints that support an occupancy sensor server.
+    // if (!existingEntry) {
+    //   for (i = 0; i < emberAfEndpointCount(); i++) {
+    //     endpoint = emberAfEndpointFromIndex(i);
+    //     defaultConfiguration.endpoint = endpoint;
+    //     if (emberAfContainsServer(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID)) {
+    //       emAfPluginReportingAppendEntry(&defaultConfiguration);
+    //     }
+    //   }
+    // }
 #endif
 }
 
