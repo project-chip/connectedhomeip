@@ -158,7 +158,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     err = mExchangeManager->Init(mSessionManager);
     SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, nullptr);
     SuccessOrExit(err);
 #else
     mSessionManager->SetDelegate(this);

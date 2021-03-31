@@ -490,7 +490,7 @@ void InitServer(AppDelegate * delegate)
 #endif
 
 #if defined(CHIP_APP_USE_INTERACTION_MODEL)
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
     SuccessOrExit(err);
 #endif
 

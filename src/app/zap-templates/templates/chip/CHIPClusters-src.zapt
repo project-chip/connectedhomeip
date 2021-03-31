@@ -38,11 +38,7 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
     uint8_t argSeqNumber = 0;
 {{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
-{{#if (isCharString type)}}
-    ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
-{{else}}
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
-{{/if}}
 {{else}}
     // Command takes no arguments.
 {{/chip_server_cluster_command_arguments}}
