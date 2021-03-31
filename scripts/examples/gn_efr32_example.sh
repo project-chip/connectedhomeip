@@ -26,12 +26,12 @@ set -x
 env
 
 if [ -z "$3" ]; then
-    gn gen --check --fail-on-unused-args --root="$1" --args="chip_config_memory_management=\"platform\"" "$2"/"$EFR32_BOARD"/
+    gn gen --check --fail-on-unused-args --root="$1" --args="" "$2"/"$EFR32_BOARD"/
     ninja -v -C "$2"/"$EFR32_BOARD"/
     #print stats
     arm-none-eabi-size -A "$2"/"$EFR32_BOARD"/*.out
 else
-    gn gen --check --fail-on-unused-args --root="$1" --args="chip_config_memory_management=\"platform\" efr32_board=\"$3\"" "$2/$3"
+    gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3"
     ninja -v -C "$2/$3"
     #print stats
     arm-none-eabi-size -A "$2"/"$3"/*.out
