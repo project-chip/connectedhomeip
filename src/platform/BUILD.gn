@@ -160,6 +160,12 @@ if (chip_device_platform != "none") {
       "CHIP_DEVICE_LAYER_NONE=1",
       "CHIP_DEVICE_LAYER_TARGET=NONE",
     ]
+
+    if (current_os == "android") {
+      defines += [
+        "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\""
+      ]
+    }
   }
 }
 
