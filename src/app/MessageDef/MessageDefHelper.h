@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,27 +30,10 @@
 
 namespace chip {
 namespace app {
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
-
-namespace {
-// this is used to run in signle thread for IM message debug purpose
-uint32_t gPrettyPrintingDepthLevel = 0;
-char gLineBuffer[256];
-size_t gCurLineBufferSize = 0;
-} // namespace
-
-class PrettyPrintCheckpoint
-{
-public:
-    PrettyPrintCheckpoint() { mLevel = gPrettyPrintingDepthLevel; }
-    ~PrettyPrintCheckpoint() { gPrettyPrintingDepthLevel = mLevel; }
-
-private:
-    uint32_t mLevel;
-};
-#define PRETTY_PRINT_CHECKPOINT() PrettyPrintCheckpoint lPrettyPrintCheckpoint;
-
+void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...);
+void IncreaseDepth();
+void DecreaseDepth();
 #define PRETTY_PRINT(fmt, ...)                                                                                                     \
     do                                                                                                                             \
     {                                                                                                                              \
@@ -64,65 +47,19 @@ private:
 #define PRETTY_PRINT_INCDEPTH()                                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        gPrettyPrintingDepthLevel++;                                                                                               \
+        IncreaseDepth(); \
     } while (0)
 #define PRETTY_PRINT_DECDEPTH()                                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        gPrettyPrintingDepthLevel--;                                                                                               \
+        DecreaseDepth();                                                                                                           \
     } while (0)
-
-static void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
-{
-    va_list args;
-    size_t ret;
-    size_t sizeLeft;
-
-    va_start(args, aFmt);
-
-    if (aIsNewLine)
-    {
-        if (gCurLineBufferSize)
-        {
-            // Don't need to explicitly NULL-terminate the string because
-            // snprintf takes care of that.
-            ChipLogDetail(DataManagement, "%s", gLineBuffer);
-            gCurLineBufferSize = 0;
-        }
-
-        for (uint32_t i = 0; i < gPrettyPrintingDepthLevel; i++)
-        {
-            if (sizeof(gLineBuffer) > gCurLineBufferSize)
-            {
-                sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-                ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
-                if (ret > 0)
-                {
-                    gCurLineBufferSize += std::min(ret, sizeLeft);
-                }
-            }
-        }
-    }
-
-    if (sizeof(gLineBuffer) > gCurLineBufferSize)
-    {
-        sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
-        if (ret > 0)
-        {
-            gCurLineBufferSize += std::min(ret, sizeLeft);
-        }
-    }
-
-    va_end(args);
-}
 #else
-#define PRETTY_PRINT_CHECKPOINT()
 #define PRETTY_PRINT(fmt, ...)
 #define PRETTY_PRINT(fmt, ...)
 #define PRETTY_PRINT_SAMELINE(fmt, ...)
 #define PRETTY_PRINT_INCDEPTH()
 #define PRETTY_PRINT_DECDEPTH()
 #endif
-}; // namespace app
-}; // namespace chip
+};
+};
