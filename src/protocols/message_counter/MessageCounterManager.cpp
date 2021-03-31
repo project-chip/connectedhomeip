@@ -28,27 +28,23 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <protocols/mcsp/MessageCounterManager.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
-namespace mcsp {
+namespace message_counter {
 
 CHIP_ERROR MessageCounterManager::Init(Messaging::ExchangeManager * exchangeMgr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrReturnError(exchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
+    ReturnErrorOnFailure(mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this));
 
-    ReturnErrorOnFailure(err);
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void MessageCounterManager::Shutdown()
@@ -91,16 +87,10 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
 CHIP_ERROR MessageCounterManager::QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
                                                                PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Queue the message as needed for sync with destination node.
-    err = AddToRetransmissionTable(session, state->GetPeerNodeId(), payloadHeader, std::move(msgBuf));
-    ReturnErrorOnFailure(err);
-
-    err = StartSync(session, state);
-    ReturnErrorOnFailure(err);
-
-    return err;
+    ReturnErrorOnFailure(AddToRetransmissionTable(session, state->GetPeerNodeId(), payloadHeader, std::move(msgBuf)));
+    ReturnErrorOnFailure(StartSync(session, state));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSessionHandle session,
@@ -109,20 +99,15 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSession
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Queue the message as needed for sync with destination node.
-    err = AddToReceiveTable(state->GetPeerNodeId(), packetHeader, peerAddress, std::move(msgBuf));
-    ReturnErrorOnFailure(err);
-
-    err = StartSync(session, state);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(AddToReceiveTable(state->GetPeerNodeId(), packetHeader, peerAddress, std::move(msgBuf)));
+    ReturnErrorOnFailure(StartSync(session, state));
 
     // After the message that triggers message counter synchronization is stored, and a message counter
     // synchronization exchange is initiated, we need to return immediately and re-process the original message
     // when the synchronization is completed.
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
@@ -152,7 +137,7 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
         ChipLogError(ExchangeManager, "Timed out! Failed to clear message counter synchronization status.");
     }
 
-    // Close the exchange if MsgCounterSyncRsp is not received before kSyncTimeout.
+    // Close the exchange if MsgCounterSyncRsp is not received before kSyncTimeoutMs.
     if (exchangeContext != nullptr)
         exchangeContext->Close();
 }
@@ -282,13 +267,11 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
 CHIP_ERROR MessageCounterManager::NewMsgCounterSyncExchange(SecureSessionHandle session,
                                                             Messaging::ExchangeContext *& exchangeContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Create new exchange context.
     exchangeContext = mExchangeMgr->NewContext(session, this);
-    VerifyOrReturnError(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle session, Transport::PeerConnectionState * state)
@@ -305,7 +288,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
     SuccessOrExit(err);
 
     // Allocate a buffer for the null message.
-    msgBuf = MessagePacketBuffer::New(kChallengeSize + 16);
+    msgBuf = MessagePacketBuffer::New(kChallengeSize + kMacSize);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Generate a 64-bit random number to uniquely identify the request.
@@ -320,8 +303,8 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
 
     sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true).Set(Messaging::SendMessageFlags::kExpectResponse, true);
 
-    // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeout.
-    exchangeContext->SetResponseTimeout(kSyncTimeout);
+    // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeoutMs.
+    exchangeContext->SetResponseTimeout(kSyncTimeoutMs);
 
     // Send the message counter synchronization request in a Secure Channel Protocol::MsgCounterSyncReq message.
     err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, std::move(msgBuf), sendFlags);
@@ -349,7 +332,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // Allocate new buffer.
-    msgBuf = System::PacketBufferHandle::New(kSyncRespMsgSize + 16);
+    msgBuf = System::PacketBufferHandle::New(kSyncRespMsgSize + kMacSize);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     msg = msgBuf->Start();
@@ -469,5 +452,5 @@ exit:
     return;
 }
 
-} // namespace mcsp
+} // namespace message_counter
 } // namespace chip

@@ -26,7 +26,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
-#include <protocols/mcsp/MessageCounterManager.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
@@ -144,7 +144,7 @@ TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
 
 Messaging::ExchangeManager gExchangeManager;
 SecureSessionMgr gSessionManager;
-chip::mcsp::MessageCounterManager gMessageCounterManager;
+chip::message_counter::MessageCounterManager gMessageCounterManager;
 Inet::IPAddress gDestAddr;
 
 bool EchoIntervalExpired(void)
