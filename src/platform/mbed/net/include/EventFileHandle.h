@@ -19,10 +19,9 @@
 #define MBED_NET_EVENT_FILE_HANDLE_H
 
 #include "platform/FileHandle.h"
-#include <limits>
-// FIXME
-//#include <mstd_atomic>
 #include <atomic>
+#include <limits>
+#include <mstd_atomic>
 
 namespace mbed {
 
@@ -164,10 +163,9 @@ struct EventFileHandle : public FileHandle
     }
 
 private:
-    Callback<void()> _cb = nullptr;
-    // FIXME
-    // mstd::atomic<counter_type> _counter = { 0 };
-    std::atomic<counter_type> _counter = { 0 };
+    Callback<void()> _cb                = nullptr;
+    mstd::atomic<counter_type> _counter = { 0 };
+    // std::atomic<counter_type> _counter = { 0 };
 };
 
 } // namespace mbed

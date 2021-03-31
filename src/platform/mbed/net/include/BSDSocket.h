@@ -18,13 +18,12 @@
 #ifndef MBED_NET_BSD_SOCKET_H
 #define MBED_NET_BSD_SOCKET_H
 
-#include <netsocket/TCPSocket.h>
-#include <netsocket/UDPSocket.h>
-// FIXME
-//#include <mstd_atomic>
 #include "OpenFileHandleAsFileDescriptor.h"
 #include "common.h"
 #include <atomic>
+#include <mstd_atomic>
+#include <netsocket/TCPSocket.h>
+#include <netsocket/UDPSocket.h>
 
 namespace mbed {
 
@@ -207,13 +206,12 @@ private:
     InternetSocket * _socket = nullptr;
     int _fd                  = -1;
     int _type;
-    Callback<void()> _callback = nullptr;
-    // FIXME
-    // mstd::atomic<counter_type> _flags = { 0 };
-    std::atomic<flags_type> _flags = { 0 };
-    bool _blocking                 = true;
-    bool _inputEnable              = true;
-    bool _outputEnable             = true;
+    Callback<void()> _callback      = nullptr;
+    mstd::atomic<flags_type> _flags = { 0 };
+    // std::atomic<flags_type> _flags = { 0 };
+    bool _blocking     = true;
+    bool _inputEnable  = true;
+    bool _outputEnable = true;
 };
 
 } // namespace mbed
