@@ -46,7 +46,7 @@ public class ChipDeviceController {
     return AndroidChipStack.getInstance().getCallback();
   }
 
-  public void pairDevice(BluetoothGatt bleServer, int deviceId, long setupPincode) {
+  public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
     if (connectionId == 0) {
       bleGatt = bleServer;
 
@@ -66,7 +66,7 @@ public class ChipDeviceController {
     }
   }
 
-  public void unpairDevice(int deviceId) {
+  public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
 
@@ -74,7 +74,7 @@ public class ChipDeviceController {
     pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
   }
 
-  public void pairDevice(int deviceId, int connectionId, long pinCode) {
+  public void pairDevice(long deviceId, int connectionId, long pinCode) {
     pairDevice(deviceControllerPtr, deviceId, connectionId, pinCode);
   }
 
@@ -86,7 +86,7 @@ public class ChipDeviceController {
     sendThreadCredentials(deviceControllerPtr, channel, panId, xpanId, masterKey);
   }
 
-  public boolean disconnectDevice(int deviceId) {
+  public boolean disconnectDevice(long deviceId) {
     return disconnectDevice(deviceControllerPtr, deviceId);
   }
 
@@ -172,32 +172,32 @@ public class ChipDeviceController {
     return true;
   }
 
-  public String getIpAddress(int deviceId) {
+  public String getIpAddress(long deviceId) {
     return getIpAddress(deviceControllerPtr, deviceId);
   }
 
-  public void sendMessage(int deviceId, String message) {
+  public void sendMessage(long deviceId, String message) {
     sendMessage(deviceControllerPtr, deviceId, message);
   }
 
-  public void sendCommand(int deviceId, ChipCommandType command, int value) {
+  public void sendCommand(long deviceId, ChipCommandType command, int value) {
     sendCommand(deviceControllerPtr, deviceId, command, value);
   }
 
-  public boolean openPairingWindow(int deviceId, int duration) {
+  public boolean openPairingWindow(long deviceId, int duration) {
     return openPairingWindow(deviceControllerPtr, deviceId, duration);
   }
 
-  public boolean isActive(int deviceId) {
+  public boolean isActive(long deviceId) {
     return isActive(deviceControllerPtr, deviceId);
   }
 
   private native long newDeviceController();
 
   private native void pairDevice(
-      long deviceControllerPtr, int deviceId, int connectionId, long pinCode);
+      long deviceControllerPtr, long deviceId, int connectionId, long pinCode);
 
-  private native void unpairDevice(long deviceControllerPtr, int deviceId);
+  private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
   private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
@@ -206,20 +206,20 @@ public class ChipDeviceController {
   private native void sendThreadCredentials(
       long deviceControllerPtr, int channel, int panId, byte[] xpanId, byte[] masterKey);
 
-  private native boolean disconnectDevice(long deviceControllerPtr, int deviceId);
+  private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
   private native void deleteDeviceController(long deviceControllerPtr);
 
-  private native String getIpAddress(long deviceControllerPtr, int deviceId);
+  private native String getIpAddress(long deviceControllerPtr, long deviceId);
 
-  private native void sendMessage(long deviceControllerPtr, int deviceId, String message);
+  private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
 
   private native void sendCommand(
-      long deviceControllerPtr, int deviceId, ChipCommandType command, int value);
+      long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
 
-  private native boolean openPairingWindow(long deviceControllerPtr, int deviceId, int duration);
+  private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
-  private native boolean isActive(long deviceControllerPtr, int deviceId);
+  private native boolean isActive(long deviceControllerPtr, long deviceId);
 
   static {
     System.loadLibrary("CHIPController");
