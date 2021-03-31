@@ -27,7 +27,8 @@ onto a CHIP-enabled Thread network.
 
 The commissioning process is composed of the following main stages:
 
--   K32W061 (CHIP accessory) device is in BLE advertising mode;
+-   K32W061 (CHIP accessory) device is put in BLE advertisment mode by pressing
+    the USERINTERFACE button;
 -   CHIPTool discovers the CHIP accessory over BLE;
 -   CHIPTool establishes a secure channel with the accessory using a SPAKE2+
     handshake;
@@ -419,14 +420,16 @@ following steps:
 1. Enable _Bluetooth_ and _Location_ services on your smartphone;
 2. Connect the smartphone to _OT-BR_ WiFi network;
 3. Open the CHIPTool application on your smartphone;
-4. Tap the _PROVISION CHIP DEVICE WITH THREAD_ button and scan the commissioning
+4. Push the USERINTERFACE button on the K32W board. This will start the BLE
+   advertising process;
+5. Tap the _PROVISION CHIP DEVICE WITH THREAD_ button and scan the commissioning
    QR code. Several notifications will appear, informing you of commissioning
    progress with scanning, connection, and pairing. At the end of this process,
    the Thread network settings screen appears.
 
     ![chiptool_main_screen](../../examples/platform/k32w/doc/images/chiptool_main_screen.png)
 
-5. In the Thread network settings screen, use the default settings and tap the
+6. In the Thread network settings screen, use the default settings and tap the
    _SAVE NETWORK_ button to send a Thread provisioning message to the accessory
    device. You will see the "Network provisioning completed" message when the
    accessory device successfully joins the Thread network.
