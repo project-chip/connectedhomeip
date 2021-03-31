@@ -18,6 +18,13 @@ import("//build_overrides/chip.gni")
 import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
+config("android_config") {
+  include_dirs = [ "${chip_root}/src/controller/java" ]
+  defines = [
+    "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"AndroidKeyValueStoreManagerImpl.h\""
+  ]
+}
+
 shared_library("jni") {
   output_name = "libCHIPController"
 
@@ -30,11 +37,14 @@ shared_library("jni") {
     "AndroidBlePlatformDelegate.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidKeyValueStoreManagerImpl.cpp",
+    "AndroidKeyValueStoreManagerImpl.h",
     "CHIPDeviceController-JNI.cpp",
     "CHIPJNIError.h",
   ]
 
   deps = [ "//src/lib" ]
+  public_configs = [ ":android_config" ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
