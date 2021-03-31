@@ -388,7 +388,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             {
                 // Enable BLE advertisements
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                // Set with fast Advertissing.
                 ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
             }
             else

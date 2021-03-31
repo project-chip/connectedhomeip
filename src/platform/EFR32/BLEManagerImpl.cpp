@@ -1094,7 +1094,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {
-        // Advertissement time expired. Stop advertissing
+        // Advertisement time expired. Stop advertising
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
         BLEMgr().SetAdvertisingEnabled(false);
     }
