@@ -601,9 +601,9 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    Device * device                       = nullptr;
-    Transport::PeerAddress udpPeerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    Device * device                    = nullptr;
+    Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
 
@@ -626,14 +626,14 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         {
             params.SetPeerAddress(Transport::PeerAddress::BLE());
         }
-        udpPeerAddress = Transport::PeerAddress::BLE();
+        peerAddress = Transport::PeerAddress::BLE();
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     }
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp ||
              params.GetPeerAddress().GetTransportType() == Transport::Type::kUdp)
     {
-        udpPeerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
-                                                     params.GetPeerAddress().GetInterface());
+        peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
+                                                  params.GetPeerAddress().GetInterface());
     }
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
@@ -648,7 +648,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                    mSessionManager, admin);
     SuccessOrExit(err);
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, admin->GetAdminId());
 
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {

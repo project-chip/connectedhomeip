@@ -351,23 +351,6 @@ BLE_ERROR BleLayer::Shutdown()
     return BLE_NO_ERROR;
 }
 
-BLE_ERROR BleLayer::NewBleConnection(void * appState, const uint16_t connDiscriminator,
-                                     BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
-                                     BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
-{
-    BLE_ERROR err = BLE_NO_ERROR;
-
-    VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
-
-    mConnectionDelegate->OnConnectionComplete = onConnectionComplete;
-    mConnectionDelegate->OnConnectionError    = onConnectionError;
-    mConnectionDelegate->NewConnection(this, appState, connDiscriminator);
-
-exit:
-    return err;
-}
-
 BLE_ERROR BleLayer::CancelBleIncompleteConnection()
 {
     BLE_ERROR err = BLE_NO_ERROR;
@@ -394,7 +377,7 @@ BLE_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator)
 
     mConnectionDelegate->OnConnectionComplete = OnConnectionComplete;
     mConnectionDelegate->OnConnectionError    = OnConnectionError;
-    // TODO: Passing BleLayer two times is not clean, this should be fixed in follow-ups.
+    // TODO: We are passing the same parameter two times, should take a look at it to see if we can remove one of them.
     mConnectionDelegate->NewConnection(this, this, connDiscriminator);
 
     return BLE_NO_ERROR;

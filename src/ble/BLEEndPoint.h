@@ -30,6 +30,8 @@
 #include <system/SystemMutex.h>
 
 #include <ble/BleLayer.h>
+#include <ble/BleLayerObject.h>
+#include <ble/BleRole.h>
 #include <ble/BtpEngine.h>
 #if CHIP_ENABLE_CHIPOBLE_TEST
 #include <ble/BtpEngineTest.h>

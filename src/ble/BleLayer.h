@@ -61,7 +61,9 @@
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
 #include <ble/BleLayerDelegate.h>
+#include <ble/BleLayerObject.h>
 #include <ble/BlePlatformDelegate.h>
+#include <ble/BleRole.h>
 #include <ble/BleUUID.h>
 
 namespace chip {
@@ -82,13 +84,6 @@ namespace Ble {
 /// Forward declarations.
 class BleLayer;
 class BLEEndPoint;
-
-/// Role of end points' associated BLE connections. Determines means used by end points to send and receive data.
-typedef enum
-{
-    kBleRole_Central    = 0,
-    kBleRole_Peripheral = 1
-} BleRole;
 
 /// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
@@ -113,23 +108,6 @@ constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
 constexpr size_t kCapabilitiesResponseLength(kCapabilitiesResponseMagicnumLength + kCapabilitiesResponseL2capMtuLength +
                                              kCapabilitiesResponseSelectedProtocolVersionLength +
                                              kCapabilitiesResponseWindowSizeLength);
-
-class BleLayerObject
-{
-    friend class BleLayer;
-
-public:
-    // Public data members:
-    BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
-    BleLayerDelegate * mBleTransport;
-    void * mAppState; ///< Generic pointer to app-specific data associated with the object.
-
-protected:
-    uint32_t mRefCount;
-
-    void AddRef() { mRefCount++; }
-    void Release();
-};
 
 class BleTransportCapabilitiesRequestMessage
 {
@@ -268,9 +246,6 @@ public:
                    BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
     BLE_ERROR Shutdown();
 
-    BLE_ERROR NewBleConnection(void * appState, uint16_t connDiscriminator,
-                               BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
-                               BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR CancelBleIncompleteConnection();
     BLE_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator);
     BLE_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);

@@ -24,6 +24,8 @@
 #include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
+constexpr size_t kMaxBlePendingPackets = 1;
+
 using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
                                             ,
@@ -31,7 +33,7 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                                             ,
-                                            chip::Transport::BLE<4>
+                                            chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
                                             >;
 
