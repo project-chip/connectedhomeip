@@ -572,6 +572,12 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer);
 /*
  * @brief Function that copies a ZCL typed list into a buffer. The index parameter
  * may indicate a specific member of the list of the whole list if it is equal to -1.
+ *
+ * Individual elements may be accessed by an index of type 16-bit unsigned integer.
+ * Elements are numbered from 1 upwards. The zeroth element, always as type uint16,
+ * and holds the number of elements contained in the list, which may be zero.
+ * If the zeroth element contains 0xffff, the list is a non value and is considered
+ * undefined.
  */
 uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
                          int32_t index);

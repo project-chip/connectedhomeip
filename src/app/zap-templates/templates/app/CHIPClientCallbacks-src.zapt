@@ -254,7 +254,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 case 0x38: // semi / Semi-precision
                 case 0x39: // single / Single precision
                 case 0x3A: // double / Double precision
-                case 0x48: // array / Array
                 case 0x49: // struct / Structure
                 case 0x50: // set / Set
                 case 0x51: // bag / Bag
@@ -303,6 +302,56 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     CHECK_MESSAGE_LENGTH(length);
                     Callback::Callback<StringAttributeCallback> * cb = Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
                     cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+                    break;
+                }
+                case 0x48: // array / Array
+                {
+                    CHECK_MESSAGE_LENGTH(2);
+                    uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+                    ChipLogProgress(Zcl, "  count: %lu", count);
+
+                    switch (clusterId)
+                    {
+{{#chip_client_clusters}}
+{{#if (chip_server_has_list_attributes)}}
+                    case {{asHex code 4}}:
+                        switch (attributeId)
+                        {
+{{#chip_server_cluster_attributes}}
+                        {{#if isList}}
+                        case {{asHex code 4}}: // {{type}}
+                        {
+                            {{#if isStruct}}
+                            _{{type}} data[count];
+                            {{else}}
+                            {{chipType}} data[count];
+                            {{/if}}
+                            for (size_t i = 0; i < count; i++)
+                            {
+                                {{#if isStruct}}
+                                {{#chip_attribute_list_entryTypes}}
+                                data[i].{{name}} = emberAfGet{{asReadType type}}(message, 0, messageLen);
+                                message += {{size}};
+                                CHECK_MESSAGE_LENGTH({{size}});
+                                {{/chip_attribute_list_entryTypes}}
+                                {{else}}
+                                data[i] = emberAfGet{{asReadType type}}(message, 0, messageLen);
+                                message += {{size}};
+                                CHECK_MESSAGE_LENGTH({{size}});
+                                {{/if}}
+                            }
+
+                            Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * cb = Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>::FromCancelable(onSuccessCallback);
+                            cb->mCall(cb->mContext, count, data);
+                            break;
+                        }
+                        {{/if}}
+{{/chip_server_cluster_attributes}}
+                        }
+                        break;
+{{/if}}
+{{/chip_client_clusters}}
+                    }
                     break;
                 }
 

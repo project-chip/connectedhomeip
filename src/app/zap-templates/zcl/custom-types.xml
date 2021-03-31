@@ -31,10 +31,10 @@ limitations under the License.
     <item name="VendorGroupId" type="INT16U"/>
     <item name="GroupKeySetIndex" type="INT16U"/>
   </struct>
-  <struct name="GroupKeys">
+  <struct name="GroupKey">
     <item name="VendorId" type="INT16U"/>
     <item name="GroupKeyIndex" type="INT16U"/>
-    <item name="GroupKeyRoot" type="ARRAY" entryType="GroupKey" length="254"/>
+    <item name="GroupKeyRoot" type="OCTET_STRING" length="16"/>
     <item name="GroupKeyEpochStartTime" type="INT64U"/>
     <item name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy"/>    
   </struct>

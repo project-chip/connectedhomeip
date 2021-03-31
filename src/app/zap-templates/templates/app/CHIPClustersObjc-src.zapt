@@ -477,6 +477,7 @@ private:
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#unless isList}}
 - (void)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler
 {
     CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(completionHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
@@ -573,6 +574,7 @@ private:
 }
 
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end
