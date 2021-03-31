@@ -231,7 +231,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
 {
     nsapi_error_t error;
     Socket * newSocket = nullptr;
-    int retFd, index;
+    int index;
 
     auto * socket = getBSDSocket(fd);
     if (socket == nullptr)

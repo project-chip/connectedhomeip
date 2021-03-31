@@ -336,24 +336,6 @@ struct linger
     int l_linger; /* linger time in seconds */
 };
 
-/* File status flags and file access modes for fnctl,
-   these are bits in an int. */
-#ifndef O_NONBLOCK
-#define O_NONBLOCK 1 /* nonblocking I/O */
-#endif
-#ifndef O_NDELAY
-#define O_NDELAY O_NONBLOCK /* same as O_NONBLOCK, for compatibility */
-#endif
-#ifndef O_RDONLY
-#define O_RDONLY 2
-#endif
-#ifndef O_WRONLY
-#define O_WRONLY 4
-#endif
-#ifndef O_RDWR
-#define O_RDWR (O_RDONLY | O_WRONLY)
-#endif
-
 /*
  * shutdown() how options
  */

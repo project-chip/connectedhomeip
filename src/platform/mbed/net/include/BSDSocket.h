@@ -107,6 +107,7 @@ struct BSDSocket : public FileHandle
     int close() override
     {
         delete _socket;
+        _socket = nullptr;
 
         _fd       = -1;
         _callback = nullptr;
@@ -152,7 +153,11 @@ struct BSDSocket : public FileHandle
     int set_blocking(bool blocking) override
     {
         _blocking = blocking;
-        _socket->set_blocking(_blocking);
+        if (_socket != nullptr)
+        {
+            _socket->set_blocking(_blocking);
+        }
+
         return 0;
     }
 
@@ -199,8 +204,8 @@ struct BSDSocket : public FileHandle
     SocketAddress socketName;
 
 private:
-    InternetSocket * _socket;
-    int _fd = -1;
+    InternetSocket * _socket = nullptr;
+    int _fd                  = -1;
     int _type;
     Callback<void()> _callback = nullptr;
     // FIXME
