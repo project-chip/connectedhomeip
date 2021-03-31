@@ -95,14 +95,9 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
     }
 
     // TODO: We should assume mTransportMgr not null for IP rendezvous.
-    if (mTransportMgr != nullptr)
+    if (mTransportMgr != nullptr && params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        mTransportMgr->SetRendezvousSession(this);
-
-        if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
-        {
-            ReturnErrorOnFailure(mExchangeTransport.Init(nullptr, mTransportMgr));
-        }
+        ReturnErrorOnFailure(mExchangeTransport.Init(nullptr, mTransportMgr));
     }
 
     return CHIP_NO_ERROR;
@@ -116,11 +111,6 @@ RendezvousSession::~RendezvousSession()
     {
         chip::Platform::Delete(mTransport);
         mTransport = nullptr;
-    }
-
-    if (mTransportMgr != nullptr)
-    {
-        mTransportMgr->SetRendezvousSession(nullptr);
     }
 
     mDelegate = nullptr;
