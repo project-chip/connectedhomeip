@@ -133,24 +133,25 @@ namespace DeviceLayer {
             ReturnErrorCodeIf(fileName == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorCodeIf(fileName[0] == '\0', CHIP_ERROR_INVALID_ARGUMENT);
 
-            NSURL *url = nullptr;
-            
+            NSURL * url = nullptr;
+
             // relative paths are relative to Documents folder
             if (fileName[0] != '/') {
-              NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
-                                                                                inDomain:NSUserDomainMask
-                                                                       appropriateForURL:nil
-                                                                                  create:YES
-                                                                                   error:nil];
-              if (documentsDirectory == nullptr) {
-                  ChipLogError(DeviceLayer, "Failed to get documents directory.");
-                  return CHIP_ERROR_INTERNAL;
-              }
-              ChipLogProgress(DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
+                NSURL * documentsDirectory = [NSFileManager.defaultManager URLForDirectory:NSDocumentDirectory
+                                                                                  inDomain:NSUserDomainMask
+                                                                         appropriateForURL:nil
+                                                                                    create:YES
+                                                                                     error:nil];
+                if (documentsDirectory == nullptr) {
+                    ChipLogError(DeviceLayer, "Failed to get documents directory.");
+                    return CHIP_ERROR_INTERNAL;
+                }
+                ChipLogProgress(
+                    DeviceLayer, "Found user documents directory: %s", [[documentsDirectory absoluteString] UTF8String]);
 
-              url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
+                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName] relativeToURL:documentsDirectory];
             } else {
-              url = [NSURL URLWithString: [NSString stringWithUTF8String: fileName]];
+                url = [NSURL URLWithString:[NSString stringWithUTF8String:fileName]];
             }
             ReturnErrorCodeIf(url == nullptr, CHIP_ERROR_NO_MEMORY);
 
