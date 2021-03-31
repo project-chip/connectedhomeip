@@ -121,7 +121,8 @@ public:
     CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
                           chip::CommandId aCommandId, BitFlags<CommandPathFlags> Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
-    CHIP_ERROR AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode);
+    CHIP_ERROR AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId,
+                             const uint16_t aProtocolCode);
 
     /**
      * Gets the inner exchange context object, without ownership.

@@ -225,7 +225,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+CHIP_ERROR Command::AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId,
+                                  const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;

@@ -118,9 +118,9 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     chip::EndpointId endpointId;
-    Protocols::SecureChannel::GeneralStatusCode generalCode  = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
-    uint32_t protocolId   = 0;
-    uint16_t protocolCode = 0;
+    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
+    uint32_t protocolId                                     = 0;
+    uint16_t protocolCode                                   = 0;
     StatusElement::Parser statusElementParser;
 
     mCommandIndex++;

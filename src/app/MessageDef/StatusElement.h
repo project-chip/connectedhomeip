@@ -86,7 +86,8 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    CHIP_ERROR DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode) const;
+    CHIP_ERROR DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId,
+                                   uint16_t * apProtocolCode) const;
 };
 
 class Builder : public ListBuilder
@@ -123,8 +124,8 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    StatusElement::Builder & EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                                 const uint16_t aProtocolCode);
+    StatusElement::Builder & EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                                 const uint32_t aProtocolId, const uint16_t aProtocolCode);
 
     /**
      *  @brief Mark the end of this StatusElement

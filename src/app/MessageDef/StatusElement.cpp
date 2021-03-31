@@ -51,7 +51,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR StatusElement::Parser::DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode) const
+CHIP_ERROR StatusElement::Parser::DecodeStatusElement(Protocols::SecureChannel::GeneralStatusCode * apGeneralCode,
+                                                      uint32_t * apProtocolId, uint16_t * apProtocolCode) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader lReader;
@@ -203,8 +204,8 @@ CHIP_ERROR StatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter, c
     return ListBuilder::Init(apWriter, aContextTagToUse);
 }
 
-StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                                                     const uint16_t aProtocolCode)
+StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                                                     const uint32_t aProtocolId, const uint16_t aProtocolCode)
 {
     uint64_t tag = chip::TLV::AnonymousTag;
 

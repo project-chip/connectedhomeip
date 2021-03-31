@@ -229,7 +229,8 @@ public:
         printf("ReportError with err %d", aError);
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender, const chip::Protocols::SecureChannel::GeneralStatusCode  aGeneralCode,
+    CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
+                                     const chip::Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                      const uint32_t aProtocolId, const uint16_t aProtocolCode, const chip::EndpointId aEndpointId,
                                      const chip::ClusterId aClusterId, const chip::CommandId aCommandId,
                                      uint8_t aCommandIndex) override
