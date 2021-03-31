@@ -375,6 +375,11 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // If src == NULL, then this method will set memory to zeroes
 // See documentation for emAfReadOrWriteAttribute for the semantics of
 // readLength when reading and writing.
+//
+// The index argument is used exclusively for List. When reading or writing a List attribute, it could take 3 types of values:
+//  -1: Read/Write the whole list content, including the number of elements in the list
+//   0: Read/Write the number of element in the list, represented as a uint16_t
+//   n: Read/Write the nth element of the list
 static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am,
                                           bool write, uint16_t readLength, int32_t index)
 {
