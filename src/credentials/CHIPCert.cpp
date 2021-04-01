@@ -708,26 +708,29 @@ exit:
 
 bool ChipDN::IsEqual(const ChipDN & other) const
 {
+    // Same number of attributes?
+    if (mCount != other.mCount)
+        return false;
 
+    // kOID_AttributeType_ChipNodeId has priority and is located at index 0, any other are at higher indices.
     if (mAttrOID[0] == chip::ASN1::kOID_AttributeType_ChipNodeId)
         return other.mAttrOID[0] == chip::ASN1::kOID_AttributeType_ChipNodeId &&
             mAttrValue[0].mChipId == other.mAttrValue[0].mChipId;
 
-    for (int i = 1; i < RDN_NUM; ++i)
+    for (int i = 1; i < mCount; ++i)
     {
-        if (mAttrOID[i] == kOID_Unknown || mAttrOID[i] == kOID_NotSpecified)
-            continue;
-
         int j = 1;
-        for (; j < RDN_NUM; ++j)
+        for (; j < other.mCount; ++j)
         {
             if (mAttrOID[i] == other.mAttrOID[j])
                 break;
         }
 
-        if (j == RDN_NUM)
-            continue;
+	// No OID match?
+        if (j == other.mCount)
+            return false;
 
+        // OIDs matched, how about values?
         if (IsChipX509Attr(mAttrOID[i]))
         {
             if (mAttrValue[i].mChipId != other.mAttrValue[j].mChipId)
@@ -740,65 +743,77 @@ bool ChipDN::IsEqual(const ChipDN & other) const
                 return false;
         }
     }
-    return true;
-}
-
-bool ChipDN::IsEmpty() const
-{
-    int i = 0;
-
-    for (; i < RDN_NUM; ++i)
-    {
-        if (mAttrOID[i] != chip::ASN1::kOID_NotSpecified)
-        {
-            return false;
-        }
-    }
+    // All match
     return true;
 }
 
 void ChipDN::Clear()
 {
-    int i = 0;
-
-    for (; i < RDN_NUM; ++i)
+    for (int i = 0; i < RDN_NUM; ++i)
     {
         mAttrOID[i] = chip::ASN1::kOID_NotSpecified;
     }
+    mCount = 0;
 }
 
-void ChipDN::Add(chip::ASN1::OID attrOID, uint64_t chipId)
+CHIP_ERROR ChipDN::Add(chip::ASN1::OID attrOID, uint64_t chipId)
 {
+    if (attrOID == chip::ASN1::kOID_NotSpecified || attrOID == chip::ASN1::kOID_Unknown)
+        return CHIP_ERROR_UNKNOWN_KEY_TYPE;
+
     if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
     {
-        mAttrOID[0]           = attrOID;
+        if (mAttrOID[0] == chip::ASN1::kOID_NotSpecified)
+        {
+            mAttrOID[0] = attrOID;
+            mCount++;
+        }
         mAttrValue[0].mChipId = chipId;
-        return;
+
+        return CHIP_NO_ERROR;
     }
 
     for (int i = 1; i < RDN_NUM; ++i)
     {
-        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
+        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified)
         {
             mAttrOID[i]           = attrOID;
             mAttrValue[i].mChipId = chipId;
-            return;
+            mCount++;
+            return CHIP_NO_ERROR;
+        }
+        if (mAttrOID[i] == attrOID)
+        {
+            mAttrValue[i].mChipId = chipId;
+            return CHIP_NO_ERROR;
         }
     }
+    return CHIP_ERROR_TOO_MANY_KEYS;
 }
 
-void ChipDN::Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen)
+CHIP_ERROR ChipDN::Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen)
 {
+    if (attrOID == chip::ASN1::kOID_NotSpecified || attrOID == chip::ASN1::kOID_Unknown)
+        return CHIP_ERROR_UNKNOWN_KEY_TYPE;
+
     for (int i = 1; i < RDN_NUM; ++i)
     {
-        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
+        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified)
         {
             mAttrOID[i]                  = attrOID;
             mAttrValue[i].mString.mValue = strVal;
             mAttrValue[i].mString.mLen   = strLen;
-            return;
+            mCount++;
+            return CHIP_NO_ERROR;;
+        }
+        if (mAttrOID[i] == attrOID)
+        {
+            mAttrValue[i].mString.mValue = strVal;
+            mAttrValue[i].mString.mLen   = strLen;
+            return CHIP_NO_ERROR;;
         }
     }
+    return CHIP_ERROR_TOO_MANY_KEYS;
 }
 
 bool ChipDN::Has(chip::ASN1::OID attrOID) const

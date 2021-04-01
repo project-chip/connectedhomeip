@@ -200,14 +200,16 @@ struct ChipDN
             const uint8_t * mValue;    /**< Pointer to the DN attribute value. */
             uint32_t mLen;             /**< DN attribute length. */
         } mString;                     /**< DN attribute structure when encoded as a string. */
-    } mAttrValue[RDN_NUM];             /**< DN attribute value union: string or unsigned integer. */
-    chip::ASN1::OID mAttrOID[RDN_NUM]; /**< DN attribute CHIP OID. */
+    } mAttrValue[RDN_NUM];             /**< Array of DN attribute value unions: string or unsigned integer. */
+    chip::ASN1::OID mAttrOID[RDN_NUM]; /**< DN attributes CHIP OID. */
+                                       /** Note: kOID_AttributeType_ChipNodeId is located at index 0, any other are at higher indices. */
+    int mCount;
 
     bool IsEqual(const ChipDN & other) const;
-    bool IsEmpty() const;
+    bool IsEmpty() const { return mCount == 0; }
     void Clear();
-    void Add(chip::ASN1::OID attrOID, uint64_t chipId);
-    void Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen);
+    CHIP_ERROR Add(chip::ASN1::OID attrOID, uint64_t chipId);
+    CHIP_ERROR Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen);
     bool Has(chip::ASN1::OID attrOID) const;
 };
 
