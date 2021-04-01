@@ -435,7 +435,6 @@ BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT 
     err = NewBleEndPoint(&newEndPoint, connObj, kBleRole_Peripheral, false);
     SuccessOrExit(err);
 
-    newEndPoint->mAppState     = mBleTransport;
     newEndPoint->mBleTransport = mBleTransport;
 
     err = newEndPoint->Receive(std::move(pBuf));

@@ -197,11 +197,11 @@ BLE_ERROR BLEEndPoint::HandleReceiveConnectionComplete()
     // Cancel receive connection timer.
     StopReceiveConnectionTimer();
 
-    // We've successfully completed the BLE transport protocol handshake, so let the application know we're open for business.
-    if (mBle->OnChipBleConnectReceived != nullptr)
+    // We've successfully completed the BLE transport protocol handshake, so let the transport know we're open for business.
+    if (mBleTransport != nullptr)
     {
         // Indicate BLE transport protocol connection received to next-higher layer.
-        mBle->OnChipBleConnectReceived(this);
+        err = mBleTransport->SetEndPoint(this);
     }
     else
     {

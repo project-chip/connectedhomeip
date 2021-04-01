@@ -108,15 +108,6 @@ private:
      */
     CHIP_ERROR SendAfterConnect(System::PacketBufferHandle msg);
 
-    /**
-     * @brief
-     *  Called when the underlying BleLayer receive a new
-     *  remote connection.
-     *
-     * @param endPoint The newly opened BLEEndPoint
-     */
-    static void OnNewConnection(Ble::BLEEndPoint * endPoint);
-
     // Those functions are BLEConnectionDelegate callbacks used when the connection
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.
     void OnBleConnectionComplete(Ble::BLEEndPoint * endPoint) override;

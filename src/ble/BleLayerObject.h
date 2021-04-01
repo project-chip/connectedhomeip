@@ -33,13 +33,10 @@ class BleLayerObject
 {
     friend class BleLayer;
 
-public:
-    // Public data members:
+protected:
     BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
     BleLayerDelegate * mBleTransport;
-    void * mAppState; ///< Generic pointer to app-specific data associated with the object.
 
-protected:
     uint32_t mRefCount;
 
     void AddRef() { mRefCount++; }

@@ -67,7 +67,7 @@ CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
 
     mBleLayer                           = bleLayer;
     mBleLayer->mBleTransport            = this;
-    mBleLayer->OnChipBleConnectReceived = OnNewConnection;
+    mBleLayer->OnChipBleConnectReceived = nullptr;
 
     mState = State::kInitialized;
 
@@ -93,10 +93,7 @@ exit:
     return err;
 }
 
-void BLEBase::SetupEvents(Ble::BLEEndPoint * endPoint)
-{
-    endPoint->mAppState = reinterpret_cast<void *>(this);
-}
+void BLEBase::SetupEvents(Ble::BLEEndPoint * endPoint) {}
 
 CHIP_ERROR BLEBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                                 System::PacketBufferHandle msgBuf)
@@ -208,15 +205,6 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
 void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
     mState = State::kInitialized;
-}
-
-void BLEBase::OnNewConnection(BLEEndPoint * endPoint)
-{
-    CHIP_ERROR err = endPoint->mBleTransport->SetEndPoint(endPoint);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Ble, "Transport::BLE Init failure: %s", ErrorStr(err));
-    }
 }
 
 } // namespace Transport
