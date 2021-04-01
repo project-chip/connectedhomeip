@@ -176,6 +176,8 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
 
         // Clear the certificate set.
         certSet.Release();
+        // Clear the Operational Credential Set
+        opCredSet.Release();
     }
 }
 

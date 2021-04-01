@@ -268,7 +268,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_le
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
     // Generate Salt for Encryption keys
-    saltlen = kIPKSize + kSHA256_Hash_Length;
+    saltlen = /*kIPKSize +*/ kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrReturnError(!msg_salt.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -976,21 +976,14 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipCertificateData chipCertData;
-    uint32_t chipcertlen;
     ChipCertificateData * resultCert = nullptr;
-    uint8_t * responderOpChipCert    = nullptr;
 
     responderOpCertLen = chip::Encoding::LittleEndian::Read16(*msgIterator);
     *responderOpCert   = *msgIterator;
     *msgIterator += responderOpCertLen;
 
     Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
-    // Derive responder credential
-    responderOpChipCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(responderOpCertLen));
-    VerifyOrExit(responderOpChipCert != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    err = ConvertX509CertToChipCert(*responderOpCert, responderOpCertLen, responderOpChipCert, responderOpCertLen, chipcertlen);
-    SuccessOrExit(err);
-    err = DecodeChipCert(responderOpChipCert, chipcertlen, chipCertData);
+    err = DecodeChipCert(*responderOpCert, responderOpCertLen, chipCertData);
     SuccessOrExit(err);
 
     bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
@@ -999,7 +992,7 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
 
     // Validate responder identity located in msg_r2_encrypted
     err = mOpCredSet->FindCertSet(mTrustedRootId)
-              ->LoadCert(responderOpChipCert, chipcertlen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
+              ->LoadCert(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
     SuccessOrExit(err);
 
     err = SetEffectiveTime();
@@ -1014,10 +1007,6 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
     }
 
 exit:
-    if (responderOpChipCert != nullptr)
-    {
-        chip::Platform::MemoryFree(responderOpChipCert);
-    }
 
     return err;
 }
