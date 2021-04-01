@@ -58,9 +58,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr = nullptr;
-    SecureSessionMgr * sessionMgr     = nullptr;
-    Inet::InetLayer * inetLayer       = nullptr;
+    DeviceTransportMgr * transportMgr        = nullptr;
+    SecureSessionMgr * sessionMgr            = nullptr;
+    Messaging::ExchangeManager * exchangeMgr = nullptr;
+    Inet::InetLayer * inetLayer              = nullptr;
 };
 
 class DLL_EXPORT Device

@@ -121,7 +121,7 @@ public:
 class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
                                     public Messaging::ExchangeMgrDelegate,
                                     public PersistentStorageResultDelegate,
-									public app::InteractionModelDelegate
+                                    public app::InteractionModelDelegate
 {
 public:
     DeviceController();

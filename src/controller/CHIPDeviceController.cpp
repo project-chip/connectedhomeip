@@ -94,6 +94,7 @@ DeviceController::DeviceController()
 {
     mState                    = State::NotInitialized;
     mSessionMgr               = nullptr;
+    mExchangeMgr              = nullptr;
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
@@ -204,24 +205,20 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemLayer = nullptr;
     mInetLayer   = nullptr;
 
-    chip::Platform::Delete(mExchangeMgr);
-    mExchangeMgr = nullptr;
-
-    chip::Platform::Delete(mSessionMgr);
-    mSessionMgr = nullptr;
-
-    chip::Platform::Delete(mTransportMgr);
-    mTransportMgr = nullptr;
-
     if (mStorageDelegate != nullptr)
     {
         mStorageDelegate->SetStorageDelegate(nullptr);
         mStorageDelegate = nullptr;
     }
 
+    if (mExchangeMgr != nullptr)
+    {
+        chip::Platform::Delete(mExchangeMgr);
+        mExchangeMgr = nullptr;
+    }
+
     if (mSessionMgr != nullptr)
     {
-        mSessionMgr->SetDelegate(nullptr);
         chip::Platform::Delete(mSessionMgr);
         mSessionMgr = nullptr;
     }
@@ -553,7 +550,9 @@ void DeviceController::OnPersistentStorageStatus(const char * key, Operation op,
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
-    return ControllerDeviceInitParams{ .transportMgr = mTransportMgr, .sessionMgr = mSessionManager, .inetLayer = mInetLayer };
+    return ControllerDeviceInitParams{
+        .transportMgr = mTransportMgr, .sessionMgr = mSessionMgr, .exchangeMgr = mExchangeMgr, .inetLayer = mInetLayer
+    };
 }
 
 DeviceCommissioner::DeviceCommissioner()
