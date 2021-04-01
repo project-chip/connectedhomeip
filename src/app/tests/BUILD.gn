@@ -22,9 +22,9 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   test_sources = [
+    "TestCommandInteraction.cpp",
     "TestMessageDef.cpp",
     "TestReadInteraction.cpp",
-    "TestCommandInteraction.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
