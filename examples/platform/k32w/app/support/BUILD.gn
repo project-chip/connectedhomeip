@@ -23,6 +23,8 @@ source_set("freertos_mbedtls_utils") {
   sources = [
     "FreeRtosMbedtlsUtils.c",
     "FreeRtosMbedtlsUtils.h",
+    "Memconfig.cpp",
+    "Memconfig.h"
   ]
 
   #TODO: not sure this is required, maybe we should make this dependant on mbedtls

@@ -27,6 +27,18 @@
 #include <support/CHIPMem.h>
 
 #include <stdlib.h>
+#include <cstring>
+
+#if defined(ESP_PLATFORM)
+#include "freertos/FreeRTOS.h"
+#else
+#include "FreeRTOS.h"
+#endif
+
+#ifndef WEAK
+#define WEAK	__attribute__((weak))
+#endif
+
 
 #ifndef NDEBUG
 #include <atomic>
@@ -51,6 +63,7 @@ namespace Platform {
 #else
 
 #define VERIFY_INITIALIZED() VerifyInitialized(__func__)
+
 
 static std::atomic_int memoryInitialized{ 0 };
 
@@ -100,30 +113,54 @@ void MemoryAllocatorShutdown()
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
+extern "C" {
+
+WEAK void * __wrap_malloc(size_t size)
+{
+	return malloc(size);
+}
+
+WEAK void __wrap_free(void * ptr)
+{
+	free(ptr);
+}
+
+WEAK void * __wrap_calloc(size_t num, size_t size)
+{
+	return calloc(num, size);
+}
+
+WEAK void * __wrap_realloc(void * ptr, size_t new_size)
+{
+	return realloc(ptr, new_size);
+}
+
+}//extern "C"
+
 void * MemoryAlloc(size_t size)
 {
     VERIFY_INITIALIZED();
-    return malloc(size);
+    return __wrap_malloc(size);
 }
 
 void * MemoryCalloc(size_t num, size_t size)
 {
     VERIFY_INITIALIZED();
-    return calloc(num, size);
+    return __wrap_calloc(num, size);
 }
 
 void * MemoryRealloc(void * p, size_t size)
 {
     VERIFY_INITIALIZED();
     VERIFY_POINTER(p);
-    return realloc(p, size);
+    return __wrap_realloc(p, size);
 }
 
 void MemoryFree(void * p)
 {
     VERIFY_INITIALIZED();
     VERIFY_POINTER(p);
-    free(p);
+    __wrap_free(p);
 }
 
 bool MemoryInternalCheckPointer(const void * p, size_t min_size)
