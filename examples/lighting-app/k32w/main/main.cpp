@@ -33,6 +33,7 @@
 #include <platform/ThreadStackManager.h>
 #include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
+#include <support/CHIPPlatformMemory.h>
 
 #include "FreeRtosMbedtlsUtils.h"
 #include "app_config.h"
@@ -44,7 +45,6 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 #include <AppTask.h>
 
@@ -66,7 +66,7 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    mbedtls_platform_set_calloc_free(pvPortCallocRtos, vPortFree);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
