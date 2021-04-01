@@ -150,8 +150,8 @@ void RendezvousSession::OnSessionEstablished()
 
     // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
     // a transport.
-    if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle) // || // For rendezvous initializer
-    //    mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
+    if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle ||                        // For rendezvous initializer
+        mPairingSession.PeerConnection().GetPeerAddress().GetTransportType() != Transport::Type::kBle) // For rendezvous target
     {
         UpdateState(State::kRendezvousComplete);
         if (!mParams.IsController())

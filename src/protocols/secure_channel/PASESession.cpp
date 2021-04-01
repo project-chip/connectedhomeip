@@ -319,6 +319,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     transport->SetPeerAddress(peerAddress);
+    mConnectionState.SetPeerAddress(peerAddress);
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -342,6 +343,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, const PAS
     VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     transport->SetPeerAddress(peerAddress);
+    mConnectionState.SetPeerAddress(peerAddress);
 
     memmove(&mPASEVerifier, verifier, sizeof(verifier));
     mComputeVerifier = false;
@@ -787,6 +789,7 @@ void PASESession::OnMessageReceived(Messaging::ExchangeContext * ec, const Packe
     }
 
     mTransport->SetPeerAddress(mExchangeCtxt->GetPeerAddress());
+    mConnectionState.SetPeerAddress(mExchangeCtxt->GetPeerAddress());
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
