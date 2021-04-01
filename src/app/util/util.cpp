@@ -139,6 +139,9 @@ void emberAfPluginBarrierControlServerInitCallback(void);
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
 void emberAfPluginDoorLockServerInitCallback(void);
 #endif
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+void emberAfPluginDescriptorServerInitCallback(void);
+#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -297,6 +300,9 @@ void emberAfInit(void)
 #endif
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
     emberAfPluginDoorLockServerInitCallback();
+#endif
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+    emberAfPluginDescriptorServerInitCallback();
 #endif
 
     emAfCallInits();
