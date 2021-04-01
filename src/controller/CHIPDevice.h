@@ -112,7 +112,7 @@ public:
             mCommandSender->Shutdown();
             mCommandSender = nullptr;
         }
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
         chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
 #endif
     }
