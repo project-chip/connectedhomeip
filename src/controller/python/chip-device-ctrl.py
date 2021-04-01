@@ -453,15 +453,24 @@ class DeviceMgrCmd(Cmd):
                 # When command takes no arguments, (not command) is True
                 if command == None:
                     raise exceptions.UnknownCommand(args[0], args[1])
-                self.devCtrl.ZCLSend(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
+                err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
+                if err != 0:
+                    print("Failed to receive command response: {}".format(res))
+                elif res != None:
+                    print("Received command status response:")
+                    print(res)
+                else:
+                    print("Success, no status code is attached with response.")
             else:
                 self.do_help("zcl")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
         except Exception as ex:
+            import traceback
             print("An exception occurred during processing input:")
+            traceback.print_exc()
             print(str(ex))
 
     def do_zclread(self, line):

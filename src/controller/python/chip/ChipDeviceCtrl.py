@@ -32,6 +32,7 @@ from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
+from .interaction_model import IMDelegate as im
 import enum
 
 
@@ -106,6 +107,8 @@ class ChipDeviceController(object):
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
 
+        im.InitIMDelegate()
+
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(HandleKeyExchangeComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(self.devCtrl, self.cbHandleKeyExchangeCompleteFunct)
 
@@ -162,13 +165,19 @@ class ChipDeviceController(object):
 
         return (address.value.decode(), port.value) if error == 0 else None
 
-    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
+    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
         )
 
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
+        im.ClearCommandStatus(commandSenderHandle)
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
+        if blocking:
+            # We only send 1 command by this function, so index is always 0
+            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+        return (0, None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid):
         device = c_void_p(None)
@@ -250,3 +259,6 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
             self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
+            self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
