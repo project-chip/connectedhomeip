@@ -34,6 +34,8 @@
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
+#include <support/CHIPPlatformMemory.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -110,10 +112,10 @@ extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
-    return pvPortCallocRtos(aNum, aSize);
+	return CHIPPlatformMemoryCalloc(aNum, aSize);
 }
 
 extern "C" void otPlatFree(void * aPtr)
 {
-    return vPortFree(aPtr);
+	return CHIPPlatformMemoryFree(aPtr);
 }
