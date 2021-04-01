@@ -55,6 +55,30 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
+struct ControllerDeviceInitParams
+{
+    DeviceTransportMgr * transportMgr = nullptr;
+    SecureSessionMgr * sessionMgr     = nullptr;
+    Inet::InetLayer * inetLayer       = nullptr;
+
+    ControllerDeviceInitParams() {}
+    ControllerDeviceInitParams & SetTransportMgr(DeviceTransportMgr * mgr)
+    {
+        transportMgr = mgr;
+        return *this;
+    }
+    ControllerDeviceInitParams & SetSessionMgr(SecureSessionMgr * mgr)
+    {
+        sessionMgr = mgr;
+        return *this;
+    }
+    ControllerDeviceInitParams & SetInetLayer(Inet::InetLayer * layer)
+    {
+        inetLayer = layer;
+        return *this;
+    }
+};
+
 class DLL_EXPORT Device
 {
 public:
@@ -140,18 +164,15 @@ public:
      *   that of this device object. If these objects are freed, while the device object is
      *   still using them, it can lead to unknown behavior and crashes.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
+        mTransportMgr   = params.transportMgr;
+        mSessionManager = params.sessionMgr;
+        mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
     }
@@ -167,18 +188,16 @@ public:
      *   uninitialzed/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, const Transport::PeerAddress & peerAddress, Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
+              Transport::AdminId admin)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
+        Init(params, mListenPort, admin);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 

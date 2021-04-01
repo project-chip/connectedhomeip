@@ -101,16 +101,23 @@ DeviceController::DeviceController()
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
                                   Inet::InetLayer * inetLayer)
 {
+    return Init(
+        localDeviceId,
+        ControllerInitParams().SetPersistentStorageDelegate(storageDelegate).SetSystemLayer(systemLayer).SetInetLayer(inetLayer));
+}
+
+CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Transport::AdminPairingInfo * admin = nullptr;
 
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (systemLayer != nullptr && inetLayer != nullptr)
+    if (params.systemLayer != nullptr && params.inetLayer != nullptr)
     {
-        mSystemLayer = systemLayer;
-        mInetLayer   = inetLayer;
+        mSystemLayer = params.systemLayer;
+        mInetLayer   = params.inetLayer;
     }
     else
     {
@@ -126,7 +133,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     VerifyOrExit(mSystemLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mInetLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mStorageDelegate = storageDelegate;
+    mStorageDelegate = params.storageDelegate;
 
     if (mStorageDelegate != nullptr)
     {
@@ -257,7 +264,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
             ReturnErrorOnFailure(err);
         }
 
-        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, mAdminId);
+        device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
     }
 
     *out_device = device;
@@ -300,7 +307,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, mAdminId);
+            device->Init(GetControllerDeviceInitParams(), mListenPort, mAdminId);
         }
     }
 
@@ -511,6 +518,13 @@ exit:
 
 void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
+ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
+{
+    ControllerDeviceInitParams ret;
+    ret.SetTransportMgr(mTransportMgr).SetSessionMgr(mSessionManager).SetInetLayer(mInetLayer);
+    return ret;
+}
+
 DeviceCommissioner::DeviceCommissioner()
 {
     mPairingDelegate      = nullptr;
@@ -537,7 +551,15 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
                                     DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
                                     Inet::InetLayer * inetLayer)
 {
-    ReturnErrorOnFailure(DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer));
+    return Init(
+        localDeviceId,
+        ControllerInitParams().SetPersistentStorageDelegate(storageDelegate).SetSystemLayer(systemLayer).SetInetLayer(inetLayer),
+        pairingDelegate);
+}
+
+CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate)
+{
+    ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
 
     if (LoadKeyId(mStorageDelegate, mNextKeyId) != CHIP_NO_ERROR)
     {
@@ -611,7 +633,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                    mSessionManager, admin);
     SuccessOrExit(err);
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
 
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
@@ -662,7 +684,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, peerAddress, mAdminId);
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mAdminId);
 
     device->Serialize(serialized);
 
