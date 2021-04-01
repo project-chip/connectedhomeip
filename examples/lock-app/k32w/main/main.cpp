@@ -32,6 +32,7 @@
 #include <platform/ThreadStackManager.h>
 #include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
+#include <support/CHIPPlatformMemory.h>
 
 #include "FreeRtosMbedtlsUtils.h"
 #include "app_config.h"
@@ -52,7 +53,6 @@ extern InitFunc __init_array_end;
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
 
-extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 extern "C" void main_task(void const * argument)
 {
@@ -65,7 +65,7 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
-    mbedtls_platform_set_calloc_free(pvPortCallocRtos, vPortFree);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     /* Used for HW initializations */
     otSysInit(0, NULL);
