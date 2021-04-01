@@ -216,8 +216,13 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
-        err = result->Init(localDeviceId, &gServerStorage, &gPairingDelegate, &chip::DeviceLayer::SystemLayer,
-                           &chip::DeviceLayer::InetLayer);
+        err = result->Init(localDeviceId,
+                           chip::Controller::ControllerInitParams{
+                               .storageDelegate = &gServerStorage,
+                               .systemLayer     = &chip::DeviceLayer::SystemLayer,
+                               .inetLayer       = &chip::DeviceLayer::InetLayer,
+                           },
+                           &gPairingDelegate);
     });
 
     if (err != CHIP_NO_ERROR)
