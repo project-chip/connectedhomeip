@@ -78,14 +78,12 @@ namespace DeviceLayer {
                 [keyAttribute setName:@"key"];
                 [keyAttribute setAttributeType:NSStringAttributeType];
                 [keyAttribute setOptional:NO];
-                // [keyAttribute setIndexed:YES];
                 [properties addObject:keyAttribute];
 
                 NSAttributeDescription * valueAttribute = [[NSAttributeDescription alloc] init];
                 [valueAttribute setName:@"value"];
                 [valueAttribute setAttributeType:NSBinaryDataAttributeType];
                 [valueAttribute setOptional:NO];
-                // [valueAttribute setIndexed:NO];
                 [properties addObject:valueAttribute];
 
                 NSFetchIndexElementDescription * elementIndex =
