@@ -208,10 +208,9 @@ private:
     int _type;
     Callback<void()> _callback      = nullptr;
     mstd::atomic<flags_type> _flags = { 0 };
-    // std::atomic<flags_type> _flags = { 0 };
-    bool _blocking     = true;
-    bool _inputEnable  = true;
-    bool _outputEnable = true;
+    bool _blocking                  = true;
+    bool _inputEnable               = true;
+    bool _outputEnable              = true;
 };
 
 } // namespace mbed

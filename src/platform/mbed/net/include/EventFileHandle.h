@@ -165,7 +165,6 @@ struct EventFileHandle : public FileHandle
 private:
     Callback<void()> _cb                = nullptr;
     mstd::atomic<counter_type> _counter = { 0 };
-    // std::atomic<counter_type> _counter = { 0 };
 };
 
 } // namespace mbed
