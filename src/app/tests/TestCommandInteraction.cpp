@@ -81,8 +81,7 @@ void TestCommandInteraction::GenerateCommandData(nlTestSuite * apSuite, void * a
 
     chip::TLV::TLVWriter * pWriter = commandDataElementBuilder.GetWriter();
     chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-    err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
-                                  dummyType);
+    err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure, dummyType);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -130,8 +129,8 @@ void TestCommandInteraction::TestCommandHandler(nlTestSuite * apSuite, void * ap
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandHandler commandHandler;
     System::PacketBufferTLVWriter writer;
-    System::PacketBufferHandle commandDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    err                                       = commandHandler.Init(&chip::gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateCommandData(apSuite, apContext, commandDatabuf);
