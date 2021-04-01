@@ -54,23 +54,6 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
-
-    ControllerInitParams() {}
-    ControllerInitParams & SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
-    {
-        storageDelegate = delegate;
-        return *this;
-    }
-    ControllerInitParams & SetSystemLayer(System::Layer * layer)
-    {
-        systemLayer = layer;
-        return *this;
-    }
-    ControllerInitParams & SetInetLayer(Inet::InetLayer * layer)
-    {
-        inetLayer = layer;
-        return *this;
-    }
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -142,10 +125,9 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
 
-    [[deprecated("Use ControllerInitParams instead")]] CHIP_ERROR Init(NodeId localDeviceId,
-                                                                       PersistentStorageDelegate * storageDelegate = nullptr,
-                                                                       System::Layer * systemLayer                 = nullptr,
-                                                                       Inet::InetLayer * inetLayer                 = nullptr);
+    // Note: Future modifications should be made to ControllerInitParams
+    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
+                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
     virtual CHIP_ERROR Shutdown();
 
@@ -289,11 +271,10 @@ public:
      */
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate = nullptr);
 
-    [[deprecated("Use ControllerInitParams instead")]] CHIP_ERROR Init(NodeId localDeviceId,
-                                                                       PersistentStorageDelegate * storageDelegate = nullptr,
-                                                                       DevicePairingDelegate * pairingDelegate     = nullptr,
-                                                                       System::Layer * systemLayer                 = nullptr,
-                                                                       Inet::InetLayer * inetLayer                 = nullptr);
+    // Note: Future modifications should be made to ControllerInitParams
+    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
+                    DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
+                    Inet::InetLayer * inetLayer = nullptr);
 
     void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 

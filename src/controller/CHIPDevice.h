@@ -60,23 +60,6 @@ struct ControllerDeviceInitParams
     DeviceTransportMgr * transportMgr = nullptr;
     SecureSessionMgr * sessionMgr     = nullptr;
     Inet::InetLayer * inetLayer       = nullptr;
-
-    ControllerDeviceInitParams() {}
-    ControllerDeviceInitParams & SetTransportMgr(DeviceTransportMgr * mgr)
-    {
-        transportMgr = mgr;
-        return *this;
-    }
-    ControllerDeviceInitParams & SetSessionMgr(SecureSessionMgr * mgr)
-    {
-        sessionMgr = mgr;
-        return *this;
-    }
-    ControllerDeviceInitParams & SetInetLayer(Inet::InetLayer * layer)
-    {
-        inetLayer = layer;
-        return *this;
-    }
 };
 
 class DLL_EXPORT Device

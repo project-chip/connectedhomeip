@@ -138,8 +138,7 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
         localDeviceId = kDefaultLocalDeviceId;
     }
     SuccessOrExit(
-        err = (*outDevCtrl)
-                  ->Init(localDeviceId, ControllerInitParams().SetPersistentStorageDelegate(&sStorageDelegate), &sPairingDelegate));
+        err = (*outDevCtrl)->Init(localDeviceId, ControllerInitParams{ .storageDelegate = &sStorageDelegate }, &sPairingDelegate));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:

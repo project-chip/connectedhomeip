@@ -101,9 +101,8 @@ DeviceController::DeviceController()
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
                                   Inet::InetLayer * inetLayer)
 {
-    return Init(
-        localDeviceId,
-        ControllerInitParams().SetPersistentStorageDelegate(storageDelegate).SetSystemLayer(systemLayer).SetInetLayer(inetLayer));
+    return Init(localDeviceId,
+                ControllerInitParams{ .storageDelegate = storageDelegate, .systemLayer = systemLayer, .inetLayer = inetLayer });
 }
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
@@ -520,9 +519,7 @@ void DeviceController::OnPersistentStorageStatus(const char * key, Operation op,
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
-    ControllerDeviceInitParams ret;
-    ret.SetTransportMgr(mTransportMgr).SetSessionMgr(mSessionManager).SetInetLayer(mInetLayer);
-    return ret;
+    return ControllerDeviceInitParams{ .transportMgr = mTransportMgr, .sessionMgr = mSessionManager, .inetLayer = mInetLayer };
 }
 
 DeviceCommissioner::DeviceCommissioner()
@@ -551,10 +548,9 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
                                     DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
                                     Inet::InetLayer * inetLayer)
 {
-    return Init(
-        localDeviceId,
-        ControllerInitParams().SetPersistentStorageDelegate(storageDelegate).SetSystemLayer(systemLayer).SetInetLayer(inetLayer),
-        pairingDelegate);
+    return Init(localDeviceId,
+                ControllerInitParams{ .storageDelegate = storageDelegate, .systemLayer = systemLayer, .inetLayer = inetLayer },
+                pairingDelegate);
 }
 
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate)
