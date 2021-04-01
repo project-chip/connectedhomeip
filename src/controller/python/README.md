@@ -321,3 +321,54 @@ Example:
 ```
 chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
 ```
+
+**Format of arguments**
+
+For any integer and char string (null terminated) types, just use `key=value`, for example: `rate=2`, `string=123`, `string_2="123 456"`
+
+For byte string type, use `key=encoding:value`, currectly, we support `str` and `hex` encoding, the `str` encoding will encode a NULL terminated string. For example, `networkId=hex:0123456789abcdef` (for `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for `['T', 'e', 's', 't', 0x00]`).
+
+## Example Commissioning flow over IP
+
+* Assuming your WiFi ssid is `TESTSSID`, and your WiFi password is `P455W4RD`.
+
+* Assuming your Thread network has the following operational dataset:
+
+   ```
+   0e 08 0000000000010000
+   00 03 000014
+   35 06 0004001fffe0
+   02 08 577c1f5384d9e909
+   07 08 fdca4e253816ae9d
+   05 10 bb53ac7bf2133f0f686759ad9969255c
+   03 0f 4f70656e5468726561642d31343937
+   01 02 1497
+   04 10 420111ea791a892d28e3160f20eea396
+   0c 03 0000ff
+   ```
+
+* Assuming your device is on the same network, with IP address 192.168.0.1
+
+* The setup pincode is 12345678
+
+* You set the temporary node id to 4546
+
+```
+chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
+```
+
+> Skip this part if your device does not support WiFi.
+> ```
+> chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 4546 1 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
+>
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+> ```
+
+
+> Skip this part if your device does not support Thread.
+>
+> ```
+> chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 4546 1 0 operationalDataset=hex:0e080000000000010000000300001435060004001fffe00208577c1f5384d9e9090708fdca4e253816ae9d0510bb53ac7bf2133f0f686759ad9969255c030f4f70656e5468726561642d31343937010214970410420111ea791a892d28e3160f20eea3960c030000ff breadcrumb=0 timeoutMs=1000
+>
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkId=hex:0123456789abcdef breadcrumb=0 timeoutMs=1000
+> ```
