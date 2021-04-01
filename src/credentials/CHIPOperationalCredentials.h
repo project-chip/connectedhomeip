@@ -35,20 +35,26 @@
 namespace chip {
 namespace Credentials {
 
-using namespace Crypto;
+static constexpr size_t kOperationalCredentialsMax = 5;
 
-struct CertificateKeyIdCompare
-{
-    bool operator()(const CertificateKeyId & lhs, const CertificateKeyId & rhs) const
-    {
-        return std::lexicographical_compare(lhs.mId, lhs.mId + lhs.mLen, rhs.mId, rhs.mId + rhs.mLen);
-    }
-};
+using namespace Crypto;
 
 struct NodeCredential
 {
     uint8_t * mCredential;
     uint16_t mLen;
+};
+
+struct NodeCredentialMap
+{
+    CertificateKeyId trustedRootId;
+    NodeCredential nodeCredential;
+};
+
+struct NodeKeypairMap
+{
+    CertificateKeyId trustedRootId;
+    P256Keypair keypair;
 };
 
 /**
@@ -61,7 +67,9 @@ struct NodeCredential
 class DLL_EXPORT OperationalCredentialSet
 {
 public:
-    OperationalCredentialSet() : mOpCreds(nullptr), mOpCredCount(0), mMaxCerts(0) {}
+    OperationalCredentialSet() :
+        mOpCreds(nullptr), mOpCredCount(0), mMaxCerts(0), mChipDeviceCredentialsCount(0), mDeviceOpCredKeypairCount(0)
+    {}
 
     ~OperationalCredentialSet() { Release(); }
 
@@ -97,6 +105,8 @@ public:
      * @brief Clear certificate data loaded into this set.
      **/
     void Clear();
+
+    void CleanupMaps();
 
     /**
      * @brief Load CHIP certificate-set into set.
@@ -199,21 +209,18 @@ public:
      **/
     const uint8_t * GetDevOpCred(const CertificateKeyId & trustedRootId) const
     {
-        return mChipDeviceCredentials.at(trustedRootId).mCredential;
+        return GetNodeCredentialAt(trustedRootId)->mCredential;
     }
 
     /**
      * @return Length of the loaded device credentials buffer.
      **/
-    uint16_t GetDevOpCredLen(const CertificateKeyId & trustedRootId) const { return mChipDeviceCredentials.at(trustedRootId).mLen; }
+    uint16_t GetDevOpCredLen(const CertificateKeyId & trustedRootId) const { return GetNodeCredentialAt(trustedRootId)->mLen; }
 
     CHIP_ERROR SetDevOpCred(const CertificateKeyId & trustedRootId, const uint8_t * chipDeviceCredentials,
                             uint16_t chipDeviceCredentialsLen);
 
-    const P256Keypair & GetDevOpCredKeypair(const CertificateKeyId & trustedRootId) const
-    {
-        return *mDeviceOpCredKeypair.at(trustedRootId);
-    }
+    P256Keypair & GetDevOpCredKeypair(const CertificateKeyId & trustedRootId) { return *GetNodeKeypairAt(trustedRootId); }
 
     CHIP_ERROR SetDevOpCredKeypair(const CertificateKeyId & trustedRootId, P256Keypair * newKeypair);
 
@@ -228,8 +235,13 @@ private:
                                     their destructor called since then. */
     uint8_t mMaxCerts;             /**< Length of mOpCreds array. */
     bool mMemoryAllocInternal;     /**< Indicates whether temporary memory buffers are allocated internally. */
-    std::map<CertificateKeyId, NodeCredential, CertificateKeyIdCompare> mChipDeviceCredentials;
-    std::map<CertificateKeyId, P256Keypair *, CertificateKeyIdCompare> mDeviceOpCredKeypair;
+    NodeCredentialMap mChipDeviceCredentials[kOperationalCredentialsMax];
+    uint8_t mChipDeviceCredentialsCount;
+    NodeKeypairMap mDeviceOpCredKeypair[kOperationalCredentialsMax];
+    uint8_t mDeviceOpCredKeypairCount;
+
+    const NodeCredential * GetNodeCredentialAt(const CertificateKeyId & trustedRootId) const;
+    P256Keypair * GetNodeKeypairAt(const CertificateKeyId & trustedRootId);
 };
 
 } // namespace Credentials

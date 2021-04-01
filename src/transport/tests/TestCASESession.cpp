@@ -288,7 +288,7 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     SuccessOrExit(error);
 
     error =
-        commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_DER, static_cast<uint16_t>(sTestCert_Node01_DER_Len));
+        commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_Chip, static_cast<uint16_t>(sTestCert_Node01_Chip_Len));
     SuccessOrExit(error);
 
     error = commissionerDevOpCred.SetDevOpCredKeypair(trustedRootId, &commissionerOpKeys);
@@ -297,7 +297,7 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     error = accessoryDevOpCred.Init(&accessoryCertificateSet, 1);
     SuccessOrExit(error);
 
-    error = accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_DER, static_cast<uint16_t>(sTestCert_Node01_DER_Len));
+    error = accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_Chip, static_cast<uint16_t>(sTestCert_Node01_Chip_Len));
     SuccessOrExit(error);
 
     error = accessoryDevOpCred.SetDevOpCredKeypair(trustedRootId, &accessoryOpKeys);

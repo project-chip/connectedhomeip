@@ -38,26 +38,38 @@ using namespace chip::Crypto;
 
 CHIP_ERROR OperationalCredentialSet::Init(uint8_t maxCertsArraySize)
 {
+    VerifyOrReturnError(mOpCreds == nullptr, CHIP_ERROR_INTERNAL);
+
     VerifyOrReturnError(maxCertsArraySize > 0, CHIP_ERROR_INVALID_ARGUMENT);
     mOpCreds = reinterpret_cast<ChipCertificateSet *>(chip::Platform::MemoryAlloc(sizeof(ChipCertificateSet) * maxCertsArraySize));
     VerifyOrReturnError(mOpCreds != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    mOpCredCount         = 0;
-    mMaxCerts            = maxCertsArraySize;
-    mMemoryAllocInternal = true;
+    mOpCredCount                = 0;
+    mMaxCerts                   = maxCertsArraySize;
+    mMemoryAllocInternal        = true;
+    mChipDeviceCredentialsCount = 0;
+    mDeviceOpCredKeypairCount   = 0;
+
+    CleanupMaps();
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OperationalCredentialSet::Init(ChipCertificateSet * certSetsArray, uint8_t certSetsArraySize)
 {
+    VerifyOrReturnError(mOpCreds == nullptr, CHIP_ERROR_INTERNAL);
+
     VerifyOrReturnError(certSetsArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(certSetsArraySize > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mOpCredCount         = certSetsArraySize;
-    mOpCreds             = certSetsArray;
-    mMaxCerts            = certSetsArraySize;
-    mMemoryAllocInternal = false;
+    mOpCredCount                = certSetsArraySize;
+    mOpCreds                    = certSetsArray;
+    mMaxCerts                   = certSetsArraySize;
+    mMemoryAllocInternal        = false;
+    mChipDeviceCredentialsCount = 0;
+    mDeviceOpCredKeypairCount   = 0;
+
+    CleanupMaps();
 
     return CHIP_NO_ERROR;
 }
@@ -74,32 +86,30 @@ void OperationalCredentialSet::Release()
         }
         mMemoryAllocInternal = false;
     }
-
+    else
     {
-        std::map<CertificateKeyId, NodeCredential, CertificateKeyIdCompare>::iterator it;
+        mOpCreds = nullptr;
+    }
 
-        for (it = mChipDeviceCredentials.begin(); it != mChipDeviceCredentials.end(); ++it)
+    for (size_t i = 0; i < kOperationalCredentialsMax; ++i)
+    {
+        if (mChipDeviceCredentials[i].nodeCredential.mCredential != nullptr)
         {
-            if (it->second.mCredential != nullptr)
-            {
-                chip::Platform::MemoryFree(it->second.mCredential);
-                it->second.mCredential = nullptr;
-            }
+            chip::Platform::MemoryFree(mChipDeviceCredentials[i].nodeCredential.mCredential);
+            mChipDeviceCredentials[i].nodeCredential.mCredential = nullptr;
+            mChipDeviceCredentials[i].nodeCredential.mLen        = 0;
+            mChipDeviceCredentials[i].trustedRootId.mId          = nullptr;
+            mChipDeviceCredentials[i].trustedRootId.mLen         = 0;
+        }
+        if (mDeviceOpCredKeypair[i].trustedRootId.mId != nullptr)
+        {
+            mDeviceOpCredKeypair[i].trustedRootId.mId  = nullptr;
+            mDeviceOpCredKeypair[i].trustedRootId.mLen = 0;
         }
     }
 
-    {
-        std::map<CertificateKeyId, P256Keypair *, CertificateKeyIdCompare>::iterator it;
-
-        for (it = mDeviceOpCredKeypair.begin(); it != mDeviceOpCredKeypair.end(); ++it)
-        {
-            if (it->second != nullptr)
-            {
-                chip::Platform::Delete(it->second);
-                it->second = nullptr;
-            }
-        }
-    }
+    mChipDeviceCredentialsCount = 0;
+    mDeviceOpCredKeypairCount   = 0;
 }
 
 void OperationalCredentialSet::Clear()
@@ -110,6 +120,20 @@ void OperationalCredentialSet::Clear()
     }
 
     mOpCredCount = 0;
+}
+
+void OperationalCredentialSet::CleanupMaps()
+{
+    for (size_t i = 0; i < kOperationalCredentialsMax; ++i)
+    {
+        mChipDeviceCredentials[i].trustedRootId.mId          = nullptr;
+        mChipDeviceCredentials[i].trustedRootId.mLen         = 0;
+        mChipDeviceCredentials[i].nodeCredential.mCredential = nullptr;
+        mChipDeviceCredentials[i].nodeCredential.mLen        = 0;
+
+        mDeviceOpCredKeypair[i].trustedRootId.mId  = nullptr;
+        mDeviceOpCredKeypair[i].trustedRootId.mLen = 0;
+    }
 }
 
 ChipCertificateSet * OperationalCredentialSet::FindCertSet(const CertificateKeyId & trustedRootId) const
@@ -185,7 +209,7 @@ CHIP_ERROR OperationalCredentialSet::FindValidCert(const CertificateKeyId & trus
 CHIP_ERROR OperationalCredentialSet::SignMsg(const CertificateKeyId & trustedRootId, const uint8_t * msg, const size_t msg_length,
                                              P256ECDSASignature & out_signature)
 {
-    return mDeviceOpCredKeypair.at(trustedRootId)->ECDSA_sign_msg(msg, msg_length, out_signature);
+    return GetNodeKeypairAt(trustedRootId)->ECDSA_sign_msg(msg, msg_length, out_signature);
 }
 
 const CertificateKeyId * OperationalCredentialSet::GetTrustedRootId(uint16_t certSetIndex) const
@@ -210,13 +234,18 @@ CHIP_ERROR OperationalCredentialSet::SetDevOpCred(const CertificateKeyId & trust
 {
     NodeCredential newCredential;
 
+    VerifyOrReturnError(mChipDeviceCredentialsCount < kOperationalCredentialsMax, CHIP_ERROR_NO_MEMORY);
+
     newCredential.mCredential = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(chipDeviceCredentialsLen));
     VerifyOrReturnError(newCredential.mCredential != nullptr, CHIP_ERROR_NO_MEMORY);
 
     memcpy(newCredential.mCredential, chipDeviceCredentials, chipDeviceCredentialsLen);
     newCredential.mLen = chipDeviceCredentialsLen;
 
-    mChipDeviceCredentials.insert(std::make_pair(trustedRootId, newCredential));
+    mChipDeviceCredentials[mChipDeviceCredentialsCount].trustedRootId  = trustedRootId;
+    mChipDeviceCredentials[mChipDeviceCredentialsCount].nodeCredential = newCredential;
+
+    ++mChipDeviceCredentialsCount;
 
     return CHIP_NO_ERROR;
 }
@@ -224,16 +253,47 @@ CHIP_ERROR OperationalCredentialSet::SetDevOpCred(const CertificateKeyId & trust
 CHIP_ERROR OperationalCredentialSet::SetDevOpCredKeypair(const CertificateKeyId & trustedRootId, P256Keypair * newKeypair)
 {
     P256SerializedKeypair serializedKeypair;
-    P256Keypair * keypair = chip::Platform::New<P256Keypair>();
 
-    VerifyOrReturnError(keypair != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mDeviceOpCredKeypairCount < kOperationalCredentialsMax, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(newKeypair->Serialize(serializedKeypair));
-    ReturnErrorOnFailure(keypair->Deserialize(serializedKeypair));
+    ReturnErrorOnFailure(mDeviceOpCredKeypair[mDeviceOpCredKeypairCount].keypair.Deserialize(serializedKeypair));
 
-    mDeviceOpCredKeypair.insert(std::make_pair(trustedRootId, keypair));
+    mDeviceOpCredKeypair[mDeviceOpCredKeypairCount].trustedRootId = trustedRootId;
+
+    ++mDeviceOpCredKeypairCount;
 
     return CHIP_NO_ERROR;
+}
+
+const NodeCredential * OperationalCredentialSet::GetNodeCredentialAt(const CertificateKeyId & trustedRootId) const
+{
+    for (size_t i = 0; i < kOperationalCredentialsMax && mChipDeviceCredentials[i].nodeCredential.mCredential != nullptr; ++i)
+    {
+        VerifyOrReturnError(trustedRootId.mLen == mChipDeviceCredentials[i].trustedRootId.mLen, nullptr);
+
+        if (memcmp(trustedRootId.mId, mChipDeviceCredentials[i].trustedRootId.mId, trustedRootId.mLen) == 0)
+        {
+            return &mChipDeviceCredentials[i].nodeCredential;
+        }
+    }
+
+    return nullptr;
+}
+
+P256Keypair * OperationalCredentialSet::GetNodeKeypairAt(const CertificateKeyId & trustedRootId)
+{
+    for (size_t i = 0; i < kOperationalCredentialsMax && mDeviceOpCredKeypair[i].trustedRootId.mId != nullptr; ++i)
+    {
+        VerifyOrReturnError(trustedRootId.mLen == mChipDeviceCredentials[i].trustedRootId.mLen, nullptr);
+
+        if (memcmp(trustedRootId.mId, mDeviceOpCredKeypair[i].trustedRootId.mId, trustedRootId.mLen) == 0)
+        {
+            return &mDeviceOpCredKeypair[i].keypair;
+        }
+    }
+
+    return nullptr;
 }
 
 } // namespace Credentials
