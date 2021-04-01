@@ -29,7 +29,7 @@
 
 #include <credentials/CHIPOperationalCredentials.h>
 #include <support/CHIPMem.h>
-#include <support/ReturnMacros.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Credentials {
