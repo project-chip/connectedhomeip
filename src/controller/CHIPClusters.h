@@ -32,6 +32,7 @@ constexpr ClusterId kBarrierControlClusterId         = 0x0103;
 constexpr ClusterId kBasicClusterId                  = 0x0028;
 constexpr ClusterId kBindingClusterId                = 0xF000;
 constexpr ClusterId kColorControlClusterId           = 0x0300;
+constexpr ClusterId kDescriptorClusterId             = 0x001D;
 constexpr ClusterId kDoorLockClusterId               = 0x0101;
 constexpr ClusterId kGeneralCommissioningClusterId   = 0x0030;
 constexpr ClusterId kGroupKeyManagementClusterId     = 0xF004;
@@ -302,6 +303,21 @@ private:
     static constexpr CommandId kStepHueCommandId                = 0x02;
     static constexpr CommandId kStepSaturationCommandId         = 0x05;
     static constexpr CommandId kStopMoveStepCommandId           = 0x47;
+};
+
+class DLL_EXPORT DescriptorCluster : public ClusterBase
+{
+public:
+    DescriptorCluster() : ClusterBase(kDescriptorClusterId) {}
+    ~DescriptorCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeServerList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClientList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT DoorLockCluster : public ClusterBase
