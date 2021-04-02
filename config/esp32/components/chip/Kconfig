@@ -24,6 +24,14 @@
 #
 menu "CHIP Core"
 
+    config ENABLE_INTERACTION_MODEL
+        bool "Enable interaction model"
+        default n
+        help
+            Enable interaction model for ESP32 builds, when this flag is turned on, the controller
+            side should also enable interaction model.
+
+
     menu "General Options"
 
         config MAX_EXCHANGE_CONTEXTS

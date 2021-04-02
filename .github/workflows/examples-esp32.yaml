@@ -51,8 +51,10 @@ jobs:
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
+                  cp examples/all-clusters-app/esp32/build/sdkconfig-chip-all-clusters-app.elf \
                      example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
+                  cp examples/all-clusters-app/esp32/build/sdkconfig_m5stack_experimental-chip-all-clusters-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app_m5stack_experimental.elf
             - name: Build example Pigweed App
               run: scripts/examples/esp_example.sh pigweed-app
             - name: Copy aside build products

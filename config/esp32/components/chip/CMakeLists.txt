@@ -58,6 +58,10 @@ if (NOT CONFIG_USE_MINIMAL_MDNS)
 endif()
 
 
+if(CONFIG_ENABLE_INTERACTION_MODEL)
+    chip_gn_arg_append("chip_enable_interaction_model"      "true")
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
