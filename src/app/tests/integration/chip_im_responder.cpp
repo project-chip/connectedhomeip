@@ -44,7 +44,8 @@ namespace app {
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    static bool statusCodeFlipper = false;
 
     if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
     {
@@ -71,24 +72,34 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
     chip::TLV::TLVWriter writer = apCommandObj->CreateCommandDataElementTLVWriter();
 
-    printf("responder constructing response");
-    err = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
-    SuccessOrExit(err);
+    if (statusCodeFlipper)
+    {
+        printf("responder constructing status code in command");
+        apCommandObj->AddStatusCode(&commandParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+    }
+    else
+    {
+        printf("responder constructing command data in command");
+        err = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
+        SuccessOrExit(err);
 
-    err = writer.Put(chip::TLV::ContextTag(1), effectIdentifier);
-    SuccessOrExit(err);
+        err = writer.Put(chip::TLV::ContextTag(1), effectIdentifier);
+        SuccessOrExit(err);
 
-    err = writer.Put(chip::TLV::ContextTag(2), effectVariant);
-    SuccessOrExit(err);
+        err = writer.Put(chip::TLV::ContextTag(2), effectVariant);
+        SuccessOrExit(err);
 
-    err = writer.EndContainer(dummyType);
-    SuccessOrExit(err);
+        err = writer.EndContainer(dummyType);
+        SuccessOrExit(err);
 
-    err = writer.Finalize();
-    SuccessOrExit(err);
+        err = writer.Finalize();
+        SuccessOrExit(err);
 
-    err = apCommandObj->AddCommand(commandParams);
-    SuccessOrExit(err);
+        err = apCommandObj->AddCommand(commandParams);
+        SuccessOrExit(err);
+    }
+    statusCodeFlipper = !statusCodeFlipper;
 
 exit:
     return;

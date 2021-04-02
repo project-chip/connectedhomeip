@@ -45,7 +45,9 @@ public:
     CHIP_ERROR SendCommandResponse();
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload);
-
+    CHIP_ERROR AddStatusCode(const CommandParams * apCommandParams,
+                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
+                                         const uint16_t aProtocolCode) override;
 private:
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };
