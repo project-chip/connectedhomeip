@@ -807,7 +807,7 @@ protected:
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
     TLVElementType ElementType() const;
 
-    template<typename int_type>
+    template <typename int_type>
     bool TLVTypeValid(uint64_t val64) const;
     CHIP_ERROR _Get(uint64_t & v);
 };

@@ -154,20 +154,21 @@ void TestGet(nlTestSuite * inSuite, S & s, TLVType type, uint64_t tag, T expecte
     NL_TEST_ASSERT(inSuite, val == expectedVal);
 }
 
-#define  TEST_GET(inSuite, s, type, tag, expectedVal, expectedErr) do {\
-    NL_TEST_ASSERT(inSuite, s.GetType() == type);                      \
-    NL_TEST_ASSERT(inSuite, s.GetTag() == tag);                        \
-    NL_TEST_ASSERT(inSuite, s.GetLength() == 0);                       \
-                                                                       \
-    decltype(expectedVal) __val;                                       \
-    CHIP_ERROR __err = s.Get(__val);                                   \
-    NL_TEST_ASSERT(inSuite, __err == expectedErr);                     \
-    if (__err == CHIP_NO_ERROR)                                        \
-        NL_TEST_ASSERT(inSuite, __val == expectedVal);                 \
-} while (false)
+#define TEST_GET(inSuite, s, type, tag, expectedVal, expectedErr)                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        NL_TEST_ASSERT(inSuite, s.GetType() == type);                                                                              \
+        NL_TEST_ASSERT(inSuite, s.GetTag() == tag);                                                                                \
+        NL_TEST_ASSERT(inSuite, s.GetLength() == 0);                                                                               \
+                                                                                                                                   \
+        decltype(expectedVal) __val;                                                                                               \
+        CHIP_ERROR __err = s.Get(__val);                                                                                           \
+        NL_TEST_ASSERT(inSuite, __err == expectedErr);                                                                             \
+        if (__err == CHIP_NO_ERROR)                                                                                                \
+            NL_TEST_ASSERT(inSuite, __val == expectedVal);                                                                         \
+    } while (false)
 
-#define  TEST_GET_NOERROR(inSuite, s, type, tag, expectedVal) \
-    TEST_GET(inSuite, s, type, tag, expectedVal, CHIP_NO_ERROR)
+#define TEST_GET_NOERROR(inSuite, s, type, tag, expectedVal) TEST_GET(inSuite, s, type, tag, expectedVal, CHIP_NO_ERROR)
 
 void ForEachElement(nlTestSuite * inSuite, TLVReader & reader, void * context,
                     void (*cb)(nlTestSuite * inSuite, TLVReader & reader, void * context))
@@ -677,8 +678,9 @@ void ReadEncoding1(nlTestSuite * inSuite, TLVReader & reader)
 
             TestNext<TLVReader>(inSuite, reader3);
 
-            TEST_GET(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag, static_cast<int64_t>(40000000000ULL), CHIP_ERROR_WRONG_TLV_TYPE);
-            TEST_GET_NOERROR(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag,static_cast<uint64_t>(40000000000ULL));
+            TEST_GET(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag, static_cast<int64_t>(40000000000ULL),
+                     CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET_NOERROR(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag, static_cast<uint64_t>(40000000000ULL));
 
             TestNext<TLVReader>(inSuite, reader3);
 
@@ -3090,7 +3092,8 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 
             TestNext<TLVReader>(inSuite, reader3);
 
-            TEST_GET(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag, static_cast<int64_t>(40000000000ULL), CHIP_ERROR_WRONG_TLV_TYPE);
+            TEST_GET(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag, static_cast<int64_t>(40000000000ULL),
+                     CHIP_ERROR_WRONG_TLV_TYPE);
             TEST_GET_NOERROR(inSuite, reader3, kTLVType_UnsignedInteger, AnonymousTag, static_cast<uint64_t>(40000000000ULL));
 
             TestNext<TLVReader>(inSuite, reader3);
@@ -3242,11 +3245,13 @@ void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TEST_GET_NOERROR(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int64_t>(40000000000ULL));
+    TEST_GET_NOERROR(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
+                     static_cast<int64_t>(40000000000ULL));
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TEST_GET_NOERROR(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int16_t>(12345));
+    TEST_GET_NOERROR(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
+                     static_cast<int16_t>(12345));
 
     TestNext<TLVReader>(inSuite, reader);
 
