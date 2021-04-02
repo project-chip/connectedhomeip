@@ -20,11 +20,13 @@
 
 #include "OpenFileHandleAsFileDescriptor.h"
 #include "common.h"
+#include "mbed-trace/mbed_trace.h"
 #include <atomic>
 #include <mstd_atomic>
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>
 
+#define TRACE_GROUP "BSDS"
 namespace mbed {
 
 struct BSDSocket : public FileHandle
@@ -57,6 +59,7 @@ struct BSDSocket : public FileHandle
             }
             break;
             default:
+                tr_err("Socket type not supported");
                 set_errno(ESOCKTNOSUPPORT);
                 return -1;
             };
@@ -65,6 +68,7 @@ struct BSDSocket : public FileHandle
         if (_socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
         {
             close();
+            tr_err("Open socket failed");
             set_errno(ENOBUFS);
             return -1;
         }
@@ -73,6 +77,7 @@ struct BSDSocket : public FileHandle
 
         _flags.store(0);
         _socket->sigio([&]() {
+            tr_debug("Socket event");
             auto current = _flags.load();
             if (current & POLLOUT)
             {
@@ -96,9 +101,12 @@ struct BSDSocket : public FileHandle
         if (_fd < 0)
         {
             close();
+            tr_err("Bind socket to fd failed");
             set_errno(ENFILE);
             return -1;
         }
+
+        tr_info("Open %s socket with fd %d", type == MBED_TCP_SOCKET ? "TCP" : "UDP", _fd);
 
         return _fd;
     }
@@ -107,6 +115,8 @@ struct BSDSocket : public FileHandle
     {
         delete _socket;
         _socket = nullptr;
+
+        tr_info("Close %s socket fd %d", _type == MBED_TCP_SOCKET ? "TCP" : "UDP", _fd);
 
         _fd       = -1;
         _callback = nullptr;
@@ -119,6 +129,7 @@ struct BSDSocket : public FileHandle
 
     ssize_t read(void * buffer, size_t size) override
     {
+        tr_info("Read from socket fd %d", _fd);
         while (true)
         {
             auto current = _flags.load();
@@ -134,6 +145,7 @@ struct BSDSocket : public FileHandle
 
     ssize_t write(const void * buffer, size_t size) override
     {
+        tr_info("Write to socket fd %d", _fd);
         while (true)
         {
             auto current = _flags.load();
@@ -151,6 +163,7 @@ struct BSDSocket : public FileHandle
 
     int set_blocking(bool blocking) override
     {
+        tr_info("Set socket fd %d blocking: %s", _fd, blocking ? "true" : "false");
         _blocking = blocking;
         if (_socket != nullptr)
         {
@@ -164,6 +177,7 @@ struct BSDSocket : public FileHandle
 
     int enable_input(bool enabled) override
     {
+        tr_info("Set socket fd %d input enable: %s\n", _fd, enabled ? "true" : "false");
         _inputEnable = enabled;
         return 0;
     }
@@ -172,6 +186,7 @@ struct BSDSocket : public FileHandle
 
     int enable_output(bool enabled) override
     {
+        tr_info("Set socket fd %d output enable: %s", _fd, enabled ? "true" : "false");
         _outputEnable = enabled;
         return 0;
     }
@@ -181,7 +196,7 @@ struct BSDSocket : public FileHandle
     short poll(short events) const override
     {
         auto state = _flags.load();
-
+        tr_debug("Socket fd %d poll state: %d", state);
         return (state & events);
     }
 

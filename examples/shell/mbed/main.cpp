@@ -24,6 +24,8 @@
 #include <lib/support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include "mbed-trace/mbed_trace.h"
+
 #include "ChipShellMbedCollection.h"
 #include <ChipShellCollection.h>
 
@@ -40,6 +42,10 @@ int main()
         ChipLogError(Shell, "Streamer initialization failed: %d", rc);
         return rc;
     }
+
+    mbed_trace_init();
+    mbed_trace_include_filters_set("BSDS,NETS");
+    mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL);
 
     cmd_misc_init();
     cmd_base64_init();

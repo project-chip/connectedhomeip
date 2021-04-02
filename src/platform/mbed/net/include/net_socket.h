@@ -42,7 +42,7 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
 
 int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen);
 
-int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen);
+int mbed_getpeername(int fd, struct sockaddr * addr, socklen_t * addrlen);
 
 int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval * timeout);
 

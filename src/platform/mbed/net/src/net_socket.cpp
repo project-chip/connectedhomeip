@@ -10,6 +10,8 @@
 using namespace mbed;
 using namespace rtos;
 
+#define TRACE_GROUP "NETS"
+
 #define NO_FREE_SOCKET_SLOT (-1)
 
 static BSDSocket sockets[MBED_NET_SOCKET_MAX_NUMBER];
@@ -54,9 +56,11 @@ int getFreeSocketSlotIndex()
 
 int mbed_socket(int family, int type, int proto)
 {
+    tr_info("Create socket family %d type %d proto %d", family, type, proto);
     int index = getFreeSocketSlotIndex();
     if (index == NO_FREE_SOCKET_SLOT)
     {
+        tr_err("No free socket slot");
         set_errno(ENOBUFS);
         return -1;
     }
@@ -85,6 +89,8 @@ int mbed_shutdown(int fd, int how)
         set_errno(EINVAL);
         return -1;
     }
+
+    tr_info("Shutdown fd %d how %d", fd, how);
 
     switch (how)
     {
@@ -131,9 +137,12 @@ int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
+    tr_info("Bind fd %d address %s", fd, sockAddr.get_ip_address());
+
     auto ret = socket->getNetSocket()->bind(sockAddr);
     if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     {
+        tr_err("Bind failed [%d]", ret);
         set_errno(EIO);
         return -1;
     }
@@ -165,9 +174,11 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
+    tr_info("Connect fd %d address %s", fd, sockAddr.get_ip_address());
     auto ret = socket->getNetSocket()->connect(sockAddr);
     if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     {
+        tr_err("Connect failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_IN_PROGRESS:
@@ -188,6 +199,7 @@ int mbed_connect(int fd, const struct sockaddr * addr, socklen_t addrlen)
 
     if (!socket->is_blocking())
     {
+        tr_debug("Connect not blocking\n");
         socket->write(NULL, 0);
         set_errno(EINPROGRESS);
         return -1;
@@ -217,9 +229,11 @@ int mbed_listen(int fd, int backlog)
         return -1;
     }
 
+    tr_info("Listen fd %d backlog %d", fd, backlog);
     auto ret = socket->getNetSocket()->listen(backlog);
     if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
     {
+        tr_err("Listen failed [%d]", ret);
         set_errno(EIO);
         return -1;
     }
@@ -232,6 +246,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
     nsapi_error_t error;
     Socket * newSocket = nullptr;
     int index;
+    SocketAddress sockAddr;
 
     auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
@@ -252,20 +267,51 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
+    tr_info("Connection accept for fd %d socket", fd);
     newSocket = socket->getNetSocket()->accept(&error);
     if ((error != NSAPI_ERROR_OK) && (error != NSAPI_ERROR_UNSUPPORTED))
     {
+        tr_err("Accept failed [%d]", error);
         set_errno(ENOBUFS);
+        return -1;
+    }
+
+    error = newSocket->getpeername(&sockAddr);
+    if (error != NSAPI_ERROR_OK)
+    {
+        tr_err("Get peer name failed [%d]", error);
+        delete newSocket;
+        switch (error)
+        {
+        case NSAPI_ERROR_NO_SOCKET:
+            set_errno(ENOTSOCK);
+            break;
+        case NSAPI_ERROR_NO_CONNECTION:
+            set_errno(ECONNABORTED);
+            break;
+        default:
+            set_errno(ENOBUFS);
+        }
+        return -1;
+    }
+
+    if (convert_mbed_addr_to_bsd(addr, &sockAddr))
+    {
+        delete newSocket;
+        set_errno(EINVAL);
         return -1;
     }
 
     index = getFreeSocketSlotIndex();
     if (index == NO_FREE_SOCKET_SLOT)
     {
+        tr_err("No free socket slot");
         delete newSocket;
         set_errno(ENOBUFS);
         return -1;
     }
+
+    tr_info("New connected socket fd %d", index);
 
     return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);
 }
@@ -298,9 +344,11 @@ ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
         socket->set_blocking(false);
     }
 
+    tr_info("Socket fd %d send %d bytes", fd, ret);
     ret = socket->getNetSocket()->send(buf, len);
     if (ret < 0)
     {
+        tr_err("Send failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -369,9 +417,11 @@ ssize_t mbed_sendto(int fd, const void * buf, size_t len, int flags, const struc
         }
     }
 
+    tr_info("Socket fd %d send %d bytes to %s", fd, len, sockAddr.get_ip_address());
     ret = socket->getNetSocket()->sendto(sockAddr, buf, len);
     if (ret < 0)
     {
+        tr_err("Send to failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -435,6 +485,7 @@ ssize_t mbed_sendmsg(int fd, const struct msghdr * message, int flags)
         return -1;
     }
 
+    tr_info("Socket fd %d send message to %s", fd, sockAddr.get_ip_address());
     for (size_t i = 0; i < message->msg_iovlen; i++)
     {
         ret = socket->getNetSocket()->sendto(sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
@@ -499,6 +550,7 @@ ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
     ret = socket->getNetSocket()->recv(buf, max_len);
     if (ret < 0)
     {
+        tr_err("Receive failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -514,6 +566,7 @@ ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
     }
     else
     {
+        tr_info("Socket fd %d recevied %d bytes", fd, ret);
         socket->read(NULL, 0);
     }
 
@@ -558,6 +611,7 @@ ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sock
     ret = socket->getNetSocket()->recvfrom(&sockAddr, buf, max_len);
     if (ret < 0)
     {
+        tr_err("Receive from failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -573,6 +627,7 @@ ssize_t mbed_recvfrom(int fd, void * buf, size_t max_len, int flags, struct sock
     }
     else
     {
+        tr_info("Socket fd %d recevied %d bytes from %s", fd, ret, sockAddr.get_ip_address());
         socket->read(NULL, 0);
         if (src_addr != nullptr)
         {
@@ -627,6 +682,7 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
         auto ret = socket->getNetSocket()->recvfrom(&sockAddr, (void *) message->msg_iov[i].iov_base, message->msg_iov[i].iov_len);
         if (ret < 0)
         {
+            tr_err("Receive from failed [%d]", ret);
             switch (ret)
             {
             case NSAPI_ERROR_NO_SOCKET:
@@ -648,6 +704,7 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
 
     if (total != -1)
     {
+        tr_info("Socket fd %d received message from %s", fd, sockAddr.get_ip_address());
         if (message->msg_name != nullptr)
         {
             if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
@@ -678,6 +735,7 @@ int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * o
     auto ret = socket->getsockopt(level, optname, optval, optlen);
     if (ret < 0)
     {
+        tr_err("Get socket option failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -696,6 +754,7 @@ int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * o
         }
         return -1;
     }
+    tr_info("Get socket fd %d option level %d optname %d", fd, level, optname);
     return 0;
 }
 
@@ -711,6 +770,7 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
     auto ret = socket->setsockopt(level, optname, optval, optlen);
     if (ret < 0)
     {
+        tr_err("Set socket option failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -724,6 +784,7 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
         }
         return -1;
     }
+    tr_info("Set socket fd %d option level %d optname %d", fd, level, optname);
     return 0;
 }
 
@@ -748,6 +809,7 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
+    tr_info("Get socket fd %d name", fd);
     if (socket->socketName.get_ip_version() == NSAPI_IPv4)
     {
         if (*addrlen < sizeof(sockaddr_in))
@@ -776,10 +838,10 @@ int mbed_getsockname(int fd, struct sockaddr * addr, socklen_t * addrlen)
     return 0;
 }
 
-int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
+int mbed_getpeername(int fd, struct sockaddr * addr, socklen_t * addrlen)
 {
     SocketAddress sockAddr;
-    auto * socket = getSocket(sockfd);
+    auto * socket = getSocket(fd);
     if (socket == nullptr)
     {
         set_errno(EBADF);
@@ -795,6 +857,7 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
     auto ret = socket->getpeername(&sockAddr);
     if (ret < 0)
     {
+        tr_err("Get peer name failed [%d]", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -809,6 +872,7 @@ int mbed_getpeername(int sockfd, struct sockaddr * addr, socklen_t * addrlen)
 
         return -1;
     }
+    tr_info("Get socket fd %d peer name", fd);
     convert_mbed_addr_to_bsd(addr, &sockAddr);
     return 0;
 }
