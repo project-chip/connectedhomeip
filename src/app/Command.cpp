@@ -169,10 +169,12 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     const uint8_t * apCommandData;
-    uint32_t apCommandLen;
+    uint32_t apCommandLen = 0;
 
-    apCommandData = mCommandDataBuf->Start();
-    apCommandLen  = mCommandDataBuf->DataLength();
+    if (!mCommandDataBuf.IsNull()) {
+        apCommandData = mCommandDataBuf->Start();
+        apCommandLen = mCommandDataBuf->DataLength();
+    }
 
     if (apCommandLen > 0)
     {
@@ -186,21 +188,9 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 
     {
         CommandDataElement::Builder commandDataElement =
-            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-        CommandPath::Builder commandPath = commandDataElement.CreateCommandPathBuilder();
-        if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
-        {
-            commandPath.EndpointId(aCommandParams.EndpointId);
-        }
+                mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
 
-        if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
-        {
-            commandPath.GroupId(aCommandParams.GroupId);
-        }
-
-        commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
-
-        err = commandPath.GetError();
+        err = ConstructCommandPath(aCommandParams, commandDataElement);
         SuccessOrExit(err);
 
         if (apCommandLen > 0)
@@ -225,24 +215,52 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId,
-                                  const uint16_t aProtocolCode)
+CHIP_ERROR Command::AddStatusCode(const CommandParams * apCommandParams, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
+    CommandDataElement::Builder commandDataElement =
+            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
 
-    err = statusElementBuilder.Init(mInvokeCommandBuilder.GetWriter());
+    if (apCommandParams != nullptr)
+    {
+        err = ConstructCommandPath(*apCommandParams, commandDataElement);
+        SuccessOrExit(err);
+    }
+    err = statusElementBuilder.Init(commandDataElement.GetWriter());
     SuccessOrExit(err);
 
     statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
+    SuccessOrExit(err);
 
+    commandDataElement.EndOfCommandDataElement();
+    err = commandDataElement.GetError();
+    SuccessOrExit(err);
     MoveToState(CommandState::AddCommand);
 
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder & aCommandDataElement)
+{
+    CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
+    if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
+    {
+        commandPath.EndpointId(aCommandParams.EndpointId);
+    }
+
+    if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
+    {
+        commandPath.GroupId(aCommandParams.GroupId);
+    }
+
+    commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
+
+    return commandPath.GetError();
 }
 
 CHIP_ERROR Command::ClearExistingExchangeContext()
