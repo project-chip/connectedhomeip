@@ -77,7 +77,7 @@ struct BSDSocket : public FileHandle
 
         _flags.store(0);
         _socket->sigio([&]() {
-            tr_debug("Socket event");
+            tr_debug("Socket %d event", _fd);
             auto current = _flags.load();
             if (current & POLLOUT)
             {
@@ -196,7 +196,6 @@ struct BSDSocket : public FileHandle
     short poll(short events) const override
     {
         auto state = _flags.load();
-        tr_debug("Socket fd %d poll state: %d", state);
         return (state & events);
     }
 

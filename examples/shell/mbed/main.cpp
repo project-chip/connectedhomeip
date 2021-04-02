@@ -43,9 +43,11 @@ int main()
         return rc;
     }
 
+#ifdef MBED_CONF_MBED_TRACE_ENABLE
     mbed_trace_init();
     mbed_trace_include_filters_set("BSDS,NETS");
-    mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL);
+    mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL | TRACE_MODE_COLOR);
+#endif
 
     cmd_misc_init();
     cmd_base64_init();
