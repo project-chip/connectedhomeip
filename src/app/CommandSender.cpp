@@ -124,13 +124,11 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     StatusElement::Parser statusElementParser;
 
     mCommandIndex++;
-
     err = aCommandElement.GetCommandPath(&commandPath);
     SuccessOrExit(err);
 
     err = commandPath.GetClusterId(&clusterId);
     SuccessOrExit(err);
-
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
@@ -143,7 +141,6 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         // Response has status element since either there is error in command response or it is empty response
         err = statusElementParser.CheckSchemaValidity();
         SuccessOrExit(err);
-
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)

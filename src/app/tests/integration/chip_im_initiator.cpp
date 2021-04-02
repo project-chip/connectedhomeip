@@ -224,6 +224,8 @@ public:
         printf("CommandResponseStatus with GeneralCode %d, ProtocolId %d, ProtocolCode %d, EndpointId %d, ClusterId %d, CommandId "
                "%d, CommandIndex %d",
                static_cast<uint16_t>(aGeneralCode), aProtocolId, aProtocolCode, aEndpointId, aClusterId, aCommandId, aCommandIndex);
+        gWaitingForCommandResp = false;
+        gCommandRespCount++;
         return CHIP_NO_ERROR;
     }
 
