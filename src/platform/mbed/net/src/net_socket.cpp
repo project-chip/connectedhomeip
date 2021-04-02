@@ -735,7 +735,7 @@ int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * o
     auto ret = socket->getsockopt(level, optname, optval, optlen);
     if (ret < 0)
     {
-        tr_err("Get socket option failed [%d]", ret);
+        tr_err("Get socket option %s [%d]", ret == NSAPI_ERROR_UNSUPPORTED ? "unsupported" : "failed", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
@@ -770,7 +770,7 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
     auto ret = socket->setsockopt(level, optname, optval, optlen);
     if (ret < 0)
     {
-        tr_err("Set socket option failed [%d]", ret);
+        tr_err("Set socket option %s [%d]", ret == NSAPI_ERROR_UNSUPPORTED ? "unsupported" : "failed", ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:
