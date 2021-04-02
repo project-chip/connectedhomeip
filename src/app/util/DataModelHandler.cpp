@@ -20,7 +20,7 @@
  *   This file implements the handler for data model messages.
  */
 
-#include <app/server/DataModelHandler.h>
+#include "DataModelHandler.h"
 
 #if __has_include("gen/endpoint_config.h")
 #define USE_ZAP_CONFIG 1
