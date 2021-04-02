@@ -123,9 +123,14 @@ public:
      * Notification that a command sender encountered an asynchronous failure.
      * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
      * during multiple command interactions
+     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when command sender fails to receive, or other error when
+     *                            fail to process command response.
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR CommandResponseTimeout(const CommandSender * apCommandSender) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     virtual ~InteractionModelDelegate() = default;
 };
