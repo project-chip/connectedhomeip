@@ -112,10 +112,10 @@ extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {
-	return CHIPPlatformMemoryCalloc(aNum, aSize);
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
 }
 
 extern "C" void otPlatFree(void * aPtr)
 {
-	return CHIPPlatformMemoryFree(aPtr);
+    return CHIPPlatformMemoryFree(aPtr);
 }

@@ -31,7 +31,7 @@
 #include <utility>
 
 #ifndef WEAK
-#define WEAK	__attribute__((weak))
+#define WEAK __attribute__((weak))
 #endif
 
 namespace chip {
@@ -97,7 +97,7 @@ WEAK void * __wrap_realloc(void * ptr, size_t new_size);
 WEAK void * __wrap_malloc_r(void * REENT, size_t size);
 WEAK void __wrap_free_r(void * REENT, void * ptr);
 WEAK void * __wrap_realloc_r(void * REENT, void * ptr, size_t new_size);
-}//extern "C"
+} // extern "C"
 
 /**
  * This function is called by the CHIP layer to allocate a block of memory of "size" bytes.
