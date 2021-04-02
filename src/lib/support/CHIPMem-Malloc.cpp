@@ -26,8 +26,8 @@
 #include <core/CHIPConfig.h>
 #include <support/CHIPMem.h>
 
-#include <stdlib.h>
 #include <cstring>
+#include <stdlib.h>
 
 #if defined(ESP_PLATFORM)
 #include "freertos/FreeRTOS.h"
@@ -36,9 +36,8 @@
 #endif
 
 #ifndef WEAK
-#define WEAK	__attribute__((weak))
+#define WEAK __attribute__((weak))
 #endif
-
 
 #ifndef NDEBUG
 #include <atomic>
@@ -63,7 +62,6 @@ namespace Platform {
 #else
 
 #define VERIFY_INITIALIZED() VerifyInitialized(__func__)
-
 
 static std::atomic_int memoryInitialized{ 0 };
 
@@ -117,25 +115,25 @@ extern "C" {
 
 WEAK void * __wrap_malloc(size_t size)
 {
-	return malloc(size);
+    return malloc(size);
 }
 
 WEAK void __wrap_free(void * ptr)
 {
-	free(ptr);
+    free(ptr);
 }
 
 WEAK void * __wrap_calloc(size_t num, size_t size)
 {
-	return calloc(num, size);
+    return calloc(num, size);
 }
 
 WEAK void * __wrap_realloc(void * ptr, size_t new_size)
 {
-	return realloc(ptr, new_size);
+    return realloc(ptr, new_size);
 }
 
-}//extern "C"
+} // extern "C"
 
 void * MemoryAlloc(size_t size)
 {

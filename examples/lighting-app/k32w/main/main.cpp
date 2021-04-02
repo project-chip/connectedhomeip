@@ -32,8 +32,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/CHIPPlatformMemory.h>
+#include <support/logging/CHIPLogging.h>
 
 #include "FreeRtosMbedtlsUtils.h"
 #include "app_config.h"
@@ -44,7 +44,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
-
 
 #include <AppTask.h>
 

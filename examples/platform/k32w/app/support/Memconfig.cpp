@@ -23,10 +23,9 @@
  *
  */
 
-#include <stdlib.h>
-#include <cstring>
 #include "FreeRTOS.h"
-
+#include <cstring>
+#include <stdlib.h>
 
 #ifndef NDEBUG
 #include <atomic>
@@ -38,7 +37,6 @@
 #include <support/SafeInt.h>
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
-
 namespace chip {
 namespace Platform {
 
@@ -46,70 +44,67 @@ extern "C" {
 
 void * __wrap_malloc(size_t size)
 {
-	return pvPortMalloc(size);
+    return pvPortMalloc(size);
 }
 
 void __wrap_free(void * ptr)
 {
-	vPortFree(ptr);
+    vPortFree(ptr);
 }
 
 void * __wrap_calloc(size_t num, size_t size)
 {
-	size_t total_size = num * size;
+    size_t total_size = num * size;
 
-	if (size && total_size / size != num)
-			return nullptr;
+    if (size && total_size / size != num)
+        return nullptr;
 
-	void * ptr = pvPortMalloc(total_size);
-	if (ptr)
-		memset(ptr, 0, total_size);
-	return ptr;
+    void * ptr = pvPortMalloc(total_size);
+    if (ptr)
+        memset(ptr, 0, total_size);
+    return ptr;
 }
 
 void * __wrap_realloc(void * ptr, size_t new_size)
 {
-	if (new_size)
-	{
-		void * new_ptr = pvPortMalloc(new_size);
-		if (new_ptr)
-		{
-			if (ptr)
-			{
-				//possibly copying beyond ptr + size
-				memcpy(new_ptr, ptr, new_size);
-				vPortFree(ptr);
-			}
-			return new_ptr;
+    if (new_size)
+    {
+        void * new_ptr = pvPortMalloc(new_size);
+        if (new_ptr)
+        {
+            if (ptr)
+            {
+                // possibly copying beyond ptr + size
+                memcpy(new_ptr, ptr, new_size);
+                vPortFree(ptr);
+            }
+            return new_ptr;
+        }
+    }
+    else
+    {
+        vPortFree(ptr);
+    }
 
-		}
-	}
-	else
-	{
-		vPortFree(ptr);
-	}
-
-	return NULL;
+    return NULL;
 }
 
-
-}//extern "C"
-
+} // extern "C"
 
 void * __wrap_malloc_r(void * REENT, size_t size)
 {
-	return __wrap_malloc(size);
+    return __wrap_malloc(size);
 }
 
 void __wrap_free_r(void * REENT, void * ptr)
 {
-	__wrap_free(ptr);
+    __wrap_free(ptr);
 }
 
 void * __wrap_realloc_r(void * REENT, void * ptr, size_t new_size)
 {
-	return __wrap_realloc(ptr, new_size);
+    return __wrap_realloc(ptr, new_size);
 }
 
-}//namespace Platform
-}//namespace chip
+} // namespace Platform
+} // namespace chip
