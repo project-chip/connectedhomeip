@@ -49,7 +49,7 @@ source_set("tv-common") {
     "${chip_root}/src/app/clusters/temperature-measurement-server/temperature-measurement-server.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
+    "${chip_root}/src/app/util/DataModelHandler.cpp",
     "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/af-main-common.cpp",
     "${chip_root}/src/app/util/attribute-size.cpp",
