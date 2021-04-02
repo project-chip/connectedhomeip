@@ -125,7 +125,8 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
                 asn1Tag = kASN1UniversalTag_UTF8String;
 
                 // Save the CHIP id value in the caller's DN structure.
-                dn.Add(attrOID, chipId);
+                err = dn.Add(attrOID, chipId);
+                SuccessOrExit(err);
             }
 
             // Otherwise the attribute is either one of the supported X.509 attributes or a CHIP-defined
@@ -159,7 +160,8 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
                 }
 
                 // Save the string value in the caller's DN structure.
-                dn.Add(attrOID, asn1AttrVal, asn1AttrValLen);
+                err = dn.Add(attrOID, asn1AttrVal, asn1AttrValLen);
+                SuccessOrExit(err);
             }
 
             // Write the ASN.1 representation of the DN...

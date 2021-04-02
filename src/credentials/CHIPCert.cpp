@@ -334,7 +334,8 @@ CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const 
 
     cert = new (&mCerts[mCertCount]) ChipCertificateData();
 
-    cert->mSubjectDN.Add(kOID_AttributeType_ChipCAId, caId);
+    err = cert->mSubjectDN.Add(kOID_AttributeType_ChipCAId, caId);
+    SuccessOrExit(err);
 
     cert->mIssuerDN          = cert->mSubjectDN;
     cert->mPubKeyCurveOID    = curveOID;
