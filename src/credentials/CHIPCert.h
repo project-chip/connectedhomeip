@@ -202,7 +202,7 @@ struct ChipDN
         } mString;                     /**< DN attribute structure when encoded as a string. */
     } mAttrValue[RDN_NUM];             /**< Array of DN attribute value unions: string or unsigned integer. */
     chip::ASN1::OID mAttrOID[RDN_NUM]; /**< DN attributes CHIP OID. */
-                                       /** Note: kOID_AttributeType_ChipNodeId is located at index 0, any other are at higher indices. */
+    /** Note: kOID_AttributeType_ChipNodeId is located at index 0, any other are at higher indices. */
     int mCount;
 
     bool IsEqual(const ChipDN & other) const;

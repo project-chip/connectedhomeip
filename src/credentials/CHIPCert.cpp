@@ -727,7 +727,7 @@ bool ChipDN::IsEqual(const ChipDN & other) const
                 break;
         }
 
-	// No OID match?
+        // No OID match?
         if (j == other.mCount)
             return false;
 
@@ -805,13 +805,15 @@ CHIP_ERROR ChipDN::Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t
             mAttrValue[i].mString.mValue = strVal;
             mAttrValue[i].mString.mLen   = strLen;
             mCount++;
-            return CHIP_NO_ERROR;;
+            return CHIP_NO_ERROR;
+            ;
         }
         if (mAttrOID[i] == attrOID)
         {
             mAttrValue[i].mString.mValue = strVal;
             mAttrValue[i].mString.mLen   = strLen;
-            return CHIP_NO_ERROR;;
+            return CHIP_NO_ERROR;
+            ;
         }
     }
     return CHIP_ERROR_TOO_MANY_KEYS;
