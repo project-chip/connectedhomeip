@@ -31,8 +31,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <support/CHIPMem.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/CHIPPlatformMemory.h>
+#include <support/logging/CHIPLogging.h>
 
 #include "FreeRtosMbedtlsUtils.h"
 #include "app_config.h"
@@ -52,7 +52,6 @@ extern InitFunc __init_array_end;
 
 /* needed for FreeRtos Heap 4 */
 uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
-
 
 extern "C" void main_task(void const * argument)
 {
