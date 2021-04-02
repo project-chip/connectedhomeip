@@ -259,15 +259,12 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     // Send the null message
     if (mExchange != nullptr)
     {
-        Messaging::SendFlags sendFlags;
-
 #if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Sending Standalone Ack for MsgId:%08" PRIX32, mPendingPeerAckId);
 #endif
 
-        sendFlags.Set(Messaging::SendMessageFlags::kStandaloneAck).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-
-        err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf), sendFlags);
+        err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
+                                     BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
     else
     {
