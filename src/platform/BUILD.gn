@@ -344,6 +344,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "EFR32/BlePlatformConfig.h",
         "EFR32/CHIPDevicePlatformConfig.h",
         "EFR32/CHIPDevicePlatformEvent.h",
+        "EFR32/CHIPMem-Platform.cpp",
         "EFR32/CHIPPlatformConfig.h",
         "EFR32/ConfigurationManagerImpl.cpp",
         "EFR32/ConfigurationManagerImpl.h",

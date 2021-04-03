@@ -31,7 +31,7 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
+CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
@@ -40,8 +40,8 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-
-    err = Reset();
+    mpDelegate    = apDelegate;
+    err           = Reset();
     SuccessOrExit(err);
 
 exit:
@@ -68,6 +68,8 @@ CHIP_ERROR Command::Reset()
 
     mInvokeCommandBuilder.CreateCommandListBuilder();
     MoveToState(CommandState::Initialized);
+
+    mCommandIndex = 0;
 
 exit:
     ChipLogFunctError(err);
@@ -134,8 +136,10 @@ void Command::Shutdown()
     ClearExistingExchangeContext();
 
     mpExchangeMgr = nullptr;
+    mpDelegate    = nullptr;
     MoveToState(CommandState::Uninitialized);
 
+    mCommandIndex = 0;
 exit:
     return;
 }
@@ -221,8 +225,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode,
-                                  const chip::ClusterId aClusterId)
+CHIP_ERROR Command::AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId,
+                                  const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
@@ -230,7 +234,7 @@ CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, Protocols::Id aPr
     err = statusElementBuilder.Init(mInvokeCommandBuilder.GetWriter());
     SuccessOrExit(err);
 
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode, aProtocolCode)
+    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
 

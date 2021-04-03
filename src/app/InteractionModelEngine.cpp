@@ -87,7 +87,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
         if (commandSender.IsFree())
         {
             *apCommandSender = &commandSender;
-            err              = commandSender.Init(mpExchangeMgr);
+            err              = commandSender.Init(mpExchangeMgr, mpDelegate);
             if (CHIP_NO_ERROR != err)
             {
                 *apCommandSender = nullptr;
@@ -155,7 +155,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
     {
         if (commandHandler.IsFree())
         {
-            err = commandHandler.Init(mpExchangeMgr);
+            err = commandHandler.Init(mpExchangeMgr, mpDelegate);
             SuccessOrExit(err);
             commandHandler.OnMessageReceived(apExchangeContext, aPacketHeader, aPayloadHeader, std::move(aPayload));
             apExchangeContext = nullptr;

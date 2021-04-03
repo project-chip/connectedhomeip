@@ -99,7 +99,11 @@ public:
 private:
     struct DBusConnectionDeleter
     {
-        void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
+        void operator()(DBusConnection * aConnection)
+        {
+            dbus_connection_close(aConnection);
+            dbus_connection_unref(aConnection);
+        }
     };
 
     using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;

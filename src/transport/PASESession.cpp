@@ -196,7 +196,10 @@ exit:
 CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                             PASEVerifier & verifier)
 {
-    return pbkdf2_sha256(reinterpret_cast<const uint8_t *>(&setUpPINCode), sizeof(setUpPINCode), salt, saltLen, pbkdf2IterCount,
+    uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
+    Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setUpPINCode);
+
+    return pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt, saltLen, pbkdf2IterCount,
                          sizeof(PASEVerifier), &verifier[0][0]);
 }
 

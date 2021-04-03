@@ -64,6 +64,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/base/hal/plugin",
       "${efr32_sdk_root}/platform/service/device_init/inc",
       "${efr32_sdk_root}/platform/CMSIS/Include",
+      "${efr32_sdk_root}/platform/common/toolchain/inc",
+      "${efr32_sdk_root}/platform/common/toolchain/config/standard/",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/inc",
       "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
@@ -158,6 +160,8 @@ template("efr32_sdk") {
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
       "CHIP_KVS_SECTOR_COUNT=4",
       "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
+      "__HEAP_SIZE=0",
+      "SL_STACK_SIZE=0",
     ]
 
     defines += board_defines
@@ -224,6 +228,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/hardware/kit/common/drivers/udelay.c",
       "${efr32_sdk_root}/platform/bootloader/plugin/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/common/toolchain/src/sl_memory.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
@@ -353,7 +358,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/Source/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
       "${efr32_sdk_root}/util/third_party/freertos/Source/list.c",
-      "${efr32_sdk_root}/util/third_party/freertos/Source/portable/MemMang/heap_3.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/timers.c",

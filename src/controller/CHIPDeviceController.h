@@ -49,6 +49,13 @@ namespace Controller {
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
+struct ControllerInitParams
+{
+    PersistentStorageDelegate * storageDelegate = nullptr;
+    System::Layer * systemLayer                 = nullptr;
+    Inet::InetLayer * inetLayer                 = nullptr;
+};
+
 class DLL_EXPORT DevicePairingDelegate
 {
 public:
@@ -116,6 +123,9 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
+    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
+
+    // Note: Future modifications should be made to ControllerInitParams
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
@@ -201,6 +211,7 @@ protected:
     void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+    ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     Transport::AdminId mAdminId = 0;
     Transport::AdminPairingTable mAdmins;
@@ -258,6 +269,9 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
+    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate = nullptr);
+
+    // Note: Future modifications should be made to ControllerInitParams
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
                     Inet::InetLayer * inetLayer = nullptr);
