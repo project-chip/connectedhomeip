@@ -503,13 +503,16 @@ CHIP_ERROR PASESession::SendMsg1()
 
     ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(X, &X_len));
 
-    System::PacketBufferHandle msg_pA = System::PacketBufferHandle::NewWithData(&X[0], X_len);
-    VerifyOrReturnError(!msg_pA.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(sizeof(uint16_t) + X_len));
+    VerifyOrReturnError(!bbuf.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
+    bbuf.Put16(mConnectionState.GetLocalKeyID());
+    bbuf.Put(&X[0], X_len);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p2;
 
     // Call delegate to send the Msg1 to peer
-    ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p1, std::move(msg_pA)));
+    ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p1, bbuf.Finalize()));
 
     ChipLogDetail(Ble, "Sent spake2p msg1");
 
@@ -531,10 +534,12 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     const uint8_t * buf = msg->Start();
     size_t buf_len      = msg->DataLength();
 
+    uint16_t encryptionKeyId = 0;
+
     ChipLogDetail(Ble, "Received spake2p msg1");
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-    VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(buf_len == sizeof(encryptionKeyId) + kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
                                  &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
@@ -543,19 +548,23 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     err = mSpake2p.ComputeRoundOne(Y, &Y_len);
     SuccessOrExit(err);
 
-    err = mSpake2p.ComputeRoundTwo(buf, buf_len, verifier, &verifier_len);
-    SuccessOrExit(err);
+    encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
+    msg->ConsumeHead(sizeof(encryptionKeyId));
 
-    mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
+    mConnectionState.SetPeerKeyID(encryptionKeyId);
+
+    err = mSpake2p.ComputeRoundTwo(msg->Start(), msg->DataLength(), verifier, &verifier_len);
+    SuccessOrExit(err);
 
     // Make sure our addition doesn't overflow.
     VerifyOrExit(UINTMAX_MAX - verifier_len >= Y_len, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(CanCastTo<uint16_t>(Y_len + verifier_len), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    data_len = static_cast<uint16_t>(Y_len + verifier_len);
+    data_len = static_cast<uint16_t>(sizeof(encryptionKeyId) + Y_len + verifier_len);
 
     {
-        Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(data_len));
+        Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(data_len));
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+        bbuf.Put16(mConnectionState.GetLocalKeyID());
         bbuf.Put(&Y[0], Y_len);
         bbuf.Put(verifier, verifier_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
@@ -586,24 +595,32 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     size_t verifier_len_raw = kMAX_Hash_Length;
     uint16_t verifier_len; // To be inited one we check length is small enough
 
-    const uint8_t * buf = msg->Start();
-    size_t buf_len      = msg->DataLength();
+    uint8_t * buf  = msg->Start();
+    size_t buf_len = msg->DataLength();
 
     System::PacketBufferHandle resp;
 
     Spake2pErrorType spake2pErr = Spake2pErrorType::kUnexpected;
 
+    uint16_t encryptionKeyId = 0;
+
     ChipLogDetail(Ble, "Received spake2p msg2");
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-    VerifyOrExit(buf_len == kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(buf_len == sizeof(encryptionKeyId) + kMAX_Point_Length + kMAX_Hash_Length,
+                 err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
+    msg->ConsumeHead(sizeof(encryptionKeyId));
+    buf     = msg->Start();
+    buf_len = msg->DataLength();
+
+    mConnectionState.SetPeerKeyID(encryptionKeyId);
 
     err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len_raw);
     SuccessOrExit(err);
     VerifyOrExit(CanCastTo<uint16_t>(verifier_len_raw), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     verifier_len = static_cast<uint16_t>(verifier_len_raw);
-
-    mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
 
     {
         Encoding::PacketBufferWriter bbuf(System::PacketBufferHandle::New(verifier_len));
@@ -660,7 +677,6 @@ CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::Pa
 
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->DataLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrExit(header.GetEncryptionKeyID() == mConnectionState.GetPeerKeyID(), err = CHIP_ERROR_INVALID_KEY_ID);
 
     err = mSpake2p.KeyConfirm(hash, kMAX_Hash_Length);
     if (err != CHIP_NO_ERROR)
