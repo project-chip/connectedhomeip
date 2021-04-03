@@ -302,7 +302,7 @@ public final class AndroidChipStack {
 
     BluetoothGattDescriptor descriptor =
         subscribeChar.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
-    descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
     if (!bluetoothGatt.writeDescriptor(descriptor)) {
       Log.e(TAG, "writeDescriptor failed");
       return false;
