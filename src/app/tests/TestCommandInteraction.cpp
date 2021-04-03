@@ -230,19 +230,19 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)
 {
     // Send response which has simple command data and command path
-    ValidateCommandHandlerWithSendCommand(apSuite, apContext, false/*aNeedStatusCode=false*/, false/*aIsEmptyResponse=false*/);
+    ValidateCommandHandlerWithSendCommand(apSuite, apContext, false /*aNeedStatusCode=false*/, false /*aIsEmptyResponse=false*/);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
 {
     // Send response which has simple status code and command path
-    ValidateCommandHandlerWithSendCommand(apSuite, apContext, true/*aNeedStatusCode=true*/, false/*aIsEmptyResponse=false*/);
+    ValidateCommandHandlerWithSendCommand(apSuite, apContext, true /*aNeedStatusCode=true*/, false /*aIsEmptyResponse=false*/);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext)
 {
     // Send empty response, which has only simple status code without command path
-    ValidateCommandHandlerWithSendCommand(apSuite, apContext, true/*aNeedStatusCode=true*/, true/*aIsEmptyResponse=true*/);
+    ValidateCommandHandlerWithSendCommand(apSuite, apContext, true /*aNeedStatusCode=true*/, true /*aIsEmptyResponse=true*/);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext)

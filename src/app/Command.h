@@ -121,8 +121,12 @@ public:
     CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
                           chip::CommandId aCommandId, BitFlags<CommandPathFlags> Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
-    virtual CHIP_ERROR AddStatusCode(const CommandParams * apCommandParams, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                             const Protocols::Id aProtocolId, const uint16_t aProtocolCode) { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    virtual CHIP_ERROR AddStatusCode(const CommandParams * apCommandParams,
+                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                     const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
 
     /**
      * Gets the inner exchange context object, without ownership.

@@ -115,13 +115,13 @@ exit:
 }
 
 CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
-                                  const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
-                                  const uint16_t aProtocolCode)
+                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                         const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
     CommandDataElement::Builder commandDataElement =
-            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
 
     if (apCommandParams != nullptr)
     {
@@ -132,7 +132,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
     SuccessOrExit(err);
 
     statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
-            .EndOfStatusElement();
+        .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
@@ -141,7 +141,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
     SuccessOrExit(err);
     MoveToState(CommandState::AddCommand);
 
-    exit:
+exit:
     ChipLogFunctError(err);
     return err;
 }
