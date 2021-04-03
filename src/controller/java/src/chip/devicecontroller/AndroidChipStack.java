@@ -100,39 +100,10 @@ public final class AndroidChipStack {
       public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
       }
 
-          @Override
-          public void onDescriptorWrite(
-              BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
-            BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
-
-            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
-
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-              Log.e(
-                  TAG,
-                  "onDescriptorWrite for "
-                      + desc.getUuid().toString()
-                      + " failed with status: "
-                      + status);
-            }
-
-            int connId = getConnId(gatt);
-            if (connId == 0) {
-              Log.e(TAG, "onDescriptorWrite no active connection");
-              return;
-            }
-
-            if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATTION_VALUE) {
-              handleSubscribeComplete(
-                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
-            } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
-              handleUnsubscribeComplete(
-                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
-            } else {
-              Log.d(TAG, "Unexpected onDescriptorWrite().");
-            }
-          }
+      @Override
+      public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+        byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+        byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
 
         if (status != BluetoothGatt.GATT_SUCCESS) {
           Log.e(TAG,
@@ -179,7 +150,7 @@ public final class AndroidChipStack {
           return;
         }
 
-        if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
+        if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATTION_VALUE) {
           handleSubscribeComplete(connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
         } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
           handleUnsubscribeComplete(connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
@@ -314,8 +285,7 @@ public final class AndroidChipStack {
       return false;
     }
 
-    BluetoothGattDescriptor descriptor =
-        subscribeChar.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
+    BluetoothGattDescriptor descriptor = subscribeChar.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
     descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATTION_VALUE);
     if (!bluetoothGatt.writeDescriptor(descriptor)) {
       Log.e(TAG, "writeDescriptor failed");
