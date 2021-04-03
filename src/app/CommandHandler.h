@@ -42,11 +42,11 @@ namespace app {
 class CommandHandler : public Command
 {
 public:
-    CHIP_ERROR SendCommandResponse();
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload);
 
 private:
+    CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };
 } // namespace app
