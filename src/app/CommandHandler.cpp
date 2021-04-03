@@ -92,8 +92,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     {
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        //The Path is not present when the CommandDataElement is used with an empty response, ResponseCommandElement would only have status code,
-        AddStatusCode(nullptr, GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+        // The Path is not present when the CommandDataElement is used with an empty response, ResponseCommandElement would only
+        // have status code,
+        AddStatusCode(nullptr, GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
+                      Protocols::SecureChannel::kProtocolCodeSuccess);
     }
     else if (CHIP_NO_ERROR == err)
     {
@@ -103,8 +105,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // The Path is not present when there is an error to be conveyed back. ResponseCommandElement would only have status code, then continue to process rest of commands
-        AddStatusCode(nullptr, GeneralStatusCode::kInvalidArgument, Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+        // The Path is not present when there is an error to be conveyed back. ResponseCommandElement would only have status code,
+        // then continue to process rest of commands
+        AddStatusCode(nullptr, GeneralStatusCode::kInvalidArgument, Protocols::SecureChannel::Id,
+                      Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         err = CHIP_NO_ERROR;
     }
     return err;

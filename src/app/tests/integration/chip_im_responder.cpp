@@ -44,7 +44,7 @@ namespace app {
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     static bool statusCodeFlipper = false;
 
     if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
@@ -75,7 +75,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     if (statusCodeFlipper)
     {
         printf("responder constructing status code in command");
-        apCommandObj->AddStatusCode(&commandParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+        apCommandObj->AddStatusCode(&commandParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
     }
     else
     {

@@ -171,9 +171,10 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
     const uint8_t * apCommandData;
     uint32_t apCommandLen = 0;
 
-    if (!mCommandDataBuf.IsNull()) {
+    if (!mCommandDataBuf.IsNull())
+    {
         apCommandData = mCommandDataBuf->Start();
-        apCommandLen = mCommandDataBuf->DataLength();
+        apCommandLen  = mCommandDataBuf->DataLength();
     }
 
     if (apCommandLen > 0)
@@ -188,7 +189,7 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 
     {
         CommandDataElement::Builder commandDataElement =
-                mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
 
         err = ConstructCommandPath(aCommandParams, commandDataElement);
         SuccessOrExit(err);
@@ -215,12 +216,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::AddStatusCode(const CommandParams * apCommandParams, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+CHIP_ERROR Command::AddStatusCode(const CommandParams * apCommandParams,
+                                  const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
+                                  const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
     CommandDataElement::Builder commandDataElement =
-            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
 
     if (apCommandParams != nullptr)
     {
