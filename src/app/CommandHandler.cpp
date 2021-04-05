@@ -130,7 +130,8 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
     }
 
     statusElementBuilder = commandDataElement.CreateStatusElementBuilder();
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode).EndOfStatusElement();
+    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
+        .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
