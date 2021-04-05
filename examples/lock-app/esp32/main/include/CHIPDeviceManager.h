@@ -58,7 +58,7 @@ public:
      * @param event   ChipDeviceEvent that occurred
      * @param arg     arguments specific to the event, if any
      */
-    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg); 
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     /**
      * @brief
      *   Called after an attribute has been changed
@@ -101,7 +101,7 @@ public:
      *
      * @param cb Application's instance of the CHIPDeviceManagerCallbacks for consuming events
      */
-    CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb); 
+    CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb);
     /**
      * @brief
      *   Fetch a pointer to the registered CHIPDeviceManagerCallbacks object.
