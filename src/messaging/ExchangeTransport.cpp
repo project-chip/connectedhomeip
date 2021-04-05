@@ -20,9 +20,20 @@
  *      This file provides implementation of ExchangeTransport class.
  */
 
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+
+#include <inttypes.h>
+
 #include <messaging/ExchangeTransport.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
@@ -44,6 +55,13 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
 
         // Set AckPending flag to false since current outgoing message is going to serve as the ack on this exchange.
         rmCtxt.SetAckPending(false);
+
+#if !defined(NDEBUG)
+        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", rmCtxt.mPendingPeerAckId);
+        }
+#endif
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
