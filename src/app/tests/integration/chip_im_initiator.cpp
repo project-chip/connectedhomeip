@@ -251,8 +251,8 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    std::mutex mtx;
-    std::unique_lock<std::mutex> lck(mtx);
+    std::mutex mutex;
+    std::unique_lock<std::mutex> lock(mutex);
     MockInteractionModelApp mockDelegate;
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
@@ -308,7 +308,7 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        if (gCond.wait_for(lck, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
+        if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
         {
             printf("Invoke Command: No response received\n");
         }
@@ -324,7 +324,7 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        if (gCond.wait_for(lck, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
+        if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
         {
             printf("read request: No response received\n");
         }
