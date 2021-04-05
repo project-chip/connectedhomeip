@@ -28,7 +28,10 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
+#include <chrono>
+#include <condition_variable>
 #include <core/CHIPCore.h>
+#include <mutex>
 #include <platform/CHIPDeviceLayer.h>
 
 #include <support/ErrorStr.h>
@@ -41,12 +44,9 @@
 
 namespace {
 // Max value for the number of message request sent.
-constexpr size_t kMaxCommandMessageCount = 3;
-constexpr size_t kMaxReadMessageCount    = 0;
-
-// The CHIP Message interval time in milliseconds.
-constexpr int32_t gMessageInterval = 1000;
-
+constexpr size_t kMaxCommandMessageCount    = 3;
+constexpr size_t kMaxReadMessageCount       = 0;
+constexpr int32_t gMessageIntervalSeconds   = 1;
 constexpr chip::Transport::AdminId gAdminId = 0;
 
 // The CommandSender object.
@@ -64,14 +64,6 @@ chip::Inet::IPAddress gDestAddr;
 // The last time a CHIP Command was attempted to be sent.
 uint64_t gLastMessageTime = 0;
 
-// True, if the CommandSender is waiting for an CommandResponse
-// after sending an CommandRequest, false otherwise.
-bool gWaitingForCommandResp = false;
-
-// True, if the ReadClient is waiting for an Report Data
-// after sending an ReadRequest, false otherwise.
-bool gWaitingForReadResp = false;
-
 // Count of the number of CommandRequests sent.
 uint64_t gCommandCount = 0;
 
@@ -84,12 +76,7 @@ uint64_t gReadCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gReadRespCount = 0;
 
-bool MessageIntervalExpired(void)
-{
-    uint64_t now = chip::System::Timer::GetCurrentEpoch();
-
-    return (now >= gLastMessageTime + gMessageInterval);
-}
+std::condition_variable gCond;
 
 CHIP_ERROR SendCommandRequest(void)
 {
@@ -137,7 +124,6 @@ CHIP_ERROR SendCommandRequest(void)
 
     if (err == CHIP_NO_ERROR)
     {
-        gWaitingForCommandResp = true;
         gCommandCount++;
     }
     else
@@ -161,7 +147,6 @@ CHIP_ERROR SendReadRequest(void)
 
     if (err == CHIP_NO_ERROR)
     {
-        gWaitingForReadResp = true;
         gReadCount++;
     }
     else
@@ -204,11 +189,12 @@ void HandleReadComplete()
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastMessageTime;
 
-    gWaitingForReadResp = false;
     gReadRespCount++;
 
     printf("Read Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gReadRespCount, gReadCount,
            static_cast<double>(gReadRespCount) * 100 / gReadCount, static_cast<double>(transitTime) / 1000);
+
+    gCond.notify_one();
 }
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate
@@ -274,11 +260,12 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
-    gWaitingForCommandResp = false;
     gCommandRespCount++;
 
     printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
            static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
+
+    gCond.notify_one();
 }
 } // namespace app
 } // namespace chip
@@ -286,6 +273,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    std::mutex mutex;
+    std::unique_lock<std::mutex> lock(mutex);
     MockInteractionModelApp mockDelegate;
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
@@ -304,6 +294,8 @@ int main(int argc, char * argv[])
     }
 
     InitializeChip();
+
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
                                      .SetAddressType(chip::Inet::kIPAddressType_IPv4)
@@ -339,17 +331,9 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        // Wait for response until the Message interval.
-        while (!MessageIntervalExpired())
-        {
-            DriveIO();
-        }
-
-        // Check if expected response was received.
-        if (gWaitingForCommandResp)
+        if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
         {
             printf("Invoke Command: No response received\n");
-            gWaitingForCommandResp = false;
         }
     }
 
@@ -363,17 +347,9 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        // Wait for response until the Message interval.
-        while (!MessageIntervalExpired())
-        {
-            DriveIO();
-        }
-
-        // Check if expected response was received.
-        if (gWaitingForReadResp)
+        if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
         {
             printf("read request: No response received\n");
-            gWaitingForReadResp = false;
         }
     }
 
