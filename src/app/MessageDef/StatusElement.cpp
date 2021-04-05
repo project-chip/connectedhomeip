@@ -147,22 +147,6 @@ CHIP_ERROR StatusElement::Parser::CheckSchemaValidity() const
             }
 #endif // CHIP_DETAIL_LOGGING
         }
-        else if (!(TagPresenceMask & (1 << kCsTag_ClusterId)))
-        {
-            TagPresenceMask |= (1 << kCsTag_ClusterId);
-
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-            {
-                chip::ClusterId clusterId;
-                err = reader.Get(clusterId);
-                SuccessOrExit(err);
-
-                PRETTY_PRINT("\tClusterId = 0x%" PRIx32 ",", clusterId);
-            }
-#endif // CHIP_DETAIL_LOGGING
-        }
         else
         {
             PRETTY_PRINT("\tExtra element in StatusElement");
