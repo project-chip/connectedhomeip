@@ -723,6 +723,8 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
     // TODO: Send unpairing message to the remote device.
 
+    FreeRendezvousSession();
+
     if (mStorageDelegate != nullptr)
     {
         PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->AsyncDeleteKeyValue(key));
