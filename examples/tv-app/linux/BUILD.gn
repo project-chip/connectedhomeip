@@ -32,9 +32,9 @@ executable("chip-tv-app") {
   sources = [
     "include/application-basic/ApplicationBasicManager.cpp",
     "include/application-basic/ApplicationBasicManager.h",
+    "include/cluster-init.cpp",
     "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
-    "include/cluster-init.cpp",
     "main.cpp",
   ]
 
