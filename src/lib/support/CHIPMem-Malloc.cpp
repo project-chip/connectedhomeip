@@ -29,12 +29,6 @@
 #include <cstring>
 #include <stdlib.h>
 
-#if defined(ESP_PLATFORM)
-#include "freertos/FreeRTOS.h"
-#else
-#include "FreeRTOS.h"
-#endif
-
 #ifndef WEAK
 #define WEAK __attribute__((weak))
 #endif
