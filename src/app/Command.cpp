@@ -167,14 +167,14 @@ CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpointId, chip::GroupId aGrou
 
 CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     const uint8_t * commandData = nullptr;
     uint32_t commandLen;
 
     if (!mCommandDataBuf.IsNull())
     {
         commandData = mCommandDataBuf->Start();
-        commandLen = mCommandDataBuf->DataLength();
+        commandLen  = mCommandDataBuf->DataLength();
     }
     if (commandLen > 0)
     {
@@ -210,8 +210,8 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
             // Copy the application data into a new TLV structure field contained with the
             // command structure.  NOTE: The TLV writer will take care of moving the app data
             // to the correct location within the buffer.
-            err = mInvokeCommandBuilder.GetWriter()->PutPreEncodedContainer(
-                chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure, commandData, commandLen);
+            err = mInvokeCommandBuilder.GetWriter()->PutPreEncodedContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                                                                            chip::TLV::kTLVType_Structure, commandData, commandLen);
             SuccessOrExit(err);
         }
         commandDataElement.EndOfCommandDataElement();
