@@ -169,7 +169,7 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     const uint8_t * commandData = nullptr;
-    uint32_t commandLen = 0;
+    uint32_t commandLen         = 0;
 
     if (!mCommandDataBuf.IsNull())
     {
