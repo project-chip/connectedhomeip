@@ -167,21 +167,24 @@ CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpointId, chip::GroupId aGrou
 
 CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    const uint8_t * apCommandData;
-    uint32_t apCommandLen;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    const uint8_t * commandData = nullptr;
+    uint32_t commandLen         = 0;
 
-    apCommandData = mCommandDataBuf->Start();
-    apCommandLen  = mCommandDataBuf->DataLength();
+    if (!mCommandDataBuf.IsNull())
+    {
+        commandData = mCommandDataBuf->Start();
+        commandLen  = mCommandDataBuf->DataLength();
+    }
 
-    if (apCommandLen > 0)
+    if (commandLen > 0 && commandData != nullptr)
     {
         // Command argument list can be empty.
-        VerifyOrExit(apCommandLen >= 2, err = CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrExit(apCommandData[0] == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(commandLen >= 2, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(commandData[0] == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        apCommandData += 1;
-        apCommandLen -= 1;
+        commandData += 1;
+        commandLen -= 1;
     }
 
     {
@@ -203,13 +206,13 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
         err = commandPath.GetError();
         SuccessOrExit(err);
 
-        if (apCommandLen > 0)
+        if (commandLen > 0 && commandData != nullptr)
         {
             // Copy the application data into a new TLV structure field contained with the
             // command structure.  NOTE: The TLV writer will take care of moving the app data
             // to the correct location within the buffer.
-            err = mInvokeCommandBuilder.GetWriter()->PutPreEncodedContainer(
-                chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure, apCommandData, apCommandLen);
+            err = mInvokeCommandBuilder.GetWriter()->PutPreEncodedContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                                                                            chip::TLV::kTLVType_Structure, commandData, commandLen);
             SuccessOrExit(err);
         }
         commandDataElement.EndOfCommandDataElement();
