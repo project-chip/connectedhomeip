@@ -592,7 +592,8 @@ void BuildCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataEle
     NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser) {
+void ParseCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
     StatusElement::Parser statusElementParser;
