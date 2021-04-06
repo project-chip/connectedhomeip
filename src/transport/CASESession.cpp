@@ -39,7 +39,7 @@
 
 namespace chip {
 
-// Remove Later
+// TODO: Remove Later
 static P256ECDHDerivedSecret fabricSecret;
 
 constexpr uint8_t kIPKInfo[] = { 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x50, 0x72, 0x6f,
@@ -268,13 +268,13 @@ CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_le
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
     // Generate Salt for Encryption keys
-    saltlen = /*kIPKSize +*/ kSHA256_Hash_Length;
+    saltlen = kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrReturnError(!msg_salt.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg_salt->Start(), saltlen);
-        //        bbuf.Put(ipk, ipklen); // placeholder...
+        // TODO: Add IPK to Salt
         bbuf.Put(mMessageDigest, sizeof(mMessageDigest));
 
         VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
@@ -1043,7 +1043,7 @@ CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size
     return CHIP_NO_ERROR;
 }
 
-// PLACEHOLDER... MIGHT REMOVE
+// TODO: Remove this and replace with system method to retrieve current time
 CHIP_ERROR CASESession::SetEffectiveTime(void)
 {
     using namespace ASN1;

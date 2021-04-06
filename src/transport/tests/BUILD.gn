@@ -22,11 +22,6 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
-  sources = [
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
-  ]
-
   test_sources = [
     "TestCASESession.cpp",
     "TestPASESession.cpp",
@@ -39,6 +34,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/credentials",
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
