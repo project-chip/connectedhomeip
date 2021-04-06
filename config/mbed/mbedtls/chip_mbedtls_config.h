@@ -38,5 +38,6 @@
 #undef MBEDTLS_NET_C
 #undef MBEDTLS_TIMING_C
 #undef MBEDTLS_FS_IO
+#define MBEDTLS_PKCS5_C
 
 #endif /* CHIP_MBEDTLS_CONFIG_H */

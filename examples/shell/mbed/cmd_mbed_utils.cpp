@@ -31,6 +31,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 
+#include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -46,6 +47,7 @@ using namespace chip;
 using namespace chip::Shell;
 using namespace chip::System;
 using namespace chip::Inet;
+using namespace chip::Transport;
 using namespace mbed;
 using namespace rtos;
 
@@ -62,7 +64,32 @@ EventFlags socketEvent;
 uint32_t socketMsgReceiveFlag           = 0x1;
 uint32_t socketConnectionCompeletedFlag = 0x2;
 
-using TCPImpl = Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+using TCPImpl = TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+
+class ServerCallback : public SecureSessionMgrDelegate
+{
+public:
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+    {
+        char src_addr[PeerAddress::kMaxToStringSize];
+        auto state            = mgr->GetPeerConnectionState(session);
+        const size_t data_len = buffer->DataLength();
+
+        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+        streamer_printf(streamer_get(), "INFO: received packet from: %zu bytes\r\n", src_addr, static_cast<size_t>(data_len));
+    }
+
+    void OnReceiveError(CHIP_ERROR error, const PeerAddress & source, SecureSessionMgr * mgr) override
+    {
+        streamer_printf(streamer_get(), "ERROR: packet received error: %s\r\n", ErrorStr(error));
+    }
+
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    {
+        streamer_printf(streamer_get(), "INFO: Received a new connection\r\n");
+    }
+};
 
 void OnTcpMessageSent(Inet::TCPEndPoint * endPoint, uint16_t Length)
 {
@@ -91,10 +118,9 @@ public:
     SocketTransportMgrDelegate() {}
     ~SocketTransportMgrDelegate() override {}
 
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override
+    void OnMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle msgBuf) override
     {
-        char info[Transport::PeerAddress::kMaxToStringSize];
+        char info[PeerAddress::kMaxToStringSize];
         char msg[msgBuf->DataLength() + 1] = { 0 };
 
         source.ToString(info, sizeof(info));
@@ -365,20 +391,20 @@ struct ChipSocket
     union
     {
         TCPImpl tcpSocket;
-        Transport::UDP udpSocket;
+        UDP udpSocket;
     };
-    Transport::Type type;
+    Type type;
 };
 
 static int socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & addr, uint16_t & port, char ** msg)
 {
     if (strcmp(argv[0], "UDP") == 0)
     {
-        sock.type = Transport::Type::kUdp;
+        sock.type = Type::kUdp;
     }
     else if (strcmp(argv[0], "TCP") == 0)
     {
-        sock.type = Transport::Type::kTcp;
+        sock.type = Type::kTcp;
     }
     else
     {
@@ -420,20 +446,20 @@ int cmd_socket_echo(int argc, char ** argv)
     err = socket_echo_parse_args(argv, sock, addr, port, &msg);
     if (err != INET_NO_ERROR)
     {
-        sock.type = Transport::Type::kUndefined;
+        sock.type = Type::kUndefined;
         streamer_printf(sout, "ERROR: wrong command arguments. Check socket help\r\n");
         ExitNow(error = err;);
     }
 
-    if (sock.type == Transport::Type::kUdp)
+    if (sock.type == Type::kUdp)
     {
-        new (&sock.udpSocket) Transport::UDP();
-        err = sock.udpSocket.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+        new (&sock.udpSocket) UDP();
+        err = sock.udpSocket.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
     else
     {
         new (&sock.tcpSocket) TCPImpl;
-        err = sock.tcpSocket.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
+        err = sock.tcpSocket.Init(TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
     }
 
     if (err != INET_NO_ERROR)
@@ -453,13 +479,13 @@ int cmd_socket_echo(int argc, char ** argv)
 
     gTransportMgrBase.SetSecureSessionMgr((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
     gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
-    if (sock.type == Transport::Type::kUdp)
+    if (sock.type == Type::kUdp)
     {
-        gTransportMgrBase.Init((Transport::Base *) &sock.udpSocket);
+        gTransportMgrBase.Init((Base *) &sock.udpSocket);
     }
     else
     {
-        gTransportMgrBase.Init((Transport::Base *) &sock.tcpSocket);
+        gTransportMgrBase.Init((Base *) &sock.tcpSocket);
     }
 
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
@@ -468,13 +494,13 @@ int cmd_socket_echo(int argc, char ** argv)
 
     streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], msg,
                     addr.ToString(addrStr, sizeof(addrStr)), port);
-    if (sock.type == Transport::Type::kUdp)
+    if (sock.type == Type::kUdp)
     {
-        err = sock.udpSocket.SendMessage(header, Transport::PeerAddress::UDP(addr, port), std::move(buffer));
+        err = sock.udpSocket.SendMessage(header, PeerAddress::UDP(addr, port), std::move(buffer));
     }
     else
     {
-        err = sock.tcpSocket.SendMessage(header, Transport::PeerAddress::TCP(addr, port), std::move(buffer));
+        err = sock.tcpSocket.SendMessage(header, PeerAddress::TCP(addr, port), std::move(buffer));
     }
 
     if (err != INET_NO_ERROR)
@@ -490,11 +516,11 @@ int cmd_socket_echo(int argc, char ** argv)
     }
 
 exit:
-    if (sock.type == Transport::Type::kTcp)
+    if (sock.type == Type::kTcp)
     {
         sock.tcpSocket.~TCP();
     }
-    else if (sock.type == Transport::Type::kUdp)
+    else if (sock.type == Type::kUdp)
     {
         sock.udpSocket.~UDP();
     }
@@ -536,7 +562,7 @@ int cmd_socket_example(int argc, char ** argv)
                     (address.get_ip_address() ? address.get_ip_address() : "None"));
     IPAddress::FromString(address.get_ip_address(), addr);
 
-    Transport::TcpListenParameters params(&DeviceLayer::InetLayer);
+    TcpListenParameters params(&DeviceLayer::InetLayer);
     err = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
     if (err != INET_NO_ERROR)
     {
@@ -674,6 +700,113 @@ int cmd_socket_bsd(int argc, char ** argv)
 exit:
     return error;
 }
+
+ServerCallback gCallbacks;
+TransportMgr<UDP> gUDPManager;
+TransportMgr<TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
+SecureSessionMgr gSessionManager;
+SecurePairingUsingTestSecret gTestPairing(Optional<NodeId>::Value(kUndefinedNodeId), static_cast<uint16_t>(0),
+                                          static_cast<uint16_t>(0));
+AdminPairingTable admins;
+
+int cmd_socket_server(int argc, char ** argv)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    INET_ERROR err;
+    Type type;
+    const AdminId gAdminId       = 0;
+    AdminPairingInfo * adminInfo = nullptr;
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+    uint16_t port = CHIP_PORT;
+    InterfaceAddressIterator intIterator;
+    char addrStr[16];
+
+    streamer_t * sout = streamer_get();
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (strcmp(argv[0], "UDP") == 0)
+    {
+        type = Type::kUdp;
+    }
+    else if (strcmp(argv[0], "TCP") == 0)
+    {
+        type = Type::kTcp;
+    }
+    else
+    {
+        streamer_printf(sout, "ERROR: wrong command arguments. Check socket help\r\n");
+        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT;);
+    }
+
+    if (argc > 1)
+    {
+        port = atoi(argv[1]);
+    }
+
+    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    if (type == Type::kUdp)
+    {
+        err = gUDPManager.Init(
+            Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(port));
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: UDP manager intialization failed\r\n");
+            ExitNow(error = err;);
+        }
+
+        err = gSessionManager.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
+            ExitNow(error = err;);
+        }
+    }
+    else
+    {
+        err = gTCPManager.Init(
+            Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(port));
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: TCP manager intialization failed\r\n");
+            ExitNow(error = err;);
+        }
+
+        err = gSessionManager.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
+            ExitNow(error = err;);
+        }
+    }
+
+    gSessionManager.SetDelegate(&gCallbacks);
+
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
+    if (err != INET_NO_ERROR)
+    {
+        streamer_printf(sout, "ERROR: set new pairing failed\r\n");
+        ExitNow(error = err;);
+    }
+
+    if (intIterator.IsUp())
+    {
+        streamer_printf(sout, "INFO: network interface IP address %s\r\n",
+                        intIterator.GetAddress().ToString(addrStr, sizeof(addrStr)));
+    }
+    else
+    {
+        streamer_printf(sout, "WARN: Network interface is down\r\n");
+    }
+
+    streamer_printf(sout, "INFO: %s server listen on port %d\r\n", argv[0], port);
+
+exit:
+    return error;
+}
+
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
 
 static const shell_command_t cmds_date[] = { { &cmd_date_set, "set", "Set date/time using 'YYYY-MM-DD HH:MM:SS' format" },
@@ -700,7 +833,8 @@ static const shell_command_t cmds_socket[] = {
       "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
     { &cmd_socket_example, "example",
       "Socket example which sends HTTP request to ifconfig.io and receives a response. Usage: socket example" },
-
+    { &cmd_socket_server, "server",
+      "Create CHIP server for communication testing. Usage: socket server <type> <port>, Usage: socket server UDP 7" },
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
 
@@ -713,6 +847,4 @@ void cmd_mbed_utils_init()
     shell_register(&cmds_test_config, 1);
     shell_register(&cmds_network_root, 1);
     shell_register(&cmds_socket_root, 1);
-
-    chip::DeviceLayer::ConnectivityMgrImpl().ProvisionWiFiNetwork("ARMtest", "ARM&chip2021");
 }
