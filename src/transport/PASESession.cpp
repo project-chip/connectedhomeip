@@ -498,8 +498,8 @@ CHIP_ERROR PASESession::SendMsg1()
     uint8_t X[kMAX_Point_Length];
     size_t X_len = sizeof(X);
 
-    ReturnErrorOnFailure(mSpake2p.BeginProver(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
-                                              &mPASEVerifier[0][0], kSpake2p_WS_Length, &mPASEVerifier[1][0], kSpake2p_WS_Length));
+    ReturnErrorOnFailure(mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &mPASEVerifier[0][0], kSpake2p_WS_Length,
+                                              &mPASEVerifier[1][0], kSpake2p_WS_Length));
 
     ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(X, &X_len));
 
@@ -541,8 +541,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == sizeof(encryptionKeyId) + kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    err = mSpake2p.BeginVerifier(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
-                                 &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
+    err = mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
     SuccessOrExit(err);
 
     err = mSpake2p.ComputeRoundOne(Y, &Y_len);
