@@ -288,11 +288,6 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
     switch (mCurrentState)
     {
     case State::kRendezvousComplete:
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnRendezvousComplete();
-        }
-
         if (mParams.HasAdvertisementDelegate())
         {
             mParams.GetAdvertisementDelegate()->RendezvousComplete();
@@ -300,6 +295,11 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
 
         // Release the admin, as the rendezvous is complete.
         mAdmin = nullptr;
+
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnRendezvousComplete();
+        }
         break;
 
     case State::kSecurePairing:
