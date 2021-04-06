@@ -4344,7 +4344,7 @@ CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback:
 CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -4376,7 +4376,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
                                                                    Callback::Cancelable * onFailureCallback,
                                                                    uint8_t percentageLiftValue)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -4410,7 +4410,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
 CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t liftValue)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -4445,7 +4445,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
                                                                    Callback::Cancelable * onFailureCallback,
                                                                    uint8_t percentageTiltValue)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -4479,7 +4479,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
 CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t tiltValue)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -4513,7 +4513,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelab
 CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -4544,7 +4544,7 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSu
 CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
 {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
