@@ -80,25 +80,6 @@ extern CHIP_ERROR MemoryInit(void * buf = nullptr, size_t bufSize = 0);
  */
 extern void MemoryShutdown();
 
-/*
- *
- * The functions below are called by the CHIP layer to allocate a block of memory of "size" bytes.
- * These are wrapper functions for malloc/calloc/realloc/free functions, so in case there are any
- * vendor specific implementations, they redirect to those.
- *
- */
-
-extern "C" {
-
-WEAK void * __wrap_malloc(size_t size);
-WEAK void __wrap_free(void * ptr);
-WEAK void * __wrap_calloc(size_t num, size_t size);
-WEAK void * __wrap_realloc(void * ptr, size_t new_size);
-WEAK void * __wrap_malloc_r(void * REENT, size_t size);
-WEAK void __wrap_free_r(void * REENT, void * ptr);
-WEAK void * __wrap_realloc_r(void * REENT, void * ptr, size_t new_size);
-} // extern "C"
-
 /**
  * This function is called by the CHIP layer to allocate a block of memory of "size" bytes.
  *
