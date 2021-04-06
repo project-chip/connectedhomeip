@@ -173,7 +173,9 @@ public:
         mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
-        mBleLayer       = params.bleLayer;
+#if CONFIG_NETWORK_LAYER_BLE
+        mBleLayer = params.bleLayer;
+#endif
     }
 
     /**
@@ -302,7 +304,9 @@ public:
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
         mInetLayer      = nullptr;
-        mBleLayer       = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+        mBleLayer = nullptr;
+#endif
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
@@ -342,7 +346,9 @@ private:
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
 
+#if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
+#endif
 
     PASESessionSerializable mPairing;
 
