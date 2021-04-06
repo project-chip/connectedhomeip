@@ -105,54 +105,32 @@ void MemoryAllocatorShutdown()
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 }
 
-extern "C" {
-
-WEAK void * __wrap_malloc(size_t size)
-{
-    return malloc(size);
-}
-
-WEAK void __wrap_free(void * ptr)
-{
-    free(ptr);
-}
-
-WEAK void * __wrap_calloc(size_t num, size_t size)
-{
-    return calloc(num, size);
-}
-
-WEAK void * __wrap_realloc(void * ptr, size_t new_size)
-{
-    return realloc(ptr, new_size);
-}
-
-} // extern "C"
-
 void * MemoryAlloc(size_t size)
 {
     VERIFY_INITIALIZED();
-    return __wrap_malloc(size);
+    return malloc(size);
 }
+
+
 
 void * MemoryCalloc(size_t num, size_t size)
 {
     VERIFY_INITIALIZED();
-    return __wrap_calloc(num, size);
+    return calloc(num, size);
 }
 
 void * MemoryRealloc(void * p, size_t size)
 {
     VERIFY_INITIALIZED();
     VERIFY_POINTER(p);
-    return __wrap_realloc(p, size);
+    return realloc(p, size);
 }
 
 void MemoryFree(void * p)
 {
     VERIFY_INITIALIZED();
     VERIFY_POINTER(p);
-    __wrap_free(p);
+    free(p);
 }
 
 bool MemoryInternalCheckPointer(const void * p, size_t min_size)
