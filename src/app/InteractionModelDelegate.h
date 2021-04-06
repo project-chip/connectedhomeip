@@ -99,6 +99,14 @@ public:
     }
 
     /**
+     * Notification that a Command Response has already been processed.
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
+     * during multiple command interactions
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR CommandResponseProcessed(const CommandSender * apCommandSender) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
      * Notification that a Command Send has received an Invoke Command Response and fails to process a command data element in that
      * command response
      * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly
