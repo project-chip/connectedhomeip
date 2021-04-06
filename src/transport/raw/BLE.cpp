@@ -55,6 +55,8 @@ void BLEBase::ClearState()
         mBleEndPoint->Close();
         mBleEndPoint = nullptr;
     }
+
+    mState = State::kNotReady;
 }
 
 CHIP_ERROR BLEBase::Init(const BleListenParameters & param)
@@ -84,7 +86,6 @@ CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
     VerifyOrExit(endPoint->mState == BLEEndPoint::kState_Connected, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mBleEndPoint = endPoint;
-    SetupEvents(mBleEndPoint);
 
     // Manually trigger the OnConnectComplete callback.
     OnEndPointConnectComplete(endPoint, err);
@@ -92,8 +93,6 @@ CHIP_ERROR BLEBase::SetEndPoint(Ble::BLEEndPoint * endPoint)
 exit:
     return err;
 }
-
-void BLEBase::SetupEvents(Ble::BLEEndPoint * endPoint) {}
 
 CHIP_ERROR BLEBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                                 System::PacketBufferHandle msgBuf)
@@ -146,7 +145,6 @@ void BLEBase::OnBleConnectionComplete(Ble::BLEEndPoint * endpoint)
     mBleEndPoint = endpoint;
 
     // Initiate CHIP over BLE protocol connection.
-    SetupEvents(mBleEndPoint);
     err = mBleEndPoint->StartConnect();
     SuccessOrExit(err);
 
@@ -204,7 +202,8 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
 
 void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
-    mState = State::kInitialized;
+    mState       = State::kInitialized;
+    mBleEndPoint = nullptr;
 }
 
 } // namespace Transport

@@ -95,7 +95,6 @@ public:
     CHIP_ERROR SetEndPoint(Ble::BLEEndPoint * endPoint) override;
 
 private:
-    void SetupEvents(Ble::BLEEndPoint * endPoint);
     void ClearState();
 
     /**
