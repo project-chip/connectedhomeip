@@ -58,7 +58,7 @@ protected:
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
-    bool IsChannelReliable() override { return (mBLETransport != nullptr); }
+    bool IsTransportReliable() override { return (mBLETransport != nullptr); }
 
 private:
     Transport::BLE * mBLETransport   = nullptr;

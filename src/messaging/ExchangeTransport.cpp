@@ -65,7 +65,7 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!IsChannelReliable() && rmCtxt.AutoRequestAck() && mReliableMessageMgr != nullptr && isReliableTransmission)
+    if (!IsTransportReliable() && rmCtxt.AutoRequestAck() && mReliableMessageMgr != nullptr && isReliableTransmission)
     {
         payloadHeader.SetNeedsAck(true);
 
@@ -101,7 +101,7 @@ CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type,
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (!IsChannelReliable() && mReliableMessageMgr != nullptr)
+    if (!IsTransportReliable() && mReliableMessageMgr != nullptr)
     {
         if (rmInfo.mHasAck)
         {
