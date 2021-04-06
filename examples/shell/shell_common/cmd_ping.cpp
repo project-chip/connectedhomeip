@@ -269,15 +269,15 @@ void StartPinging(streamer_t * stream, char * destination)
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.ResetTransport(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
-                                         .SetAddressType(gDestAddr.Type())
-                                         .SetListenPort(gPingArguments.GetEchoPort() + 1));
+    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
+                               .SetAddressType(gDestAddr.Type())
+                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
-    err = gUDPManager.ResetTransport(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                                         .SetAddressType(gDestAddr.Type())
-                                         .SetListenPort(gPingArguments.GetEchoPort() + 1));
+    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
+                               .SetAddressType(gDestAddr.Type())
+                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -344,7 +344,9 @@ void StartPinging(streamer_t * stream, char * destination)
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     gTCPManager.Disconnect(peerAddress);
+    gTCPManager.Close();
 #endif
+    gUDPManager.Close();
 
     gEchoClient.Shutdown();
     gExchangeManager.Shutdown();

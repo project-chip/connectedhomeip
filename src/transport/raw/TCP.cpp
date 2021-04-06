@@ -122,6 +122,11 @@ exit:
 
 void TCPBase::Close()
 {
+    if (mListenSocket)
+    {
+        mListenSocket->Free();
+        mListenSocket = nullptr;
+    }
     mState = State::kNotReady;
 }
 
