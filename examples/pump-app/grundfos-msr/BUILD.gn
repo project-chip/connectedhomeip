@@ -73,7 +73,7 @@ ti_sysconfig("sysconfig") {
   ]
 }
 
-ti_simplelink_executable("lock_app") {
+ti_simplelink_executable("pump_app") {
   include_dirs = [
     "${chip_root}/src/app/util",
     "${chip_root}/src/app/server",
@@ -117,7 +117,7 @@ ti_simplelink_executable("lock_app") {
 }
 
 group("grundfos-msr") {
-  deps = [ ":lock_app" ]
+  deps = [ ":pump_app" ]
 }
 
 group("default") {

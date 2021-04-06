@@ -24,7 +24,7 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
-project_dir = "${chip_root}/examples/pump-app/cc13x2x7_26x2x7"
+project_dir = "${chip_root}/examples/pump-controller-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/main/include" ]
@@ -73,7 +73,7 @@ ti_sysconfig("sysconfig") {
   ]
 }
 
-ti_simplelink_executable("lock_app") {
+ti_simplelink_executable("pump_controller_app") {
   include_dirs = [
     "${chip_root}/src/app/util",
     "${chip_root}/src/app/server",
@@ -82,19 +82,19 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/include",
   ]
   defines = []
-  output_name = "chip-${ti_simplelink_board}-pump-example.out"
+  output_name = "chip-${ti_simplelink_board}-pump-controller-example.out"
 
   public_deps = [
     ":sdk",
     ":sysconfig",
-    "${chip_root}/examples/pump-app/pump-common",
+    "${chip_root}/examples/pump-controller-app/pump-controller-common",
     "${chip_root}/src/lib",
     "${openthread_root}:libopenthread-cli-ftd",
   ]
 
   sources = [
     "${project_dir}/main/AppTask.cpp",
-    "${project_dir}/main/BoltLockManager.cpp",
+    "${project_dir}/main/PumpManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",
   ]
@@ -117,7 +117,7 @@ ti_simplelink_executable("lock_app") {
 }
 
 group("cc13x2x7_26x2x7") {
-  deps = [ ":lock_app" ]
+  deps = [ ":pump_controller_app" ]
 }
 
 group("default") {

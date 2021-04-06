@@ -73,7 +73,7 @@ ti_sysconfig("sysconfig") {
   ]
 }
 
-ti_simplelink_executable("lock_app") {
+ti_simplelink_executable("pump_app") {
   include_dirs = [
     "${chip_root}/src/app/util",
     "${chip_root}/src/app/server",
@@ -94,7 +94,7 @@ ti_simplelink_executable("lock_app") {
 
   sources = [
     "${project_dir}/main/AppTask.cpp",
-    "${project_dir}/main/BoltLockManager.cpp",
+    "${project_dir}/main/PumpManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",
   ]
@@ -117,7 +117,7 @@ ti_simplelink_executable("lock_app") {
 }
 
 group("cc13x2x7_26x2x7") {
-  deps = [ ":lock_app" ]
+  deps = [ ":pump_app" ]
 }
 
 group("default") {
