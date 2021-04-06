@@ -37,11 +37,11 @@ BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
 function __screen() {
-  if [[ "x$GITHUB_ACTION_RUN" != "x1" ]]; then
-    screen -dm "$@"
-  else
-    "$@"
-  fi
+    if [[ "x$GITHUB_ACTION_RUN" != "x1" ]]; then
+        screen -dm "$@"
+    else
+        "$@"
+    fi
 }
 
 function __kill_grep() {
