@@ -121,8 +121,8 @@ public:
     CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
                           chip::CommandId aCommandId, BitFlags<CommandPathFlags> Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
-    CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, Protocols::Id aProtocolId, const uint16_t aProtocolCode,
-                             const chip::ClusterId aClusterId);
+    CHIP_ERROR AddStatusCode(const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, Protocols::Id aProtocolId,
+                             const uint16_t aProtocolCode);
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -154,6 +154,7 @@ protected:
     uint8_t mCommandIndex = 0;
 
 private:
+    friend class TestCommandInteraction;
     chip::System::PacketBufferHandle mpBufHandle;
     InvokeCommand::Builder mInvokeCommandBuilder;
     CommandState mState;

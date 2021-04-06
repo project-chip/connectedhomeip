@@ -211,10 +211,13 @@ combination with JLinkRTTClient as follows:
         -   _Solid On_ ; Light is on
         -   _Off_ ; Light is off
 
-    **Push Button 0** - Press and Release : If not commissioned, start thread
-    with default configurations (DEBUG)
+    **Push Button 0**
 
-        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+            for 30 seconds. The device will then switch to a slower interval advertisement.
+            After 15 minutes, the adverstiment stops.
+
+        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
             procedure. **LEDs** blink in unison when the factory reset procedure is
             initiated.

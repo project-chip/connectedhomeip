@@ -1697,7 +1697,7 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
         BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
 
         sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
-        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         /* Send event to process state change request */
         DriveBLEState();

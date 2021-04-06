@@ -118,9 +118,9 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     chip::EndpointId endpointId;
-    uint16_t generalCode  = 0;
-    uint32_t protocolId   = 0;
-    uint16_t protocolCode = 0;
+    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
+    uint32_t protocolId                                     = 0;
+    uint16_t protocolCode                                   = 0;
     StatusElement::Parser statusElementParser;
 
     mCommandIndex++;
@@ -144,7 +144,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         err = statusElementParser.CheckSchemaValidity();
         SuccessOrExit(err);
 
-        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &clusterId);
+        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
         {
@@ -155,13 +155,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     else if (CHIP_END_OF_TLV == err)
     {
         err = aCommandElement.GetData(&commandDataReader);
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-            ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-            AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::SecureChannel::Id,
-                          Protocols::SecureChannel::kProtocolCodeSuccess, clusterId);
-        }
+        SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
