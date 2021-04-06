@@ -36,6 +36,14 @@ BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
 
+function __screen() {
+  if [[ "x$GITHUB_ACTION_RUN" != "x1" ]]; then
+    screen -dm "$@"
+  else
+    "$@"
+  fi
+}
+
 function __kill_grep() {
     ps aux | grep "$1" | awk '{print $2}' | sort -k2 -rn |
         while read -r pid; do
@@ -58,9 +66,14 @@ function __virtual_thread_clean() {
 function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
-    FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/simulation/bin/ \
-        python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
+    # screen is a wrapper function, it run the program directly on github actions and wrap
+    # the command using screen when running locally.
+    # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
+    # This is not expected, so we append a screen to make it run totally background.
+    # We don't have this issue on GitHub actions, so we don't need screen.
+    __screen bash -c 'FLASK_APP=cirque/restservice/service.py \
+        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/output/simulation/bin/ \
+        python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1'
 }
 
 function __cirquetest_clean_flask() {
