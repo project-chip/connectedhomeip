@@ -47,6 +47,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp",
     "${chip_root}/src/app/clusters/network-commissioning/network-commissioning.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
+    "${chip_root}/src/app/clusters/ota-server/ota-server.cpp",
     "${chip_root}/src/app/clusters/scenes/scenes.cpp",
     "${chip_root}/src/app/clusters/target-navigator-server/target-navigator-server.cpp",
     "${chip_root}/src/app/clusters/temperature-measurement-server/temperature-measurement-server.cpp",
