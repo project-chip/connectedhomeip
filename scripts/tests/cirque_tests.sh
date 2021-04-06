@@ -104,7 +104,8 @@ function cirquetest_run_test() {
     export CURRENT_TEST="$1"
     export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
     mkdir -p "$DEVICE_LOG_DIR"
-    __cirquetest_start_flask & disown;
+    __cirquetest_start_flask &
+    disown
     sleep 5
     cd "$TEST_DIR"
     ./"$1.sh"
