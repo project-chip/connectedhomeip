@@ -37,5 +37,17 @@ CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, uint64_t fabricId, 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64)
+{
+    ReturnErrorCodeIf(bufferLen < macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    size_t idx = 0;
+    for (size_t i = 0; i < macOrEui64.size(); ++i)
+    {
+        idx += snprintf(buffer + idx, 3, "%02X", macOrEui64.data()[i]);
+    }
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Mdns
 } // namespace chip
