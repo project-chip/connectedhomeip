@@ -476,7 +476,7 @@ CHIP_ERROR ChipMdnsStopPublish()
     RegisterContext * sdCtx = nullptr;
     if (CHIP_ERROR_KEY_NOT_FOUND == MdnsContexts::GetInstance().Get(ContextType::Register, sdCtx))
     {
-      return CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
 
     return MdnsContexts::GetInstance().Removes(ContextType::Register);
