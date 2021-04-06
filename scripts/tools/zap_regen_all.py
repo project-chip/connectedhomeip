@@ -35,6 +35,8 @@ os.system("./scripts/tools/zap_generate_chip.sh")
 
 os.system("./scripts/tools/zap_generate_chip_tool.sh")
 
+os.system("./scripts/tools/zap_generate.sh src/controller/python/local-clusters.zap")
+
 for path in Path('./examples').rglob('*.zap'):
     os.system("./scripts/tools/zap_generate.sh " + str(path))
 
