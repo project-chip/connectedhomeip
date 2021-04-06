@@ -57,6 +57,18 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     mSecureSessionMgr = sessionMgr;
     mAdmin            = admin;
 
+    // Note: Since BLE is only used for initial setup, enable BLE advertisement in rendezvous session can be expected.
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
+#if CONFIG_NETWORK_LAYER_BLE
+    {
+        ReturnErrorOnFailure(mParams.GetAdvertisementDelegate()->StartAdvertisement());
+    }
+#else
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+#endif // CONFIG_NETWORK_LAYER_BLE
+
     if (!mParams.IsController())
     {
         if (mParams.HasPASEVerifier())
@@ -233,17 +245,6 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             else
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingFailed, err);
-            }
-            break;
-
-        case State::kNetworkProvisioning:
-            if (CHIP_NO_ERROR == err)
-            {
-                mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess, err);
-            }
-            else
-            {
-                mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed, err);
             }
             break;
 

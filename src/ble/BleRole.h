@@ -16,11 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines the BleRole enum.
- */
-
 #pragma once
 
 namespace chip {

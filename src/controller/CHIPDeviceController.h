@@ -209,7 +209,9 @@ protected:
     Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
+#if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
+#endif
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
