@@ -39,4 +39,5 @@ constexpr chip::GroupId kTestGroupId       = 0;
 
 void InitializeChip(void);
 void ShutdownChip(void);
+void DriveIO(void);
 void TLVPrettyPrinter(const char * aFormat, ...);

@@ -58,7 +58,45 @@ exit:
 void ShutdownChip(void)
 {
     gExchangeManager.Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
+    chip::DeviceLayer::SystemLayer.Shutdown();
+}
+
+void DriveIO(void)
+{
+    struct timeval sleepTime;
+    fd_set readFDs, writeFDs, exceptFDs;
+    int numFDs = 0;
+    int selectRes;
+
+    sleepTime.tv_sec  = 0;
+    sleepTime.tv_usec = NETWORK_SLEEP_TIME_MSECS;
+
+    FD_ZERO(&readFDs);
+    FD_ZERO(&writeFDs);
+    FD_ZERO(&exceptFDs);
+
+    if (chip::DeviceLayer::SystemLayer.State() == chip::System::kLayerState_Initialized)
+        chip::DeviceLayer::SystemLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
+
+    if (chip::DeviceLayer::InetLayer.State == chip::Inet::InetLayer::kState_Initialized)
+        chip::DeviceLayer::InetLayer.PrepareSelect(numFDs, &readFDs, &writeFDs, &exceptFDs, sleepTime);
+
+    selectRes = select(numFDs, &readFDs, &writeFDs, &exceptFDs, &sleepTime);
+    if (selectRes < 0)
+    {
+        printf("select failed: %s\n", chip::ErrorStr(chip::System::MapErrorPOSIX(errno)));
+        return;
+    }
+
+    if (chip::DeviceLayer::SystemLayer.State() == chip::System::kLayerState_Initialized)
+    {
+        chip::DeviceLayer::SystemLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+    }
+
+    if (chip::DeviceLayer::InetLayer.State == chip::Inet::InetLayer::kState_Initialized)
+    {
+        chip::DeviceLayer::InetLayer.HandleSelectResult(selectRes, &readFDs, &writeFDs, &exceptFDs);
+    }
 }
 
 void TLVPrettyPrinter(const char * aFormat, ...)
