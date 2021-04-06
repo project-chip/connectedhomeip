@@ -567,7 +567,6 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     }
 #endif
 
-    // BleLayerObject initialization:
     mBle      = bleLayer;
     mRefCount = 1;
 
@@ -589,6 +588,17 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
 
 exit:
     return err;
+}
+
+void BLEEndPoint::Release()
+{
+    // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
+    // object. This effectively declared the object free and ready for re-allocation.
+    mRefCount--;
+    if (mRefCount == 0)
+    {
+        mBle = nullptr;
+    }
 }
 
 BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)

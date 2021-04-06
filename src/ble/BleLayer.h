@@ -61,7 +61,6 @@
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
 #include <ble/BleLayerDelegate.h>
-#include <ble/BleLayerObject.h>
 #include <ble/BlePlatformDelegate.h>
 #include <ble/BleRole.h>
 #include <ble/BleUUID.h>

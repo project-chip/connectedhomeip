@@ -145,17 +145,6 @@ const ChipBleUUID BleLayer::CHIP_BLE_CHAR_3_ID = { { // 64630238-8772-45F2-B87D-
                                                      0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83,
                                                      0x21, 0x8F, 0x04 } };
 
-void BleLayerObject::Release()
-{
-    // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
-    // object. This effectively declared the object free and ready for re-allocation.
-    mRefCount--;
-    if (mRefCount == 0)
-    {
-        mBle = nullptr;
-    }
-}
-
 // BleTransportCapabilitiesRequestMessage implementation:
 
 void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t index, uint8_t version)

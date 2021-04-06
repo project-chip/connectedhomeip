@@ -33,8 +33,6 @@
 namespace chip {
 namespace Ble {
 
-class BLEEndPoint;
-
 class BleLayerDelegate
 {
 public:

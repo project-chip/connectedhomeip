@@ -27,10 +27,9 @@
 
 #pragma once
 
+#include <system/SystemLayer.h>
 #include <system/SystemMutex.h>
 
-#include <ble/BleLayer.h>
-#include <ble/BleLayerObject.h>
 #include <ble/BleRole.h>
 #include <ble/BtpEngine.h>
 #if CHIP_ENABLE_CHIPOBLE_TEST
@@ -51,11 +50,13 @@ enum
 // Forward declarations
 class BleLayer;
 class BleEndPointPool;
+// BLEEndPoint holds a pointer to BleLayerDelegate for messages, while BleLayerDelegate functions also accepts BLEEndPoint.
+class BleLayerDelegate;
 #if CHIP_ENABLE_CHIPOBLE_TEST
 class BtpEngineTest;
 #endif
 
-class DLL_EXPORT BLEEndPoint : public BleLayerObject
+class DLL_EXPORT BLEEndPoint
 {
     friend class BleLayer;
     friend class BleEndPointPool;
@@ -108,6 +109,14 @@ public:
     void Abort();
 
 private:
+    BleLayer * mBle; ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
+    BleLayerDelegate * mBleTransport;
+
+    uint32_t mRefCount;
+
+    void AddRef() { mRefCount++; }
+    void Release();
+
     // Private data members:
     enum class ConnectionStateFlag : uint8_t
     {
