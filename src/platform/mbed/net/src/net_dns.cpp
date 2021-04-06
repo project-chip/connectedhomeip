@@ -31,18 +31,13 @@ int mbed_getaddrinfo(const char * nodename, const char * servname, const struct 
 
         for (int i = 0; i < result; i++)
         {
-
             res[i]          = new addrinfo;
             res[i]->ai_addr = new sockaddr;
-            if (i)
+            res[i]->ai_next = nullptr;
+            if (i > 0)
             {
                 res[i - 1]->ai_next = res[i];
             }
-            else
-            {
-                res[i - 1]->ai_next = nullptr;
-            }
-
             if (convert_mbed_addr_to_bsd(res[i]->ai_addr, &temp[i]) < 0)
             {
                 // to  do free res  to avoid memory leak

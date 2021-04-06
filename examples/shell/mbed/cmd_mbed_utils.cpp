@@ -602,11 +602,12 @@ int cmd_socket_tcp(int argc, char ** argv)
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
     TCPEndPoint * endPoint = nullptr;
-    IPAddress addr;
-    SocketAddress address;
     PacketBufferHandle buffer;
+    const uint16_t port = 80;
+    IPAddress IPaddr[5] = { IPAddress::Any };
+    bool async_dummy    = false;
+    char destAddrStr[64];
 
-    const uint16_t port   = 80;
     const char hostname[] = "ifconfig.io";
     const char msg[]      = "GET / HTTP/1.1\r\n"
                        "Host: ifconfig.io\r\n"
@@ -615,24 +616,11 @@ int cmd_socket_tcp(int argc, char ** argv)
     uint16_t msgLen = sizeof(msg);
 
     streamer_t * sout = streamer_get();
-
-    //******************************to be replaced********************************************************
-    /* get the host address */
-    printf("\nResolve hostname %s\r\n", hostname);
-    WiFiInterface * _net = WiFiInterface::get_default_instance();
-    int result           = _net->gethostbyname(hostname, &address);
-    if (result != 0)
-    {
-        printf("Error! gethostbyname(%s) returned: %d\r\n", hostname, result);
-        return false;
-    }
-
-    //**************************************************************************************
-    streamer_printf(sout, "INFO: %s IP address is %s\r\n", hostname,
-                    (address.get_ip_address() ? address.get_ip_address() : "None"));
-    IPAddress::FromString(address.get_ip_address(), addr);
+    streamer_printf(sout, "TCP  test host : %s\r\n", hostname);
 
     TcpListenParameters params(&DeviceLayer::InetLayer);
+    params.GetInetLayer()->ResolveHostAddress(hostname, 4, IPaddr, HandleDNSResolveComplete, &async_dummy);
+
     err = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
     if (err != INET_NO_ERROR)
     {
@@ -646,8 +634,10 @@ int cmd_socket_tcp(int argc, char ** argv)
 
     socketEvent.clear();
 
-    streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", address.get_ip_address(), port);
-    err = endPoint->Connect(addr, port, 0);
+    IPaddr[0].ToString(destAddrStr, sizeof(destAddrStr));
+
+    streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", destAddrStr, port);
+    err = endPoint->Connect(IPaddr[0], port, 0);
     if (err != INET_NO_ERROR)
     {
         streamer_printf(sout, "ERROR: socket connect failed\r\n");

@@ -141,9 +141,6 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDSTORAGE_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDNETSOCKET_CFLAGS mbed-netsocket)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDNETSOCKET_CFLAGS})
 
-mbed_get_target_common_compile_flags(CHIP_MBEDLWIPSTACK_CFLAGS mbed-lwipstack)
-list(APPEND CHIP_CFLAGS ${CHIP_MBEDLWIPSTACK_CFLAGS})
-
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
