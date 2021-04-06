@@ -120,6 +120,11 @@ exit:
     return err;
 }
 
+void TCPBase::Close()
+{
+    mState = State::kNotReady;
+}
+
 TCPBase::ActiveConnectionState * TCPBase::FindActiveConnection(const PeerAddress & address)
 {
     if (address.GetTransportType() != Type::kTcp)

@@ -74,6 +74,7 @@ public:
     template <typename... Args>
     CHIP_ERROR ResetTransport(Args &&... transportInitArgs)
     {
+        mTransport.Close();
         return mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
     }
 
