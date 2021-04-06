@@ -29,6 +29,7 @@ static_library("controller") {
     "CHIPDeviceController.h",
     "DeviceAddressUpdater.cpp",
     "DeviceAddressUpdater.h",
+    "EmptyDataModelHandler.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
