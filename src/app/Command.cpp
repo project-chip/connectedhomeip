@@ -52,7 +52,7 @@ exit:
 CHIP_ERROR Command::Reset()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CommandList::Builder commandListBuilder;
     ClearExistingExchangeContext();
 
     if (mCommandMessageBuf.IsNull())
@@ -66,7 +66,8 @@ CHIP_ERROR Command::Reset()
     err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
     SuccessOrExit(err);
 
-    mInvokeCommandBuilder.CreateCommandListBuilder();
+    commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
+    SuccessOrExit(commandListBuilder.GetError());
     MoveToState(CommandState::Initialized);
 
     mCommandIndex = 0;
@@ -264,6 +265,9 @@ CHIP_ERROR Command::ClearExistingExchangeContext()
 CHIP_ERROR Command::FinalizeCommandsMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommandList::Builder commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
+    SuccessOrExit(commandListBuilder.GetError());
 
     mInvokeCommandBuilder.EndOfInvokeCommand();
     err = mInvokeCommandBuilder.GetError();
