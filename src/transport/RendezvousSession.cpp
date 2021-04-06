@@ -357,45 +357,6 @@ CHIP_ERROR RendezvousSession::HandlePairingMessage(const PacketHeader & packetHe
     return mPairingSession.HandlePeerMessage(packetHeader, peerAddress, std::move(msgBuf));
 }
 
-CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                                  PacketBufferHandle msgBuf)
-{
-    ReturnErrorCodeIf(mPairingSessionHandle == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    PeerConnectionState * state = mSecureSessionMgr->GetPeerConnectionState(*mPairingSessionHandle);
-    ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
-
-    PayloadHeader payloadHeader;
-    ReturnErrorOnFailure(SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msgBuf));
-
-    // Use the node IDs from the packet header only after it's successfully decrypted
-    if (packetHeader.GetDestinationNodeId().HasValue() && !mParams.HasLocalNodeId())
-    {
-        NodeId destNodeId = packetHeader.GetDestinationNodeId().Value();
-        ChipLogProgress(Ble, "Received rendezvous message for 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(destNodeId >> 32),
-                        static_cast<uint32_t>(destNodeId));
-        mAdmin->SetNodeId(destNodeId);
-        mParams.SetLocalNodeId(destNodeId);
-        mSecureSessionMgr->SetLocalNodeId(destNodeId);
-    }
-
-    if (packetHeader.GetSourceNodeId().HasValue() && !mParams.HasRemoteNodeId())
-    {
-        NodeId sourceNodeId = packetHeader.GetSourceNodeId().Value();
-        ChipLogProgress(Ble, "Received rendezvous message from  0x%08" PRIx32 "%08" PRIx32,
-                        static_cast<uint32_t>(sourceNodeId >> 32), static_cast<uint32_t>(sourceNodeId));
-        mParams.SetRemoteNodeId(sourceNodeId);
-    }
-
-    if (payloadHeader.HasProtocol(Protocols::NetworkProvisioning::Id))
-    {
-        ReturnErrorOnFailure(mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void RendezvousSession::InitPairingSessionHandle()
 {
     ReleasePairingSessionHandle();

@@ -154,8 +154,6 @@ private:
     CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
 
-    CHIP_ERROR HandleSecureMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                   System::PacketBufferHandle msgBuf);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
