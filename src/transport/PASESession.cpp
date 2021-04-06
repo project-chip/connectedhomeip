@@ -165,6 +165,8 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
     ReturnErrorOnFailure(mCommissioningHash.AddData(Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext)));
 
     mDelegate = delegate;
+
+    ChipLogDetail(Ble, "Assigned local session key ID %d", myKeyId);
     mConnectionState.SetLocalKeyID(myKeyId);
     mSetupPINCode    = setupCode;
     mComputeVerifier = true;
@@ -550,6 +552,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
     msg->ConsumeHead(sizeof(encryptionKeyId));
 
+    ChipLogDetail(Ble, "Peer assigned session key ID %d", encryptionKeyId);
     mConnectionState.SetPeerKeyID(encryptionKeyId);
 
     err = mSpake2p.ComputeRoundTwo(msg->Start(), msg->DataLength(), verifier, &verifier_len);
@@ -614,6 +617,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
     buf     = msg->Start();
     buf_len = msg->DataLength();
 
+    ChipLogDetail(Ble, "Peer assigned session key ID %d", encryptionKeyId);
     mConnectionState.SetPeerKeyID(encryptionKeyId);
 
     err = mSpake2p.ComputeRoundTwo(buf, kMAX_Point_Length, verifier, &verifier_len_raw);
