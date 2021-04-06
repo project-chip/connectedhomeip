@@ -76,7 +76,26 @@ uint64_t gReadCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gReadRespCount = 0;
 
-std::condition_variable gCond;
+std::condition_variable cvWaitingForResponse;
+bool gWaitingForCommandResp = false;
+std::mutex cvWaitingForResponseMutex;
+
+void UpdateWaitForResponse(bool value)
+{
+    {
+        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+        gWaitingForCommandResp = value;
+    }
+    cvWaitingForResponse.notify_all();
+}
+
+bool WaitForResponse(int32_t duration)
+{
+    std::chrono::seconds waitingForResponseTimeout(duration);
+    std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
+    auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
+    return cvWaitingForResponse.wait_until(lk, waitingUntil, []() { return !gWaitingForCommandResp; });
+}
 
 CHIP_ERROR SendCommandRequest(void)
 {
@@ -124,6 +143,7 @@ CHIP_ERROR SendCommandRequest(void)
 
     if (err == CHIP_NO_ERROR)
     {
+        UpdateWaitForResponse(true);
         gCommandCount++;
     }
     else
@@ -147,6 +167,7 @@ CHIP_ERROR SendReadRequest(void)
 
     if (err == CHIP_NO_ERROR)
     {
+        UpdateWaitForResponse(true);
         gReadCount++;
     }
     else
@@ -194,7 +215,7 @@ void HandleReadComplete()
     printf("Read Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gReadRespCount, gReadCount,
            static_cast<double>(gReadRespCount) * 100 / gReadCount, static_cast<double>(transitTime) / 1000);
 
-    gCond.notify_one();
+    UpdateWaitForResponse(false);
 }
 
 class MockInteractionModelApp : public chip::app::InteractionModelDelegate
@@ -265,7 +286,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
            static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
 
-    gCond.notify_one();
+    UpdateWaitForResponse(false);
 }
 } // namespace app
 } // namespace chip
@@ -331,7 +352,7 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
+        if (!WaitForResponse(gMessageIntervalSeconds))
         {
             printf("Invoke Command: No response received\n");
         }
@@ -347,7 +368,7 @@ int main(int argc, char * argv[])
             goto exit;
         }
 
-        if (gCond.wait_for(lock, std::chrono::seconds(gMessageIntervalSeconds)) == std::cv_status::timeout)
+        if (!WaitForResponse(gMessageIntervalSeconds))
         {
             printf("read request: No response received\n");
         }
