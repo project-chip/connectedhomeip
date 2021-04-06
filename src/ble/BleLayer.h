@@ -251,6 +251,9 @@ public:
     BLE_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
+    BLE_ERROR CloseAllBleConnections();
+    BLE_ERROR CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
+
     chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
     {
         return mSystemLayer->ScheduleWork(aComplete, aAppState);

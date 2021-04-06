@@ -365,6 +365,11 @@ void BLEEndPoint::DoClose(uint8_t flags, BLE_ERROR err)
             {
                 DoCloseCallback(oldState, flags, err);
             }
+
+            if ((flags & kBleCloseFlag_SuppressCallback) != 0)
+            {
+                mBleTransport->OnEndPointConnectionClosed(this, err);
+            }
         }
     }
 }
@@ -382,6 +387,11 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
     if (oldState != kState_Closing && (flags & kBleCloseFlag_SuppressCallback) == 0)
     {
         DoCloseCallback(oldState, flags, err);
+    }
+
+    if ((flags & kBleCloseFlag_SuppressCallback) != 0)
+    {
+        mBleTransport->OnEndPointConnectionClosed(this, err);
     }
 
     // If underlying BLE connection has closed, connection object is invalid, so just free the end point and return.

@@ -173,6 +173,7 @@ class DeviceMgrCmd(Cmd):
         "ble-debug-log",
 
         "connect",
+        "close-ble",
         "resolve",
         "zcl",
         "zclread",
@@ -238,11 +239,11 @@ class DeviceMgrCmd(Cmd):
                 80,
             )
 
-    def do_close(self, line):
+    def do_closeble(self, line):
         """
-        close
+        close-ble
 
-        Close the connection to the device.
+        Close the ble connection to the device.
         """
 
         args = shlex.split(line)
@@ -253,7 +254,7 @@ class DeviceMgrCmd(Cmd):
             return
 
         try:
-            self.devCtrl.Close()
+            self.devCtrl.CloseBLEConnection()
         except exceptions.ChipStackException as ex:
             print(str(ex))
 

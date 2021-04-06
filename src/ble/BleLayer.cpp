@@ -323,7 +323,11 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
 BLE_ERROR BleLayer::Shutdown()
 {
     mState = kState_NotInitialized;
+    return CloseAllBleConnections();
+}
 
+BLE_ERROR BleLayer::CloseAllBleConnections()
+{
     // Close and free all BLE end points.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {
@@ -347,7 +351,34 @@ BLE_ERROR BleLayer::Shutdown()
             }
         }
     }
+    return BLE_NO_ERROR;
+}
 
+BLE_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
+{
+    // Close and free all BLE end points.
+    for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+    {
+        BLEEndPoint * elem = sBLEEndPointPool.Get(i);
+
+        // If end point was initialized, and has not since been freed...
+        if (elem->mBle != nullptr && elem->ConnectionObjectIs(connObj))
+        {
+            // If end point hasn't already been closed...
+            if (elem->mState != BLEEndPoint::kState_Closed)
+            {
+                // Close end point such that callbacks are suppressed and pending transmissions aborted.
+                elem->Abort();
+            }
+
+            // If end point was closed, but is still waiting for GATT unsubscribe to complete, free it anyway.
+            // This cancels the unsubscribe timer (plus all the end point's other timers).
+            if (elem->IsUnsubscribePending())
+            {
+                elem->Free();
+            }
+        }
+    }
     return BLE_NO_ERROR;
 }
 

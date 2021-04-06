@@ -338,6 +338,17 @@ public:
 
     void ReleaseDevice(Device * device) override;
 
+#if CONFIG_NETWORK_LAYER_BLE
+    /**
+     * @brief
+     *   Once we have finished all commissioning work, the Controller should close the BLE
+     *   connection to the device and establish CASE session / another PASE session to the device
+     *   if needed.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR CloseBleConnection();
+#endif
+
 private:
     DevicePairingDelegate * mPairingDelegate;
     RendezvousSession * mRendezvousSession;
