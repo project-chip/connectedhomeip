@@ -90,6 +90,8 @@ public:
 
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
+
     CHIP_ERROR _JoinerStart();
 
     ~ThreadStackManagerImpl() = default;
