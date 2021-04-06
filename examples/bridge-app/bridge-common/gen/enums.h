@@ -2006,6 +2006,39 @@ typedef enum
     EMBER_ZCL_NOTIFICATION_SCHEME_PREDEFINED_NOTIFICATION_SCHEME_B = 2,
 } EmberAfNotificationScheme;
 
+// Enum for OTAAnnouncementReason
+typedef enum
+{
+    EMBER_ZCL_OTA_ANNOUNCEMENT_REASON_SIMPLE_ANNOUNCEMENT       = 0,
+    EMBER_ZCL_OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE          = 1,
+    EMBER_ZCL_OTA_ANNOUNCEMENT_REASON_CRITICAL_UPDATE_AVAILABLE = 2,
+} EmberAfOTAAnnouncementReason;
+
+// Enum for OTAApplyUpdateAction
+typedef enum
+{
+    EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_PROCEED           = 0,
+    EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_AWAIT_NEXT_ACTION = 1,
+    EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_DISCONTINUE       = 2,
+} EmberAfOTAApplyUpdateAction;
+
+// Enum for OTADownloadProtocol
+typedef enum
+{
+    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS  = 0,
+    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_ASYNCHRONOUS = 1,
+    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_HTTPS            = 2,
+    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_VENDOR_SPECIFIC  = 3,
+} EmberAfOTADownloadProtocol;
+
+// Enum for OTAQueryStatus
+typedef enum
+{
+    EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE = 0,
+    EMBER_ZCL_OTA_QUERY_STATUS_BUSY             = 1,
+    EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE    = 2,
+} EmberAfOTAQueryStatus;
+
 // Enum for OccupancySensorType
 typedef enum
 {
