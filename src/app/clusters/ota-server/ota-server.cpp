@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include <gen/att-storage.h>
 #include <gen/attribute-id.h>
 #include <gen/attribute-type.h>
@@ -60,11 +59,12 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::Byte
  * @param vendorId The Vendor ID applying to the OTA Client’s Node. Should match the value in the Basic Information Cluster.
  * @param productId The Product ID applying to the OTA Client’s Node. Should match the value in the Basic Information Cluster.
  * @param imageType A Vendor-specific numerical value that may help an OTA Server select the correct payload.
- * @param hardwareVersion The OTA Client’s hardware version. Should match the HardwareVersion attribute of the Client's Basic Information Cluster.
- * @param currentVersion The current version running on the OTA Client. Should match the SoftwareVersion attribute of the Client's Basic
- *                       Information Cluster.
- * @param protocolsSupported A list of OTADownloadProtocol enum values indicating download protocols supported by the OTA Client (max length 8
- *                           entries).
+ * @param hardwareVersion The OTA Client’s hardware version. Should match the HardwareVersion attribute of the Client's Basic
+ * Information Cluster.
+ * @param currentVersion The current version running on the OTA Client. Should match the SoftwareVersion attribute of the Client's
+ * Basic Information Cluster.
+ * @param protocolsSupported A list of OTADownloadProtocol enum values indicating download protocols supported by the OTA Client
+ * (max length 8 entries).
  * @param location Optional, 2 chars. If present, it should match the Location value in the Client's Basic Information Cluster.
  * @param clientCanConsent Optional. May be set by an OTA Client which is capable of obtaining user consent for OTA application.
  * @param metadataForServer Optional, max 512 octets. A TLV-encoded Vendor-specific payload.
