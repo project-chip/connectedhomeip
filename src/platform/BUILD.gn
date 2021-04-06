@@ -615,6 +615,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       }
     } else if (chip_device_platform == "mbed") {
       sources += [
+        "mbed/arch.c",
         "mbed/BLEManagerImpl.cpp",
         "mbed/BLEManagerImpl.h",
         "mbed/ConfigurationManagerImpl.cpp",
