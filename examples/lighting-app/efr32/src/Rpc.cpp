@@ -22,7 +22,8 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 
-#include "lighting_service/pigweed_lighting.rpc.pb.h"
+#include "button_service/button_service.rpc.pb.h"
+#include "lighting_service/lighting_service.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
@@ -33,18 +34,34 @@
 namespace chip {
 namespace rpc {
 
-class LightingService final : public generated::LightingService<LightingService>
+class Lighting final : public generated::Lighting<Lighting>
 {
 public:
-    pw::Status ButtonEvent(ServerContext & ctx, const chip_rpc_Button & request, chip_rpc_Empty & response)
+    pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
-        GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.action /* 0 =PRESSED 1= RELEASE */);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light,
+                                  request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+        return pw::OkStatus();
+    }
+
+    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
+    {
+        response.on = LightMgr().IsLightOn();
+        return pw::OkStatus();
+    }
+};
+
+class Button final : public generated::Button<Button>
+{
+public:
+    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    {
+        GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
         return pw::OkStatus();
     }
 };
 
 namespace {
-using std::byte;
 
 #define RPC_TASK_STACK_SIZE 4096
 #define RPC_TASK_PRIORITY 1
@@ -52,11 +69,13 @@ static TaskHandle_t sRpcTaskHandle;
 StaticTask_t sRpcTaskBuffer;
 StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 
-chip::rpc::LightingService lighting_service;
+chip::rpc::Button button_service;
+chip::rpc::Lighting lighting_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
     server.RegisterService(lighting_service);
+    server.RegisterService(button_service);
 }
 
 } // namespace
