@@ -39,13 +39,6 @@ namespace {
 NodeId GetCurrentNodeId()
 {
     // TODO: once operational credentials are implemented, node ID should be read from them
-    if (!DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogError(Discovery, "Device not fully provisioned. Node ID unknown.");
-        return chip::kTestDeviceNodeId;
-    }
-
-    // Admin pairings should have been persisted and should be loadable
 
     // TODO: once multi-admin is decided, figure out if a single node id
     // is sufficient or if we need multi-node-id advertisement. Existing
@@ -55,7 +48,7 @@ NodeId GetCurrentNodeId()
     auto pairing = GetGlobalAdminPairingTable().cbegin();
     if (pairing != GetGlobalAdminPairingTable().cend())
     {
-        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
+        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX16 ", node %" PRIX64, pairing->GetAdminId(),
                         pairing->GetNodeId());
         return pairing->GetNodeId();
     }
