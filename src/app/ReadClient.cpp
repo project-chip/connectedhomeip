@@ -136,12 +136,22 @@ void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContex
 
 exit:
     ChipLogFunctError(err);
-    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
-    {
-        mpDelegate->ReportError(this, err);
-    }
+
     ClearExistingExchangeContext();
     MoveToState(ClientState::Initialized);
+
+    if (mpDelegate != nullptr)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            mpDelegate->ReportError(this, err);
+        }
+        else
+        {
+            mpDelegate->ReportProcessed(this);
+        }
+    }
+
     return;
 }
 
@@ -205,7 +215,9 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
         }
         SuccessOrExit(err);
 
-        if (isEventListPresent && nullptr != mpDelegate && !moreChunkedMessages)
+        VerifyOrExit(moreChunkedMessages == false, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+
+        if (isEventListPresent && nullptr != mpDelegate)
         {
             chip::TLV::TLVReader eventListReader;
             eventList.GetReader(&eventListReader);
@@ -218,10 +230,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     {
         // TODO: Add status report support and correspond handler in ReadHandler, particular for situation when there
         // are multiple reports
-    }
-    if (nullptr != mpDelegate && !moreChunkedMessages)
-    {
-        err = mpDelegate->ReportProcessed(this);
     }
 
 exit:

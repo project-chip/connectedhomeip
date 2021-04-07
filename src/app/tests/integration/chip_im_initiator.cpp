@@ -227,6 +227,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR CommandResponseProcessed(const chip::app::CommandSender * apCommandSender) override
+    {
+        gCond.notify_one();
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR CommandResponseProtocolError(const chip::app::CommandSender * apCommandSender, uint8_t aCommandIndex) override
     {
         printf("CommandResponseProtocolError happens with CommandIndex %d", aCommandIndex);
@@ -264,8 +270,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
     printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
            static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
-
-    gCond.notify_one();
 }
 } // namespace app
 } // namespace chip
