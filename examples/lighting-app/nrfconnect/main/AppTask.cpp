@@ -450,7 +450,7 @@ int AppTask::StartNFCTag()
     // Get QR Code and emulate its content using NFC tag
     std::string QRCode;
 
-    int result = GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE);
+    int result = GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
 
     // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
