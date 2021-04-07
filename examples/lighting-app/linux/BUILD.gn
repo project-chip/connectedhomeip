@@ -19,6 +19,12 @@ import("${chip_root}/src/app/common_flags.gni")
 
 assert(chip_build_tools)
 
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+}
+
 config("includes") {
   include_dirs = [
     ".",
@@ -41,9 +47,43 @@ executable("chip-lighting-app") {
     "${chip_root}/src/lib",
   ]
 
+  if (chip_enable_pw_rpc) {
+    defines = [ "PW_RPC_ENABLED" ]
+
+    sources += [
+      "${dir_pigweed}/targets/host/system_rpc_server.cc",
+      "${dir_pw_hdlc}/rpc_example/hdlc_rpc_server.cc",
+      "Rpc.cpp",
+    ]
+
+    deps += [
+      "$dir_pw_checksum",
+      "$dir_pw_hdlc:pw_rpc",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_rpc:server",
+      "$dir_pw_rpc:synchronized_channel_output",
+      "$dir_pw_rpc/nanopb:echo_service",
+      "$dir_pw_rpc/system_server",
+      "$dir_pw_rpc/system_server:facade",
+      "$dir_pw_stream",
+      "$dir_pw_stream:socket_stream",
+      "$dir_pw_sync:mutex",
+      "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
+      dir_pw_hdlc,
+      dir_pw_log,
+    ]
+  }
+
   output_dir = root_out_dir
 }
 
 group("linux") {
   deps = [ ":chip-lighting-app" ]
+}
+
+group("default") {
+  deps = [ ":linux" ]
 }

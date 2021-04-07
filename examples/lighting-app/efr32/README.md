@@ -282,8 +282,8 @@ via 2002::2
 
 -   As part of building the example with RPCs enabled the lighting_app python
     interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/lighting_app_wheels
-    To install the wheel files without rebuilding:
+    also created in the output folder: out/debug/lighting_app_wheels. To install
+    the wheel files without rebuilding:
     `pip3 install out/debug/lighting_app_wheels/*.whl`
 
 -   To use the lighting-app console after it has been installed run:
@@ -296,6 +296,7 @@ via 2002::2
 
 -   You can also Get and Set the light directly using the RPCs:
     `rpcs.chip.rpc.Lighting.Get()`
+
     `rpcs.chip.rpc.Lighting.Set(on=True)`
 
 ## Memory settings
