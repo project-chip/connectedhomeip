@@ -15,6 +15,5 @@ cp ./third_party/k32w_sdk/mr2_fixes/RNG_Interface.h "$K32W061_SDK_ROOT"/middlewa
 cp ./third_party/k32w_sdk/mr2_fixes/gpio_pins.h "$K32W061_SDK_ROOT"/boards/k32w061dk6/wireless_examples/openthread/reed/bm/
 cp ./third_party/k32w_sdk/mr2_fixes/pin_mux.c "$K32W061_SDK_ROOT"/boards/k32w061dk6/wireless_examples/openthread/enablement/
 
-
 echo "K32W SDK Master Release 2 was patched!"
 exit 0
