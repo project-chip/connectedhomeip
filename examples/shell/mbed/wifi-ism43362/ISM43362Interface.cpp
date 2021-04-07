@@ -309,6 +309,7 @@ struct ISM43362_socket {
 
 int ISM43362Interface::socket_open(void **handle, nsapi_protocol_t proto)
 {
+    int ret = NSAPI_ERROR_OK;
     _mutex.lock();
 
     // Look for an unused socket
@@ -331,6 +332,7 @@ int ISM43362Interface::socket_open(void **handle, nsapi_protocol_t proto)
         return NSAPI_ERROR_NO_SOCKET;
     }
     socket->id = id;
+
     debug_if(_ism_debug, "ISM43362Interface: socket_open id=%d proto=%d\n", socket->id, proto);
     memset(socket->read_data, 0, sizeof(socket->read_data));
     socket->addr = 0;
@@ -338,9 +340,11 @@ int ISM43362Interface::socket_open(void **handle, nsapi_protocol_t proto)
     socket->proto = proto;
     socket->connected = false;
     *handle = socket;
+
+    ret = _ism.open(socket->id, (socket->proto == NSAPI_UDP) ? "1" : "0");
     _mutex.unlock();
 
-    return 0;
+    return ret;
 }
 
 int ISM43362Interface::socket_close(void *handle)
@@ -364,37 +368,75 @@ int ISM43362Interface::socket_close(void *handle)
 
 int ISM43362Interface::socket_bind(void *handle, const SocketAddress &address)
 {
-    return NSAPI_ERROR_UNSUPPORTED;
+    int ret = NSAPI_ERROR_OK;
+    _mutex.lock();
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    debug_if(_ism_debug, "ISM43362Interface: socket_bind, id=%d address=%s port=%d\n", socket->id, address.get_ip_address(), address.get_port());
+    ret = _ism.bind(socket->id, address.get_ip_address(), address.get_port());
+    if (ret == NSAPI_ERROR_OK)
+    {
+        if (socket->proto == NSAPI_UDP)
+        {
+            ret = _ism.startServer(socket->id);
+            _socket_obj[socket->id] = (uint32_t)socket;
+        }
+    }
+    
+    _mutex.unlock();
+    return ret;
 }
 
 int ISM43362Interface::socket_listen(void *handle, int backlog)
 {
-    return NSAPI_ERROR_UNSUPPORTED;
-}
-
-int ISM43362Interface::socket_connect(void *handle, const SocketAddress &addr)
-{
+    int ret = NSAPI_ERROR_OK;
     _mutex.lock();
-    int ret = socket_connect_nolock(handle, addr);
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    debug_if(_ism_debug, "ISM43362Interface: socket_listen, id=%d backlog=%d\n", socket->id, backlog);
+    ret = _ism.setServerParam(socket->id, backlog);
+    if (ret == NSAPI_ERROR_OK)
+    {
+        if (socket->proto == NSAPI_TCP)
+        {
+            ret = _ism.startServer(socket->id);
+            _socket_obj[socket->id] = (uint32_t)socket;
+        }
+    }
     _mutex.unlock();
     return ret;
 }
 
 int ISM43362Interface::socket_connect_nolock(void *handle, const SocketAddress &addr)
 {
-    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
-    const char *proto = (socket->proto == NSAPI_UDP) ? "1" : "0";
-    if (_ism.open(proto, socket->id, addr.get_ip_address(), addr.get_port()) != NSAPI_ERROR_OK) {
-        return NSAPI_ERROR_DEVICE_ERROR;
-    }
-    _ids[socket->id]  = true;
-    _socket_obj[socket->id] = (uint32_t)socket;
-    socket->connected = true;
-    return 0;
-
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle; 
+    return _ism.setClientParam(socket->id, addr.get_ip_address(), addr.get_port());;
 }
 
+int ISM43362Interface::socket_connect(void *handle, const SocketAddress &addr)
+{
+    int ret = NSAPI_ERROR_OK;
+    _mutex.lock();
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    debug_if(_ism_debug, "ISM43362Interface: socket_connect, id=%d ip=%s port=%d\n", socket->id, addr.get_ip_address(), addr.get_port());
+    ret = socket_connect_nolock(handle, addr);
+    if (ret != NSAPI_ERROR_OK)
+    {
+        _mutex.unlock();
+        return ret;
+    }
 
+    ret = _ism.startClient(socket->id);
+    if (ret != NSAPI_ERROR_OK)
+    {
+        _mutex.unlock();
+        return ret;
+    }
+
+    socket->connected = true;
+    _socket_obj[socket->id] = (uint32_t)socket;
+    socket->addr = addr;
+    _mutex.unlock();
+    return ret;
+}
 
 void ISM43362Interface::socket_check_read()
 {
@@ -405,7 +447,7 @@ void ISM43362Interface::socket_check_read()
                 struct ISM43362_socket *socket = (struct ISM43362_socket *)_socket_obj[i];
                 /* Check if there is something to read for this socket. But if it */
                 /* has already been read : don't read again */
-                if ((socket->connected) && (socket->read_data_size == 0) && _cbs[socket->id].callback) {
+                if ((socket->read_data_size == 0) && _cbs[socket->id].callback) {
                     /* if no callback is set, no need to read ?*/
                     // debug_if(_ism_debug, "ISM43362Interface socket_check_read: i %d\r\n", i);
                     int read_amount = _ism.check_recv_status(socket->id, socket->read_data);
@@ -436,14 +478,6 @@ int ISM43362Interface::socket_accept(void *server, void **socket, SocketAddress 
     return NSAPI_ERROR_UNSUPPORTED;
 }
 
-int ISM43362Interface::socket_send(void *handle, const void *data, unsigned size)
-{
-    _mutex.lock();
-    int ret = socket_send_nolock(handle, data, size);
-    _mutex.unlock();
-    return ret;
-}
-
 /*  CAREFULL LOCK must be taken before callling this function */
 int ISM43362Interface::socket_send_nolock(void *handle, const void *data, unsigned size)
 {
@@ -463,6 +497,20 @@ int ISM43362Interface::socket_send_nolock(void *handle, const void *data, unsign
     return size;
 }
 
+int ISM43362Interface::socket_send(void *handle, const void *data, unsigned size)
+{
+    int ret = 0;
+    _mutex.lock();
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    if (!socket->connected) {
+        _mutex.unlock();
+        return NSAPI_ERROR_NO_CONNECTION;
+    }
+    ret = socket_send_nolock(handle, data, size);
+    _mutex.unlock();
+    return ret;
+}
+
 int ISM43362Interface::socket_recv(void *handle, void *data, unsigned size)
 {
     _mutex.lock();
@@ -470,14 +518,9 @@ int ISM43362Interface::socket_recv(void *handle, void *data, unsigned size)
     struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
     char *ptr = (char *)data;
 
-    // debug_if(_ism_debug, "ISM43362Interface socket_recv: req=%d read_data_size=%d connected %d\r\n", size, socket->read_data_size, socket->connected);
-
     if (!socket->connected) {
         _mutex.unlock();
-	if (socket->proto == NSAPI_UDP) {
-	   return NSAPI_ERROR_WOULD_BLOCK;
-	}
-        return 0;
+        return NSAPI_ERROR_NO_CONNECTION;
     }
 
     if (socket->read_data_size == 0) {
@@ -537,31 +580,39 @@ int ISM43362Interface::socket_recv(void *handle, void *data, unsigned size)
 
 int ISM43362Interface::socket_sendto(void *handle, const SocketAddress &addr, const void *data, unsigned size)
 {
+    int ret;
     _mutex.lock();
     struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
 
-    if (socket->connected && socket->addr != addr) {
-        if (!_ism.close(socket->id)) {
-            debug_if(_ism_debug, "ISM43362Interface: socket_sendto ERROR\r\n");
+    if (socket->proto == NSAPI_UDP)
+    {
+        ret = socket_connect_nolock(handle, addr);
+        if (ret != NSAPI_ERROR_OK)
+        {
             _mutex.unlock();
-            return NSAPI_ERROR_DEVICE_ERROR;
+            return ret;
         }
-        socket->connected = false;
-        _ids[socket->id] = false;
-        _socket_obj[socket->id] = 0;
-    }
 
-    if (!socket->connected) {
-        int err = socket_connect_nolock(socket, addr);
-        if (err < 0) {
+        ret = _ism.startClient(socket->id);
+        if (ret != NSAPI_ERROR_OK)
+        {
             _mutex.unlock();
-            return err;
+            return ret;
         }
+        socket->connected = true;
+        _socket_obj[socket->id] = (uint32_t)socket;
         socket->addr = addr;
     }
+    else
+    {
+        if (!socket->connected)
+        {
+            _mutex.unlock();
+            return NSAPI_ERROR_NO_CONNECTION;
+        }
+    }
 
-    int ret = socket_send_nolock(socket, data, size);
-
+    ret = socket_send_nolock(socket, data, size);
     _mutex.unlock();
 
     return ret;
@@ -569,12 +620,60 @@ int ISM43362Interface::socket_sendto(void *handle, const SocketAddress &addr, co
 
 int ISM43362Interface::socket_recvfrom(void *handle, SocketAddress *addr, void *data, unsigned size)
 {
-    int ret = socket_recv(handle, data, size);
+    int ret = 0;
     _mutex.lock();
-    if ((ret >= 0) && addr) {
-        struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
-        *addr = socket->addr;
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    char *ptr = (char *)data;
+    char tmp[16];
+    uint16_t port;
+
+    if (addr == nullptr || data == nullptr) 
+    {
+        debug_if(_ism_debug, "ISM43362Interface socket_recvfrom: wrong arguments\r\n");
+        return NSAPI_ERROR_PARAMETER;
     }
+
+    ret = _ism.get_client_details(socket->id, tmp, sizeof(tmp), &port);
+    SocketAddress clientAddr(tmp, port);
+
+    *addr = clientAddr;
+
+    if (socket->read_data_size == 0) {
+        int read_amount = _ism.check_recv_status(socket->id, socket->read_data);
+        if (read_amount > 0) {
+            socket->read_data_size = read_amount;
+        } else if (read_amount < 0) {
+            debug_if(_ism_debug, "ISM43362Interface socket_recvfrom: data received failed\r\n");
+            ret = NSAPI_ERROR_DEVICE_ERROR;
+        }
+    }
+
+    if (socket->read_data_size > 0) {
+        uint32_t i = 0;
+        while ((i < socket->read_data_size) && (i < size)) {
+            *ptr++ = socket->read_data[i];
+            i++;
+        }
+
+        ret = i;
+
+        if (i >= socket->read_data_size) {
+            /* All the storeed data has been read, reset buffer */
+            memset(socket->read_data, 0, sizeof(socket->read_data));
+            socket->read_data_size = 0;
+        } else {
+            /*  In case there is remaining data in buffer, update socket content
+             *  For now by shift copy of all data (not very efficient to be
+             *  revised */
+            while (i < socket->read_data_size) {
+                socket->read_data[i - size] = socket->read_data[i];
+                i++;
+            }
+
+            socket->read_data_size -= size;
+        }
+    }
+
     _mutex.unlock();
     return ret;
 }

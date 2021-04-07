@@ -152,7 +152,19 @@ public:
     * @   NSAPI_ERROR_DEVICE_ERROR :
     * @   failure interfacing with the network processor
     */
-    int open(const char *type, int id, const char *addr, int port);
+    int open(int id, const char *type);
+
+    int bind(int id, const char *addr, int port);
+
+    int setServerParam(int id, int backlog);
+
+    int setClientParam(int id, const char *addr, int port);
+
+    int startClient(int id);
+
+    int startServer(int id);
+    
+    int get_client_details(int id, char *addr, size_t addrSize, uint16_t *port);
 
     /**
     * Sends data to an open socket

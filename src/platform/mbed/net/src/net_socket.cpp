@@ -698,13 +698,13 @@ ssize_t mbed_recvmsg(int fd, struct msghdr * message, int flags)
             break;
         }
         total += ret;
+        tr_info("Socket fd %d received %d bytes message from %s", fd, ret, sockAddr.get_ip_address());
     }
 
     socket->read(NULL, 0);
 
     if (total != -1)
     {
-        tr_info("Socket fd %d received message from %s", fd, sockAddr.get_ip_address());
         if (message->msg_name != nullptr)
         {
             if (convert_mbed_addr_to_bsd((sockaddr *) message->msg_name, &sockAddr))
