@@ -249,6 +249,13 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
         mTransport = mDelegate->AllocTransport(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
         VerifyOrDie(mTransport != nullptr);
     }
+    else
+    {
+        ApplicationExchangeTransport * transport = chip::Platform::New<Messaging::ApplicationExchangeTransport>();
+        VerifyOrDie(transport != nullptr);
+        transport->Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+        mTransport = transport;
+    }
 
     mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
