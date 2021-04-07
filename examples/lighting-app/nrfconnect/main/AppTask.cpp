@@ -113,7 +113,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
     ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
     ret = sNFC.Init(ConnectivityMgr());

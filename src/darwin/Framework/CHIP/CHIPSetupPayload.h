@@ -29,9 +29,6 @@ typedef NS_ENUM(NSUInteger, RendezvousInformationFlags) {
     kRendezvousInformationBLE = 1 << 1, // Device supports BLE
     kRendezvousInformationOnNetwork = 1 << 2, // Device supports On Network setup
 
-    kRendezvousInformationSoftAPOnNetwork = kRendezvousInformationSoftAP | kRendezvousInformationOnNetwork,
-    kRendezvousInformationBLEOnNetwork = kRendezvousInformationBLE | kRendezvousInformationOnNetwork,
-
     kRendezvousInformationAllMask = kRendezvousInformationSoftAP | kRendezvousInformationBLE | kRendezvousInformationOnNetwork,
 };
 

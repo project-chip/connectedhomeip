@@ -29,6 +29,7 @@
 #include <vector>
 
 #include <core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 
@@ -85,18 +86,14 @@ const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 const char * const kQRCodePrefix = "CH:";
 
 /// The rendezvous type this device supports.
-enum class RendezvousInformationFlags : uint16_t
+enum class RendezvousInformationFlag : uint16_t
 {
     kNone      = 0,      ///< Device does not support any method for rendezvous
     kSoftAP    = 1 << 0, ///< Device supports Wi-Fi softAP
     kBLE       = 1 << 1, ///< Device supports BLE
     kOnNetwork = 1 << 2, ///< Device supports Setup on network
-
-    kSoftAPOnNetwork = kSoftAP | kOnNetwork,
-    kBLEOnNetwork    = kBLE | kOnNetwork,
-
-    kAllMask = kSoftAP | kBLE | kOnNetwork,
 };
+using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint16_t>;
 
 enum optionalQRCodeInfoType
 {
@@ -206,7 +203,7 @@ public:
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
-        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlags::kNone),
+        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlag::kNone),
         discriminator(0), setUpPINCode(0)
     {}
 

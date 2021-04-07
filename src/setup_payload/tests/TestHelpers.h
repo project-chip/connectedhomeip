@@ -44,7 +44,7 @@ inline SetupPayload GetDefaultPayload()
     payload.vendorID              = 12;
     payload.productID             = 1;
     payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
+    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
 

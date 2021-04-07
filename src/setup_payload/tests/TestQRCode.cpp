@@ -38,25 +38,28 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kNone);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAP;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kOnNetwork;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kSoftAPOnNetwork;
+    inPayload.rendezvousInformation =
+        RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kBLEOnNetwork;
+    inPayload.rendezvousInformation =
+        RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kAllMask;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
@@ -197,9 +200,11 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
-    test_payload = payload;
-    test_payload.rendezvousInformation =
-        static_cast<RendezvousInformationFlags>(static_cast<uint16_t>(RendezvousInformationFlags::kAllMask) + 1);
+    test_payload                       = payload;
+    RendezvousInformationFlags invalid = RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
+    invalid.SetRaw(static_cast<uint16_t>(invalid.Raw() + 1));
+    test_payload.rendezvousInformation = invalid;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
