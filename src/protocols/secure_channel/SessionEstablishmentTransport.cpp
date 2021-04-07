@@ -27,7 +27,8 @@
 #include <transport/BLE.h>
 
 namespace chip {
-namespace Messaging {
+
+using namespace Messaging;
 
 CHIP_ERROR SessionEstablishmentTransport::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                                           System::PacketBufferHandle && message,
@@ -47,6 +48,16 @@ CHIP_ERROR SessionEstablishmentTransport::SendMessageImpl(SecureSessionHandle se
     }
 
     return CHIP_ERROR_INCORRECT_STATE;
+}
+
+CHIP_ERROR SessionEstablishmentTransport::OnMessageReceived(uint16_t protocol, uint8_t type,
+                                                            const Transport::PeerAddress & peerAddress,
+                                                            ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo)
+{
+    ReturnErrorOnFailure(ExchangeTransport::OnMessageReceived(protocol, type, peerAddress, rmCtxt, rmInfo));
+    mPeerAddress = peerAddress;
+
+    return CHIP_NO_ERROR;
 }
 
 bool SessionEstablishmentTransport::MessagePermitted(uint16_t protocol, uint8_t type)
@@ -75,5 +86,4 @@ bool SessionEstablishmentTransport::MessagePermitted(uint16_t protocol, uint8_t 
     return false;
 }
 
-} // namespace Messaging
 } // namespace chip

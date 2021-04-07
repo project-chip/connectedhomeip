@@ -67,7 +67,8 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo);
+    virtual CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
+                                         ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;

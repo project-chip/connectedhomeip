@@ -32,9 +32,7 @@ namespace Transport {
 class BLE;
 }
 
-namespace Messaging {
-
-class SessionEstablishmentTransport : public ExchangeTransport
+class SessionEstablishmentTransport : public Messaging::ExchangeTransport
 {
 public:
     SessionEstablishmentTransport() {}
@@ -49,6 +47,9 @@ public:
         mTransportMgr = transportMgr;
         return CHIP_NO_ERROR;
     }
+
+    CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
+                                 Messaging::ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo) override;
 
     void SetPeerAddress(const Transport::PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
 
@@ -66,5 +67,4 @@ private:
     Transport::PeerAddress mPeerAddress;
 };
 
-} // namespace Messaging
 } // namespace chip

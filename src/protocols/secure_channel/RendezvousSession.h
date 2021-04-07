@@ -161,7 +161,7 @@ private:
     SecureSessionHandle * mPairingSessionHandle   = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
-    Messaging::SessionEstablishmentTransport mExchangeTransport;
+    //    SessionEstablishmentTransport mExchangeTransport;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
 

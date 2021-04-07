@@ -381,7 +381,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         ExchangeTransport::MessageReliabilityInfo reliabilityInfo = { packetHeader.GetMessageId(), payloadHeader.IsAckMsg(),
                                                                       payloadHeader.GetAckId().ValueOr(0),
                                                                       payloadHeader.NeedsAck() };
-        err = mTransport->OnMessageReceived(protocolId.GetProtocolId(), messageType, mReliableMessageContext, reliabilityInfo);
+        err = mTransport->OnMessageReceived(protocolId.GetProtocolId(), messageType, peerAddress, mReliableMessageContext,
+                                            reliabilityInfo);
         SuccessOrExit(err);
     }
 

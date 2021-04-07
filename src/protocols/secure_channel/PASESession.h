@@ -85,15 +85,12 @@ public:
      * @param salt            Salt to be used for SPAKE2P opertation
      * @param saltLen         Length of salt
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
-     * @param exchangeMgr     The instance of exchange manager to create exchange contexts
-     * @param transport       The instance of message transport to send and receive messages to peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              uint16_t myKeyId, Messaging::ExchangeManager * exchangeMgr,
-                              Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate);
+                              uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -101,14 +98,11 @@ public:
      *
      * @param verifier        PASE verifier to be used for SPAKE2P pairing
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
-     * @param exchangeMgr     The instance of exchange manager to create exchange contexts
-     * @param transport       The instance of message transport to send and receive messages to peer node
      * @param delegate        Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, Messaging::ExchangeManager * exchangeMgr,
-                              Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -117,32 +111,13 @@ public:
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
-     * @param exchangeMgr      The instance of exchange manager to create exchange contexts
-     * @param transport        The instance of message transport to send and receive messages to peer node
+     * @param exchangeCtxt     The exchange context to send and receive messages with the peer
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
-                    Messaging::ExchangeManager * exchangeMgr, Messaging::SessionEstablishmentTransport * transport,
-                    SessionEstablishmentDelegate * delegate);
-
-    /**
-     * @brief
-     *   Create a pairing request using given PASE verifier.
-     *
-     * @param peerAddress      Address of peer to pair
-     * @param verifier         PASE verifier to be used for SPAKE2P pairing
-     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
-     * @param exchangeMgr      The instance of exchange manager to create exchange contexts
-     * @param transport        The instance of message transport to send and receive messages to peer node
-     * @param delegate         Callback object
-     *
-     * @return CHIP_ERROR      The result of initialization
-     */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, uint16_t myKeyId,
-                    Messaging::ExchangeManager * exchangeMgr, Messaging::SessionEstablishmentTransport * transport,
-                    SessionEstablishmentDelegate * delegate);
+                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -231,13 +206,15 @@ public:
      **/
     void Clear();
 
+    SessionEstablishmentTransport & Transport() { return mTransport; }
+
     //// ExchangeDelegate Implementation ////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     Messaging::ExchangeTransport * AllocTransport(Messaging::ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
     {
-        return mTransport;
+        return &mTransport;
     }
     void ReleaseTransport(Messaging::ExchangeTransport * transport) override {}
 
@@ -248,8 +225,7 @@ private:
         kUnexpected             = 0xff,
     };
 
-    CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, Messaging::ExchangeManager * exchangeMgr,
-                    Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
@@ -291,9 +267,10 @@ private:
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
 
-    Messaging::ExchangeContext * mExchangeCtxt            = nullptr;
-    Messaging::ExchangeManager * mExchangeMgr             = nullptr;
-    Messaging::SessionEstablishmentTransport * mTransport = nullptr;
+    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+
+    SessionEstablishmentTransport mTransport;
+
     struct Spake2pErrorMsg
     {
         Spake2pErrorType error;

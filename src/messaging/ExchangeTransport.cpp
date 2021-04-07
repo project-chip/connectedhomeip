@@ -96,8 +96,8 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
     return err;
 }
 
-CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type, ReliableMessageContext & rmCtxt,
-                                                MessageReliabilityInfo & rmInfo)
+CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
+                                                ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 

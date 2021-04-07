@@ -74,7 +74,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
 
         ReturnErrorOnFailure(
             transport->Init(this, sessionMgr, mParams.GetBleLayer(), mParams.GetDiscriminator(), mParams.GetConnectionObject()));
-        ReturnErrorOnFailure(mExchangeTransport.Init(transport, nullptr));
+        ReturnErrorOnFailure(mPairingSession.Transport().Init(transport, nullptr));
     }
 #else
     {
@@ -84,6 +84,9 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
 
     if (!mParams.IsController())
     {
+        ReturnErrorOnFailure(mExchangeManager->RegisterUnsolicitedMessageHandlerForType(
+            Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
+
         if (mParams.HasPASEVerifier())
         {
             ReturnErrorOnFailure(WaitForPairing(mParams.GetPASEVerifier()));
@@ -97,7 +100,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
     // TODO: We should assume mTransportMgr not null for IP rendezvous.
     if (mTransportMgr != nullptr && params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        ReturnErrorOnFailure(mExchangeTransport.Init(nullptr, mTransportMgr));
+        ReturnErrorOnFailure(mPairingSession.Transport().Init(nullptr, mTransportMgr));
     }
 
     return CHIP_NO_ERROR;
@@ -206,6 +209,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
         switch (mCurrentState)
         {
         case State::kSecurePairing:
+            mExchangeManager->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
             if (CHIP_NO_ERROR == err)
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingSuccess, err);
@@ -319,21 +323,24 @@ void RendezvousSession::ReleasePairingSessionHandle()
 CHIP_ERROR RendezvousSession::WaitForPairing(uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.WaitForPairing(
-        setupPINCode, kSpake2p_Iteration_Count, reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
-        strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, mExchangeManager, &mExchangeTransport, this);
+    return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
+                                          reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
+                                          strlen(kSpake2pKeyExchangeSalt), mNextKeyId++, this);
 }
 
 CHIP_ERROR RendezvousSession::WaitForPairing(const PASEVerifier & verifier)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.WaitForPairing(verifier, mNextKeyId++, mExchangeManager, &mExchangeTransport, this);
+    return mPairingSession.WaitForPairing(verifier, mNextKeyId++, this);
 }
 
 CHIP_ERROR RendezvousSession::Pair(uint32_t setupPINCode)
 {
+    Messaging::ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), &mPairingSession);
+    ReturnErrorCodeIf(ctxt == nullptr, CHIP_ERROR_INTERNAL);
+
     UpdateState(State::kSecurePairing);
-    return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, mNextKeyId++, mExchangeManager, &mExchangeTransport, this);
+    return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, mNextKeyId++, ctxt, this);
 }
 
 void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * passwd)
