@@ -49,9 +49,16 @@ enum class ResetAdmins
     kNo,
 };
 
+enum class PairingWindowAdvertisement
+{
+    kBle,
+    kMdns,
+};
+
 } // namespace chip
 
 /**
  * Open the pairing window using default configured parameters.
  */
-CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins, bool onNetwork = false);
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins,
+                                    chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);

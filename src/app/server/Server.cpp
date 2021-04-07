@@ -426,7 +426,7 @@ SecureSessionMgr & chip::SessionManager()
     return gSessions;
 }
 
-CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, bool onNetwork)
+CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
@@ -438,9 +438,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, bool onNetwork)
 
     params.SetSetupPINCode(pinCode);
 #if CONFIG_NETWORK_LAYER_BLE
-    gAdvDelegate.SetBLE(!onNetwork);
+    gAdvDelegate.SetBLE(advertisementMode == chip::PairingWindowAdvertisement::kBle);
     params.SetAdvertisementDelegate(&gAdvDelegate);
-    if (!onNetwork)
+    if (advertisementMode == chip::PairingWindowAdvertisement::kBle)
     {
         params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
     }

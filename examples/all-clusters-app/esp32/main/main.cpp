@@ -297,7 +297,7 @@ public:
         else if (i == 2)
         {
             app::Mdns::AdvertiseCommisioning();
-            OpenDefaultPairingWindow(ResetAdmins::kNo, true);
+            OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }
 
