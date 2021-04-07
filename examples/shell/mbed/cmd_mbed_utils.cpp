@@ -543,61 +543,8 @@ exit:
     }
     return error;
 }
-int cmd_socket_tcp(int argc, char ** argv)
-{
-    CHIP_ERROR error      = CHIP_NO_ERROR;
-    uint16_t port         = 80;
-    bool async_dummy      = false;
-    const char hostname[] = "ifconfig.io";
-    IPAddress IPaddr[5]   = { IPAddress::Any };
 
-    streamer_t * sout    = streamer_get();
-    const char payload[] = "GET / HTTP/1.1\r\n"
-                           "Host: ifconfig.io\r\n"
-                           "Connection: close\r\n"
-                           "\r\n";
-
-    uint16_t payloadLen = sizeof(payload);
-
-    streamer_printf(sout, "TCP  test host : %s\r\n", hostname);
-    PacketBufferHandle buffer = PacketBufferHandle::NewWithData(payload, payloadLen);
-    if (buffer.IsNull())
-    {
-        streamer_printf(sout, "ERROR: create payload buffer failed\r\n");
-        return false;
-    }
-    chip::Transport::TcpListenParameters params(&chip::DeviceLayer::InetLayer);
-
-    params.GetInetLayer()->ResolveHostAddress(hostname, 4, IPaddr, HandleDNSResolveComplete, &async_dummy);
-
-    Inet::TCPEndPoint * endPoint;
-
-    error = params.GetInetLayer()->NewTCPEndPoint(&endPoint);
-    if (error != 0)
-        streamer_printf(sout, "ERROR: TCP endpoint not created %d\r\n", error);
-
-    endPoint->OnDataSent         = OnTcpMessageSent;
-    endPoint->OnDataReceived     = OnTcpMessageReceived;
-    endPoint->OnConnectComplete  = OnConnectionCompleted;
-    endPoint->OnConnectionClosed = OnConnectionClosed;
-
-    error = endPoint->Connect(IPaddr[0], port, 0);
-    if (error != 0)
-        streamer_printf(sout, "ERROR: TCP connect error %d \r\n", error);
-
-    error = endPoint->Send(std::move(buffer));
-    if (error != 0)
-        streamer_printf(sout, "ERROR: TCP send error %d \r\n", error);
-
-    if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
-    {
-        streamer_printf(sout, "ERROR: socket message does not received\r\n");
-        error = CHIP_ERROR_TIMEOUT;
-    }
-    endPoint->Close();
-    return error;
-}
-int cmd_socket_tcp(int argc, char ** argv)
+int cmd_socket_example(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
