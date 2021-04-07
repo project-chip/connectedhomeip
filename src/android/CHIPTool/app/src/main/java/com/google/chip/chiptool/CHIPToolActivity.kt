@@ -21,10 +21,12 @@ import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import chip.setuppayload.SetupPayloadParser
+import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
@@ -36,6 +38,8 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
 import chip.devicecontroller.PersistentStorage
+import chip.setuppayload.SetupPayload
+import chip.setuppayload.SetupPayloadParser
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -148,8 +152,17 @@ class CHIPToolActivity :
     val uri = records[0].toUri()
     if (!uri?.scheme.equals("ch", true)) return
 
-    // TODO: Issue #4504 - Remove replacing _ with spaces after problem described in #415 will be fixed.
-    val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase().replace('_', ' '))
+    lateinit var setupPayload: SetupPayload
+    try {
+      // TODO: Issue #4504 - Remove replacing _ with spaces after problem described in #415 will be fixed.
+      setupPayload =
+        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase().replace('_', ' '))
+    } catch (ex: UnrecognizedQrCodeException) {
+      Log.e(TAG, "Unrecognized QR Code", ex)
+      Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+      return
+    }
+
     val deviceInfo = CHIPDeviceInfo(
         setupPayload.version,
         setupPayload.vendorId,
@@ -179,6 +192,7 @@ class CHIPToolActivity :
   }
 
   companion object {
+    private const val TAG = "CHIPToolActivity"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
 
     var REQUEST_CODE_COMMISSIONING = 0xB003
