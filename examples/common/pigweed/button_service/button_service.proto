@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+import 'chip_common_proto/chip_common.proto';
+
+package chip.rpc;
+
+message ButtonEvent {
+  uint32 idx = 1;
+  bool pushed = 2;
+}
+
+service Button {
+  rpc Event(ButtonEvent) returns (Empty){}
+}

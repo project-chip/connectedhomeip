@@ -21,7 +21,11 @@ import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
-import("${chip_root}/examples/lighting-app/lighting-common/lighting.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+}
 
 assert(current_os == "freertos")
 
@@ -115,12 +119,14 @@ efr32_executable("lighting_app") {
   }
 
   if (enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
     public_deps += [
       "$dir_pw_assert",
       "$dir_pw_checksum",
       "$dir_pw_stream",
       "$dir_pw_sys_io",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
