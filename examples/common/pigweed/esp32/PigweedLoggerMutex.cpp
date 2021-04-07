@@ -16,19 +16,12 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          Platform-specific key value storage implementation for Darwin
- */
-
-#include <platform/KeyValueStoreManager.h>
+#include "PigweedLoggerMutex.h"
 
 namespace chip {
-namespace DeviceLayer {
-namespace PersistedStorage {
+namespace rpc {
 
-KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
+PigweedLoggerMutex logger_mutex;
 
-} // namespace PersistedStorage
-} // namespace DeviceLayer
+} // namespace rpc
 } // namespace chip

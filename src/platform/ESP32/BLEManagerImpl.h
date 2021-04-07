@@ -195,6 +195,17 @@ private:
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
+    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
+    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
+    uint64_t mAdvertiseStartTime;
+    chip::Callback::Callback<> mAdvertiseTimerCallback;
+    chip::Callback::Callback<> mFastAdvertiseTimerCallback;
+
+    static void HandleFastAdvertisementTimer(void * context);
+    void HandleFastAdvertisementTimer();
+    static void HandleAdvertisementTimer(void * context);
+    void HandleAdvertisementTimer();
+
 #if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
@@ -211,17 +222,6 @@ private:
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 
 #elif CONFIG_BT_NIMBLE_ENABLED
-    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
-    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
-    uint64_t mAdvertiseStartTime;
-    chip::Callback::Callback<> mAdvertiseTimerCallback;
-    chip::Callback::Callback<> mFastAdvertiseTimerCallback;
-
-    static void HandleFastAdvertisementTimer(void * context);
-    void HandleFastAdvertisementTimer();
-    static void HandleAdvertisementTimer(void * context);
-    void HandleAdvertisementTimer();
-
     void HandleRXCharRead(struct ble_gatt_char_context * param);
     void HandleRXCharWrite(struct ble_gatt_char_context * param);
     void HandleTXCharWrite(struct ble_gatt_char_context * param);

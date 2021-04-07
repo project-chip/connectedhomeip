@@ -22,6 +22,9 @@ jobs:
     cirque:
         name: Cirque
 
+        env:
+            DOCKER_RUN_VERSION: 0.4.21
+
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 

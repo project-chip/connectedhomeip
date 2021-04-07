@@ -82,6 +82,13 @@ TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
  * details on each parameter) */
 static sl_bt_configuration_t config;
 
+/** @brief Table of used BGAPI classes */
+static const struct sli_bgapi_class * const bt_class_table[] = { SL_BT_BGAPI_CLASS(system),      SL_BT_BGAPI_CLASS(advertiser),
+                                                                 SL_BT_BGAPI_CLASS(gap),         SL_BT_BGAPI_CLASS(scanner),
+                                                                 SL_BT_BGAPI_CLASS(connection),  SL_BT_BGAPI_CLASS(gatt),
+                                                                 SL_BT_BGAPI_CLASS(gatt_server), SL_BT_BGAPI_CLASS(nvm),
+                                                                 SL_BT_BGAPI_CLASS(sm),          NULL };
+
 StackType_t bluetoothEventStack[CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t bluetoothEventTaskStruct;
 static TaskHandle_t BluetoothEventTaskHandle;
@@ -111,15 +118,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 extern "C" sl_status_t initialize_bluetooth()
 {
     sl_status_t ret = sl_bt_init_stack(&config);
-    sl_bt_class_system_init();
-    sl_bt_class_advertiser_init();
-    sl_bt_class_gap_init();
-    sl_bt_class_scanner_init();
-    sl_bt_class_connection_init();
-    sl_bt_class_gatt_init();
-    sl_bt_class_gatt_server_init();
-    sl_bt_class_nvm_init();
-    sl_bt_class_sm_init();
+    sl_bt_init_classes(bt_class_table);
     sl_bt_init_multiprotocol();
     return ret;
 }
