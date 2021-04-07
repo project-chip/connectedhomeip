@@ -945,6 +945,55 @@ CHIP_ERROR chip_ime_ReadAttribute_ColorControl_ClusterRevision(chip::Controller:
 }
 
 // End of Cluster ColorControl
+// Cluster Descriptor
+
+CHIP_ERROR chip_ime_ReadAttribute_Descriptor_DeviceList(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                        chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::DescriptorCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeDeviceList(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_Descriptor_ServerList(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                        chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::DescriptorCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeServerList(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_Descriptor_ClientList(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                        chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::DescriptorCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClientList(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_Descriptor_PartsList(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                       chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::DescriptorCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePartsList(nullptr, nullptr);
+}
+CHIP_ERROR chip_ime_ReadAttribute_Descriptor_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId ZCLgroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::DescriptorCluster cluster;
+    (void) ZCLgroupId;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(nullptr, nullptr);
+}
+
+// End of Cluster Descriptor
 // Cluster DoorLock
 
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,

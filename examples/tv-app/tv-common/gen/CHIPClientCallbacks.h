@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <gen/af-structs.h>
 #include <inttypes.h>
 #include <lib/support/Span.h>
 
@@ -41,3 +42,5 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 // Cluster Specific Response Callbacks
 typedef void (*DoorLockClusterLockDoorResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context);
+
+// List specific responses
