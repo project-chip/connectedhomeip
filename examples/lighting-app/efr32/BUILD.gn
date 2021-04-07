@@ -170,6 +170,12 @@ efr32_executable("lighting_app") {
 
 group("efr32") {
   deps = [ ":lighting_app" ]
+  if (enable_pw_rpc) {
+    deps += [
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+    ]
+  }
 }
 
 group("default") {
