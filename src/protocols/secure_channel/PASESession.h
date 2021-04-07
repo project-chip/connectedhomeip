@@ -271,8 +271,6 @@ private:
     void SendErrorMsg(Spake2pErrorType errorCode);
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
-
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;

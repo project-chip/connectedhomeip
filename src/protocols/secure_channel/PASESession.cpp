@@ -47,6 +47,7 @@
 namespace chip {
 
 using namespace Crypto;
+using namespace Messaging;
 
 const char * kSpake2pContext        = "CHIP PAKE V1 Commissioning";
 const char * kSpake2pI2RSessionInfo = "Commissioning I2R Key";
@@ -54,6 +55,11 @@ const char * kSpake2pR2ISessionInfo = "Commissioning R2I Key";
 
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
+
+// Wait at most 30 seconds for the response from the peer.
+// This timeout value assumes the underlying transport is reliable.
+// The session establishment fails if the response is not received with in timeout window.
+static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = 30000;
 
 PASESession::PASESession() {}
 
@@ -166,8 +172,8 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, Messaging::ExchangeManager * exchangeMgr,
-                             Messaging::SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, ExchangeManager * exchangeMgr,
+                             SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorCodeIf(delegate == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -240,8 +246,7 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
 }
 
 CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                                       uint16_t myKeyId, Messaging::ExchangeManager * exchangeMgr,
-                                       Messaging::SessionEstablishmentTransport * transport,
+                                       uint16_t myKeyId, ExchangeManager * exchangeMgr, SessionEstablishmentTransport * transport,
                                        SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -284,9 +289,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, Messaging::ExchangeManager * exchangeMgr,
-                                       Messaging::SessionEstablishmentTransport * transport,
-                                       SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, ExchangeManager * exchangeMgr,
+                                       SessionEstablishmentTransport * transport, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = WaitForPairing(0, kSpake2p_Iteration_Count, reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
                                     strlen(kSpake2pKeyExchangeSalt), myKeyId, exchangeMgr, transport, delegate);
@@ -303,13 +307,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
-{
-    return mExchangeCtxt->SendMessage(msgType, std::move(msgBuf), Messaging::SendMessageFlags::kNone);
-}
-
 CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
-                             Messaging::ExchangeManager * exchangeMgr, Messaging::SessionEstablishmentTransport * transport,
+                             ExchangeManager * exchangeMgr, SessionEstablishmentTransport * transport,
                              SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = Init(myKeyId, peerSetUpPINCode, exchangeMgr, transport, delegate);
@@ -317,6 +316,8 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
 
     mExchangeCtxt = exchangeMgr->NewContext(SecureSessionHandle(), this);
     VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
 
     transport->SetPeerAddress(peerAddress);
     mConnectionState.SetPeerAddress(peerAddress);
@@ -333,7 +334,7 @@ exit:
 }
 
 CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, uint16_t myKeyId,
-                             Messaging::ExchangeManager * exchangeMgr, Messaging::SessionEstablishmentTransport * transport,
+                             ExchangeManager * exchangeMgr, SessionEstablishmentTransport * transport,
                              SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = Init(myKeyId, 0, exchangeMgr, transport, delegate);
@@ -341,6 +342,8 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, const PAS
 
     mExchangeCtxt = exchangeMgr->NewContext(SecureSessionHandle(), this);
     VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
 
     transport->SetPeerAddress(peerAddress);
     mConnectionState.SetPeerAddress(peerAddress);
@@ -359,7 +362,15 @@ exit:
     return err;
 }
 
-void PASESession::OnResponseTimeout(Messaging::ExchangeContext * ec) {}
+void PASESession::OnResponseTimeout(ExchangeContext * ec)
+{
+    VerifyOrReturn(ec != nullptr, ChipLogError(Ble, "PASESession::OnResponseTimeout was called by null exchange"));
+    VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
+                   ChipLogError(Ble, "PASESession::OnResponseTimeout exchange doesn't match"));
+    ChipLogError(Ble, "PASESession timed out while waiting for a response from the peer. Expected message type was %d",
+                 mNextExpectedMsg);
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+}
 
 CHIP_ERROR PASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
 {
@@ -388,7 +399,8 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
 
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PBKDFParamRequest, std::move(req));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PBKDFParamRequest, std::move(req),
+                                     SendFlags(SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent PBKDF param request");
@@ -467,8 +479,8 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p1;
 
-    ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PBKDFParamResponse, std::move(resp)));
-
+    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PBKDFParamResponse, std::move(resp),
+                                                    SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(Ble, "Sent PBKDF param response");
 
     return CHIP_NO_ERROR;
@@ -542,8 +554,8 @@ CHIP_ERROR PASESession::SendMsg1()
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p2;
 
     // Call delegate to send the Msg1 to peer
-    ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p1, bbuf.Finalize()));
-
+    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p1, bbuf.Finalize(),
+                                                    SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(Ble, "Sent spake2p msg1");
 
     return CHIP_NO_ERROR;
@@ -602,7 +614,8 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
         mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
 
         // Call delegate to send the Msg2 to peer
-        err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p2, bbuf.Finalize());
+        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p2, bbuf.Finalize(),
+                                         SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
     }
 
@@ -661,7 +674,8 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, con
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
         // Call delegate to send the Msg3 to peer
-        err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
+        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize(),
+                                         SendFlags(SendMessageFlags::kNone));
         SuccessOrExit(err);
     }
 
@@ -749,7 +763,8 @@ void PASESession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg),
+                                     SendFlags(SendMessageFlags::kNone));
     SuccessOrExit(err);
 
 exit:
@@ -769,23 +784,28 @@ void PASESession::HandleErrorMsg(const PacketHeader & header, const System::Pack
     pMsg = reinterpret_cast<Spake2pErrorMsg *>(msg->Start());
     ChipLogError(Ble, "Received error (%d) during pairing process", pMsg->error);
 
+    mDelegate->OnSessionEstablishmentError(pMsg->error);
+
 exit:
     Clear();
 }
 
-void PASESession::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle msg)
+void PASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                    System::PacketBufferHandle msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(ec != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mExchangeCtxt == nullptr || mExchangeCtxt == ec, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(payloadHeader.HasMessageType(mNextExpectedMsg), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.HasMessageType(mNextExpectedMsg) ||
+                     payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::PASE_Spake2pError),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     if (mExchangeCtxt == nullptr)
     {
         mExchangeCtxt = ec->Retain();
+        mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
     }
 
     mTransport->SetPeerAddress(mExchangeCtxt->GetPeerAddress());
@@ -811,6 +831,10 @@ void PASESession::OnMessageReceived(Messaging::ExchangeContext * ec, const Packe
 
     case Protocols::SecureChannel::MsgType::PASE_Spake2p3:
         err = HandleMsg3(packetHeader, msg);
+        break;
+
+    case Protocols::SecureChannel::MsgType::PASE_Spake2pError:
+        HandleErrorMsg(packetHeader, msg);
         break;
 
     default:
