@@ -53,6 +53,11 @@ if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
 endif()
 
+if (NOT CONFIG_USE_MINIMAL_MDNS)
+    chip_gn_arg_append("chip_mdns"                          "\"platform\"")
+endif()
+
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 
@@ -144,6 +149,11 @@ endif()
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+endif()
+
+if(NOT CONFIG_USE_MINIMAL_MDNS)
+    idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
 target_link_libraries(${COMPONENT_LIB} INTERFACE "-L${CMAKE_CURRENT_BINARY_DIR}/lib")

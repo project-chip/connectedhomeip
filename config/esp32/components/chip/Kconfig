@@ -84,6 +84,13 @@ menu "CHIP Core"
             help
                 Link the application with the library containing Pigweed RPC functionalities
 
+        config USE_MINIMAL_MDNS
+            bool "Use the minimal mDNS implementation shipped in the CHIP library"
+            default n
+            help
+                The CHIP library is shipped with a minimal mDNS implementation,
+                enable this config to use it rather than the mDNS library in IDF.
+
         # TODO: add log level selection
 
     endmenu # "General Options"
