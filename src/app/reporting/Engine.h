@@ -47,7 +47,7 @@ namespace reporting {
  * reports for each reader.
  *
  *         At its core, it  tries to gather and pack as much relevant attributes changes and/or events as possible into a report
- * message before sending that to the reader. It continues to do so until it has no more work to do. 
+ * message before sending that to the reader. It continues to do so until it has no more work to do.
  */
 class Engine
 {
