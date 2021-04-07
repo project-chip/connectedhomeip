@@ -1,0 +1,34 @@
+{
+    "macros": [
+        "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""
+    ],
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "lwip.ipv6-enabled": true,
+            "lwip.raw-socket-enabled": true,
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
+            "nsapi.default-wifi-password": "\"YOUR_PASSWORD\""
+        },
+        "DISCO_L475VG_IOT01A": {
+            "lwip.ipv6-enabled": true,
+            "lwip.raw-socket-enabled": true,
+            "target.components_add": [
+                "wifi_ism43362",
+                "BlueNRG_MS"
+            ],
+            "ism43362.provide-default": true,
+            "target.network-default-interface-type": "WIFI",
+            "target.macros_add": [
+                "MBEDTLS_SHA1_C"
+            ],
+            "target.features_add": [
+                "BLE"
+            ],
+            "target.extra_labels_add": [
+                "CORDIO"
+            ]
+        }
+    }
+}
