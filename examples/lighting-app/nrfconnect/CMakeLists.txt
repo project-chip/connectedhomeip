@@ -70,12 +70,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                )
 
-if (CONFIG_CHIP_NFC_COMMISSIONING)
-target_sources(app PRIVATE
-               ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
-)
-endif(CONFIG_CHIP_NFC_COMMISSIONING)
-
 if (CONFIG_CHIP_PW_RPC)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
