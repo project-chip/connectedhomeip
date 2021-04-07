@@ -30,6 +30,12 @@ if (enable_pw_rpc) {
     sources = [ "chip_common_proto/chip_common.proto" ]
   }
 
+  pw_proto_library("device_common_service") {
+    sources = [ "device_common_service/device_common_service.proto" ]
+    inputs = [ "device_common_service/device_common_service.options" ]
+    deps = [ ":chip_common_proto" ]
+  }
+
   pw_proto_library("button_service") {
     sources = [ "button_service/button_service.proto" ]
     deps = [ ":chip_common_proto" ]
