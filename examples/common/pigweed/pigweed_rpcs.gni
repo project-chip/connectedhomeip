@@ -14,5 +14,5 @@
 
 declare_args() {
   # Enable Pigweed RPC integration.
-  enable_pw_rpc = false
+  chip_enable_pw_rpc = false
 }
