@@ -23,6 +23,7 @@
 #include "pigweed/RpcService.h"
 
 #include "button_service/button_service.rpc.pb.h"
+#include "device_service/device_service.rpc.pb.h"
 #include "lighting_service/lighting_service.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
@@ -61,6 +62,35 @@ public:
     }
 };
 
+class Device final : public generated::Device<Device>
+{
+public:
+    pw::Status FactoryReset(ServerContext & ctx, const chip_rpc_Empty & request, chip_rpc_Empty & response)
+    {
+        // TODO: Clear data from KVS
+        DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+        return pw::OkStatus();
+    }
+    pw::Status Reboot(ServerContext & ctx, const chip_rpc_Empty & request, chip_rpc_Empty & response)
+    {
+        NVIC_SystemReset();
+        // WILL NOT RETURN
+        return pw::OkStatus();
+    }
+    pw::Status TriggerOta(ServerContext & ctx, const chip_rpc_Empty & request, chip_rpc_Empty & response)
+    {
+        // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
+        return pw::Status::Unimplemented();
+    }
+    pw::Status GetDeviceInfo(ServerContext &, const chip_rpc_Empty & request, chip_rpc_DeviceInfo & response)
+    {
+        response.vendor_id        = 1234;
+        response.product_id       = 5678;
+        response.software_version = 0;
+        return pw::OkStatus();
+    }
+};
+
 namespace {
 using std::byte;
 
@@ -72,11 +102,13 @@ StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 
 chip::rpc::Button button_service;
 chip::rpc::Lighting lighting_service;
+chip::rpc::Device device_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
     server.RegisterService(lighting_service);
     server.RegisterService(button_service);
+    server.RegisterService(device_service);
 }
 
 } // namespace

@@ -30,6 +30,12 @@ if (chip_enable_pw_rpc) {
     sources = [ "proto/empty.proto" ]
   }
 
+  pw_proto_library("device_service") {
+    sources = [ "device_service/device_service.proto" ]
+    inputs = [ "device_service/device_service.options" ]
+    deps = [ ":empty_proto" ]
+  }
+
   pw_proto_library("button_service") {
     sources = [ "button_service/button_service.proto" ]
     deps = [ ":empty_proto" ]
