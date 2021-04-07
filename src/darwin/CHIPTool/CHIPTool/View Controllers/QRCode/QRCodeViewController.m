@@ -590,8 +590,6 @@
 {
     switch (payload.rendezvousInformation) {
     case kRendendezvousInformationOnNetwork:
-    case kRendendezvousInformationSoftAPOnNetwork:
-    case kRendendezvousInformationBLEOnNetwork:
     case kRendezvousInformationAllMask:
         NSLog(@"Rendezvous Unknown");
         break;
