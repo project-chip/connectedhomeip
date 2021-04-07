@@ -501,9 +501,7 @@ CHIP_ERROR PASESession::SendMsg1()
     ReturnErrorOnFailure(mSpake2p.BeginProver(reinterpret_cast<const uint8_t *>(""), 0, reinterpret_cast<const uint8_t *>(""), 0,
                                               &mPASEVerifier[0][0], kSpake2p_WS_Length, &mPASEVerifier[1][0], kSpake2p_WS_Length));
 
-
     ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(NULL, 0, X, &X_len));
-
 
     System::PacketBufferHandle msg_pA = System::PacketBufferHandle::NewWithData(&X[0], X_len);
     VerifyOrReturnError(!msg_pA.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
