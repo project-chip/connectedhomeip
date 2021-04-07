@@ -127,7 +127,10 @@ public:
      *                            fail to process command response.
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
-    virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     virtual ~InteractionModelDelegate() = default;
 };
