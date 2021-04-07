@@ -337,9 +337,8 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         if (result->mName[i] == '-')
         {
             deliminatorFound = true;
-            break;
         }
-        else
+        else if (deliminatorFound)
         {
             uint8_t val = HexToInt(result->mName[i]);
 
