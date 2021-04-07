@@ -82,6 +82,13 @@ executable("chip-lighting-app") {
 
 group("linux") {
   deps = [ ":chip-lighting-app" ]
+
+  if (chip_enable_pw_rpc) {
+    deps += [
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+    ]
+  }
 }
 
 group("default") {
