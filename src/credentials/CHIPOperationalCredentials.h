@@ -58,7 +58,6 @@ struct NodeKeypairMap
 };
 
 /**
- *  @class OperationalCredentialSet
  *
  *  @brief
  *    Collection of CHIPCertificateSet providing methods for
