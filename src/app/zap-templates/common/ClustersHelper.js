@@ -78,7 +78,7 @@ function loadStructs(packageId)
 function loadClusters()
 {
   const { db, sessionId } = this.global;
-  return queryImpexp.exportendPointTypeIds(db, sessionId)
+  return queryImpexp.exportEndPointTypeIds(db, sessionId)
       .then(endpointTypes => zclQuery.exportAllClustersDetailsFromEndpointTypes(db, endpointTypes))
       .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
 }
@@ -95,7 +95,7 @@ function loadCommandArguments(command, packageId)
 function loadCommands(packageId)
 {
   const { db, sessionId } = this.global;
-  return queryImpexp.exportendPointTypeIds(db, sessionId)
+  return queryImpexp.exportEndPointTypeIds(db, sessionId)
       .then(endpointTypes => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
       .then(endpointTypesAndClusters => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(db, endpointTypesAndClusters))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
@@ -106,7 +106,7 @@ function loadAttributes(packageId)
   // The 'server' side is enforced here, because the list of attributes is used to generate client global
   // commands to retrieve server side attributes.
   const { db, sessionId } = this.global;
-  return queryImpexp.exportendPointTypeIds(db, sessionId)
+  return queryImpexp.exportEndPointTypeIds(db, sessionId)
       .then(endpointTypes => Promise.all(
                 endpointTypes.map(({ endpointTypeId }) => queryEndpoint.queryEndpointClusters(db, endpointTypeId))))
       .then(clusters => clusters.flat())
@@ -258,14 +258,17 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const atomic = getAtomic(atomics, itemType);
   if (atomic) {
-    item.name                = item.name || item.label;
-    item.isStruct            = false;
-    item.atomicTypeId        = atomic.atomicId;
-    item.discrete            = atomic.discrete;
-    item.size                = atomic.size;
-    item.chipType            = atomic.chipType;
-    item.chipTypePutLength   = asPutLength(atomic.chipType);
-    item.chipTypePutCastType = asPutCastType(atomic.chipType);
+    item.name         = item.name || item.label;
+    item.isStruct     = false;
+    item.atomicTypeId = atomic.atomicId;
+    item.discrete     = atomic.discrete;
+    item.size         = atomic.size;
+    item.chipType     = atomic.chipType;
+    // For the moment, SECURITY_KEY is unhandled.
+    if (atomic.atomicId != 0xF1) {
+      item.chipTypePutLength   = asPutLength(atomic.chipType);
+      item.chipTypePutCastType = asPutCastType(atomic.chipType);
+    }
     return true;
   }
 
