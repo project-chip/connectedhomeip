@@ -16,14 +16,14 @@
  */
 
 // Import helpers from zap core
-const zapPath = '../../../../../third_party/zap/repo/src-electron/';
-const queryImpexp = require(zapPath + 'db/query-impexp.js')
+const zapPath      = '../../../../../third_party/zap/repo/src-electron/';
+const queryImpexp  = require(zapPath + 'db/query-impexp.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
-const zclHelper = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery = require(zapPath + 'db/query-zcl.js')
-const cHelper = require(zapPath + 'generator/helper-c.js')
+const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const cHelper      = require(zapPath + 'generator/helper-c.js')
 
-const StringHelper = require('../../common/StringHelper.js');
+const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 /**
@@ -35,35 +35,38 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
  * @param {*} options
  * @returns True if cluster has enabled commands otherwise false
  */
-function user_cluster_has_enabled_manufacturer_command(name, side, options) {
+function user_cluster_has_enabled_manufacturer_command(name, side, options)
+{
   return queryImpexp.exportendPointTypeIds(this.global.db, this.global.sessionId)
-    .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
-    .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
-      this.global.db, endpointsAndClusters))
-    .then((endpointCommands) => {
-      return !!endpointCommands.find(cmd => cmd.mfgCode && zclHelper.isStrEqual(name, cmd.clusterName)
-        && zclHelper.isCommandAvailable(side, cmd.incoming, cmd.outgoing, cmd.commandSource, cmd.name));
-    })
+      .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
+      .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
+                this.global.db, endpointsAndClusters))
+      .then((endpointCommands) => {
+        return !!endpointCommands.find(cmd => cmd.mfgCode && zclHelper.isStrEqual(name, cmd.clusterName)
+                && zclHelper.isCommandAvailable(side, cmd.incoming, cmd.outgoing, cmd.commandSource, cmd.name));
+      })
 }
 
-function asValueIfNotPresent(type, isArray) {
+function asValueIfNotPresent(type, isArray)
+{
   if (StringHelper.isString(type) || isArray) {
     return 'NULL';
   }
 
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       switch (zclType) {
-        case 'uint8_t':
-          return 'UINT8_MAX';
-        case 'uint16_t':
-          return 'UINT16_MAX';
-        case 'uint32_t':
-          return 'UINT32_MAX';
-        default:
-          error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-          throw error;
+      case 'uint8_t':
+        return 'UINT8_MAX';
+      case 'uint16_t':
+        return 'UINT16_MAX';
+      case 'uint32_t':
+        return 'UINT32_MAX';
+      default:
+        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
+        throw error;
       }
     })
   }
@@ -74,7 +77,8 @@ function asValueIfNotPresent(type, isArray) {
 
 // TODO Expose the readTypeLength as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
-function asReadTypeLength(type) {
+function asReadTypeLength(type)
+{
   const db = this.global.db;
 
   if (StringHelper.isShortString(type)) {
@@ -85,7 +89,8 @@ function asReadTypeLength(type) {
     return '2u';
   }
 
-  function fn(pkgId) {
+  function fn(pkgId)
+  {
     const defaultResolver = zclQuery.selectAtomicType(db, pkgId, type);
 
     const enumResolver = zclHelper.isEnum(db, type, pkgId).then(result => {
@@ -100,7 +105,7 @@ function asReadTypeLength(type) {
       });
     });
 
-    const typeResolver = Promise.all([defaultResolver, enumResolver, bitmapResolver]);
+    const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
     return typeResolver.then(types => (types.find(type => type)).size);
   }
 
@@ -110,7 +115,8 @@ function asReadTypeLength(type) {
 
 // TODO Expose the readType as an additional member field of {{asUnderlyingZclType}} instead
 //      of having to call this method separately.
-function asReadType(type) {
+function asReadType(type)
+{
   if (StringHelper.isShortString(type)) {
     return 'String';
   }
@@ -119,29 +125,30 @@ function asReadType(type) {
     return 'LongString';
   }
 
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
-        case 'int8_t':
-        case 'uint8_t':
-          return 'Int8u';
-        case 'int16_t':
-        case 'uint16_t':
-          return 'Int16u';
-        case 'int24_t':
-        case 'uint24_t':
-          return 'Int24u';
-        case 'int32_t':
-        case 'uint32_t':
-          return 'Int32u';
-        case 'int64_t':
-        case 'uint64_t':
-          return 'Int64u';
-        default:
-          error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
-          throw error;
+      case 'int8_t':
+      case 'uint8_t':
+        return 'Int8u';
+      case 'int16_t':
+      case 'uint16_t':
+        return 'Int16u';
+      case 'int24_t':
+      case 'uint24_t':
+        return 'Int24u';
+      case 'int32_t':
+      case 'uint32_t':
+        return 'Int32u';
+      case 'int64_t':
+      case 'uint64_t':
+        return 'Int64u';
+      default:
+        error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
+        throw error;
       }
     })
   }
@@ -159,7 +166,8 @@ function asReadType(type) {
  * @param {*} label : The xml label of the type.
  * @param {*} type : The xml type to be converted
  */
-function asChipUnderlyingType(label, type) {
+function asChipUnderlyingType(label, type)
+{
 
   if (zclHelper.isStrEqual(label, "endpoint")) {
     return 'chip::EndpointId';
@@ -174,7 +182,7 @@ function asChipUnderlyingType(label, type) {
   } else if (zclHelper.isStrEqual(label, "commandId")) {
     return 'chip::CommandId';
   } else {
-    const options = { 'hash': {} };
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options);
   }
 }
@@ -185,16 +193,18 @@ function asChipUnderlyingType(label, type) {
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit = ['Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone'];
-var endpointClusterWithAttributeChanged = ['Identify', 'Door Lock'];
-var endpointClusterWithPreAttribute = ['IAS Zone'];
-var endpointClusterWithMessageSent = ['IAS Zone'];
+var endpointClusterWithInit =
+    [ 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
+var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
+var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
  * extract the cluster name from the enpoint cluster comment
  * @param {*} comments
  */
-function extract_cluster_name(comments) {
+function extract_cluster_name(comments)
+{
   let secondPart = comments.split(": ").pop();
   return secondPart.split(" (")[0];
 }
@@ -202,11 +212,12 @@ function extract_cluster_name(comments) {
 /**
  * Populate the GENERATED_FUNCTIONS field
  */
-function chip_endpoint_generated_functions() {
+function chip_endpoint_generated_functions()
+{
   let alreadySetCluster = [];
-  let ret = '\\\n';
+  let ret               = '\\\n';
   this.clusterList.forEach((c) => {
-    let clusterName = extract_cluster_name(c.comment);
+    let clusterName  = extract_cluster_name(c.comment);
     let functionList = '';
     if (alreadySetCluster.includes(clusterName)) {
       // Only one array of Generated functions per cluster across all endpoints
@@ -214,30 +225,34 @@ function chip_endpoint_generated_functions() {
     }
     if (c.comment.includes('server')) {
       let hasFunctionArray = false
-      if (endpointClusterWithInit.includes(clusterName)) {
+      if (endpointClusterWithInit.includes(clusterName))
+      {
         hasFunctionArray = true
-        functionList = functionList.concat(
-          `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+        functionList     = functionList.concat(
+            `  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
         ret = ret.concat(
-          `const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
+            `const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
         ret = ret.concat(functionList)
         ret = ret.concat(`};\\\n`)
         alreadySetCluster.push(clusterName)
@@ -252,12 +267,13 @@ function chip_endpoint_generated_functions() {
  * To be used as a replacement of endpoint_cluster_list since this one
  * includes the GENERATED_FUNCTIONS array
  */
-function chip_endpoint_cluster_list() {
+function chip_endpoint_cluster_list()
+{
   let ret = '{ \\\n';
   this.clusterList.forEach((c) => {
-    let mask = '';
+    let mask          = '';
     let functionArray = c.functions;
-    let clusterName = extract_cluster_name(c.comment);
+    let clusterName   = extract_cluster_name(c.comment);
 
     if (c.comment.includes('server')) {
       let hasFunctionArray = false;
@@ -291,45 +307,48 @@ function chip_endpoint_cluster_list() {
     } else {
       mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
-    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
+    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${
+        mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
   })
   return ret.concat('}\n');
 }
 
 //  End of Endpoint-config specific helpers
 
-function asPrintFormat(type) {
+function asPrintFormat(type)
+{
   if (StringHelper.isString(type)) {
     return '%s';
   }
 
-  function fn(pkgId) {
-    const options = { 'hash': {} };
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
-        case 'int8_t':
-          return '%" PRId8 "';
-        case 'uint8_t':
-          return '%" PRIu8 "';
-        case 'int16_t':
-          return '%" PRId16 "';
-        case 'uint16_t':
-          return '%" PRIu16 "';
-        case 'int24_t':
-          return '%" PRId32 "';
-        case 'uint24_t':
-          return '%" PRIu32 "';
-        case 'int32_t':
-          return '%" PRId32 "';
-        case 'uint32_t':
-          return '%" PRIu32 "';
-        case 'int64_t':
-          return '%" PRId64 "';
-        case 'uint64_t':
-          return '%" PRIu64 "';
-        default:
-          return '%p';
+      case 'int8_t':
+        return '%" PRId8 "';
+      case 'uint8_t':
+        return '%" PRIu8 "';
+      case 'int16_t':
+        return '%" PRId16 "';
+      case 'uint16_t':
+        return '%" PRIu16 "';
+      case 'int24_t':
+        return '%" PRId32 "';
+      case 'uint24_t':
+        return '%" PRIu32 "';
+      case 'int32_t':
+        return '%" PRId32 "';
+      case 'uint32_t':
+        return '%" PRIu32 "';
+      case 'int64_t':
+        return '%" PRId64 "';
+      case 'uint64_t':
+        return '%" PRIu64 "';
+      default:
+        return '%p';
       }
     })
   }
@@ -338,25 +357,27 @@ function asPrintFormat(type) {
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function isFirstElement(index) {
+function isFirstElement(index)
+{
   return index == 0;
 }
 
-function isStrEndsWith(str, substr) {
+function isStrEndsWith(str, substr)
+{
   return str.endsWith(substr);
 }
 
 //
 // Module exports
 //
-exports.asPrintFormat = asPrintFormat;
-exports.asReadType = asReadType;
-exports.asReadTypeLength = asReadTypeLength;
-exports.asValueIfNotPresent = asValueIfNotPresent;
-exports.asChipUnderlyingType = asChipUnderlyingType;
-exports.isFirstElement = isFirstElement;
+exports.asPrintFormat                                 = asPrintFormat;
+exports.asReadType                                    = asReadType;
+exports.asReadTypeLength                              = asReadTypeLength;
+exports.asValueIfNotPresent                           = asValueIfNotPresent;
+exports.asChipUnderlyingType                          = asChipUnderlyingType;
+exports.isFirstElement                                = isFirstElement;
 exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
-exports.chip_endpoint_generated_functions = chip_endpoint_generated_functions
-exports.chip_endpoint_cluster_list = chip_endpoint_cluster_list
-exports.isSigned = ChipTypesHelper.isSigned;
-exports.isStrEndsWith = isStrEndsWith;
+exports.chip_endpoint_generated_functions             = chip_endpoint_generated_functions
+exports.chip_endpoint_cluster_list                    = chip_endpoint_cluster_list
+exports.isSigned                                      = ChipTypesHelper.isSigned;
+exports.isStrEndsWith                                 = isStrEndsWith;
