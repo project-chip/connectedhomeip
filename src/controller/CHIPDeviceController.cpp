@@ -320,6 +320,22 @@ exit:
     return err;
 }
 
+void DeviceController::PersistDevice(Device * device)
+{
+    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
+    // requires a valid storage delegate. However, test pairing usecase, that's used
+    // mainly by test applications, do not require a storage delegate. This is to
+    // reduce overheads on these tests.
+    // Let's make sure the delegate object is available before calling into it.
+    if (mStorageDelegate != nullptr)
+    {
+        SerializedDevice serialized;
+        device->Serialize(serialized);
+        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+    }
+}
+
 CHIP_ERROR DeviceController::ServiceEvents()
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
@@ -785,18 +801,7 @@ void DeviceCommissioner::OnRendezvousComplete()
     // We need to kick the device since we are not a valid secure pairing delegate when using IM.
     device->InitCommandSender();
 
-    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
-    // requires a valid storage delegate. However, test pairing usecase, that's used
-    // mainly by test applications, do not require a storage delegate. This is to
-    // reduce overheads on these tests.
-    // Let's make sure the delegate object is available before calling into it.
-    if (mStorageDelegate != nullptr)
-    {
-        SerializedDevice serialized;
-        device->Serialize(serialized);
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
-    }
+    PersistDevice(device);
 
     RendezvousCleanup(CHIP_NO_ERROR);
 }

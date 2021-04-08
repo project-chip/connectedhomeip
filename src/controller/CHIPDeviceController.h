@@ -158,6 +158,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    void PersistDevice(Device * device);
+
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     virtual void ReleaseDevice(Device * device);
