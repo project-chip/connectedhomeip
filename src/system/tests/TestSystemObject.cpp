@@ -32,7 +32,7 @@
 // collisions between the threads that call it.
 
 // clang-format off
-#define SYSTEM_OBJECT_HWM_TEST_HOOK() do { usleep(1000); } while(0)
+// #define SYSTEM_OBJECT_HWM_TEST_HOOK() do { usleep(1000); } while(0)
 // clang-format on
 
 #include <system/SystemLayer.h>

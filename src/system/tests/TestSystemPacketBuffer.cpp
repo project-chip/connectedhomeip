@@ -1951,6 +1951,11 @@ const nlTest sTests[] =
 
 int TestSystemPacketBuffer(void)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // Initialize LwIP.
+    tcpip_init(NULL, NULL);
+#endif
+
     // clang-format off
     nlTestSuite theSuite = {
         .name ="chip-system-packetbuffer",
