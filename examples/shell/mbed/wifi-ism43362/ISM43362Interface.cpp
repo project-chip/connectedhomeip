@@ -302,7 +302,6 @@ struct ISM43362_socket {
     int id;
     nsapi_protocol_t proto;
     volatile bool connected;
-    SocketAddress addr;
     char read_data[1400];
     volatile uint32_t read_data_size;
 };
@@ -310,6 +309,7 @@ struct ISM43362_socket {
 int ISM43362Interface::socket_open(void **handle, nsapi_protocol_t proto)
 {
     int ret = NSAPI_ERROR_OK;
+    struct ISM43362_socket *socket;
     _mutex.lock();
 
     // Look for an unused socket
@@ -323,27 +323,29 @@ int ISM43362Interface::socket_open(void **handle, nsapi_protocol_t proto)
     }
 
     if (id == -1) {
-        _mutex.unlock();
-        return NSAPI_ERROR_NO_SOCKET;
+        debug_if(_ism_debug, "ISM43362Interface: socket_open: no empty slot\n");
+        ret = NSAPI_ERROR_NO_SOCKET;
+        goto exit;
     }
-    struct ISM43362_socket *socket = new struct ISM43362_socket;
+    socket = new struct ISM43362_socket;
     if (!socket) {
-        _mutex.unlock();
-        return NSAPI_ERROR_NO_SOCKET;
+        debug_if(_ism_debug, "ISM43362Interface: socket_open: create socket failed\n");
+        ret = NSAPI_ERROR_NO_SOCKET;
+        goto exit;
     }
     socket->id = id;
 
     debug_if(_ism_debug, "ISM43362Interface: socket_open id=%d proto=%d\n", socket->id, proto);
     memset(socket->read_data, 0, sizeof(socket->read_data));
-    socket->addr = 0;
     socket->read_data_size = 0;
     socket->proto = proto;
     socket->connected = false;
     *handle = socket;
 
     ret = _ism.open(socket->id, (socket->proto == NSAPI_UDP) ? "1" : "0");
-    _mutex.unlock();
 
+exit:
+    _mutex.unlock();
     return ret;
 }
 
@@ -369,19 +371,30 @@ int ISM43362Interface::socket_close(void *handle)
 int ISM43362Interface::socket_bind(void *handle, const SocketAddress &address)
 {
     int ret = NSAPI_ERROR_OK;
+    struct ISM43362_socket *socket;
+
     _mutex.lock();
-    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    socket = (struct ISM43362_socket *)handle;
     debug_if(_ism_debug, "ISM43362Interface: socket_bind, id=%d address=%s port=%d\n", socket->id, address.get_ip_address(), address.get_port());
     ret = _ism.bind(socket->id, address.get_ip_address(), address.get_port());
-    if (ret == NSAPI_ERROR_OK)
+    if (ret != NSAPI_ERROR_OK)
     {
-        if (socket->proto == NSAPI_UDP)
-        {
-            ret = _ism.startServer(socket->id);
-            _socket_obj[socket->id] = (uint32_t)socket;
-        }
+        debug_if(_ism_debug, "ISM43362Interface: socket_bind: bind failed\n");
+        goto exit;
     }
-    
+
+    if (socket->proto == NSAPI_UDP)
+    {
+        ret = _ism.startServer(socket->id);
+        if (ret != NSAPI_ERROR_OK)
+        {
+            debug_if(_ism_debug, "ISM43362Interface: socket_bind: start UDP server failed\n");
+            goto exit;
+        }
+        _socket_obj[socket->id] = (uint32_t)socket;
+    }
+
+exit:
     _mutex.unlock();
     return ret;
 }
@@ -389,51 +402,64 @@ int ISM43362Interface::socket_bind(void *handle, const SocketAddress &address)
 int ISM43362Interface::socket_listen(void *handle, int backlog)
 {
     int ret = NSAPI_ERROR_OK;
+    struct ISM43362_socket *socket;
+
     _mutex.lock();
-    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    socket = (struct ISM43362_socket *)handle;
     debug_if(_ism_debug, "ISM43362Interface: socket_listen, id=%d backlog=%d\n", socket->id, backlog);
     ret = _ism.setServerParam(socket->id, backlog);
-    if (ret == NSAPI_ERROR_OK)
+    if (ret != NSAPI_ERROR_OK)
     {
-        if (socket->proto == NSAPI_TCP)
-        {
-            ret = _ism.startServer(socket->id);
-            _socket_obj[socket->id] = (uint32_t)socket;
-        }
+        debug_if(_ism_debug, "ISM43362Interface: socket_bind: start UDP server failed\n");
+        goto exit;
     }
+
+    ret = _ism.startServer(socket->id);
+    if (ret != NSAPI_ERROR_OK)
+    {
+        debug_if(_ism_debug, "ISM43362Interface: socket_listen: start TCP server failed\n");
+        goto exit;
+    }
+
+    _socket_obj[socket->id] = (uint32_t)socket;
+
+exit:
     _mutex.unlock();
     return ret;
 }
 
 int ISM43362Interface::socket_connect_nolock(void *handle, const SocketAddress &addr)
 {
-    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle; 
+    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
     return _ism.setClientParam(socket->id, addr.get_ip_address(), addr.get_port());;
 }
 
 int ISM43362Interface::socket_connect(void *handle, const SocketAddress &addr)
 {
     int ret = NSAPI_ERROR_OK;
+    struct ISM43362_socket *socket;
+
     _mutex.lock();
-    struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
+    socket = (struct ISM43362_socket *)handle;
     debug_if(_ism_debug, "ISM43362Interface: socket_connect, id=%d ip=%s port=%d\n", socket->id, addr.get_ip_address(), addr.get_port());
     ret = socket_connect_nolock(handle, addr);
     if (ret != NSAPI_ERROR_OK)
     {
-        _mutex.unlock();
-        return ret;
+        debug_if(_ism_debug, "ISM43362Interface: socket_connect: connect failed\n");
+        goto exit;
     }
 
     ret = _ism.startClient(socket->id);
     if (ret != NSAPI_ERROR_OK)
     {
-        _mutex.unlock();
-        return ret;
+        debug_if(_ism_debug, "ISM43362Interface: socket_connect: start client failed\n");
+        goto exit;
     }
 
     socket->connected = true;
     _socket_obj[socket->id] = (uint32_t)socket;
-    socket->addr = addr;
+
+exit:
     _mutex.unlock();
     return ret;
 }
@@ -475,7 +501,42 @@ void ISM43362Interface::socket_check_read()
 
 int ISM43362Interface::socket_accept(void *server, void **socket, SocketAddress *addr)
 {
-    return NSAPI_ERROR_UNSUPPORTED;
+    int ret = NSAPI_ERROR_OK;
+    char tmp[16];
+    uint16_t port;
+
+    _mutex.lock();
+
+    if (server == nullptr || socket == nullptr || addr == nullptr)
+    {
+        debug_if(_ism_debug, "ISM43362Interface socket_accept: wrong arguments\r\n");
+        _mutex.unlock();
+        return NSAPI_ERROR_PARAMETER;
+    }
+
+    struct ISM43362_socket *serverSocket = (struct ISM43362_socket *)server;
+
+    ret = _ism.get_client_details(serverSocket->id, tmp, sizeof(tmp), &port);
+    if (ret != NSAPI_ERROR_OK)
+    {
+        debug_if(_ism_debug, "ISM43362Interface socket_accept: get client details failed\r\n");
+        _mutex.unlock();
+        return ret;
+    }
+    SocketAddress clientAddr(tmp, port);
+    *addr = clientAddr;
+
+    serverSocket->connected = true;
+
+    /* Reset read buffer */
+    memset(serverSocket->read_data, 0, sizeof(serverSocket->read_data));
+    serverSocket->read_data_size = 0;
+
+    *socket = server;
+
+exit:
+    _mutex.unlock();
+    return ret;
 }
 
 /*  CAREFULL LOCK must be taken before callling this function */
@@ -520,7 +581,7 @@ int ISM43362Interface::socket_recv(void *handle, void *data, unsigned size)
 
     if (!socket->connected) {
         _mutex.unlock();
-        return NSAPI_ERROR_NO_CONNECTION;
+        return 0;
     }
 
     if (socket->read_data_size == 0) {
@@ -601,7 +662,6 @@ int ISM43362Interface::socket_sendto(void *handle, const SocketAddress &addr, co
         }
         socket->connected = true;
         _socket_obj[socket->id] = (uint32_t)socket;
-        socket->addr = addr;
     }
     else
     {
@@ -627,13 +687,20 @@ int ISM43362Interface::socket_recvfrom(void *handle, SocketAddress *addr, void *
     char tmp[16];
     uint16_t port;
 
-    if (addr == nullptr || data == nullptr) 
+    if (addr == nullptr || data == nullptr)
     {
         debug_if(_ism_debug, "ISM43362Interface socket_recvfrom: wrong arguments\r\n");
+        _mutex.unlock();
         return NSAPI_ERROR_PARAMETER;
     }
 
     ret = _ism.get_client_details(socket->id, tmp, sizeof(tmp), &port);
+    if (ret != NSAPI_ERROR_OK)
+    {
+        debug_if(_ism_debug, "ISM43362Interface socket_recvfrom: get client details failed\r\n");
+        _mutex.unlock();
+        return ret;
+    }
     SocketAddress clientAddr(tmp, port);
 
     *addr = clientAddr;

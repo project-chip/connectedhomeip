@@ -255,6 +255,8 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
+    socket->read(NULL, 0);
+
     if (addr == nullptr || addrlen == nullptr)
     {
         set_errno(EINVAL);
@@ -311,9 +313,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    tr_info("New connected socket fd %d", index);
-
-    return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);
+    return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);;
 }
 
 ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
@@ -522,6 +522,7 @@ ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
 {
     ssize_t ret;
     bool blockingState;
+    SocketAddress peerAddr;
 
     auto * socket = getBSDSocket(fd);
     if (socket == nullptr)
@@ -566,7 +567,8 @@ ssize_t mbed_recv(int fd, void * buf, size_t max_len, int flags)
     }
     else
     {
-        tr_info("Socket fd %d recevied %d bytes", fd, ret);
+        socket->getNetSocket()->getpeername(&peerAddr);
+        tr_info("Socket fd %d recevied %d bytes from %s", fd, ret, peerAddr.get_ip_address());
         socket->read(NULL, 0);
     }
 

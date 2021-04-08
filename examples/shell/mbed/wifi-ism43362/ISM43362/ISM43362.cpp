@@ -674,7 +674,7 @@ int ISM43362::bind(int id, const char *addr, int port)
     if ((id < 0) || (id > 3)) {
         debug_if(_ism_debug, "\tISM43362: bind: wrong id\n");
         return NSAPI_ERROR_PARAMETER;
-    }    
+    }
 
     /* Set local port */
     if (!(_parser.send("P2=%d", port) && check_response())) {
@@ -698,7 +698,7 @@ int ISM43362::setServerParam(int id, int backlog)
     if ((backlog < 0) || (backlog > 30)) {
         debug_if(_ism_debug, "\tISM43362: set server param:: wrong backlog\n");
         return NSAPI_ERROR_PARAMETER;
-    }       
+    }
 
     /* Set listen backlog */
     if (!(_parser.send("P8=%d", backlog) && check_response())) {

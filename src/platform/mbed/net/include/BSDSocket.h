@@ -63,14 +63,14 @@ struct BSDSocket : public FileHandle
                 set_errno(ESOCKTNOSUPPORT);
                 return -1;
             };
-        }
 
-        if (_socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
-        {
-            close();
-            tr_err("Open socket failed");
-            set_errno(ENOBUFS);
-            return -1;
+            if (_socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
+            {
+                close();
+                tr_err("Open socket failed");
+                set_errno(ENOBUFS);
+                return -1;
+            }
         }
 
         _type = type;
