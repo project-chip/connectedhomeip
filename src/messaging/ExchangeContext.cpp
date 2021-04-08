@@ -124,7 +124,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
     Retain();
 
     ExchangeTransport::ExchangeInfo exchangeInfo = { IsInitiator(), mExchangeId };
-    bool reliability                             = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+
+    bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
@@ -142,9 +143,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         }
     }
 
-    err = mTransport->SendMessage(mSecureSession, exchangeInfo, mReliableMessageContext, reliability, protocolId, msgType,
-                                  std::move(msgBuf));
-    SuccessOrExit(err);
+    err = mTransport->SendMessage(mSecureSession, exchangeInfo, mReliableMessageContext, reliableTransmissionRequested, protocolId,
+                                  msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -251,7 +251,8 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     }
     else
     {
-        ApplicationExchangeTransport * transport = chip::Platform::New<Messaging::ApplicationExchangeTransport>();
+        // By default, let's allocate the application transport. This is the most commonly used and secure transport.
+        ApplicationExchangeTransport * transport = Platform::New<Messaging::ApplicationExchangeTransport>();
         VerifyOrDie(transport != nullptr);
         transport->Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
         mTransport = transport;
@@ -288,9 +289,16 @@ void ExchangeContext::Free()
         mExchangeACL = nullptr;
     }
 
-    if (mTransport != nullptr && mDelegate != nullptr)
+    if (mTransport != nullptr)
     {
-        mDelegate->ReleaseTransport(mTransport);
+        if (mDelegate != nullptr)
+        {
+            mDelegate->ReleaseTransport(mTransport);
+        }
+        else
+        {
+            Platform::Delete(mTransport);
+        }
         mTransport = nullptr;
     }
 
@@ -364,9 +372,10 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                           const Transport::PeerAddress & peerAddress, PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
     Protocols::Id protocolId = payloadHeader.GetProtocolID();
     uint8_t messageType      = payloadHeader.GetMessageType();
+
+    VerifyOrDie(mTransport != nullptr);
 
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
@@ -374,16 +383,16 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    mPeerAddress = peerAddress;
+    ExchangeTransport::MessageReliabilityInfo reliabilityInfo = { packetHeader.GetMessageId(), payloadHeader.IsAckMsg(),
+                                                                  payloadHeader.GetAckId().ValueOr(0), payloadHeader.NeedsAck() };
+    CHIP_ERROR err = mTransport->OnMessageReceived(protocolId.GetProtocolId(), messageType, peerAddress, mReliableMessageContext,
+                                                   reliabilityInfo);
+    SuccessOrExit(err);
 
-    if (mTransport != nullptr)
+    // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
+    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
-        ExchangeTransport::MessageReliabilityInfo reliabilityInfo = { packetHeader.GetMessageId(), payloadHeader.IsAckMsg(),
-                                                                      payloadHeader.GetAckId().ValueOr(0),
-                                                                      payloadHeader.NeedsAck() };
-        err = mTransport->OnMessageReceived(protocolId.GetProtocolId(), messageType, peerAddress, mReliableMessageContext,
-                                            reliabilityInfo);
-        SuccessOrExit(err);
+        ExitNow(err = CHIP_NO_ERROR);
     }
 
     // Since we got the response, cancel the response timer.

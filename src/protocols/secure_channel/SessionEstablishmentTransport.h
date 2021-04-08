@@ -51,7 +51,7 @@ public:
     CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
                                  Messaging::ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo) override;
 
-    void SetPeerAddress(const Transport::PeerAddress & peerAddress) { mPeerAddress = peerAddress; }
+    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
 protected:
     CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,

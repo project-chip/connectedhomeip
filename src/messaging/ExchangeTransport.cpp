@@ -64,7 +64,6 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
 #endif
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     if (!IsTransportReliable() && rmCtxt.AutoRequestAck() && mReliableMessageMgr != nullptr && isReliableTransmission)
     {
         payloadHeader.SetNeedsAck(true);
@@ -74,11 +73,13 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
         // Add to Table for subsequent sending
         ReturnErrorOnFailure(mReliableMessageMgr->AddToRetransTable(&rmCtxt, &entry));
 
-        err = SendMessageImpl(session, payloadHeader, std::move(message), &entry->retainedBuf);
+        CHIP_ERROR err = SendMessageImpl(session, payloadHeader, std::move(message), &entry->retainedBuf);
         if (err != CHIP_NO_ERROR)
         {
             // Remove from table
+            ChipLogError(ExchangeManager, "Failed to send message with err %ld", long(err));
             mReliableMessageMgr->ClearRetransTable(*entry);
+            ReturnErrorOnFailure(err);
         }
         else
         {
@@ -89,11 +90,10 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
     {
         // If the channel itself is providing reliability, let's not request CRMP acks
         payloadHeader.SetNeedsAck(false);
-        ChipLogProgress(ExchangeManager, "Calling transport sendmessage");
-        err = SendMessageImpl(session, payloadHeader, std::move(message), nullptr);
+        ReturnErrorOnFailure(SendMessageImpl(session, payloadHeader, std::move(message), nullptr));
     }
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
@@ -101,7 +101,7 @@ CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type,
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (!IsTransportReliable() && mReliableMessageMgr != nullptr)
+    if (!IsTransportReliable())
     {
         if (rmInfo.mHasAck)
         {

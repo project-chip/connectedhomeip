@@ -193,8 +193,6 @@ public:
 
     void SetResponseTimeout(Timeout timeout);
 
-    const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-
 private:
     enum class ExFlagValues : uint16_t
     {
@@ -208,8 +206,6 @@ private:
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
     ExchangeTransport * mTransport = nullptr;
-
-    Transport::PeerAddress mPeerAddress;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
