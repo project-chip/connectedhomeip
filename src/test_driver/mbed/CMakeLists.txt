@@ -53,6 +53,38 @@ if("BlueNRG_MS" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
+# As noted in the nrfconnect impl:
+#   TODO: this list is hard to maintain manually (and currently incomplete).
+#   An automated way that includes figuring out dependencies would be much better
+set(CHIP_TESTS
+# TODO: Enable all the tests.
+    # -lAppTests
+    # -lASN1Tests
+    # -lBleLayerTests
+    -lChipCryptoTests
+    # -lCoreTests
+    # -lInetLayerTests
+    # -lMessagingLayerTests
+    # -lPlatformTests
+    # # TODO: raw transport tests fail by running out of TCP/UDP endpoints
+    # # -lRawTransportTests
+    # -lRetransmitTests
+    # -lSupportTests
+    # -lSystemLayerTests
+    # -lTransportLayerTests
+)
+
+# Link the *whole-archives* to keep the static test objects.
+target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,--no-whole-archive)
+
+# Add test libs.
+target_link_libraries(${APP_TARGET}
+# TODO: Enable all the tests.
+        # InetTestHelpers
+        # NetworkTestHelpers
+        nlunit-test
+)
+
 target_link_libraries(${APP_TARGET} mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
 
 mbed_set_post_build(${APP_TARGET})
