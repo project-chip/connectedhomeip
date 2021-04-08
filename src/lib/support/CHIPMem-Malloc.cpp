@@ -26,12 +26,7 @@
 #include <core/CHIPConfig.h>
 #include <support/CHIPMem.h>
 
-#include <cstring>
 #include <stdlib.h>
-
-#ifndef WEAK
-#define WEAK __attribute__((weak))
-#endif
 
 #ifndef NDEBUG
 #include <atomic>
