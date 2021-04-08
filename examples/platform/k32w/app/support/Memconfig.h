@@ -11,9 +11,9 @@ void * __wrap_malloc(size_t size);
 void __wrap_free(void * ptr);
 void * __wrap_calloc(size_t num, size_t size);
 void * __wrap_realloc(void * ptr, size_t new_size);
-void * __wrap_malloc_r(void * REENT, size_t size);
-void __wrap_free_r(void * REENT, void * ptr);
-void * __wrap_realloc_r(void * REENT, void * ptr, size_t new_size);
+void * __wrap__malloc_r(void * REENT, size_t size);
+void __wrap__free_r(void * REENT, void * ptr);
+void * __wrap__realloc_r(void * REENT, void * ptr, size_t new_size);
 }
 
 } // namespace Platform
