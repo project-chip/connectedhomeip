@@ -111,8 +111,6 @@ void * MemoryAlloc(size_t size)
     return malloc(size);
 }
 
-
-
 void * MemoryCalloc(size_t num, size_t size)
 {
     VERIFY_INITIALIZED();
