@@ -24,9 +24,10 @@
  */
 
 #include "FreeRTOS.h"
-#include <cstring>
-#include <malloc.h>
+#include "task.h"
 #include <stdlib.h>
+#include <stdint.h>
+#include <cstring>
 
 #ifndef NDEBUG
 #include <atomic>
@@ -38,10 +39,60 @@
 #include <support/SafeInt.h>
 #endif // CHIP_CONFIG_MEMORY_DEBUG_DMALLOC
 
-namespace chip {
-namespace Platform {
+/* Assumes 8bit bytes! */
+#define heapBITS_PER_BYTE		( ( size_t ) 8 )
+
+/* Define the linked list structure.  This is used to link free blocks in order
+of their memory address. */
+typedef struct A_BLOCK_LINK
+{
+	struct A_BLOCK_LINK *pxNextFreeBlock;	/*<< The next free block in the list. */
+	size_t xBlockSize;						/*<< The size of the free block. */
+} BlockLink_t;
+
+/* The size of the structure placed at the beginning of each allocated memory
+block must by correctly byte aligned. */
+static const size_t xHeapStructSize	= ( sizeof( BlockLink_t ) + ( ( size_t ) ( portBYTE_ALIGNMENT - 1 ) ) )
+		& ~( ( size_t ) portBYTE_ALIGNMENT_MASK );
+
+/* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
+member of an BlockLink_t structure is set then the block belongs to the
+application.  When the bit is free the block is still part of the free heap
+space. */
+static size_t xBlockAllocatedBit = ( ( size_t ) 1 ) << ( ( sizeof( size_t ) * heapBITS_PER_BYTE ) - 1 );
 
 extern "C" {
+
+size_t xPortMallocUsableSize( void *pv )
+{
+	uint8_t *puc = ( uint8_t * ) pv;
+	BlockLink_t *pxLink;
+	void *voidp;
+	size_t sz = 0;
+
+	if( pv != NULL )
+	{
+	    vTaskSuspendAll();
+	    {
+	        /* The memory being checked will have an BlockLink_t structure immediately
+	        before it. */
+	        puc -= xHeapStructSize;
+
+	        /* This casting is to keep the compiler from issuing warnings. */
+	        voidp = (void *) puc;
+	        pxLink = (BlockLink_t *)voidp;
+
+	        /* Check if the block is actually allocated. */
+	        configASSERT( ( pxLink->xBlockSize & xBlockAllocatedBit ) != 0 );
+	        configASSERT( pxLink->pxNextFreeBlock == NULL );
+
+	        sz = (pxLink->xBlockSize & ~xBlockAllocatedBit) - xHeapStructSize;
+	    }
+	    ( void ) xTaskResumeAll();
+	}
+
+	return sz;
+}
 
 void * __wrap_malloc(size_t size)
 {
@@ -75,9 +126,17 @@ void * __wrap_realloc(void * ptr, size_t new_size)
         {
             if (ptr)
             {
-                memset(new_ptr, 0, new_size);
-                memcpy(new_ptr, ptr, malloc_usable_size(ptr));
-                vPortFree(ptr);
+            	size_t old_ptr_size = xPortMallocUsableSize(ptr);
+            	if (new_size >= old_ptr_size)
+            	{
+            		memset(new_ptr, 0, new_size);
+					memcpy(new_ptr, ptr, old_ptr_size);
+					vPortFree(ptr);
+            	}
+            	else
+            	{
+            		return ptr;
+            	}
             }
             return new_ptr;
         }
@@ -106,6 +165,3 @@ void * __wrap__realloc_r(void * REENT, void * ptr, size_t new_size)
 }
 
 } // extern "C"
-
-} // namespace Platform
-} // namespace chip
