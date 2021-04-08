@@ -209,8 +209,8 @@ void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    CHIP_ERROR err =
-        gMessageCounterManager.AddToRetransmissionTable(ctx.GetSessionToPeer(), ctx.GetDestinationNodeId(), payloadHeader, std::move(buffer));
+    CHIP_ERROR err = gMessageCounterManager.AddToRetransmissionTable(ctx.GetSessionToPeer(), ctx.GetDestinationNodeId(),
+                                                                     payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -225,9 +225,9 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
 
     PacketHeader packetHeader;
 
-    CHIP_ERROR err =
-        gMessageCounterManager.AddToReceiveTable(ctx.GetDestinationNodeId(), packetHeader,
-                             Transport::PeerAddress::UDP(ctx.GetAddress(), CHIP_PORT, INET_NULL_INTERFACEID), std::move(buffer));
+    CHIP_ERROR err = gMessageCounterManager.AddToReceiveTable(
+        ctx.GetDestinationNodeId(), packetHeader, Transport::PeerAddress::UDP(ctx.GetAddress(), CHIP_PORT, INET_NULL_INTERFACEID),
+        std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

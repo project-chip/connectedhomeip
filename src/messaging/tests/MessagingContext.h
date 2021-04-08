@@ -41,7 +41,8 @@ public:
     {}
 
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport, Transport::MessageCounterManagerInterface * messageCounterManagerInterface);
+    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport,
+                    Transport::MessageCounterManagerInterface * messageCounterManagerInterface);
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
