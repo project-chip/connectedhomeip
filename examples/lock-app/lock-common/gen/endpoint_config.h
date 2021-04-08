@@ -304,6 +304,9 @@
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (1)
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS { \
-  { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */ \
-}
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
+    {                                                                                                                              \
+        {                                                                                                                          \
+            ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
+        }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */                                                \
+    }
