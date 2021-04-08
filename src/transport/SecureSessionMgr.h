@@ -91,18 +91,18 @@ private:
 class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
-    EncryptedPacketBufferHandle() : mMsgId(0) {}
-    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) :
-        PacketBufferHandle(std::move(aBuffer)), mMsgId(aBuffer.mMsgId)
-    {}
+    EncryptedPacketBufferHandle() {}
+    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
-    void operator=(EncryptedPacketBufferHandle && aBuffer)
+    void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
+    uint32_t GetMsgId() const
     {
-        PacketBufferHandle::operator=(std::move(aBuffer));
-        mMsgId                      = aBuffer.mMsgId;
-    }
+        PacketHeader header;
+        uint16_t headerSize = 0;
 
-    uint32_t GetMsgId() const { return mMsgId; }
+        return (header.Decode((*this)->Start(), (*this)->DataLength(), &headerSize) == CHIP_NO_ERROR) ? header.GetMessageId() : 0;
+    }
 
     /**
      * Creates a copy of the data in this packet.
@@ -137,15 +137,9 @@ private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
     friend class SecureSessionMgr;
 
-    EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)), mMsgId(0) {}
+    EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
-    void operator=(PacketBufferHandle && aBuffer)
-    {
-        PacketBufferHandle::operator=(std::move(aBuffer));
-        mMsgId                      = 0;
-    }
-
-    uint32_t mMsgId; // The message identifier of the CHIP message awaiting acknowledgment.
+    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 };
 
 /**

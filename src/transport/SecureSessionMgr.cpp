@@ -196,8 +196,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        encryptedMsg        = msgBuf.Retain();
-        encryptedMsg.mMsgId = packetHeader.GetMessageId();
+        encryptedMsg = msgBuf.Retain();
     }
 
     ChipLogProgress(Inet, "Sending msg from 0x%08" PRIx32 "%08" PRIx32 "to 0x%08" PRIx32 "%08" PRIx32,
