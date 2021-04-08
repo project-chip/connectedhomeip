@@ -96,13 +96,7 @@ public:
 
     void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 
-    uint32_t GetMsgId() const
-    {
-        PacketHeader header;
-        uint16_t headerSize = 0;
-
-        return (header.Decode((*this)->Start(), (*this)->DataLength(), &headerSize) == CHIP_NO_ERROR) ? header.GetMessageId() : 0;
-    }
+    uint32_t GetMsgId() const;
 
     /**
      * Creates a copy of the data in this packet.
