@@ -27,10 +27,6 @@
 #include "Service.h"
 #include "ThreadUtil.h"
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-#include "NFCWidget.h"
-#endif
-
 #include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
@@ -38,16 +34,12 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
-#include <setup_payload/SetupPayload.h>
 #include <support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
 #include <zephyr.h>
-
-#include <algorithm>
 
 LOG_MODULE_DECLARE(app);
 
@@ -67,10 +59,6 @@ k_timer sFunctionTimer;
 LEDWidget sStatusLED;
 LEDWidget sUnusedLED;
 LEDWidget sUnusedLED_1;
-
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-NFCWidget sNFC;
-#endif
 
 bool sIsThreadProvisioned     = false;
 bool sIsThreadEnabled         = false;
@@ -116,14 +104,7 @@ int AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    ret = sNFC.Init(ConnectivityMgr());
-    if (ret)
-    {
-        LOG_ERR("NFC initialization failed");
-        return ret;
-    }
-
-    PlatformMgr().AddEventHandler(AppTask::ThreadProvisioningHandler, 0);
+    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
 #endif
 
     return 0;
@@ -384,20 +365,13 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    if (!sNFC.IsTagEmulationStarted())
+    if (NFCMgr().IsTagEmulationStarted())
     {
-        if (!(GetAppTask().StartNFCTag() < 0))
-        {
-            LOG_INF("Started NFC Tag emulation");
-        }
-        else
-        {
-            LOG_ERR("Starting NFC Tag failed");
-        }
+        LOG_INF("NFC Tag emulation is already started");
     }
     else
     {
-        LOG_INF("NFC Tag emulation is already started");
+        ShareQRCodeOverNFC(chip::RendezvousInformationFlags::kBLE);
     }
 #endif
 
@@ -418,16 +392,11 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
 }
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
-void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t arg)
+void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
 {
-    ARG_UNUSED(arg);
-    if ((event->Type == DeviceEventType::kServiceProvisioningChange) && ConnectivityMgr().IsThreadProvisioned())
+    if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
     {
-        const int result = sNFC.StopTagEmulation();
-        if (result)
-        {
-            LOG_ERR("Stopping NFC Tag emulation failed");
-        }
+        NFCMgr().StopTagEmulation();
     }
 }
 #endif
@@ -443,26 +412,6 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     k_timer_start(&sFunctionTimer, K_MSEC(aTimeoutInMs), K_NO_WAIT);
     mFunctionTimerActive = true;
 }
-
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-int AppTask::StartNFCTag()
-{
-    // Get QR Code and emulate its content using NFC tag
-    std::string QRCode;
-
-    int result = GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
-    VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
-
-    // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
-    std::replace(QRCode.begin(), QRCode.end(), ' ', '_');
-
-    result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
-    VerifyOrExit(result >= 0, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));
-
-exit:
-    return result;
-}
-#endif
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {

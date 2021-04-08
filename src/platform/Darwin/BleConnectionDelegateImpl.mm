@@ -169,9 +169,12 @@ namespace DeviceLayer {
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
-    // If the setup discriminator is only 4 bits, only match the lower 4 from the BLE advertisement
-    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
-    if (_deviceDiscriminator <= kManualSetupDiscriminatorFieldBitMask) {
+    // If the manual setup discriminator was passed in, only match the most significant 4 bits from the BLE advertisement
+    constexpr uint16_t manualSetupDiscriminatorOffsetInBits
+        = chip::kPayloadDiscriminatorFieldLengthInBits - chip::kManualSetupDiscriminatorFieldLengthInBits;
+    constexpr uint16_t maxManualDiscriminatorValue = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
+    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
+    if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
         return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
     } else {
         // else compare the entire thing

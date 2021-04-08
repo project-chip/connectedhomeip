@@ -115,7 +115,7 @@ public:
                 mStates[i].SetLocalKeyID(localKeyId);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
 
-                if (peerNode.HasValue())
+                if (peerNode.ValueOr(kUndefinedNodeId) != kUndefinedNodeId)
                 {
                     mStates[i].SetPeerNodeId(peerNode.Value());
                 }
@@ -227,7 +227,8 @@ public:
             }
             if (peerKeyId == kAnyKeyId || iter->GetPeerKeyID() == peerKeyId)
             {
-                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
+                if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
+                    iter->GetPeerNodeId() == nodeId.Value())
                 {
                     state = iter;
                     break;
@@ -304,7 +305,8 @@ public:
             }
             if (iter->GetLocalKeyID() == localKeyId)
             {
-                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
+                if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
+                    iter->GetPeerNodeId() == nodeId.Value())
                 {
                     state = iter;
                     break;

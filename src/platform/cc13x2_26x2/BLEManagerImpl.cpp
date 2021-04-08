@@ -165,7 +165,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mFlags.Set(Flags::kFlag_AdvertisingRefreshNeeded);
+    mFlags.Set(Flags::kAdvertisingRefreshNeeded);
     ret = DriveBLEState();
     return ret;
 }
@@ -805,9 +805,9 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 Util_stopClock(&sInstance.clkAdvTimeout);
             }
             /* Other case is that advertising is already working, but should be restarted, as its settings changed */
-            else if (sInstance.mFlags.Has(Flags::kFlag_AdvertisingRefreshNeeded))
+            else if (sInstance.mFlags.Has(Flags::kAdvertisingRefreshNeeded))
             {
-                sInstance.mFlags.Clear(Flags::kFlag_AdvertisingRefreshNeeded);
+                sInstance.mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
                 GapAdv_disable(sInstance.advHandleLegacy);
 
                 // Enable legacy advertising for set #1
@@ -1071,7 +1071,7 @@ void BLEManagerImpl::ProcessGapMessage(gapEventHdr_t * pMsg)
         {
             // Stop advertising since there is no room for more connections
             BLEMGR_LOG("BLEMGR: BLE event GAP_LINK_ESTABLISHED_EVENT: MAX connections");
-            sInstance.mFlags.Clear(Flags::kAdvertisingEnabled.Clear(Flags::kAdvertising);
+            sInstance.mFlags.Clear(Flags::kAdvertisingEnabled).Clear(Flags::kAdvertising);
             mFlags.Set(Flags::kFastAdvertisingEnabled, true);
         }
 
@@ -1697,7 +1697,7 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
         BLEMGR_LOG("BLEMGR: AdvTimeoutHandler ble adv 15 minute timeout");
 
         sInstance.mFlags.Clear(Flags::kAdvertisingEnabled);
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         /* Send event to process state change request */
         DriveBLEState();

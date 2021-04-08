@@ -13,14 +13,27 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/examples/lighting-app/lighting-common/lighting.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
+
+if (enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_protobuf_compiler/proto.gni")
+}
 
 config("includes") {
   include_dirs = [
     ".",
     "include",
   ]
+}
+
+if (enable_pw_rpc) {
+  pw_proto_library("lighting_service") {
+    sources = [ "lighting_service/pigweed_lighting.proto" ]
+    inputs = [ "lighting_service/pigweed_lighting.options" ]
+  }
 }
 
 source_set("lighting-common") {
@@ -50,7 +63,7 @@ source_set("lighting-common") {
     "gen/callback-stub.cpp",
   ]
 
-  if (chip_app_use_interaction_model) {
+  if (chip_enable_interaction_model) {
     sources += [
       "${chip_root}/src/app/util/ember-compatibility-functions.cpp",
       "gen/IMClusterCommandHandler.cpp",

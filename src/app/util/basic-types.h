@@ -37,4 +37,5 @@ typedef uint8_t CommandId;
 typedef uint16_t EventId;
 typedef uint64_t EventNumber;
 typedef uint64_t DataVersion;
+typedef uint32_t DeviceTypeId;
 } // namespace chip

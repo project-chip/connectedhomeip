@@ -15,14 +15,13 @@
 name: Doxygen
 
 on:
-    push:
-    pull_request:
+    tag:
 
 jobs:
     doxygen:
         name: Build Doxygen
         runs-on: ubuntu-20.04
-        if: github.actor != 'restyled-io'
+        if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: "Print Actor"

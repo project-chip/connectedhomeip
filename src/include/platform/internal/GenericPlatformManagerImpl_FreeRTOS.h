@@ -53,6 +53,7 @@ namespace Internal {
 template <class ImplClass>
 class GenericPlatformManagerImpl_FreeRTOS : public GenericPlatformManagerImpl<ImplClass>
 {
+
 protected:
     TimeOut_t mNextTimerBaseTime;
     TickType_t mNextTimerDurationTicks;
@@ -83,6 +84,16 @@ private:
     inline ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 
     static void EventLoopTaskMain(void * arg);
+
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
+    uint8_t mEventQueueBuffer[CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE * sizeof(ChipDeviceEvent)];
+    StaticQueue_t mEventQueueStruct;
+#endif
+
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    StackType_t mEventLoopStack[CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE / sizeof(StackType_t)];
+    StaticTask_t mventLoopTaskStruct;
+#endif
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

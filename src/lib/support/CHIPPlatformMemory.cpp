@@ -34,11 +34,6 @@ extern void CHIPPlatformMemoryShutdown()
     return chip::Platform::MemoryShutdown();
 }
 
-extern void * CHIPPlatformMemoryAllocLongTerm(size_t size, bool isLongTermAlloc)
-{
-    return chip::Platform::MemoryAlloc(size, isLongTermAlloc);
-}
-
 extern void * CHIPPlatformMemoryAlloc(size_t size)
 {
     return chip::Platform::MemoryAlloc(size);
