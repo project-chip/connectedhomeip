@@ -189,6 +189,7 @@ private:
     uint16_t mTXCharCCCDAttrHandle;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
+    CHIP_ERROR MapBLEError(int btErr);
 
     void DriveBLEState(void);
     CHIP_ERROR InitESPBleLayer(void);

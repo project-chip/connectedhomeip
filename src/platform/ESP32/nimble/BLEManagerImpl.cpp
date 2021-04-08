@@ -350,7 +350,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
 
     // Signal the ESP BLE layer to close the conneecction.
-    err = ble_gap_terminate(conId, BLE_ERR_REM_USER_CONN_TERM);
+    err = MapBLEError(ble_gap_terminate(conId, BLE_ERR_REM_USER_CONN_TERM));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ble_gap_terminate() failed: %s", ErrorStr(err));
@@ -387,7 +387,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
         ExitNow();
     }
 
-    err = ble_gattc_notify_custom(conId, mTXCharCCCDAttrHandle, om);
+    err = MapBLEError(ble_gattc_notify_custom(conId, mTXCharCCCDAttrHandle, om));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ble_gattc_notify_custom() failed: %s", ErrorStr(err));
@@ -426,9 +426,37 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
+CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
+{
+    switch (bleErr)
+    {
+    case ESP_OK:
+        return CHIP_NO_ERROR;
+    case BLE_HS_EMSGSIZE:
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    case BLE_HS_ENOMEM:
+    case ESP_ERR_NO_MEM:
+        return CHIP_ERROR_NO_MEMORY;
+    case BLE_HS_ENOTCONN:
+        return CHIP_ERROR_NOT_CONNECTED;
+    case BLE_HS_ENOTSUP:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case BLE_HS_EAPP:
+        return CHIP_ERROR_READ_FAILED;
+    case BLE_HS_EBADDATA:
+        return CHIP_ERROR_DATA_NOT_ALIGNED;
+    case BLE_HS_ETIMEOUT:
+        return CHIP_ERROR_TIMEOUT;
+    case BLE_HS_ENOADDR:
+        return CHIP_ERROR_INVALID_ADDRESS;
+    case ESP_ERR_INVALID_ARG:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    default:
+        return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR) bleErr;
+    }
+}
 void BLEManagerImpl::DriveBLEState(void)
 {
-    int ret;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Perform any initialization actions that must occur after the Chip task is running.
@@ -518,10 +546,9 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            ret = ble_gap_adv_stop();
-            if (ret != 0)
+            err = MapBLEError(ble_gap_adv_stop());
+            if (err != 0)
             {
-                err = CHIP_ERROR_INTERNAL;
                 ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
                 ExitNow();
             }
@@ -599,7 +626,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
     }
 
-    err = esp_nimble_hci_and_controller_init();
+    err = MapBLEError(esp_nimble_hci_and_controller_init());
     SuccessOrExit(err);
 
     nimble_port_init();
@@ -618,14 +645,14 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         ble_svc_gap_init();
         ble_svc_gatt_init();
 
-        err = ble_gatts_count_cfg(CHIPoBLEGATTAttrs);
+        err = MapBLEError(ble_gatts_count_cfg(CHIPoBLEGATTAttrs));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "ble_gatts_count_cfg failed: %s", ErrorStr(err));
             ExitNow();
         }
 
-        err = ble_gatts_add_svcs(CHIPoBLEGATTAttrs);
+        err = MapBLEError(ble_gatts_add_svcs(CHIPoBLEGATTAttrs));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "ble_gatts_add_svcs failed: %s", ErrorStr(err));
@@ -657,7 +684,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     }
 
     // Configure the BLE device name.
-    err = ble_svc_gap_device_name_set(mDeviceName);
+    err = MapBLEError(ble_svc_gap_device_name_set(mDeviceName));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ble_svc_gap_device_name_set() failed: %s", ErrorStr(err));
@@ -686,7 +713,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
 
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
-    err = ble_gap_adv_set_data(advData, sizeof(advData));
+    err = MapBLEError(ble_gap_adv_set_data(advData, sizeof(advData)));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "ble_gap_adv_set_data failed: %s %d", ErrorStr(err), discriminator);
@@ -1051,8 +1078,7 @@ int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_hand
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    int ret;
-
+    CHIP_ERROR err;
     ble_gap_adv_params adv_params;
     memset(&adv_params, 0, sizeof(adv_params));
     uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
@@ -1094,32 +1120,31 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         {
             /* Advertising is already active. Stop and restart with the new parameters */
             ChipLogProgress(DeviceLayer, "Device already advertising, stop active advertisement and restart");
-            ret = ble_gap_adv_stop();
-            if (ret != 0)
+            err = MapBLEError(ble_gap_adv_stop());
+            if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", ret);
-                return CHIP_ERROR_INTERNAL;
+                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", ErrorStr(err));
+                return err;
             }
         }
         else
         {
-            ret = ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA);
-            if (ret != 0)
+            err = MapBLEError(ble_hs_pvcy_rpa_config(NIMBLE_HOST_ENABLE_RPA));
+            if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "RPA not set: %d", ret);
-                return CHIP_ERROR_INTERNAL;
+                ChipLogError(DeviceLayer, "RPA not set: %d", ErrorStr(err));
+                return err;
             }
         }
-        ret = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
-
-        if (ret == 0)
+        err = MapBLEError(ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL));
+        if (err == CHIP_NO_ERROR)
         {
             return CHIP_NO_ERROR;
         }
         else
         {
-            ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %d", ret);
-            return CHIP_ERROR_INTERNAL;
+            ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %d", ErrorStr(err));
+            return err;
         }
     }
 }
