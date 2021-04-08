@@ -78,7 +78,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
     CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
 
     buffer = nullptr;
-    ChipLogDetail(Controller, "SendMessage returned %d", err);
+    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try session resumption if needed
