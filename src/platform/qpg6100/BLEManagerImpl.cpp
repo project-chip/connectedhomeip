@@ -534,7 +534,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     mFlags.Set(Flags::kAdvertising);
     StartBleAdvTimeoutTimer(bleAdvTimeout);
-    
+
 exit:
     return err;
 }
