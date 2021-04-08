@@ -21,49 +21,47 @@
 
 #include "ReportingCommand.h"
 
+
 typedef void (*UnsupportedAttributeCallback)(void * context);
 
 class Listen : public ReportingCommand
 {
 public:
-    Listen() : ReportingCommand("listen") {}
+    Listen() : ReportingCommand("listen")
+    {
+    }
 
     ~Listen()
     {
-        delete onReportColorControlCurrentHueCallback;
-        delete onReportColorControlCurrentSaturationCallback;
-        delete onReportColorControlCurrentXCallback;
-        delete onReportColorControlCurrentYCallback;
-        delete onReportColorControlColorTemperatureCallback;
-        delete onReportDoorLockLockStateCallback;
-        delete onReportLevelControlCurrentLevelCallback;
-        delete onReportOnOffOnOffCallback;
-        delete onReportTemperatureMeasurementMeasuredValueCallback;
+    delete onReportColorControlCurrentHueCallback;
+    delete onReportColorControlCurrentSaturationCallback;
+    delete onReportColorControlCurrentXCallback;
+    delete onReportColorControlCurrentYCallback;
+    delete onReportColorControlColorTemperatureCallback;
+    delete onReportDoorLockLockStateCallback;
+    delete onReportLevelControlCurrentLevelCallback;
+    delete onReportOnOffOnOffCallback;
+    delete onReportTemperatureMeasurementMeasuredValueCallback;
     }
-
+    
     void AddReportCallbacks(uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0000,
-                                       onReportColorControlCurrentHueCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0001,
-                                       onReportColorControlCurrentSaturationCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0003,
-                                       onReportColorControlCurrentXCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0004,
-                                       onReportColorControlCurrentYCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0007,
-                                       onReportColorControlColorTemperatureCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0101, 0x0000,
-                                       onReportDoorLockLockStateCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0008, 0x0000,
-                                       onReportLevelControlCurrentLevelCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0001, onReportColorControlCurrentSaturationCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0003, onReportColorControlCurrentXCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0004, onReportColorControlCurrentYCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0300, 0x0007, onReportColorControlColorTemperatureCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0402, 0x0000,
-                                       onReportTemperatureMeasurementMeasuredValueCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0402, 0x0000, onReportTemperatureMeasurementMeasuredValueCallback->Cancel());
     }
 
-    static void OnDefaultSuccessResponse(void * context) { ChipLogProgress(chipTool, "Default Success Response"); }
+    static void OnDefaultSuccessResponse(void * context)
+    {
+        ChipLogProgress(chipTool, "Default Success Response");
+    }
 
     static void OnDefaultFailureResponse(void * context, uint8_t status)
     {
@@ -96,24 +94,15 @@ public:
     }
 
 private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorTemperatureCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback = new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback = new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentXCallback = new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentYCallback = new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorTemperatureCallback = new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback = new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback = new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback = new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback = new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
 };
 
 void registerCommandsReporting(Commands & commands)
