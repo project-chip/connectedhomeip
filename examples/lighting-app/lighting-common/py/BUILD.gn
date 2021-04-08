@@ -33,9 +33,9 @@ pw_python_package("lighting_app") {
     "$dir_pw_hdlc/py",
     "$dir_pw_protobuf_compiler/py",
     "$dir_pw_rpc/py",
-    "${chip_root}/examples/lighting-app/lighting-common:lighting_service.python",
     "${chip_root}/examples/common/pigweed:button_service.python",
     "${chip_root}/examples/common/pigweed:device_common_service.python",
+    "${chip_root}/examples/lighting-app/lighting-common:lighting_service.python",
   ]
 }
 
