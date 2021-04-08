@@ -157,8 +157,7 @@ void MessageCounterSyncMgr::RetransPendingGroupMsgs(NodeId peerNodeId)
     }
 }
 
-CHIP_ERROR MessageCounterSyncMgr::AddToReceiveTable(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                                    const SecureSessionHandle & session, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterSyncMgr::AddToReceiveTable(System::PacketBufferHandle msgBuf)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -168,12 +167,8 @@ CHIP_ERROR MessageCounterSyncMgr::AddToReceiveTable(const PacketHeader & packetH
         // Entries are in use if they have a message buffer.
         if (entry.msgBuf.IsNull())
         {
-            entry.packetHeader  = packetHeader;
-            entry.payloadHeader = payloadHeader;
-            entry.session       = session;
-            entry.msgBuf        = std::move(msgBuf);
-            added               = true;
-
+            entry.msgBuf = std::move(msgBuf);
+            added        = true;
             break;
         }
     }
@@ -200,17 +195,27 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
     // this table was using an application group key; that's why it was added.
     for (ReceiveTableEntry & entry : mReceiveTable)
     {
-        if (!entry.msgBuf.IsNull() && entry.session.GetPeerNodeId() == peerNodeId)
+        if (!entry.msgBuf.IsNull())
         {
-            // Reprocess message.
-            mExchangeMgr->HandleGroupMessageReceived(entry.packetHeader, entry.payloadHeader, entry.session,
-                                                     std::move(entry.msgBuf));
+            PacketHeader packetHeader;
+            uint16_t headerSize = 0;
 
-            // Explicitly free any buffer owned by this handle.  The
-            // HandleGroupMessageReceived() call should really handle this, but
-            // just in case it messes up we don't want to get confused about
-            // wheter the entry is in use.
-            entry.msgBuf = nullptr;
+            if (packetHeader.Decode((entry.msgBuf)->Start(), (entry.msgBuf)->DataLength(), &headerSize) != CHIP_NO_ERROR)
+            {
+                break;
+            }
+
+            if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
+            {
+                // Reprocess message.
+                mExchangeMgr->GetSessionMgr()->HandleGroupMessageReceived(packetHeader, std::move(entry.msgBuf));
+
+                // Explicitly free any buffer owned by this handle.  The
+                // HandleGroupMessageReceived() call should really handle this, but
+                // just in case it messes up we don't want to get confused about
+                // wheter the entry is in use.
+                entry.msgBuf = nullptr;
+            }
         }
     }
 }

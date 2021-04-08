@@ -80,16 +80,12 @@ public:
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
      * protocol for re-processing.
      *
-     *  @param[in]    packetHeader     The message header for the received message.
-     *  @param[in]    payloadHeader    The payload header for the received message.
-     *  @param[in]    session          The handle to the secure session.
      *  @param[in]    msgBuf           A handle to the packet buffer holding the received message.
      *
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AddToReceiveTable(System::PacketBufferHandle msgBuf);
 
 private:
     /**
@@ -125,9 +121,6 @@ private:
      */
     struct ReceiveTableEntry
     {
-        PacketHeader packetHeader;         /**< The packet header for the message. */
-        PayloadHeader payloadHeader;       /**< The payload header for the message. */
-        SecureSessionHandle session;       /**< The secure session the message was received on. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding
                                                 the message data. This is non-null if and only
                                                 if this entry is in use. */
