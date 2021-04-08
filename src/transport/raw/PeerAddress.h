@@ -43,7 +43,7 @@ namespace Transport {
  * will keep the same TCP channel.
  *
  */
-enum class Type : uint8_t
+enum class Type
 {
     kUndefined,
     kUdp,

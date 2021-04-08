@@ -30,7 +30,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/basic-types.h>
-#include <ble/BleLayer.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <setup_payload/SetupPayload.h>
