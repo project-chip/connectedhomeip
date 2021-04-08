@@ -4,7 +4,7 @@
 #define SRC_PLATFORM_K32W_MEMCONFIG_H_
 
 extern "C" {
-size_t xPortMallocUsableSize( void *pv );
+size_t xPortMallocUsableSize(void * pv);
 void * __wrap_malloc(size_t size);
 void __wrap_free(void * ptr);
 void * __wrap_calloc(size_t num, size_t size);
