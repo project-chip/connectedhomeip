@@ -51,6 +51,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/bindings                          \
   ../third_party/connectedhomeip/src/app/reporting                                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \
+  ../third_party/connectedhomeip/src/app/clusters/occupancy-sensor-server           \
    ../third_party/connectedhomeip/src/app/clusters/ias-zone-server                  \
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client                  \
 
