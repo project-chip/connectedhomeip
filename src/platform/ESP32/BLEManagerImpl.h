@@ -189,6 +189,7 @@ private:
     uint16_t mTXCharCCCDAttrHandle;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
+    CHIP_ERROR MapBLEError(int btErr);
 
     void DriveBLEState(void);
     CHIP_ERROR InitESPBleLayer(void);
@@ -217,7 +218,7 @@ private:
     void HandleDisconnect(esp_ble_gatts_cb_param_t * param);
     CHIPoBLEConState * GetConnectionState(uint16_t conId, bool allocate = false);
     bool ReleaseConnectionState(uint16_t conId);
-
+ 
     static void HandleGATTEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 

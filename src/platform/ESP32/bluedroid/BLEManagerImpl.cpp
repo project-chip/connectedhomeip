@@ -347,12 +347,14 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 
 bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
+    int ret;
     CHIP_ERROR err;
 
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
 
     // Signal the ESP BLE layer to close the conntion.
-    err = esp_ble_gatts_close(mAppIf, conId);
+    ret = esp_ble_gatts_close(mAppIf, conId);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_close() failed: %s", ErrorStr(err));
@@ -378,6 +380,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle data)
 {
+    int ret;
     CHIP_ERROR err              = CHIP_NO_ERROR;
     CHIPoBLEConState * conState = GetConnectionState(conId);
 
@@ -387,7 +390,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     VerifyOrExit(conState->PendingIndBuf.IsNull(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), false);
+    ret = esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), false);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_indicate() failed: %s", ErrorStr(err));
@@ -430,8 +434,24 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
+CHIP_ERROR BLEManagerImpl::MapBLEError(int btErr)
+{
+    switch(btErr)
+    {
+        case ESP_ERR_INVALID_ARG:
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        case ESP_ERR_INVALID_STATE:
+            return CHIP_ERROR_INCORRECT_STATE;
+        case ESP_ERR_NO_MEM:
+            return CHIP_ERROR_NO_MEMORY;
+        default:
+            return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR) btErr;
+    }
+}
+
 void BLEManagerImpl::DriveBLEState(void)
 {
+    int ret;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Perform any initialization actions that must occur after the Chip task is running.
@@ -463,7 +483,8 @@ void BLEManagerImpl::DriveBLEState(void)
     // Register the CHIPoBLE application with the ESP BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
-        err = esp_ble_gatts_app_register(CHIPoBLEAppId);
+        ret = esp_ble_gatts_app_register(CHIPoBLEAppId);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_ble_gatts_app_register() failed: %s", ErrorStr(err));
@@ -478,7 +499,8 @@ void BLEManagerImpl::DriveBLEState(void)
     // Register the CHIPoBLE GATT attributes with the ESP BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAttrsRegistered))
     {
-        err = esp_ble_gatts_create_attr_tab(CHIPoBLEGATTAttrs, mAppIf, CHIPoBLEGATTAttrCount, 0);
+        ret = esp_ble_gatts_create_attr_tab(CHIPoBLEGATTAttrs, mAppIf, CHIPoBLEGATTAttrCount, 0);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_ble_gatts_create_attr_tab() failed: %s", ErrorStr(err));
@@ -493,7 +515,8 @@ void BLEManagerImpl::DriveBLEState(void)
     // Start the CHIPoBLE GATT service if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kGATTServiceStarted))
     {
-        err = esp_ble_gatts_start_service(mServiceAttrHandle);
+        ret = esp_ble_gatts_start_service(mServiceAttrHandle);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_ble_gatts_start_service() failed: %s", ErrorStr(err));
@@ -538,7 +561,8 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = esp_ble_gap_stop_advertising();
+            ret = esp_ble_gap_stop_advertising();
+            err = MapBLEError(ret);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "esp_ble_gap_stop_advertising() failed: %s", ErrorStr(err));
@@ -556,7 +580,8 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         // TODO: what to do about existing connections??
 
-        err = esp_ble_gatts_stop_service(mServiceAttrHandle);
+        ret = esp_ble_gatts_stop_service(mServiceAttrHandle);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_ble_gatts_stop_service() failed: %s", ErrorStr(err));
@@ -578,6 +603,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
 {
+    int ret;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(!mFlags.Has(Flags::kESPBLELayerInitialized), /* */);
@@ -586,7 +612,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     if (esp_bt_controller_get_status() == ESP_BT_CONTROLLER_STATUS_IDLE)
     {
         // Since Chip only uses BLE, release memory held by ESP classic bluetooth stack.
-        err = esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT);
+        ret = esp_bt_controller_mem_release(ESP_BT_MODE_CLASSIC_BT);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_bt_controller_mem_release() failed: %s", ErrorStr(err));
@@ -595,7 +622,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
 
         // Initialize the ESP Bluetooth controller.
         esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-        err                               = esp_bt_controller_init(&bt_cfg);
+        ret                               = esp_bt_controller_init(&bt_cfg);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_bt_controller_init() failed: %s", ErrorStr(err));
@@ -606,7 +634,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     // If the ESP Bluetooth controller has not been enabled, enable it now.
     if (esp_bt_controller_get_status() != ESP_BT_CONTROLLER_STATUS_ENABLED)
     {
-        err = esp_bt_controller_enable(ESP_BT_MODE_BLE);
+        ret = esp_bt_controller_enable(ESP_BT_MODE_BLE);
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_bt_controller_enable() failed: %s", ErrorStr(err));
@@ -617,7 +646,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     // If the ESP Bluedroid stack has not been initialized, initialize it now.
     if (esp_bluedroid_get_status() == ESP_BLUEDROID_STATUS_UNINITIALIZED)
     {
-        err = esp_bluedroid_init();
+        ret = esp_bluedroid_init();
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_bluedroid_init() failed: %s", ErrorStr(err));
@@ -628,7 +658,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     // If the ESP Bluedroid stack has not been enabled, enable it now.
     if (esp_bluedroid_get_status() != ESP_BLUEDROID_STATUS_ENABLED)
     {
-        err = esp_bluedroid_enable();
+        ret = esp_bluedroid_enable();
+        err = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_bluedroid_enable() failed: %s", ErrorStr(err));
@@ -637,7 +668,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     }
 
     // Register a callback to receive GATT events.
-    err = esp_ble_gatts_register_callback(HandleGATTEvent);
+    ret = esp_ble_gatts_register_callback(HandleGATTEvent);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_register_callback() failed: %s", ErrorStr(err));
@@ -645,7 +677,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     }
 
     // Register a callback to receive GAP events.
-    err = esp_ble_gap_register_callback(HandleGAPEvent);
+    ret = esp_ble_gap_register_callback(HandleGAPEvent);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gap_register_callback() failed: %s", ErrorStr(err));
@@ -653,7 +686,8 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
     }
 
     // Set the maximum supported MTU size.
-    err = esp_ble_gatt_set_local_mtu(ESP_GATT_MAX_MTU_SIZE);
+    ret = esp_ble_gatt_set_local_mtu(ESP_GATT_MAX_MTU_SIZE);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatt_set_local_mtu() failed: %s", ErrorStr(err));
@@ -668,6 +702,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
+    int ret;
     CHIP_ERROR err;
     uint8_t advData[MAX_ADV_DATA_LEN];
     uint8_t index = 0;
@@ -684,7 +719,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     }
 
     // Configure the BLE device name.
-    err = esp_ble_gap_set_device_name(mDeviceName);
+    ret = esp_ble_gap_set_device_name(mDeviceName);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gap_set_device_name() failed: %s", ErrorStr(err));
@@ -713,7 +749,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
 
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
-    err = esp_ble_gap_config_adv_data_raw(advData, sizeof(advData));
+    ret = esp_ble_gap_config_adv_data_raw(advData, sizeof(advData));
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gap_config_adv_data_raw(<raw_data>) failed: %s", ErrorStr(err));
@@ -728,6 +765,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
+    int ret;
     CHIP_ERROR err;
     esp_ble_adv_params_t advertParams = {
         0,                                 // adv_int_min
@@ -767,7 +805,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     ChipLogProgress(DeviceLayer, "Configuring CHIPoBLE advertising (interval %" PRIu32 " ms, %sconnectable, device name %s)",
                     (((uint32_t) advertParams.adv_int_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
 
-    err = esp_ble_gap_start_advertising(&advertParams);
+    ret = esp_ble_gap_start_advertising(&advertParams);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gap_start_advertising() failed: %s", ErrorStr(err));
@@ -1016,6 +1055,7 @@ exit:
 
 void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)
 {
+    int ret;
     CHIP_ERROR err;
     esp_gatt_rsp_t rsp;
 
@@ -1024,7 +1064,8 @@ void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)
     // Send a zero-length response.
     memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
     rsp.attr_value.handle = param->read.handle;
-    err                   = esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
+    ret                   = esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
@@ -1033,6 +1074,7 @@ void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)
 
 void BLEManagerImpl::HandleTXCharCCCDRead(esp_ble_gatts_cb_param_t * param)
 {
+    int ret;
     CHIP_ERROR err;
     CHIPoBLEConState * conState;
     esp_gatt_rsp_t rsp;
@@ -1050,8 +1092,9 @@ void BLEManagerImpl::HandleTXCharCCCDRead(esp_ble_gatts_cb_param_t * param)
         rsp.attr_value.len      = 2;
         rsp.attr_value.value[0] = conState->Subscribed ? 1 : 0;
     }
-    err = esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id,
+    ret = esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id,
                                       (conState != NULL) ? ESP_GATT_OK : ESP_GATT_INTERNAL_ERROR, &rsp);
+    err = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
