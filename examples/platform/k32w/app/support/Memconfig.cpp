@@ -26,6 +26,7 @@
 #include "FreeRTOS.h"
 #include <cstring>
 #include <stdlib.h>
+#include <malloc.h>
 
 #ifndef NDEBUG
 #include <atomic>
@@ -74,8 +75,8 @@ void * __wrap_realloc(void * ptr, size_t new_size)
         {
             if (ptr)
             {
-                // possibly copying beyond ptr + size
-                memcpy(new_ptr, ptr, new_size);
+                memset(new_ptr, 0, new_size);
+                memcpy(new_ptr, ptr, malloc_usable_size(ptr));
                 vPortFree(ptr);
             }
             return new_ptr;
@@ -89,22 +90,22 @@ void * __wrap_realloc(void * ptr, size_t new_size)
     return NULL;
 }
 
-} // extern "C"
-
-void * __wrap_malloc_r(void * REENT, size_t size)
+void * __wrap__malloc_r(void * REENT, size_t size)
 {
     return __wrap_malloc(size);
 }
 
-void __wrap_free_r(void * REENT, void * ptr)
+void __wrap__free_r(void * REENT, void * ptr)
 {
     __wrap_free(ptr);
 }
 
-void * __wrap_realloc_r(void * REENT, void * ptr, size_t new_size)
+void * __wrap__realloc_r(void * REENT, void * ptr, size_t new_size)
 {
     return __wrap_realloc(ptr, new_size);
 }
+
+} // extern "C"
 
 } // namespace Platform
 } // namespace chip
