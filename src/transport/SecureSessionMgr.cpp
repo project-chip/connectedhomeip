@@ -266,6 +266,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     {
         state->SetPeerAddress(peerAddr.Value());
     }
+    else if (peerAddr.HasValue() && peerAddr.Value().GetTransportType() == Transport::Type::kBle)
+    {
+        state->SetPeerAddress(peerAddr.Value());
+    }
     else if (peerAddr.HasValue() &&
              (peerAddr.Value().GetTransportType() == Transport::Type::kTcp ||
               peerAddr.Value().GetTransportType() == Transport::Type::kUdp))
