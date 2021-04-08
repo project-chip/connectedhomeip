@@ -233,19 +233,19 @@ private:
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
 
     CHIP_ERROR SendPBKDFParamRequest();
-    CHIP_ERROR HandlePBKDFParamRequest(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamRequest(const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendPBKDFParamResponse();
-    CHIP_ERROR HandlePBKDFParamResponse(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamResponse(const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendMsg1();
 
-    CHIP_ERROR HandleMsg1_and_SendMsg2(const PacketHeader & header, const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg2_and_SendMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg1_and_SendMsg2(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg2_and_SendMsg3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
 
     void SendErrorMsg(Spake2pErrorType errorCode);
-    void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    void HandleErrorMsg(const System::PacketBufferHandle & msg);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

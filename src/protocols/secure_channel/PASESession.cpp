@@ -367,7 +367,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::HandlePBKDFParamRequest(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandlePBKDFParamRequest(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -439,7 +439,7 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::HandlePBKDFParamResponse(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandlePBKDFParamResponse(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -514,7 +514,7 @@ CHIP_ERROR PASESession::SendMsg1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -583,7 +583,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -661,7 +661,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PASESession::HandleMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR PASESession::HandleMsg3(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     const uint8_t * hash        = msg->Start();
@@ -724,7 +724,7 @@ exit:
     Clear();
 }
 
-void PASESession::HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg)
+void PASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
 {
     // Request message processing
     const uint8_t * buf    = msg->Start();
@@ -766,27 +766,27 @@ void PASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
     case Protocols::SecureChannel::MsgType::PBKDFParamRequest:
-        err = HandlePBKDFParamRequest(packetHeader, msg);
+        err = HandlePBKDFParamRequest(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::PBKDFParamResponse:
-        err = HandlePBKDFParamResponse(packetHeader, msg);
+        err = HandlePBKDFParamResponse(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::PASE_Spake2p1:
-        err = HandleMsg1_and_SendMsg2(packetHeader, msg);
+        err = HandleMsg1_and_SendMsg2(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::PASE_Spake2p2:
-        err = HandleMsg2_and_SendMsg3(packetHeader, msg);
+        err = HandleMsg2_and_SendMsg3(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::PASE_Spake2p3:
-        err = HandleMsg3(packetHeader, msg);
+        err = HandleMsg3(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::PASE_Spake2pError:
-        HandleErrorMsg(packetHeader, msg);
+        HandleErrorMsg(msg);
         break;
 
     default:
