@@ -38,6 +38,7 @@ chip_data_model("all-clusters-common") {
     "media-input-server",
     "media-playback-server",
     "network-commissioning",
+    "occupancy-sensor-server",
     "on-off-server",
     "operational-credentials",
     "ota-server",
