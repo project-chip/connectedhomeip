@@ -25,6 +25,7 @@ chip_test_suite("tests") {
     "TestCommandInteraction.cpp",
     "TestMessageDef.cpp",
     "TestReadInteraction.cpp",
+    "TestReportingEngine.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
