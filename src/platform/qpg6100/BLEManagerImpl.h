@@ -26,8 +26,8 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "FreeRTOS.h"
-#include "timers.h"
 #include "qvCHIP.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -96,8 +96,8 @@ private:
         kAdvertising              = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
         kDeviceNameSet            = 0x0020, /**< The device name has been set. */
-        kRestartAdvertising       = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
-                                                  flag is set*/
+        kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
+                                            flag is set*/
     };
 
     enum

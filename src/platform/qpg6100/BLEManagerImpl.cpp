@@ -91,15 +91,15 @@ CHIP_ERROR BLEManagerImpl::_Init()
     qvCHIP_BleInit(&appCbacks);
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                         1, // == default timer period (mS)
-                                         false,               // no timer reload (==one-shot)
-                                         (void *) this,       // init timer id = ble obj context
-                                         BleAdvTimeoutHandler // timer callback handler
- 										);
-     VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
+                                       1,                   // == default timer period (mS)
+                                       false,               // no timer reload (==one-shot)
+                                       (void *) this,       // init timer id = ble obj context
+                                       BleAdvTimeoutHandler // timer callback handler
+    );
+    VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
-     PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Init() complete");
@@ -516,14 +516,14 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        intervalMin = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
-        intervalMax = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        intervalMin   = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        intervalMax   = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
         bleAdvTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
     }
     else
     {
-        intervalMin = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        intervalMax = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        intervalMin   = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        intervalMax   = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
         bleAdvTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
     }
 
@@ -909,44 +909,43 @@ void BLEManagerImpl::_handleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event)
 }
 
 void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
- {
-     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
-     {
-         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-     }
-     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
-     {
-         // Advertisement time expired. Stop advertising
-         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
-         BLEMgr().SetAdvertisingEnabled(false);
-     }
- }
+{
+    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    }
+    else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
+    {
+        // Advertisement time expired. Stop advertising
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
+        BLEMgr().SetAdvertisingEnabled(false);
+    }
+}
 
- void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
- {
-     if (xTimerStop(sbleAdvTimeoutTimer, 0) == pdFAIL)
-     {
-         ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
-     }
- }
+void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
+{
+    if (xTimerStop(sbleAdvTimeoutTimer, 0) == pdFAIL)
+    {
+        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+    }
+}
 
- void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
- {
-     if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
-     {
+void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
+    {
         CancelBleAdvTimeoutTimer();
-     }
+    }
 
-     // timer is not active, change its period to required value (== restart).
-     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
-     // cannot immediately be sent to the timer command queue.
-     if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), 100) != pdPASS)
-     {
-         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
-     }
- }
-
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), 100) != pdPASS)
+    {
+        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
+    }
+}
 
 } // namespace Internal
 } // namespace DeviceLayer
