@@ -30,10 +30,6 @@
 #include <new>
 #include <utility>
 
-#ifndef WEAK
-#define WEAK __attribute__((weak))
-#endif
-
 namespace chip {
 namespace Platform {
 
