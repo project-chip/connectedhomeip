@@ -25,8 +25,8 @@
 
 #include "FreeRTOS.h"
 #include <cstring>
-#include <stdlib.h>
 #include <malloc.h>
+#include <stdlib.h>
 
 #ifndef NDEBUG
 #include <atomic>
