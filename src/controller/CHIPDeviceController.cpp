@@ -751,11 +751,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(status);
-    }
-
     // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.
     if (mDeviceBeingPaired != kNumMaxActiveDevices && mStorageDelegate != nullptr)
     {
@@ -768,6 +763,11 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
     }
 
     mDeviceBeingPaired = kNumMaxActiveDevices;
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(status);
+    }
 }
 
 void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
