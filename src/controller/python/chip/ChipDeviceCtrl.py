@@ -32,7 +32,7 @@ from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
-from .interaction_model import IMDelegate as im
+from .interaction_model import delegate as im
 import enum
 
 

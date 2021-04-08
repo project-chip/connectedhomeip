@@ -36,8 +36,6 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
-    "ChipDeviceController-InteractionModelDelegate.cpp",
-    "ChipDeviceController-InteractionModelDelegate.h",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
     "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
@@ -46,6 +44,8 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
     "chip/clusters/CHIPClusters.cpp",
+    "chip/interaction_model/Delegate.cpp",
+    "chip/interaction_model/Delegate.h",
     "chip/internal/ChipThreadWork.cpp",
     "chip/internal/ChipThreadWork.h",
     "chip/internal/CommissionerImpl.cpp",
@@ -106,7 +106,7 @@ pw_python_action("python") {
         "chip/clusters/__init__.py",
         "chip/configuration/__init__.py",
         "chip/exceptions/__init__.py",
-        "chip/interaction_model/IMDelegate.py",
+        "chip/interaction_model/delegate.py",
         "chip/internal/__init__.py",
         "chip/internal/commissioner.py",
         "chip/internal/thread.py",
