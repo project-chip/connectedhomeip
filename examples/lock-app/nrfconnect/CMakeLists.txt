@@ -66,4 +66,4 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp)
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp)
