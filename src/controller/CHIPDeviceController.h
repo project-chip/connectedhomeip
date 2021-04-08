@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -54,6 +55,9 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
+#if CHIP_ENABLE_INTERACTION_MODEL
+    app::InteractionModelDelegate * imDelegate = nullptr;
+#endif
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -113,7 +117,9 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate,
+                                    public PersistentStorageResultDelegate,
+                                    public app::InteractionModelDelegate
 {
 public:
     DeviceController();
