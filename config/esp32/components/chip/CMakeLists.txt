@@ -30,7 +30,7 @@ if(NOT CHIP_ROOT)
 endif()
 
 idf_component_register(SRCS chip.c chip.cpp
-                       PRIV_REQUIRES freertos lwip bt mdns mbedtls)
+                       PRIV_REQUIRES freertos lwip bt mdns mbedtls fatfs)
 
 # Prepare initial args file (lacking compile flags)
 # This will be saved as args.gn.in
@@ -105,7 +105,7 @@ externalproject_add(
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
-    BUILD_COMMAND           ninja
+    BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
     WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}

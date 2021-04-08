@@ -46,6 +46,10 @@ declare_args() {
       (chip_device_platform == "linux" || chip_device_platform == "darwin" ||
        chip_device_platform == "cc13x2_26x2")
 
+  # Enable NFC support
+  chip_enable_nfc = false
+
+  # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32") {
     chip_mdns = "minimal"
   } else if (chip_device_platform == "darwin") {

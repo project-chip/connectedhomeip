@@ -24,6 +24,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
+#include <support/Span.h>
 
 using namespace chip;
 
@@ -54,6 +55,7 @@ struct Options
     // operational params
     uint64_t fabricId = 12345;
     uint64_t nodeId   = 6789;
+    uint8_t mac[6]    = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 
 } gOptions;
 
@@ -219,6 +221,7 @@ int main(int argc, char ** args)
                                                                       .SetPort(CHIP_PORT)
                                                                       .SetShortDiscriminator(gOptions.shortDiscriminator)
                                                                       .SetLongDiscrimininator(gOptions.longDiscriminator)
+                                                                      .SetMac(chip::ByteSpan(gOptions.mac, 6))
                                                                       .SetVendorId(gOptions.vendorId)
                                                                       .SetProductId(gOptions.productId));
     }
@@ -227,6 +230,7 @@ int main(int argc, char ** args)
         err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::OperationalAdvertisingParameters()
                                                                       .EnableIpV4(gOptions.enableIpV4)
                                                                       .SetPort(CHIP_PORT)
+                                                                      .SetMac(chip::ByteSpan(gOptions.mac, 6))
                                                                       .SetFabricId(gOptions.fabricId)
                                                                       .SetNodeId(gOptions.nodeId));
     }

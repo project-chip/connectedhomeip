@@ -77,6 +77,12 @@ public:
         return mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
     }
 
+    void Close()
+    {
+        TransportMgrBase::Close();
+        mTransport.Close();
+    };
+
 private:
     Transport::Tuple<TransportTypes...> mTransport;
 };

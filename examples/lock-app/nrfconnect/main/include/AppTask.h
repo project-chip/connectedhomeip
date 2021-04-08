@@ -60,10 +60,6 @@ private:
 
     void StartTimer(uint32_t aTimeoutInMs);
 
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    int StartNFCTag();
-#endif
-
     enum Function_t
     {
         kFunction_NoneSelected   = 0,

@@ -85,10 +85,9 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
         goto exit;
     }
 
-    // Remove the EC from the app state now. OnMessageReceived can call
-    // SendCommandRequest and install a new one. We abort rather than close
-    // because we no longer care whether the echo request message has been
-    // acknowledged at the transport layer.
+    // Close the current exchange after receiving the response since the response message marks the
+    // end of conversation represented by the exchange. We should create an new exchange for a new
+    // conversation defined in Interaction Model protocol.
     ClearExistingExchangeContext();
 
     err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
@@ -96,6 +95,17 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 
 exit:
     Reset();
+    if (mpDelegate != nullptr)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            mpDelegate->CommandResponseError(this, err);
+        }
+        else
+        {
+            mpDelegate->CommandResponseProcessed(this);
+        }
+    }
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -106,7 +116,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
     if (mpDelegate != nullptr)
     {
-        mpDelegate->CommandResponseTimeout(this);
+        mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
 }
 
@@ -124,13 +134,11 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     StatusElement::Parser statusElementParser;
 
     mCommandIndex++;
-
     err = aCommandElement.GetCommandPath(&commandPath);
     SuccessOrExit(err);
 
     err = commandPath.GetClusterId(&clusterId);
     SuccessOrExit(err);
-
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
@@ -143,7 +151,6 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         // Response has status element since either there is error in command response or it is empty response
         err = statusElementParser.CheckSchemaValidity();
         SuccessOrExit(err);
-
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)

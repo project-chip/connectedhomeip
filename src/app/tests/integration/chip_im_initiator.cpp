@@ -227,16 +227,30 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR CommandResponseProcessed(const chip::app::CommandSender * apCommandSender) override
+    {
+
+        uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
+        uint32_t transitTime = respTime - gLastMessageTime;
+
+        gCommandRespCount++;
+
+        printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
+               static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
+        gCond.notify_one();
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR CommandResponseProtocolError(const chip::app::CommandSender * apCommandSender, uint8_t aCommandIndex) override
     {
         printf("CommandResponseProtocolError happens with CommandIndex %d", aCommandIndex);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR CommandResponseTimeout(const chip::app::CommandSender * apCommandSender) override
+    CHIP_ERROR CommandResponseError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
-        printf("CommandResponseTimeout happens");
-        return CHIP_NO_ERROR;
+        printf("CommandResponseError happens with %d", aError);
+        return aError;
     }
 };
 
@@ -253,19 +267,10 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         return;
     }
 
-    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gLastMessageTime;
-
     if (aReader.GetLength() != 0)
     {
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
-    gCommandRespCount++;
-
-    printf("Command Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) time=%.3fms\n", gCommandRespCount, gCommandCount,
-           static_cast<double>(gCommandRespCount) * 100 / gCommandCount, static_cast<double>(transitTime) / 1000);
-
-    gCond.notify_one();
 }
 } // namespace app
 } // namespace chip
