@@ -146,18 +146,6 @@ public:
 
     /**
      * @brief
-     *   Handler for peer's messages, exchanged during pairing handshake.
-     *
-     * @param packetHeader      Message header for the received message
-     * @param peerAddress Source of the message
-     * @param msg         Message sent by the peer
-     * @return CHIP_ERROR The result of message processing
-     */
-    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                         System::PacketBufferHandle msg);
-
-    /**
-     * @brief
      *  Return the associated peer key id
      *
      * @return uint16_t The associated peer key id
@@ -335,12 +323,6 @@ public:
 
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, uint16_t myKeyId,
                     SessionEstablishmentDelegate * delegate)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                 System::PacketBufferHandle msg) override
     {
         return CHIP_NO_ERROR;
     }

@@ -19,18 +19,9 @@
 
 #include <protocols/secure_channel/RendezvousSession.h>
 
-#include <core/CHIPEncoding.h>
-#include <core/CHIPSafeCasts.h>
-#include <platform/internal/DeviceNetworkInfo.h>
-#include <protocols/secure_channel/RendezvousSession.h>
-#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
-#include <support/SafeInt.h>
-#include <transport/SecureMessageCodec.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
-#include <transport/raw/PeerAddress.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>

@@ -346,10 +346,10 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     VerifyOrReturnError(rc != nullptr, err);
 
-    const ExchangeTransport * transport = entry->rc->mExchange->GetTransport();
+    const ExchangeTransport * transport = rc->mExchange->GetTransport();
     VerifyOrExit(transport != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = transport->ResendMessage(entry->rc->mExchange->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
+    err = transport->ResendMessage(rc->mExchange->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
     SuccessOrExit(err);
 
     // Update the counters

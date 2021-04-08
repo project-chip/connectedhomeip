@@ -803,20 +803,4 @@ exit:
     }
 }
 
-CHIP_ERROR PASESession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBufferHandle msg)
-{
-    PayloadHeader payloadHeader;
-
-    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
-
-    OnMessageReceived(mExchangeCtxt, packetHeader, payloadHeader, std::move(msg));
-
-    mConnectionState.SetPeerAddress(peerAddress);
-
-    return CHIP_NO_ERROR;
-}
-
 } // namespace chip
