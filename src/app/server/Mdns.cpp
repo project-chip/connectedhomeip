@@ -21,6 +21,7 @@
 
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <support/Span.h>
@@ -94,12 +95,14 @@ CHIP_ERROR AdvertiseOperational()
 
     uint8_t mac[8];
 
-    const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
-                                         .SetFabricId(fabricId)
-                                         .SetNodeId(GetCurrentNodeId())
-                                         .SetMac(FillMAC(mac))
-                                         .SetPort(CHIP_PORT)
-                                         .EnableIpV4(true);
+    const auto advertiseParameters =
+        chip::Mdns::OperationalAdvertisingParameters()
+            .SetFabricId(fabricId)
+            .SetNodeId(GetCurrentNodeId())
+            .SetMac(FillMAC(mac))
+            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+            .SetPort(CHIP_PORT)
+            .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 

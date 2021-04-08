@@ -455,6 +455,11 @@ CHIP_ERROR ThreadStackManagerImpl::_GetExternalIPv6Address(chip::Inet::IPAddress
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

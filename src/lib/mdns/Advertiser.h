@@ -89,9 +89,23 @@ public:
     }
     uint64_t GetNodeId() const { return mNodeId; }
 
+    OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
+    {
+        mCrmpRetryIntervalIdle   = intervalIdle;
+        mCrmpRetryIntervalActive = intervalActive;
+        return *this;
+    }
+    void GetCRMPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
+    {
+        intervalIdle   = mCrmpRetryIntervalIdle;
+        intervalActive = mCrmpRetryIntervalActive;
+    }
+
 private:
-    uint64_t mFabricId = 0;
-    uint64_t mNodeId   = 0;
+    uint64_t mFabricId                = 0;
+    uint64_t mNodeId                  = 0;
+    uint32_t mCrmpRetryIntervalIdle   = 0;
+    uint32_t mCrmpRetryIntervalActive = 0;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>
