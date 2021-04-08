@@ -645,7 +645,7 @@ int ISM43362Interface::socket_sendto(void *handle, const SocketAddress &addr, co
     _mutex.lock();
     struct ISM43362_socket *socket = (struct ISM43362_socket *)handle;
 
-    if (socket->proto == NSAPI_UDP)
+    if (socket->proto == NSAPI_UDP && !socket->connected)
     {
         ret = socket_connect_nolock(handle, addr);
         if (ret != NSAPI_ERROR_OK)
