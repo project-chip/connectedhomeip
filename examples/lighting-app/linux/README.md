@@ -109,13 +109,12 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   As part of building the example with RPCs enabled the lighting_app python
     interactive console is installed into your venv. The python wheel files are
-    also created in the output folder: out/debug/lighting_app_wheels
-    To install the wheel files without rebuilding:
+    also created in the output folder: out/debug/lighting_app_wheels To install
+    the wheel files without rebuilding:
     `pip3 install out/debug/lighting_app_wheels/*.whl`
 
 -   To use the lighting-app console after it has been installed run:
     `python3 -m lighting_app.rpc_console -s localhost:33000 -o /<YourFolder>/pw_log.out`
 
 -   Then you can Get and Set the light using the RPCs:
-    `rpcs.chip.rpc.Lighting.Get()`
-    `rpcs.chip.rpc.Lighting.Set(on=True)`
+    `rpcs.chip.rpc.Lighting.Get()` `rpcs.chip.rpc.Lighting.Set(on=True)`
