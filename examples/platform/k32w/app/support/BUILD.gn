@@ -22,6 +22,7 @@ import("$dir_pw_unit_test/test.gni")
 
 config("support_config") {
   include_dirs = [ "../../.." ]
+
   # Link options that provides replace dynamic memory operations in standard
   # library with the pigweed malloc.
   ldflags = [
