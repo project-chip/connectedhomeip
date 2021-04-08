@@ -92,7 +92,7 @@ class ChipDeviceController(object):
         def HandleKeyExchangeComplete(err):
             if err != 0:
                 print("Failed to establish secure session to device: {}".format(err))
-                self._ChipStack.callbackRes = False
+                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(err)
             else:
                 print("Secure Session to Device Established")
                 self._ChipStack.callbackRes = True
