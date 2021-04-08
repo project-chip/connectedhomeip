@@ -126,7 +126,7 @@ def FormatZCLArguments(args, command):
 
 
 class DeviceMgrCmd(Cmd):
-    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=0):
+    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=None):
         self.lastNetworkId = None
 
         Cmd.__init__(self)
@@ -146,7 +146,7 @@ class DeviceMgrCmd(Cmd):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
-        if sys.platform.startswith("linux") and bluetoothAdapter != 0:
+        if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
             self.bleMgr = BleManager(self.devCtrl)
             self.bleMgr.ble_adapter_select("hci{}".format(bluetoothAdapter))
 
@@ -599,7 +599,7 @@ def main():
         print("Unexpected argument: %s" % remainingArgs[0])
         sys.exit(-1)
 
-    adapterId = 0
+    adapterId = None
     if sys.platform.startswith("linux"):
         if not options.bluetoothAdapter.startswith("hci"):
             print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")

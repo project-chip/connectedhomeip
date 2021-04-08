@@ -32,6 +32,7 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
   setupPinCode = 73141520
+  enable_heap_monitoring = false
 }
 
 show_qr_code = true
@@ -57,6 +58,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "SL_HEAP_SIZE=(10 * 1024)",
   ]
 
   if (enable_pw_rpc) {
@@ -138,10 +140,15 @@ efr32_executable("lighting_app") {
 
   output_dir = root_out_dir
 
+  if (enable_heap_monitoring) {
+    defines += [ "HEAP_MONITORING" ]
+    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+  }
+
   if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG12P.ld"
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]

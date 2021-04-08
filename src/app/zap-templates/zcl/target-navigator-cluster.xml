@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>General</domain>
+    <name>Target Navigator</name>
+    <code>0x0505</code>
+    <define>TARGET_NAVIGATOR_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.</description>
+
+    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST" type="OCTET_STRING" length="32" writable="false" optional="false">target navigator list</attribute>
+    <attribute side="server" code="0x0001" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current navigator target</attribute>
+
+    <command source="client" code="0x00" name="NavigateTarget" optional="false">
+      <description>Upon receipt, this SHALL navigation the UX to the target identified.</description>
+      <arg name="target" type="INT8U"/>
+      <arg name="data" type="CHAR_STRING"/>
+    </command>
+
+    <command source="server" code="0x00" name="NavigateTargetResponse" optional="false">
+      <description>This command SHALL be generated in response to NavigateTarget commands.</description>
+      <arg name="status" type="NavigateTargetStatus"/>
+      <arg name="data" type="CHAR_STRING"/>
+    </command>
+  </cluster>
+  
+  <enum name="NavigateTargetStatus" type="ENUM8">
+      <item name="Success" value="0x00"/>
+      <item name="AppNotAvailable" value="0x01"/>
+      <item name="SystemBusy" value="0x02"/>
+  </enum>
+
+  <struct name="NavigateTargetTargetInfo">
+      <item name="identifier" type="INT8U"/>
+      <item name="name" type="CHAR_STRING"/>
+  </struct>
+</configurator>

@@ -20,6 +20,7 @@
 #include <setup_payload/SetupPayload.h>
 
 void PrintOnboardingCodes(chip::RendezvousInformationFlags rendezvousFlags);
+void ShareQRCodeOverNFC(chip::RendezvousInformationFlags rendezvousFlags);
 CHIP_ERROR GetQRCode(std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags);
 CHIP_ERROR GetManualPairingCode(std::string & manualPairingCode, chip::RendezvousInformationFlags rendezvousFlags);
 

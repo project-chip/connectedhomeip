@@ -167,7 +167,7 @@ CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input
     bbuf.Put(&input[consumed], length);
 
     consumed += bbuf.Needed();
-    bbuf.Put('\0');
+    bbuf.Put(static_cast<uint8_t>('\0'));
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 

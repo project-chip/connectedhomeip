@@ -261,6 +261,7 @@ SECTIONS
     __end__ = .;
     end = __end__;
     _end = __end__;
+    KEEP(*(.heap*))
     __HeapLimit = .;
   } > RAM
 

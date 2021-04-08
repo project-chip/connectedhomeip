@@ -1,5 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,24 +18,18 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceLayer.h>
+#ifdef HEAP_MONITORING
+#include "FreeRTOS.h"
 
-#include <nfc_t2t_lib.h>
+#define MONITORING_STACK_SIZE_byte 1024
 
-class NFCWidget
+class MemMonitoring
 {
 public:
-    int Init(chip::DeviceLayer::ConnectivityManager & mgr);
-    int StartTagEmulation(const char * tagPayload, uint8_t tagPayloadLength);
-    int StopTagEmulation();
-    bool IsTagEmulationStarted() const;
+    static void startHeapMonitoring();
 
 private:
-    static void FieldDetectionHandler(void * context, enum nfc_t2t_event event, const uint8_t * data, size_t data_length);
-
-    constexpr static uint8_t mNdefBufferSize = 128;
-
-    uint8_t mNdefBuffer[mNdefBufferSize];
-
-    bool mIsTagStarted;
+    static void HeapMonitoring(void * pvParameter);
 };
+
+#endif
