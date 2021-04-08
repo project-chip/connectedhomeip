@@ -325,6 +325,14 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
+void SecureSessionMgr::HandleGroupMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf)
+{
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
+    VerifyOrReturn(state != nullptr, ChipLogError(Inet, "Failed to find the peer connection state"));
+
+    OnMessageReceived(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+}
+
 void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
                                          System::PacketBufferHandle msg)
 {
@@ -335,7 +343,6 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     PacketBufferHandle origMsg;
     PayloadHeader payloadHeader;
 
-    bool peerGroupMsgIdNotSynchronized  = false;
     Transport::AdminPairingInfo * admin = nullptr;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
@@ -355,6 +362,23 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
             ChipLogError(Inet, "Secure transport received message, but destination node ID doesn't match our node ID, discarding"));
     }
     mPeerConnections.MarkConnectionActive(state);
+
+    if (!packetHeader.IsSecureSessionControlMsg() && !state->IsPeerMsgCounterSynced() &&
+        ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()))
+    {
+        // Queue the message as needed for sync with destination node.
+        if (mCB != nullptr)
+        {
+            err = mCB->QueueReceivedMessageAndSync(state, std::move(msg));
+            VerifyOrReturn(err == CHIP_NO_ERROR);
+        }
+
+        // After the message that triggers message counter synchronization is stored, and a message counter
+        // synchronization exchange is initiated, we need to return immediately and re-process the original message
+        // when the synchronization is completed.
+
+        return;
+    }
 
     // Decode the message
     VerifyOrReturn(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg));
@@ -380,20 +404,11 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         {
             state->SetPeerMessageIndex(packetHeader.GetMessageId());
         }
-
-        // For all group messages, Set flag if peer group key message counter is not synchronized.
-        if (ChipKeyId::IsAppGroupKey(packetHeader.GetEncryptionKeyID()))
-        {
-            peerGroupMsgIdNotSynchronized = true;
-        }
     }
 
     if (mCB != nullptr)
     {
         SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
-
-        session.SetPeerGroupMsgIdNotSynchronized(peerGroupMsgIdNotSynchronized);
-
         mCB->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msg), this);
     }
 

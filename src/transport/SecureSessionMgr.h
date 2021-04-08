@@ -57,9 +57,6 @@ public:
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
 
-    bool IsPeerGroupMsgIdNotSynchronized() const { return mPeerGroupMsgIdNotSynchronized; }
-    void SetPeerGroupMsgIdNotSynchronized(bool value) { mPeerGroupMsgIdNotSynchronized = value; }
-
     bool operator==(const SecureSessionHandle & that) const
     {
         return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
@@ -77,8 +74,6 @@ private:
     //       to identify an approach that'll allow looking up the corresponding information for
     //       such sessions.
     Transport::AdminId mAdmin;
-
-    bool mPeerGroupMsgIdNotSynchronized = false;
 };
 
 /**
@@ -201,6 +196,22 @@ public:
      */
     virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
+    /**
+     * @brief
+     *   Called when received message from a source node whose message counter is unknown.
+     *   Queue the message and start sync if the sync procedure is not started yet.
+     *
+     * @param state    A pointer to the state of peer connection
+     * @param msgBuf   The received message
+     *
+     * @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left to queue the message.
+     * @retval  #CHIP_NO_ERROR On success.
+     */
+    virtual CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     virtual ~SecureSessionMgrDelegate() {}
 };
 
@@ -281,6 +292,16 @@ public:
      *  of the object and reset it's state.
      */
     void Shutdown();
+
+    /**
+     * @brief
+     *   Called when a cached group message that was waiting for message counter
+     *   sync shold be reprocessed.
+     *
+     * @param packetHeader  The message header
+     * @param msgBuf        The received message
+     */
+    void HandleGroupMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
