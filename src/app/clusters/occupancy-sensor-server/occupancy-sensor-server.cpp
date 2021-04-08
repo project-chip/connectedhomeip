@@ -193,3 +193,7 @@ static void checkForReportingConfig(void)
 }
 
 void emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
+
+HalOccupancySensorType __attribute__((weak)) halOccupancyGetSensorType(chip::EndpointId endpoint) {
+    return HAL_OCCUPANCY_SENSOR_TYPE_PIR;
+}
