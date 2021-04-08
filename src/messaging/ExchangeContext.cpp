@@ -310,14 +310,12 @@ void ExchangeContext::ForceFree()
 
     ExchangeManager * em = mExchangeMgr;
 
-    // Clear protocol callbacks
     if (mDelegate != nullptr)
     {
         mDelegate->OnExchangeClosing(this);
     }
     mDelegate = nullptr;
 
-    // Cancel the response timer.
     CancelResponseTimer();
 
     mExchangeMgr = nullptr;
