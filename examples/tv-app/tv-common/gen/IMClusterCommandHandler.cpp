@@ -109,7 +109,7 @@ else if (1 != validArgumentCount)
             break;
         }
         case ZCL_BARRIER_CONTROL_STOP_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfBarrierControlClusterBarrierControlStopCallback();
                     break;
@@ -1980,13 +1980,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         switch (commandId)
         {
         case ZCL_CLEAR_ALL_PINS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfDoorLockClusterClearAllPinsCallback();
                     break;
         }
         case ZCL_CLEAR_ALL_RFIDS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfDoorLockClusterClearAllRfidsCallback();
                     break;
@@ -3939,7 +3939,7 @@ else if (2 != validArgumentCount)
             break;
         }
         case ZCL_REMOVE_ALL_GROUPS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfGroupsClusterRemoveAllGroupsCallback();
                     break;
@@ -4247,7 +4247,7 @@ else if (1 != validArgumentCount)
             break;
         }
         case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfIdentifyClusterIdentifyQueryCallback();
                     break;
@@ -4946,7 +4946,7 @@ else if (2 != validArgumentCount)
             break;
         }
         case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfLevelControlClusterStopWithOnOffCallback();
                     break;
@@ -4971,7 +4971,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         switch (commandId)
         {
         case ZCL_SLEEP_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfLowPowerClusterSleepCallback();
                     break;
@@ -5901,19 +5901,19 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         switch (commandId)
         {
         case ZCL_OFF_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterOffCallback();
                     break;
         }
         case ZCL_ON_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterOnCallback();
                     break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterToggleCallback();
                     break;

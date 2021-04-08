@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Barrier Control
- *    
+ *
  */
 @interface CHIPBarrierControl : CHIPCluster
 
@@ -63,7 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Color Control
- *    
+ *
  */
 @interface CHIPColorControl : CHIPCluster
 
@@ -163,7 +163,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Cluster Door Lock
- *    
+ *
  */
 @interface CHIPDoorLock : CHIPCluster
 

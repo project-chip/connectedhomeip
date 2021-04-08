@@ -29,4 +29,3 @@
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginOccupancyClusterServerPostInitCallback(chip::EndpointId endpoint);
-
