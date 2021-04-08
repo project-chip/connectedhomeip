@@ -293,9 +293,6 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             mParams.GetAdvertisementDelegate()->RendezvousComplete();
         }
 
-        // Release the admin, as the rendezvous is complete.
-        mAdmin = nullptr;
-
         if (mDelegate != nullptr)
         {
             mDelegate->OnRendezvousComplete();
