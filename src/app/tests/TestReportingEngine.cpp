@@ -18,11 +18,12 @@
 
 /**
  *    @file
- *      This file implements unit tests for CHIP Interaction Model Read Interaction
+ *      This file implements unit tests for CHIP Interaction Model Reporting Engine
  *
  */
 
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/Engine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -42,85 +43,32 @@
 #include <nlunit-test.h>
 
 namespace chip {
-System::Layer gSystemLayer;
-SecureSessionMgr gSessionManager;
-Messaging::ExchangeManager gExchangeManager;
-TransportMgr<Transport::UDP> gTransportManager;
-const Transport::AdminId gAdminId = 0;
+static System::Layer gSystemLayer;
+static SecureSessionMgr gSessionManager;
+static Messaging::ExchangeManager gExchangeManager;
+static TransportMgr<Transport::UDP> gTransportManager;
+static const Transport::AdminId gAdminId = 0;
 
 namespace app {
-class TestReadInteraction
+namespace reporting {
+class TestReportingEngine
 {
 public:
-    static void TestReadClient(nlTestSuite * apSuite, void * apContext);
-    static void TestReadHandler(nlTestSuite * apSuite, void * apContext);
-
-private:
-    static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext);
 };
 
-void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(aPayload));
-
-    ReportData::Builder reportDataBuilder;
-
-    err = reportDataBuilder.Init(&writer);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    reportDataBuilder.SuppressResponse(true);
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
-
-    reportDataBuilder.MoreChunkedMessages(false);
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
-
-    reportDataBuilder.EndOfReportData();
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
-
-    err = writer.Finalize(&aPayload);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-}
-
-void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    app::ReadClient readClient;
-
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = readClient.Init(&gExchangeManager, nullptr);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr, 0);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
-
-    GenerateReportData(apSuite, apContext, buf);
-
-    err = readClient.ProcessReportData(std::move(buf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    readClient.Shutdown();
-}
-
-void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContext)
+void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::ReadHandler readHandler;
+    Engine reportingEngine;
     System::PacketBufferTLVWriter writer;
-    System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
 
     err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    readHandler.Init(nullptr);
-
-    GenerateReportData(apSuite, apContext, reportDatabuf);
-    err = readHandler.SendReportData(std::move(reportDatabuf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
-
+    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
     writer.Init(std::move(readRequestbuf));
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -131,15 +79,16 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readHandler.OnReadRequest(nullptr, std::move(readRequestbuf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    readHandler.OnReadRequest(exchangeCtx, std::move(readRequestbuf));
+    reportingEngine.Init();
+    err = reportingEngine.BuildAndSendSingleReportData(&readHandler);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 }
-
+} // namespace reporting
 } // namespace app
 } // namespace chip
 
 namespace {
-
 void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -161,27 +110,21 @@ void InitializeChip(nlTestSuite * apSuite)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
 // clang-format off
 const nlTest sTests[] =
-{
-    NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
-    NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
-    NL_TEST_SENTINEL()
-};
+        {
+                NL_TEST_DEF("CheckBuildAndSendSingleReportData", chip::app::reporting::TestReportingEngine::TestBuildAndSendSingleReportData),
+                NL_TEST_SENTINEL()
+        };
 // clang-format on
-
 } // namespace
 
-int TestReadInteraction()
+int TestReportingEngine()
 {
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "TestReadInteraction",
+        "TestReportingEngine",
         &sTests[0],
         nullptr,
         nullptr
@@ -195,4 +138,4 @@ int TestReadInteraction()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestReadInteraction)
+CHIP_REGISTER_TEST_SUITE(TestReportingEngine)
