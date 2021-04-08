@@ -96,6 +96,7 @@ void PASESession::Clear()
     if (mExchangeCtxt != nullptr)
     {
         mExchangeCtxt->Release();
+        mExchangeCtxt = nullptr;
     }
 }
 
@@ -298,7 +299,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     CHIP_ERROR err = Init(myKeyId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
-    mExchangeCtxt = exchangeCtxt;
+    mExchangeCtxt = exchangeCtxt->Retain();
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
 
     mConnectionState.SetPeerAddress(peerAddress);
