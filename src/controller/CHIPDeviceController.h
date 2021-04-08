@@ -204,6 +204,7 @@ protected:
     Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
+    System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -230,8 +231,6 @@ private:
     void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     void ReleaseAllDevices();
-
-    System::Layer * mSystemLayer;
 };
 
 /**
@@ -357,6 +356,10 @@ private:
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    void OnSessionEstablishmentTimeout();
+
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
     uint16_t mNextKeyId = 0;
 };

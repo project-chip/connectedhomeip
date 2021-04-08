@@ -71,6 +71,8 @@ constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
 
+constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+
 // Maximum key ID is 65535 (given it's uint16_t type)
 constexpr uint16_t kMaxKeyIDStringSize = 6;
 
@@ -647,6 +649,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
 
+    mSystemLayer->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
+
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
@@ -825,10 +829,12 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }
+        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
         break;
 
     case RendezvousSessionDelegate::SecurePairingFailed:
         ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
+        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
@@ -880,6 +886,25 @@ void DeviceCommissioner::ReleaseDevice(Device * device)
 {
     PersistDeviceList();
     DeviceController::ReleaseDevice(device);
+}
+
+void DeviceCommissioner::OnSessionEstablishmentTimeout()
+{
+    VerifyOrReturn(mState == State::Initialized);
+    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+    StopPairing(device->GetDeviceId());
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(CHIP_ERROR_TIMEOUT);
+    }
+}
+
+void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
+{
+    reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 
 } // namespace Controller
