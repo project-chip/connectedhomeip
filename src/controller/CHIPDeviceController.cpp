@@ -144,9 +144,9 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
 #if CHIP_ENABLE_INTERACTION_MODEL
-    mExchangeManager                                     = chip::Platform::New<Messaging::ExchangeManager>();
+    mExchangeManager                                                = chip::Platform::New<Messaging::ExchangeManager>();
     message_counter::MessageCounterManager * gMessageCounterManager = chip::Platform::New<message_counter::MessageCounterManager>();
-    mMessageCounterManager                               = gMessageCounterManager;
+    mMessageCounterManager                                          = gMessageCounterManager;
 #else
     mMessageCounterManager = chip::Platform::New<Transport::DummyMessageCounterManager>();
 #endif

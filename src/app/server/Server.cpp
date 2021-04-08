@@ -43,7 +43,7 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#ifdef CHIP_ENABLE_INTERACTION_MODEL
 #include <protocols/message_counter/MessageCounterManager.h>
 #else
 #include <transport/DummyMessageCounterManager.h>
