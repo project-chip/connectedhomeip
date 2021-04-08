@@ -307,17 +307,19 @@ int main(int argc, char ** args)
 
     printf("Running...\n");
 
-    mdns::Minimal::Server<10> mdnsServer;
+    mdns::Minimal::Server<20> mdnsServer;
     ReportDelegate reporter;
 
     mdnsServer.SetDelegate(&reporter);
 
     {
+
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        if (mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
+        CHIP_ERROR err = mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort);
+        if (err != CHIP_NO_ERROR)
         {
-            printf("Server failed to listen on all interfaces\n");
+            printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));
             return 1;
         }
     }

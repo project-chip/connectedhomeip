@@ -43,8 +43,8 @@ public:
 
 private:
     // Mdns::ResolverDelegate Implementation
-    void OnNodeIdResolved(NodeId nodeId, const Mdns::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error) override;
+    void OnNodeIdResolved(const Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const PeerId & nodeId, CHIP_ERROR error) override;
 
     DeviceController * mController          = nullptr;
     DeviceAddressUpdateDelegate * mDelegate = nullptr;

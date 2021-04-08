@@ -144,7 +144,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "pairing-instruction", kArgumentRequired, kOptionCommisioningPairingInstr },
     { "pairing-hint", kArgumentRequired, kOptionCommisioningPairingHint },
 
-    { "fabrid-id", kArgumentRequired, kOptionOperationalFabricId },
+    { "fabric-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
     nullptr,
 };
@@ -173,7 +173,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Commisionable pairing instruction.\n"
                              "  --pairing-hint <value>\n"
                              "        Commisionable pairing hint.\n"
-                             "  --fabrid-id <value>\n"
+                             "  --fabric-id <value>\n"
                              "  -f <value>\n"
                              "        Operational fabric id.\n"
                              "  --node-id <value>\n"
@@ -227,12 +227,12 @@ int main(int argc, char ** args)
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::OperationalAdvertisingParameters()
-                                                                      .EnableIpV4(gOptions.enableIpV4)
-                                                                      .SetPort(CHIP_PORT)
-                                                                      .SetMac(chip::ByteSpan(gOptions.mac, 6))
-                                                                      .SetFabricId(gOptions.fabricId)
-                                                                      .SetNodeId(gOptions.nodeId));
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
+            chip::Mdns::OperationalAdvertisingParameters()
+                .EnableIpV4(gOptions.enableIpV4)
+                .SetPort(CHIP_PORT)
+                .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                .SetPeerId(PeerId().SetFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
     {

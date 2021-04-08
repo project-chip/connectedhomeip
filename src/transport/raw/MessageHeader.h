@@ -30,18 +30,14 @@
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <core/PeerId.h>
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 
-/// Convenience type to make it clear a number represents a node id.
-typedef uint64_t NodeId;
-
-static constexpr NodeId kUndefinedNodeId = 0ULL;
-static constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
-static constexpr size_t kMaxTagLen       = 16;
+static constexpr size_t kMaxTagLen = 16;
 
 typedef int PacketHeaderFlags;
 

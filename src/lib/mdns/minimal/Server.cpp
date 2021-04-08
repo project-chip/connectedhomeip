@@ -132,6 +132,18 @@ void ServerBase::Shutdown()
     }
 }
 
+bool ServerBase::IsListening() const
+{
+    for (size_t i = 0; i < mEndpointCount; i++)
+    {
+        if (mEndpoints[i].udp != nullptr)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh

@@ -34,29 +34,29 @@ CHIP_ERROR DeviceAddressUpdater::Init(DeviceController * controller, DeviceAddre
     return CHIP_NO_ERROR;
 }
 
-void DeviceAddressUpdater::OnNodeIdResolved(NodeId nodeId, const Mdns::ResolvedNodeData & nodeData)
+void DeviceAddressUpdater::OnNodeIdResolved(const Mdns::ResolvedNodeData & nodeData)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     Device * device  = nullptr;
 
     VerifyOrExit(nodeData.mAddress.Type() != Inet::kIPAddressType_Any, error = CHIP_ERROR_INVALID_ADDRESS);
     VerifyOrExit(mController != nullptr, error = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(error = mController->GetDevice(nodeId, &device));
+    SuccessOrExit(error = mController->GetDevice(nodeData.mPeerId.GetNodeId(), &device));
 
     device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, nodeData.mInterfaceId));
 
 exit:
     if (mDelegate != nullptr)
     {
-        mDelegate->OnAddressUpdateComplete(nodeId, error);
+        mDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), error);
     }
 }
 
-void DeviceAddressUpdater::OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error)
+void DeviceAddressUpdater::OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error)
 {
     if (mDelegate != nullptr)
     {
-        mDelegate->OnAddressUpdateComplete(nodeId, error);
+        mDelegate->OnAddressUpdateComplete(peerId.GetNodeId(), error);
     }
 }
 

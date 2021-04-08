@@ -41,7 +41,9 @@ static_library("mdns") {
   } else if (chip_mdns == "minimal") {
     sources += [
       "Advertiser_ImplMinimalMdns.cpp",
-      "Resolver_ImplNone.cpp",
+      "MinimalMdnsServer.cpp",
+      "MinimalMdnsServer.h",
+      "Resolver_ImplMinimalMdns.cpp",
     ]
     public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
   } else if (chip_mdns == "platform") {

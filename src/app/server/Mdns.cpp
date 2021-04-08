@@ -102,8 +102,7 @@ CHIP_ERROR AdvertiseOperational()
     uint8_t mac[8];
 
     const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
-                                         .SetFabricId(fabricId)
-                                         .SetNodeId(GetCurrentNodeId())
+                                         .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
                                          .SetMac(FillMAC(mac))
                                          .SetPort(CHIP_PORT)
                                          .EnableIpV4(true);

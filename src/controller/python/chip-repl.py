@@ -85,6 +85,16 @@ data.FieldPresent.ThreadExtendedPANId = True
 
 if device.needsNetworkCredentials:
   device.ConnectToThread(ThreadDeviceNetworkInfo.build(data))
+
+######## Node discovery ########
+
+import chip.discovery
+
+chip.discovery.FindAddressAsync(123, 456, lambda x: print("%r", x))
+
+print(chip.discovery.FindAddress(123, 456)
+
+
     '''.strip())
 
 if __name__ == "__main__":
