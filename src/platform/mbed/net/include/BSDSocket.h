@@ -44,7 +44,8 @@ struct BSDSocket : public FileHandle
     {
         if (socket != nullptr)
         {
-            _socket = socket;
+            _socket            = socket;
+            _factory_allocated = true;
         }
         else
         {
@@ -113,13 +114,22 @@ struct BSDSocket : public FileHandle
 
     int close() override
     {
-        delete _socket;
+        if (_factory_allocated)
+        {
+            _socket->close();
+        }
+        else
+        {
+            delete _socket;
+        }
+
         _socket = nullptr;
 
         tr_info("Close %s socket fd %d", _type == MBED_TCP_SOCKET ? "TCP" : "UDP", _fd);
 
-        _fd       = -1;
-        _callback = nullptr;
+        _fd                = -1;
+        _callback          = nullptr;
+        _factory_allocated = false;
         _flags.store(0);
         if (socketName)
         {
@@ -225,6 +235,7 @@ private:
     bool _blocking                  = true;
     bool _inputEnable               = true;
     bool _outputEnable              = true;
+    bool _factory_allocated         = false;
 };
 
 } // namespace mbed

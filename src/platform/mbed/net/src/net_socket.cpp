@@ -313,7 +313,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);;
+    return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);
 }
 
 ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
