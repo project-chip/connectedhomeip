@@ -112,11 +112,7 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isList}}
-{{#if isStruct}}
-static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse(void * context, uint16_t count, _{{type}} * entries)
-{{else}}
 static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
-{{/if}}
 {
     ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse: %lu entries", count);
 
