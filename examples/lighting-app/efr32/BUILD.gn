@@ -18,10 +18,9 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/examples/lighting-app/lighting-common/lighting.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
-
-import("${chip_root}/examples/lighting-app/lighting-common/lighting.gni")
 
 assert(current_os == "freertos")
 
@@ -31,7 +30,11 @@ examples_plat_dir = "${chip_root}/examples/platform/efr32"
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
+
+  # PIN code for PASE session establishment.
   setupPinCode = 73141520
+
+  # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 }
 
@@ -43,16 +46,16 @@ if (efr32_board == "BRD4166A") {
 }
 
 efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
-
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
   defines = [
@@ -65,36 +68,14 @@ efr32_sdk("sdk") {
     sources +=
         [ "${efr32_sdk_root}/hardware/kit/common/drivers/retargetserial.c" ]
     defines += [
-      "HAL_VCOM_ENABLE = 1",
+      "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
     ]
   }
 }
 
 efr32_executable("lighting_app") {
-  include_dirs = []
-  defines = []
   output_name = "chip-efr32-lighting-example.out"
-
-  public_deps = [
-    ":sdk",
-    "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-  ]
-
-  include_dirs += [
-    "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-    "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
@@ -108,16 +89,39 @@ efr32_executable("lighting_app") {
     "src/main.cpp",
   ]
 
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+  ]
+
+  include_dirs = [ "include" ]
+
+  defines = []
+
   if (show_qr_code) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
     defines += [ "DISPLAY_ENABLED" ]
   }
 
   if (enable_pw_rpc) {
-    public_deps += [
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_plat_dir}/PigweedLogger.cpp",
+      "src/Rpc.cpp",
+    ]
+
+    deps += [
       "$dir_pw_assert",
       "$dir_pw_checksum",
+      "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream",
       "$dir_pw_sys_io",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
@@ -129,20 +133,11 @@ efr32_executable("lighting_app") {
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/efr32",
     ]
-
-    sources += [
-      "${chip_root}/examples/common/pigweed/RpcService.cpp",
-      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "src/Rpc.cpp",
-    ]
   }
 
-  output_dir = root_out_dir
-
   if (enable_heap_monitoring) {
-    defines += [ "HEAP_MONITORING" ]
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING" ]
   }
 
   if (efr32_family == "efr32mg12") {
@@ -159,6 +154,8 @@ efr32_executable("lighting_app") {
       "-fstack-usage",
     ]
   }
+
+  output_dir = root_out_dir
 }
 
 group("efr32") {
