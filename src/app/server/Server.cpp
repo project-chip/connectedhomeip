@@ -58,7 +58,7 @@ constexpr bool isRendezvousBypassed()
 #if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
     return true;
 #elif defined(CONFIG_RENDEZVOUS_MODE)
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
+    return static_cast<RendezvousInformationFlag>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlag::kNone;
 #else
     return false;
 #endif

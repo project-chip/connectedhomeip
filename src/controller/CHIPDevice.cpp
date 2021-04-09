@@ -286,7 +286,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     ReturnErrorOnFailure(SendMessage(std::move(outBuffer), header));
 
     setupPayload.version               = 0;
-    setupPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
 
     return CHIP_NO_ERROR;
 }

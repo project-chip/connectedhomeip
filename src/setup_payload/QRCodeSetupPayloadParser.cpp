@@ -383,7 +383,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.rendezvousInformation = static_cast<RendezvousInformationFlags>(dest);
+    outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
     SuccessOrExit(err);
