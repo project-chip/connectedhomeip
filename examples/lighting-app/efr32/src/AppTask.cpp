@@ -124,7 +124,7 @@ int AppTask::Init()
         appError(err);
     }
 
-    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
     err = LightMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
