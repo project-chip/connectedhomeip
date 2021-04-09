@@ -32,6 +32,7 @@ from threading import Thread
 from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
+from .interaction_model import delegate as im
 import enum
 
 
@@ -62,9 +63,11 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=0):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
+        if bluetoothAdapter is None:
+            bluetoothAdapter = 0
         self._ChipStack = ChipStack(bluetoothAdapter=bluetoothAdapter)
         self._dmLib = None
 
@@ -90,7 +93,7 @@ class ChipDeviceController(object):
         def HandleKeyExchangeComplete(err):
             if err != 0:
                 print("Failed to establish secure session to device: {}".format(err))
-                self._ChipStack.callbackRes = False
+                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(err)
             else:
                 print("Secure Session to Device Established")
                 self._ChipStack.callbackRes = True
@@ -105,6 +108,8 @@ class ChipDeviceController(object):
             self.state = DCState.IDLE
             self._ChipStack.callbackRes = err
             self._ChipStack.completeEvent.set()
+
+        im.InitIMDelegate()
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(HandleKeyExchangeComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(self.devCtrl, self.cbHandleKeyExchangeCompleteFunct)
@@ -167,13 +172,19 @@ class ChipDeviceController(object):
 
         return (address.value.decode(), port.value) if error == 0 else None
 
-    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
+    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
         )
 
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
+        im.ClearCommandStatus(commandSenderHandle)
         self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
+        if blocking:
+            # We only send 1 command by this function, so index is always 0
+            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+        return (0, None)
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid):
         device = c_void_p(None)
@@ -258,3 +269,7 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [c_void_p]
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.restype = c_uint32
+
+            self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
+            self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
+

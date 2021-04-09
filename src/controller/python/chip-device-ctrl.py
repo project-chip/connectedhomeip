@@ -126,7 +126,7 @@ def FormatZCLArguments(args, command):
 
 
 class DeviceMgrCmd(Cmd):
-    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=0):
+    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=None):
         self.lastNetworkId = None
 
         Cmd.__init__(self)
@@ -146,7 +146,7 @@ class DeviceMgrCmd(Cmd):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
-        if sys.platform.startswith("linux") and bluetoothAdapter != 0:
+        if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
             self.bleMgr = BleManager(self.devCtrl)
             self.bleMgr.ble_adapter_select("hci{}".format(bluetoothAdapter))
 
@@ -454,15 +454,24 @@ class DeviceMgrCmd(Cmd):
                 # When command takes no arguments, (not command) is True
                 if command == None:
                     raise exceptions.UnknownCommand(args[0], args[1])
-                self.devCtrl.ZCLSend(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
+                err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
+                if err != 0:
+                    print("Failed to receive command response: {}".format(res))
+                elif res != None:
+                    print("Received command status response:")
+                    print(res)
+                else:
+                    print("Success, no status code is attached with response.")
             else:
                 self.do_help("zcl")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
         except Exception as ex:
+            import traceback
             print("An exception occurred during processing input:")
+            traceback.print_exc()
             print(str(ex))
 
     def do_zclread(self, line):
@@ -582,7 +591,7 @@ def main():
         print("Unexpected argument: %s" % remainingArgs[0])
         sys.exit(-1)
 
-    adapterId = 0
+    adapterId = None
     if sys.platform.startswith("linux"):
         if not options.bluetoothAdapter.startswith("hci"):
             print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")

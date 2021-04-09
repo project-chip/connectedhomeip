@@ -43,6 +43,8 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
+#include "chip/interaction_model/Delegate.h"
+
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPDevice.h>
@@ -123,7 +125,7 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                     chip::Controller::Device ** device);
-
+uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device);
 // CHIP Stack objects
 CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
 }
@@ -132,6 +134,9 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
                                                        chip::NodeId localDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    ControllerInitParams initParams{
+        .storageDelegate = &sStorageDelegate,
+    };
 
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
@@ -140,8 +145,12 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     {
         localDeviceId = kDefaultLocalDeviceId;
     }
-    SuccessOrExit(
-        err = (*outDevCtrl)->Init(localDeviceId, ControllerInitParams{ .storageDelegate = &sStorageDelegate }, &sPairingDelegate));
+
+#if CHIP_ENABLE_INTERACTION_MODEL
+    initParams.imDelegate = &PythonInteractionModelDelegate::Instance();
+#endif
+
+    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams, &sPairingDelegate));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
@@ -363,6 +372,12 @@ CHIP_ERROR pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::Device
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
+
+uint64_t pychip_GetCommandSenderHandle(chip::Controller::Device * device)
+{
+    chip::app::CommandSender * sender = device->GetCommandSender();
+    return sender == nullptr ? 0 : reinterpret_cast<uint64_t>(sender);
 }
 
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct)

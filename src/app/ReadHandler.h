@@ -95,6 +95,7 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle aPayload);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
+    bool IsReportable() const { return mState == HandlerState::Reportable; }
 
     virtual ~ReadHandler() = default;
 

@@ -60,7 +60,8 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    bool useTCP = false;
+    bool useTCP      = false;
+    bool disableEcho = false;
 
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
@@ -76,6 +77,11 @@ int main(int argc, char * argv[])
     if ((argc == 2) && (strcmp(argv[1], "--tcp") == 0))
     {
         useTCP = true;
+    }
+
+    if ((argc == 2) && (strcmp(argv[1], "--disable") == 0))
+    {
+        disableEcho = true;
     }
 
     InitializeChip();
@@ -105,15 +111,21 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = gEchoServer.Init(&gExchangeManager);
-    SuccessOrExit(err);
+    if (!disableEcho)
+    {
+        err = gEchoServer.Init(&gExchangeManager);
+        SuccessOrExit(err);
+    }
 
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
                                      chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
-    // Arrange to get a callback whenever an Echo Request is received.
-    gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
+    if (!disableEcho)
+    {
+        // Arrange to get a callback whenever an Echo Request is received.
+        gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
+    }
 
     printf("Listening for Echo requests...\n");
 
@@ -126,7 +138,10 @@ exit:
         exit(EXIT_FAILURE);
     }
 
-    gEchoServer.Shutdown();
+    if (!disableEcho)
+    {
+        gEchoServer.Shutdown();
+    }
 
     ShutdownChip();
 

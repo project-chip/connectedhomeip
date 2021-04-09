@@ -547,6 +547,8 @@
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
 					"-framework",
+					CoreData,
+					"-framework",
 					Foundation,
 					"-framework",
 					CoreBluetooth,

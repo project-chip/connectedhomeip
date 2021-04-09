@@ -104,7 +104,9 @@ void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
 
     // create the channel
     ChannelBuilder channelBuilder;
-    channelBuilder.SetPeerNodeId(ctx.GetDestinationNodeId()).SetForcePeerAddress(ctx.GetAddress());
+    channelBuilder.SetPeerNodeId(ctx.GetDestinationNodeId())
+        .SetForcePeerAddress(ctx.GetAddress())
+        .SetOperationalCredentialSet(&ctx.GetOperationalCredentialSet());
     MockChannelDelegate channelDelegate;
     auto channelHandle = ctx.GetExchangeManager().EstablishChannel(channelBuilder, &channelDelegate);
     return;

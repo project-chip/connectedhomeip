@@ -37,6 +37,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC
+#include <platform/NFCManager.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {

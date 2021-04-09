@@ -324,7 +324,8 @@ void BuildStatusElement(nlTestSuite * apSuite, StatusElement::Builder & aStatusE
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    aStatusElementBuilder.EncodeStatusElement(1, 2, 3, 4).EndOfStatusElement();
+    aStatusElementBuilder.EncodeStatusElement(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure, 2, 3)
+        .EndOfStatusElement();
     err = aStatusElementBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -334,16 +335,19 @@ void ParseStatusElement(nlTestSuite * apSuite, StatusElement::Parser & aStatusEl
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Parser StatusElementParser;
 
-    uint16_t generalCode      = 0;
-    uint32_t protocolId       = 0;
-    uint16_t protocolCode     = 0;
-    chip::ClusterId clusterId = 0;
+    chip::Protocols::SecureChannel::GeneralStatusCode generalCode = chip::Protocols::SecureChannel::GeneralStatusCode::kFailure;
+    uint32_t protocolId                                           = 0;
+    uint16_t protocolCode                                         = 0;
 
     err = aStatusElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = aStatusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &clusterId);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && generalCode == 1 && protocolId == 2 && protocolCode == 3 && clusterId == 4);
+    err = aStatusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
+    NL_TEST_ASSERT(apSuite,
+                   err == CHIP_NO_ERROR &&
+                       static_cast<uint16_t>(generalCode) ==
+                           static_cast<uint16_t>(chip::Protocols::SecureChannel::GeneralStatusCode::kFailure) &&
+                       protocolId == 2 && protocolCode == 3);
 }
 
 void BuildAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::Builder & aAttributeStatusElementBuilder)
@@ -572,6 +576,35 @@ void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser &
         err = reader.ExitContainer(container);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
+}
+
+void BuildCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Builder & aCommandDataElementBuilder)
+{
+    CommandPath::Builder commandPathBuilder = aCommandDataElementBuilder.CreateCommandPathBuilder();
+    NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+    BuildCommandPath(apSuite, commandPathBuilder);
+
+    StatusElement::Builder statusElementBuilder = aCommandDataElementBuilder.CreateStatusElementBuilder();
+    NL_TEST_ASSERT(apSuite, statusElementBuilder.GetError() == CHIP_NO_ERROR);
+    BuildStatusElement(apSuite, statusElementBuilder);
+
+    aCommandDataElementBuilder.EndOfCommandDataElement();
+    NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    CommandPath::Parser commandPathParser;
+    StatusElement::Parser statusElementParser;
+    err = aCommandDataElementParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = aCommandDataElementParser.GetCommandPath(&commandPathParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = aCommandDataElementParser.GetStatusElement(&statusElementParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
 void BuildCommandList(nlTestSuite * apSuite, CommandList::Builder & aCommandListBuilder)
@@ -1073,6 +1106,30 @@ void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
     ParseCommandDataElement(apSuite, commandDataElementParser);
 }
 
+void CommandDataElementWithStatusCodeTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    CommandDataElement::Builder commandDataElementBuilder;
+    CommandDataElement::Parser commandDataElementParser;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    commandDataElementBuilder.Init(&writer);
+    BuildCommandDataElementWithStatusCode(apSuite, commandDataElementBuilder);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    commandDataElementParser.Init(reader);
+    ParseCommandDataElementWithStatusCode(apSuite, commandDataElementParser);
+}
+
 void CommandListTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1222,6 +1279,7 @@ const nlTest sTests[] =
                 NL_TEST_DEF("AttributeDataListTest", AttributeDataListTest),
                 NL_TEST_DEF("AttributeDataVersionListTest", AttributeDataVersionListTest),
                 NL_TEST_DEF("CommandDataElementTest", CommandDataElementTest),
+                NL_TEST_DEF("CommandDataElementWithStatusCodeTest", CommandDataElementWithStatusCodeTest),
                 NL_TEST_DEF("CommandListTest", CommandListTest),
                 NL_TEST_DEF("ReportDataTest", ReportDataTest),
                 NL_TEST_DEF("InvokeCommandTest", InvokeCommandTest),

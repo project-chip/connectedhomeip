@@ -45,6 +45,13 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
     return CHIP_NO_ERROR;
 }
 
+void TransportMgrBase::Close()
+{
+    mSecureSessionMgr = nullptr;
+    mRendezvous       = nullptr;
+    mTransport        = nullptr;
+}
+
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                              System::PacketBufferHandle msg)
 {

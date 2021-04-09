@@ -132,6 +132,7 @@ try:
             'chip.clusters',
             'chip.exceptions',
             'chip.internal',
+            'chip.interaction_model',
             'chip.logging',
             'chip.native',
             'chip.clusters',

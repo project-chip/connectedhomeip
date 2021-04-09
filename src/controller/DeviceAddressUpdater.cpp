@@ -44,6 +44,7 @@ void DeviceAddressUpdater::OnNodeIdResolved(NodeId nodeId, const Mdns::ResolvedN
     SuccessOrExit(error = mController->GetDevice(nodeId, &device));
 
     device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, nodeData.mInterfaceId));
+    mController->PersistDevice(device);
 
 exit:
     if (mDelegate != nullptr)

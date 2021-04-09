@@ -1,5 +1,7 @@
 /*
+ *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,24 +19,33 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceLayer.h>
-
-#include <nfc_t2t_lib.h>
-
-class NFCWidget
+struct AppEvent
 {
-public:
-    int Init(chip::DeviceLayer::ConnectivityManager & mgr);
-    int StartTagEmulation(const char * tagPayload, uint8_t tagPayloadLength);
-    int StopTagEmulation();
-    bool IsTagEmulationStarted() const;
+    enum class EventType
+    {
+        None = 0,
+        // Button events
+        ButtonPressed,
+        ButtonReleased,
+        // Window cover events
+        CoverStatusChange,
+        CoverTypeChange,
+        CoverTiltModeChange,
+        CoverLiftUp,
+        CoverLiftDown,
+        CoverTiltUp,
+        CoverTiltDown,
+        CoverOpen,
+        CoverClosed,
+        CoverStart,
+        CoverStop
+    };
 
-private:
-    static void FieldDetectionHandler(void * context, enum nfc_t2t_event event, const uint8_t * data, size_t data_length);
+    static const char * TypeString(EventType type);
 
-    constexpr static uint8_t mNdefBufferSize = 128;
+    AppEvent() = default;
+    AppEvent(EventType type, void * context);
 
-    uint8_t mNdefBuffer[mNdefBufferSize];
-
-    bool mIsTagStarted;
+    EventType mType = EventType::None;
+    void * mContext = nullptr;
 };
