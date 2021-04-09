@@ -32,9 +32,7 @@ qpg6100_sdk("sdk") {
     "${examples_plat_dir}/project_include",
   ]
 
-  sources = [
-    "${qpg6100_project_dir}/include/CHIPProjectConfig.h",
-  ]
+  sources = [ "${qpg6100_project_dir}/include/CHIPProjectConfig.h" ]
 
   defines = []
 }
@@ -48,7 +46,6 @@ qpg6100_executable("persistent_storage") {
 
   public_deps = [
     ":sdk",
-
     "${chip_root}/src/lib",
   ]
 
