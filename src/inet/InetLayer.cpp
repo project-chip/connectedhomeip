@@ -499,10 +499,10 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    const net_if * const iface = (link == INET_NULL_INTERFACEID) ? net_if_get_default() : net_if_get_by_index(link);
+    net_if * const iface = (link == INET_NULL_INTERFACEID) ? net_if_get_default() : net_if_get_by_index(link);
     VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    const in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
+    in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
     VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
     *llAddr = IPAddress::FromIPv6(*ip6_addr);
