@@ -308,12 +308,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mPort          = CHIP_PORT;
     service.mTextEntries   = crmpRetryIntervalEntries;
     service.mTextEntrySize = textEntrySize;
-
-    // TODO: this is likely wrong: IPv6 LinkLocal addresses will require a valid
-    // interface id to be reachable.
-    service.mInterface   = INET_NULL_INTERFACEID;
-    service.mAddressType = Inet::kIPAddressType_Any;
-    error                = ChipMdnsPublishService(&service);
+    service.mInterface     = INET_NULL_INTERFACEID;
+    service.mAddressType   = Inet::kIPAddressType_Any;
+    error                  = ChipMdnsPublishService(&service);
 
     return error;
 }
