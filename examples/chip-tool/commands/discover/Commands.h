@@ -37,7 +37,8 @@ public:
         ReturnErrorOnFailure(mCommissioner.ServiceEvents());
 
         ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(this));
-        ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().ResolveNodeId(mNodeId, mFabricId, chip::Inet::kIPAddressType_Any));
+        ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().ResolveNodeId(
+            chip::PeerId().SetNodeId(mNodeId).SetFabricId(mFabricId), chip::Inet::kIPAddressType_Any));
 
         UpdateWaitForResponse(true);
         WaitForResponse(mWaitDurationInSeconds);
@@ -50,15 +51,16 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData) override
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
         nodeData.mAddress.ToString(addrBuffer);
-        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeId, addrBuffer, nodeData.mPort);
+        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
+                        addrBuffer, nodeData.mPort);
         SetCommandExitStatus(true);
     };
 
-    void OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error) override
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(false);
