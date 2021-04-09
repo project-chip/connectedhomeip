@@ -393,4 +393,3 @@ example, `networkId=hex:0123456789abcdef` (for
 > ```
 > chip-device-ctrl > close-ble
 > ```
-
