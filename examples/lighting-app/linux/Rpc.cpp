@@ -59,7 +59,7 @@ public:
     }
 };
 
-class Device: public generated::Device<Device>
+class Device : public generated::Device<Device>
 {
 public:
     pw::Status FactoryReset(ServerContext &, const chip_rpc_Empty & request, chip_rpc_Empty & response)
