@@ -26,6 +26,7 @@ chip_data_model("all-clusters-common") {
     "bindings",
     "color-control-server",
     "content-launch-server",
+    "descriptor",
     "door-lock-server",
     "general-commissioning-server",
     "groups-server",
