@@ -39,6 +39,7 @@ if (enable_pw_rpc) {
 
 chip_data_model("lighting-common") {
   cluster_sources = [
+    "basic",
     "bindings",
     "level-control",
     "network-commissioning",

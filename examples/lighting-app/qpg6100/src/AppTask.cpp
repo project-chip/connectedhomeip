@@ -84,7 +84,7 @@ int AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     err = LightingMgr().Init();
     if (err != CHIP_NO_ERROR)
