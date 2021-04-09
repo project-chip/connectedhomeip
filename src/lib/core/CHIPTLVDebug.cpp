@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2015-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -283,7 +283,7 @@ const char * DecodeType(const TLVType aType)
         break;
 
     case kTLVType_List:
-        retval = "Path";
+        retval = "List";
         break;
 
     default:
@@ -333,19 +333,17 @@ CHIP_ERROR DumpIterator(DumpWriter aWriter, const TLVReader & aReader)
 CHIP_ERROR DumpHandler(const TLVReader & aReader, size_t aDepth, void * aContext)
 {
     static const char indent[] = "    ";
-    CHIP_ERROR retval          = CHIP_NO_ERROR;
     DumpContext * context;
 
-    VerifyOrExit(aContext != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aContext != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     context = static_cast<DumpContext *>(aContext);
 
-    VerifyOrExit(context->mWriter != nullptr, retval = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(context->mWriter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     DumpHandler(context->mWriter, indent, aReader, aDepth);
 
-exit:
-    return retval;
+    return CHIP_NO_ERROR;
 }
 
 /**

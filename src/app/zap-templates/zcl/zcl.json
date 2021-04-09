@@ -2,12 +2,27 @@
     "version": "ZCL Test Data",
     "xmlRoot": [".", "./data-model/silabs/"],
     "xmlFile": [
+        "account-login-cluster.xml",
+        "application-launcher-cluster.xml",
+        "audio-output-cluster.xml",
+        "application-basic-cluster.xml",
         "binding-cluster.xml",
         "clusters-extensions.xml",
+        "content-launch-cluster.xml",
+        "media-playback-cluster.xml",
+        "low-power-cluster.xml",
+        "keypad-input-cluster.xml",
+        "wake-on-lan-cluster.xml",
+        "media-input-cluster.xml",
+        "tv-channel-cluster.xml",
+        "target-navigator-cluster.xml",
         "custom-types.xml",
         "chip-devices.xml",
+        "descriptor-cluster.xml",
         "types.xml",
         "general.xml",
+        "general-commissioning-cluster.xml",
+        "group-key-mgmt-cluster.xml",
         "ha.xml",
         "ha-devices.xml",
         "cba.xml",
@@ -19,6 +34,7 @@
         "zll-devices.xml",
         "ta.xml",
         "ta-devices.xml",
+        "tv-device-types.xml",
         "hc.xml",
         "hc-devices.xml",
         "green-power.xml",
@@ -27,10 +43,11 @@
         "lo-devices.xml",
         "wwah-silabs.xml",
         "wwah-silabs-devices.xml",
-        "sample-extensions.xml"
+        "sample-extensions.xml",
+        "commissioning.xml",
+        "chip-ota.xml"
     ],
-
-    "manufacturersXml": "manufacturers.xml",
+    "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]

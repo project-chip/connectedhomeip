@@ -29,12 +29,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPDeviceController : NSObject
 
+@property (readonly, nonatomic) BOOL isRunning;
+
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
+                          address:(NSString *)address
+                             port:(uint16_t)port
+                            error:(NSError * __autoreleasing *)error;
+- (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password;
+- (void)sendThreadCredentials:(NSData *)threadDataSet;
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 
@@ -47,6 +56,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (CHIPDeviceController *)sharedController;
 
 /**
+ * Return the Node Id assigned to the controller.
+ */
+- (NSNumber *)getControllerNodeId;
+
+/**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
  *
  * @param[in] delegate The delegate the pairing process should use
@@ -56,13 +70,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Set the Delegate for the persistent storage  as well as the Queue on which the Delegate callbacks will be triggered
+ * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to
+ * check if the stack needs to be started up.
  *
- * @param[in] delegate The delegate for persistent storage
+ * @param[in] storageDelegate The delegate for persistent storage
  *
- * @param[in] queue The queue on which the callbacks will be delivered
+ * @param[in] queue The queue on which the storage callbacks will be delivered
  */
-- (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue;
+
+/**
+ * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
+ */
+- (BOOL)shutdown;
 
 @end
 

@@ -115,7 +115,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
     mState = kState_Connecting;
 
     // Build BLE transport protocol capabilities request.
-    buf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+    buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     VerifyOrExit(!buf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Zero-initialize BLE transport capabilities request.
@@ -272,7 +272,7 @@ exit:
 void BLEEndPoint::HandleSubscribeComplete()
 {
     ChipLogProgress(Ble, "subscribe complete, ep = %p", this);
-    SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, false);
+    mConnStateFlags.Clear(ConnectionStateFlag::kGattOperationInFlight);
 
     BLE_ERROR err = DriveSending();
 
@@ -295,7 +295,7 @@ bool BLEEndPoint::IsConnected(uint8_t state) const
 
 bool BLEEndPoint::IsUnsubscribePending() const
 {
-    return (GetFlag(mTimerStateFlags, kTimerState_UnsubscribeTimerRunning));
+    return mTimerStateFlags.Has(TimerStateFlag::kUnsubscribeTimerRunning);
 }
 
 void BLEEndPoint::Abort()
@@ -392,7 +392,7 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
     }
     else // Otherwise, try to signal close to remote device before end point releases BLE connection and frees itself.
     {
-        if (mRole == kBleRole_Central && GetFlag(mConnStateFlags, kConnState_DidBeginSubscribe))
+        if (mRole == kBleRole_Central && mConnStateFlags.Has(ConnectionStateFlag::kDidBeginSubscribe))
         {
             // Cancel send and receive-ack timers, if running.
             StopAckReceivedTimer();
@@ -420,10 +420,10 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
                 }
 
                 // Mark unsubscribe GATT operation in progress.
-                SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
+                mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
             }
         }
-        else // mRole == kBleRole_Peripheral, OR GetFlag(mTimerStateFlags, kConnState_DidBeginSubscribe) == false...
+        else // mRole == kBleRole_Peripheral, OR mTimerStateFlags.Has(ConnectionStateFlag::kDidBeginSubscribe) == false...
         {
             Free();
         }
@@ -456,7 +456,7 @@ void BLEEndPoint::ReleaseBleConnection()
 {
     if (mConnObj != BLE_CONNECTION_UNINITIALIZED)
     {
-        if (GetFlag(mConnStateFlags, kConnState_AutoClose))
+        if (mConnStateFlags.Has(ConnectionStateFlag::kAutoClose))
         {
             ChipLogProgress(Ble, "Auto-closing end point's BLE connection.");
             mBle->mPlatformDelegate->CloseConnection(mConnObj);
@@ -562,11 +562,10 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     mRefCount = 1;
 
     // BLEEndPoint data members:
-    mConnObj         = connObj;
-    mRole            = role;
-    mConnStateFlags  = 0;
-    mTimerStateFlags = 0;
-    SetFlag(mConnStateFlags, kConnState_AutoClose, autoClose);
+    mConnObj = connObj;
+    mRole    = role;
+    mTimerStateFlags.ClearAll();
+    mConnStateFlags.ClearAll().Set(ConnectionStateFlag::kAutoClose, autoClose);
     mLocalReceiveWindowSize  = 0;
     mRemoteReceiveWindowSize = 0;
     mReceiveWindowMaxSize    = 0;
@@ -633,12 +632,12 @@ void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
     if (mSendQueue.IsNull())
     {
         mSendQueue = std::move(data);
-        ChipLogDebugBleEndPoint(Ble, "%s: Set data as new mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
+        ChipLogDebugBleEndPoint(Ble, "%s: Set data as new mSendQueue %p, type %d", __FUNCTION__, mSendQueue->Start(), type);
     }
     else
     {
         mSendQueue->AddToEnd(std::move(data));
-        ChipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue, type);
+        ChipLogDebugBleEndPoint(Ble, "%s: Append data to mSendQueue %p, type %d", __FUNCTION__, mSendQueue->Start(), type);
     }
 
     QueueTxUnlock();
@@ -686,7 +685,7 @@ exit:
 bool BLEEndPoint::PrepareNextFragment(PacketBufferHandle && data, bool & sentAck)
 {
     // If we have a pending fragment acknowledgement to send, piggyback it on the fragment we're about to transmit.
-    if (GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning))
+    if (mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning))
     {
         // Reset local receive window counter.
         mLocalReceiveWindowSize = mReceiveWindowMaxSize;
@@ -818,10 +817,10 @@ BLE_ERROR BLEEndPoint::HandleHandshakeConfirmationReceived()
                      err = BLE_ERROR_GATT_SUBSCRIBE_FAILED);
 
         // We just sent a GATT subscribe request, so make sure to attempt unsubscribe on close.
-        SetFlag(mConnStateFlags, kConnState_DidBeginSubscribe, true);
+        mConnStateFlags.Set(ConnectionStateFlag::kDidBeginSubscribe);
 
         // Mark GATT operation in progress for subscribe request.
-        SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
+        mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
     }
     else // (mRole == kBleRole_Peripheral), verified on Init
     {
@@ -882,12 +881,12 @@ BLE_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
     // TODO Packet buffer high water mark optimization: if ack pending, but fragmenter state == complete, free fragmenter's
     // tx buf before sending ack.
 
-    if (GetFlag(mConnStateFlags, kConnState_StandAloneAckInFlight))
+    if (mConnStateFlags.Has(ConnectionStateFlag::kStandAloneAckInFlight))
     {
         // If confirmation was received for stand-alone ack, free its tx buffer.
         mAckToSend = nullptr;
 
-        SetFlag(mConnStateFlags, kConnState_StandAloneAckInFlight, false);
+        mConnStateFlags.Clear(ConnectionStateFlag::kStandAloneAckInFlight);
     }
 
     // If local receive window size has shrunk to or below immediate ack threshold, AND a message fragment is not
@@ -922,12 +921,12 @@ BLE_ERROR BLEEndPoint::HandleGattSendConfirmationReceived()
     ChipLogDebugBleEndPoint(Ble, "entered HandleGattSendConfirmationReceived");
 
     // Mark outstanding GATT operation as finished.
-    SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, false);
+    mConnStateFlags.Clear(ConnectionStateFlag::kGattOperationInFlight);
 
     // If confirmation was for outbound portion of BTP connect handshake...
-    if (!GetFlag(mConnStateFlags, kConnState_CapabilitiesConfReceived))
+    if (!mConnStateFlags.Has(ConnectionStateFlag::kCapabilitiesConfReceived))
     {
-        SetFlag(mConnStateFlags, kConnState_CapabilitiesConfReceived, true);
+        mConnStateFlags.Set(ConnectionStateFlag::kCapabilitiesConfReceived);
 
         return HandleHandshakeConfirmationReceived();
     }
@@ -970,7 +969,7 @@ BLE_ERROR BLEEndPoint::DoSendStandAloneAck()
     mLocalReceiveWindowSize = mReceiveWindowMaxSize;
     ChipLogDebugBleEndPoint(Ble, "reset local rx window on stand-alone ack tx, size = %u", mLocalReceiveWindowSize);
 
-    SetFlag(mConnStateFlags, kConnState_StandAloneAckInFlight, true);
+    mConnStateFlags.Set(ConnectionStateFlag::kStandAloneAckInFlight);
 
     // Start ack received timer, if it's not already running.
     err = StartAckReceivedTimer();
@@ -989,12 +988,12 @@ BLE_ERROR BLEEndPoint::DriveSending()
     // If receiver's window is almost closed and we don't have an ack to send, OR we do have an ack to send but
     // receiver's window is completely empty, OR another GATT operation is in flight, awaiting confirmation...
     if ((mRemoteReceiveWindowSize <= BTP_WINDOW_NO_ACK_SEND_THRESHOLD &&
-         !GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning) && mAckToSend.IsNull()) ||
-        (mRemoteReceiveWindowSize == 0) || (GetFlag(mConnStateFlags, kConnState_GattOperationInFlight)))
+         !mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning) && mAckToSend.IsNull()) ||
+        (mRemoteReceiveWindowSize == 0) || (mConnStateFlags.Has(ConnectionStateFlag::kGattOperationInFlight)))
     {
 #ifdef CHIP_BLE_END_POINT_DEBUG_LOGGING_ENABLED
         if (mRemoteReceiveWindowSize <= BTP_WINDOW_NO_ACK_SEND_THRESHOLD &&
-            !GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning) && mAckToSend == NULL)
+            !mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning) && mAckToSend.IsNull())
         {
             ChipLogDebugBleEndPoint(Ble, "NO SEND: receive window almost closed, and no ack to send");
         }
@@ -1004,7 +1003,7 @@ BLE_ERROR BLEEndPoint::DriveSending()
             ChipLogDebugBleEndPoint(Ble, "NO SEND: remote receive window closed");
         }
 
-        if (GetFlag(mConnStateFlags, kConnState_GattOperationInFlight))
+        if (mConnStateFlags.Has(ConnectionStateFlag::kGattOperationInFlight))
         {
             ChipLogDebugBleEndPoint(Ble, "NO SEND: Gatt op in flight");
         }
@@ -1273,13 +1272,13 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
         }
 
         // If we're receiving the first inbound packet of a BLE transport connection handshake...
-        if (!GetFlag(mConnStateFlags, kConnState_CapabilitiesMsgReceived))
+        if (!mConnStateFlags.Has(ConnectionStateFlag::kCapabilitiesMsgReceived))
         {
             if (mRole == kBleRole_Central) // If we're a central receiving a capabilities response indication...
             {
                 // Ensure end point's in the right state before continuing.
                 VerifyOrExit(mState == kState_Connecting, err = BLE_ERROR_INCORRECT_STATE);
-                SetFlag(mConnStateFlags, kConnState_CapabilitiesMsgReceived, true);
+                mConnStateFlags.Set(ConnectionStateFlag::kCapabilitiesMsgReceived);
 
                 err = HandleCapabilitiesResponseReceived(std::move(data));
                 SuccessOrExit(err);
@@ -1288,7 +1287,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
             {
                 // Ensure end point's in the right state before continuing.
                 VerifyOrExit(mState == kState_Ready, err = BLE_ERROR_INCORRECT_STATE);
-                SetFlag(mConnStateFlags, kConnState_CapabilitiesMsgReceived, true);
+                mConnStateFlags.Set(ConnectionStateFlag::kCapabilitiesMsgReceived);
 
                 err = HandleCapabilitiesRequestReceived(std::move(data));
 
@@ -1391,7 +1390,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     if (mBtpEngine.HasUnackedData())
     {
         if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD &&
-            !GetFlag(mConnStateFlags, kConnState_GattOperationInFlight))
+            !mConnStateFlags.Has(ConnectionStateFlag::kGattOperationInFlight))
         {
             ChipLogDebugBleEndPoint(Ble, "sending immediate ack");
             err = DriveStandAloneAck();
@@ -1446,14 +1445,14 @@ exit:
 
 bool BLEEndPoint::SendWrite(PacketBufferHandle && buf)
 {
-    SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
+    mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
 
     return mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_1_ID, std::move(buf));
 }
 
 bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 {
-    SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
+    mConnStateFlags.Set(ConnectionStateFlag::kGattOperationInFlight);
 
     return mBle->mPlatformDelegate->SendIndication(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_2_ID, std::move(buf));
 }
@@ -1465,7 +1464,7 @@ BLE_ERROR BLEEndPoint::StartConnectTimer()
 
     timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleConnectTimeout, this);
     VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
-    SetFlag(mTimerStateFlags, kTimerState_ConnectTimerRunning, true);
+    mTimerStateFlags.Set(TimerStateFlag::kConnectTimerRunning);
 
 exit:
     return err;
@@ -1478,7 +1477,7 @@ BLE_ERROR BLEEndPoint::StartReceiveConnectionTimer()
 
     timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleReceiveConnectionTimeout, this);
     VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
-    SetFlag(mTimerStateFlags, kTimerState_ReceiveConnectionTimerRunning, true);
+    mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
 
 exit:
     return err;
@@ -1489,12 +1488,12 @@ BLE_ERROR BLEEndPoint::StartAckReceivedTimer()
     BLE_ERROR err = BLE_NO_ERROR;
     chip::System::Error timerErr;
 
-    if (!GetFlag(mTimerStateFlags, kTimerState_AckReceivedTimerRunning))
+    if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
     {
         timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_RECEIVED_TIMEOUT_MS, HandleAckReceivedTimeout, this);
         VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
 
-        SetFlag(mTimerStateFlags, kTimerState_AckReceivedTimerRunning, true);
+        mTimerStateFlags.Set(TimerStateFlag::kAckReceivedTimerRunning);
     }
 
 exit:
@@ -1505,7 +1504,7 @@ BLE_ERROR BLEEndPoint::RestartAckReceivedTimer()
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
-    VerifyOrExit(GetFlag(mTimerStateFlags, kTimerState_AckReceivedTimerRunning), err = BLE_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning), err = BLE_ERROR_INCORRECT_STATE);
 
     StopAckReceivedTimer();
 
@@ -1523,13 +1522,13 @@ BLE_ERROR BLEEndPoint::StartSendAckTimer()
 
     ChipLogDebugBleEndPoint(Ble, "entered StartSendAckTimer");
 
-    if (!GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning))
+    if (!mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning))
     {
         ChipLogDebugBleEndPoint(Ble, "starting new SendAckTimer");
         timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_SEND_TIMEOUT_MS, HandleSendAckTimeout, this);
         VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
 
-        SetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning, true);
+        mTimerStateFlags.Set(TimerStateFlag::kSendAckTimerRunning);
     }
 
 exit:
@@ -1543,7 +1542,7 @@ BLE_ERROR BLEEndPoint::StartUnsubscribeTimer()
 
     timerErr = mBle->mSystemLayer->StartTimer(BLE_UNSUBSCRIBE_TIMEOUT_MS, HandleUnsubscribeTimeout, this);
     VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
-    SetFlag(mTimerStateFlags, kTimerState_UnsubscribeTimerRunning, true);
+    mTimerStateFlags.Set(TimerStateFlag::kUnsubscribeTimerRunning);
 
 exit:
     return err;
@@ -1553,35 +1552,35 @@ void BLEEndPoint::StopConnectTimer()
 {
     // Cancel any existing connect timer.
     mBle->mSystemLayer->CancelTimer(HandleConnectTimeout, this);
-    SetFlag(mTimerStateFlags, kTimerState_ConnectTimerRunning, false);
+    mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
 }
 
 void BLEEndPoint::StopReceiveConnectionTimer()
 {
     // Cancel any existing receive connection timer.
     mBle->mSystemLayer->CancelTimer(HandleReceiveConnectionTimeout, this);
-    SetFlag(mTimerStateFlags, kTimerState_ReceiveConnectionTimerRunning, false);
+    mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
 }
 
 void BLEEndPoint::StopAckReceivedTimer()
 {
     // Cancel any existing ack-received timer.
     mBle->mSystemLayer->CancelTimer(HandleAckReceivedTimeout, this);
-    SetFlag(mTimerStateFlags, kTimerState_AckReceivedTimerRunning, false);
+    mTimerStateFlags.Clear(TimerStateFlag::kAckReceivedTimerRunning);
 }
 
 void BLEEndPoint::StopSendAckTimer()
 {
     // Cancel any existing send-ack timer.
     mBle->mSystemLayer->CancelTimer(HandleSendAckTimeout, this);
-    SetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning, false);
+    mTimerStateFlags.Clear(TimerStateFlag::kSendAckTimerRunning);
 }
 
 void BLEEndPoint::StopUnsubscribeTimer()
 {
     // Cancel any existing unsubscribe timer.
     mBle->mSystemLayer->CancelTimer(HandleUnsubscribeTimeout, this);
-    SetFlag(mTimerStateFlags, kTimerState_UnsubscribeTimerRunning, false);
+    mTimerStateFlags.Clear(TimerStateFlag::kUnsubscribeTimerRunning);
 }
 
 void BLEEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void * appState, chip::System::Error err)
@@ -1589,10 +1588,10 @@ void BLEEndPoint::HandleConnectTimeout(chip::System::Layer * systemLayer, void *
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
     // Check for event-based timer race condition.
-    if (GetFlag(ep->mTimerStateFlags, kTimerState_ConnectTimerRunning))
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kConnectTimerRunning))
     {
         ChipLogError(Ble, "connect handshake timed out, closing ep %p", ep);
-        SetFlag(ep->mTimerStateFlags, kTimerState_ConnectTimerRunning, false);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kConnectTimerRunning);
         ep->DoClose(kBleCloseFlag_AbortTransmission, BLE_ERROR_CONNECT_TIMED_OUT);
     }
 }
@@ -1602,10 +1601,10 @@ void BLEEndPoint::HandleReceiveConnectionTimeout(chip::System::Layer * systemLay
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
     // Check for event-based timer race condition.
-    if (GetFlag(ep->mTimerStateFlags, kTimerState_ReceiveConnectionTimerRunning))
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kReceiveConnectionTimerRunning))
     {
         ChipLogError(Ble, "receive handshake timed out, closing ep %p", ep);
-        SetFlag(ep->mTimerStateFlags, kTimerState_ReceiveConnectionTimerRunning, false);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kReceiveConnectionTimerRunning);
         ep->DoClose(kBleCloseFlag_SuppressCallback | kBleCloseFlag_AbortTransmission, BLE_ERROR_RECEIVE_TIMED_OUT);
     }
 }
@@ -1615,11 +1614,11 @@ void BLEEndPoint::HandleAckReceivedTimeout(chip::System::Layer * systemLayer, vo
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
     // Check for event-based timer race condition.
-    if (GetFlag(ep->mTimerStateFlags, kTimerState_AckReceivedTimerRunning))
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
     {
         ChipLogError(Ble, "ack recv timeout, closing ep %p", ep);
         ep->mBtpEngine.LogStateDebug();
-        SetFlag(ep->mTimerStateFlags, kTimerState_AckReceivedTimerRunning, false);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kAckReceivedTimerRunning);
         ep->DoClose(kBleCloseFlag_AbortTransmission, BLE_ERROR_FRAGMENT_ACK_TIMED_OUT);
     }
 }
@@ -1629,12 +1628,12 @@ void BLEEndPoint::HandleSendAckTimeout(chip::System::Layer * systemLayer, void *
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
     // Check for event-based timer race condition.
-    if (GetFlag(ep->mTimerStateFlags, kTimerState_SendAckTimerRunning))
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning))
     {
-        SetFlag(ep->mTimerStateFlags, kTimerState_SendAckTimerRunning, false);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kSendAckTimerRunning);
 
         // If previous stand-alone ack isn't still in flight...
-        if (!GetFlag(ep->mConnStateFlags, kConnState_StandAloneAckInFlight))
+        if (!ep->mConnStateFlags.Has(ConnectionStateFlag::kStandAloneAckInFlight))
         {
             BLE_ERROR sendErr = ep->DriveStandAloneAck();
 
@@ -1651,10 +1650,10 @@ void BLEEndPoint::HandleUnsubscribeTimeout(chip::System::Layer * systemLayer, vo
     BLEEndPoint * ep = static_cast<BLEEndPoint *>(appState);
 
     // Check for event-based timer race condition.
-    if (GetFlag(ep->mTimerStateFlags, kTimerState_UnsubscribeTimerRunning))
+    if (ep->mTimerStateFlags.Has(TimerStateFlag::kUnsubscribeTimerRunning))
     {
         ChipLogError(Ble, "unsubscribe timed out, ble ep %p", ep);
-        SetFlag(ep->mTimerStateFlags, kTimerState_UnsubscribeTimerRunning, false);
+        ep->mTimerStateFlags.Clear(TimerStateFlag::kUnsubscribeTimerRunning);
         ep->HandleUnsubscribeComplete();
     }
 }

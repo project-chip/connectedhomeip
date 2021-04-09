@@ -22,7 +22,7 @@ cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK)
-SUPPORTED_APP=(shell)
+SUPPORTED_APP=(shell lock-app)
 SUPPORTED_PROFILES=(release develop debug)
 
 APP=shell
@@ -85,8 +85,12 @@ MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
 # Override Mbed OS path to development directory
 MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
 
-# Create symlink to mbed-os directory
+# Add the Mbed OS driver for the ISM43362 Wi-Fi module
+WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
+
+# Create symlinks to submodules
 ln -sfTr $MBED_OS_PATH "${APP}/mbed/mbed-os"
+ln -sfTr $WIFI_ISM43362_PATH "${APP}/mbed/wifi-ism43362"
 
 # Generate config file for selected target, toolchain and hardware
 mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/

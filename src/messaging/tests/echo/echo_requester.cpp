@@ -32,9 +32,9 @@
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -103,7 +103,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(std::move(payloadBuf));
+    err = gEchoClient.SendEchoRequest(std::move(payloadBuf), chip::Messaging::SendFlags(chip::Messaging::SendMessageFlags::kNone));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -123,8 +123,7 @@ CHIP_ERROR EstablishSecureSession()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::Optional<chip::Transport::PeerAddress> peerAddr;
-    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>(
-        chip::Optional<chip::NodeId>::Value(chip::kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>();
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     if (gUseTCP)
@@ -138,7 +137,8 @@ CHIP_ERROR EstablishSecureSession()
     }
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret, gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -164,6 +164,35 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
 
     printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
            static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
+}
+
+void RunPinging()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Connection has been established. Now send the EchoRequests.
+    for (unsigned int i = 0; i < kMaxEchoCount; i++)
+    {
+        err = SendEchoRequest();
+        if (err != CHIP_NO_ERROR)
+        {
+            printf("Send request failed: %s\n", chip::ErrorStr(err));
+            break;
+        }
+
+        // Wait for response until the Echo interval.
+        while (!EchoIntervalExpired())
+        {
+            sleep(1);
+        }
+
+        // Check if expected response was received.
+        if (gWaitingForEchoResp)
+        {
+            printf("No response received\n");
+            gWaitingForEchoResp = false;
+        }
+    }
 }
 
 } // namespace
@@ -200,6 +229,8 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
+
     adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
@@ -232,35 +263,13 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0 });
+    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
     gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < kMaxEchoCount; i++)
-    {
-        err = SendEchoRequest();
-        if (err != CHIP_NO_ERROR)
-        {
-            printf("Send request failed: %s\n", chip::ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            DriveIO();
-        }
-
-        // Check if expected response was received.
-        if (gWaitingForEchoResp)
-        {
-            printf("No response received\n");
-            gWaitingForEchoResp = false;
-        }
-    }
+    RunPinging();
 
     gEchoClient.Shutdown();
 

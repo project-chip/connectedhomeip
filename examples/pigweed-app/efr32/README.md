@@ -1,4 +1,4 @@
-# CHIP EFR32 Pigweed Example Application
+#CHIP EFR32 Pigweed Example Application
 
 The EFR32 example demonstrates the usage of Pigweed module functionalities in an
 application.
@@ -32,9 +32,9 @@ following features are available:
 
 -   Download or clone the
     [sdk_support](https://github.com/SiliconLabs/sdk_support) from GitHub
-    $ git clone https://github.com/SiliconLabs/sdk_support.git
-    and export the path with :
-            $
+    $ git
+    clone https://github.com/SiliconLabs/sdk_support.git and export the path
+    with : $
     export EFR32_SDK_ROOT=<Path to cloned git repo>
 
 -   Download the
@@ -50,11 +50,9 @@ following features are available:
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
-           brew install ninja
+#Mac OS X brew install ninja
 
 -   Supported hardware:
 
@@ -79,9 +77,8 @@ following features are available:
         cd ~/connectedhomeip/examples/pigweed-app/efr32
         git submodule update --init
         source third_party/connectedhomeip/scripts/activate.sh
-        export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
         export EFR32_BOARD=BRD4161A
-        gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+        gn gen out/debug
         ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
@@ -101,25 +98,34 @@ following features are available:
 
 ## Testing the Example Application
 
-Determine the serial port name for the EFR device by checking /dev: ls
-/dev/tty\*
+-   Determine the serial port name for the EFR device by checking /dev: ls
+    /dev/tty\*
 
-    It should look like this :
-    - On Linux
-        /dev/ttyACM0
-    - On MAC
-        /dev/tty.usbmodem0004401548451
+        It should look like this :
+        - On Linux
+            /dev/ttyACM0
+        - On MAC
+            /dev/tty.usbmodem0004401548451
 
-Run the following command to start an interactive Python shell, where the Echo
-RPC commands can be invoked:
+-   Run the following command to start an interactive Python shell, where the
+    Echo RPC commands can be invoked:
 
-        python -m pw_hdlc.rpc_console --device /dev/tty.usbmodem0004401548451 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
+        python -m pw_hdlc.rpc_console --device /dev/tty.usbmodem0004401548451 -b 115200 <CHIP_ROOT>/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
 
-To send an Echo RPC message, type the following command, where the actual
-message is the text in quotation marks after the `msg=` phrase:
+-   To send an Echo RPC message, type the following command, where the actual
+    message is the text in quotation marks after the `msg=` phrase:
 
         rpcs.pw.rpc.EchoService.Echo(msg="hi")
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
     before the device shows up on `/dev/tty`.
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.

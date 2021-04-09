@@ -31,5 +31,16 @@ chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
-# TODO - enable OpenThread build flow
-# https://github.com/project-chip/connectedhomeip/issues/2939
+
+# GH #4224
+# Lifetime counter keyId not available in ConfigurationManager
+# Disabling feature awaiting path into ConfigurationManager
+chip_enable_rotating_device_id = false
+
+openthread_external_mbedtls = mbedtls_target
+openthread_project_core_config_file = "openthread-core-qpg6100-config.h"
+openthread_core_config_platform_check_file =
+    "openthread-core-qpg6100-config-check.h"
+openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/qpg6100:libopenthread-qpg6100-config" ]
+
+openthread_external_platform = "${chip_root}/third_party/openthread/platforms/qpg6100:libopenthread-qpg6100"

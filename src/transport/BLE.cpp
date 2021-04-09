@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,6 @@
 #include <transport/BLE.h>
 
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -37,42 +36,54 @@ using namespace chip::System;
 namespace chip {
 namespace Transport {
 
+// The largest supported value for Rendezvous discriminators
+const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
+
 BLE::~BLE()
 {
+    ClearState();
+}
+
+void BLE::ClearState()
+{
+    if (mBleLayer)
+    {
+        mBleLayer->CancelBleIncompleteConnection();
+        mBleLayer->OnChipBleConnectReceived = nullptr;
+        mBleLayer                           = nullptr;
+    }
+
     if (mBleEndPoint)
     {
-        // Ble endpoint is only non null if ble endpoint is initialized and connected
         mBleEndPoint->Close();
         mBleEndPoint = nullptr;
     }
 }
 
-CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params)
+CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, TransportMgrDelegate * transport, BleLayer * bleLayer,
+                     uint16_t discriminator, BLE_CONNECTION_OBJECT connObj)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    BleLayer * bleLayer = params.GetBleLayer();
+    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(bleLayer, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(bleLayer, err = CHIP_ERROR_INCORRECT_STATE);
-
-    mDelegate = delegate;
+    mDelegate  = delegate;
+    mTransport = transport;
 
     mBleLayer                           = bleLayer;
     mBleLayer->mAppState                = reinterpret_cast<void *>(this);
     mBleLayer->OnChipBleConnectReceived = OnNewConnection;
 
-    if (params.HasDiscriminator())
+    if (discriminator <= kMaxRendezvousDiscriminatorValue)
     {
-        err = DelegateConnection(params.GetDiscriminator());
+        return mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), discriminator, OnBleConnectionComplete,
+                                           OnBleConnectionError);
     }
-    else if (params.HasConnectionObject())
+    else if (connObj != 0)
     {
-        err = InitInternal(params.GetConnectionObject());
+        return InitInternal(connObj);
     }
-    SuccessOrExit(err);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLE::InitInternal(BLE_CONNECTION_OBJECT connObj)
@@ -90,29 +101,22 @@ CHIP_ERROR BLE::InitInternal(BLE_CONNECTION_OBJECT connObj)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (mBleEndPoint)
-        {
-            mBleEndPoint->Close();
-            mBleEndPoint = nullptr;
-        }
+        ClearState();
     }
     return err;
 }
 
 CHIP_ERROR BLE::SetEndPoint(Ble::BLEEndPoint * endPoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(endPoint->mState == BLEEndPoint::kState_Connected, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endPoint->mState == BLEEndPoint::kState_Connected, CHIP_ERROR_INVALID_ARGUMENT);
 
     mBleEndPoint = endPoint;
     SetupEvents(mBleEndPoint);
 
     // Manually trigger the OnConnectComplete callback.
-    OnBleEndPointConnectionComplete(endPoint, err);
+    OnBleEndPointConnectionComplete(endPoint, BLE_NO_ERROR);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
@@ -123,41 +127,15 @@ void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
     endPoint->OnConnectionClosed = OnBleEndPointConnectionClosed;
 }
 
-CHIP_ERROR BLE::DelegateConnection(const uint16_t connDiscriminator)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), connDiscriminator, OnBleConnectionComplete,
-                                      OnBleConnectionError);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    const uint16_t headerSize = header.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize;
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
+    ReturnErrorOnFailure(mBleEndPoint->Send(std::move(msgBuf)));
 
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
-    SuccessOrExit(err);
-
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
-
-    err = mBleEndPoint->Send(std::move(msgBuf));
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLE::OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
@@ -195,16 +173,13 @@ void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer
     BLE * ble      = reinterpret_cast<BLE *>(endPoint->mAppState);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (ble->mDelegate)
+    if (ble->mTransport)
     {
-        uint16_t headerSize = 0;
-
         PacketHeader header;
-        err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+        err = header.DecodeAndConsume(buffer);
         SuccessOrExit(err);
 
-        buffer->ConsumeHead(headerSize);
-        ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
+        ble->mTransport->OnMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
     }
 exit:
     if (err != CHIP_NO_ERROR)

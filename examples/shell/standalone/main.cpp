@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/shell.h>
+#include <lib/shell/shell_core.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>
@@ -45,6 +45,7 @@ int main()
     cmd_device_init();
     cmd_btp_init();
     cmd_otcli_init();
+    cmd_ping_init();
 
     shell_task(nullptr);
     return 0;

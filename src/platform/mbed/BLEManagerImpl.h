@@ -49,6 +49,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsFastAdvertisingEnabled(void);
     CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
@@ -89,7 +90,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
     // ===== Private members reserved for use by this class only.
 
-    enum
+    enum Flags : uint16_t
     {
         kFlag_AsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
         kFlag_AdvertisingEnabled       = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
@@ -108,7 +109,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     };
 
     CHIPoBLEServiceMode mServiceMode;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     uint16_t mGAPConns;
     char mDeviceName[kMaxDeviceNameLength + 1];
     uint8_t mAdvertisingDataBuffer[kAdvertisingDataSize];
@@ -155,21 +156,18 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
+    return mFlags.Has(Flags::kFlag_AdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kFlag_FastAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)
 {
-    return GetFlag(mFlags, kFlag_Advertising);
-}
-
+    return mFlags.Has(Flags::kFlag_Advertising);
 } // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
+} // namespace Internal
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

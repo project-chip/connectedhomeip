@@ -74,7 +74,7 @@ public:
      *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
      *                                      non-NULL.
      */
-    CHIP_ERROR populatePayload(SetupPayload::AdditionalDataPayload & outPayload);
+    CHIP_ERROR populatePayload(SetupPayloadData::AdditionalDataPayload & outPayload);
 };
 
 } // namespace chip

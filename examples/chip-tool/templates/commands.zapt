@@ -2,9 +2,12 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include "ModelCommand.h"
 #include "gen/CHIPClientCallbacks.h"
 #include <controller/CHIPClusters.h>
+#include <lib/core/CHIPSafeCasts.h>
 
 static void OnDefaultSuccessResponse(void * context)
 {
@@ -20,12 +23,6 @@ static void OnDefaultFailureResponse(void * context, uint8_t status)
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(false);
-}
-
-typedef void (*UnsupportedAttributeCallback)(void * context);
-static void OnUnsupportedAttributeResponse(void * context)
-{
-    ChipLogError(chipTool, "Unsupported attribute Response. This should never happen !");
 }
 
 static void OnBooleanAttributeResponse(void * context, bool value)
@@ -52,9 +49,38 @@ static void OnInt16uAttributeResponse(void * context, uint16_t value)
     command->SetCommandExitStatus(true);
 }
 
+static void OnInt32uAttributeResponse(void * context, uint32_t value)
+{
+    ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnInt64uAttributeResponse(void * context, uint64_t value)
+{
+    ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 static void OnInt16sAttributeResponse(void * context, int16_t value)
 {
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnStringAttributeResponse(void * context, const chip::ByteSpan value)
+{
+    char * str = (char *)malloc(value.size() * sizeof(char));
+    memmove(str, value.data(), value.size());
+    str[value.size()] = '\0';
+    free(str);
+
+    ChipLogProgress(chipTool, "String attribute Response: %s (%" PRIu16 ")", str, strlen(str));
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
@@ -83,13 +109,40 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
 {{/if}}
 {{/all_user_clusters}}
 
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
+{
+    ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        {{#if isStruct}}
+        ChipLogProgress(chipTool, "{{type}}[%lu]:", i);
+        {{#chip_attribute_list_entryTypes}}
+        ChipLogProgress(chipTool, "  {{name}}: {{asPrintFormat type}}", entries[i].{{name}});
+        {{/chip_attribute_list_entryTypes}}
+        {{else}}
+        ChipLogProgress(chipTool, "{{type}}[%lu]: {{asPrintFormat type}}", i, entries[i]);
+        {{/if}}
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
 {{> clusters_header}}
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 constexpr chip::ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4}};
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 {{> cluster_header}}
 
 {{#chip_server_cluster_commands}}
@@ -110,6 +163,11 @@ public:
         {{/chip_server_cluster_command_arguments}}
         ModelCommand::AddArguments();
     }
+    ~{{asCamelCased clusterName false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+    }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -117,7 +175,7 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, m{{asCamelCased label false}}{{/chip_server_cluster_command_arguments}});
+        return cluster.{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isString type)}} chip::ByteSpan(chip::Uint8::from_char(m{{asCamelCased label false}}), strlen(m{{asCamelCased label false}})){{else}}m{{asCamelCased label false}}{{/if}}{{/chip_server_cluster_command_arguments}});
     }
 
 private:
@@ -149,6 +207,12 @@ public:
         ModelCommand::AddArguments();
     }
 
+    ~Discover{{asCamelCased name false}}Attributes()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+    }
+
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x0C) on endpoint %" PRIu16, endpointId);
@@ -176,6 +240,12 @@ public:
         ModelCommand::AddArguments();
     }
 
+    ~Read{{asCamelCased parent.name false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+    }
+
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x00) on endpoint %" PRIu16, endpointId);
@@ -186,7 +256,11 @@ public:
     }
 
 private:
+{{#if isList}}
+    chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, this);
+{{else}}
     chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+{{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
@@ -197,8 +271,18 @@ public:
     Write{{asCamelCased parent.name false}}{{asCamelCased name false}}(): ModelCommand("write")
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asCamelCased name)}}");
+        {{#if (isString type)}}
+        AddArgument("attr-value", &mValue);
+        {{else}}
         AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
+        {{/if}}
         ModelCommand::AddArguments();
+    }
+
+    ~Write{{asCamelCased parent.name false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
@@ -207,13 +291,17 @@ public:
 
         chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+        return cluster.WriteAttribute{{asCamelCased name false}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), {{#if (isString type)}} chip::ByteSpan(chip::Uint8::from_char(mValue), strlen(mValue)){{else}}mValue{{/if}});
     }
 
 private:
     chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback = new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    {{#if (isString type)}}
+    char * mValue;
+    {{else}}
     {{chipType}} mValue;
+    {{/if}}
 };
 
 {{/if}}
@@ -227,9 +315,18 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         {{#unless (isDiscreteType)}}
+        {{#unless (isString type)}}
         AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
         {{/unless}}
+        {{/unless}}
         ModelCommand::AddArguments();
+    }
+
+    ~Report{{asCamelCased parent.name false}}{{asCamelCased name false}}()
+    {
+      delete onSuccessCallback;
+      delete onFailureCallback;
+      delete onReportCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
@@ -255,18 +352,20 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     {{#unless (isDiscreteType)}}
+    {{#unless (isString type)}}
     {{chipType}} mChange;
+    {{/unless}}
     {{/unless}}
 };
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 void registerCluster{{asCamelCased name false}}(Commands & commands)
 {
     const char * clusterName = "{{asCamelCased name false}}";
@@ -289,11 +388,11 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
 void registerClusters(Commands & commands)
 {
-{{#chip_clusters}}
+{{#chip_client_clusters}}
     registerCluster{{asCamelCased name false}}(commands);
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 }

@@ -13,11 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-declare_args() {
-  # Set up what advertiser to use for mDNS advertisement
-  chip_mdns_advertiser = "minimal"
-}
+import("${chip_root}/src/platform/device.gni")
 
 source_set("platform_header") {
   sources = [ "platform/Mdns.h" ]
@@ -30,14 +26,25 @@ static_library("mdns") {
     "${chip_root}/src/lib/support",
   ]
 
-  sources = [ "Advertiser.h" ]
+  sources = [
+    "Advertiser.h",
+    "Resolver.h",
+    "ServiceNaming.cpp",
+    "ServiceNaming.h",
+  ]
 
-  if (chip_mdns_advertiser == "none") {
-    sources += [ "Advertiser_ImplNone.cpp" ]
-  } else if (chip_mdns_advertiser == "minimal") {
-    sources += [ "Advertiser_ImplMinimalMdns.cpp" ]
+  if (chip_mdns == "none") {
+    sources += [
+      "Advertiser_ImplNone.cpp",
+      "Resolver_ImplNone.cpp",
+    ]
+  } else if (chip_mdns == "minimal") {
+    sources += [
+      "Advertiser_ImplMinimalMdns.cpp",
+      "Resolver_ImplNone.cpp",
+    ]
     public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
-  } else if (chip_mdns_advertiser == "platform") {
+  } else if (chip_mdns == "platform") {
     sources += [
       "Discovery_ImplPlatform.cpp",
       "Discovery_ImplPlatform.h",

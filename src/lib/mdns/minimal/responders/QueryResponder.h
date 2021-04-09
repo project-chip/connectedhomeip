@@ -22,8 +22,6 @@
 
 #include <inet/InetLayer.h>
 
-#include <iterator>
-
 namespace mdns {
 namespace Minimal {
 
@@ -162,9 +160,13 @@ private:
 
 /// Iterates over an array of QueryResponderRecord items, providing only 'valid' ones, where
 /// valid is based on the provided filter.
-class QueryResponderIterator : public std::iterator<std::input_iterator_tag, QueryResponderRecord>
+class QueryResponderIterator
 {
 public:
+    using value_type = QueryResponderRecord;
+    using pointer    = QueryResponderRecord *;
+    using reference  = QueryResponderRecord &;
+
     QueryResponderIterator() : mCurrent(nullptr), mRemaining(0) {}
     QueryResponderIterator(QueryResponderRecordFilter * recordFilter, Internal::QueryResponderInfo * pos, size_t size) :
         mFilter(recordFilter), mCurrent(pos), mRemaining(size)
@@ -265,6 +267,10 @@ public:
 
     /// Flag any additional responses required for the given iterator
     void MarkAdditionalRepliesFor(QueryResponderIterator it);
+
+    /// Resets the internal broadcast throttle setting to allow re-broadcasting
+    /// of all packets without a timedelay.
+    void ClearBroadcastThrottle();
 
 private:
     Internal::QueryResponderInfo * mResponderInfos;

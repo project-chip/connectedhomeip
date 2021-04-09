@@ -32,9 +32,9 @@
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -46,8 +46,7 @@ chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing(chip::Optional<chip::NodeId>::Value(chip::kUndefinedNodeId),
-                                                static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
 void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
@@ -61,7 +60,8 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    bool useTCP = false;
+    bool useTCP      = false;
+    bool disableEcho = false;
 
     chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
@@ -77,6 +77,11 @@ int main(int argc, char * argv[])
     if ((argc == 2) && (strcmp(argv[1], "--tcp") == 0))
     {
         useTCP = true;
+    }
+
+    if ((argc == 2) && (strcmp(argv[1], "--disable") == 0))
+    {
+        disableEcho = true;
     }
 
     InitializeChip();
@@ -106,14 +111,21 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = gEchoServer.Init(&gExchangeManager);
+    if (!disableEcho)
+    {
+        err = gEchoServer.Init(&gExchangeManager);
+        SuccessOrExit(err);
+    }
+
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
-    SuccessOrExit(err);
-
-    // Arrange to get a callback whenever an Echo Request is received.
-    gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
+    if (!disableEcho)
+    {
+        // Arrange to get a callback whenever an Echo Request is received.
+        gEchoServer.SetEchoRequestReceived(HandleEchoRequestReceived);
+    }
 
     printf("Listening for Echo requests...\n");
 
@@ -126,7 +138,10 @@ exit:
         exit(EXIT_FAILURE);
     }
 
-    gEchoServer.Shutdown();
+    if (!disableEcho)
+    {
+        gEchoServer.Shutdown();
+    }
 
     ShutdownChip();
 

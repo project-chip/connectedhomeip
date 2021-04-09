@@ -48,9 +48,7 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
-#endif
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>

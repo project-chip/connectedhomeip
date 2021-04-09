@@ -28,6 +28,7 @@ class Mutex
 public:
     virtual void Lock()   = 0;
     virtual void Unlock() = 0;
+    virtual ~Mutex() {} // Virtual Destructor
 };
 
 void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uart_mutex_);

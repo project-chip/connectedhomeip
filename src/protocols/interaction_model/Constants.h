@@ -42,17 +42,24 @@ namespace Protocols {
 namespace InteractionModel {
 
 /**
+ * Version of the Interaction Model used by the node.
+ */
+constexpr uint16_t kVersion = 0;
+
+/**
  * SecureChannel Protocol Message Types
  */
 enum class MsgType : uint8_t
 {
-    SubscribeRequest      = 0x01,
     ReadRequest           = 0x02,
-    ReportData            = 0x03,
-    WriteRequest          = 0x04,
-    WriteResponse         = 0x05,
-    InvokeCommandRequest  = 0x06,
-    InvokeCommandResponse = 0x07,
+    SubscribeRequest      = 0x03,
+    SubscribeResponse     = 0x04,
+    ReportData            = 0x05,
+    WriteRequest          = 0x06,
+    WriteResponse         = 0x07,
+    InvokeCommandRequest  = 0x08,
+    InvokeCommandResponse = 0x09,
+    TimedRequest          = 0x0a,
 };
 
 } // namespace InteractionModel
@@ -60,7 +67,7 @@ enum class MsgType : uint8_t
 template <>
 struct MessageTypeTraits<InteractionModel::MsgType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_InteractionModel;
+    static constexpr const Protocols::Id & ProtocolId() { return InteractionModel::Id; }
 };
 
 } // namespace Protocols

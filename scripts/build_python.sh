@@ -18,6 +18,10 @@
 
 set -e
 
+_normpath() {
+    python -c "import os.path; print(os.path.normpath('$@'))"
+}
+
 echo_green() {
     echo -e "\033[0;32m$*\033[0m"
 }
@@ -30,7 +34,7 @@ echo_bold_white() {
     echo -e "\033[1;37m$*\033[0m"
 }
 
-CHIP_ROOT=$(realpath "$(dirname "$0")/..")
+CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 
@@ -51,11 +55,9 @@ source "$ENVIRONMENT_ROOT"/bin/activate
 "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade pip
 "$ENVIRONMENT_ROOT"/bin/pip install "$OUTPUT_ROOT"/controller/python/chip-*.whl
 
-RELATIVE_ENVIRONMENT_ROOT=$(realpath --relative-to "$PWD" "$ENVIRONMENT_ROOT")
-
 echo ""
 echo_green "Compilation completed and WHL package installed in: "
-echo_blue "  $RELATIVE_ENVIRONMENT_ROOT"
+echo_blue "  $ENVIRONMENT_ROOT"
 echo ""
 echo_green "To use please run:"
-echo_bold_white "  source $RELATIVE_ENVIRONMENT_ROOT/bin/activate"
+echo_bold_white "  source $ENVIRONMENT_ROOT/bin/activate"

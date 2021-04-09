@@ -41,7 +41,7 @@ ninja -C out/python_lib python
 > WHL file.
 
 ```sh
-virtualenv out/python_env --clean
+virtualenv out/python_env --clear
 source out/python_env/bin/activate
 pip install out/python_lib/controller/python/chip*.whl
 ```
@@ -83,6 +83,34 @@ Bring up two virtual ble interface:
 sudo third_party/bluez/repo/emulator/btvirt -L -l2
 ```
 
+You can find the virtual interface by `hciconfig` command:
+
+```
+$ hciconfig
+
+hci2:	Type: Primary  Bus: Virtual
+	BD Address: 00:AA:01:01:00:24  ACL MTU: 192:1  SCO MTU: 0:0
+	UP RUNNING
+	RX bytes:0 acl:95 sco:0 events:205 errors:0
+	TX bytes:2691 acl:95 sco:0 commands:98 errors:0
+
+hci1:	Type: Primary  Bus: Virtual
+	BD Address: 00:AA:01:00:00:23  ACL MTU: 192:1  SCO MTU: 0:0
+	UP RUNNING
+	RX bytes:0 acl:95 sco:0 events:208 errors:0
+	TX bytes:3488 acl:95 sco:0 commands:110 errors:0
+```
+
+Then you can choose the adapter to use in command line arguments of the device
+controller:
+
+For example, add `--bluetooth-adapter=hci2` to use the virtual interface `hci2`
+listed above.
+
+```
+chip-device-ctrl --bluetooth-adapter=hci2
+```
+
 ## Usage / BLE Secure Session Establishment
 
 1. Run CHIP Device Controller
@@ -94,19 +122,13 @@ sudo third_party/bluez/repo/emulator/btvirt -L -l2
 sudo chip-device-ctrl
 ```
 
-2. [WIP][required when there are multiple ble adapters] Select BLE adapter
-   (Linux only)
+or select the bluetooth interface by command line arguments.
 
 ```
-chip-device-ctrl > ble-adapter-print
-2020-11-23 17:41:53,116 ChipBLEMgr   INFO     adapter 0 = DE:AD:BE:EF:00:00
-2020-11-23 17:41:53,116 ChipBLEMgr   INFO     adapter 1 = DE:AD:BE:EF:01:01
-2020-11-23 17:41:53,116 ChipBLEMgr   INFO     adapter 2 = DE:AD:BE:EF:02:02
-
-chip-device-ctrl > ble-adapter-select DE:AD:BE:EF:00:00
+sudo chip-device-ctrl --bluetooth-adapter=hci2
 ```
 
-3. Scan BLE devices
+2. Scan BLE devices
 
 ```
 chip-device-ctrl > ble-scan
@@ -126,7 +148,7 @@ chip-device-ctrl > ble-scan
 Connect to BLE device
 ```
 
-4.  Set wifi credential
+3.  Set wifi credential
 
 > Note: This command will be deprerated after the network provisioning cluster
 > is ready.
@@ -135,10 +157,34 @@ Connect to BLE device
 chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 ```
 
-5.  Connect to device using setup pin code
+4.  Connect to device using setup pin code
 
 ```
 chip-device-ctrl > connect -ble 1383 12345678
+```
+
+## Thread provisioning
+
+1. Configure Thread border router. For example, follow
+   [Setup OpenThread Border Router on Raspberry Pi / ubuntu](../../../docs/guides/openthread_border_router_pi.md)
+   instruction to configure OpenThread Border Router on a Linux workstation.
+
+2. Run CHIP Device Controller
+
+```
+sudo chip-device-ctrl
+```
+
+3. Set Thread credentials
+
+```
+set-pairing-thread-credential <channel> <pan id[HEX]> <master_key>
+```
+
+4. BLE Connect to the device
+
+```
+connect -ble <discriminator> <setup pin code> [<nodeid>]
 ```
 
 ## IP Secure Session Establishment
@@ -162,19 +208,49 @@ chip-device-ctrl > connect -ip <Device IP Address> 12345678
 **`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
 For testing
 
-### **`[W][L]`** `ble-adapter-print`
+### `setup-payload parse-manual <manual-pairing-code>`
+
+Print the commissioning information encoded in the Manual Pairing Code.
+
+```
+chip-device-ctrl > setup-payload parse-manual 35767807533
+Version: 0
+VendorID: 0
+ProductID: 0
+RequiresCustomFlow: 0
+RendezvousInformation: 0
+Discriminator: 3840
+SetUpPINCode: 12345678
+```
+
+### `setup-payload parse-qr <qr-code>`
+
+Print the commissioning information encoded in the QR Code payload.
+
+```
+chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%CH:H34.GHY00 0C9SS0"
+Version: 0
+VendorID: 9050
+ProductID: 20043
+RequiresCustomFlow: 0
+RendezvousInformation: 2 [BLE]
+Discriminator: 3840
+SetUpPINCode: 12345678
+```
+
+### **`[L]`** `ble-adapter-print`
 
 Print the available Bluetooth adapters on device. Takes no arguments.
 
 ```
 chip-device-ctrl > ble-adapter-print
-2021-01-19 02:14:16,766 ChipBLEMgr   INFO     adapter 0 = DC:A6:32:9E:2E:A7
+2021-03-04 16:09:40,930 ChipBLEMgr   INFO     AdapterName: hci0   AdapterAddress: 00:AA:01:00:00:23
 ```
 
-### **`[W][L]`** `ble-adapter-select <address>`
+### **`[D]`** `ble-adapter-select <address>`
 
 Select the Bluetooth adapter for device controller, takes adapter MAC address as
-argument.
+argument. This command only affects `ble-scan` command.
 
 ```
 chip-device-ctrl > ble-adapter-select DC:A6:32:9E:2E:A7
@@ -203,15 +279,27 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
 ```
 
-### `connect -ip <address> <SetUpPinCode>`
+### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using IP transport.
 
-### `connect -ble <discriminator> <SetUpPinCode>`
+The node id will be used by controller to distinguish multiple devices. This
+does not match the spec and will be removed later. The nodeid will not be
+persisted by controller / device.
+
+If no nodeid given, a random node id will be used.
+
+### `connect -ble <discriminator> <SetUpPinCode> [<nodeid>]`
 
 Do key exchange and establish a secure session between controller and device
 using BLE transport.
+
+The node id will be used by controller to distinguish multiple devices. This
+does not match the spec and will be removed later. The nodeid will not be
+persisted by controller / device.
+
+If no nodeid given, a random node id will be used.
 
 ### **`[D]`** `set-pairing-wifi-credential <ssid> <password>`
 
@@ -263,3 +351,59 @@ Example:
 ```
 chip-device-ctrl > zcl LevelControl MoveWithOnOff 12344321 1 0 moveMode=1 rate=2
 ```
+
+**Format of arguments**
+
+For any integer and char string (null terminated) types, just use `key=value`,
+for example: `rate=2`, `string=123`, `string_2="123 456"`
+
+For byte string type, use `key=encoding:value`, currectly, we support `str` and
+`hex` encoding, the `str` encoding will encode a NULL terminated string. For
+example, `networkId=hex:0123456789abcdef` (for
+`[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
+`['T', 'e', 's', 't', 0x00]`).
+
+## Example Commissioning flow over IP
+
+-   Assuming your WiFi ssid is `TESTSSID`, and your WiFi password is `P455W4RD`.
+
+-   Assuming your Thread network has the following operational dataset:
+
+    ```
+    0e 08 0000000000010000
+    00 03 000014
+    35 06 0004001fffe0
+    02 08 577c1f5384d9e909
+    07 08 fdca4e253816ae9d
+    05 10 bb53ac7bf2133f0f686759ad9969255c
+    03 0f 4f70656e5468726561642d31343937
+    01 02 1497
+    04 10 420111ea791a892d28e3160f20eea396
+    0c 03 0000ff
+    ```
+
+-   Assuming your device is on the same network, with IP address 192.168.0.1
+
+-   The setup pincode is 12345678
+
+-   You set the temporary node id to 4546
+
+```
+chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
+```
+
+> Skip this part if your device does not support WiFi.
+>
+> ```
+> chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 4546 1 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
+>
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+> ```
+
+> Skip this part if your device does not support Thread.
+>
+> ```
+> chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 4546 1 0 operationalDataset=hex:0e080000000000010000000300001435060004001fffe00208577c1f5384d9e9090708fdca4e253816ae9d0510bb53ac7bf2133f0f686759ad9969255c030f4f70656e5468726561642d31343937010214970410420111ea791a892d28e3160f20eea3960c030000ff breadcrumb=0 timeoutMs=1000
+>
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkId=hex:0123456789abcdef breadcrumb=0 timeoutMs=1000
+> ```

@@ -22,17 +22,16 @@
 #include <inipp/inipp.h>
 #include <support/logging/CHIPLogging.h>
 
-class PersistentStorage : public chip::Controller::PersistentStorageDelegate
+class PersistentStorage : public chip::PersistentStorageDelegate
 {
 public:
     CHIP_ERROR Init();
 
     /////////// PersistentStorageDelegate Interface /////////
-    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate) override;
-    void GetKeyValue(const char * key) override;
-    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
-    void SetKeyValue(const char * key, const char * value) override;
-    void DeleteKeyValue(const char * key) override;
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
+    void AsyncSetKeyValue(const char * key, const char * value) override;
+    void AsyncDeleteKeyValue(const char * key) override;
 
     uint16_t GetListenPort();
     chip::Logging::LogCategory GetLoggingLevel();

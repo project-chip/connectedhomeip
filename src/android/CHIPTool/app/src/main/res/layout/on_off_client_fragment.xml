@@ -4,14 +4,14 @@
     android:layout_height="match_parent">
 
     <EditText
-        android:id="@+id/ipAddressEd"
+        android:id="@+id/deviceIdEd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:layout_alignParentTop="true"
         android:inputType="text"
         android:textSize="20sp"
-        android:hint="@string/enter_ip_address_hint_text"/>
+        android:hint="@string/enter_device_id_hint_text"/>
 
     <TextView
         android:id="@+id/onBtn"
@@ -21,7 +21,7 @@
         android:layout_margin="32dp"
         android:layout_gravity="center"
         android:layout_alignParentStart="true"
-        android:layout_below="@id/ipAddressEd"
+        android:layout_below="@id/deviceIdEd"
         android:background="@android:color/darker_gray"
         android:text="@string/send_command_on_btn_text"
         android:textSize="16sp"/>
@@ -35,7 +35,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="48dp"
         android:layout_gravity="center"
-        android:layout_below="@id/ipAddressEd"
+        android:layout_below="@id/deviceIdEd"
         android:layout_toEndOf="@id/onBtn"
         android:layout_toStartOf="@+id/offBtn"
         android:background="@android:color/darker_gray"
@@ -51,7 +51,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_alignParentEnd="true"
-        android:layout_below="@id/ipAddressEd"
+        android:layout_below="@id/deviceIdEd"
         android:background="@android:color/darker_gray"
         android:text="@string/send_command_off_btn_text"
         android:textSize="16sp"/>

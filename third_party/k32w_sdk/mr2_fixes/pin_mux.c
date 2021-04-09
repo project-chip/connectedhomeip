@@ -176,6 +176,7 @@ void BOARD_InitPins(void)
 
     /* Debugger signals */
     ConfigureDebugPort();
+
     BOARD_InitAppUARTPins();
 
     ConfigureDongleLEDs();

@@ -29,7 +29,7 @@ from Foundation import *
 
 import logging
 import objc
-import six.moves.queue
+import queue
 import time
 
 from .ChipBleUtility import (
@@ -154,7 +154,7 @@ class CoreBluetoothManager(ChipBleBase):
         self.peripheral_list = []
         self.peripheral_adv_list = []
         self.bg_peripheral_name = None
-        self.chip_queue = six.moves.queue.Queue()
+        self.chip_queue = queue.Queue()
 
         self.manager = CBCentralManager.alloc()
         self.manager.initWithDelegate_queue_options_(self, None, None)

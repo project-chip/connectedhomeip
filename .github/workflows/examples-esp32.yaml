@@ -27,6 +27,7 @@ jobs:
             BUILD_TYPE: esp32
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build-esp32:latest
@@ -41,11 +42,10 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
             - name: Build example All Clusters App
               run: scripts/examples/esp_example.sh all-clusters-app
             - name: Copy aside build products
@@ -81,6 +81,6 @@ jobs:
             #   run: find . -type d -name "third_party" -exec rm -rf {} +
             # - name: Remove m5stack-tft binaries for CodeQL Analysis
             #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

@@ -60,6 +60,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
+    case PairingMode::Ethernet:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
     }
     WaitForResponse(kWaitDurationInSeconds);
 
@@ -77,7 +80,7 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress address)
 {
     ChipSerializedDevice serializedTestDevice;
-    return mCommissioner.PairTestDeviceWithoutSecurity(remoteId, address.GetIPAddress(), serializedTestDevice, address.GetPort());
+    return mCommissioner.PairTestDeviceWithoutSecurity(remoteId, address, serializedTestDevice);
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)

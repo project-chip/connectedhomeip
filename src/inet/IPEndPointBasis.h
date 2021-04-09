@@ -166,6 +166,18 @@ protected:
     void ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+public:
+    using JoinMulticastGroupHandler  = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
+    using LeaveMulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
+    static void SetJoinMulticastGroupHandler(JoinMulticastGroupHandler handler) { sJoinMulticastGroupHandler = handler; }
+    static void SetLeaveMulticastGroupHandler(LeaveMulticastGroupHandler handler) { sLeaveMulticastGroupHandler = handler; }
+
+private:
+    static JoinMulticastGroupHandler sJoinMulticastGroupHandler;
+    static LeaveMulticastGroupHandler sLeaveMulticastGroupHandler;
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 private:
     IPEndPointBasis()                        = delete;
     IPEndPointBasis(const IPEndPointBasis &) = delete;

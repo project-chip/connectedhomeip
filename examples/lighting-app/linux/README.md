@@ -9,6 +9,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
+    -   [Commandline Arguments](#command-line-args)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
 
 <hr>
@@ -34,19 +35,54 @@ Raspberry Pi Desktop 20.10 (aarch64)**
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
 
+-   Build the example with pigweed RCP
+
+          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
+
+<a name="command-line-args"></a>
+
+## Commandline arguments
+
+-   `--wifi`
+
+    Enables WiFi management feature. Required for WiFi commissioning.
+
+-   `--thread`
+
+    Enables Thread management feature, requires ot-br-posix dbus daemon running.
+    Required for Thread commissioning.
+
+-   `--ble-device <interface id>`
+
+    Use specific bluetooth interface for BLE advertisement and connections.
+
+    `interface id`: the number after `hci` when listing BLE interfaces by
+    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
+    interface. Default: `0`.
+
 <a name="running-complete-example"></a>
 
 ## Running the Complete Example on Raspberry Pi 4
 
 > If you want to test ZCL, please disable Rendezvous
 >
->     gn gen out/debug --args='bypass_rendezvous=true'
+>     gn gen out/debug --args='chip_bypass_rendezvous=true'
 >     ninja -C out/debug
 >
-> Note that GN will set bypass_rendezvous for future builds, to enable
+> Note that GN will set chip_bypass_rendezvous for future builds, to enable
 > rendezvous, re-generate using
 >
 >     gn gen out/debug --args='chip_bypass_rendezvous=false'
+
+> If you want to test Echo protocol, please disable Rendezvous and enable Echo
+> handler
+>
+>     gn gen out/debug --args='chip_bypass_rendezvous=true chip_app_use_echo=true'
+>     ninja -C out/debug
 
 -   Prerequisites
 
@@ -84,9 +120,25 @@ Raspberry Pi Desktop 20.10 (aarch64)**
         -   Run Linux Lighting Example App
 
                   $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
+                  $ sudo out/debug/chip-lighting-app --ble-device [bluetooth device number]
                   # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-tool-server --ble-device 1
+                  $ sudo out/debug/chip-lighting-app --ble-device 1
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
+
+## Running Pigweed RPC console
+
+-   As part of building the example with RPCs enabled the lighting_app python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/lighting_app_wheels. To install
+    the wheel files without rebuilding:
+    `pip3 install out/debug/lighting_app_wheels/*.whl`
+
+-   To use the lighting-app console after it has been installed run:
+    `python3 -m lighting_app.rpc_console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+
+-   Then you can Get and Set the light using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True)`

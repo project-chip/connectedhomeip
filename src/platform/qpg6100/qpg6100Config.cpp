@@ -26,6 +26,7 @@
 #include <platform/qpg6100/qpg6100Config.h>
 
 #include <core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -46,106 +47,78 @@ CHIP_ERROR QPG6100Config::Init()
 
 uint16_t QPG6100Config::GetSettingsMaxValueLength(Key key)
 {
-    return qvCHIP_Nvm_GetMaxKeyLen(key);
+    uint16_t keyLen;
+
+    return (qvCHIP_Nvm_GetMaxKeyLen(key, &keyLen) == QV_STATUS_NO_ERROR) ? keyLen : 0;
 }
 
 CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, bool & val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t length;
-    bool res;
 
     length = sizeof(bool);
 
-    res = qvCHIP_Nvm_Restore(key, (uint8_t *) (&val), &length);
-    if (res == false)
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-
-    return err;
+    return MapNVMError(qvCHIP_Nvm_Restore(key, reinterpret_cast<uint8_t *>(&val), &length));
 }
 
 CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, uint32_t & val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t length;
-    bool res;
 
     length = sizeof(uint32_t);
 
-    res = qvCHIP_Nvm_Restore(key, (uint8_t *) (&val), &length);
-    if (res == false)
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-
-    return err;
+    return MapNVMError(qvCHIP_Nvm_Restore(key, reinterpret_cast<uint8_t *>(&val), &length));
 }
 
 CHIP_ERROR QPG6100Config::ReadConfigValue(Key key, uint64_t & val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t length;
-    bool res;
 
     length = sizeof(uint64_t);
 
-    res = qvCHIP_Nvm_Restore(key, (uint8_t *) (&val), &length);
-    if (res == false)
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
-
-    return err;
+    return MapNVMError(qvCHIP_Nvm_Restore(key, reinterpret_cast<uint8_t *>(&val), &length));
 }
 
 CHIP_ERROR QPG6100Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    bool res;
+    qvStatus_t res;
     uint16_t length;
 
-    if (buf == NULL)
+    if ((buf == NULL) || (bufSize > UINT16_MAX))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    length = (uint16_t) bufSize;
-    res    = qvCHIP_Nvm_Restore(key, (uint8_t *) buf, &length);
+    length = static_cast<uint16_t>(bufSize);
+    res    = qvCHIP_Nvm_Restore(key, Uint8::from_char(buf), &length);
     if (length > bufSize)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
-    if (res == true)
+    if (res == QV_STATUS_NO_ERROR)
     {
         outLen      = length;
         buf[outLen] = 0;
     }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
 
-    return err;
+    return MapNVMError(res);
 }
 
 CHIP_ERROR QPG6100Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t buffer[255];
     uint16_t length;
-    bool res;
+    qvStatus_t res;
 
-    if (buf == NULL)
+    if ((buf == NULL) || (bufSize > UINT16_MAX))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    length = (uint16_t) outLen;
+    length = static_cast<uint16_t>(bufSize);
 
     res = qvCHIP_Nvm_Restore(key, buffer, &length);
-    if (res == true)
+    if (res == QV_STATUS_NO_ERROR)
     {
         outLen = length;
         if (outLen > bufSize)
@@ -156,12 +129,8 @@ CHIP_ERROR QPG6100Config::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufS
         memcpy(buf, buffer, outLen);
         buf[outLen] = 0;
     }
-    else
-    {
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    }
 
-    return err;
+    return MapNVMError(res);
 }
 
 CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, bool val)
@@ -170,9 +139,7 @@ CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, bool val)
 
     length = sizeof(bool);
 
-    qvCHIP_Nvm_Backup(key, (uint8_t *) (&val), length);
-
-    return CHIP_NO_ERROR;
+    return MapNVMError(qvCHIP_Nvm_Backup(key, reinterpret_cast<uint8_t *>(&val), length));
 }
 
 CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint32_t val)
@@ -181,9 +148,7 @@ CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint32_t val)
 
     length = sizeof(uint32_t);
 
-    qvCHIP_Nvm_Backup(key, (uint8_t *) (&val), length);
-
-    return CHIP_NO_ERROR;
+    return MapNVMError(qvCHIP_Nvm_Backup(key, reinterpret_cast<uint8_t *>(&val), length));
 }
 
 CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint64_t val)
@@ -192,9 +157,7 @@ CHIP_ERROR QPG6100Config::WriteConfigValue(Key key, uint64_t val)
 
     length = sizeof(uint64_t);
 
-    qvCHIP_Nvm_Backup(key, (uint8_t *) (&val), length);
-
-    return CHIP_NO_ERROR;
+    return MapNVMError(qvCHIP_Nvm_Backup(key, reinterpret_cast<uint8_t *>(&val), length));
 }
 
 CHIP_ERROR QPG6100Config::WriteConfigValueStr(Key key, const char * str)
@@ -204,13 +167,17 @@ CHIP_ERROR QPG6100Config::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR QPG6100Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
+    if (strLen > UINT16_MAX)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     if (str == NULL)
     {
         qvCHIP_Nvm_ClearValue(key);
     }
     else
     {
-        qvCHIP_Nvm_Backup(key, (uint8_t *) str, (uint16_t) strLen);
+        return MapNVMError(qvCHIP_Nvm_Backup(key, Uint8::from_const_char(str), static_cast<uint16_t>(strLen)));
     }
 
     return CHIP_NO_ERROR;
@@ -218,13 +185,17 @@ CHIP_ERROR QPG6100Config::WriteConfigValueStr(Key key, const char * str, size_t 
 
 CHIP_ERROR QPG6100Config::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
+    if (dataLen > UINT16_MAX)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     if (data == NULL)
     {
         qvCHIP_Nvm_ClearValue(key);
     }
     else
     {
-        qvCHIP_Nvm_Backup(key, (uint8_t *) data, (uint16_t) dataLen);
+        return MapNVMError(qvCHIP_Nvm_Backup(key, data, static_cast<uint16_t>(dataLen)));
     }
 
     return CHIP_NO_ERROR;
@@ -282,6 +253,26 @@ CHIP_ERROR QPG6100Config::ForEachRecord(Key firstKey, Key lastKey, bool addNewRe
 
 exit:
     return err;
+}
+
+CHIP_ERROR QPG6100Config::MapNVMError(qvStatus_t aStatus)
+{
+    switch (aStatus)
+    {
+    case QV_STATUS_NO_ERROR:
+        return CHIP_NO_ERROR;
+    case QV_STATUS_BUFFER_TOO_SMALL:
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    case QV_STATUS_INVALID_ARGUMENT:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case QV_STATUS_KEY_LEN_TOO_SMALL:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+    case QV_STATUS_INVALID_DATA:
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    default:
+        break;
+    }
+    return CHIP_ERROR_INTERNAL;
 }
 
 void QPG6100Config::RunConfigUnitTest()

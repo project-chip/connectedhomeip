@@ -59,7 +59,7 @@ menu "CHIP Core"
         config MAX_UNSOLICITED_MESSAGE_HANDLERS
             int "Max Unsolicited Message Handlers"
             range 0 65535
-            default 16
+            default 8
             help
                 The maximum number of simultaneously active unsolicited message handlers.
 
@@ -83,6 +83,13 @@ menu "CHIP Core"
             default n
             help
                 Link the application with the library containing Pigweed RPC functionalities
+
+        config USE_MINIMAL_MDNS
+            bool "Use the minimal mDNS implementation shipped in the CHIP library"
+            default y
+            help
+                The CHIP library is shipped with a minimal mDNS implementation,
+                enable this config to use it rather than the mDNS library in IDF.
 
         # TODO: add log level selection
 
@@ -321,7 +328,7 @@ menu "CHIP Device Layer"
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
             range 0 65535
-            default 8192
+            default 5120
             help
                 The size (in bytes) of the CHIP task stack.
 
@@ -507,20 +514,36 @@ menu "CHIP Device Layer"
                 However, due to other data sent in WoBLE advertise packets, the device name
                 may need to be shorter.
 
-        config BLE_FAST_ADVERTISING_INTERVAL
-            int "Fast Advertising Interval"
-            default 320
+        config BLE_FAST_ADVERTISING_INTERVAL_MIN
+            int "Fast Advertising Min Interval"
+            default 40
             depends on ENABLE_CHIPOBLE
             help
-                The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
                 in fast advertising mode.
 
-        config BLE_SLOW_ADVERTISING_INTERVAL
-            int "Slow Advertising Interval"
-            default 3200
+        config BLE_FAST_ADVERTISING_INTERVAL_MAX
+            int "Fast Advertising Max Interval"
+            default 40
             depends on ENABLE_CHIPOBLE
             help
-                The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                in fast advertising mode.
+
+        config BLE_SLOW_ADVERTISING_INTERVAL_MIN
+            int "Slow Advertising Min Interval"
+            default 800
+            depends on ENABLE_CHIPOBLE
+            help
+                The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+                in slow advertising mode.
+
+        config BLE_SLOW_ADVERTISING_INTERVAL_MAX
+            int "Slow Advertising Max Interval"
+            default 800
+            depends on ENABLE_CHIPOBLE
+            help
+                The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
                 in slow advertising mode.
 
         config CHIPOBLE_SINGLE_CONNECTION
@@ -640,7 +663,7 @@ menu "CHIP Device Layer"
 
         config USE_TEST_SERIAL_NUMBER
             string "Use Test Serial Number"
-            default "DUMMY_SN"
+            default "TEST_SN"
             help
                 Specifies a hard-coded device serial number to be used if none is found in CHIP NV storage.
                 Setting the value to an empty string disables the feature.

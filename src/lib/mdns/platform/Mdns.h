@@ -35,9 +35,10 @@
 namespace chip {
 namespace Mdns {
 
-static constexpr uint8_t kMdnsNameMaxSize  = 33;
-static constexpr uint8_t kMdnsTypeMaxSize  = 32;
-static constexpr uint16_t kMdnsTextMaxSize = 64;
+static constexpr uint8_t kMdnsNameMaxSize         = 33;
+static constexpr uint8_t kMdnsProtocolTextMaxSize = 8;
+static constexpr uint8_t kMdnsTypeMaxSize         = 32;
+static constexpr uint16_t kMdnsTextMaxSize        = 64;
 
 enum class MdnsServiceProtocol : uint8_t
 {
@@ -95,7 +96,7 @@ using MdnsResolveCallback = void (*)(void * context, MdnsService * result, CHIP_
  */
 using MdnsBrowseCallback = void (*)(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error);
 
-using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
+using MdnsAsyncReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
  * This function intializes the mdns module
@@ -108,7 +109,7 @@ using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
  * @retval Error code     The initialization fails
  *
  */
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
+CHIP_ERROR ChipMdnsInit(MdnsAsyncReturnCallback initCallback, MdnsAsyncReturnCallback errorCallback, void * context);
 
 /**
  * This function sets the host name for services.
@@ -135,13 +136,25 @@ CHIP_ERROR ChipMdnsSetHostname(const char * hostname);
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service);
 
 /**
- * This function stops publishing service via mDNS.
+ * This function stops publishing all services via mDNS.
  *
  * @retval CHIP_NO_ERROR                The publish stops successfully.
  * @retval Error code                   Stopping the publish fails.
  *
  */
 CHIP_ERROR ChipMdnsStopPublish();
+
+/**
+ * This function stops publishing a specific service via mDNS.
+ *
+ * @param[in] service   The service entry.
+ *
+ * @retval CHIP_NO_ERROR                The service stop succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The service is nullptr.
+ * @retval Error code                   The service stop fails.
+ *
+ */
+CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service);
 
 /**
  * This function browses the services published by mdns

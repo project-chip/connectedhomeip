@@ -24,8 +24,8 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
+#include "OnboardingCodesUtil.h"
 #include "QRCodeScreen.h"
-#include "QRCodeUtil.h"
 #include "ScreenManager.h"
 #include "Server.h"
 #include "WiFiWidget.h"
@@ -46,10 +46,13 @@
 #include <vector>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <server/Mdns.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
+
+#include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
@@ -133,16 +136,22 @@ void AddDevice(std::string name)
 
 class EditAttributeListModel : public ListScreen::Model
 {
-    int d;
-    int e;
-    int c;
-    int a;
+    int deviceIndex;
+    int endpointIndex;
+    int clusterIndex;
+    int attributeIndex;
 
 public:
-    EditAttributeListModel(int d, int e, int c, int a) : d(d), e(e), c(c), a(a) {}
+    EditAttributeListModel(int deviceIndex, int endpointIndex, int clusterIndex, int attributeIndex) :
+        deviceIndex(deviceIndex), endpointIndex(endpointIndex), clusterIndex(clusterIndex), attributeIndex(attributeIndex)
+    {}
+    Attribute & attribute()
+    {
+        return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[attributeIndex];
+    }
     virtual std::string GetTitle()
     {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+        auto & attribute = this->attribute();
         auto & name      = std::get<0>(attribute);
         auto & value     = std::get<1>(attribute);
         char buffer[64];
@@ -153,15 +162,22 @@ public:
     virtual std::string GetItemText(int i) { return i == 0 ? "+" : "-"; }
     virtual void ItemAction(int i)
     {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[a];
+        auto & attribute = this->attribute();
         auto & value     = std::get<1>(attribute);
         int n;
         if (sscanf(value.c_str(), "%d", &n) == 1)
         {
+            auto & name = std::get<0>(attribute);
+
             ESP_LOGI(TAG, "editing attribute as integer: %d (%s)", n, i == 0 ? "+" : "-");
             n += (i == 0) ? 1 : -1;
             char buffer[32];
             sprintf(buffer, "%d", n);
+            if (name == "Temperature")
+            {
+                // update the temp attribute here for hardcoded endpoint 1
+                emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(n * 100));
+            }
             value = buffer;
         }
         else
@@ -174,17 +190,22 @@ public:
 
 class AttributeListModel : public ListScreen::Model
 {
-    int d;
-    int e;
-    int c;
+    int deviceIndex;
+    int endpointIndex;
+    int clusterIndex;
 
 public:
-    AttributeListModel(int d, int e, int c) : d(d), e(e), c(c) {}
+    AttributeListModel(int deviceIndex, int endpointIndex, int clusterIndex) :
+        deviceIndex(deviceIndex), endpointIndex(endpointIndex), clusterIndex(clusterIndex)
+    {}
     virtual std::string GetTitle() { return "Attributes"; }
-    virtual int GetItemCount() { return std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c]).size(); }
+    virtual int GetItemCount()
+    {
+        return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex]).size();
+    }
     virtual std::string GetItemText(int i)
     {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[d])[e])[c])[i];
+        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[i];
         auto & name      = std::get<0>(attribute);
         auto & value     = std::get<1>(attribute);
         char buffer[64];
@@ -194,40 +215,42 @@ public:
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening attribute %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<EditAttributeListModel>(d, e, c, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(
+            chip::Platform::New<EditAttributeListModel>(deviceIndex, endpointIndex, clusterIndex, i)));
     }
 };
 
 class ClusterListModel : public ListScreen::Model
 {
-    int d;
-    int e;
+    int deviceIndex;
+    int endpointIndex;
 
 public:
-    ClusterListModel(int d, int e) : d(d), e(e) {}
+    ClusterListModel(int deviceIndex, int endpointIndex) : deviceIndex(deviceIndex), endpointIndex(endpointIndex) {}
     virtual std::string GetTitle() { return "Clusters"; }
-    virtual int GetItemCount() { return std::get<1>(std::get<1>(devices[d])[e]).size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(std::get<1>(devices[d])[e])[i]); }
+    virtual int GetItemCount() { return std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex]).size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]); }
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening cluster %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<AttributeListModel>(d, e, i)));
+        ScreenManager::PushScreen(
+            chip::Platform::New<ListScreen>(chip::Platform::New<AttributeListModel>(deviceIndex, endpointIndex, i)));
     }
 };
 
 class EndpointListModel : public ListScreen::Model
 {
-    int d;
+    int deviceIndex;
 
 public:
-    EndpointListModel(int d) : d(d) {}
+    EndpointListModel(int deviceIndex) : deviceIndex(deviceIndex) {}
     virtual std::string GetTitle() { return "Endpoints"; }
-    virtual int GetItemCount() { return std::get<1>(devices[d]).size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(devices[d])[i]); }
+    virtual int GetItemCount() { return std::get<1>(devices[deviceIndex]).size(); }
+    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(devices[deviceIndex])[i]); }
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening endpoint %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<ClusterListModel>(d, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<ClusterListModel>(deviceIndex, i)));
     }
 };
 
@@ -249,8 +272,12 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi = "Reset WiFi";
+        std::string resetWiFi              = "Reset WiFi";
+        std::string resetToFactory         = "Reset to factory";
+        std::string forceWifiCommissioning = "Force WiFi commissioning";
         options.emplace_back(resetWiFi);
+        options.emplace_back(resetToFactory);
+        options.emplace_back(forceWifiCommissioning);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -261,7 +288,16 @@ public:
         if (i == 0)
         {
             ConnectivityMgr().ClearWiFiStationProvision();
-            OpenDefaultPairingWindow();
+            OpenDefaultPairingWindow(ResetAdmins::kYes);
+        }
+        else if (i == 1)
+        {
+            ConfigurationMgr().InitiateFactoryReset();
+        }
+        else if (i == 2)
+        {
+            app::Mdns::AdvertiseCommisioning();
+            OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }
 
@@ -301,9 +337,8 @@ void SetupPretendDevices()
     AddEndpoint("External");
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
-    AddEndpoint("Internal");
-    AddCluster("Thermometer");
-    AddAttribute("Temperature", "42");
+    // write the temp attribute
+    emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(21 * 100));
 
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
@@ -335,7 +370,8 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 bool isRendezvousBLE()
 {
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
+    return flags.Has(RendezvousInformationFlag::kBLE);
 }
 
 std::string createSetupPayload()
@@ -376,10 +412,10 @@ std::string createSetupPayload()
     }
 
     SetupPayload payload;
-    payload.version               = 1;
+    payload.version               = 0;
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+    payload.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
     payload.vendorID              = vendorId;
     payload.productID             = productId;
 
@@ -435,12 +471,20 @@ std::string createSetupPayload()
     return result;
 };
 
+WiFiWidget pairingWindowLED;
+
 class AppCallbacks : public AppDelegate
 {
 public:
     void OnReceiveError() override { statusLED1.BlinkOnError(); }
     void OnRendezvousStarted() override { bluetoothLED.Set(true); }
-    void OnRendezvousStopped() override { bluetoothLED.Set(false); }
+    void OnRendezvousStopped() override
+    {
+        bluetoothLED.Set(false);
+        pairingWindowLED.Set(false);
+    }
+    void OnPairingWindowOpened() override { pairingWindowLED.Set(true); }
+    void OnPairingWindowClosed() override { pairingWindowLED.Set(false); }
 };
 
 } // namespace
@@ -485,18 +529,19 @@ extern "C" void app_main()
         return;
     }
 
-    SetupPretendDevices();
-
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
     // "LED"s on devices with screens.
     statusLED2.Init(GPIO_NUM_MAX);
     bluetoothLED.Init();
     wifiLED.Init();
+    pairingWindowLED.Init();
 
     // Init ZCL Data Model and CHIP App Server
     AppCallbacks callbacks;
     InitServer(&callbacks);
+
+    SetupPretendDevices();
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
@@ -585,6 +630,7 @@ extern "C" void app_main()
 
         bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
         wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
+        pairingWindowLED.SetVLED(ScreenManager::AddVLED(TFT_ORANGE));
     }
 
 #endif // CONFIG_HAVE_DISPLAY

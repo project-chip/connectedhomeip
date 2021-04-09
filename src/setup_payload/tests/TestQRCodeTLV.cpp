@@ -224,31 +224,6 @@ void TestOptionalDataWriteSmallBuffer(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
-void TestPayloadBinary(nlTestSuite * inSuite, void * inContext)
-{
-    SetupPayload payload = GetDefaultPayload();
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 0));
-
-    payload.addOptionalVendorData(kOptionalDefaultStringTag, "1");
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 5));
-    payload.removeOptionalVendorData(kOptionalDefaultStringTag);
-
-    payload.addOptionalVendorData(1, kOptionalDefaultIntValue);
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 4));
-
-    payload.addOptionalVendorData(2, kOptionalDefaultIntValue);
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 8));
-
-    payload.addOptionalVendorData(3, kOptionalDefaultIntValue);
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 12));
-
-    payload.addOptionalVendorData(4, kOptionalDefaultIntValue);
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 16));
-
-    payload.addOptionalVendorData(5, kOptionalDefaultIntValue);
-    NL_TEST_ASSERT(inSuite, CompareBinaryLength(payload, 19));
-}
-
 // Test Suite
 
 /**
@@ -270,7 +245,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test Optional Read Vendor Int",    TestOptionalDataReadVendorInt),
     NL_TEST_DEF("Test Optional Read",               TestOptionalDataRead),
     NL_TEST_DEF("Test Optional Tag Values",         TestOptionalTagValues),
-    NL_TEST_DEF("Test Payload Binary",              TestPayloadBinary),
 
     NL_TEST_SENTINEL()
 };

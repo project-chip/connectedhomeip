@@ -233,6 +233,12 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, double v)
     return WriteElementHead(TLVElementType::FloatingPointNumber64, tag, cvt.u64);
 }
 
+CHIP_ERROR TLVWriter::Put(uint64_t tag, ByteSpan data)
+{
+    VerifyOrReturnError(CanCastTo<uint32_t>(data.size()), CHIP_ERROR_MESSAGE_TOO_LONG);
+    return PutBytes(tag, data.data(), static_cast<uint32_t>(data.size()));
+}
+
 CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len)
 {
     return WriteElementWithData(kTLVType_ByteString, tag, buf, len);
@@ -405,56 +411,50 @@ const size_t kCHIPTLVCopyChunkSize = 16;
 
 CHIP_ERROR TLVWriter::CopyElement(uint64_t tag, TLVReader & reader)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
     TLVElementType elemType = reader.ElementType();
     uint64_t elemLenOrVal   = reader.mElemLenOrVal;
     TLVReader readerHelper; // used to figure out the length of the element and read data of the element
     uint32_t copyDataLen;
     uint8_t chunk[kCHIPTLVCopyChunkSize];
 
-    VerifyOrExit(elemType != TLVElementType::NotSpecified && elemType != TLVElementType::EndOfContainer,
-                 err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(elemType != TLVElementType::NotSpecified && elemType != TLVElementType::EndOfContainer,
+                        CHIP_ERROR_INCORRECT_STATE);
 
     // Initialize the helper
     readerHelper.Init(reader);
 
     // Skip to the end of the element.
-    err = reader.Skip();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Skip());
 
     // Compute the amount of value data to copy from the reader.
     copyDataLen = reader.GetLengthRead() - readerHelper.GetLengthRead();
 
     // Write the head of the new element with the same type and length/value, but using the
     // specified tag.
-    err = WriteElementHead(elemType, tag, elemLenOrVal);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(WriteElementHead(elemType, tag, elemLenOrVal));
 
     while (copyDataLen > 0)
     {
         uint32_t chunkSize = copyDataLen > kCHIPTLVCopyChunkSize ? kCHIPTLVCopyChunkSize : copyDataLen;
-        err                = readerHelper.ReadData(chunk, chunkSize);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(readerHelper.ReadData(chunk, chunkSize));
 
-        err = WriteData(chunk, chunkSize);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(WriteData(chunk, chunkSize));
 
         copyDataLen -= chunkSize;
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWriter & containerWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(TLVTypeIsContainer(containerType), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(TLVTypeIsContainer(containerType), CHIP_ERROR_WRONG_TLV_TYPE);
 
     if (IsCloseContainerReserved())
     {
-        VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mMaxLen >= kEndOfContainerMarkerSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         mMaxLen -= kEndOfContainerMarkerSize;
     }
     err = WriteElementHead(static_cast<TLVElementType>(containerType), tag, 0);
@@ -465,7 +465,7 @@ CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWrit
         if (IsCloseContainerReserved())
             mMaxLen += kEndOfContainerMarkerSize;
 
-        ExitNow();
+        return err;
     }
 
     containerWriter.mBackingStore  = mBackingStore;
@@ -481,8 +481,7 @@ CHIP_ERROR TLVWriter::OpenContainer(uint64_t tag, TLVType containerType, TLVWrit
 
     SetContainerOpen(true);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
@@ -514,11 +513,11 @@ CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVTyp
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(TLVTypeIsContainer(containerType), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(TLVTypeIsContainer(containerType), CHIP_ERROR_WRONG_TLV_TYPE);
 
     if (IsCloseContainerReserved())
     {
-        VerifyOrExit(mMaxLen >= kEndOfContainerMarkerSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(mMaxLen >= kEndOfContainerMarkerSize, CHIP_ERROR_BUFFER_TOO_SMALL);
         mMaxLen -= kEndOfContainerMarkerSize;
     }
 
@@ -529,15 +528,14 @@ CHIP_ERROR TLVWriter::StartContainer(uint64_t tag, TLVType containerType, TLVTyp
         if (IsCloseContainerReserved())
             mMaxLen += kEndOfContainerMarkerSize;
 
-        ExitNow();
+        return err;
     }
     outerContainerType = mContainerType;
     mContainerType     = containerType;
 
     SetContainerOpen(false);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
@@ -598,19 +596,15 @@ CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader & container)
 
 CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen)
 {
-    CHIP_ERROR err;
     TLVReader reader;
 
     reader.Init(encodedContainer, encodedContainerLen);
 
-    err = reader.Next();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next());
 
-    err = PutPreEncodedContainer(tag, reader.GetType(), reader.GetReadPoint(), reader.GetRemainingLength());
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(PutPreEncodedContainer(tag, reader.GetType(), reader.GetReadPoint(), reader.GetRemainingLength()));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, uint64_t lenOrVal)
@@ -758,22 +752,18 @@ CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uin
 
 CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit((mLenWritten + len) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError((mLenWritten + len) <= mMaxLen, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     while (len > 0)
     {
         if (mRemainingLen == 0)
         {
-            VerifyOrExit(mBackingStore != nullptr, err = CHIP_ERROR_NO_MEMORY);
+            VerifyOrReturnError(mBackingStore != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            VerifyOrExit(CanCastTo<uint32_t>(mWritePoint - mBufStart), err = CHIP_ERROR_INCORRECT_STATE);
-            err = mBackingStore->FinalizeBuffer(*this, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart));
-            SuccessOrExit(err);
+            VerifyOrReturnError(CanCastTo<uint32_t>(mWritePoint - mBufStart), CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(mBackingStore->FinalizeBuffer(*this, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart)));
 
-            err = mBackingStore->GetNewBuffer(*this, mBufStart, mRemainingLen);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(mBackingStore->GetNewBuffer(*this, mBufStart, mRemainingLen));
 
             mWritePoint = mBufStart;
 
@@ -793,8 +783,7 @@ CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
         len -= writeLen;
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace TLV

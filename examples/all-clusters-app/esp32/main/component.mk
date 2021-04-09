@@ -21,18 +21,33 @@
 
 COMPONENT_DEPENDS := chip QRCode tft spidriver
 
+# The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/CMakeLists.txt
 COMPONENT_SRCDIRS :=                                                                \
   .                                                                                 \
   ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
   ../third_party/connectedhomeip/src/app/server                                     \
   ../third_party/connectedhomeip/src/app/util                                       \
+  ../third_party/connectedhomeip/src/app/clusters/descriptor                        \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
   ../third_party/connectedhomeip/src/app/clusters/identify                          \
+  ../third_party/connectedhomeip/src/app/clusters/account-login-server              \
+  ../third_party/connectedhomeip/src/app/clusters/application-launcher-server       \
+  ../third_party/connectedhomeip/src/app/clusters/audio-output-server               \
   ../third_party/connectedhomeip/src/app/clusters/barrier-control-server            \
+  ../third_party/connectedhomeip/src/app/clusters/general-commissioning-server      \
   ../third_party/connectedhomeip/src/app/clusters/groups-server                     \
   ../third_party/connectedhomeip/src/app/clusters/color-control-server              \
+  ../third_party/connectedhomeip/src/app/clusters/content-launch-server             \
+  ../third_party/connectedhomeip/src/app/clusters/low-power-server                  \
+  ../third_party/connectedhomeip/src/app/clusters/keypad-input-server               \
+  ../third_party/connectedhomeip/src/app/clusters/media-playback-server             \
+  ../third_party/connectedhomeip/src/app/clusters/media-input-server                \
+  ../third_party/connectedhomeip/src/app/clusters/network-commissioning             \
+  ../third_party/connectedhomeip/src/app/clusters/ota-server                        \
+  ../third_party/connectedhomeip/src/app/clusters/target-navigator-server           \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
+  ../third_party/connectedhomeip/src/app/clusters/tv-channel-server                 \
   ../third_party/connectedhomeip/src/app/clusters/scenes                            \
   ../third_party/connectedhomeip/src/app/clusters/basic                             \
   ../third_party/connectedhomeip/src/app/clusters/bindings                          \

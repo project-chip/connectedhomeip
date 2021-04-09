@@ -19,10 +19,13 @@
 
 #include <inttypes.h>
 
+#include "ServiceNaming.h"
+#include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
@@ -56,20 +59,32 @@ namespace Mdns {
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
 
-DiscoveryImplPlatform::DiscoveryImplPlatform()
+DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
+
+CHIP_ERROR DiscoveryImplPlatform::Init()
 {
-    mCommissionInstanceName = GetRandU64();
-    CHIP_ERROR error        = ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this);
+    if (!mMdnsInitialized)
+    {
+        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
+        mCommissionInstanceName = GetRandU64();
+        mMdnsInitialized        = true;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
+{
+    ReturnErrorOnFailure(Init());
+
+    CHIP_ERROR error = ChipMdnsStopPublish();
 
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
     }
-}
 
-CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
-{
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
@@ -83,6 +98,7 @@ void DiscoveryImplPlatform::HandleMdnsInit(void * context, CHIP_ERROR initError)
     else
     {
         ChipLogError(Discovery, "mDNS initialization failed with %s", chip::ErrorStr(initError));
+        publisher->mMdnsInitialized = false;
     }
 }
 
@@ -106,21 +122,40 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
     }
 }
 
-CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize)
 {
-    uint8_t mac[6];    // 6 byte wifi mac
-    char hostname[13]; // Hostname will be the hex representation of mac.
-    CHIP_ERROR error;
-
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
-    for (size_t i = 0; i < sizeof(mac); i++)
-    {
-        snprintf(&hostname[i * 2], sizeof(hostname) - i * 2, "%02X", mac[i]);
-    }
-    SuccessOrExit(error = ChipMdnsSetHostname(hostname));
-
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    SuccessOrExit(error =
+                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                      rotatingDeviceIdHexBufferSize));
 exit:
     return error;
+}
+#endif
+
+CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
+{
+    char nameBuffer[17];
+    CHIP_ERROR error = MakeHostName(nameBuffer, sizeof(nameBuffer), macOrEui64);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
+    error = ChipMdnsSetHostname(nameBuffer);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
@@ -133,15 +168,22 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     TextEntry textEntries[4];
     size_t textEntrySize = 0;
     char shortDiscriminatorSubtype[6];
-    char longDiscriminatorSubtype[7];
+    char longDiscriminatorSubtype[8];
     char vendorSubType[8];
     const char * subTypes[3];
     size_t subTypeSize = 0;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    size_t rotatingDeviceIdHexBufferSize = 0;
+#endif
 
     if (!mMdnsInitialized)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
     {
@@ -170,9 +212,18 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "VP", reinterpret_cast<const uint8_t *>(vendorProductBuf),
                                          strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
     }
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID),
-                                     strlen(CHIP_ROTATING_DEVICE_ID) };
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    if (textEntrySize < ArraySize(textEntries))
+    {
+        ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
+        // Rotating Device ID
+
+        textEntries[textEntrySize++] = { "RI", Uint8::from_const_char(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize };
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_LIST_LENGTH;
+    }
 #endif
     if (params.GetPairingHint().HasValue() && params.GetPairingInstr().HasValue())
     {
@@ -211,15 +262,74 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, params.GetNodeId(), params.GetFabricId());
+
+    // According to spec CRI and CRA intervals should not exceed 1 hour (3600000 ms).
+    // TODO: That value should be defined in the ReliableMessageProtocolConfig.h,
+    // but for now it is not possible to access it from src/lib/mdns. It should be
+    // refactored after creating common DNS-SD layer.
+    constexpr uint32_t kMaxCRMPRetryInterval = 3600000;
+    // kMaxCRMPRetryInterval max value is 3600000, what gives 7 characters and newline
+    // necessary to represent it in the text form.
+    constexpr uint8_t kMaxCRMPRetryBufferSize = 7 + 1;
+    char crmpRetryIntervalIdleBuf[kMaxCRMPRetryBufferSize];
+    char crmpRetryIntervalActiveBuf[kMaxCRMPRetryBufferSize];
+    TextEntry crmpRetryIntervalEntries[2];
+    size_t textEntrySize = 0;
+    uint32_t crmpRetryIntervalIdle, crmpRetryIntervalActive;
+    int writtenCharactersNumber;
+    params.GetCRMPRetryIntervals(crmpRetryIntervalIdle, crmpRetryIntervalActive);
+
+    // TODO: Issue #5833 - CRMP retry intervals should be updated on the poll period value
+    // change or device type change.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ConnectivityMgr().GetThreadDeviceType() ==
+        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice)
+    {
+        uint32_t sedPollPeriod;
+        ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
+        // Increment default CRMP retry intervals by SED poll period to be on the safe side
+        // and avoid unnecessary retransmissions.
+        crmpRetryIntervalIdle += sedPollPeriod;
+        crmpRetryIntervalActive += sedPollPeriod;
+    }
+#endif
+
+    if (crmpRetryIntervalIdle > kMaxCRMPRetryInterval)
+    {
+        ChipLogProgress(Discovery, "CRMP retry interval idle value exceeds allowed range of 1 hour, using maximum available",
+                        chip::ErrorStr(error));
+        crmpRetryIntervalIdle = kMaxCRMPRetryInterval;
+    }
+    writtenCharactersNumber = snprintf(crmpRetryIntervalIdleBuf, sizeof(crmpRetryIntervalIdleBuf), "%u", crmpRetryIntervalIdle);
+    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
+                        CHIP_ERROR_INVALID_STRING_LENGTH);
+    crmpRetryIntervalEntries[textEntrySize++] = { "CRI", reinterpret_cast<const uint8_t *>(crmpRetryIntervalIdleBuf),
+                                                  strlen(crmpRetryIntervalIdleBuf) };
+
+    if (crmpRetryIntervalActive > kMaxCRMPRetryInterval)
+    {
+        ChipLogProgress(Discovery, "CRMP retry interval active value exceeds allowed range of 1 hour, using maximum available",
+                        chip::ErrorStr(error));
+        crmpRetryIntervalActive = kMaxCRMPRetryInterval;
+    }
+    writtenCharactersNumber =
+        snprintf(crmpRetryIntervalActiveBuf, sizeof(crmpRetryIntervalActiveBuf), "%u", crmpRetryIntervalActive);
+    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
+                        CHIP_ERROR_INVALID_STRING_LENGTH);
+    crmpRetryIntervalEntries[textEntrySize++] = { "CRA", reinterpret_cast<const uint8_t *>(crmpRetryIntervalActiveBuf),
+                                                  strlen(crmpRetryIntervalActiveBuf) };
+
+    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetFabricId(), params.GetNodeId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
-    service.mTextEntries   = nullptr;
-    service.mTextEntrySize = 0;
-    service.mInterface     = INET_NULL_INTERFACEID;
-    service.mAddressType   = Inet::kIPAddressType_Any;
-    error                  = ChipMdnsPublishService(&service);
+    service.mTextEntries   = crmpRetryIntervalEntries;
+    service.mTextEntrySize = textEntrySize;
+
+    service.mInterface   = INET_NULL_INTERFACEID;
+    service.mAddressType = Inet::kIPAddressType_Any;
+    error                = ChipMdnsPublishService(&service);
 
     return error;
 }
@@ -231,24 +341,20 @@ CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
     return ChipMdnsStopPublish();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::RegisterResolveDelegate(ResolveDelegate * delegate)
+CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)
 {
-    if (mResolveDelegate != nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    else
-    {
-        mResolveDelegate = delegate;
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(delegate == nullptr || mResolverDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mResolverDelegate = delegate;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
+    ReturnErrorOnFailure(Init());
+
     MdnsService service;
 
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), fabricId, nodeId));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
@@ -259,62 +365,78 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
 {
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
 
-    if (mgr->mResolveDelegate == nullptr)
+    if (mgr->mResolverDelegate == nullptr)
     {
         return;
     }
+
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, MdnsService{});
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(kUndefinedNodeId, error);
+        return;
     }
-    else if (result == nullptr)
+
+    if (result == nullptr)
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, MdnsService{});
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(kUndefinedNodeId, CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+        return;
     }
-    else
-    {
-        // Parse '%x-%x' from the name
-        uint64_t nodeId       = 0;
-        bool deliminatorFound = false;
 
-        for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
+    // Parse '%x-%x' from the name
+    uint64_t nodeId       = 0;
+    bool deliminatorFound = false;
+
+    for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
+    {
+        if (result->mName[i] == '-')
         {
-            if (result->mName[i] == '-')
+            deliminatorFound = true;
+        }
+        else if (deliminatorFound)
+        {
+            uint8_t val = HexToInt(result->mName[i]);
+
+            if (val == UINT8_MAX)
             {
-                deliminatorFound = true;
                 break;
             }
             else
             {
-                uint8_t val = HexToInt(result->mName[i]);
-
-                if (val == UINT8_MAX)
-                {
-                    break;
-                }
-                else
-                {
-                    nodeId = nodeId * 16 + val;
-                }
+                nodeId = nodeId * 16 + val;
             }
         }
+    }
 
-        if (deliminatorFound)
-        {
-            ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
-        }
-        else
-        {
-            ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
-        }
+    ResolvedNodeData nodeData;
+    nodeData.mInterfaceId = result->mInterface;
+    nodeData.mAddress     = result->mAddress.ValueOr({});
+    nodeData.mPort        = result->mPort;
+
+    if (deliminatorFound)
+    {
+        ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
+        mgr->mResolverDelegate->OnNodeIdResolved(nodeId, nodeData);
+    }
+    else
+    {
+        ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
+        mgr->mResolverDelegate->OnNodeIdResolved(kUndefinedNodeId, nodeData);
     }
 }
 
+DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
+{
+    return sManager;
+}
+
 ServiceAdvertiser & chip::Mdns::ServiceAdvertiser::Instance()
+{
+    return DiscoveryImplPlatform::GetInstance();
+}
+
+Resolver & chip::Mdns::Resolver::Instance()
 {
     return DiscoveryImplPlatform::GetInstance();
 }

@@ -15,6 +15,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 
 declare_args() {
   # Location of the k32w SDK.
@@ -49,7 +50,7 @@ template("k32w_sdk") {
     _sdk_include_dirs = [
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement",
-      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/hybrid/ble_ot/chip",
+      "${chip_root}/src/platform/K32W",
       "${k32w_sdk_root}/CMSIS/Include",
       "${k32w_sdk_root}/components/serial_manager",
       "${k32w_sdk_root}/components/uart",
@@ -97,7 +98,7 @@ template("k32w_sdk") {
 
     libs = [
       "${k32w_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller.a",
-      "${k32w_sdk_root}/middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_peripheral_cm4_noFP.a",
+      "${k32w_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_peripheral_cm4_noFP.a",
       "${k32w_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Dynamic_MMAC.a",
       "${k32w_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM.a",
       "${k32w_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
@@ -123,13 +124,12 @@ template("k32w_sdk") {
       "configFRTOS_MEMORY_SCHEME=4",
       "osCustomStartup=1",
       "OM15082=1",
-      "gKBD_KeysCount_c=3",
+      "gKBD_KeysCount_c=4",
       "gLEDsOnTargetBoardCnt_c=2",
       "gLED_InvertedMode_d=1",
       "ENABLE_RAM_VECTOR_TABLE=1",
       "gTMR_Enabled_d=1",
       "gTimestamp_Enabled_d=0",
-      "gMainThreadStackSize_c=6024",
       "K32W_LOG_ENABLED=1",
       "CHIP_ENABLE_OPENTHREAD=1",
       "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
@@ -151,6 +151,14 @@ template("k32w_sdk") {
       #TODO: move this define in a MBEDTLS specific GN file
       "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
     ]
+    if (chip_with_se05x == 1) {
+      defines += [
+        "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
+        "gMainThreadStackSize_c=14048",
+      ]
+    } else {
+      defines += [ "gMainThreadStackSize_c=6024" ]
+    }
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -178,8 +186,6 @@ template("k32w_sdk") {
     }
 
     sources += [
-      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
-      "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board.c",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/board_utility.c",
       "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/reed/bm/hardware_init.c",
@@ -194,6 +200,8 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flash.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_flexcomm.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_gpio.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c.c",
+      "${k32w_sdk_root}/devices/K32W061/drivers/fsl_i2c_freertos.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_inputmux.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_pint.c",
       "${k32w_sdk_root}/devices/K32W061/drivers/fsl_power.c",
@@ -238,6 +246,18 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
     ]
+
+    if (chip_with_se05x == 1) {
+      sources += [
+        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/clock_config.c",
+        "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip/pin_mux.c",
+      ]
+    } else {
+      sources += [
+        "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/clock_config.c",
+        "${k32w_sdk_root}/boards/k32w061dk6/wireless_examples/openthread/enablement/pin_mux.c",
+      ]
+    }
 
     if (!defined(public_deps)) {
       public_deps = []

@@ -30,6 +30,8 @@
 namespace chip {
 namespace Transport {
 
+static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
+
 /**
  * Defines state of a peer connection at a transport layer.
  *
@@ -46,7 +48,7 @@ namespace Transport {
 class PeerConnectionState
 {
 public:
-    PeerConnectionState() : mPeerAddress(PeerAddress::Uninitialized()) {}
+    PeerConnectionState() : mMsgCounterSynStatus(MsgCounterSyncStatus::NotSync), mPeerAddress(PeerAddress::Uninitialized()) {}
     PeerConnectionState(const PeerAddress & addr) : mPeerAddress(addr) {}
     PeerConnectionState(PeerAddress && addr) : mPeerAddress(addr) {}
 
@@ -61,6 +63,9 @@ public:
 
     void SetTransport(Transport::Base * transport) { mTransport = transport; }
     Transport::Base * GetTransport() { return mTransport; }
+
+    bool IsPeerMsgCounterSynced() { return (mPeerMessageIndex != kUndefinedMessageIndex); }
+    void SetPeerMessageIndex(uint32_t id) { mPeerMessageIndex = id; }
 
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
@@ -77,17 +82,24 @@ public:
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
-    SecureSession & GetSecureSession() { return mSecureSession; }
-    const SecureSession & GetSecureSession() const { return mSecureSession; }
+    SecureSession & GetSenderSecureSession() { return mSenderSecureSession; }
+    SecureSession & GetReceiverSecureSession() { return mReceiverSecureSession; }
 
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
+
+    void SetMsgCounterSyncInProgress(bool value)
+    {
+        mMsgCounterSynStatus = value ? MsgCounterSyncStatus::SyncInProcess : MsgCounterSyncStatus::Synced;
+    }
 
     bool IsInitialized()
     {
         return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
                 mLocalKeyID != UINT16_MAX);
     }
+
+    bool IsMsgCounterSyncInProgress() { return mMsgCounterSynStatus == MsgCounterSyncStatus::SyncInProcess; }
 
     /**
      *  Reset the connection state to a completely uninitialized status.
@@ -98,18 +110,41 @@ public:
         mPeerNodeId         = kUndefinedNodeId;
         mSendMessageIndex   = 0;
         mLastActivityTimeMs = 0;
-        mSecureSession.Reset();
+        mSenderSecureSession.Reset();
+        mReceiverSecureSession.Reset();
+        mMsgCounterSynStatus = MsgCounterSyncStatus::NotSync;
+    }
+
+    CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                 MessageAuthenticationCode & mac) const
+    {
+        return mSenderSecureSession.Encrypt(input, input_length, output, header, mac);
+    }
+
+    CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                const MessageAuthenticationCode & mac) const
+    {
+        return mReceiverSecureSession.Decrypt(input, input_length, output, header, mac);
     }
 
 private:
+    enum class MsgCounterSyncStatus
+    {
+        NotSync,
+        SyncInProcess,
+        Synced,
+    } mMsgCounterSynStatus;
+
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
     uint32_t mSendMessageIndex   = 0;
+    uint32_t mPeerMessageIndex   = kUndefinedMessageIndex;
     uint16_t mPeerKeyID          = UINT16_MAX;
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     Transport::Base * mTransport = nullptr;
-    SecureSession mSecureSession;
+    SecureSession mSenderSecureSession;
+    SecureSession mReceiverSecureSession;
     Transport::AdminId mAdmin = kUndefinedAdminId;
 };
 

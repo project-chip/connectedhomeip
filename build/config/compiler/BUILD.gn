@@ -18,16 +18,17 @@ import("//build_overrides/pigweed.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/target.gni")
 
+if (current_os == "mac") {
+  import("${build_root}/config/mac/mac_sdk.gni")
+}
+
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
   # with unfixed or unsupported wanings.
   treat_warnings_as_errors = true
 }
 
-_is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
-                   (current_cpu == "arm" || current_cpu == "arm64")
-
-if (_is_embedded_arm) {
+if (current_cpu == "arm" || current_cpu == "arm64") {
   import("${build_root}/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
   import("${build_root}/config/x86.gni")
@@ -45,7 +46,14 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (_is_embedded_arm) {
+  if (current_os == "mac") {
+    cflags += [
+      "-target",
+      mac_target_triple,
+    ]
+  } else if (current_os == "ios") {
+    # iOS ABI currently set by chip_xcode_build_connector.sh
+  } else if (current_cpu == "arm" || current_cpu == "arm64") {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -92,6 +100,7 @@ config("abi_default") {
       ]
     }
   }
+  asmflags = cflags
   ldflags = cflags
 }
 
@@ -159,6 +168,7 @@ config("strict_warnings") {
     "-Wall",
     "-Wextra",
     "-Wshadow",
+    "-Wunreachable-code",
   ]
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
@@ -202,15 +212,11 @@ config("symbols_default") {
   cflags = [ "-g${symbol_level}" ]
 }
 
-config("gnu14") {
-  cflags_c = [ "-std=gnu11" ]
-  cflags_objc = [ "-std=gnu11" ]
-  cflags_cc = [ "-std=gnu++14" ]
-  cflags_objcc = [ "-std=gnu++14" ]
-}
-
 config("std_default") {
-  configs = [ ":gnu14" ]
+  cflags_c = [ "-std=${c_standard}" ]
+  cflags_objc = [ "-std=${c_standard}" ]
+  cflags_cc = [ "-std=${cpp_standard}" ]
+  cflags_objcc = [ "-std=${cpp_standard}" ]
 }
 
 config("cosmetic_default") {
@@ -250,6 +256,9 @@ declare_args() {
   # Enable memory sanitizer
   is_msan = false
 
+  # enable undefined behavior sanitizer
+  is_ubsan = false
+
   # Exit on sanitize error. Generally standard libraries may get errors
   # so not stopping on the first error is often useful
   is_sanitize_fatal = true
@@ -272,6 +281,18 @@ config("sanitize_memory") {
   ldflags = cflags
 }
 
+config("sanitize_undefined_behavior") {
+  cflags = [
+    "-fvisibility=hidden",
+    "-fsanitize=undefined",
+    "-fsanitize=float-divide-by-zero",
+    "-fsanitize=unsigned-integer-overflow",
+    "-fsanitize=implicit-conversion",
+    "-fsanitize=nullability",
+  ]
+  ldflags = cflags
+}
+
 config("sanitize_recover_all") {
   cflags = [ "-fsanitize-recover=all" ]
   ldflags = cflags
@@ -286,6 +307,10 @@ config("sanitize_default") {
 
   if (is_msan) {
     configs += [ ":sanitize_memory" ]
+  }
+
+  if (is_ubsan) {
+    configs += [ ":sanitize_undefined_behavior" ]
   }
 
   if (!is_sanitize_fatal) {
@@ -320,11 +345,23 @@ config("exceptions_default") {
   configs = [ ":no_exceptions" ]
 }
 
-config("unwind_tables_default") {
+config("unwind_tables") {
+  cflags = [ "-funwind-tables" ]
+}
+
+config("no_unwind_tables") {
   cflags = [
     "-fno-unwind-tables",
     "-fno-asynchronous-unwind-tables",
   ]
+}
+
+config("unwind_tables_default") {
+  if (exclude_unwind_tables) {
+    configs = [ ":no_unwind_tables" ]
+  } else {
+    configs = [ ":unwind_tables" ]
+  }
 }
 
 config("size_default") {

@@ -38,6 +38,14 @@
 // platform folder in the TI SDK example application
 #include <platform/system.h>
 
+// DMM Includes
+#ifdef USE_DMM
+#include "ti_dmm_application_policy.h"
+#include <dmm/dmm_policy.h>
+#include <dmm/dmm_priority_ble_thread.h>
+#include <dmm/dmm_scheduler.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -45,6 +53,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0
 static void * ot_calloc(size_t n, size_t size)
 {
     void * p_ptr = NULL;
@@ -60,6 +69,7 @@ static void ot_free(void * p_ptr)
 {
     vPortFree(p_ptr);
 }
+#endif /* OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0 */
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 {
@@ -73,11 +83,18 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     // Create FreeRTOS queue for platform driver messages
     procQueue = xQueueCreate(16U, sizeof(ThreadStackManagerImpl::procQueueMsg));
 
+#if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0
     mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
-    otHeapSetCAllocFree(ot_calloc, ot_free);
+#endif /* OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE != 0 */
 
     // Initialize the OpenThread platform layer
     otSysInit(0, NULL);
+
+#ifdef USE_DMM
+    // DMM Init
+    DMMSch_registerClient(xTaskGetCurrentTaskHandle(), DMMPolicy_StackRole_threadFtd);
+    DMMPolicy_updateStackState(DMMPolicy_StackRole_threadFtd, DMMPOLICY_THREAD_IDLE);
+#endif
 
     // Initialize the generic implementation base classes.
     err = GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>::DoInit();

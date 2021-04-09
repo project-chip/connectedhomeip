@@ -34,7 +34,6 @@ extern "C" {
 
 extern int CHIPPlatformMemoryInit(void * buf, size_t bufSize);
 extern void CHIPPlatformMemoryShutdown();
-extern void * CHIPPlatformMemoryAllocLongTerm(size_t size, bool isLongTermAlloc);
 extern void * CHIPPlatformMemoryAlloc(size_t size);
 extern void * CHIPPlatformMemoryCalloc(size_t num, size_t size);
 extern void * CHIPPlatformMemoryRealloc(void * p, size_t size);

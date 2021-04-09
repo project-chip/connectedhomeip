@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,20 +63,127 @@ public:
     void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
     void SetDelegate(ReliableMessageDelegate * delegate) { mDelegate = delegate; }
 
+    /**
+     * Flush the pending Ack for current exchange.
+     *
+     */
     CHIP_ERROR FlushAcks();
-    uint64_t GetCurrentRetransmitTimeoutTick();
 
+    /**
+     *  Get the initial retransmission interval. It would be the time to wait before
+     *  retransmission after first failure.
+     *
+     *  @return the initial retransmission interval.
+     */
+    uint64_t GetInitialRetransmitTimeoutTick();
+
+    /**
+     *  Get the active retransmit interval. It would be the time to wait before
+     *  retransmission after subsequent failures.
+     *
+     *  @return the active retransmission interval.
+     */
+    uint64_t GetActiveRetransmitTimeoutTick();
+
+    /**
+     *  Send a SecureChannel::StandaloneAck message.
+     *
+     *  @note  When sent via UDP, the null message is sent *without* requesting an acknowledgment,
+     *  even in the case where the auto-request acknowledgment feature has been enabled on the
+     *  exchange.
+     *
+     *  @retval  #CHIP_ERROR_NO_MEMORY   If no available PacketBuffers.
+     *  @retval  #CHIP_NO_ERROR          If the method succeeded or the error wasn't critical.
+     *  @retval  other                    Another critical error returned by SendMessage().
+     */
     CHIP_ERROR SendStandaloneAckMessage();
 
+    /**
+     *  Determine whether an acknowledgment will be requested whenever a message is sent for the exchange.
+     *
+     *  @return Returns 'true' an acknowledgment will be requested whenever a message is sent, else 'false'.
+     */
     bool AutoRequestAck() const;
+
+    /**
+     * Set whether an acknowledgment should be requested whenever a message is sent.
+     *
+     * @param[in] autoReqAck            A Boolean indicating whether or not an
+     *                                  acknowledgment should be requested whenever a
+     *                                  message is sent.
+     */
     void SetAutoRequestAck(bool autoReqAck);
+
+    /**
+     *  Determine whether the ChipExchangeManager should not send an
+     *  acknowledgement.
+     *
+     *  For internal, debug use only.
+     */
     bool ShouldDropAckDebug() const;
+
+    /**
+     *  Set whether the ChipExchangeManager should not send acknowledgements
+     *  for this context.
+     *
+     *  For internal, debug use only.
+     *
+     *  @param[in]  inDropAckDebug  A Boolean indicating whether (true) or not
+     *                         (false) the acknowledgements should be not
+     *                         sent for the exchange.
+     */
     void SetDropAckDebug(bool inDropAckDebug);
+
+    /**
+     *  Determine whether there is already an acknowledgment pending to be sent to the peer on this exchange.
+     *
+     *  @return Returns 'true' if there is already an acknowledgment pending  on this exchange, else 'false'.
+     */
     bool IsAckPending() const;
+
+    /**
+     *  Set if an acknowledgment needs to be sent back to the peer on this exchange.
+     *
+     *  @param[in]  inAckPending A Boolean indicating whether (true) or not
+     *                          (false) an acknowledgment should be sent back
+     *                          in response to a received message.
+     */
     void SetAckPending(bool inAckPending);
+
+    /**
+     *  Determine whether peer requested acknowledgment for at least one message
+     *  on this exchange.
+     *
+     *  @return Returns 'true' if acknowledgment requested, else 'false'.
+     */
     bool HasPeerRequestedAck() const;
+
+    /**
+     *  Set if an acknowledgment was requested in the last message received
+     *  on this exchange.
+     *
+     *  @param[in]  inPeerRequestedAck A Boolean indicating whether (true) or not
+     *                                 (false) an acknowledgment was requested
+     *                                 in the last received message.
+     */
     void SetPeerRequestedAck(bool inPeerRequestedAck);
+
+    /**
+     *  Determine whether at least one message has been received
+     *  on this exchange from peer.
+     *
+     *  @return Returns 'true' if message received, else 'false'.
+     */
     bool HasRcvdMsgFromPeer() const;
+
+    /**
+     *  Set if a message has been received from the peer
+     *  on this exchange.
+     *
+     *  @param[in]  inMsgRcvdFromPeer  A Boolean indicating whether (true) or not
+     *                                 (false) a message has been received
+     *                                 from the peer on this exchange context.
+     */
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
 
 private:
@@ -103,16 +210,17 @@ private:
         kFlagMsgRcvdFromPeer = 0x0080,
     };
 
-    BitFlags<uint16_t, Flags> mFlags; // Internal state flags
+    BitFlags<Flags> mFlags; // Internal state flags
 
     void Retain();
     void Release();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags);
+    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
 
 private:
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
+    friend class ExchangeMessageDispatch;
 
     ReliableMessageMgr * mManager;
     ExchangeContext * mExchange;

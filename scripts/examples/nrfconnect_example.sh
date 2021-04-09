@@ -17,7 +17,6 @@
 #
 
 # Run bootstrap and activate to set up e.g. Pigweed correctly
-source "$(dirname "$0")/../../scripts/bootstrap.sh"
 source "$(dirname "$0")/../../scripts/activate.sh"
 
 cd "$(dirname "$0")/../../examples"
@@ -42,4 +41,4 @@ set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 env
 
-west build -b "$BOARD" -d "$APP/nrfconnect/build" "$APP/nrfconnect" -- "$@"
+west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$@"

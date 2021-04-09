@@ -19,7 +19,9 @@
 
 #pragma once
 
+#include <gen/af-structs.h>
 #include <inttypes.h>
+#include <lib/support/Span.h>
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -33,6 +35,7 @@ typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
+typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
@@ -68,12 +71,28 @@ typedef void (*DoorLockClusterSetWeekdayScheduleResponseCallback)(void * context
 typedef void (*DoorLockClusterSetYeardayScheduleResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockWithTimeoutResponseCallback)(void * context);
+typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
+                                                                                 uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterSetFabricResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint16_t groupId, uint8_t * groupName);
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
+typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterEnableNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterRemoveNetworkResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterScanNetworksResponseCallback)(
+    void * context, uint8_t errorCode, uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
+typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                               uint8_t * debugText);
+typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
+                                                                             uint8_t * debugText);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
                                                                 uint8_t sceneCount,
@@ -84,3 +103,17 @@ typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint16_t
 typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                                        uint8_t * sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+typedef void (*ThermostatClusterCurrentWeeklyScheduleCallback)(void * context, uint8_t numberOfTransitionsForSequence,
+                                                               uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+typedef void (*ThermostatClusterRelayStatusLogCallback)(void * context, uint16_t timeOfDay, uint16_t relayStatus,
+                                                        int16_t localTemperature, uint8_t humidityInPercentage, int16_t setpoint,
+                                                        uint16_t unreadEntries);
+
+// List specific responses
+typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16_t count, _DeviceType * entries);
+typedef void (*DescriptorServerListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
+typedef void (*DescriptorClientListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
+typedef void (*DescriptorPartsListListAttributeCallback)(void * context, uint16_t count, chip::EndpointId * entries);
+typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, uint16_t count, _GroupState * entries);
+typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);

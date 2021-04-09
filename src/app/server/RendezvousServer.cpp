@@ -17,9 +17,10 @@
 
 #include <app/server/RendezvousServer.h>
 
-#include <app/server/SessionManager.h>
+#include <app/server/StorablePeerConnection.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <transport/SecureSessionMgr.h>
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -35,10 +36,11 @@ namespace chip {
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
-CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr,
-                                  SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin)
+CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
+                                            TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                                            Transport::AdminPairingInfo * admin)
 {
-    return mRendezvousSession.Init(params, transportMgr, sessionMgr, admin);
+    return mRendezvousSession.Init(params, exchangeManager, transportMgr, sessionMgr, admin);
 }
 
 void RendezvousServer::OnRendezvousError(CHIP_ERROR err)
@@ -63,6 +65,15 @@ void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHe
 void RendezvousServer::OnRendezvousComplete()
 {
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
+    StorablePeerConnection connection(mRendezvousSession.GetPairingSession(), mRendezvousSession.GetAdminId());
+
+    VerifyOrReturn(mStorage != nullptr,
+                   ChipLogError(AppServer, "Storage delegate is not available. Cannot store the connection state"));
+    VerifyOrReturn(connection.StoreIntoKVS(*mStorage) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to store the connection state"));
+
+    uint16_t nextKeyId = mRendezvousSession.GetNextKeyId();
+    mStorage->SyncSetKeyValue(kStorablePeerConnectionCountKey, &nextKeyId, sizeof(nextKeyId));
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)

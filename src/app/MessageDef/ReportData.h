@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H
-
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
@@ -33,7 +30,6 @@
 #include <util/basic-types.h>
 
 #include "AttributeDataList.h"
-#include "AttributeStatusList.h"
 #include "Builder.h"
 #include "EventList.h"
 #include "Parser.h"
@@ -43,12 +39,11 @@ namespace app {
 namespace ReportData {
 enum
 {
-    kCsTag_RequestResponse     = 0,
+    kCsTag_SuppressResponse    = 0,
     kCsTag_SubscriptionId      = 1,
-    kCsTag_AttributeStatusList = 2,
-    kCsTag_AttributeDataList   = 3,
-    kCsTag_EventDataList       = 4,
-    kCsTag_IsLastReport        = 5,
+    kCsTag_AttributeDataList   = 2,
+    kCsTag_EventDataList       = 3,
+    kCsTag_MoreChunkedMessages = 4,
 };
 
 class Parser : public chip::app::Parser
@@ -63,6 +58,7 @@ public:
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -77,37 +73,28 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
+#endif
 
     /**
-     *  @brief Check whether this message needs request response. Next() must be called before accessing them.
+     *  @brief Check whether a response (a StatusReponse specifically) is to be sent back to the request.
+     *  Next() must be called before accessing them.
      *
-     *  @param [in] apRequestResponse    A pointer to apRequestResponse
+     *  @param [in] apSuppressResponse    A pointer to apSuppressResponse
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetRequestResponse(bool * const apRequestResponse) const;
+    CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
      *  @brief Get Subscription Id. Next() must be called before accessing them.
      *
-     *  @param [in] apSubscriptionId    A pointer to apIsLastReport
+     *  @param [in] apSubscriptionId    A pointer to apSubscriptionId
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
-
-    /**
-     *  @brief Get a TLVReader for the AttributesStatusList. Next() must be called before accessing them.
-     *
-     *  @param [in] apAttributeStatusList    A pointer to apAttributeStatusList
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Array
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const;
 
     /**
      *  @brief Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
@@ -132,14 +119,14 @@ public:
     CHIP_ERROR GetEventDataList(EventList::Parser * const apEventDataList) const;
 
     /**
-     *  @brief Check whether this message is last report. Next() must be called before accessing them.
+     *  @brief Check whether there are more chunked messages in a transaction. Next() must be called before accessing them.
      *
-     *  @param [in] apIsLastReport    A pointer to apIsLastReport
+     *  @param [in] apMoreChunkedMessages   A pointer to apMoreChunkedMessages
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetIsLastReport(bool * const apIsLastReport) const;
+    CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
 };
 
 class Builder : public chip::app::Builder
@@ -155,14 +142,14 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Inject RequestResponse into the TLV stream to indicate whether a response (a StatusReponse specifically)
+     *  @brief Inject SuppressResponse into the TLV stream to indicate whether a response (a StatusResponse specifically)
      *  is to be sent back to the request.
      *
-     *  @param [in] aRequestResponse The boolean variable to indicate if request response is needed.
+     *  @param [in] aSuppressResponse The boolean variable to indicate if request response is needed.
      *
      *  @return A reference to *this
      */
-    ReportData::Builder & RequestResponse(const bool aRequestResponse);
+    ReportData::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
      *  @brief Inject subscription id into the TLV stream, This field contains the Subscription ID
@@ -176,13 +163,6 @@ public:
      *  @return A reference to *this
      */
     ReportData::Builder & SubscriptionId(const uint64_t aSubscriptionId);
-
-    /**
-     *  @brief Initialize a AttributeStatusList::Builder for writing into the TLV stream
-     *
-     *  @return A reference to AttributeStatusList::Builder
-     */
-    AttributeStatusList::Builder & CreateAttributeStatusListBuilder();
 
     /**
      *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
@@ -199,12 +179,11 @@ public:
     EventList::Builder & CreateEventDataListBuilder();
 
     /**
-     *  @brief This flag is set to ‘true’ when this is the last ReportDataRequest message
-     *  in a transaction and there are no more Changes to be conveyed.
-     *  @param [in] aIsLastReport The boolean variable to indicate if it is LastReport
+     *  @brief This flag is set to ‘true’ when there are more chunked messages in a transaction.
+     *  @param [in] aMoreChunkedMessages The boolean variable to indicate if there are more chunked messages in a transaction.
      *  @return A reference to *this
      */
-    ReportData::Builder & IsLastReport(const bool aIsLastReport);
+    ReportData::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
      *  @brief Mark the end of this ReportData
@@ -214,7 +193,6 @@ public:
     ReportData::Builder & EndOfReportData();
 
 private:
-    AttributeStatusList::Builder mAttributeStatusListBuilder;
     AttributeDataList::Builder mAttributeDataListBuilder;
     EventList::Builder mEventDataListBuilder;
 };
@@ -222,5 +200,3 @@ private:
 
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H

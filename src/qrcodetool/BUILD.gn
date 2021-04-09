@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
@@ -29,6 +29,7 @@ executable("qrcodetool") {
 
   public_deps = [
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform/logging:stdio",
     "${chip_root}/src/setup_payload",
   ]
 }

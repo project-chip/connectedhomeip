@@ -19,16 +19,15 @@ on:
     pull_request:
 
 jobs:
-    build:
+    unit_tests:
         name: Unit / Interation Tests
+        if: github.actor != 'restyled-io[bot]'
 
         strategy:
             matrix:
                 type: [main, clang, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_IMAGE: chip-build-openssl
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 

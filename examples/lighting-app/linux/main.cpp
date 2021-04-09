@@ -36,6 +36,10 @@
 #include "Options.h"
 #include "Server.h"
 
+#if defined(PW_RPC_ENABLED)
+#include "Rpc.h"
+#endif // PW_RPC_ENABLED
+
 #include <cassert>
 #include <iostream>
 
@@ -122,7 +126,7 @@ CHIP_ERROR PrintQRCodeContent()
     err = ConfigurationMgr().GetProductId(productId);
     SuccessOrExit(err);
 
-    payload.version       = 1;
+    payload.version       = 0;
     payload.vendorID      = vendorId;
     payload.productID     = productId;
     payload.setUpPINCode  = setUpPINCode;
@@ -164,11 +168,18 @@ int main(int argc, char * argv[])
     err = PrintQRCodeContent();
     SuccessOrExit(err);
 
+#if defined(PW_RPC_ENABLED)
+    chip::rpc::Init();
+    std::cerr << "PW_RPC initialized." << std::endl;
+#endif // defined(PW_RPC_ENABLED)
+
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
 
+#if CONFIG_NETWORK_LAYER_BLE
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
+#endif
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 

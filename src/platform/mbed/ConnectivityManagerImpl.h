@@ -33,8 +33,6 @@
 #endif
 #include "netsocket/WiFiInterface.h"
 #include <support/logging/CHIPLogging.h>
-
-#include <inttypes.h>
 namespace chip {
 namespace Inet {
 class IPAddress;

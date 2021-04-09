@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/openthread.gni")
+import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 import("${k32w_sdk_build_root}/k32w_executable.gni")
 import("${k32w_sdk_build_root}/k32w_sdk.gni")
@@ -24,17 +25,6 @@ assert(current_os == "freertos")
 k32w_platform_dir = "${chip_root}/examples/platform/k32w"
 
 k32w_sdk("sdk") {
-  include_dirs = [
-    "main/include",
-    "main",
-    "${k32w_platform_dir}/app/project_include",
-    "${k32w_platform_dir}/app/support",
-    "${chip_root}/examples/lock-app/lock-common",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-    "${k32w_platform_dir}/util/include",
-  ]
-
   sources = [
     "${k32w_platform_dir}/app/project_include/CHIPProjectConfig.h",
     "${k32w_platform_dir}/app/project_include/FreeRTOSConfig.h",
@@ -44,6 +34,14 @@ k32w_sdk("sdk") {
 
   public_deps =
       [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+
+  include_dirs = [
+    "main/include",
+    "main",
+    "${k32w_platform_dir}/app/project_include",
+    "${k32w_platform_dir}/app/support",
+    "${k32w_platform_dir}/util/include",
+  ]
 
   defines = []
   if (is_debug) {
@@ -72,16 +70,20 @@ k32w_executable("lock_app") {
     ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/crypto",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
+    "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w_platform_dir}/app/support:freertos_mbedtls_utils",
     "${openthread_root}:libopenthread-cli-ftd",
     "${openthread_root}:libopenthread-ftd",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   output_dir = root_out_dir
 
-  ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-lock-example.ld"
+  ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 }

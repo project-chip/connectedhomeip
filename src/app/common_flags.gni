@@ -13,6 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Temporary flag for new interaction model engine, set it to true to enable
-  chip_app_use_interaction_model = false
+  # Temporary flag for interaction model and echo protocols, set it to true to enable
+  chip_app_use_echo = false
 }

@@ -7,7 +7,7 @@ digraph RendezvousSession
     label=<<b>Controller</b>>
     node [fillcolor="white:gray", gradientangle=90]
 
-    ChipDeviceController [shape=record label=<{ChipDeviceController|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::DeviceController::ChipDeviceController"]
+    DeviceCommissioner [shape=record label=<{DeviceCommissioner|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::Controller::DeviceCommissioner"]
   }
 
   # This section represents device-only elements
@@ -66,7 +66,7 @@ digraph RendezvousSession
   #############################
   # Main relationships
   #############################
-  {ChipDeviceController, RendezvousDeviceDelegate} -> RendezvousSession
+  {DeviceCommissioner, RendezvousDeviceDelegate} -> RendezvousSession
 
   RendezvousSession -> HasDiscriminator
 

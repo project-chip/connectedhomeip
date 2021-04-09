@@ -82,7 +82,7 @@ groups:
         reviewers:
             teams: [reviewers-apple]
         reviews:
-            request: 2
+            request: 1
     shared-reviewers-comcast:
         type: optional
         conditions:
@@ -90,7 +90,7 @@ groups:
         reviewers:
             teams: [reviewers-comcast]
         reviews:
-            request: 2
+            request: 1
     shared-reviewers-google:
         type: optional
         conditions:
@@ -98,7 +98,15 @@ groups:
         reviewers:
             teams: [reviewers-google]
         reviews:
-            request: 2
+            request: 1
+    shared-reviewers-nordic:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-nordic]
+        reviews:
+            request: 1
     shared-reviewers-samsung:
         type: optional
         conditions:
@@ -106,7 +114,15 @@ groups:
         reviewers:
             teams: [reviewers-samsung]
         reviews:
-            request: 2
+            request: 1
+    shared-reviewers-silabs:
+        type: optional
+        conditions:
+            - files.include('*')
+        reviewers:
+            teams: [reviewers-silabs]
+        reviews:
+            request: 1
 
     ############################################################
     #  Base Required Reviewers
@@ -134,7 +150,7 @@ groups:
             teams:
                 - codeowners-android
         reviews:
-            request: 2
+            request: 1
 
     codeowners-app:
         type: optional
@@ -144,7 +160,7 @@ groups:
             teams:
                 - codeowners-app
         reviews:
-            request: 2
+            request: 1
 
     codeowners-ble:
         type: optional
@@ -154,7 +170,7 @@ groups:
             teams:
                 - codeowners-ble
         reviews:
-            request: 2
+            request: 1
 
     codeowners-controller:
         type: optional
@@ -164,7 +180,7 @@ groups:
             teams:
                 - codeowners-controller
         reviews:
-            request: 2
+            request: 1
 
     codeowners-darwin:
         type: optional
@@ -174,7 +190,7 @@ groups:
             teams:
                 - codeowners-darwin
         reviews:
-            request: 2
+            request: 1
 
     codeowners-crypto:
         type: optional
@@ -184,7 +200,7 @@ groups:
             teams:
                 - codeowners-crypto
         reviews:
-            request: 2
+            request: 1
 
     codeowners-inet:
         type: optional
@@ -214,7 +230,7 @@ groups:
             teams:
                 - codeowners-protocols
         reviews:
-            request: 2
+            request: 1
 
     codeowners-shell:
         type: optional
@@ -224,7 +240,7 @@ groups:
             teams:
                 - codeowners-shell
         reviews:
-            request: 2
+            request: 1
 
     codeowners-support:
         type: optional
@@ -234,7 +250,7 @@ groups:
             teams:
                 - codeowners-support
         reviews:
-            request: 2
+            request: 1
 
     codeowners-platform:
         type: optional
@@ -244,7 +260,7 @@ groups:
             teams:
                 - codeowners-platform
         reviews:
-            request: 2
+            request: 1
 
     codeowners-qrcode:
         type: optional
@@ -254,7 +270,7 @@ groups:
             teams:
                 - codeowners-qrcode
         reviews:
-            request: 2
+            request: 1
 
     codeowners-setup-payload:
         type: optional
@@ -264,7 +280,7 @@ groups:
             teams:
                 - codeowners-setup-payload
         reviews:
-            request: 2
+            request: 1
 
     codeowners-system:
         type: optional
@@ -274,7 +290,7 @@ groups:
             teams:
                 - codeowners-system
         reviews:
-            request: 2
+            request: 1
 
     codeowners-test-driver:
         type: optional
@@ -284,7 +300,7 @@ groups:
             teams:
                 - codeowners-test-driver
         reviews:
-            request: 2
+            request: 1
 
     codeowners-github:
         type: optional
@@ -294,7 +310,7 @@ groups:
             teams:
                 - codeowners-github
         reviews:
-            request: 2
+            request: 1
 
     codeowners-vscode:
         type: optional
@@ -314,7 +330,7 @@ groups:
             teams:
                 - codeowners-integrations
         reviews:
-            request: 2
+            request: 1
 
     codeowners-transport:
         type: optional
@@ -324,7 +340,7 @@ groups:
             teams:
                 - codeowners-transport
         reviews:
-            request: 2
+            request: 1
 
     codeowners-scripts:
         type: optional
@@ -334,7 +350,7 @@ groups:
             teams:
                 - codeowners-scripts
         reviews:
-            request: 2
+            request: 1
 
     codeowners-documentation:
         type: optional
@@ -344,7 +360,7 @@ groups:
             teams:
                 - codeowners-documentation
         reviews:
-            request: 2
+            request: 1
 
     codeowners-gn:
         type: optional
@@ -354,4 +370,4 @@ groups:
             teams:
                 - codeowners-gn
         reviews:
-            request: 2
+            request: 1

@@ -31,17 +31,17 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr)
+CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Error if already initialized.
-    if (mpExchangeMgr != nullptr)
-        return CHIP_ERROR_INCORRECT_STATE;
+    VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-    mpExchangeCtx = nullptr;
-
-    err = Reset();
+    mpDelegate    = apDelegate;
+    err           = Reset();
     SuccessOrExit(err);
 
 exit:
@@ -52,13 +52,13 @@ exit:
 CHIP_ERROR Command::Reset()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CommandList::Builder commandListBuilder;
     ClearExistingExchangeContext();
 
     if (mCommandMessageBuf.IsNull())
     {
         // TODO: Calculate the packet buffer size
-        mCommandMessageBuf = System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
+        mCommandMessageBuf = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -66,12 +66,15 @@ CHIP_ERROR Command::Reset()
     err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
     SuccessOrExit(err);
 
-    mInvokeCommandBuilder.CreateCommandListBuilder();
-    MoveToState(kState_Initialized);
+    commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
+    err                = commandListBuilder.GetError();
+    SuccessOrExit(err);
+    MoveToState(CommandState::Initialized);
+
+    mCommandIndex = 0;
 
 exit:
     ChipLogFunctError(err);
-
     return err;
 }
 
@@ -90,9 +93,10 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
     err = invokeCommandParser.Init(reader);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = invokeCommandParser.CheckSchemaValidity();
     SuccessOrExit(err);
-
+#endif
     err = invokeCommandParser.GetCommandList(&commandListParser);
     SuccessOrExit(err);
 
@@ -108,9 +112,6 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
         err = commandElement.Init(commandListReader);
         SuccessOrExit(err);
 
-        err = commandElement.CheckSchemaValidity();
-        SuccessOrExit(err);
-
         err = ProcessCommandDataElement(commandElement);
         SuccessOrExit(err);
     }
@@ -122,133 +123,87 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
     }
 
 exit:
+    ChipLogFunctError(err);
     return err;
 }
 
 void Command::Shutdown()
 {
-    VerifyOrExit(mState != kState_Uninitialized, );
+    VerifyOrExit(mState != CommandState::Uninitialized, );
     mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
-    if (mpExchangeCtx != nullptr)
-    {
-        mpExchangeCtx->Abort();
-        mpExchangeCtx = nullptr;
-    }
-    mpExchangeMgr = nullptr;
-    MoveToState(kState_Uninitialized);
+    ClearExistingExchangeContext();
 
+    mpExchangeMgr = nullptr;
+    mpDelegate    = nullptr;
+    ClearState();
+
+    mCommandIndex = 0;
 exit:
     return;
 }
 
-chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
-{
-    mCommandDataBuf = chip::System::PacketBufferHandle::New(System::kMaxPacketBufferSize);
-    if (mCommandDataBuf.IsNull())
-    {
-        ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
-    }
-
-    mCommandDataWriter.Init(mCommandDataBuf.Retain());
-
-    return mCommandDataWriter;
-}
-
-CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
-                               chip::CommandId aCommandId, uint8_t aFlags)
-{
-    CommandParams commandParams;
-
-    memset(&commandParams, 0, sizeof(CommandParams));
-
-    commandParams.EndpointId = aEndpintId;
-    commandParams.GroupId    = aGroupId;
-    commandParams.ClusterId  = aClusterId;
-    commandParams.CommandId  = aCommandId;
-    commandParams.Flags      = aFlags;
-
-    return AddCommand(commandParams);
-}
-
-CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
+CHIP_ERROR Command::PrepareCommand(const CommandParams * const apCommandParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    const uint8_t * apCommandData;
-    uint32_t apCommandLen;
 
-    apCommandData = mCommandDataBuf->Start();
-    apCommandLen  = mCommandDataBuf->DataLength();
-
-    if (apCommandLen > 0)
-    {
-        // Command argument list can be empty.
-        VerifyOrExit(apCommandLen >= 2, err = CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrExit(apCommandData[0] == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        apCommandData += 1;
-        apCommandLen -= 1;
-    }
-
-    {
-        CommandDataElement::Builder commandDataElement =
-            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-        CommandPath::Builder commandPath = commandDataElement.CreateCommandPathBuilder();
-        if (aCommandParams.Flags & kCommandPathFlag_EndpointIdValid)
-        {
-            commandPath.EndpointId(aCommandParams.EndpointId);
-        }
-
-        if (aCommandParams.Flags & kCommandPathFlag_GroupIdValid)
-        {
-            commandPath.GroupId(aCommandParams.GroupId);
-        }
-
-        commandPath.NamespacedClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
-
-        err = commandPath.GetError();
-        SuccessOrExit(err);
-
-        if (apCommandLen > 0)
-        {
-            // Copy the application data into a new TLV structure field contained with the
-            // command structure.  NOTE: The TLV writer will take care of moving the app data
-            // to the correct location within the buffer.
-            err = mInvokeCommandBuilder.GetWriter()->PutPreEncodedContainer(
-                chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure, apCommandData, apCommandLen);
-            SuccessOrExit(err);
-        }
-        commandDataElement.EndOfCommandDataElement();
-
-        err = commandDataElement.GetError();
-        SuccessOrExit(err);
-    }
-    MoveToState(kState_AddCommand);
-
-exit:
-    mCommandDataBuf = nullptr;
-    ChipLogFunctError(err);
-    return err;
-}
-
-CHIP_ERROR Command::AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                  const chip::ClusterId aNamespacedClusterId)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusElement::Builder statusElementBuilder;
-
-    err = statusElementBuilder.Init(mInvokeCommandBuilder.GetWriter());
+    CommandDataElement::Builder commandDataElement =
+        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    err = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId, aProtocolCode, aProtocolCode).EndOfStatusElement();
-    err = statusElementBuilder.GetError();
+    if (apCommandParams != nullptr)
+    {
+        err = ConstructCommandPath(*apCommandParams, commandDataElement);
+        SuccessOrExit(err);
+    }
 
-    MoveToState(kState_AddCommand);
+    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure,
+                                                         mDataElementContainerType);
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
+TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
+{
+    return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
+}
+
+CHIP_ERROR Command::FinishCommand()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
+    err                                            = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
+    SuccessOrExit(err);
+    commandDataElement.EndOfCommandDataElement();
+    err = commandDataElement.GetError();
+    SuccessOrExit(err);
+    MoveToState(CommandState::AddCommand);
 
 exit:
     ChipLogFunctError(err);
     return err;
+}
+
+CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder aCommandDataElement)
+{
+    CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
+    if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
+    {
+        commandPath.EndpointId(aCommandParams.EndpointId);
+    }
+
+    if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
+    {
+        commandPath.GroupId(aCommandParams.GroupId);
+    }
+
+    commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
+
+    return commandPath.GetError();
 }
 
 CHIP_ERROR Command::ClearExistingExchangeContext()
@@ -267,6 +222,11 @@ CHIP_ERROR Command::ClearExistingExchangeContext()
 CHIP_ERROR Command::FinalizeCommandsMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    CommandList::Builder commandListBuilder;
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
+    err                = commandListBuilder.GetError();
+    SuccessOrExit(err);
 
     mInvokeCommandBuilder.EndOfInvokeCommand();
     err = mInvokeCommandBuilder.GetError();
@@ -274,34 +234,31 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
 
     err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
     SuccessOrExit(err);
-
-    mCommandMessageBuf->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
-
 exit:
     ChipLogFunctError(err);
     return err;
 }
 
-#if CHIP_DETAIL_LOGGING
 const char * Command::GetStateStr() const
 {
+#if CHIP_DETAIL_LOGGING
     switch (mState)
     {
-    case kState_Uninitialized:
+    case CommandState::Uninitialized:
         return "Uninitialized";
 
-    case kState_Initialized:
+    case CommandState::Initialized:
         return "Initialized";
 
-    case kState_AddCommand:
+    case CommandState::AddCommand:
         return "AddCommand";
 
-    case kState_Sending:
+    case CommandState::Sending:
         return "Sending";
     }
+#endif // CHIP_DETAIL_LOGGING
     return "N/A";
 }
-#endif // CHIP_DETAIL_LOGGING
 
 void Command::MoveToState(const CommandState aTargetState)
 {
@@ -311,7 +268,7 @@ void Command::MoveToState(const CommandState aTargetState)
 
 void Command::ClearState(void)
 {
-    MoveToState(kState_Uninitialized);
+    MoveToState(CommandState::Uninitialized);
 }
 
 } // namespace app

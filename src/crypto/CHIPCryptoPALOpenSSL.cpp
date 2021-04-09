@@ -42,6 +42,7 @@
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
+#include <support/SafePointerCast.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <string.h>
@@ -300,9 +301,7 @@ Hash_SHA256_stream::~Hash_SHA256_stream() {}
 
 static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
-    static_assert(sizeof(HashSHA256OpaqueContext) >= sizeof(SHA256_CTX), "Need more memory for SHA256 Context");
-    static_assert(std::is_trivially_copyable<SHA256_CTX>(), "SHA256_CTX values must copyable");
-    return reinterpret_cast<SHA256_CTX *>(context->mOpaque);
+    return SafePointerCast<SHA256_CTX *>(context);
 }
 
 CHIP_ERROR Hash_SHA256_stream::Begin()
@@ -422,7 +421,8 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(slen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen >= kMin_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen <= kMax_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -482,20 +482,17 @@ ECName MapECName(SupportedECPKeyTypes keyType)
 
 static inline void from_EC_KEY(EC_KEY * key, P256KeypairContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(P256KeypairContext) >= sizeof(key), "Need more memory for EC_KEY");
-    *reinterpret_cast<EC_KEY **>(context->mBytes) = key;
+    *SafePointerCast<EC_KEY **>(context) = key;
 }
 
 static inline EC_KEY * to_EC_KEY(P256KeypairContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(P256KeypairContext) >= sizeof(EC_KEY *), "Need more memory for EC_KEY");
-    return *reinterpret_cast<EC_KEY **>(context->mBytes);
+    return *SafePointerCast<EC_KEY **>(context);
 }
 
 static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(P256KeypairContext) >= sizeof(EC_KEY *), "Need more memory for EC_KEY");
-    return *reinterpret_cast<const EC_KEY * const *>(context->mBytes);
+    return *SafePointerCast<const EC_KEY * const *>(context);
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
@@ -969,7 +966,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 
     {
         size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-        Encoding::LittleEndian::BufferWriter bbuf(output, len);
+        Encoding::BufferWriter bbuf(output, len);
         bbuf.Put(mPublicKey, mPublicKey.Length());
         bbuf.Put(privkey, sizeof(privkey));
         VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
@@ -984,7 +981,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    Encoding::LittleEndian::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
+    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     BIGNUM * pvt_key     = nullptr;
     EC_GROUP * group     = nullptr;
@@ -1183,8 +1180,7 @@ typedef struct Spake2p_Context
 
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(Spake2pOpaqueContext) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
-    return reinterpret_cast<Spake2p_Context *>(context->mOpaque);
+    return SafePointerCast<Spake2p_Context *>(context);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal()

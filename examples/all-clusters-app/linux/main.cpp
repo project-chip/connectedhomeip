@@ -23,6 +23,7 @@
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/server/Mdns.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -62,6 +63,9 @@ int main(int argc, char * argv[])
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
+
+    // Init Mdns Server
+    app::Mdns::StartServer();
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

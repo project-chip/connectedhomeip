@@ -138,47 +138,27 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
 
     TLV::TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
-    rootWriter.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
 
-    // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
-    if ((optionalData.size() + optionalExtensionData.size()) >= 4)
+    TLV::TLVWriter innerStructureWriter;
+
+    err = rootWriter.OpenContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, innerStructureWriter);
+    SuccessOrExit(err);
+
+    for (OptionalQRCodeInfo info : optionalData)
     {
-
-        TLV::TLVWriter innerStructureWriter;
-
-        err = rootWriter.OpenContainer(TLV::ProfileTag(rootWriter.ImplicitProfileId, kTag_QRCodeExensionDescriptor),
-                                       TLV::kTLVType_Structure, innerStructureWriter);
-        SuccessOrExit(err);
-
-        for (OptionalQRCodeInfo info : optionalData)
-        {
-            err = writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info);
-            SuccessOrExit(err);
-        }
-
-        for (OptionalQRCodeInfoExtension info : optionalExtensionData)
-        {
-            err = writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info);
-            SuccessOrExit(err);
-        }
-
-        err = rootWriter.CloseContainer(innerStructureWriter);
+        err = writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info);
         SuccessOrExit(err);
     }
-    else
-    {
-        for (OptionalQRCodeInfo info : optionalData)
-        {
-            err = writeTag(rootWriter, TLV::ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
-            SuccessOrExit(err);
-        }
 
-        for (OptionalQRCodeInfoExtension info : optionalExtensionData)
-        {
-            err = writeTag(rootWriter, TLV::ProfileTag(rootWriter.ImplicitProfileId, info.tag), info);
-            SuccessOrExit(err);
-        }
+    for (OptionalQRCodeInfoExtension info : optionalExtensionData)
+    {
+        err = writeTag(innerStructureWriter, TLV::ContextTag(info.tag), info);
+        SuccessOrExit(err);
     }
+
+    err = rootWriter.CloseContainer(innerStructureWriter);
+    SuccessOrExit(err);
+
     err = rootWriter.Finalize();
     SuccessOrExit(err);
 
@@ -197,7 +177,7 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     err = populateBits(bits, offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.requiresCustomFlow, kCustomFlowRequiredFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, static_cast<uint16_t>(payload.rendezvousInformation), kRendezvousInfoFieldLengthInBits,
+    err = populateBits(bits, offset, payload.rendezvousInformation.Raw(), kRendezvousInfoFieldLengthInBits,
                        kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);

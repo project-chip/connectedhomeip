@@ -23,62 +23,61 @@
 #include <map>
 #include <string>
 
-#include <controller/CHIPPersistentStorageDelegate.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Controller {
 
-void PythonPersistentStorageDelegate::SetDelegate(PersistentStorageResultDelegate * delegate)
+void PythonPersistentStorageDelegate::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
 {
     mDelegate = delegate;
 }
 
-void PythonPersistentStorageDelegate::GetKeyValue(const char * key)
-{
-    auto val = mStorage.find(key);
-    if (val == mStorage.end())
-    {
-        mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kGET, CHIP_ERROR_KEY_NOT_FOUND);
-        return;
-    }
-
-    mDelegate->OnValue(key, val->second.c_str());
-}
-
-CHIP_ERROR PythonPersistentStorageDelegate::GetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
     auto val = mStorage.find(key);
     if (val == mStorage.end())
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
-    if (size == 0 && value == nullptr)
+
+    if (value == nullptr)
     {
-        size = val->second.size() + 1;
-        return CHIP_NO_ERROR;
+        size = 0;
     }
-    else if (size < val->second.size() + 1)
+
+    uint16_t neededSize = val->second.size() + 1;
+    if (size == 0)
     {
-        size = val->second.size() + 1;
+        size = neededSize;
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    memcpy(value, val->second.c_str(), val->second.size() + 1);
+    if (size < neededSize)
+    {
+        memcpy(value, val->second.c_str(), size - 1);
+        value[size - 1] = '\0';
+        size            = neededSize;
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    memcpy(value, val->second.c_str(), neededSize);
+    size = neededSize;
     return CHIP_NO_ERROR;
 }
 
-void PythonPersistentStorageDelegate::SetKeyValue(const char * key, const char * value)
+void PythonPersistentStorageDelegate::AsyncSetKeyValue(const char * key, const char * value)
 {
     mStorage[key] = value;
-    ChipLogDetail(Controller, "SetKeyValue: %s=%s", key, value);
-    mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
+    ChipLogDetail(Controller, "AsyncSetKeyValue: %s=%s", key, value);
+    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
 }
 
-void PythonPersistentStorageDelegate::DeleteKeyValue(const char * key)
+void PythonPersistentStorageDelegate::AsyncDeleteKeyValue(const char * key)
 {
     mStorage.erase(key);
-    mDelegate->OnStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
+    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
 }
 
 } // namespace Controller

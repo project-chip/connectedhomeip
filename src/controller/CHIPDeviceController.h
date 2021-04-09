@@ -28,19 +28,26 @@
 
 #pragma once
 
+#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/ExchangeMgrDelegate.h>
+#include <protocols/secure_channel/RendezvousSession.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#include <controller/DeviceAddressUpdateDelegate.h>
+#include <mdns/Resolver.h>
+#endif
 
 namespace chip {
 
@@ -48,6 +55,19 @@ namespace Controller {
 
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
+
+struct ControllerInitParams
+{
+    PersistentStorageDelegate * storageDelegate = nullptr;
+    System::Layer * systemLayer                 = nullptr;
+    Inet::InetLayer * inetLayer                 = nullptr;
+#if CHIP_ENABLE_INTERACTION_MODEL
+    app::InteractionModelDelegate * imDelegate = nullptr;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+#endif
+};
 
 class DLL_EXPORT DevicePairingDelegate
 {
@@ -106,7 +126,13 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
+                                    public Messaging::ExchangeMgrDelegate,
+                                    public PersistentStorageResultDelegate,
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+                                    public Mdns::ResolverDelegate,
+#endif
+                                    public app::InteractionModelDelegate
 {
 public:
     DeviceController();
@@ -116,6 +142,9 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
+    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
+
+    // Note: Future modifications should be made to ControllerInitParams
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
@@ -147,6 +176,20 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
+
+    /**
+     * @brief
+     *   This function update the device informations asynchronously using mdns.
+     *   If new device informations has been found, it will be persisted.
+     *
+     * @param[in] device    The input device object to update
+     * @param[in] fabricId  The fabricId used for mdns resolution
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR UpdateDevice(Device * device, uint64_t fabricId);
+
+    void PersistDevice(Device * device);
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
@@ -188,36 +231,48 @@ protected:
 
     NodeId mLocalDeviceId;
     DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionManager;
-    Messaging::ExchangeManager * mExchangeManager;
+    SecureSessionMgr * mSessionMgr;
+    Messaging::ExchangeManager * mExchangeMgr;
     PersistentStorageDelegate * mStorageDelegate;
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+#endif
     Inet::InetLayer * mInetLayer;
+    System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
     uint16_t FindDeviceIndex(SecureSessionHandle session);
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
+    void ReleaseDeviceById(NodeId remoteDeviceId);
+    CHIP_ERROR InitializePairedDeviceList();
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+    ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     Transport::AdminId mAdminId = 0;
     Transport::AdminPairingTable mAdmins;
 
 private:
-    //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
+    //////////// ExchangeDelegate Implementation ///////////////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle msgBuf) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    //////////// ExchangeMgrDelegate Implementation ///////////////
+    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnValue(const char * key, const char * value) override;
-    void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
+    void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    //////////// ResolverDelegate Implementation ///////////////
+    void OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
-
-    System::Layer * mSystemLayer;
 };
 
 /**
@@ -257,6 +312,9 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
+    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate = nullptr);
+
+    // Note: Future modifications should be made to ControllerInitParams
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
                     Inet::InetLayer * inetLayer = nullptr);
@@ -277,17 +335,11 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The Rendezvous connection parameters
-     * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
-     * @param[in] interfaceId           [Optional] The local inet interface to use to communicate with the device.
-     *
-     * @return CHIP_ERROR               The connection status
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t devicePort = CHIP_PORT,
-                          Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
 
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr, SerializedDevice & serialized,
-                                  uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+    PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Transport::PeerAddress & peerAddress, SerializedDevice & serialized);
 
     /**
      * @brief
@@ -342,6 +394,16 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
+
+    void FreeRendezvousSession();
+
+    CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    void OnSessionEstablishmentTimeout();
+
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
+
+    uint16_t mNextKeyId = 0;
 };
 
 } // namespace Controller

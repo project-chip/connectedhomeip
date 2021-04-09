@@ -36,7 +36,6 @@
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 
@@ -266,24 +265,20 @@ CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, u
     }
     TLV::TLVReader rootReader;
     rootReader.Init(tlvDataStart, static_cast<uint32_t>(tlvDataLengthInBytes));
-    rootReader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
-    err                          = rootReader.Next();
+    err = rootReader.Next();
     SuccessOrExit(err);
 
-    if (rootReader.GetType() == TLV::kTLVType_Structure)
+    if (rootReader.GetType() != TLV::kTLVType_Structure)
     {
-        TLV::TLVReader innerStructureReader;
-        err = openTLVContainer(rootReader, TLV::kTLVType_Structure,
-                               TLV::ProfileTag(rootReader.ImplicitProfileId, kTag_QRCodeExensionDescriptor), innerStructureReader);
-        SuccessOrExit(err);
-        err = innerStructureReader.Next();
-        SuccessOrExit(err);
-        err = retrieveOptionalInfos(outPayload, innerStructureReader);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    else
-    {
-        err = retrieveOptionalInfos(outPayload, rootReader);
-    }
+
+    TLV::TLVReader innerStructureReader;
+    err = openTLVContainer(rootReader, TLV::kTLVType_Structure, TLV::AnonymousTag, innerStructureReader);
+    SuccessOrExit(err);
+    err = innerStructureReader.Next();
+    SuccessOrExit(err);
+    err = retrieveOptionalInfos(outPayload, innerStructureReader);
 
     if (err == CHIP_END_OF_TLV)
     {
@@ -388,7 +383,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.rendezvousInformation = static_cast<RendezvousInformationFlags>(dest);
+    outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
     SuccessOrExit(err);

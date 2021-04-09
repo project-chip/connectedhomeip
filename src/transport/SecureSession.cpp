@@ -25,7 +25,6 @@
 #include <core/CHIPEncoding.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -113,7 +112,7 @@ CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, uin
 }
 
 CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                  MessageAuthenticationCode & mac)
+                                  MessageAuthenticationCode & mac) const
 {
 
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
@@ -142,7 +141,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
 }
 
 CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                  const MessageAuthenticationCode & mac)
+                                  const MessageAuthenticationCode & mac) const
 {
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
     const uint8_t * tag = mac.GetTag();

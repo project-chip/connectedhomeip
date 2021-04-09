@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <thread>
+#include <vector>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
@@ -48,6 +49,8 @@ public:
     CHIP_ERROR _GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
 
     CHIP_ERROR _SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
+
+    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
 
     void _ErasePersistentInfo();
 
@@ -83,7 +86,11 @@ public:
 
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
 
-    CHIP_ERROR _GetSlaacIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
+
+    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR _JoinerStart();
 
@@ -94,7 +101,11 @@ public:
 private:
     struct DBusConnectionDeleter
     {
-        void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
+        void operator()(DBusConnection * aConnection)
+        {
+            dbus_connection_close(aConnection);
+            dbus_connection_unref(aConnection);
+        }
     };
 
     using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
@@ -103,6 +114,7 @@ private:
 
     std::unique_ptr<otbr::DBus::ThreadApiDBus> mThreadApi;
     UniqueDBusConnection mConnection;
+    std::vector<uint8_t> mOperationalDatasetTlv;
     Internal::DeviceNetworkInfo mNetworkInfo;
     bool mAttached;
     std::thread mDBusEventLoop;

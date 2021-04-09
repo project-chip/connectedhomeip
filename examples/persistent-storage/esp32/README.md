@@ -41,13 +41,13 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.1 branch
+-   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.1
+          $ git checkout release/v4.2
           $ git submodule update --init
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
@@ -59,21 +59,36 @@ step. To install these components manually, follow these steps:
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
--   In the root of the example directory, sync the CHIP tree's submodules and
-    source `idf.sh`. Note: This does not have to be repeated for incremental
-    builds.
+-   Setting up the environment
 
-          $ source idf.sh
+To download and install packages.
+
+        $ cd ${HOME}/tools/esp-idf
+        $ ./install.sh
+        $ . ./export.sh
+        $ cd {path-to-connectedhomeip}
+        $ source ./scripts/bootstrap.sh
+        $ source ./scripts/activate.sh
+        $ cd {path-to-connectedhomeip-examples}
+
+If packages are already installed then simply activate it.
+
+        $ cd ${HOME}/tools/esp-idf
+        $ ./install.sh
+        $ . ./export.sh
+        $ cd {path-to-connectedhomeip}
+        $ source ./scripts/activate.sh
+        $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
 
-        To use the default configuration options, run the default config
+        To choose from the different configuration options, run menuconfig
 
-          $ idf make defconfig
+          $ idf.py menuconfig
 
--   Run make to build the demo application.
+-   To build the demo application.
 
-          $ idf make
+          $ idf.py build
 
 <a name="flashing"></a>
 
@@ -88,7 +103,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
-          $ idf make flash ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf.py flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)

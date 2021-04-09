@@ -30,3 +30,10 @@ arm_toolchain("efr32_lighting_app") {
     import("${chip_root}/examples/lighting-app/efr32/args.gni")
   }
 }
+
+arm_toolchain("efr32_window_app") {
+  toolchain_args = {
+    current_os = "freertos"
+    import("${chip_root}/examples/window-app/efr32/args.gni")
+  }
+}

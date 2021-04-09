@@ -34,4 +34,3 @@ extern chip::Messaging::ExchangeManager gExchangeManager;
 
 void InitializeChip(void);
 void ShutdownChip(void);
-void DriveIO(void);

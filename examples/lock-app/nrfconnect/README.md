@@ -5,9 +5,14 @@ device with one basic bolt. It uses buttons to test changing the lock and device
 states and LEDs to show the state of these changes. You can use this example as
 a reference for creating your own application.
 
+<p align="center">
+  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
+  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
+</p>
+
 The example is based on [CHIP](https://github.com/project-chip/connectedhomeip)
-and the nRF Connect platform, and supports remote access and control of a
-simulated door lock over a low-power, 802.15.4 Thread network.
+and Nordic Semiconductor's nRF Connect SDK, and supports remote access and
+control of a simulated door lock over a low-power, 802.15.4 Thread network.
 
 The example behaves as a CHIP accessory, that is a device that can be paired
 into an existing CHIP network and can be controlled by this network.
@@ -18,6 +23,7 @@ into an existing CHIP network and can be controlled by this network.
     -   [Bluetooth LE advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
 -   [Requirements](#requirements)
+    -   [Supported devices](#supported_devices)
 -   [Device UI](#device-ui)
 -   [Setting up the environment](#setting-up-the-environment)
     -   [Using Docker container for setup](#using-docker-container-for-setup)
@@ -34,7 +40,8 @@ into an existing CHIP network and can be controlled by this network.
 
 ## Overview
 
-This example is running on the nRF Connect platform, which is based on the
+This example is running on the nRF Connect platform, which is based on Nordic
+Semiconductor's
 [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
@@ -82,13 +89,20 @@ with other Thread devices in the network.
 
 ## Requirements
 
-The application requires the nRF Connect SDK v1.4.0 to work correctly.
+The application requires a specific revision of the nRF Connect SDK to work
+correctly. See [Setting up the environment](#setting-up-the-environment) for
+more information.
+
+<a name="supported_devices"></a>
+
+### Supported devices
 
 The example supports building and running on the following devices:
 
-| Board name                                                                                | Board platform build name |
-| ----------------------------------------------------------------------------------------- | ------------------------- |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`     |
+| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                      |
+| ----------------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840-DK_top-view-small.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340-DK_top-view-small.jpg" alt="nRF5340 DK"/></details>    |
 
 <hr>
 
@@ -97,10 +111,8 @@ The example supports building and running on the following devices:
 ## Device UI
 
 This section lists the User Interface elements that you can use to control and
-monitor the state of the device. All these elements can be located on the
-following board picture:
-
-![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.jpg)
+monitor the state of the device. These correspond to PCB components on the
+platform image.
 
 **LED 1** shows the overall state of the device and its connectivity. The
 following states are possible:
@@ -166,12 +178,12 @@ using the following command:
 
         $ git submodule update --init
 
-The example requires the nRF Connect SDK v1.4.0. You can either install it along
-with the related tools directly on your system or use a Docker image that has
-the tools pre-installed.
+The example requires a specific revision of the nRF Connect SDK. You can either
+install it along with the related tools directly on your system or use a Docker
+image that has the tools pre-installed.
 
 If you are a macOS user, you won't be able to use the Docker container to flash
-the application onto a Nordic board due to
+the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
 Use the [native shell](#using-native-shell) for building instead.
 
@@ -210,13 +222,11 @@ To use the Docker container for setup, complete the following steps:
     -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
         current user instead of root.
 
-4.  Check out or update the nRF Connect SDK to the recommended `v1.4.0` version
-    by running the following command in the Docker container:
+4.  Update the nRF Connect SDK to the most recent supported revision, by running
+    the following command:
 
-         $ setup --ncs v1.4.0
-         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
-         ...
-         /var/chip repository is initialized, skipping...
+         $ cd /var/chip
+         $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
 
@@ -229,23 +239,14 @@ To use the native shell for setup, complete the following steps:
     -   [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
     -   [GN meta-build system](https://gn.googlesource.com/gn/)
 
-2.  Depending on whether you have the nRF Connect SDK installed:
+2.  If you do not have the nRF Connect SDK installed, follow the
+    [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
+    in the nRF Connect SDK documentation to install the latest stable nRF
+    Connect SDK version. Since command-line tools will be used for building the
+    example, installing SEGGER Embedded Studio is not required.
 
-    -   Follow the
-        [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
-        in the nRF Connect SDK documentation to install the nRF Connect SDK
-        v1.4.0. Since command-line tools will be used for building the example,
-        installing SEGGER Embedded Studio is not required.
-
-    -   If you have an older version of the SDK installed, use the following
-        commands to update it to the recommended version. Replace
-        _nrfconnect-dir_ with the path to your nRF Connect SDK installation
-        directory.
-
-               $ cd nrfconnect-dir/nrf
-               $ git fetch origin
-               $ git checkout v1.4.0
-               $ west update
+    If you have the SDK already installed, continue to the next step and update
+    the nRF Connect SDK after initializing environment variables.
 
 3.  Initialize environment variables referred to by the CHIP and the nRF Connect
     SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
@@ -255,6 +256,13 @@ To use the native shell for setup, complete the following steps:
          $ source nrfconnect-dir/zephyr/zephyr-env.sh
          $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
          $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
+
+4.  Update the nRF Connect SDK to the most recent supported revision by running
+    the following command (replace _chip-dir_ with the path to CHIP repository
+    directory):
+
+         $ cd chip-dir
+         $ python3 scripts/setup/nrfconnect/update_ncs.py --update
 
 Now you can proceed with the [Building](#building) instruction.
 
@@ -271,20 +279,20 @@ environment:
 
         $ cd examples/lock-app/nrfconnect
 
-2.  Run the following command to build the example, with _board-name_ replaced
-    with the name of the Nordic Semiconductor's board you own, for example
-    `nrf52840dk_nrf52840`:
+2.  Run the following command to build the example, with _build-target_ replaced
+    with the build target name of the Nordic Semiconductor's kit you own, for
+    example `nrf52840dk_nrf52840`:
 
-         $ west build -b board-name
+         $ west build -b build-target
 
-    You only need to specify the board name on the first build. See
-    [Requirements](#requirements) for the names of compatible boards.
+    You only need to specify the build target on the first build. See
+    [Requirements](#requirements) for the build target names of compatible kits.
 
 The output `zephyr.hex` file will be available in the `build/zephyr/` directory.
 
 ### Removing build artifacts
 
-If you're planning to build the example for a different board or make changes to
+If you're planning to build the example for a different kit or make changes to
 the configuration, remove all build artifacts before building. To do so, use the
 following command:
 
@@ -295,10 +303,10 @@ following command:
 To build the example with release configuration that disables the diagnostic
 features like logs and command-line interface, run the following command:
 
-    $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/release.conf
+    $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/release.conf
 
-Remember to replace _board-name_ with the name of the Nordic Semiconductor's
-board you own.
+Remember to replace _build-target_ with the build target name of the Nordic
+Semiconductor's kit you own.
 
 <hr>
 
@@ -312,10 +320,10 @@ using the menuconfig utility.
 To open the menuconfig utility, run the following command from the example
 directory:
 
-    $ west build -b board-name -t menuconfig
+    $ west build -b build-target -t menuconfig
 
-Remember to replace _board-name_ with the name of the Nordic Semiconductor's
-board you own.
+Remember to replace _build-target_ with the build target name of the Nordic
+Semiconductor's kit you own.
 
 Changes done with menuconfig will be lost if the `build` directory is deleted.
 To make them persistent, save the configuration options in the `prj.conf` file.
@@ -332,9 +340,9 @@ page.
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
 
-        $ west flash
+        $ west flash --erase
 
-If you have multiple nRF52840 DK boards connected, west will prompt you to pick
+If you have multiple development kits connected, west will prompt you to pick
 the correct one.
 
 To debug the application on target, run the following command from the example

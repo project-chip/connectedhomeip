@@ -15,8 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/java/rules.gni")
 import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
 
 shared_library("jni") {
   output_name = "libCHIPController"
@@ -30,7 +30,13 @@ shared_library("jni") {
     "AndroidBlePlatformDelegate.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidKeyValueStoreManagerImpl.cpp",
+    "AndroidKeyValueStoreManagerImpl.h",
     "CHIPDeviceController-JNI.cpp",
+    "CHIPJNIError.h",
+    "JniReferences.cpp",
+    "JniReferences.h",
+    "JniTypeWrappers.h",
   ]
 
   deps = [ "//src/lib" ]
@@ -43,14 +49,17 @@ android_library("java") {
 
   data_deps = [
     ":jni",
-    "${build_root}/chip/java:shared_cpplib",
+    "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
   sources = [
     "src/chip/devicecontroller/AndroidChipStack.java",
+    "src/chip/devicecontroller/AndroidPersistentStorageDelegate.java",
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/KeyValueStoreManager.java",
+    "src/chip/devicecontroller/PersistentStorage.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

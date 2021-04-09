@@ -43,7 +43,9 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev unzip
+sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev \
+     libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev \
+     python3-pip unzip libgirepository1.0-dev libcairo2-dev
 ```
 
 #### How to install prerequisites on macOS
@@ -85,6 +87,38 @@ sudo apt-get install pi-bluetooth
 ```
 
 You need to reboot your RPi after install `pi-bluetooth`.
+
+By default, wpa_supplicant is not allowed to update (overwrite) configuration,
+if you want chip app to be able to store the configuration changes permanently,
+we need to make the following changes.
+
+1. Edit the dbus-fi.w1.wpa_supplicant1.service file to use configuration file
+   instead.
+
+```
+sudo nano /etc/systemd/system/dbus-fi.w1.wpa_supplicant1.service
+```
+
+Change the wpa_supplicant start parameters to:
+
+```
+ExecStart=/sbin/wpa_supplicant -u -s -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+2. Add the wpa-supplicant configuration file
+
+```
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+And add the following content to the file:
+
+```
+ctrl_interface=DIR=/run/wpa_supplicant
+update_config=1
+```
+
+Finally, reboot your RPi.
 
 ### Build Preparation
 
@@ -238,13 +272,14 @@ all of the target instances. For example:
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
-Note: Some builds are disabled by default as they need extra SDKs. For example,
-to add the EFR32 examples to the unified build, download the
-[SDK](https://github.com/SiliconLabs/sdk_support) and add the following build
-arguments:
+Note: Some platforms that can be build as part of the unified build require
+downloading additional SDKs. To add these to the build, the location of the SDK
+installation must be provided as a build argument. For example, to add the
+Simplelink cc13x2_26x2 examples to the unified build, install the
+[SDK](https://ti.com/chip_sdk) and add the following build arguments:
 
 ```
-gn gen out/unified --args='target_os="all" enable_efr32_builds=true efr32_sdk_root="/path/to/sdk" efr32_board="BRD4161A"'
+gn gen out/unified --args="target_os=\"all\" enable_ti_simplelink_builds=true ti_simplelink_sdk_root=\"/path/to/sdk\" ti_sysconfig_root=\"/path/to/sysconfig\""
 ```
 
 ### Getting Help
@@ -304,6 +339,17 @@ To find dependency paths:
 
 ```
 gn path out/host //src/transport/tests:tests //src/system
+```
+
+To list useful information for linking against libCHIP:
+
+```
+gn desc out/host //src/lib include_dirs
+gn desc out/host //src/lib defines
+gn desc out/host //src/lib outputs
+
+# everything as JSON
+gn desc out/host //src/lib --format=json
 ```
 
 ## Maintaining CHIP

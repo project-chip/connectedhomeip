@@ -19,7 +19,6 @@
 
 #include "QueryReplyFilter.h"
 
-#include <support/ReturnMacros.h>
 #include <system/SystemClock.h>
 
 #define RETURN_IF_ERROR(err)                                                                                                       \
@@ -74,7 +73,6 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         const uint64_t kTimeNowMs = chip::System::Platform::Layer::GetClock_MonotonicMS();
 
         QueryReplyFilter queryReplyFilter(query);
-
         QueryResponderRecordFilter responseFilter;
 
         responseFilter.SetReplyFilter(&queryReplyFilter);
@@ -108,7 +106,8 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         mSendState.SetResourceType(ResourceType::kAdditional);
 
         QueryReplyFilter queryReplyFilter(query);
-        queryReplyFilter.SetIgnoreNameMatch(true);
+
+        queryReplyFilter.SetIgnoreNameMatch(true).SetSendingAdditionalItems(true);
 
         QueryResponderRecordFilter responseFilter;
         responseFilter

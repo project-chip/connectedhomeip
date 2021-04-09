@@ -42,6 +42,8 @@ struct ifaddrs;
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+#include <device.h>
+
 struct net_if;
 struct net_if_ipv4;
 struct net_if_ipv6;
@@ -151,6 +153,19 @@ public:
     bool IsUp();
     bool SupportsMulticast();
     bool HasBroadcastAddress();
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static constexpr size_t kMaxIfNameLength = 13; // Names are formatted as %c%c%d
+#elif CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+    static constexpr size_t kMaxIfNameLength = IF_NAMESIZE;
+#elif CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    static constexpr size_t kMaxIfNameLength = Z_DEVICE_MAX_NAME_LEN;
+#elif defined(IFNAMSIZ)
+    static constexpr size_t kMaxIfNameLength = IFNAMSIZ;
+#else
+    // No constant available here - set some reasonable size
+    static constexpr size_t kMaxIfNameLength = 33;
+#endif
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -42,34 +42,16 @@ set(CHIP_CFLAGS
     -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
     -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=1
     -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
-    -isystem${ZEPHYR_BASE}/../modules/crypto/mbedtls/configs
-    -isystem${ZEPHYR_BASE}/../mbedtls/include
+    -isystem$ENV{ZEPHYR_BASE}/../modules/crypto/mbedtls/configs
+    -isystem$ENV{ZEPHYR_BASE}/../mbedtls/include
 )
 
 set(CHIP_TESTS
-    # TODO: this list is hard to maintain manually (and currently incomplete).
-    # An automated way that includes figuring out dependencies would be much better
-    -lAppTests
-    -lASN1Tests
-    -lBleLayerTests
-    -lChipCryptoTests
-    -lCoreTests
-    -lInetLayerTests
-    -lMessagingLayerTests
-    -lPlatformTests
-    # TODO: raw transport tests fail by running out of TCP/UDP endpoints
-    # -lRawTransportTests
-    -lRetransmitTests
-    -lSupportTests
-    -lSystemLayerTests
-    -lTransportLayerTests
+    -lCHIP_tests
 )
 
 set(CHIP_LIBRARIES
     -lCHIP
-    -lInetTestHelpers
-    -lNetworkTestHelpers
-    -lnlunit-test
     ${CHIP_TESTS}
 )
 
