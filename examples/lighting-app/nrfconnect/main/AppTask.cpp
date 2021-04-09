@@ -371,7 +371,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
     else
     {
-        ShareQRCodeOverNFC(chip::RendezvousInformationFlags::kBLE);
+        ShareQRCodeOverNFC(RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
 #endif
 
