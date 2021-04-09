@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -54,6 +55,9 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
+#if CHIP_ENABLE_INTERACTION_MODEL
+    app::InteractionModelDelegate * imDelegate = nullptr;
+#endif
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -113,7 +117,9 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate,
+                                    public PersistentStorageResultDelegate,
+                                    public app::InteractionModelDelegate
 {
 public:
     DeviceController();
@@ -157,6 +163,8 @@ public:
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
+
+    void PersistDevice(Device * device);
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
@@ -202,6 +210,7 @@ protected:
     Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
+    System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -228,8 +237,6 @@ private:
     void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     void ReleaseAllDevices();
-
-    System::Layer * mSystemLayer;
 };
 
 /**
@@ -355,6 +362,10 @@ private:
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    void OnSessionEstablishmentTimeout();
+
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
     uint16_t mNextKeyId = 0;
 };

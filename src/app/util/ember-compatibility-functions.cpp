@@ -65,25 +65,17 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
         // If this command is not handled by IM, then let ember send response.
         return false;
     }
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    (void) status;
 
-    // TODO: handle the response according to status value
-    chip::app::Command::CommandParams returnCommandParam = { imCompatibilityEmberApsFrame.sourceEndpoint,
-                                                             0, // GroupId
-                                                             imCompatibilityEmberApsFrame.clusterId,
-                                                             imCompatibilityEmberAfCluster.commandId,
-                                                             (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    chip::app::Command::CommandParams returnStatusParam = { imCompatibilityEmberApsFrame.sourceEndpoint,
+                                                            0, // GroupId
+                                                            imCompatibilityEmberApsFrame.clusterId,
+                                                            imCompatibilityEmberAfCluster.commandId,
+                                                            (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
 
-    chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
-    chip::TLV::TLVWriter writer  = currentCommandObject->CreateCommandDataElementTLVWriter();
-
-    SuccessOrExit(err = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType));
-    SuccessOrExit(err = writer.EndContainer(dummyType));
-    SuccessOrExit(err = writer.Finalize());
-    SuccessOrExit(err = currentCommandObject->AddCommand(returnCommandParam));
-exit:
-    return true;
+    CHIP_ERROR err =
+        currentCommandObject->AddStatusCode(&returnStatusParam, chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                            chip::Protocols::InteractionModel::Id, status);
+    return CHIP_NO_ERROR == err;
 }
 
 void ResetEmberAfObjects()

@@ -175,6 +175,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CoreFoundation.framework",
         "CoreBluetooth.framework",
         "Foundation.framework",
+        "IOKit.framework",
       ]
     }
   }

@@ -82,6 +82,7 @@ static_library("app") {
     "ReadHandler.cpp",
     "decoder.cpp",
     "encoder.cpp",
+    "reporting/Engine.cpp",
   ]
 
   public_deps = [

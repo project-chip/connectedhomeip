@@ -44,6 +44,7 @@ constexpr ClusterId kNetworkCommissioningClusterId   = 0x0031;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
 constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr ClusterId kWindowCoveringClusterId         = 0x0102;
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
@@ -680,6 +681,69 @@ public:
     CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval, int16_t change);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+};
+
+class DLL_EXPORT WindowCoveringCluster : public ClusterBase
+{
+public:
+    WindowCoveringCluster() : ClusterBase(kWindowCoveringClusterId) {}
+    ~WindowCoveringCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR WindowCoveringDownClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WindowCoveringGoToLiftPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t percentageLiftValue);
+    CHIP_ERROR WindowCoveringGoToLiftValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t liftValue);
+    CHIP_ERROR WindowCoveringGoToTiltPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t percentageTiltValue);
+    CHIP_ERROR WindowCoveringGoToTiltValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t tiltValue);
+    CHIP_ERROR WindowCoveringStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WindowCoveringUpOpen(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t value);
+    CHIP_ERROR ConfigureAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                    uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeWindowCoveringType(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                     uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeCurrentPositionLift(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                     uint16_t maxInterval, uint16_t change);
+    CHIP_ERROR ReportAttributeCurrentPositionTilt(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ConfigureAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeConfigStatus(Callback::Cancelable * onReportCallback);
+
+private:
+    static constexpr CommandId kWindowCoveringDownCloseCommandId          = 0x01;
+    static constexpr CommandId kWindowCoveringGoToLiftPercentageCommandId = 0x05;
+    static constexpr CommandId kWindowCoveringGoToLiftValueCommandId      = 0x04;
+    static constexpr CommandId kWindowCoveringGoToTiltPercentageCommandId = 0x08;
+    static constexpr CommandId kWindowCoveringGoToTiltValueCommandId      = 0x07;
+    static constexpr CommandId kWindowCoveringStopCommandId               = 0x02;
+    static constexpr CommandId kWindowCoveringUpOpenCommandId             = 0x00;
 };
 
 } // namespace Controller

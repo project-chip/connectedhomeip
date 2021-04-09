@@ -243,7 +243,10 @@ class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDele
 public:
     CHIP_ERROR StartAdvertisement() const override
     {
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+        if (isBLE)
+        {
+            ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+        }
         if (mDelegate != nullptr)
         {
             mDelegate->OnPairingWindowOpened();
@@ -254,7 +257,10 @@ public:
     {
         gDeviceDiscriminatorCache.RestoreDiscriminator();
 
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
+        if (isBLE)
+        {
+            ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
+        }
         {
             if (mDelegate != nullptr)
                 mDelegate->OnPairingWindowClosed();
@@ -279,12 +285,13 @@ public:
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
-
+    void SetBLE(bool ble) { isBLE = ble; }
     void SetAdminId(AdminId id) { mAdmin = id; }
 
 private:
     AppDelegate * mDelegate = nullptr;
     AdminId mAdmin;
+    bool isBLE = true;
 };
 
 DemoTransportMgr gTransports;
@@ -419,8 +426,9 @@ SecureSessionMgr & chip::SessionManager()
     return gSessions;
 }
 
-CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
+CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
 {
+    // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
 
     uint32_t pinCode;
@@ -428,13 +436,14 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 
     RendezvousParameters params;
 
-#if CONFIG_NETWORK_LAYER_BLE
-    params.SetSetupPINCode(pinCode)
-        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-        .SetPeerAddress(Transport::PeerAddress::BLE())
-        .SetAdvertisementDelegate(&gAdvDelegate);
-#else
     params.SetSetupPINCode(pinCode);
+#if CONFIG_NETWORK_LAYER_BLE
+    gAdvDelegate.SetBLE(advertisementMode == chip::PairingWindowAdvertisement::kBle);
+    params.SetAdvertisementDelegate(&gAdvDelegate);
+    if (advertisementMode == chip::PairingWindowAdvertisement::kBle)
+    {
+        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
+    }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     if (resetAdmins == ResetAdmins::kYes)
