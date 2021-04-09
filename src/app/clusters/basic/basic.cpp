@@ -28,8 +28,21 @@
 #include <gen/cluster-id.h>
 #include <protocols/interaction_model/Constants.h>
 
+#include <cstring>
+
 using namespace chip;
 using namespace chip::DeviceLayer;
+
+namespace {
+template <size_t BufferLength>
+uint8_t * MakeZclCharString(uint8_t (&zclString)[BufferLength], char (&cString)[BufferLength])
+{
+    static_assert(BufferLength <= 256, "Too long string to fit in ZCL_CHAR_STRING type");
+    zclString[0] = static_cast<uint8_t>(strlen(cString));
+    memcpy(&zclString[1], cString, zclString[0]);
+    return zclString;
+}
+} // namespace
 
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
@@ -38,15 +51,16 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     uint16_t productId;
     uint16_t productRevision;
     uint32_t firmwareRevision;
-    char buffer[65];
+    char cString[65];
+    uint8_t zclString[65];
 
     emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_INTERACTION_MODEL_VERSION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                           reinterpret_cast<uint8_t *>(&imVersion), ZCL_INT16U_ATTRIBUTE_TYPE);
 
-    if (ConfigurationMgr().GetVendorName(buffer, sizeof(buffer)) == CHIP_NO_ERROR)
+    if (ConfigurationMgr().GetVendorName(cString, sizeof(cString)) == CHIP_NO_ERROR)
     {
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_VENDOR_NAME_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(buffer), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                              MakeZclCharString(zclString, cString), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     }
 
     if (ConfigurationMgr().GetVendorId(vendorId) == CHIP_NO_ERROR)
@@ -55,10 +69,10 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
                               reinterpret_cast<uint8_t *>(&vendorId), ZCL_INT16U_ATTRIBUTE_TYPE);
     }
 
-    if (ConfigurationMgr().GetProductName(buffer, sizeof(buffer)) == CHIP_NO_ERROR)
+    if (ConfigurationMgr().GetProductName(cString, sizeof(cString)) == CHIP_NO_ERROR)
     {
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_PRODUCT_NAME_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(buffer), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                              MakeZclCharString(zclString, cString), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     }
 
     if (ConfigurationMgr().GetProductId(productId) == CHIP_NO_ERROR)
@@ -67,10 +81,10 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
                               reinterpret_cast<uint8_t *>(&productId), ZCL_INT16U_ATTRIBUTE_TYPE);
     }
 
-    if (ConfigurationMgr().GetProductRevisionString(buffer, sizeof(buffer)) == CHIP_NO_ERROR)
+    if (ConfigurationMgr().GetProductRevisionString(cString, sizeof(cString)) == CHIP_NO_ERROR)
     {
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_HARDWARE_VERSION_STRING_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(buffer), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                              MakeZclCharString(zclString, cString), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     }
 
     if (ConfigurationMgr().GetProductRevision(productRevision) == CHIP_NO_ERROR)
@@ -79,10 +93,10 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
                               reinterpret_cast<uint8_t *>(&productRevision), ZCL_INT16U_ATTRIBUTE_TYPE);
     }
 
-    if (ConfigurationMgr().GetFirmwareRevisionString(buffer, sizeof(buffer)) == CHIP_NO_ERROR)
+    if (ConfigurationMgr().GetFirmwareRevisionString(cString, sizeof(cString)) == CHIP_NO_ERROR)
     {
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_SOFTWARE_VERSION_STRING_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                              reinterpret_cast<uint8_t *>(buffer), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+                              MakeZclCharString(zclString, cString), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     }
 
     if (ConfigurationMgr().GetFirmwareRevision(firmwareRevision) == CHIP_NO_ERROR)
@@ -90,4 +104,4 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                               reinterpret_cast<uint8_t *>(&firmwareRevision), ZCL_INT32U_ATTRIBUTE_TYPE);
     }
-}
+    }
