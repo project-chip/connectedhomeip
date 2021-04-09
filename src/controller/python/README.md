@@ -333,7 +333,7 @@ example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
 `['T', 'e', 's', 't', 0x00]`).
 
-## Example Commissioning flow over IP
+## Example Commissioning flow over
 
 -   Assuming your WiFi ssid is `TESTSSID`, and your WiFi password is `P455W4RD`.
 
@@ -358,9 +358,19 @@ example, `networkId=hex:0123456789abcdef` (for
 
 -   You set the temporary node id to 4546
 
-```
-chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
-```
+-   The discriminator of the device is 2333
+
+> Establish PASE session over BLE
+>
+> ```
+> chip-device-ctrl > connect -ble 2333 12345678 4546
+> ```
+
+> Establish PASE session over IP
+>
+> ```
+> chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
+> ```
 
 > Skip this part if your device does not support WiFi.
 >
@@ -377,3 +387,10 @@ chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
 >
 > chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkId=hex:0123456789abcdef breadcrumb=0 timeoutMs=1000
 > ```
+
+> If you are using BLE connection, release BLE connection
+>
+> ```
+> chip-device-ctrl > close-ble
+> ```
+
