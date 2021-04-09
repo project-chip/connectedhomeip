@@ -32,7 +32,7 @@
 
 #define APP_NAME "KVS-Test"
 
-#define LOG_MODULE_ID   1
+#define LOG_MODULE_ID 1
 
 static TaskHandle_t sTestTaskHandle;
 void TestTask(void * pvParameter)
