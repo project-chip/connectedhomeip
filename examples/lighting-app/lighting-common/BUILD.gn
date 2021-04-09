@@ -38,6 +38,7 @@ if (enable_pw_rpc) {
 
 source_set("lighting-common") {
   sources = [
+    "${chip_root}/src/app/clusters/basic/basic.cpp",
     "${chip_root}/src/app/clusters/bindings/bindings.cpp",
     "${chip_root}/src/app/clusters/level-control/level-control.cpp",
     "${chip_root}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp",

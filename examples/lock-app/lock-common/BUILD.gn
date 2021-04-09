@@ -25,6 +25,7 @@ config("includes") {
 source_set("lock-common") {
   sources = [
     "${chip_root}/src/app/clusters/bindings/bindings.cpp",
+    "${chip_root}/src/app/clusters/basic/basic.cpp",
     "${chip_root}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp",
     "${chip_root}/src/app/clusters/network-commissioning/network-commissioning.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
