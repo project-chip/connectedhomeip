@@ -24,6 +24,7 @@
 #include <platform/KeyValueStoreManager.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
+#include <support/CodeUtils.h>
 
 using namespace chip::DeviceLayer::PersistedStorage;
 
