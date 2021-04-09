@@ -94,9 +94,7 @@ efr32_executable("window_app") {
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
   ]
 
-  include_dirs = [
-    "include",
-  ]
+  include_dirs = [ "include" ]
 
   defines = []
 

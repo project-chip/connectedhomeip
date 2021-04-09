@@ -31,7 +31,8 @@ k32w_sdk("sdk") {
     "main/include/app_config.h",
   ]
 
-  public_deps = [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
 
   include_dirs = [
     "main/include",
@@ -75,9 +76,7 @@ k32w_executable("lock_app") {
     "${openthread_root}:libopenthread-ftd",
   ]
 
-  cflags = [
-    "-Wconversion",
-  ]
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 

@@ -66,9 +66,7 @@ qpg6100_executable("lock_app") {
     "${examples_plat_dir}/app/include",
   ]
 
-  cflags = [
-    "-Wconversion",
-  ]
+  cflags = [ "-Wconversion" ]
 
   ldscript = "${qpg6100_sdk_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
 

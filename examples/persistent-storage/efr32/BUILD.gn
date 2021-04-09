@@ -57,9 +57,10 @@ efr32_executable("persistent_storage") {
     "main.cpp",
   ]
 
-  deps = [ "$dir_pw_kvs:crc16",
+  deps = [
     ":sdk",
     "$dir_pw_assert",
+    "$dir_pw_kvs:crc16",
     "${chip_root}/src/lib",
   ]
 

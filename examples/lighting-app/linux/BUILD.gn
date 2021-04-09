@@ -32,9 +32,7 @@ executable("chip-lighting-app") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs = [
-    "include",
-  ]
+  include_dirs = [ "include" ]
 
   cflags = [ "-Wconversion" ]
 
