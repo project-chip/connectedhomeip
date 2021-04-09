@@ -26,7 +26,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#include "AppConfig.h"
 #include "KeyValueStorageTest.h"
 #include <platform/KeyValueStoreManager.h>
 
