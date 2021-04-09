@@ -582,7 +582,8 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer);
  *
  * When writing, dest points to the list to write to, src points to the value to write, and index is the index to write at.
  *
- * When reading (i.e write is false), dest is the location to read into, src points to the list, and index is the index to read from.
+ * When reading (i.e write is false), dest is the location to read into, src points to the list, and index is the index to read
+ * from.
  *
  * When reading or writing if the index leads to read or write outside of the
  * allocated size for the list, this function will return 0.
