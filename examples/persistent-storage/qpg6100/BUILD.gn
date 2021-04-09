@@ -16,8 +16,6 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/qpg6100_sdk.gni")
 
-#import("//build_overrides/pigweed.gni")
-
 import("${build_root}/config/defaults.gni")
 
 import("${qpg6100_sdk_build_root}/qpg6100_executable.gni")
@@ -36,7 +34,6 @@ qpg6100_sdk("sdk") {
 
   sources = [
     "${qpg6100_project_dir}/include/CHIPProjectConfig.h",
-    #"${qpg6100_project_dir}/include/FreeRTOSConfig.h",
   ]
 
   defines = []
@@ -49,11 +46,9 @@ qpg6100_executable("persistent_storage") {
 
   deps = []
 
-  #  deps = [ "$dir_pw_kvs:crc16" ]
   public_deps = [
     ":sdk",
 
-    #"$dir_pw_assert",
     "${chip_root}/src/lib",
   ]
 
