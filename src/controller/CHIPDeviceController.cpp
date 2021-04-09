@@ -71,6 +71,8 @@ constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
 
+constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+
 // Maximum key ID is 65535 (given it's uint16_t type)
 constexpr uint16_t kMaxKeyIDStringSize = 6;
 
@@ -164,7 +166,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 #if CHIP_ENABLE_INTERACTION_MODEL
     err = mExchangeManager->Init(mSessionManager);
     SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, nullptr);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, params.imDelegate);
     SuccessOrExit(err);
 #else
     mSessionManager->SetDelegate(this);
@@ -318,6 +320,22 @@ exit:
         ReleaseDevice(device);
     }
     return err;
+}
+
+void DeviceController::PersistDevice(Device * device)
+{
+    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
+    // requires a valid storage delegate. However, test pairing usecase, that's used
+    // mainly by test applications, do not require a storage delegate. This is to
+    // reduce overheads on these tests.
+    // Let's make sure the delegate object is available before calling into it.
+    if (mStorageDelegate != nullptr)
+    {
+        SerializedDevice serialized;
+        device->Serialize(serialized);
+        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+    }
 }
 
 CHIP_ERROR DeviceController::ServiceEvents()
@@ -631,6 +649,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
 
+    mSystemLayer->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
+
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
@@ -751,11 +771,6 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mPairingDelegate != nullptr)
-    {
-        mPairingDelegate->OnPairingComplete(status);
-    }
-
     // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.
     if (mDeviceBeingPaired != kNumMaxActiveDevices && mStorageDelegate != nullptr)
     {
@@ -768,6 +783,11 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
     }
 
     mDeviceBeingPaired = kNumMaxActiveDevices;
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(status);
+    }
 }
 
 void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
@@ -785,18 +805,7 @@ void DeviceCommissioner::OnRendezvousComplete()
     // We need to kick the device since we are not a valid secure pairing delegate when using IM.
     device->InitCommandSender();
 
-    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
-    // requires a valid storage delegate. However, test pairing usecase, that's used
-    // mainly by test applications, do not require a storage delegate. This is to
-    // reduce overheads on these tests.
-    // Let's make sure the delegate object is available before calling into it.
-    if (mStorageDelegate != nullptr)
-    {
-        SerializedDevice serialized;
-        device->Serialize(serialized);
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
-    }
+    PersistDevice(device);
 
     RendezvousCleanup(CHIP_NO_ERROR);
 }
@@ -820,10 +829,12 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }
+        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
         break;
 
     case RendezvousSessionDelegate::SecurePairingFailed:
         ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
+        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
@@ -875,6 +886,25 @@ void DeviceCommissioner::ReleaseDevice(Device * device)
 {
     PersistDeviceList();
     DeviceController::ReleaseDevice(device);
+}
+
+void DeviceCommissioner::OnSessionEstablishmentTimeout()
+{
+    VerifyOrReturn(mState == State::Initialized);
+    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices);
+
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+    StopPairing(device->GetDeviceId());
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(CHIP_ERROR_TIMEOUT);
+    }
+}
+
+void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
+{
+    reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
 
 } // namespace Controller

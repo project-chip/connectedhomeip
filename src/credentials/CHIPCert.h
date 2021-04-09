@@ -302,6 +302,20 @@ public:
     ChipCertificateSet();
     ~ChipCertificateSet();
 
+    ChipCertificateSet & operator=(ChipCertificateSet && aOther)
+    {
+        mCerts               = aOther.mCerts;
+        aOther.mCerts        = nullptr;
+        mCertCount           = aOther.mCertCount;
+        mMaxCerts            = aOther.mMaxCerts;
+        mDecodeBuf           = aOther.mDecodeBuf;
+        aOther.mDecodeBuf    = nullptr;
+        mDecodeBufSize       = aOther.mDecodeBufSize;
+        mMemoryAllocInternal = aOther.mMemoryAllocInternal;
+
+        return *this;
+    }
+
     /**
      * @brief Initialize ChipCertificateSet.
      *        This initialization method is used when all memory structures needed for operation are
