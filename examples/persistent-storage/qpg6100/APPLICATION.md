@@ -1,6 +1,7 @@
 # CHIP QPG6100 Persistent Storage Application
 
-An example application showing the use of key value storage API on the Qorvo QPG6100.
+An example application showing the use of key value storage API on the Qorvo
+QPG6100.
 
 More detailed information to be included in
 [SDK Documentation](../../platform/qpg6100/README.md).
