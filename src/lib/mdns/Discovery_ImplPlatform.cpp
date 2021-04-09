@@ -382,7 +382,7 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-    ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, peerId.GetNodeId());
+    ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeData.mPeerId.GetNodeId());
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 
