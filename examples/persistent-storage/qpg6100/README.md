@@ -128,8 +128,3 @@ qvCHIP v0.0.0.0 (CL:155586) running
 [P][-] ==================================
 [D][DL] CHIP task running
 ```
-
--   Note! Logging is currently encapsulated by the Qorvo logging module.
-    Output  
-    will have additional header and footer bytes. This will be updated later  
-    into a raw stream for any serial terminal to parse.

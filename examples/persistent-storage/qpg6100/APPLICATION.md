@@ -1,12 +1,11 @@
 # CHIP QPG6100 Persistent Storage Application
 
-An example application showing the key value storage API
-[CHIP](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6100.
+An example application showing the use of key value storage API on the Qorvo QPG6100.
 
 More detailed information to be included in
 [SDK Documentation](../../platform/qpg6100/README.md).
 
-## Lighting-app
+## Persistent-storage-app
 
 This example serves to both test the key value storage implementation and API as
 it is brought-up on different platforms, as well as provide an example for how
@@ -15,7 +14,7 @@ to use the API.
 In the future this example can be moved into a unit test when available on all
 platforms.
 
-## Lighting-app button control
+## Persistent-storage-app button control
 
 This application does not use any buttons.
 
