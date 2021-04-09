@@ -104,4 +104,4 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         emberAfWriteAttribute(endpoint, ZCL_BASIC_CLUSTER_ID, ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                               reinterpret_cast<uint8_t *>(&firmwareRevision), ZCL_INT32U_ATTRIBUTE_TYPE);
     }
-    }
+}
