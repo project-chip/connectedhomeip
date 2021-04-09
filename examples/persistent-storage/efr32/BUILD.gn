@@ -28,17 +28,17 @@ efr32_project_dir = "${chip_root}/examples/persistent-storage/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
 efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${efr32_project_dir}/src",
     "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
-
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
   defines = [
@@ -48,23 +48,7 @@ efr32_sdk("sdk") {
 }
 
 efr32_executable("persistent_storage") {
-  include_dirs = [ "${efr32_project_dir}/.." ]
-  defines = []
   output_name = "chip-efr32-persistent_storage-example.out"
-
-  deps = [ "$dir_pw_kvs:crc16" ]
-  public_deps = [
-    ":sdk",
-    "$dir_pw_assert",
-    "${chip_root}/src/lib",
-  ]
-
-  include_dirs += [
-    "${efr32_project_dir}/include",
-    "${chip_root}/src/app/util",
-    "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
 
   sources = [
     "${efr32_project_dir}/../KeyValueStorageTest.cpp",
@@ -73,7 +57,16 @@ efr32_executable("persistent_storage") {
     "main.cpp",
   ]
 
-  output_dir = root_out_dir
+  deps = [ "$dir_pw_kvs:crc16",
+    ":sdk",
+    "$dir_pw_assert",
+    "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [
+    "${efr32_project_dir}/..",
+    "${efr32_project_dir}/include",
+  ]
 
   if (efr32_family == "efr32mg12") {
     ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
@@ -82,6 +75,8 @@ efr32_executable("persistent_storage") {
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
 }
 
 group("efr32") {

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/pigweed.gni")
+
 import("$dir_pw_build/target_types.gni")
 
 config("default_config") {
@@ -20,6 +21,8 @@ config("default_config") {
 }
 
 pw_source_set("system_rpc_server") {
+  sources = [ "system_rpc_server.cc" ]
+
   deps = [
     "$dir_pw_hdlc:pw_rpc",
     "$dir_pw_hdlc:rpc_channel_output",
@@ -27,6 +30,6 @@ pw_source_set("system_rpc_server") {
     "$dir_pw_stream:sys_io_stream",
     dir_pw_log,
   ]
-  sources = [ "system_rpc_server.cc" ]
+
   public_configs = [ ":default_config" ]
 }

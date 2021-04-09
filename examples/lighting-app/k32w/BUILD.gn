@@ -24,6 +24,16 @@ assert(current_os == "freertos")
 k32w_platform_dir = "${chip_root}/examples/platform/k32w"
 
 k32w_sdk("sdk") {
+  sources = [
+    "${k32w_platform_dir}/app/project_include/CHIPProjectConfig.h",
+    "${k32w_platform_dir}/app/project_include/FreeRTOSConfig.h",
+    "${k32w_platform_dir}/app/project_include/OpenThreadConfig.h",
+    "main/include/app_config.h",
+  ]
+
+  public_deps =
+      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
+
   include_dirs = [
     "main/include",
     "main",
@@ -34,16 +44,6 @@ k32w_sdk("sdk") {
     "${chip_root}/src/app/server",
     "${k32w_platform_dir}/util/include",
   ]
-
-  sources = [
-    "${k32w_platform_dir}/app/project_include/CHIPProjectConfig.h",
-    "${k32w_platform_dir}/app/project_include/FreeRTOSConfig.h",
-    "${k32w_platform_dir}/app/project_include/OpenThreadConfig.h",
-    "main/include/app_config.h",
-  ]
-
-  public_deps =
-      [ "${chip_root}/third_party/openthread/platforms:libopenthread-platform" ]
 
   defines = []
   if (is_debug) {
@@ -79,11 +79,11 @@ k32w_executable("light_app") {
     "${openthread_root}:libopenthread-ftd",
   ]
 
-  output_dir = root_out_dir
-
   ldscript = "${k32w_platform_dir}/app/ldscripts/chip-k32w061-linker.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
 }
 
 group("k32w") {

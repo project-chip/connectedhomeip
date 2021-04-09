@@ -19,17 +19,8 @@ import("${build_root}/chip/tools.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-  ]
-}
-
 executable("chip-tv-app") {
   sources = [ "main.cpp" ]
-
-  public_configs = [ ":includes" ]
 
   deps = [
     "${chip_root}/examples/tv-app/tv-common",

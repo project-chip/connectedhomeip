@@ -19,19 +19,10 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [ "." ]
-}
-
 executable("chip-tool-darwin") {
   sources = [ "main.m" ]
 
-  cflags = [
-    "-Wconversion",
-    "-fobjc-arc",
-  ]
-
-  public_deps = [
+  deps = [
     "${chip_root}/src/app/server",
     "${chip_root}/src/darwin/Framework/CHIP",
     "${chip_root}/src/lib",
@@ -39,7 +30,10 @@ executable("chip-tool-darwin") {
     "${chip_root}/third_party/inipp",
   ]
 
-  public_configs = [ ":includes" ]
+  cflags = [
+    "-Wconversion",
+    "-fobjc-arc",
+  ]
 
   output_dir = root_out_dir
 }
