@@ -50,6 +50,7 @@ EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t 
     //
     // Since the first 2 bytes of the attribute are used to store the number of elements, elements indexing starts
     // at 1. In order to hide this to the rest of the code of this file, the element index is incremented by 1 here.
+    // This also allows calling writeAttribute() with no index arg to mean "write the length".
     return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
 }
 
