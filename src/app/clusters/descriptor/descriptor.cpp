@@ -45,7 +45,7 @@ EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t 
 
     // When reading or writing a List attribute the 'index' value could have 3 types of values:
     //  -1: Read/Write the whole list content, including the number of elements in the list
-    //   0: Read/Write the number of element in the list, represented as a uint16_t
+    //   0: Read/Write the number of elements in the list, represented as a uint16_t
     //   n: Read/Write the nth element of the list
     //
     // Since the first 2 bytes of the attribute are used to store the number of elements, elements indexing starts
