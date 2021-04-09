@@ -36,8 +36,6 @@ shared_library("ChipDeviceCtrl") {
   include_dirs = [ "." ]
 
   sources = [
-    "chip/interaction_model/Delegate.cpp",
-    "chip/interaction_model/Delegate.h",
     "${chip_root}/src/app/clusters/media-playback-client/media-playback-client.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
@@ -63,6 +61,8 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
     "chip/clusters/CHIPClusters.cpp",
+    "chip/interaction_model/Delegate.cpp",
+    "chip/interaction_model/Delegate.h",
     "chip/internal/ChipThreadWork.cpp",
     "chip/internal/ChipThreadWork.h",
     "chip/internal/CommissionerImpl.cpp",
