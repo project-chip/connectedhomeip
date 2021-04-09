@@ -42,6 +42,7 @@ namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
+class ExchangeTransport;
 
 class ExchangeContextDeletor
 {
@@ -63,6 +64,8 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
+
+    virtual ~ExchangeContext() {}
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -108,8 +111,8 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
-                           const SendFlags & sendFlags);
+    virtual CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                                   const SendFlags & sendFlags);
 
     /**
      * A strongly-message-typed version of SendMessage.
@@ -129,6 +132,8 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
+     *  @param[in]    peerAddress   The address of the sender
+     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -137,7 +142,7 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
@@ -146,6 +151,8 @@ public:
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+
+    const ExchangeTransport * GetTransport() const { return mTransport; }
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
@@ -181,7 +188,7 @@ public:
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                             ExchangeDelegate * delegate);
-    void Free();
+    virtual void Free();
     void Reset();
 
     void SetResponseTimeout(Timeout timeout);
@@ -198,6 +205,7 @@ private:
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
+    ExchangeTransport * mTransport = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.

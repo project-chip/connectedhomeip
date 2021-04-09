@@ -220,6 +220,7 @@ private:
 private:
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
+    friend class ExchangeTransport;
 
     ReliableMessageMgr * mManager;
     ExchangeContext * mExchange;
