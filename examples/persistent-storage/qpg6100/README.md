@@ -1,157 +1,135 @@
-# CHIP EFR32 Persistent Storage Example
+# CHIP QPG6100 Example Application
 
-An example testing and demonstrating the key value storage API.
+An example application showing the use
+[CHIP](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6100.
 
-<hr>
+---
 
--   [CHIP EFR32 Persistent Storage Example](#chip-efr32-persistent-storage-example)
+-   [CHIP QPG6100 Example Application](#chip-qpg6100-example-application)
     -   [Introduction](#introduction)
-    -   [EFR32](#efr32)
-        -   [Building](#building)
-        -   [Flashing the Application](#flashing-the-application)
-        -   [Viewing Logging Output](#viewing-logging-output)
+    -   [Building](#building)
+    -   [Flashing the application](#flashing-the-application)
+    -   [Viewing Logging Output](#viewing-logging-output)
 
-<hr>
-
-<a name="intro"></a>
+---
 
 ## Introduction
 
-This example serves to both test the key value storage implementation and API as
-it is brought-up on different platforms, as well as provide an example for how
-to use the API.
+![QPG6100 DK board](../../platform/qpg6100/doc/QPG6100_DK_Board.jpg)
 
-In the future this example can be moved into a unit test when available on all
-platforms.
+Several example applications are provided to to demonstrate a CHIP  
+device, with Thread connectivity, using BLE to perform CHIP provisioning  
+on the Qorvo QPG6100 SDK. More information about each application can be  
+found in the APPLICATION.md file found in the qpg6100 directory of the  
+example application directory
 
-<a name="EFR32"></a>
+Currently supported example applications
 
-## EFR32
+-   [~/examples/lighting-app/](../../../examples/lighting-app/qpg6100/APPLICATION.md)
+-   [~/examples/lock-app/](../../../examples/lock-app/qpg6100/APPLICATION.md)
+-   [~/examples/persistent-storage/](../../../examples/persistent-storage/qpg6100/APPLICATION.md)
 
-The EFR32 platform KVS is fully implemented, the KVS is enabled and configured
-using theese defines:
+For more information on Qorvo and the platforms, please visit
+[the Qorvo website](http://www.qorvo.com) or contact us on
+LPW.support@qorvo.com.
 
-```
-defines = [
-  "CHIP_KVS_SECTOR_COUNT=4",
-  "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
-]
-```
+## Building
 
-<a name="building"></a>
-
-### Building
-
--   Download the
-    [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
-    command line tool, and ensure that `commander` is your shell search path.
-    (For Mac OS X, `commander` is located inside
-    `Commander.app/Contents/MacOS/`.)
+### Preparation
 
 -   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+    [GNU Arm Embedded Toolchain 9-2019-q4-update](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+    (Direct download link:
+    [Linux](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2)
+    [Mac OS X](https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-mac.tar.bz2))
 
--   Install some additional tools(likely already present for CHIP developers):
+-   Install additional tools used by the CHIP build:
 
-           # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+```
+# Linux
+sudo apt-get install git make libtool ccache ninja-build
+```
 
-           # Mac OS X
-           $ brew install ninja
+```
+# Mac OS X
+brew install libtool ccache ninja
+```
 
--   Supported hardware:
+-   Clone the [CHIP](https://github.com/project-chip/connectedhomeip) repo into
+    a local directory
 
-    MG12 boards:
+```
+cd ~
+git clone https://github.com/project-chip/connectedhomeip.git
+```
 
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
+-   The Qorvo CHIP SDK is added as a submodule in /third_party/qpg_sdk/repo. To
+    manually clone this repo you can clone it from
+    [CHIP SDK](https://github.com/Qorvo/qpg-connectedhomeip)
 
-    MG21 boards:
+```
+cd ~
+git clone https://github.com/Qorvo/qpg-connectedhomeip
+```
 
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
+### Compilation
 
-*   Build the example application:
+-   Set the following environment variables before compilation:
 
-          cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/persistent-storage/efr32/ ./out/persistent-storage BRD4161A
+```
+export ARM_GCC_INSTALL_ROOT=${HOME}/tools/gcc-arm-none-eabi-9-2019-q4-major/bin
+export PATH=$PATH:$ARM_GCC_INSTALL_ROOT
+```
 
--   To delete generated executable, libraries and object files use:
+-   Optionally, to use a different version of the QPG6100 SDK from the one
+    bundled with CHIP:
 
-          $ cd ~/connectedhomeip
-          $ rm -rf ./out/persistent-storage
+```
+export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip
+```
 
-OR use GN/Ninja directly
+-   All builds are GN/ninja based
 
-          $ cd ~/connectedhomeip/examples/persistent-storage/efr32
-          $ git submodule update --init
-          $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
-          $ ninja -C out/debug
+```
+cd ~/connectedhomeip/examples/[lighting|lock]-app/qpg6100
+source third_party/connectedhomeip/scripts/activate.sh
+gn gen out/debug
+ninja -C out/debug
+```
 
--   To delete generated executable, libraries and object files use:
+## Flashing the application
 
-          $ cd ~/connectedhomeip/examples/persistent-storage/efr32
-          $ rm -rf out/
+The QPG6100 DK boards can be programmed using:
 
-<a name="flashing"></a>
+### CMSIS-DAP Drag and Drop
 
-### Flashing the Application
+Drag/copy the hex-file generated to the mBED drive that appears when plugging in
+the DK board.
 
--   On the command line:
+### Segger JLink debugger
 
-          $ cd ~/connectedhomeip/examples/persistent-storage/efr32
-          $ python3 out/debug/chip-efr32-persistent_storage-example.flash.py
+Connect the Segger J-Link to the programming header and use the Segger SW to
+flash the .hex.
 
--   Or with the Ozone debugger, just load the .out file.
+More detailed information to be included in SDK Documentation.
 
-<a name="view-logging"></a>
+## Viewing Logging Output
 
-### Viewing Logging Output
+-   Launch a serial terminal with baudrate 115200.
+-   At startup you will see:
 
-The example application is built to use the SEGGER Real Time Transfer (RTT)
-facility for log output. RTT is a feature built-in to the J-Link Interface MCU
-on the WSTK development board. It allows bi-directional communication with an
-embedded application without the need for a dedicated UART.
+```
+qvCHIP v0.0.0.0 (CL:155586) running
+[P][-] Init CHIP Stack
+[P][DL] BLEManagerImpl::Init() complete
+[P][-] Starting Platform Manager Event Loop
+[P][-] ==================================
+[P][-] Qorvo [Application Name] Launching
+[P][-] ==================================
+[D][DL] CHIP task running
+```
 
-Using the RTT facility requires downloading and installing the _SEGGER J-Link
-Software and Documentation Pack_
-([web site](https://www.segger.com/downloads/jlink#J-LinkSoftwareAndDocumentationPack)).
-Alternatively the _SEGGER Ozone - J-Link Debugger_ can be used to view RTT logs.
-
--   Download the J-Link installer by navigating to the appropriate URL and
-    agreeing to the license agreement.
-
--   [JLink_Linux_x86_64.deb](https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb)
--   [JLink_MacOSX.pkg](https://www.segger.com/downloads/jlink/JLink_MacOSX.pkg)
-
-*   Install the J-Link software
-
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
-
-*   In Linux, grant the logged in user the ability to talk to the development
-    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
-    dialout group.
-
-          $ sudo usermod -a -G dialout ${USER}
-
-Once the above is complete, log output can be viewed using the JLinkExe tool in
-combination with JLinkRTTClient as follows:
-
--   Run the JLinkExe tool with arguments to autoconnect to the WSTK board:
-
-    For MG12 use:
-
-          $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
-
-    For MG21 use:
-
-          $ JLinkExe -device EFR32MG21AXXXF1024 -if SWD -speed 4000 -autoconnect 1
-
--   In a second terminal, run the JLinkRTTClient to view logs:
-
-          $ JLinkRTTClient
+-   Note! Logging is currently encapsulated by the Qorvo logging module.
+    Output  
+    will have additional header and footer bytes. This will be updated later  
+    into a raw stream for any serial terminal to parse.
