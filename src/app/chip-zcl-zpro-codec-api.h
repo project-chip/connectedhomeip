@@ -33,6 +33,7 @@
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
+| Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -1062,6 +1063,60 @@ encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t seq
  */
 chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Descriptor                                                  | 0x001D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * DeviceList                                                        | 0x0000 |
+| * ServerList                                                        | 0x0001 |
+| * ClientList                                                        | 0x0002 |
+| * PartsList                                                         | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Descriptor server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the device list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadDeviceListAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the server list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadServerListAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the client list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadClientListAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the parts list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |

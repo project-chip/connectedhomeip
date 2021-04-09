@@ -37,7 +37,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
  */
 function user_cluster_has_enabled_manufacturer_command(name, side, options)
 {
-  return queryImpexp.exportendPointTypeIds(this.global.db, this.global.sessionId)
+  return queryImpexp.exportEndPointTypeIds(this.global.db, this.global.sessionId)
       .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
       .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
                 this.global.db, endpointsAndClusters))

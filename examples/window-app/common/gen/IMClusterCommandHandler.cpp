@@ -47,120 +47,275 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         switch (commandId)
         {
         case ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID: {
+
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             emberAfWindowCoveringClusterWindowCoveringDownCloseCallback();
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID: {
-            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
             uint8_t percentageLiftValue;
+            bool percentageLiftValueExists = false;
+            uint32_t validArgumentCount    = 0;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
                 case 0:
-                    TLVError = dataTlv.Get(percentageLiftValue);
+                    if (percentageLiftValueExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = dataTlv.Get(percentageLiftValue);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        percentageLiftValueExists = true;
+                        validArgumentCount++;
+                    }
                     break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
                     break;
                 }
-                if (TLVError != CHIP_NO_ERROR)
+                if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                    break;
                 }
             }
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(percentageLiftValue);
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(percentageLiftValue);
+            }
+            else if (1 != validArgumentCount)
+            {
+                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
+                                validArgumentCount);
+            }
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID: {
-            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
             uint16_t liftValue;
+            bool liftValueExists        = false;
+            uint32_t validArgumentCount = 0;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
                 case 0:
-                    TLVError = dataTlv.Get(liftValue);
+                    if (liftValueExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = dataTlv.Get(liftValue);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        liftValueExists = true;
+                        validArgumentCount++;
+                    }
                     break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
                     break;
                 }
-                if (TLVError != CHIP_NO_ERROR)
+                if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                    break;
                 }
             }
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(liftValue);
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(liftValue);
+            }
+            else if (1 != validArgumentCount)
+            {
+                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
+                                validArgumentCount);
+            }
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID: {
-            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
             uint8_t percentageTiltValue;
+            bool percentageTiltValueExists = false;
+            uint32_t validArgumentCount    = 0;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
                 case 0:
-                    TLVError = dataTlv.Get(percentageTiltValue);
+                    if (percentageTiltValueExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = dataTlv.Get(percentageTiltValue);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        percentageTiltValueExists = true;
+                        validArgumentCount++;
+                    }
                     break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
                     break;
                 }
-                if (TLVError != CHIP_NO_ERROR)
+                if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                    break;
                 }
             }
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(percentageTiltValue);
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(percentageTiltValue);
+            }
+            else if (1 != validArgumentCount)
+            {
+                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
+                                validArgumentCount);
+            }
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID: {
-            CHIP_ERROR TLVError = CHIP_NO_ERROR;
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
             uint16_t tiltValue;
+            bool tiltValueExists        = false;
+            uint32_t validArgumentCount = 0;
 
             while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
             {
                 switch (TLV::TagNumFromTag(dataTlv.GetTag()))
                 {
                 case 0:
-                    TLVError = dataTlv.Get(tiltValue);
+                    if (tiltValueExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = dataTlv.Get(tiltValue);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        tiltValueExists = true;
+                        validArgumentCount++;
+                    }
                     break;
                 default:
                     // Unsupported tag, ignore it.
                     ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
                     break;
                 }
-                if (TLVError != CHIP_NO_ERROR)
+                if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVError);
+                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                    break;
                 }
             }
-            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(tiltValue);
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(tiltValue);
+            }
+            else if (1 != validArgumentCount)
+            {
+                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
+                                validArgumentCount);
+            }
             break;
         }
         case ZCL_WINDOW_COVERING_STOP_COMMAND_ID: {
+
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             emberAfWindowCoveringClusterWindowCoveringStopCallback();
             break;
         }
         case ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID: {
+
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
             emberAfWindowCoveringClusterWindowCoveringUpOpenCallback();
             break;

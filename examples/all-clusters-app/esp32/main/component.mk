@@ -27,6 +27,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
   ../third_party/connectedhomeip/src/app/server                                     \
   ../third_party/connectedhomeip/src/app/util                                       \
+  ../third_party/connectedhomeip/src/app/clusters/descriptor                        \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
   ../third_party/connectedhomeip/src/app/clusters/identify                          \
