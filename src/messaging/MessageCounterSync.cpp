@@ -198,8 +198,9 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
         if (!entry.msgBuf.IsNull())
         {
             PacketHeader packetHeader;
+            uint16_t headerSize = 0;
 
-            if (packetHeader.DecodeAndConsume(entry.msgBuf) != CHIP_NO_ERROR)
+            if (packetHeader.Decode((entry.msgBuf)->Start(), (entry.msgBuf)->DataLength(), &headerSize) != CHIP_NO_ERROR)
             {
                 ChipLogError(ExchangeManager, "ProcessPendingGroupMsgs::Failed to decode PacketHeader");
                 break;
@@ -207,6 +208,8 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
 
             if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
             {
+                (entry.msgBuf)->ConsumeHead(headerSize);
+
                 // Reprocess message.
                 mExchangeMgr->GetSessionMgr()->HandleGroupMessageReceived(packetHeader, std::move(entry.msgBuf));
 
