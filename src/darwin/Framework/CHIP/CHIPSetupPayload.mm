@@ -28,10 +28,10 @@
 
 - (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
 {
-    if (value.Has(chip::RendezvousInformationFlag::kBle)) {
+    if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
         return kRendezvousInformationBLE;
     } else if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
-        return kRendezvousInformationWiFi;
+        return kRendezvousInformationSoftAP;
     } else if (value.Has(chip::RendezvousInformationFlag::kOnNetwork)) {
         return kRendezvousInformationOnNetwork;
     } else {
