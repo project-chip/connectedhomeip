@@ -133,6 +133,7 @@ try:
             'chip.discovery',
             'chip.exceptions',
             'chip.internal',
+            'chip.interaction_model',
             'chip.logging',
             'chip.native',
             'chip.tlv',

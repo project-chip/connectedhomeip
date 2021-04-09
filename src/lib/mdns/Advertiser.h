@@ -83,8 +83,22 @@ public:
     }
     PeerId GetPeerId() const { return mPeerId; }
 
+    OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
+    {
+        mCrmpRetryIntervalIdle   = intervalIdle;
+        mCrmpRetryIntervalActive = intervalActive;
+        return *this;
+    }
+    void GetCRMPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
+    {
+        intervalIdle   = mCrmpRetryIntervalIdle;
+        intervalActive = mCrmpRetryIntervalActive;
+    }
+
 private:
     PeerId mPeerId;
+    uint32_t mCrmpRetryIntervalIdle   = 0;
+    uint32_t mCrmpRetryIntervalActive = 0;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>
