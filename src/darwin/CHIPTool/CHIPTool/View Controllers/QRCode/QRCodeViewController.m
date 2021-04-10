@@ -589,7 +589,7 @@
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
     switch (payload.rendezvousInformation) {
-    case kRendendezvousInformationOnNetwork:
+    case kRendezvousInformationOnNetwork:
     case kRendezvousInformationAllMask:
         NSLog(@"Rendezvous Unknown");
         break;
