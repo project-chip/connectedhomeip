@@ -533,7 +533,7 @@ void InitServer(AppDelegate * delegate)
 
     gCallbacks.SetSessionMgr(&gSessions);
 
-    // Register to receive unsolicited Device Management messages from the exchange manager.
+    // Register to receive unsolicited legacy ZCL messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
