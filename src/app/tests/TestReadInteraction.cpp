@@ -42,6 +42,7 @@
 #include <nlunit-test.h>
 
 namespace chip {
+System::Layer gSystemLayer;
 SecureSessionMgr gSessionManager;
 Messaging::ExchangeManager gExchangeManager;
 TransportMgr<Transport::UDP> gTransportManager;
@@ -111,6 +112,9 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
+
+    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readHandler.Init(nullptr);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
@@ -135,6 +139,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
 } // namespace chip
 
 namespace {
+
 void InitializeChip(nlTestSuite * apSuite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -147,10 +152,12 @@ void InitializeChip(nlTestSuite * apSuite)
     err = chip::Platform::MemoryInit();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, nullptr, nullptr, &admins);
+    chip::gSystemLayer.Init(nullptr);
+
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = chip::gExchangeManager.Init(chip::kTestDeviceNodeId, &chip::gTransportManager, &chip::gSessionManager);
+    err = chip::gExchangeManager.Init(&chip::gSessionManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -160,20 +167,21 @@ void InitializeChip(nlTestSuite * apSuite)
 
 // clang-format off
 const nlTest sTests[] =
-        {
-                NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
-                NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
-                NL_TEST_SENTINEL()
-        };
+{
+    NL_TEST_DEF("CheckReadClient", chip::app::TestReadInteraction::TestReadClient),
+    NL_TEST_DEF("CheckReadHandler", chip::app::TestReadInteraction::TestReadHandler),
+    NL_TEST_SENTINEL()
+};
 // clang-format on
+
 } // namespace
 
-int TestEventLogging()
+int TestReadInteraction()
 {
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "InteractionMessage",
+        "TestReadInteraction",
         &sTests[0],
         nullptr,
         nullptr
@@ -187,4 +195,4 @@ int TestEventLogging()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestEventLogging)
+CHIP_REGISTER_TEST_SUITE(TestReadInteraction)

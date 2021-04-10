@@ -22,7 +22,7 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 
-#include "pigweed_lighting.rpc.pb.h"
+#include "lighting_service/pigweed_lighting.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
@@ -49,6 +49,8 @@ using std::byte;
 #define RPC_TASK_STACK_SIZE 4096
 #define RPC_TASK_PRIORITY 1
 static TaskHandle_t sRpcTaskHandle;
+StaticTask_t sRpcTaskBuffer;
+StackType_t sRpcTaskStack[RPC_TASK_STACK_SIZE];
 
 chip::rpc::LightingService lighting_service;
 
@@ -70,11 +72,8 @@ int Init()
     pw_sys_io_Init();
 
     // Start App task.
-    if (xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr, RPC_TASK_PRIORITY,
-                    &sRpcTaskHandle) == pdPASS)
-    {
-        err = CHIP_NO_ERROR;
-    }
+    sRpcTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr,
+                                       RPC_TASK_PRIORITY, sRpcTaskStack, &sRpcTaskBuffer);
     return err;
 }
 

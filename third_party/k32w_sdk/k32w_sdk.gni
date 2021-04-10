@@ -97,7 +97,7 @@ template("k32w_sdk") {
 
     libs = [
       "${k32w_sdk_root}/middleware/wireless/ble_controller/lib/lib_ble_controller.a",
-      "${k32w_sdk_root}/middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_peripheral_cm4_noFP.a",
+      "${k32w_sdk_root}//middleware/wireless/bluetooth/host/lib/lib_ble_5-0_host_peripheral_cm4_noFP.a",
       "${k32w_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Dynamic_MMAC.a",
       "${k32w_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM.a",
       "${k32w_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a",
@@ -123,7 +123,7 @@ template("k32w_sdk") {
       "configFRTOS_MEMORY_SCHEME=4",
       "osCustomStartup=1",
       "OM15082=1",
-      "gKBD_KeysCount_c=3",
+      "gKBD_KeysCount_c=4",
       "gLEDsOnTargetBoardCnt_c=2",
       "gLED_InvertedMode_d=1",
       "ENABLE_RAM_VECTOR_TABLE=1",

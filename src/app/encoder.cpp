@@ -104,6 +104,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
+| Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -116,6 +117,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
+| WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
 #define EMBER_ZCL_REPORTING_DIRECTION_REPORTED 0x00
@@ -172,6 +174,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_STEP_HUE_COMMAND_ID (0x02)
 #define ZCL_STEP_SATURATION_COMMAND_ID (0x05)
 #define ZCL_STOP_MOVE_STEP_COMMAND_ID (0x47)
+
+#define DESCRIPTOR_CLUSTER_ID 0x001D
 
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define ZCL_CLEAR_ALL_PINS_COMMAND_ID (0x08)
@@ -258,6 +262,15 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_VIEW_SCENE_COMMAND_ID (0x01)
 
 #define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
+
+#define WINDOW_COVERING_CLUSTER_ID 0x0102
+#define ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID (0x01)
+#define ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID (0x05)
+#define ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID (0x04)
+#define ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID (0x08)
+#define ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID (0x07)
+#define ZCL_WINDOW_COVERING_STOP_COMMAND_ID (0x02)
+#define ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID (0x00)
 
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
@@ -1851,6 +1864,76 @@ PacketBufferHandle encodeColorControlClusterWriteStartUpColorTemperatureMiredsAt
 PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadColorControlClusterRevision", COLOR_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster Descriptor                                                  | 0x001D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * DeviceList                                                        | 0x0000 |
+| * ServerList                                                        | 0x0001 |
+| * ClientList                                                        | 0x0002 |
+| * PartsList                                                         | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeDescriptorClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverDescriptorAttributes", DESCRIPTOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute DeviceList
+ */
+PacketBufferHandle encodeDescriptorClusterReadDeviceListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadDescriptorDeviceList", DESCRIPTOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ServerList
+ */
+PacketBufferHandle encodeDescriptorClusterReadServerListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadDescriptorServerList", DESCRIPTOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClientList
+ */
+PacketBufferHandle encodeDescriptorClusterReadClientListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadDescriptorClientList", DESCRIPTOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PartsList
+ */
+PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadDescriptorPartsList", DESCRIPTOR_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadDescriptorClusterRevision", DESCRIPTOR_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -3639,6 +3722,306 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttrib
 PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadTemperatureMeasurementClusterRevision", TEMP_MEASUREMENT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster WindowCovering                                              | 0x0102 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * WindowCoveringDownClose                                           |   0x01 |
+| * WindowCoveringGoToLiftPercentage                                  |   0x05 |
+| * WindowCoveringGoToLiftValue                                       |   0x04 |
+| * WindowCoveringGoToTiltPercentage                                  |   0x08 |
+| * WindowCoveringGoToTiltValue                                       |   0x07 |
+| * WindowCoveringStop                                                |   0x02 |
+| * WindowCoveringUpOpen                                              |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * WindowCoveringType                                                | 0x0000 |
+| * CurrentPositionLift                                               | 0x0003 |
+| * CurrentPositionTilt                                               | 0x0004 |
+| * ConfigStatus                                                      | 0x0007 |
+| * InstalledOpenLimitLift                                            | 0x0010 |
+| * InstalledClosedLimitLift                                          | 0x0011 |
+| * InstalledOpenLimitTilt                                            | 0x0012 |
+| * InstalledClosedLimitTilt                                          | 0x0013 |
+| * Mode                                                              | 0x0017 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command WindowCoveringDownClose
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringDownCloseCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("WindowCoveringDownClose", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command WindowCoveringGoToLiftPercentage
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringGoToLiftPercentageCommand(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint,
+                                                                                      uint8_t percentageLiftValue)
+{
+    COMMAND_HEADER("WindowCoveringGoToLiftPercentage", WINDOW_COVERING_CLUSTER_ID);
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID)
+        .Put8(percentageLiftValue);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command WindowCoveringGoToLiftValue
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringGoToLiftValueCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                 uint16_t liftValue)
+{
+    COMMAND_HEADER("WindowCoveringGoToLiftValue", WINDOW_COVERING_CLUSTER_ID);
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID)
+        .Put16(liftValue);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command WindowCoveringGoToTiltPercentage
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringGoToTiltPercentageCommand(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint,
+                                                                                      uint8_t percentageTiltValue)
+{
+    COMMAND_HEADER("WindowCoveringGoToTiltPercentage", WINDOW_COVERING_CLUSTER_ID);
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID)
+        .Put8(percentageTiltValue);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command WindowCoveringGoToTiltValue
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringGoToTiltValueCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                 uint16_t tiltValue)
+{
+    COMMAND_HEADER("WindowCoveringGoToTiltValue", WINDOW_COVERING_CLUSTER_ID);
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID)
+        .Put16(tiltValue);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command WindowCoveringStop
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringStopCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("WindowCoveringStop", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_WINDOW_COVERING_STOP_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command WindowCoveringUpOpen
+ */
+PacketBufferHandle encodeWindowCoveringClusterWindowCoveringUpOpenCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("WindowCoveringUpOpen", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeWindowCoveringClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverWindowCoveringAttributes", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute WindowCoveringType
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                   uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportWindowCoveringWindowCoveringType", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0000)
+        .Put8(48)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentPositionLift
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringCurrentPositionLift", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                    uint16_t minInterval, uint16_t maxInterval,
+                                                                                    uint16_t change)
+{
+    COMMAND_HEADER("ReportWindowCoveringCurrentPositionLift", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0003)
+        .Put8(33)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    buf.Put16(static_cast<uint16_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentPositionTilt
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringCurrentPositionTilt", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                    uint16_t minInterval, uint16_t maxInterval,
+                                                                                    uint16_t change)
+{
+    COMMAND_HEADER("ReportWindowCoveringCurrentPositionTilt", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0004)
+        .Put8(33)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    buf.Put16(static_cast<uint16_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ConfigStatus
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadConfigStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringConfigStatus", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0007);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                             uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportWindowCoveringConfigStatus", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0007)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute InstalledOpenLimitLift
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringInstalledOpenLimitLift", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute InstalledClosedLimitLift
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringInstalledClosedLimitLift", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute InstalledOpenLimitTilt
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringInstalledOpenLimitTilt", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute InstalledClosedLimitTilt
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringInstalledClosedLimitTilt", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Mode
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringMode", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0017);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeWindowCoveringClusterWriteModeAttribute(uint8_t seqNum, EndpointId destinationEndpoint, uint8_t mode)
+{
+    COMMAND_HEADER("WriteWindowCoveringMode", WINDOW_COVERING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0017)
+        .Put8(24)
+        .Put8(static_cast<uint8_t>(mode));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeWindowCoveringClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadWindowCoveringClusterRevision", WINDOW_COVERING_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

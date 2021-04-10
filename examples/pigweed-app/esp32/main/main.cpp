@@ -24,9 +24,10 @@
 #include "pw_rpc/echo_service_nanopb.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
-#include "pw_sys_io_esp32/init.h"
 
+#include "PigweedLoggerMutex.h"
 #include "RpcService.h"
+#include <support/logging/CHIPLogging.h>
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
@@ -34,22 +35,32 @@
 
 const char * TAG = "chip-pigweed-app";
 
+static bool uartInitialised;
+
+extern "C" void __wrap_esp_log_write(esp_log_level_t level, const char * tag, const char * format, ...)
+{
+    va_list v;
+    va_start(v, format);
+#ifndef CONFIG_LOG_DEFAULT_LEVEL_NONE
+    if (uartInitialised)
+    {
+        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        size_t len = vsnprintf(formattedMsg, sizeof formattedMsg, format, v);
+        if (len >= sizeof formattedMsg)
+        {
+            len = sizeof formattedMsg - 1;
+        }
+        PigweedLogger::putString(formattedMsg, len);
+    }
+#endif
+    va_end(v);
+}
+
 namespace {
 using std::byte;
 
 constexpr size_t kRpcStackSizeBytes = (4 * 1024);
 constexpr uint8_t kRpcTaskPriority  = 5;
-
-SemaphoreHandle_t uart_mutex;
-
-class LoggerMutex : public chip::rpc::Mutex
-{
-public:
-    void Lock() override { xSemaphoreTake(uart_mutex, portMAX_DELAY); }
-    void Unlock() override { xSemaphoreGive(uart_mutex); }
-};
-
-LoggerMutex logger_mutex;
 
 TaskHandle_t rpcTaskHandle;
 
@@ -62,18 +73,18 @@ void RegisterServices(pw::rpc::Server & server)
 
 void RunRpcService(void *)
 {
-    ::chip::rpc::Start(RegisterServices, &logger_mutex);
+    ::chip::rpc::Start(RegisterServices, &::chip::rpc::logger_mutex);
 }
 
 } // namespace
 
 extern "C" void app_main()
 {
-    pw_sys_io_Init();
+    PigweedLogger::init();
+    uartInitialised = true;
 
     ESP_LOGI(TAG, "----------- chip-esp32-pigweed-example starting -----------");
 
-    uart_mutex = xSemaphoreCreateMutex();
     xTaskCreate(RunRpcService, "RPC", kRpcStackSizeBytes / sizeof(StackType_t), nullptr, kRpcTaskPriority, &rpcTaskHandle);
 
     while (1)

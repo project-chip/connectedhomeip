@@ -125,7 +125,8 @@ static CHIP_ERROR addParameter(SetupPayload & setupPayload, const SetupPayloadPa
         break;
     case SetupPayloadKey_RendezVousInformation:
         ChipLogDetail(SetupPayload, "Loaded rendezvousInfo: %u", (uint16_t) parameter.uintValue);
-        setupPayload.rendezvousInformation = static_cast<RendezvousInformationFlags>(parameter.uintValue);
+        setupPayload.rendezvousInformation =
+            RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(parameter.uintValue));
         break;
     case SetupPayloadKey_Discriminator:
         ChipLogDetail(SetupPayload, "Loaded discriminator: %u", (uint16_t) parameter.uintValue);

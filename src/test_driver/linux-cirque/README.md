@@ -79,3 +79,40 @@ Or
 LOG_DIR=/some/log/directory scripts/tests/cirque_tests.sh run_all_tests
 LOG_DIR=/some/log/directory scripts/tests/cirque_tests.sh run_test OnOffClusterTest
 ```
+
+## Setup test topology only
+
+You can run a ManualTest to setup test topology only:
+
+```
+scripts/tests/cirque_tests.sh run_test ManualTest
+```
+
+It will print the container id in log, you can execute commands inside them.
+
+```
+2021-04-06 15:01:57,780 [CHIPCirqueTest] INFO Finished setting up environment.
+2021-04-06 15:01:57,780 [CHIPCirqueTest] INFO Device: CHIP-Server (Type: CHIP-Server, Container: 459c901ed9)
+2021-04-06 15:01:57,780 [CHIPCirqueTest] INFO Device: CHIP-Tool (Type: CHIP-Tool, Container: c5831124e7)
+2021-04-06 15:01:57,780 [CHIPCirqueTest] INFO Press Ctrl-C to stop the test.
+2021-04-06 15:01:57,780 [CHIPCirqueTest] INFO Container will be cleaned when the test finished.
+```
+
+> You can run docker commands with these containers, for example, to launch a
+> shell on CHIP-Tool, you can use:
+>
+> ```
+> docker exec -it c5831124e7 /bin/bash
+> ```
+>
+> For detailed command you can use, please refer to
+> [official docker documents](https://docs.docker.com/engine/reference/commandline/cli/).
+
+> It is not recommanded to run commands that can change the state of the
+> container, for example: `attach` (will stop container once you exit), `stop`
+> etc.
+
+After you finished you test, press `Ctrl-C` and it will clean up testing
+environment.
+
+Refer to `test-manual.py` and `ManualTest.sh` for detail.

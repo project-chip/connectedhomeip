@@ -18,10 +18,6 @@ import("${chip_root}/src/app/common_flags.gni")
 config("server_config") {
   defines = []
 
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
-
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }

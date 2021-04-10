@@ -150,6 +150,26 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 /**
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE should change his advertisements
+ * from fast interval to slow interval.
+ *
+ * 30000 (30 secondes).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
+ * from the moment of slow advertisement commencement.
+ *
+ * Defaults to 9000000 (15 minutes).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
+
+/**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
  *
  * For a development build, set the default importance of events to be logged as Debug.

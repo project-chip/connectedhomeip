@@ -27,7 +27,8 @@ onto a CHIP-enabled Thread network.
 
 The commissioning process is composed of the following main stages:
 
--   K32W061 (CHIP accessory) device is in BLE advertising mode;
+-   K32W061 (CHIP accessory) device is put in BLE advertisment mode by pressing
+    the USERINTERFACE button;
 -   CHIPTool discovers the CHIP accessory over BLE;
 -   CHIPTool establishes a secure channel with the accessory using a SPAKE2+
     handshake;
@@ -84,7 +85,8 @@ OpenThread RCP firmware is required to allow the PC to communicate with Thread
 devices. Run the commands mentioned in the following steps to build and program
 the RCP firmware onto an K32W061 DK6:
 
-1.  Clone the OpenThread repository into the current directory:
+1.  Clone the OpenThread repository into the current directory (we recommand
+    using commit ced158e65a00dd5394c04548b7b187d3a3f11eef):
 
         $ git clone https://github.com/openthread/openthread.git
 
@@ -122,8 +124,8 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 1.  Set up Thread Border Router package by following steps
     [3,4,5](https://openthread.io/guides/border-router/build) from the official
     documentation. Use NETWORK_MANAGER=0 as the Wi-Fi AP will be set manually at
-    the next step.
-
+    the next step. Also, we recommend using commit
+    83babaf236cad8471be28185d8d4351d37564919 for ot-br-posix repository.
 2.  Configure the Wi-Fi AP
 
     -   Install the required package:
@@ -418,14 +420,16 @@ following steps:
 1. Enable _Bluetooth_ and _Location_ services on your smartphone;
 2. Connect the smartphone to _OT-BR_ WiFi network;
 3. Open the CHIPTool application on your smartphone;
-4. Tap the _PROVISION CHIP DEVICE WITH THREAD_ button and scan the commissioning
+4. Push the USERINTERFACE button on the K32W board. This will start the BLE
+   advertising process;
+5. Tap the _PROVISION CHIP DEVICE WITH THREAD_ button and scan the commissioning
    QR code. Several notifications will appear, informing you of commissioning
    progress with scanning, connection, and pairing. At the end of this process,
    the Thread network settings screen appears.
 
     ![chiptool_main_screen](../../examples/platform/k32w/doc/images/chiptool_main_screen.png)
 
-5. In the Thread network settings screen, use the default settings and tap the
+6. In the Thread network settings screen, use the default settings and tap the
    _SAVE NETWORK_ button to send a Thread provisioning message to the accessory
    device. You will see the "Network provisioning completed" message when the
    accessory device successfully joins the Thread network.

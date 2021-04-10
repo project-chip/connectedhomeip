@@ -71,7 +71,7 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common \
     && add-apt-repository universe \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y python python2 \
-    && curl https://bootstrap.pypa.io/2.7/get-pip.py --output get-pip.py \
+    && curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py \
     && python2 get-pip.py \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line

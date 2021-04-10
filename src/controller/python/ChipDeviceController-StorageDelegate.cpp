@@ -34,18 +34,6 @@ void PythonPersistentStorageDelegate::SetStorageDelegate(PersistentStorageResult
     mDelegate = delegate;
 }
 
-void PythonPersistentStorageDelegate::AsyncGetKeyValue(const char * key)
-{
-    auto val = mStorage.find(key);
-    if (val == mStorage.end())
-    {
-        mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kGET, CHIP_ERROR_KEY_NOT_FOUND);
-        return;
-    }
-
-    mDelegate->OnPersistentStorageValue(key, val->second.c_str());
-}
-
 CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
     auto val = mStorage.find(key);

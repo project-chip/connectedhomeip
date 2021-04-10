@@ -867,6 +867,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(uint32_t & buf)
+{
+    Impl()->LockThreadStack();
+    buf = otLinkGetPollPeriod(mOTInst);
+    Impl()->UnlockThreadStack();
+    return CHIP_NO_ERROR;
+};
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1259,7 +1268,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
     if (strcmp(mSrpClient.mHostName, aHostName) != 0)
     {
         strcpy(mSrpClient.mHostName, aHostName);
-        error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, aHostName));
+        error = MapOpenThreadError(otSrpClientSetHostName(mOTInst, mSrpClient.mHostName));
         SuccessOrExit(error);
     }
 

@@ -58,8 +58,9 @@ devices.
 ### Bluetooth LE Advertising
 
 In this example, to commission the device onto a Project CHIP network, it must
-be discoverable over Bluetooth LE. Bluetooth LE advertising is started
-automatically when the device is powered up.
+be discoverable over Bluetooth LE. For security reasons, you must start
+Bluetooth LE advertising manually after powering up the device by pressing
+Button USERINTERFACE.
 
 ### Bluetooth LE Rendezvous
 
@@ -105,22 +106,25 @@ states are depicted:
 **LED D3** shows the state of the simulated light bulb. When the LED is lit the
 light bulb is on; when not lit, the light bulb is off.
 
-**Button SW2** can be used to change the state of the simulated light bulb. This
-can be used to mimic a user manually operating a switch. The button behaves as a
-toggle, swapping the state every time it is pressed.
-
-**Button SW3** can be used to reset the device to a default state. Pressing and
+**Button SW2** can be used to reset the device to a default state. Pressing and
 holding Button SW3 for 6 seconds initiates a factory reset. After an initial
 period of 3 seconds, LED2 D2 and D3 will flash in unison to signal the pending
 reset. Holding the button past 6 seconds will cause the device to reset its
 persistent configuration and initiate a reboot. The reset action can be
 cancelled by releasing the button at any point before the 6 second limit.
 
+**Button SW3** can be used to change the state of the simulated light bulb. This
+can be used to mimic a user manually operating a switch. The button behaves as a
+toggle, swapping the state every time it is pressed.
+
 **Button SW4** can be used for joining a predefined Thread network advertised by
 a Border Router. Default parameters for a Thread network are hard-coded and are
 being used if this button is pressed.
 
 The remaining two LEDs (D1/D2) and button (SW1) are unused.
+
+Directly on the development board, **Button USERINTERFACE** can be used for
+enabling Bluetooth LE advertising for a predefined period of time.
 
 <a name="building"></a>
 

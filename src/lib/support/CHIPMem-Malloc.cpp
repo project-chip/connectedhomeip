@@ -103,12 +103,6 @@ void MemoryAllocatorShutdown()
 void * MemoryAlloc(size_t size)
 {
     VERIFY_INITIALIZED();
-    return MemoryAlloc(size, false);
-}
-
-void * MemoryAlloc(size_t size, bool isLongTermAlloc)
-{
-    VERIFY_INITIALIZED();
     return malloc(size);
 }
 

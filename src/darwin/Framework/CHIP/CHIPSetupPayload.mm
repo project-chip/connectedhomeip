@@ -28,28 +28,15 @@
 
 - (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
 {
-    RendezvousInformationFlags rv = kRendezvousInformationNone;
-    switch (value) {
-    case chip::RendezvousInformationFlags::kNone:
-        rv = kRendezvousInformationNone;
-        break;
-    case chip::RendezvousInformationFlags::kWiFi:
-        rv = kRendezvousInformationWiFi;
-        break;
-    case chip::RendezvousInformationFlags::kBLE:
-        rv = kRendezvousInformationBLE;
-        break;
-    case chip::RendezvousInformationFlags::kThread:
-        rv = kRendezvousInformationThread;
-        break;
-    case chip::RendezvousInformationFlags::kEthernet:
-        rv = kRendezvousInformationEthernet;
-        break;
-    case chip::RendezvousInformationFlags::kAllMask:
-        rv = kRendezvousInformationAllMask;
-        break;
+    if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
+        return kRendezvousInformationBLE;
+    } else if (value.Has(chip::RendezvousInformationFlag::kSoftAP)) {
+        return kRendezvousInformationSoftAP;
+    } else if (value.Has(chip::RendezvousInformationFlag::kOnNetwork)) {
+        return kRendezvousInformationOnNetwork;
+    } else {
+        return kRendezvousInformationNone;
     }
-    return rv;
 }
 
 - (id)initWithSetupPayload:(chip::SetupPayload)setupPayload

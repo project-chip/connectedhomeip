@@ -399,14 +399,16 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 {
     Clear();
 
-    char uniqueName[64] = "";
+    char nameBuffer[64] = "";
 
     /// need to set server name
-    ReturnErrorOnFailure(MakeInstanceName(uniqueName, sizeof(uniqueName), params.GetFabricId(), params.GetNodeId()));
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetFabricId(), params.GetNodeId()));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
-    FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
-    FullQName serverName             = AllocateQName(uniqueName, "local");
+    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chip", "_tcp", "local");
+
+    ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
+    FullQName serverName = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -473,7 +475,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
-    FullQName serverName             = AllocateQName(nameBuffer, "local");
+
+    ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
+    FullQName serverName = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {

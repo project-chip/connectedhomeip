@@ -39,8 +39,6 @@ restyle-paths() {
 }
 
 cd "$CHIP_ROOT"
-declare -a paths=()
-
-readarray -t paths < <(git diff --ignore-submodules --name-only "${1:-master}")
+declare -a paths="($(git diff --ignore-submodules --name-only "${1:-master}"))"
 
 restyle-paths "${paths[@]}"

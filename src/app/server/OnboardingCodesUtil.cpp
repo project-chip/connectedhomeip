@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include <app/server/OnboardingCodesUtil.h>
+#include "OnboardingCodesUtil.h"
 
+#include <algorithm>
 #include <inttypes.h>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -64,6 +65,19 @@ void PrintOnboardingCodes(chip::RendezvousInformationFlags rendezvousFlags)
         ChipLogError(AppServer, "Getting manual pairing code failed!");
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC
+void ShareQRCodeOverNFC(chip::RendezvousInformationFlags rendezvousFlags)
+{
+    // Get QR Code and emulate its content using NFC tag
+    std::string QRCode;
+    ReturnOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
+
+    // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
+    std::replace(QRCode.begin(), QRCode.end(), ' ', '_');
+    ReturnOnFailure(NFCMgr().StartTagEmulation(QRCode.c_str(), QRCode.size()));
+}
+#endif
 
 static CHIP_ERROR GetSetupPayload(chip::SetupPayload & setupPayload, chip::RendezvousInformationFlags rendezvousFlags)
 {

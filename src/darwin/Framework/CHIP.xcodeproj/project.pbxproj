@@ -539,6 +539,7 @@
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+					"$(TEMP_DIR)/out/gen/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -546,6 +547,8 @@
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
+					"-framework",
+					CoreData,
 					"-framework",
 					Foundation,
 					"-framework",
@@ -665,6 +668,7 @@
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					.,
+					"$(TEMP_DIR)/out/gen/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

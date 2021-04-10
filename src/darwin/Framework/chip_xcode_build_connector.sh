@@ -87,7 +87,6 @@ done
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="mbedtls"'
-    'chip_logging_style="darwin"'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_ble_project_config_include=""'
@@ -101,7 +100,7 @@ declare -a args=(
 
 [[ $CONFIGURATION != Debug* ]] && args+='is_debug=true'
 
-[[ $PLATFORM_FAMILY_NAME == iOS || $PLATFORM_FAMILY_NAME == watchOS || $PLATFORM_FAMILY_NAME == tvOS ]] && {
+[[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
         'target_os="ios"'
         'import("//config/ios/args.gni")'

@@ -239,10 +239,7 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    PacketHeader packetHeader;
-    PayloadHeader payloadHeader;
-
-    CHIP_ERROR err = sm->AddToReceiveTable(packetHeader, payloadHeader, { chip::kTestDeviceNodeId, 0, 0 }, std::move(buffer));
+    CHIP_ERROR err = sm->AddToReceiveTable(std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

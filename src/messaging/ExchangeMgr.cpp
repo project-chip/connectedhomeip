@@ -59,20 +59,18 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mLocalNodeId  = localNodeId;
-    mTransportMgr = transportMgr;
-    mSessionMgr   = sessionMgr;
+    mSessionMgr = sessionMgr;
 
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
@@ -84,10 +82,10 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
         // Mark all handlers as unallocated.  This handles both initial
         // initialization and the case when the consumer shuts us down and
         // then re-initializes without removing registered handlers.
-        handler.Delegate = nullptr;
+        handler.Reset();
     }
 
-    mTransportMgr->SetRendezvousSession(this);
+    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
 
@@ -172,12 +170,12 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate == nullptr)
+        if (!umh->IsInUse())
         {
             if (selected == nullptr)
                 selected = umh;
         }
-        else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        else if (umh->Matches(protocolId, msgType))
         {
             umh->Delegate = delegate;
             return CHIP_NO_ERROR;
@@ -202,32 +200,15 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Delegate != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        if (umh->IsInUse() && umh->Matches(protocolId, msgType))
         {
-            umh->Delegate = nullptr;
+            umh->Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
     }
 
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
-}
-
-bool ExchangeManager::IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader)
-{
-    if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
-        payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-void ExchangeManager::HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf)
-{
-    OnMessageReceived(packetHeader, payloadHeader, session, std::move(msgBuf), nullptr);
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -237,35 +218,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
-
-    if (!IsMsgCounterSyncMessage(payloadHeader) && session.IsPeerGroupMsgIdNotSynchronized())
-    {
-        Transport::PeerConnectionState * state = mSessionMgr->GetPeerConnectionState(session);
-        VerifyOrReturn(state != nullptr);
-
-        // Queue the message as needed for sync with destination node.
-        err = mMessageCounterSyncMgr.AddToReceiveTable(packetHeader, payloadHeader, session, std::move(msgBuf));
-        VerifyOrReturn(err == CHIP_NO_ERROR);
-
-        // Initiate message counter synchronization if no message counter synchronization is in progress.
-        if (!state->IsMsgCounterSyncInProgress())
-        {
-            err = mMessageCounterSyncMgr.SendMsgCounterSyncReq(session);
-        }
-
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(ExchangeManager,
-                         "Message counter synchronization for received message, failed to send synchronization request, err = %d",
-                         err);
-        }
-
-        // After the message that triggers message counter synchronization is stored, and a message counter
-        // synchronization exchange is initiated, we need to return immediately and re-process the original message
-        // when the synchronization is completed.
-
-        return;
-    }
 
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
@@ -299,7 +251,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            if (umh->Delegate != nullptr && payloadHeader.HasProtocol(umh->ProtocolId))
+            if (umh->IsInUse() && payloadHeader.HasProtocol(umh->ProtocolId))
             {
                 if (umh->MessageType == payloadHeader.GetMessageType())
                 {
@@ -358,6 +310,33 @@ exit:
     }
 }
 
+CHIP_ERROR ExchangeManager::QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+
+    // Queue the message as needed for sync with destination node.
+    err = mMessageCounterSyncMgr.AddToReceiveTable(std::move(msgBuf));
+    SuccessOrExit(err);
+
+    // Initiate message counter synchronization if no message counter synchronization is in progress.
+    if (!state->IsMsgCounterSyncInProgress())
+    {
+        SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
+        err = mMessageCounterSyncMgr.SendMsgCounterSyncReq(session);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(ExchangeManager,
+                     "Message counter synchronization for received message, failed to send synchronization request, err = %d", err);
+    }
+
+    return err;
+}
+
 ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
 {
     ChannelContext * channelContext = nullptr;
@@ -392,6 +371,11 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
 
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnNewConnection(session, this);
+    }
+
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesSession(session, mgr))
         {
@@ -404,6 +388,11 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnConnectionExpired(session, this);
+    }
+
     for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.mSecureSession == session)
@@ -442,7 +431,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
         {
             CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
             if (err != CHIP_NO_ERROR)
-                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node %llu.", chip::ErrorStr(err), node);
+                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".",
+                             chip::ErrorStr(err), static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
             return false;
         }
         return true;
@@ -452,8 +442,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node %llu.", addrBuffer,
-                     node);
+        ChipLogError(ExchangeManager,
+                     "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
+                     addrBuffer, static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
         return;
     }
 }

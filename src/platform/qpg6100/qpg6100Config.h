@@ -26,6 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include "FreeRTOS.h"
+#include "qvCHIP.h"
 
 #include <functional>
 
@@ -125,6 +126,7 @@ public:
 protected:
     using ForEachRecordFunct = std::function<CHIP_ERROR(const Key & key, const size_t & length)>;
     static CHIP_ERROR ForEachRecord(uint16_t fileId, uint16_t recordKey, bool addNewRecord, ForEachRecordFunct funct);
+    static CHIP_ERROR MapNVMError(qvStatus_t status);
 
 private:
 };

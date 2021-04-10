@@ -90,6 +90,8 @@ public:
 
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
 
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
+
     CHIP_ERROR _JoinerStart();
 
     ~ThreadStackManagerImpl() = default;
@@ -99,7 +101,11 @@ public:
 private:
     struct DBusConnectionDeleter
     {
-        void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
+        void operator()(DBusConnection * aConnection)
+        {
+            dbus_connection_close(aConnection);
+            dbus_connection_unref(aConnection);
+        }
     };
 
     using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;

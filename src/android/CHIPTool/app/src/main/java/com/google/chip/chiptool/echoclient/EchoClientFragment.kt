@@ -84,7 +84,7 @@ class EchoClientFragment : Fragment() {
 
     val echoEditTextContents = inputTextEd.text.toString()
     val echoText = if (echoEditTextContents.isEmpty()) DEFAULT_ECHO_MSG else echoEditTextContents
-    deviceController.sendMessage(deviceIdEd.text.toString().toInt(), echoText)
+    deviceController.sendMessage(deviceIdEd.text.toString().toLong(), echoText)
   }
 
   companion object {

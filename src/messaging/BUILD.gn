@@ -30,6 +30,7 @@ static_library("messaging") {
     "ExchangeDelegate.h",
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
+    "ExchangeMgrDelegate.h",
     "Flags.h",
     "MessageCounterSync.cpp",
     "MessageCounterSync.h",

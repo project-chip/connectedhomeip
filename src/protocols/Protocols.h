@@ -37,7 +37,10 @@ class Id
 public:
     constexpr Id(VendorId aVendorId, uint16_t aProtocolId) : mVendorId(aVendorId), mProtocolId(aProtocolId) {}
 
-    constexpr bool operator==(const Id & aOther) { return mVendorId == aOther.mVendorId && mProtocolId == aOther.mProtocolId; }
+    constexpr bool operator==(const Id & aOther) const
+    {
+        return mVendorId == aOther.mVendorId && mProtocolId == aOther.mProtocolId;
+    }
 
     // Convert the Protocols::Id to a TLV profile id.
     // NOTE: We may want to change the TLV reader/writer to take Protocols::Id
@@ -76,6 +79,7 @@ CHIP_STANDARD_PROTOCOL(InteractionModel, 0x0005)    // Interaction Model Protoco
 CHIP_STANDARD_PROTOCOL(FabricProvisioning, 0x0006)  // Fabric Provisioning Protocol
 CHIP_STANDARD_PROTOCOL(ServiceProvisioning, 0x0007) // Service Provisioning Protocol
 CHIP_STANDARD_PROTOCOL(OpCredentials, 0x0008)       // Operational Credentials
+CHIP_STANDARD_PROTOCOL(TempZCL, 0x0009) // For carrying ZCL-compatible messages, to be removed when we no longer use them
 
 #undef CHIP_STANDARD_PROTOCOL
 

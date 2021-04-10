@@ -83,7 +83,7 @@ int AppTask::Init()
     InitServer();
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     TMR_Init();
 
@@ -212,7 +212,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != JOIN_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -233,6 +233,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == JOIN_BUTTON)
     {
         button_event.Handler = JoinHandler;
+    }
+    else if (pin_no == BLE_BUTTON)
+    {
+        button_event.Handler = BleHandler;
     }
 
     sAppTask.PostEvent(&button_event);
@@ -270,6 +274,9 @@ void AppTask::HandleKeyboard(void)
             break;
         case gKBD_EventPB3_c:
             ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
+            break;
+        case gKBD_EventPB4_c:
+            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
         default:
             break;
@@ -450,6 +457,37 @@ void AppTask::JoinHandler(AppEvent * aEvent)
      * In a future PR, these parameters will be sent via BLE.
      */
     ThreadStart();
+}
+
+void AppTask::BleHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
+        return;
+
+    if (sAppTask.mFunction != kFunction_NoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        K32W_LOG("Stopped BLE Advertising!");
+    }
+    else
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+
+        if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+        {
+            K32W_LOG("Started BLE Advertising!");
+        }
+        else
+        {
+            K32W_LOG("OpenDefaultPairingWindow() failed");
+        }
+    }
 }
 
 void AppTask::CancelTimer()

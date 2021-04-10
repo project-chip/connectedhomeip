@@ -49,11 +49,11 @@ using namespace chip::System;
 namespace chip {
 namespace Messaging {
 
-static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                     PacketBufferHandle payload)
+static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, Protocols::Id protocolId,
+                                     uint8_t msgType, PacketBufferHandle payload)
 {
-    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32, protocolId,
-                 msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
+    ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32,
+                 protocolId.ToFullyQualifiedSpecForm(), msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -157,8 +157,11 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         mReliableMessageContext.SetAckPending(false);
 
 #if !defined(NDEBUG)
-        ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
-                        mReliableMessageContext.mPendingPeerAckId);
+        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
+                            mReliableMessageContext.mPendingPeerAckId);
+        }
 #endif
     }
 
@@ -405,20 +408,16 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                           PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint32_t messageId  = 0;
-    uint16_t protocolId = 0;
-    uint8_t messageType = 0;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    uint32_t messageId       = packetHeader.GetMessageId();
+    Protocols::Id protocolId = payloadHeader.GetProtocolID();
+    uint8_t messageType      = payloadHeader.GetMessageType();
 
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
     Retain();
-
-    messageId   = packetHeader.GetMessageId();
-    protocolId  = payloadHeader.GetProtocolID();
-    messageType = payloadHeader.GetMessageType();
 
     if (payloadHeader.IsAckMsg())
     {
