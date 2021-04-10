@@ -110,10 +110,14 @@ android_sdk_args=""
 
 if [[ -d "${ANDROID_NDK_HOME}/toolchains" && -d "${ANDROID_HOME}/platforms" ]]; then
     android_sdk_args+="android_sdk_root=\"$ANDROID_HOME\" android_ndk_root=\"$ANDROID_NDK_HOME\""
+    if [[ ! -z "${ANDROID_SDK_VERSION}" ]]; then
+      android_sdk_args+="android_sdk_version=\"$ANDROID_SDK_VERSION\""
+    fi
     extra_args+=" $android_sdk_args enable_android_builds=true"
 else
     echo
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
+    echo "      Set \$CHIP_ANDROID_VERSION to change the android version (default 21)"
 fi
 
 echo
