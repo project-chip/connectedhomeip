@@ -29,6 +29,7 @@
 #include <messaging/Channel.h>
 #include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
@@ -197,6 +198,8 @@ public:
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
+    void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
+
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
@@ -238,6 +241,8 @@ private:
     uint16_t mNextExchangeId;
     uint16_t mNextKeyId;
     State mState;
+
+    ExchangeMgrDelegate * mDelegate;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;

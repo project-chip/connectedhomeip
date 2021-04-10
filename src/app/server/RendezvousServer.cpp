@@ -17,7 +17,6 @@
 
 #include <app/server/RendezvousServer.h>
 
-#include <app/server/SessionManager.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>

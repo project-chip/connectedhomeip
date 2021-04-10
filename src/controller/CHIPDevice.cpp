@@ -40,6 +40,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <protocols/Protocols.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -55,15 +56,18 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader & payloadHeader)
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
+    Messaging::SendFlags sendFlags;
 
-    VerifyOrReturnError(mSessionManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (!loadedSecureSession)
     {
@@ -75,7 +79,14 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
         resend = buffer.CloneData();
     }
 
-    CHIP_ERROR err = mSessionManager->SendMessage(mSecureSession, payloadHeader, std::move(buffer));
+    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currenlty, we use a temporary Protocol
+    // TempZCL to carry over legacy ZCL messages, use an ephemeral exchange to send message and use its unsolicited message
+    // handler to receive messages. We need to set flag kFromInitiator to allow receiver to deliver message to corresponding
+    // unsolicited message handler, and we also need to set flag kNoAutoRequestAck since there is no persistent exchange to
+    // receive the ack message. This logic need to be deleted after we converting all legacy ZCL messages to IM messages.
+    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
+
+    CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
 
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
@@ -88,9 +99,14 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer, PayloadHeader 
 
         ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
-        err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
+        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         ReturnErrorOnFailure(err);
+    }
+
+    if (exchange != nullptr)
+    {
+        exchange->Close();
     }
 
     return CHIP_NO_ERROR;
@@ -130,12 +146,6 @@ CHIP_ERROR Device::SendCommands()
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
-}
-
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
-{
-    PayloadHeader unusedHeader;
-    return SendMessage(std::move(buffer), unusedHeader);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -223,20 +233,19 @@ exit:
     return error;
 }
 
-void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void Device::OnNewConnection(SecureSessionHandle session)
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
 }
 
-void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void Device::OnConnectionExpired(SecureSessionHandle session)
 {
     mState         = ConnectionState::NotConnected;
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -279,11 +288,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     System::PacketBufferHandle outBuffer;
     ReturnErrorOnFailure(writer.Finalize(&outBuffer));
 
-    PayloadHeader header;
-
-    header.SetMessageType(chip::Protocols::ServiceProvisioning::Id, 0);
-
-    ReturnErrorOnFailure(SendMessage(std::move(outBuffer), header));
+    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::Id, 0, std::move(outBuffer)));
 
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
