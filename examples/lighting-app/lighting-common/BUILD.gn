@@ -28,6 +28,8 @@ if (enable_pw_rpc) {
 }
 
 chip_data_model("lighting-common") {
+  public_deps = [ "${chip_root}/src/protocols/secure_channel" ]
+
   cluster_sources = [
     "basic",
     "bindings",

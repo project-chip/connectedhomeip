@@ -80,7 +80,10 @@ public:
     virtual ExchangeTransport * AllocTransport(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
     {
         ApplicationExchangeTransport * transport = chip::Platform::New<Messaging::ApplicationExchangeTransport>();
-        transport->Init(rmMgr, sessionMgr);
+        if (transport != nullptr)
+        {
+            transport->Init(rmMgr, sessionMgr);
+        }
         return transport;
     }
 
