@@ -60,10 +60,6 @@ public:
      *  Add a CHIP message into the cache table to queue the outging messages that trigger message counter synchronization protocol
      *  for retransmission.
      *
-     *  @param[in]    protocolId       The protocol identifier of the CHIP message to be sent.
-     *
-     *  @param[in]    msgType          The message type of the corresponding protocol.
-     *
      *  @param[in]    sendFlags        Flags set by the application for the CHIP message being sent.
      *
      *  @param[in]    msgBuf           A handle to the packet buffer holding the CHIP message.
@@ -73,8 +69,8 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToRetransmissionTable(Protocols::Id protocolId, uint8_t msgType, const SendFlags & sendFlags,
-                                        System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
+    CHIP_ERROR AddToRetransmissionTable(const SendFlags & sendFlags, System::PacketBufferHandle msgBuf,
+                                        Messaging::ExchangeContext * exchangeContext);
 
     /**
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
@@ -100,13 +96,11 @@ private:
      */
     struct RetransTableEntry
     {
-        RetransTableEntry() : protocolId(Protocols::NotSpecified) {}
+        RetransTableEntry() : exchangeContext(nullptr) {}
         ExchangeContext * exchangeContext; /**< The ExchangeContext for the stored CHIP message.
                                                 Non-null if and only if this entry is in use. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
         SendFlags sendFlags;               /**< Flags set by the application for the CHIP message being sent. */
-        Protocols::Id protocolId;          /**< The protocol identifier of the CHIP message to be sent. */
-        uint8_t msgType;                   /**< The message type of the CHIP message to be sent. */
     };
 
     /**

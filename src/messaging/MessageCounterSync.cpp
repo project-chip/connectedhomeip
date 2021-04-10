@@ -92,8 +92,7 @@ void MessageCounterSyncMgr::OnResponseTimeout(Messaging::ExchangeContext * excha
         exchangeContext->Close();
 }
 
-CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(Protocols::Id protocolId, uint8_t msgType, const SendFlags & sendFlags,
-                                                           System::PacketBufferHandle msgBuf,
+CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(const SendFlags & sendFlags, System::PacketBufferHandle msgBuf,
                                                            Messaging::ExchangeContext * exchangeContext)
 {
     bool added     = false;
@@ -106,8 +105,6 @@ CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(Protocols::Id protoco
         // Entries are in use if they have an exchangeContext.
         if (entry.exchangeContext == nullptr)
         {
-            entry.protocolId      = protocolId;
-            entry.msgType         = msgType;
             entry.msgBuf          = std::move(msgBuf);
             entry.exchangeContext = exchangeContext;
             entry.exchangeContext->Retain();
@@ -141,9 +138,17 @@ void MessageCounterSyncMgr::RetransPendingGroupMsgs(NodeId peerNodeId)
     {
         if (entry.exchangeContext != nullptr && entry.exchangeContext->GetSecureSession().GetPeerNodeId() == peerNodeId)
         {
+            PayloadHeader payloadHeader;
+
+            if (payloadHeader.DecodeAndConsume(entry.msgBuf) != CHIP_NO_ERROR)
+            {
+                ChipLogError(ExchangeManager, "Failed to decode and consume the temporary payloadHeader");
+                break;
+            }
+
             // Retramsmit message.
-            CHIP_ERROR err =
-                entry.exchangeContext->SendMessage(entry.protocolId, entry.msgType, std::move(entry.msgBuf), entry.sendFlags);
+            CHIP_ERROR err = entry.exchangeContext->SendMessage(payloadHeader.GetProtocolID(), payloadHeader.GetMessageType(),
+                                                                std::move(entry.msgBuf), entry.sendFlags);
 
             if (err != CHIP_NO_ERROR)
             {

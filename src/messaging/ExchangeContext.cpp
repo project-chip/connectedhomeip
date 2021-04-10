@@ -90,11 +90,19 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // If a group message is to be transmitted to a destination node whose message counter is unknown.
     if (ChipKeyId::IsAppGroupKey(state->GetLocalKeyID()) && !state->IsPeerMsgCounterSynced())
     {
+        PayloadHeader payloadHeader;
+
         MessageCounterSyncMgr * messageCounterSyncMgr = mExchangeMgr->GetMessageCounterSyncMgr();
         VerifyOrReturnError(messageCounterSyncMgr != nullptr, CHIP_ERROR_INTERNAL);
 
+        // Temporarily encode the protocol ID and message type into the packetbuffer buffer to avoid out-of-band
+        // storage. This header will be take out from there when we go to actually retransmit.
+        payloadHeader.SetMessageType(protocolId, msgType);
+        err = payloadHeader.EncodeBeforeData(msgBuf);
+        ReturnErrorOnFailure(err);
+
         // Queue the message as needed for sync with destination node.
-        err = messageCounterSyncMgr->AddToRetransmissionTable(protocolId, msgType, sendFlags, std::move(msgBuf), this);
+        err = messageCounterSyncMgr->AddToRetransmissionTable(sendFlags, std::move(msgBuf), this);
         ReturnErrorOnFailure(err);
 
         // Initiate message counter synchronization if no message counter synchronization is in progress.

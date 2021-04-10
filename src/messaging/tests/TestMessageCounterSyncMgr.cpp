@@ -267,8 +267,7 @@ void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     CHIP_ERROR err =
-        sm->AddToRetransmissionTable(Protocols::Echo::Id, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
+        sm->AddToRetransmissionTable(Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -358,6 +357,71 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 }
 
+SecureSessionMgr gSecureSessionMgr;
+Messaging::ExchangeManager gExchangeManager;
+
+void CheckSendMessage(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    uint16_t payload_len = sizeof(PAYLOAD);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    Transport::AdminPairingTable admins;
+    err = gSecureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &gTransportMgr, &admins);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    Transport::AdminPairingInfo * admin = admins.AssignAdminId(0, kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
+    admin = admins.AssignAdminId(1, kDestinationNodeId);
+    NL_TEST_ASSERT(inSuite, admin != nullptr);
+
+    SecurePairingUsingTestSecret pairingPeerToLocal(kTestLocalGroupKeyId, kTestPeerGroupKeyId);
+
+    err = gSecureSessionMgr.NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, SecureSessionMgr::PairingDirection::kInitiator, 1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecurePairingUsingTestSecret pairingLocalToPeer(kTestPeerGroupKeyId, kTestLocalGroupKeyId);
+    err = gSecureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairingLocalToPeer,
+                                       SecureSessionMgr::PairingDirection::kResponder, 0);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = gExchangeManager.Init(&gSecureSessionMgr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    MockAppDelegate mockAppDelegate;
+    SecureSessionHandle session(kDestinationNodeId, kTestPeerGroupKeyId, 0);
+
+    Transport::PeerConnectionState * state = gSecureSessionMgr.GetPeerConnectionState(session);
+    NL_TEST_ASSERT(inSuite, state != nullptr);
+
+    state->SetMsgCounterSyncInProgress(true);
+
+    ExchangeContext * exchange = gExchangeManager.NewContext(session, &mockAppDelegate);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    chip::System::PacketBufferHandle backup = buffer.Retain();
+    err                                     = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
+                                Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    PayloadHeader payloadHeader;
+    err = payloadHeader.DecodeAndConsume(backup);
+    NL_TEST_ASSERT(inSuite, payloadHeader.HasProtocol(Protocols::Echo::Id));
+    NL_TEST_ASSERT(inSuite, payloadHeader.HasMessageType(Echo::MsgType::EchoRequest));
+}
+
 // Test Suite
 
 /**
@@ -371,6 +435,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test MessageCounterSyncMgr::AddToRetransTable", CheckAddRetransTable),
     NL_TEST_DEF("Test MessageCounterSyncMgr::AddToReceiveTable", CheckAddToReceiveTable),
     NL_TEST_DEF("Test MessageCounterSyncMgr::ReceiveMessage", CheckReceiveMessage),
+    NL_TEST_DEF("Test MessageCounterSyncMgr::SendMessage", CheckSendMessage),
     NL_TEST_SENTINEL()
 };
 // clang-format on
