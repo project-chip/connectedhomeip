@@ -159,9 +159,6 @@ void ReliableMessageMgr::ExecuteActions()
                             entry.sendCount);
 #endif
         }
-
-        if (err != CHIP_NO_ERROR && rc->mDelegate)
-            rc->mDelegate->OnSendError(err);
     }
 
     TicklessDebugDumpRetransTable("ReliableMessageMgr::ExecuteActions Dumping mRetransTable entries after processing");
@@ -252,7 +249,7 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrDie(rc != nullptr && rc->mExchange != nullptr);
+    VerifyOrDie(rc != nullptr && !rc->IsOccupied());
 
     for (RetransTableEntry & entry : mRetransTable)
     {
@@ -269,7 +266,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
             *rEntry = &entry;
 
             // Increment the reference count
-            rc->Retain();
+            rc->RetainContext();
+            rc->SetOccupied(true);
             added = true;
 
             break;
@@ -383,12 +381,13 @@ void ReliableMessageMgr::ClearRetransTable(RetransTableEntry & rEntry)
 {
     if (rEntry.rc)
     {
-        VerifyOrDie(rEntry.rc->mExchange != nullptr);
+        VerifyOrDie(rEntry.rc->IsOccupied() == true);
 
         // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
         ExpireTicks();
 
-        rEntry.rc->Release();
+        rEntry.rc->ReleaseContext();
+        rEntry.rc->SetOccupied(false);
         rEntry.rc = nullptr;
 
         // Clear all other fields
@@ -408,9 +407,6 @@ void ReliableMessageMgr::FailRetransTableEntries(ReliableMessageContext * rc, CH
         {
             // Remove the entry from the retransmission table.
             ClearRetransTable(entry);
-
-            // Application callback OnSendError.
-            rc->mDelegate->OnSendError(err);
         }
     }
 }

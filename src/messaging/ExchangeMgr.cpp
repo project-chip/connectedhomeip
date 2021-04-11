@@ -225,9 +225,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             // Found a matching exchange. Set flag for correct subsequent CRMP
             // retransmission timeout selection.
-            if (!ec.mReliableMessageContext.HasRcvdMsgFromPeer())
+            if (!ec.HasRcvdMsgFromPeer())
             {
-                ec.mReliableMessageContext.SetMsgRcvdFromPeer(true);
+                ec.SetMsgRcvdFromPeer(true);
             }
 
             // Matched ExchangeContext; send to message handler.

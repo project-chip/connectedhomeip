@@ -44,24 +44,13 @@ enum class MessageFlagValues : uint32_t;
 class ReliableMessageContext;
 class ReliableMessageMgr;
 
-class ReliableMessageDelegate
-{
-public:
-    virtual ~ReliableMessageDelegate() {}
-
-    /* Application callbacks */
-    virtual void OnSendError(CHIP_ERROR err) = 0; /**< Application callback for error while sending. */
-    virtual void OnAckRcvd()                 = 0; /**< Application callback for received acknowledgment. */
-};
-
 class ReliableMessageContext
 {
 public:
     ReliableMessageContext();
 
-    void Init(ReliableMessageMgr * manager, ExchangeContext * exchange);
+    void Init(ReliableMessageMgr * manager);
     void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
-    void SetDelegate(ReliableMessageDelegate * delegate) { mDelegate = delegate; }
 
     /**
      * Flush the pending Ack for current exchange.
@@ -186,17 +175,41 @@ public:
      */
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
 
-private:
+    /**
+     *  Determine whether there is already an acknowledgment pending to be sent to the peer on this exchange.
+     *
+     *  @return Returns 'true' if there is already an acknowledgment pending  on this exchange, else 'false'.
+     */
+    bool IsOccupied() const;
+
+    /**
+     *  Set if an acknowledgment needs to be sent back to the peer on this exchange.
+     *
+     *  @param[in]  inAckPending A Boolean indicating whether (true) or not
+     *                          (false) an acknowledgment should be sent back
+     *                          in response to a received message.
+     */
+    void SetOccupied(bool inOccupied);
+
+protected:
+    uint32_t mPendingPeerAckId;
+
     enum class Flags : uint16_t
     {
+        /// When set, signifies that this context is the initiator of the exchange.
+        kFlagInitiator = 0x0001,
+
+        /// When set, signifies that a response is expected for a message that is being sent.
+        kFlagResponseExpected = 0x0002,
+
         /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
         kFlagAutoRequestAck = 0x0004,
 
         /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
         kFlagDropAckDebug = 0x0008,
 
-        /// If a response is expected for a message that is being sent.
-        kFlagResponseExpected = 0x0010,
+        /// When set, signifies current reliable message context is in usage.
+        kFlagOccupied = 0x0010,
 
         /// When set, signifies that there is an acknowledgment pending to be sent back.
         kFlagAckPending = 0x0020,
@@ -212,8 +225,9 @@ private:
 
     BitFlags<Flags> mFlags; // Internal state flags
 
-    void Retain();
-    void Release();
+private:
+    void RetainContext();
+    void ReleaseContext();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
 
@@ -223,11 +237,8 @@ private:
     friend class ExchangeMessageDispatch;
 
     ReliableMessageMgr * mManager;
-    ExchangeContext * mExchange;
-    ReliableMessageDelegate * mDelegate;
     ReliableMessageProtocolConfig mConfig;
     uint16_t mNextAckTimeTick; // Next time for triggering Solo Ack
-    uint32_t mPendingPeerAckId;
 };
 
 } // namespace Messaging

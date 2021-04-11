@@ -56,7 +56,8 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -144,11 +145,10 @@ public:
 
     ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
-    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+    ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
     ExchangeMessageDispatch * GetMessageDispatch();
 
@@ -192,14 +192,7 @@ public:
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    enum class ExFlagValues : uint16_t
-    {
-        kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
-        kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
-    };
-
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ReliableMessageContext mReliableMessageContext;
     ExchangeDelegateBase * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr   = nullptr;
     ExchangeACL * mExchangeACL       = nullptr;
@@ -210,8 +203,6 @@ private:
     // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
     // actions with a delegate pattern.
     uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
-
-    BitFlags<ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
