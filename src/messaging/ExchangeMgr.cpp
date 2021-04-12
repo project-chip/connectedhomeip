@@ -306,7 +306,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %d", err);
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
     }
 }
 
@@ -331,7 +331,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ExchangeManager,
-                     "Message counter synchronization for received message, failed to send synchronization request, err = %d", err);
+                     "Message counter synchronization for received message, failed to send synchronization request, err = %s",
+                     ErrorStr(err));
     }
 
     return err;
