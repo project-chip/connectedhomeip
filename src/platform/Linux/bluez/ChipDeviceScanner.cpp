@@ -250,7 +250,7 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
     }
 
     const auto devicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(device));
-    GError * error = nullptr;
+    GError * error        = nullptr;
 
     if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &error))
     {
