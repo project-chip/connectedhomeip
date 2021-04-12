@@ -115,7 +115,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     message_counter::MessageCounterManager * messageCounterManager = nullptr;
-    Transport::AdminPairingInfo * admin = nullptr;
+    Transport::AdminPairingInfo * admin                            = nullptr;
 
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -145,10 +145,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
         mStorageDelegate->SetStorageDelegate(this);
     }
 
-    mTransportMgr = chip::Platform::New<DeviceTransportMgr>();
-    mSessionMgr   = chip::Platform::New<SecureSessionMgr>();
-    mExchangeMgr  = chip::Platform::New<Messaging::ExchangeManager>();
-    messageCounterManager = chip::Platform::New<message_counter::MessageCounterManager>();
+    mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
+    mSessionMgr            = chip::Platform::New<SecureSessionMgr>();
+    mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
+    messageCounterManager  = chip::Platform::New<message_counter::MessageCounterManager>();
     mMessageCounterManager = messageCounterManager;
 
     err = mTransportMgr->Init(
