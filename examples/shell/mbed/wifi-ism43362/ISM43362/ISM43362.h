@@ -163,8 +163,8 @@ public:
     int startClient(int id);
 
     int startServer(int id);
-    
-    int get_client_details(int id, char *addr, size_t addrSize, uint16_t *port);
+
+    int getClientDetails(int id, char *addr, size_t addrSize, uint16_t *port);
 
     /**
     * Sends data to an open socket
@@ -246,6 +246,7 @@ private:
     volatile int _active_id;
     void print_rx_buff(void);
     bool check_response(void);
+    bool isServerEnable();
 
 #ifdef MBED_CONF_ISM43362_WIFI_COUNTRY_CODE
     bool check_country_code(const char *country_code);

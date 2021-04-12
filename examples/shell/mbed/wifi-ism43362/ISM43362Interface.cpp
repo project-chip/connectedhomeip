@@ -516,7 +516,7 @@ int ISM43362Interface::socket_accept(void *server, void **socket, SocketAddress 
 
     struct ISM43362_socket *serverSocket = (struct ISM43362_socket *)server;
 
-    ret = _ism.get_client_details(serverSocket->id, tmp, sizeof(tmp), &port);
+    ret = _ism.getClientDetails(serverSocket->id, tmp, sizeof(tmp), &port);
     if (ret != NSAPI_ERROR_OK)
     {
         debug_if(_ism_debug, "ISM43362Interface socket_accept: get client details failed\r\n");
@@ -694,7 +694,7 @@ int ISM43362Interface::socket_recvfrom(void *handle, SocketAddress *addr, void *
         return NSAPI_ERROR_PARAMETER;
     }
 
-    ret = _ism.get_client_details(socket->id, tmp, sizeof(tmp), &port);
+    ret = _ism.getClientDetails(socket->id, tmp, sizeof(tmp), &port);
     if (ret != NSAPI_ERROR_OK)
     {
         debug_if(_ism_debug, "ISM43362Interface socket_recvfrom: get client details failed\r\n");

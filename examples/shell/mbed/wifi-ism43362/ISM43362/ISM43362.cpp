@@ -676,6 +676,14 @@ int ISM43362::bind(int id, const char *addr, int port)
         return NSAPI_ERROR_PARAMETER;
     }
 
+    if (_active_id != id) {
+        _active_id = id;
+        if (!(_parser.send("P0=%d", id) && check_response())) {
+            debug_if(_ism_debug, "\tISM43362 bind: P0 issue\n");
+            return NSAPI_ERROR_DEVICE_ERROR;
+        }
+    }
+
     /* Set local port */
     if (!(_parser.send("P2=%d", port) && check_response())) {
         debug_if(_ism_debug, "\tISM43362: bind: P2 issue\n");
@@ -689,20 +697,28 @@ int ISM43362::bind(int id, const char *addr, int port)
 
 int ISM43362::setServerParam(int id, int backlog)
 {
+    if ((backlog < 0) || (backlog > 30)) {
+        debug_if(_ism_debug, "\tISM43362: set server param:: wrong backlog\n");
+        return NSAPI_ERROR_PARAMETER;
+    }
+
     //IDs only 0-3
     if ((id < 0) || (id > 3)) {
         debug_if(_ism_debug, "\tISM43362: set server param: wrong id\n");
         return NSAPI_ERROR_PARAMETER;
     }
 
-    if ((backlog < 0) || (backlog > 30)) {
-        debug_if(_ism_debug, "\tISM43362: set server param:: wrong backlog\n");
-        return NSAPI_ERROR_PARAMETER;
+    if (_active_id != id) {
+        _active_id = id;
+        if (!(_parser.send("P0=%d", id) && check_response())) {
+            debug_if(_ism_debug, "\tISM43362 set server param: P0 issue\n");
+            return NSAPI_ERROR_DEVICE_ERROR;
+        }
     }
 
     /* Set listen backlog */
     if (!(_parser.send("P8=%d", backlog) && check_response())) {
-        debug_if(_ism_debug, "\tISM43362: set server param:: P8 issue\n");
+        debug_if(_ism_debug, "\tISM43362: set server param: P8 issue\n");
         return NSAPI_ERROR_DEVICE_ERROR;
     }
 
@@ -723,6 +739,14 @@ int ISM43362::setClientParam(int id, const char *addr, int port)
     if ((id < 0) || (id > 3)) {
         debug_if(_ism_debug, "\tISM43362: set client param: wrong id\n");
         return NSAPI_ERROR_PARAMETER;
+    }
+
+    if (_active_id != id) {
+        _active_id = id;
+        if (!(_parser.send("P0=%d", id) && check_response())) {
+            debug_if(_ism_debug, "\tISM43362 set client param: P0 issue\n");
+            return NSAPI_ERROR_DEVICE_ERROR;
+        }
     }
 
      /* Set remote host IP address */
@@ -746,13 +770,21 @@ int ISM43362::startClient(int id)
 {
     //IDs only 0-3
     if ((id < 0) || (id > 3)) {
-        debug_if(_ism_debug, "\tISM43362: connect param: wrong id\n");
+        debug_if(_ism_debug, "\tISM43362: start client: wrong id\n");
         return NSAPI_ERROR_PARAMETER;
+    }
+
+    if (_active_id != id) {
+        _active_id = id;
+        if (!(_parser.send("P0=%d", id) && check_response())) {
+            debug_if(_ism_debug, "\tISM43362 start client: P0 issue\n");
+            return NSAPI_ERROR_DEVICE_ERROR;
+        }
     }
 
     /* Start client */
     if (!(_parser.send("P6=1") && check_response())) {
-        debug_if(_ism_debug, "\tISM43362: start client P6 issue\n");
+        debug_if(_ism_debug, "\tISM43362: start client: P6 issue\n");
         return NSAPI_ERROR_DEVICE_ERROR;
     }
 
@@ -765,13 +797,21 @@ int ISM43362::startServer(int id)
 {
     //IDs only 0-3
     if ((id < 0) || (id > 3)) {
-        debug_if(_ism_debug, "\tISM43362: wrong id\n");
+        debug_if(_ism_debug, "\tISM43362: start server: wrong id\n");
         return NSAPI_ERROR_PARAMETER;
+    }
+
+    if (_active_id != id) {
+        _active_id = id;
+        if (!(_parser.send("P0=%d", id) && check_response())) {
+            debug_if(_ism_debug, "\tISM43362 start server: P0 issue\n");
+            return NSAPI_ERROR_DEVICE_ERROR;
+        }
     }
 
     /* Start server */
     if (!(_parser.send("P5=1") && check_response())) {
-        debug_if(_ism_debug, "\tISM43362: start server P5 issue\n");
+        debug_if(_ism_debug, "\tISM43362: start server: P5 issue\n");
         return NSAPI_ERROR_DEVICE_ERROR;
     }
 
@@ -792,6 +832,7 @@ bool ISM43362::send(int id, const void *data, uint32_t amount)
     if ((id < 0) || (id > 3)) {
         return false;
     }
+
     if (_active_id != id) {
         _active_id = id;
         if (!(_parser.send("P0=%d", id) && check_response())) {
@@ -838,7 +879,6 @@ int ISM43362::check_recv_status(int id, void *data)
         }
     }
 
-
     if (!_parser.send("R0")) {
         return -1;
     }
@@ -882,23 +922,32 @@ int ISM43362::check_recv_status(int id, void *data)
     return read_amount;
 }
 
-int ISM43362::get_client_details(int id, char *addr, size_t addrSize, uint16_t *port)
+int ISM43362::getClientDetails(int id, char *addr, size_t addrSize, uint16_t *port)
 {
     char tmp[512];
-
-    if ((id < 0) || (id > 3)) {
-        debug_if(_ism_debug, "\tISM43362: Wrong socket number\n");
-        return NSAPI_ERROR_PARAMETER;
-    }
 
     if (addr == nullptr || port == nullptr) {
         debug_if(_ism_debug, "\tISM43362: parameter error\n");
         return NSAPI_ERROR_PARAMETER;
     }
 
+    //IDs only 0-3
+    if ((id < 0) || (id > 3)) {
+        debug_if(_ism_debug, "\tISM43362: client details: wrong id\n");
+        return NSAPI_ERROR_PARAMETER;
+    }
+
+    if (_active_id != id) {
+        _active_id = id;
+        if (!(_parser.send("P0=%d", id) && check_response())) {
+            debug_if(_ism_debug, "\tISM43362 client details: P0 issue\n");
+            return NSAPI_ERROR_DEVICE_ERROR;
+        }
+    }
+
      /* Use %[^\n] instead of %s to allow having spaces in the string */
     if (!(_parser.send("P?") && _parser.recv("%[^\n^\r]\r\n", tmp) && check_response())) {
-        debug_if(_ism_debug, "\tISM43362: get_client_address failed\n");
+        debug_if(_ism_debug, "\tISM43362: client details: P? issue\n");
         return NSAPI_ERROR_DEVICE_ERROR;
     }
 
@@ -922,6 +971,44 @@ int ISM43362::get_client_details(int id, char *addr, size_t addrSize, uint16_t *
     return NSAPI_ERROR_OK;
 }
 
+bool ISM43362::isServerEnable()
+{
+    char tmp[512];
+
+    /* Use %[^\n] instead of %s to allow having spaces in the string */
+    if (!(_parser.send("P?") && _parser.recv("%[^\n^\r]\r\n", tmp) && check_response())) {
+        debug_if(_ism_debug, "\tISM43362: is server enable: P? issue\n");
+        return false;
+    }
+
+    /* Extract server state */
+    char *ptr;
+    ptr = strtok(tmp, ",");
+    /* Extract client port in the received buffer */
+    for (int i = 0; i < 5; i++) {
+        if (ptr == NULL) {
+            break;
+        }
+        ptr = strtok(NULL, ",");
+    }
+
+    if (atoi(ptr) == 1)
+    {
+        debug_if(_ism_debug, "\tISM43362: TCP server enabled\n");
+        return true;
+    }
+
+    ptr = strtok(NULL, ",");
+
+    if (atoi(ptr) == 1)
+    {
+        debug_if(_ism_debug, "\tISM43362: UDP server enabled\n");
+        return true;
+    }
+
+    return false;
+}
+
 bool ISM43362::close(int id)
 {
     if ((id < 0) || (id > 3)) {
@@ -932,17 +1019,23 @@ bool ISM43362::close(int id)
     debug_if(_ism_debug, "\tISM43362: CLOSE socket id=%d\n", id);
     _active_id = id;
     if (!(_parser.send("P0=%d", id) && check_response())) {
+        debug_if(_ism_debug, "\tISM43362 close: P0 issue\n");
         return false;
     }
-    /* Stop server */
-    if (!(_parser.send("P5=0") && check_response())) {
-        debug_if(_ism_debug, "\tISM43362: close: P5 issue\n");
-        return false;
-    }
+
     /* Stop client */
     if (!(_parser.send("P6=0") && check_response())) {
         debug_if(_ism_debug, "\tISM43362: close: P6 issue\n");
         return false;
+    }
+
+    if (isServerEnable())
+    {
+        /* Stop server */
+        if (!(_parser.send("P5=0") && check_response())) {
+            debug_if(_ism_debug, "\tISM43362: close: P5 issue\n");
+            return false;
+        }
     }
 
     return true;
