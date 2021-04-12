@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <gen/af-structs.h>
 #include <inttypes.h>
 #include <lib/support/Span.h>
 
@@ -90,3 +91,5 @@ typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint16_t
 typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                                        uint8_t * sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+
+// List specific responses

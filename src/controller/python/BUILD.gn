@@ -68,6 +68,7 @@ shared_library("ChipDeviceCtrl") {
     "chip/internal/CommissionerImpl.cpp",
     "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
+    "gen/attribute-size.cpp",
     "gen/CHIPClientCallbacks.cpp",
     "gen/call-command-handler.cpp",
     "gen/callback-stub.cpp",

@@ -39,7 +39,7 @@ class ChipClusters:
 {{#chip_server_clusters}}
             "{{asCamelCased name false}}": [
 {{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual (asCallbackAttributeType atomicTypeId) "Unsupported")}}
+{{#unless isList}}
                 "{{asCamelCased name false}}",
 {{/unless}}
 {{/chip_server_cluster_attributes}}
@@ -81,7 +81,7 @@ class ChipClusters:
 
 {{#chip_server_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual (asCallbackAttributeType atomicTypeId) "Unsupported")}}
+{{#unless isList}}
     def Cluster{{asCamelCased parent.name false}}_ReadAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(device, ZCLendpoint, ZCLgroupid)
 {{/unless}}
@@ -105,7 +105,7 @@ class ChipClusters:
         self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/chip_server_cluster_commands}}
 {{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual (asCallbackAttributeType atomicTypeId) "Unsupported")}}
+{{#unless isList}}
         # Cluster {{asCamelCased parent.name false}} ReadAttribute {{asCamelCased name false}}
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32

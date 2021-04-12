@@ -86,7 +86,7 @@ CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCa
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual (asCallbackAttributeType atomicTypeId) "Unsupported")}}
+{{#unless isList}}
 CHIP_ERROR chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
