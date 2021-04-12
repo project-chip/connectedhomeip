@@ -26,11 +26,11 @@ def get(nd: Optional[Mapping], keys: Key, default: Any = None) -> Any:
     while d and keys:
         d = d.get(keys[0])
         keys = keys[1:]
-    if d is not None:
+    if d is not None and d != {}:
         return d
     if default is not None:
         return default
-    return None
+    return d
 
 
 def put(nd: MutableMapping, keys: Key, value: Any) -> None:
