@@ -36,8 +36,6 @@
 
 namespace chip {
 
-constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
-
 namespace Messaging {
 
 class ExchangeManager;
@@ -170,9 +168,9 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
+    void SetAppState(void * state) { mAppState = state; }
 
-    const uint8_t * GetChallenge() const { return mChallenge; }
+    void * GetAppState() const { return mAppState; }
 
     SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
@@ -196,13 +194,10 @@ private:
     ExchangeDelegateBase * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr   = nullptr;
     ExchangeACL * mExchangeACL       = nullptr;
+    void * mAppState               = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
-
-    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
-    // actions with a delegate pattern.
-    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
 
     /**
      *  Search for an existing exchange that the message applies to.

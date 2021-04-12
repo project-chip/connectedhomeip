@@ -283,6 +283,7 @@ void ExchangeContext::Free()
 
     DoClose(false);
     mExchangeMgr = nullptr;
+    mAppState    = nullptr;
 
     em->DecrementContextsInUse();
 
