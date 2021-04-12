@@ -37,9 +37,3 @@ jobs:
               shell: bash
               run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
               id: extract_branch
-            - name: Deploy if master
-              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
-              uses: peaceiris/actions-gh-pages@v3
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./docs/html
