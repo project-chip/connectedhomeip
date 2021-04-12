@@ -550,10 +550,6 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "Descriptor": [
-                "DeviceList",
-                "ServerList",
-                "ClientList",
-                "PartsList",
                 "ClusterRevision",
             ],
             "DoorLock": [
@@ -1161,26 +1157,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterDescriptor_ReadAttributeDeviceList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Descriptor_DeviceList(device, ZCLendpoint, ZCLgroupid)
-        )
-    def ClusterDescriptor_ReadAttributeServerList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Descriptor_ServerList(device, ZCLendpoint, ZCLgroupid)
-        )
-    def ClusterDescriptor_ReadAttributeClientList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Descriptor_ClientList(device, ZCLendpoint, ZCLgroupid)
-        )
-    def ClusterDescriptor_ReadAttributePartsList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Descriptor_PartsList(device, ZCLendpoint, ZCLgroupid)
-        )
     def ClusterDescriptor_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeLockState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeLockType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1573,18 +1551,6 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Descriptor
-        # Cluster Descriptor ReadAttribute DeviceList
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_DeviceList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_DeviceList.restype = ctypes.c_uint32
-        # Cluster Descriptor ReadAttribute ServerList
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_ServerList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_ServerList.restype = ctypes.c_uint32
-        # Cluster Descriptor ReadAttribute ClientList
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_ClientList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_ClientList.restype = ctypes.c_uint32
-        # Cluster Descriptor ReadAttribute PartsList
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_PartsList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_Descriptor_PartsList.restype = ctypes.c_uint32
         # Cluster Descriptor ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.restype = ctypes.c_uint32
