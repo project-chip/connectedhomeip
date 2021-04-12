@@ -136,15 +136,11 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
 
     ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize());
 
-    initParams.storageDelegate              = &sStorageDelegate;
-    initParams.mDeviceAddressUpdateDelegate = &sDeviceAddressUpdateDelegate;
-    initParams.pairingDelegate              = &sPairingDelegate;
-
+    initParams.storageDelegate                = &sStorageDelegate;
+    initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
+    initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
-
-#if CHIP_ENABLE_INTERACTION_MODEL
-    initParams.imDelegate = &PythonInteractionModelDelegate::Instance();
-#endif
+    initParams.imDelegate                     = &PythonInteractionModelDelegate::Instance();
 
     SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
