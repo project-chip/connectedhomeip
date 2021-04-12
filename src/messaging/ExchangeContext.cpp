@@ -168,6 +168,11 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // Clear protocol callbacks
     if (mDelegate != nullptr)
     {
+        if (mTransport != nullptr)
+        {
+            mDelegate->ReleaseTransport(mTransport);
+            mTransport = nullptr;
+        }
         mDelegate->OnExchangeClosing(this);
     }
     mDelegate = nullptr;
