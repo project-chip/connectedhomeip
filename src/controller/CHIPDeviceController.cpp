@@ -806,9 +806,10 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     // TODO: Send unpairing message to the remote device.
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
-    VerifyOrReturnError(device->GetDeviceId() == remoteDeviceId, CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-
-    FreeRendezvousSession();
+    if (device->GetDeviceId() == remoteDeviceId)
+    {
+        FreeRendezvousSession();
+    }
 
     if (mStorageDelegate != nullptr)
     {
