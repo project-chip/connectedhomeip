@@ -167,8 +167,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, params.imDelegate);
+#if CHIP_ENABLE_INTERACTION_MODEL
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
     SuccessOrExit(err);
 #endif
 
@@ -817,8 +817,6 @@ void DeviceCommissioner::OnRendezvousComplete()
     Device * device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
-    // We need to kick the device since we are not a valid secure pairing delegate when using IM.
-    device->InitCommandSender();
 
     PersistDevice(device);
 
