@@ -24,6 +24,7 @@
 
 #include "button_service/button_service.rpc.pb.h"
 #include "device_service/device_service.rpc.pb.h"
+#include "lib/support/CodeUtils.h"
 #include "lighting_service/lighting_service.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
@@ -123,8 +124,8 @@ int Init()
     pw_sys_io_Init();
 
     // Start App task.
-    sRpcTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr,
-                                       RPC_TASK_PRIORITY, sRpcTaskStack, &sRpcTaskBuffer);
+    sRpcTaskHandle = xTaskCreateStatic(RunRpcService, "RPC_TASK", ArraySize(sRpcTaskStack), nullptr, RPC_TASK_PRIORITY,
+                                       sRpcTaskStack, &sRpcTaskBuffer);
     return err;
 }
 
