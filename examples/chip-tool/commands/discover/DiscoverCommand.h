@@ -21,7 +21,7 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
 
-class DiscoverCommand : public Command
+class DiscoverCommand : public Command, public chip::Controller::DeviceAddressUpdateDelegate
 {
 public:
     DiscoverCommand(const char * commandName) : Command(commandName)
@@ -29,6 +29,9 @@ public:
         AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
         AddArgument("fabricid", 0, UINT64_MAX, &mFabricId);
     }
+
+    /////////// DeviceAddressUpdateDelegate Interface /////////
+    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override{};
 
     /////////// Command Interface /////////
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;

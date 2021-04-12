@@ -50,7 +50,7 @@ public:
     };
 };
 
-class Update : public DiscoverCommand, public chip::Controller::DeviceAddressUpdateDelegate
+class Update : public DiscoverCommand
 {
 public:
     Update() : DiscoverCommand("update") {}
@@ -58,24 +58,25 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ReturnErrorOnFailure(mAddressUpdater.Init(&mCommissioner, this));
-        ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(&mAddressUpdater));
-        return chip::Mdns::Resolver::Instance().ResolveNodeId(remoteId, fabricId, chip::Inet::kIPAddressType_Any);
+        ChipDevice * device;
+        ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &device));
+        return mCommissioner.UpdateDevice(device, fabricId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override
     {
-        if (CHIP_NO_ERROR != error)
+        if (CHIP_NO_ERROR == error)
+        {
+            ChipLogProgress(chipTool, "Device address updated successfully");
+        }
+        else
         {
             ChipLogError(chipTool, "Failed to update the device address: %s", chip::ErrorStr(error));
         }
 
         SetCommandExitStatus(CHIP_NO_ERROR == error);
     }
-
-private:
-    chip::Controller::DeviceAddressUpdater mAddressUpdater;
 };
 
 void registerCommandsDiscover(Commands & commands)

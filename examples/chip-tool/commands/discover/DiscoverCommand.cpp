@@ -22,8 +22,13 @@ constexpr uint16_t kWaitDurationInSeconds = 30;
 
 CHIP_ERROR DiscoverCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
+    chip::Controller::ControllerInitParams params{
+        .storageDelegate              = &storage,
+        .mDeviceAddressUpdateDelegate = this,
+    };
+
     ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-    ReturnErrorOnFailure(mCommissioner.Init(localId, &storage));
+    ReturnErrorOnFailure(mCommissioner.Init(localId, params));
     ReturnErrorOnFailure(mCommissioner.ServiceEvents());
 
     ReturnErrorOnFailure(RunCommand(mNodeId, mFabricId));
