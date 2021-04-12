@@ -42,6 +42,7 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
+               ${LIGHTING_COMMON}/gen/attribute-size.cpp
                ${LIGHTING_COMMON}/gen/call-command-handler.cpp
                ${LIGHTING_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
@@ -64,7 +65,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
@@ -79,7 +80,7 @@ include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
-set(dir_pw_third_party_nanopb PRESENT CACHE STRING ${CHIP_ROOT}/third_party/nanopb/repo FORCE)
+set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)

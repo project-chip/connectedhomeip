@@ -98,7 +98,8 @@ constexpr uint16_t kMaxKeyIDStringSize = 6;
 DeviceController::DeviceController()
 {
     mState                    = State::NotInitialized;
-    mSessionManager           = nullptr;
+    mSessionMgr               = nullptr;
+    mExchangeMgr              = nullptr;
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
@@ -156,12 +157,9 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
         mStorageDelegate->SetStorageDelegate(this);
     }
 
-    mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
-    mSessionManager = chip::Platform::New<SecureSessionMgr>();
-
-#if CHIP_ENABLE_INTERACTION_MODEL
-    mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
-#endif
+    mTransportMgr = chip::Platform::New<DeviceTransportMgr>();
+    mSessionMgr   = chip::Platform::New<SecureSessionMgr>();
+    mExchangeMgr  = chip::Platform::New<Messaging::ExchangeManager>();
 
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
@@ -179,17 +177,21 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
+    err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL
-    err = mExchangeManager->Init(mSessionManager);
+    err = mExchangeMgr->Init(mSessionMgr);
     SuccessOrExit(err);
+
+    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
+    SuccessOrExit(err);
+
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, params.imDelegate);
     SuccessOrExit(err);
-#else
-    mSessionManager->SetDelegate(this);
 #endif
+
+    mExchangeMgr->SetDelegate(this);
 
     InitDataModelHandler();
 
@@ -228,11 +230,16 @@ CHIP_ERROR DeviceController::Shutdown()
         mStorageDelegate = nullptr;
     }
 
-    if (mSessionManager != nullptr)
+    if (mExchangeMgr != nullptr)
     {
-        mSessionManager->SetDelegate(nullptr);
-        chip::Platform::Delete(mSessionManager);
-        mSessionManager = nullptr;
+        chip::Platform::Delete(mExchangeMgr);
+        mExchangeMgr = nullptr;
+    }
+
+    if (mSessionMgr != nullptr)
+    {
+        chip::Platform::Delete(mSessionMgr);
+        mSessionMgr = nullptr;
     }
 
     if (mTransportMgr != nullptr)
@@ -381,18 +388,38 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
     return CHIP_NO_ERROR;
 }
 
-void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+{
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
+
+    VerifyOrReturn(packetHeader.GetSourceNodeId().HasValue(),
+                   ChipLogError(Controller, "OnMessageReceived was called for unknown source node"));
+
+    uint16_t index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
+    VerifyOrReturn(index < kNumMaxActiveDevices,
+                   ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
+
+    mActiveDevices[index].OnMessageReceived(packetHeader, payloadHeader, std::move(msgBuf));
+}
+
+void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
+{
+    ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
+}
+
+void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
-    uint16_t index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
+    uint16_t index = FindDeviceIndex(mgr->GetSessionMgr()->GetPeerConnectionState(session)->GetPeerNodeId());
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
-    mActiveDevices[index].OnNewConnection(session, mgr);
+    mActiveDevices[index].OnNewConnection(session);
 }
 
-void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void DeviceController::OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
@@ -400,21 +427,7 @@ void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSe
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
 
-    mActiveDevices[index].OnConnectionExpired(session, mgr);
-}
-
-void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
-{
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
-    VerifyOrReturn(header.GetSourceNodeId().HasValue(),
-                   ChipLogError(Controller, "OnMessageReceived was called for unknown source node"));
-
-    uint16_t index = FindDeviceIndex(session);
-    VerifyOrReturn(index < kNumMaxActiveDevices,
-                   ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
-
-    mActiveDevices[index].OnMessageReceived(header, payloadHeader, session, std::move(msgBuf), mgr);
+    mActiveDevices[index].OnConnectionExpired(session);
 }
 
 uint16_t DeviceController::GetInactiveDeviceIndex()
@@ -556,7 +569,9 @@ void DeviceController::OnPersistentStorageStatus(const char * key, Operation op,
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
-    return ControllerDeviceInitParams{ .transportMgr = mTransportMgr, .sessionMgr = mSessionManager, .inetLayer = mInetLayer };
+    return ControllerDeviceInitParams{
+        .transportMgr = mTransportMgr, .sessionMgr = mSessionMgr, .exchangeMgr = mExchangeMgr, .inetLayer = mInetLayer
+    };
 }
 
 DeviceCommissioner::DeviceCommissioner()
@@ -663,7 +678,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mRendezvousSession->SetNextKeyId(mNextKeyId);
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr,
-                                   mSessionManager, admin);
+                                   mSessionMgr, admin);
     SuccessOrExit(err);
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, admin->GetAdminId());

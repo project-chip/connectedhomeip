@@ -59,7 +59,7 @@ menu "CHIP Core"
         config MAX_UNSOLICITED_MESSAGE_HANDLERS
             int "Max Unsolicited Message Handlers"
             range 0 65535
-            default 16
+            default 8
             help
                 The maximum number of simultaneously active unsolicited message handlers.
 

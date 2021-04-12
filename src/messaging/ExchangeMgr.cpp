@@ -59,7 +59,7 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
@@ -371,6 +371,11 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
 
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnNewConnection(session, this);
+    }
+
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesSession(session, mgr))
         {
@@ -383,6 +388,11 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnConnectionExpired(session, this);
+    }
+
     for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.mSecureSession == session)

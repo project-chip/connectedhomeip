@@ -42,6 +42,7 @@ target_sources(app PRIVATE
                main/BoltLockManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
+               ${LOCK_COMMON}/gen/attribute-size.cpp
                ${LOCK_COMMON}/gen/call-command-handler.cpp
                ${LOCK_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
@@ -66,4 +67,4 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp)
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <transport/SecureSessionMgr.h>
+#include <jni.h>
 
-namespace chip {
-SecureSessionMgr & SessionManager();
-} // namespace chip
+#include <core/CHIPError.h>
+
+CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);

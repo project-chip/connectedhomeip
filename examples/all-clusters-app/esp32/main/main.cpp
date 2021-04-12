@@ -370,7 +370,8 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 bool isRendezvousBLE()
 {
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
+    return flags.Has(RendezvousInformationFlag::kBLE);
 }
 
 std::string createSetupPayload()
@@ -414,7 +415,7 @@ std::string createSetupPayload()
     payload.version               = 0;
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+    payload.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
     payload.vendorID              = vendorId;
     payload.productID             = productId;
 

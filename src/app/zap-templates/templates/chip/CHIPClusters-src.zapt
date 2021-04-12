@@ -90,7 +90,7 @@ CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ConfigureAttribute{{asCame
 
 CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCased name false}}(Callback::Cancelable * onReportCallback)
 {
-    return RequestAttributeReporting({{asHex attributeCode 4}}, onReportCallback);
+    return RequestAttributeReporting({{asHex code 4}}, onReportCallback);
 }
 
 {{/if}}
