@@ -186,7 +186,6 @@ public:
                             ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
-    void ForceFree();
 
     void SetResponseTimeout(Timeout timeout);
 

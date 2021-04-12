@@ -104,11 +104,8 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
     for (auto & ec : mContextPool)
     {
-        if (ec.GetReferenceCount() > 0)
-        {
-            ChipLogError(ExchangeManager, "Exchange (id: %d) leaked", ec.GetExchangeId());
-            ec.ForceFree();
-        }
+        // ExchangeContext leaked
+        assert(ec.GetReferenceCount() == 0);
     }
 
     if (mSessionMgr != nullptr)
