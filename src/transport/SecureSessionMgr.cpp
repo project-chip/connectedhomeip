@@ -56,6 +56,22 @@ using Transport::PeerConnectionState;
 // TODO: this should be checked within the transport message sending instead of the session management layer.
 static const size_t kMax_SecureSDU_Length = 1024;
 
+uint32_t EncryptedPacketBufferHandle::GetMsgId() const
+{
+    PacketHeader header;
+    uint16_t headerSize = 0;
+    CHIP_ERROR err      = header.Decode((*this)->Start(), (*this)->DataLength(), &headerSize);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        return header.GetMessageId();
+    }
+
+    ChipLogError(Inet, "Failed to decode EncryptedPacketBufferHandle header with error: %s", ErrorStr(err));
+
+    return 0;
+}
+
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
 SecureSessionMgr::~SecureSessionMgr()
@@ -190,8 +206,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        encryptedMsg        = msgBuf.Retain();
-        encryptedMsg.mMsgId = packetHeader.GetMessageId();
+        encryptedMsg = msgBuf.Retain();
     }
 
     ChipLogProgress(Inet,
