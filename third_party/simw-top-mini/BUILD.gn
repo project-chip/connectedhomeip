@@ -60,11 +60,11 @@ config("se05x_config") {
 source_set("se05x") {
   sources = [
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/global_platf.c",
-    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/nxLog.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_apdu.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_connect.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_errors.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_printf.c",
+    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/log/nxLog.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/smCom.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/rsp/se05x_reset.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x/src/se05x_ECC_curves.c",
