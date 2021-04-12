@@ -35,7 +35,10 @@ struct ResponseCallbackInfo
     chip::NodeId nodeId;
     uint8_t sequenceNumber;
 
-    bool operator==(ResponseCallbackInfo const & other) const { return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber; }
+    bool operator==(ResponseCallbackInfo const & other) const
+    {
+        return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber;
+    }
 };
 
 struct ReportCallbackInfo
