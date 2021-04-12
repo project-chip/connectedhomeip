@@ -243,17 +243,6 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 
 // The default implementation to make compiler happy before codegen for this is ready.
 // TODO: Remove this after codegen is ready.
-void __attribute__((weak))
-DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                             chip::TLV::TLVReader & aReader, Command * apCommandObj)
-{
-    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
-                  aCommandId, aEndPointId);
-    ChipLogError(
-        DataManagement,
-        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
-}
-
 CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
 {
     ChipLogDetail(DataManagement,
