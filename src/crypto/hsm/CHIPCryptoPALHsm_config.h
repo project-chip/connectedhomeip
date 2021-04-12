@@ -24,46 +24,6 @@
 #define _CHIP_CRYPTO_PAL_HSM_CONFIG_H_
 
 /*
- * Enable HSM for SHA256
- */
-#define ENABLE_HSM_HASH_SHA256 0
-
-/*
- * Enable HSM for MultiStep SHA256 (Currently not supported)
- */
-#define ENABLE_HSM_HASH_SHA256_MULTISTEP 0
-
-/*
- * Enable HSM for HKDF-SHA256
- */
-#define ENABLE_HSM_HKDF_SHA256 1
-
-/*
- * Enable HSM for AES CCM ENCRYPT (Currently not supported)
- */
-#define ENABLE_HSM_AES_CCM_ENCRYPT 0
-
-/*
- * Enable HSM for AES CCM DECRYPT (Currently not supported)
- */
-#define ENABLE_HSM_AES_CCM_DECRYPT 0
-
-/*
- * Enable HSM for random generator
- */
-#define ENABLE_HSM_RAND_GEN 1
-
-/*
- * Enable HSM for Generate EC Key
- */
-#define ENABLE_HSM_GENERATE_EC_KEY 0 // 1 for ecc example
-
-/*
- * Enable HSM for MAC
- */
-#define ENABLE_HSM_MAC 0
-
-/*
  * Enable HSM for SPAKE VERIFIER
  */
 #define ENABLE_HSM_SPAKE_VERIFIER 1
@@ -73,8 +33,9 @@
  */
 #define ENABLE_HSM_SPAKE_PROVER 1
 
-#if CHIP_CRYPTO_HSM_NXP
-#include "nxp/CHIPCryptoPALHsm_SE05X.h"
+
+#if ( (CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)) )
+#define ENABLE_HSM_SPAKE
 #endif
 
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_

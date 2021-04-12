@@ -503,7 +503,7 @@ CHIP_ERROR PASESession::SendMsg1()
     ReturnErrorOnFailure(mSpake2p.BeginProver(nullptr, 0, nullptr, 0, &mPASEVerifier[0][0], kSpake2p_WS_Length,
                                               &mPASEVerifier[1][0], kSpake2p_WS_Length));
 
-    ReturnErrorOnFailure(mSpake2p.ComputeRoundOne(NULL, 0, X, &X_len));
+    err = mSpake2p.ComputeRoundOne(NULL, 0, X, &X_len);
 
     Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(sizeof(uint16_t) + X_len));
     VerifyOrReturnError(!bbuf.IsNull(), CHIP_SYSTEM_ERROR_NO_MEMORY);
@@ -546,7 +546,7 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const PacketHeader & header, con
     err = mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
     SuccessOrExit(err);
 
-    // Pass parameters Pa (to check abort condition) and random value (to compute Pb value).
+    // Pass Pa to check abort condition.
     err = mSpake2p.ComputeRoundOne(buf, buf_len, Y, &Y_len);
     SuccessOrExit(err);
 

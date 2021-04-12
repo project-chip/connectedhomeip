@@ -27,6 +27,9 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 #include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
@@ -245,8 +248,13 @@ private:
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
-    Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 
+
+#ifdef ENABLE_HSM_SPAKE
+    Spake2pHSM_P256_SHA256_HKDF_HMAC mSpake2p;
+#else
+    Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
+#endif
     uint8_t mPoint[kMAX_Point_Length];
 
     /* w0s and w1s */

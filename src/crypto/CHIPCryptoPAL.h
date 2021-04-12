@@ -30,10 +30,6 @@
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 
-#if CHIP_CRYPTO_HSM
-#include "hsm/CHIPCryptoPALHsm_config.h"
-#endif
-
 #include <stddef.h>
 #include <string.h>
 
@@ -180,15 +176,9 @@ public:
                                             const P256ECDSASignature & signature) const override;
     CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
                                              const P256ECDSASignature & signature) const override;
-#if ENABLE_HSM_GENERATE_EC_KEY
-    void setPubKeyId(uint32_t id) { pub_key_id = id; }
-#endif
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
-#if ENABLE_HSM_GENERATE_EC_KEY
-    uint32_t pub_key_id = 0;
-#endif
 };
 
 template <typename PK, typename Secret, typename Sig>
@@ -248,9 +238,6 @@ class P256Keypair : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256
 {
 public:
     P256Keypair() {}
-#if ENABLE_HSM_GENERATE_EC_KEY
-    P256Keypair(uint32_t id) { key_id = id; }
-#endif
     ~P256Keypair();
 
     /** @brief Initialize the keypair.
@@ -313,9 +300,6 @@ private:
     P256PublicKey mPublicKey;
     P256KeypairContext mKeypair;
     bool mInitialized = false;
-#if ENABLE_HSM_GENERATE_EC_KEY
-    uint32_t key_id = 0;
-#endif
 };
 
 /**
@@ -484,7 +468,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(const uint8_t * context, size_t context_len);
+    virtual CHIP_ERROR Init(const uint8_t * context, size_t context_len);
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -500,11 +484,11 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+    virtual CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
                              size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin, size_t Lin_len);
 
     /**
-     * @brief Start the Spake2+ process as a prover (i.e. a commissioner).
+     * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
      *
      * @param my_identity       The prover identity. May be NULL if identities are not established.
      * @param my_identity_len   The prover identity length.
@@ -517,20 +501,18 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+    virtual CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
                            size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len);
 
     /**
      * @brief Compute the first round of the protocol.
      *
-     * @param pab      X value from commissioner.
-     * @param pab_len  X length.
-     * @param out      The output first round Spake2+ contribution.
-     * @param out_len  The output first round Spake2+ contribution length.
+     * @param out     The output first round Spake2+ contribution.
+     * @param out_len The output first round Spake2+ contribution length.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
+    virtual CHIP_ERROR ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Compute the second round of the protocol.
@@ -542,7 +524,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
+    virtual CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Confirm that each party computed the same keys.
@@ -552,7 +534,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
+    virtual CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
 
     /**
      * @brief Return the shared secret.
@@ -712,9 +694,6 @@ public:
     void * xy;
     void * order;
     void * tempbn;
-#if CHIP_CRYPTO_HSM
-    hsm_pake_context_t hsm_pake_context;
-#endif
 
 protected:
     /**

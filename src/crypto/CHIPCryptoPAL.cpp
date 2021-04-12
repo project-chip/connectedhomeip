@@ -21,11 +21,6 @@
  */
 
 #include "CHIPCryptoPAL.h"
-
-#if CHIP_CRYPTO_HSM
-#include "hsm/CHIPCryptoPALHsm.h"
-#endif
-
 #include <string.h>
 #include <support/CodeUtils.h>
 
@@ -104,11 +99,6 @@ CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
     error = InternalHash(context, context_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
-#if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_Init_HSM(&hsm_pake_context, context, context_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-#endif
-
     state = CHIP_SPAKE2P_STATE::INIT;
     error = CHIP_NO_ERROR;
 exit:
@@ -133,32 +123,8 @@ CHIP_ERROR Spake2p::BeginVerifier(const uint8_t * my_identity, size_t my_identit
                                   size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
                                   size_t Lin_len)
 {
-#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_SPAKE_VERIFIER))
-    uint8_t w0in_mod[32] = {
-        0,
-    };
-    size_t w0in_mod_len = 32;
-#endif
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
-
-#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_SPAKE_VERIFIER))
-
-    error = FELoad(w0in, w0in_len, w0);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = FEWrite(w0, w0in_mod, w0in_mod_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = Spake2p_BeginVerifier_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod,
-                                      w0in_mod_len, Lin, Lin_len);
-    if (CHIP_NO_ERROR == error)
-    {
-        state = CHIP_SPAKE2P_STATE::STARTED;
-        role  = CHIP_SPAKE2P_ROLE::VERIFIER;
-    }
-    goto exit;
-#endif
 
     error = InternalHash(peer_identity, peer_identity_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -186,42 +152,8 @@ CHIP_ERROR Spake2p::BeginProver(const uint8_t * my_identity, size_t my_identity_
                                 size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
                                 size_t w1in_len)
 {
-#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_SPAKE_PROVER))
-    uint8_t w0in_mod[32] = {
-        0,
-    };
-    size_t w0in_mod_len  = 32;
-    uint8_t w1in_mod[32] = {
-        0,
-    };
-    size_t w1in_mod_len = 32;
-#endif
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
-
-#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_SPAKE_PROVER))
-
-    error = FELoad(w0in, w0in_len, w0);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = FEWrite(w0, w0in_mod, w0in_mod_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = FELoad(w1in, w1in_len, w1);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = FEWrite(w1, w1in_mod, w1in_mod_len);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = Spake2p_BeginProver_HSM(&hsm_pake_context, my_identity, my_identity_len, peer_identity, peer_identity_len, w0in_mod,
-                                    w0in_mod_len, w1in_mod, w1in_mod_len);
-    if (CHIP_NO_ERROR == error)
-    {
-        state = CHIP_SPAKE2P_STATE::STARTED;
-        role  = CHIP_SPAKE2P_ROLE::PROVER;
-    }
-    goto exit;
-#endif
 
     error = InternalHash(my_identity, my_identity_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -255,33 +187,6 @@ CHIP_ERROR Spake2p::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t
 
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::STARTED, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(*out_len >= point_size, error = CHIP_ERROR_INTERNAL);
-
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_VERIFIER))
-    if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER)
-    {
-        goto sw_rollback;
-    }
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_PROVER))
-    if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER)
-    {
-        goto sw_rollback;
-    }
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_ComputeRoundOne_HSM(&hsm_pake_context, role, pab, pab_len, out, out_len);
-    if (CHIP_NO_ERROR == error)
-    {
-        state = CHIP_SPAKE2P_STATE::R1;
-    }
-    goto exit;
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && ((!ENABLE_HSM_SPAKE_VERIFIER) || (!ENABLE_HSM_SPAKE_PROVER)))
-sw_rollback:
-#endif
 
     error = FEGenerate(xy);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
@@ -320,44 +225,9 @@ CHIP_ERROR Spake2p::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t *
     void * XY        = nullptr; // Choose Y if a prover, X if a verifier
     uint8_t * Kcaorb = nullptr; // Choose Kca if a prover, Kcb if a verifier
 
-#if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    uint8_t pKeyKe[16] = {
-        0,
-    };
-    size_t pkeyKeLen = sizeof(pKeyKe);
-#endif
-
     VerifyOrExit(*out_len >= hash_size, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::R1, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(in_len == point_size, error = CHIP_ERROR_INTERNAL);
-
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_VERIFIER))
-    if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER)
-    {
-        goto sw_rollback;
-    }
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_PROVER))
-    if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER)
-    {
-        goto sw_rollback;
-    }
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_ComputeRoundTwo_HSM(&hsm_pake_context, role, in, in_len, out, out_len, pKeyKe, &pkeyKeLen);
-    if (CHIP_NO_ERROR == error)
-    {
-        memcpy((Kae + 16), pKeyKe, pkeyKeLen);
-        state = CHIP_SPAKE2P_STATE::R2;
-    }
-    goto exit;
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && ((!ENABLE_HSM_SPAKE_VERIFIER) || (!ENABLE_HSM_SPAKE_PROVER)))
-sw_rollback:
-#endif
 
     if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
@@ -478,33 +348,6 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
 
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::R2, error = CHIP_ERROR_INTERNAL);
 
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_VERIFIER))
-    if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER)
-    {
-        goto sw_rollback;
-    }
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && (!ENABLE_HSM_SPAKE_PROVER))
-    if (role == chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER)
-    {
-        goto sw_rollback;
-    }
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    error = Spake2p_KeyConfirm_HSM(&hsm_pake_context, role, in, in_len);
-    if (CHIP_NO_ERROR == error)
-    {
-        state = CHIP_SPAKE2P_STATE::KC;
-    }
-    goto exit;
-#endif
-
-#if ((CHIP_CRYPTO_HSM) && ((!ENABLE_HSM_SPAKE_VERIFIER) || (!ENABLE_HSM_SPAKE_PROVER)))
-sw_rollback:
-#endif
-
     if (role == CHIP_SPAKE2P_ROLE::PROVER)
     {
         XY     = X;
@@ -527,9 +370,6 @@ sw_rollback:
     state = CHIP_SPAKE2P_STATE::KC;
     error = CHIP_NO_ERROR;
 exit:
-#if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
-    Spake2p_Finish_HSM(&hsm_pake_context);
-#endif
     return error;
 }
 
