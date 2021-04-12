@@ -18,6 +18,7 @@
 
 #include "ModelCommand.h"
 
+#include <app/InteractionModelEngine.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -25,6 +26,16 @@ using namespace ::chip;
 namespace {
 constexpr uint16_t kWaitDurationInSeconds = 10;
 } // namespace
+
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+{
+    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
+                  aCommandId, aEndPointId);
+    ChipLogError(
+        Controller,
+        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
+}
 
 CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
