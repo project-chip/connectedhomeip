@@ -35,7 +35,7 @@ struct ResponseCallbackInfo
     chip::NodeId nodeId;
     uint8_t sequenceNumber;
 
-    bool operator==(ResponseCallbackInfo const & other) { return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber; }
+    bool operator==(ResponseCallbackInfo const & other) const { return nodeId == other.nodeId && sequenceNumber == other.sequenceNumber; }
 };
 
 struct ReportCallbackInfo
@@ -45,7 +45,7 @@ struct ReportCallbackInfo
     chip::ClusterId clusterId;
     chip::AttributeId attributeId;
 
-    bool operator==(ReportCallbackInfo const & other)
+    bool operator==(ReportCallbackInfo const & other) const
     {
         return nodeId == other.nodeId && endpointId == other.endpointId && clusterId == other.clusterId &&
             attributeId == other.attributeId;

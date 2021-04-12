@@ -704,7 +704,7 @@ private:
 
     PacketBuffer * Get() const { return mBuffer; }
 
-    bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
+    bool operator==(const PacketBufferHandle & aOther) const { return mBuffer == aOther.mBuffer; }
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_RIGHT_SIZE
     void InternalRightSize();
