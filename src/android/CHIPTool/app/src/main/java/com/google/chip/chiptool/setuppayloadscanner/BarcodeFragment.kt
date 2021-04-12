@@ -68,11 +68,8 @@ class BarcodeFragment : Fragment() {
             return aspectRatio(metrics.widthPixels, metrics.heightPixels)
         }
 
-    // Initialize our background executor
-    private val cameraExecutor: ExecutorService
-        get() {
-            return Executors.newSingleThreadExecutor()
-        }
+    private var cameraExecutor: ExecutorService? = null
+    private var cameraProvider: ProcessCameraProvider? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -247,8 +244,9 @@ class BarcodeFragment : Fragment() {
 
         cameraProviderFuture.addListener(Runnable {
             // Used to bind the lifecycle of cameras to the lifecycle owner
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
+            cameraProvider = cameraProviderFuture.get()
+            // Initialize our background executor
+            cameraExecutor = Executors.newSingleThreadExecutor()
             // Preview
             val preview = Preview.Builder()
                     .build()
@@ -267,17 +265,17 @@ class BarcodeFragment : Fragment() {
                     .build()
 
             imageAnalysis.setAnalyzer(
-                    cameraExecutor,
+                    cameraExecutor!!,
                     ImageAnalysis.Analyzer { imageProxy ->
                         processImageProxy(barcodeScanner, imageProxy)
                     }
             )
             try {
                 // Unbind use cases before rebinding
-                cameraProvider.unbindAll()
+                cameraProvider?.unbindAll()
 
                 // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
+                cameraProvider?.bindToLifecycle(
                         this, cameraSelector, imageAnalysis, preview)
                 cameraStarted = true
             } catch (exc: Exception) {
@@ -289,7 +287,10 @@ class BarcodeFragment : Fragment() {
 
     private fun stopCamera() {
         cameraStarted = false
-        cameraExecutor.shutdown()
+        // Unbind use cases
+        cameraProvider?.unbindAll()
+        // Shutdown background executor
+        cameraExecutor?.shutdown()
     }
 
     private fun hasCameraPermission(): Boolean {
