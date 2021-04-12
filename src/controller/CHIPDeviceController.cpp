@@ -179,10 +179,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
     SuccessOrExit(err);
-#endif
 
     mExchangeMgr->SetDelegate(this);
 
