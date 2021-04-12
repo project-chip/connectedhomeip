@@ -411,10 +411,8 @@ void Device::InitCommandSender()
         mCommandSender->Shutdown();
         mCommandSender = nullptr;
     }
-#if CHIP_ENABLE_INTERACTION_MODEL
     CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
     ChipLogFunctError(err);
-#endif
 }
 
 } // namespace Controller

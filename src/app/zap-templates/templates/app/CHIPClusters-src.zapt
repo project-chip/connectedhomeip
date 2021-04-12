@@ -19,7 +19,6 @@ namespace Controller {
 {{#chip_server_cluster_commands}}
 CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
 {
-#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
     (void) onFailureCallback;
@@ -44,11 +43,6 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
     ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
-#else
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(seqNum, mEndpoint{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-#endif
 }
 
 {{/chip_server_cluster_commands}}

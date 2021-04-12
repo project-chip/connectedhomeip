@@ -108,6 +108,7 @@ template("chip_data_model") {
       "${_app_root}/util/process-cluster-message.cpp",
       "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",
+      "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp",
     ]
 
     if (defined(invoker.cluster_sources)) {
@@ -151,11 +152,6 @@ template("chip_data_model") {
 
       if (_use_default_client_callbacks) {
         sources += [ "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp" ]
-      }
-
-      if (chip_enable_interaction_model) {
-        sources +=
-            [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
       }
     }
 
