@@ -18,38 +18,23 @@
 
 #pragma once
 
-#include "Command.h"
+#include "DiscoverCommand.h"
+#include <controller/DeviceAddressUpdater.h>
 #include <mdns/Resolver.h>
 
-class Discover : public Command, public chip::Mdns::ResolverDelegate
+class Resolve : public DiscoverCommand, public chip::Mdns::ResolverDelegate
 {
 public:
-    Discover() : Command("resolve-node-id")
-    {
-        AddArgument("nodeid", 0, UINT64_MAX, &mNodeId);
-        AddArgument("fabricid", 0, UINT64_MAX, &mFabricId);
-    }
+    Resolve() : DiscoverCommand("resolve") {}
 
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override
+    /////////// DiscoverCommand Interface /////////
+    CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
-        ReturnErrorOnFailure(mCommissioner.SetUdpListenPort(storage.GetListenPort()));
-        ReturnErrorOnFailure(mCommissioner.Init(localId, &storage));
-        ReturnErrorOnFailure(mCommissioner.ServiceEvents());
-
         ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(this));
-        ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().ResolveNodeId(mNodeId, mFabricId, chip::Inet::kIPAddressType_Any));
-
-        UpdateWaitForResponse(true);
-        WaitForResponse(mWaitDurationInSeconds);
-
-        mCommissioner.ServiceEventSignal();
-        mCommissioner.Shutdown();
-
-        VerifyOrReturnError(GetCommandExitStatus(), CHIP_ERROR_INTERNAL);
-
-        return CHIP_NO_ERROR;
+        return chip::Mdns::Resolver::Instance().ResolveNodeId(remoteId, fabricId, chip::Inet::kIPAddressType_Any);
     }
 
+    /////////// ResolverDelegate Interface /////////
     void OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
@@ -63,12 +48,34 @@ public:
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(false);
     };
+};
+
+class Update : public DiscoverCommand, public chip::Controller::DeviceAddressUpdateDelegate
+{
+public:
+    Update() : DiscoverCommand("update") {}
+
+    /////////// DiscoverCommand Interface /////////
+    CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
+    {
+        ReturnErrorOnFailure(mAddressUpdater.Init(&mCommissioner, this));
+        ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(&mAddressUpdater));
+        return chip::Mdns::Resolver::Instance().ResolveNodeId(remoteId, fabricId, chip::Inet::kIPAddressType_Any);
+    }
+
+    /////////// DeviceAddressUpdateDelegate Interface /////////
+    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override
+    {
+        if (CHIP_NO_ERROR != error)
+        {
+            ChipLogError(chipTool, "Failed to update the device address: %s", chip::ErrorStr(error));
+        }
+
+        SetCommandExitStatus(CHIP_NO_ERROR == error);
+    }
 
 private:
-    uint16_t mWaitDurationInSeconds = 30;
-    ChipDeviceCommissioner mCommissioner;
-    chip::NodeId mNodeId;
-    uint64_t mFabricId;
+    chip::Controller::DeviceAddressUpdater mAddressUpdater;
 };
 
 void registerCommandsDiscover(Commands & commands)
@@ -76,7 +83,8 @@ void registerCommandsDiscover(Commands & commands)
     const char * clusterName = "Discover";
 
     commands_list clusterCommands = {
-        make_unique<Discover>(),
+        make_unique<Resolve>(),
+        make_unique<Update>(),
     };
 
     commands.Register(clusterName, clusterCommands);
