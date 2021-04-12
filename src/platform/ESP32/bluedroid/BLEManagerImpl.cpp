@@ -436,16 +436,16 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int btErr)
 {
-    switch(btErr)
+    switch (btErr)
     {
-        case ESP_ERR_INVALID_ARG:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        case ESP_ERR_INVALID_STATE:
-            return CHIP_ERROR_INCORRECT_STATE;
-        case ESP_ERR_NO_MEM:
-            return CHIP_ERROR_NO_MEMORY;
-        default:
-            return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR) btErr;
+    case ESP_ERR_INVALID_ARG:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case ESP_ERR_INVALID_STATE:
+        return CHIP_ERROR_INCORRECT_STATE;
+    case ESP_ERR_NO_MEM:
+        return CHIP_ERROR_NO_MEMORY;
+    default:
+        return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR) btErr;
     }
 }
 
@@ -623,7 +623,7 @@ CHIP_ERROR BLEManagerImpl::InitESPBleLayer(void)
         // Initialize the ESP Bluetooth controller.
         esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
         ret                               = esp_bt_controller_init(&bt_cfg);
-        err = MapBLEError(ret);
+        err                               = MapBLEError(ret);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "esp_bt_controller_init() failed: %s", ErrorStr(err));
@@ -1065,7 +1065,7 @@ void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)
     memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
     rsp.attr_value.handle = param->read.handle;
     ret                   = esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp);
-    err = MapBLEError(ret);
+    err                   = MapBLEError(ret);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));

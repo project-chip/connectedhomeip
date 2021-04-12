@@ -432,26 +432,26 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 CHIP_ERROR BLEManagerImpl::MapBLEError(int bleErr)
 {
-    switch(bleErr)
+    switch (bleErr)
     {
-        case BLE_HS_EMSGSIZE:
-            return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
-        case BLE_HS_ENOMEM:
-            return CHIP_ERROR_NO_MEMORY;
-        case BLE_HS_ENOTCONN:
-            return CHIP_ERROR_NOT_CONNECTED;
-        case BLE_HS_ENOTSUP:
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        case BLE_HS_EAPP:
-            return CHIP_ERROR_READ_FAILED;
-        case BLE_HS_EBADDATA:
-            return CHIP_ERROR_DATA_NOT_ALIGNED;
-        case BLE_HS_ETIMEOUT:
-            return CHIP_ERROR_TIMEOUT;
-        case BLE_HS_ENOADDR:
-            return CHIP_ERROR_INVALID_ADDRESS;
-        default:
-            return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR)bleErr;
+    case BLE_HS_EMSGSIZE:
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    case BLE_HS_ENOMEM:
+        return CHIP_ERROR_NO_MEMORY;
+    case BLE_HS_ENOTCONN:
+        return CHIP_ERROR_NOT_CONNECTED;
+    case BLE_HS_ENOTSUP:
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    case BLE_HS_EAPP:
+        return CHIP_ERROR_READ_FAILED;
+    case BLE_HS_EBADDATA:
+        return CHIP_ERROR_DATA_NOT_ALIGNED;
+    case BLE_HS_ETIMEOUT:
+        return CHIP_ERROR_TIMEOUT;
+    case BLE_HS_ENOADDR:
+        return CHIP_ERROR_INVALID_ADDRESS;
+    default:
+        return CHIP_DEVICE_CONFIG_ESP32_BLE_ERROR_MIN + (CHIP_ERROR) bleErr;
     }
 }
 void BLEManagerImpl::DriveBLEState(void)
