@@ -50,7 +50,6 @@ public:
 
     ~Spake2pHSM_P256_SHA256_HKDF_HMAC() {}
 
-
     CHIP_ERROR Init(const uint8_t * context, size_t context_len);
 
 #if ENABLE_HSM_SPAKE_VERIFIER
@@ -72,9 +71,9 @@ public:
     hsm_pake_context_t hsm_pake_context;
 };
 
-} // namespace chip {
-} // namespace Crypto {
+} // namespace Crypto
+} // namespace chip
 
-#endif  //#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
+#endif //#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_H_

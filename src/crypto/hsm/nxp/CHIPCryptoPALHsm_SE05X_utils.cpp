@@ -29,27 +29,27 @@ ex_sss_boot_ctx_t gex_sss_chip_ctx;
 #if ENABLE_REENTRANCY
 
 uint8_t objIDtable[MAX_SPAKE_CRYPTO_OBJECT][2] = {
-    {kSE05x_CryptoObject_End + 0, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 1, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 2, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 3, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 4, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 5, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 6, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 7, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 8, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 9, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 10, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 11, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 12, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 13, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 14, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 15, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 16, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 17, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 18, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    {kSE05x_CryptoObject_End + 19, OBJ_ID_TABLE_OBJID_STATUS_FREE},
-    };
+    { kSE05x_CryptoObject_End + 0, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 1, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 2, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 3, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 4, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 5, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 6, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 7, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 8, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 9, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 10, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 11, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 12, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 13, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 14, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 15, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 16, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 17, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 18, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+    { kSE05x_CryptoObject_End + 19, OBJ_ID_TABLE_OBJID_STATUS_FREE },
+};
 
 int spake_objects_created = 0;
 
@@ -73,7 +73,6 @@ static Mutex sSEObjMutex;
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 #endif //#if ENABLE_REENTRANCY
-
 
 /* Open session to se05x */
 void se05x_sessionOpen(void)
@@ -198,45 +197,50 @@ exit:
     return error;
 }
 
-
 #if ENABLE_REENTRANCY
 
 /* Init crypto object mutext */
 void init_cryptoObj_mutex(void)
 {
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
-        Mutex::Init(sSEObjMutex);
+    Mutex::Init(sSEObjMutex);
 #endif
-        return;
+    return;
 }
 
 /* Delete all crypto objects in se05x */
 void delete_crypto_objects(void)
 {
     static int obj_deleted = 0;
-    smStatus_t smstatus = SM_NOT_OK;
-    uint8_t list[1024] = {0,};
+    smStatus_t smstatus    = SM_NOT_OK;
+    uint8_t list[1024]     = {
+        0,
+    };
     size_t listlen = sizeof(list);
     size_t i;
 
-    if (obj_deleted == 1){
+    if (obj_deleted == 1)
+    {
         return;
     }
     se05x_sessionOpen();
     if (gex_sss_chip_ctx.ks.session != NULL)
     {
-        smstatus =  Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t*)&gex_sss_chip_ctx.session)->s_ctx, list, &listlen);
-        if(smstatus != SM_OK){
+        smstatus = Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, list, &listlen);
+        if (smstatus != SM_OK)
+        {
             return;
         }
 
-        for (i = 0; i < listlen; i += 4) {
+        for (i = 0; i < listlen; i += 4)
+        {
             uint32_t cryptoObjectId = list[i + 1] | (list[i + 0] << 8);
-            Se05x_API_DeleteCryptoObject(&((sss_se05x_session_t*)&gex_sss_chip_ctx.session)->s_ctx, (SE05x_CryptoObjectID_t)cryptoObjectId);
+            Se05x_API_DeleteCryptoObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                         (SE05x_CryptoObjectID_t) cryptoObjectId);
         }
     }
 
-    obj_deleted = 1;
+    obj_deleted           = 1;
     spake_objects_created = 0;
     return;
 }
@@ -244,21 +248,24 @@ void delete_crypto_objects(void)
 /* Get unused object id */
 SE05x_CryptoObjectID_t getObjID(void)
 {
-    SE05x_CryptoObjectID_t objId = (SE05x_CryptoObjectID_t)0;
-    SE05x_Result_t exists = kSE05x_Result_NA;
+    SE05x_CryptoObjectID_t objId = (SE05x_CryptoObjectID_t) 0;
+    SE05x_Result_t exists        = kSE05x_Result_NA;
 
     LOCK_SECURE_ELEMENT();
 
-    for(int i = 0; i < MAX_SPAKE_CRYPTO_OBJECT; i++)
+    for (int i = 0; i < MAX_SPAKE_CRYPTO_OBJECT; i++)
     {
-        if (objIDtable[i][OBJ_ID_TABLE_IDX_STATUS] == OBJ_ID_TABLE_OBJID_STATUS_FREE) {
-            Se05x_API_CheckObjectExists(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, objIDtable[i][OBJ_ID_TABLE_IDX_OBJID], &exists);
-            if (exists == kSE05x_Result_SUCCESS) {
+        if (objIDtable[i][OBJ_ID_TABLE_IDX_STATUS] == OBJ_ID_TABLE_OBJID_STATUS_FREE)
+        {
+            Se05x_API_CheckObjectExists(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
+                                        objIDtable[i][OBJ_ID_TABLE_IDX_OBJID], &exists);
+            if (exists == kSE05x_Result_SUCCESS)
+            {
                 // Object in use. Check for other id.
                 objIDtable[i][OBJ_ID_TABLE_IDX_STATUS] = OBJ_ID_TABLE_OBJID_STATUS_USED;
                 continue;
             }
-            objId =  (SE05x_CryptoObjectID_t)objIDtable[i][OBJ_ID_TABLE_IDX_OBJID];
+            objId                                  = (SE05x_CryptoObjectID_t) objIDtable[i][OBJ_ID_TABLE_IDX_OBJID];
             objIDtable[i][OBJ_ID_TABLE_IDX_STATUS] = OBJ_ID_TABLE_OBJID_STATUS_USED;
             goto exit;
         }
@@ -273,9 +280,10 @@ exit:
 void setObjID(SE05x_CryptoObjectID_t objId, uint8_t status)
 {
     LOCK_SECURE_ELEMENT();
-    for(int i = 0; i < MAX_SPAKE_CRYPTO_OBJECT; i++)
+    for (int i = 0; i < MAX_SPAKE_CRYPTO_OBJECT; i++)
     {
-        if (objIDtable[i][OBJ_ID_TABLE_IDX_OBJID] == objId) {
+        if (objIDtable[i][OBJ_ID_TABLE_IDX_OBJID] == objId)
+        {
             objIDtable[i][OBJ_ID_TABLE_IDX_STATUS] = status;
             break;
         }

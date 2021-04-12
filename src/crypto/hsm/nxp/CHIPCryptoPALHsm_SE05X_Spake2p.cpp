@@ -39,17 +39,16 @@ const int w0in_id_p = 0x2349;
 const int w1in_id_p = 0x2350;
 #endif
 
-
 void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
 {
 #if ENABLE_REENTRANCY
     if (gex_sss_chip_ctx.ks.session != NULL)
     {
-        Se05x_API_DeleteCryptoObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
-                                         phsm_pake_context->spake_objId);
+        Se05x_API_DeleteCryptoObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, phsm_pake_context->spake_objId);
         setObjID(phsm_pake_context->spake_objId, OBJ_ID_TABLE_OBJID_STATUS_FREE);
 
-        if (spake_objects_created > 0) {
+        if (spake_objects_created > 0)
+        {
             spake_objects_created--;
         }
     }
@@ -66,19 +65,24 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
 #if ENABLE_REENTRANCY
     SE05x_CryptoObjectID_t spakeObjectId = getObjID();
 #else
-    SE05x_CryptoObjectID_t spakeObjectId = (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? kSE05x_CryptoObject_SPAKE_VERIFIER : kSE05x_CryptoObject_SPAKE_PROVER;
-    uint8_t list[1024] = {0,};
-    size_t listlen = sizeof(list);
-    size_t i = 0;
+    SE05x_CryptoObjectID_t spakeObjectId =
+        (role == chip::Crypto::CHIP_SPAKE2P_ROLE::VERIFIER) ? kSE05x_CryptoObject_SPAKE_VERIFIER : kSE05x_CryptoObject_SPAKE_PROVER;
+    uint8_t list[1024] = {
+        0,
+    };
+    size_t listlen            = sizeof(list);
+    size_t i                  = 0;
     uint8_t create_crypto_obj = 1;
 #endif
 
-    ChipLogProgress(Crypto,"Using Object Id --> %d \n", spakeObjectId);
+    ChipLogProgress(Crypto, "Using Object Id --> %d \n", spakeObjectId);
 
-    if(spakeObjectId != 0 ) {
+    if (spakeObjectId != 0)
+    {
         phsm_pake_context->spake_objId = spakeObjectId;
     }
-    else {
+    else
+    {
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -86,12 +90,12 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
 
     se05x_delete_key(m_id);
     error = se05x_set_key(m_id, chip::Crypto::spake2p_M_p256, sizeof(chip::Crypto::spake2p_M_p256), kSSS_KeyPart_Public,
-                    kSSS_CipherType_EC_NIST_P);
+                          kSSS_CipherType_EC_NIST_P);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     se05x_delete_key(n_id);
     error = se05x_set_key(n_id, chip::Crypto::spake2p_N_p256, sizeof(chip::Crypto::spake2p_N_p256), kSSS_KeyPart_Public,
-                    kSSS_CipherType_EC_NIST_P);
+                          kSSS_CipherType_EC_NIST_P);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
@@ -106,25 +110,23 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     VerifyOrExit(smstatus == SM_OK, error = CHIP_ERROR_INTERNAL);
 
     /* Increment number of crypto objects created */
-    spake_objects_created ++;
+    spake_objects_created++;
 
 #else
-    smstatus = Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t*)&gex_sss_chip_ctx.session)->s_ctx,
-        list,
-        &listlen);
-    for (i = 0; i < listlen; i += 4) {
+    smstatus = Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, list, &listlen);
+    for (i = 0; i < listlen; i += 4)
+    {
         uint32_t cryptoObjectId = list[i + 1] | (list[i + 0] << 8);
-        if (cryptoObjectId == spakeObjectId) {
+        if (cryptoObjectId == spakeObjectId)
+        {
             create_crypto_obj = 0;
         }
     }
 
-    if (create_crypto_obj) {
-        smstatus = Se05x_API_CreateCryptoObject(
-            &((sss_se05x_session_t*)&gex_sss_chip_ctx.session)->s_ctx,
-            spakeObjectId,
-            kSE05x_CryptoContext_SPAKE,
-            subtype);
+    if (create_crypto_obj)
+    {
+        smstatus = Se05x_API_CreateCryptoObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, spakeObjectId,
+                                                kSE05x_CryptoContext_SPAKE, subtype);
         VerifyOrExit(smstatus == SM_OK, error = CHIP_ERROR_INTERNAL);
     }
 #endif
@@ -136,7 +138,6 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
 exit:
     return error;
 }
-
 
 CHIP_ERROR Spake2p_ComputeRoundOne_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
                                        const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len)
@@ -205,7 +206,6 @@ exit:
     return error;
 }
 
-
 CHIP_ERROR Spake2p_ComputeRoundTwo_HSM(hsm_pake_context_t * phsm_pake_context, chip::Crypto::CHIP_SPAKE2P_ROLE role,
                                        const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len, uint8_t * pKeyKe,
                                        size_t * pkeyKeLen)
@@ -257,7 +257,6 @@ exit:
     return error;
 }
 
-
 namespace chip {
 namespace Crypto {
 
@@ -268,14 +267,16 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::Init(const uint8_t * context, size_
 
 #if ENABLE_REENTRANCY
     static uint8_t alreadyInitialised = 0;
-    if (alreadyInitialised == false) {
+    if (alreadyInitialised == false)
+    {
         delete_crypto_objects();
         init_cryptoObj_mutex();
         alreadyInitialised = true;
     }
 #endif //#if ENABLE_REENTRANCY
 
-    if (context_len > 0) {
+    if (context_len > 0)
+    {
         VerifyOrExit(context != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
     VerifyOrExit(context_len <= sizeof(hsm_pake_context.spake_context), error = CHIP_ERROR_INTERNAL);
@@ -293,26 +294,28 @@ exit:
     return error;
 }
 
-
 #if ENABLE_HSM_SPAKE_VERIFIER
-CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                  size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
-                                  size_t Lin_len)
+CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_identity, size_t my_identity_len,
+                                                           const uint8_t * peer_identity, size_t peer_identity_len,
+                                                           const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
+                                                           size_t Lin_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
     uint8_t w0in_mod[32] = {
         0,
     };
     size_t w0in_mod_len = 32;
-    smStatus_t smstatus                  = SM_NOT_OK;
+    smStatus_t smstatus = SM_NOT_OK;
 
     VerifyOrExit(w0in != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(Lin != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(state == CHIP_SPAKE2P_STATE::INIT, error = CHIP_ERROR_INTERNAL);
-    if (my_identity_len > 0) {
+    if (my_identity_len > 0)
+    {
         VerifyOrExit(my_identity != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
-    if (peer_identity_len > 0) {
+    if (peer_identity_len > 0)
+    {
         VerifyOrExit(peer_identity != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -357,7 +360,6 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginVerifier(const uint8_t * my_id
 #endif
     VerifyOrExit(smstatus == SM_OK, error = CHIP_ERROR_INTERNAL);
 
-
     state = CHIP_SPAKE2P_STATE::STARTED;
     role  = CHIP_SPAKE2P_ROLE::VERIFIER;
     error = CHIP_NO_ERROR;
@@ -368,12 +370,13 @@ exit:
 #endif
 
 #if ENABLE_HSM_SPAKE_PROVER
-CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                                size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
-                                size_t w1in_len)
+CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_identity, size_t my_identity_len,
+                                                         const uint8_t * peer_identity, size_t peer_identity_len,
+                                                         const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
+                                                         size_t w1in_len)
 {
-    CHIP_ERROR error    = CHIP_ERROR_INTERNAL;
-    smStatus_t smstatus = SM_NOT_OK;
+    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
+    smStatus_t smstatus  = SM_NOT_OK;
     uint8_t w0in_mod[32] = {
         0,
     };
@@ -410,7 +413,6 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::BeginProver(const uint8_t * my_iden
 
     error = create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE::PROVER, &hsm_pake_context);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
 
 #if SSS_HAVE_SE05X_VER_GTE_16_02
     smstatus = Se05x_API_PAKEConfigDevice(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, SE05x_SPAKEDevice_A,
@@ -493,7 +495,7 @@ exit:
 
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len)
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    CHIP_ERROR error   = CHIP_ERROR_INTERNAL;
     uint8_t pKeyKe[16] = {
         0,
     };
@@ -530,12 +532,11 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::ComputeRoundTwo(const uint8_t * in,
 sw_rollback:
 #endif
 
-    error = Spake2p::ComputeRoundTwo( in,  in_len, out,  out_len);
+    error = Spake2p::ComputeRoundTwo(in, in_len, out, out_len);
 
 exit:
     return error;
 }
-
 
 CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size_t in_len)
 {
@@ -566,7 +567,7 @@ CHIP_ERROR Spake2pHSM_P256_SHA256_HKDF_HMAC::KeyConfirm(const uint8_t * in, size
 
     goto exit;
 
-#if ( !ENABLE_HSM_SPAKE_VERIFIER || !ENABLE_HSM_SPAKE_PROVER )
+#if (!ENABLE_HSM_SPAKE_VERIFIER || !ENABLE_HSM_SPAKE_PROVER)
 sw_rollback:
 #endif
 
@@ -576,8 +577,7 @@ exit:
     return error;
 }
 
-} //Crypto
-} //chip
+} // namespace Crypto
+} // namespace chip
 
-
-#endif  //#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
+#endif //#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))

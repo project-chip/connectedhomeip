@@ -18,7 +18,6 @@
 #ifndef _CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_
 #define _CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_
 
-
 #include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -44,12 +43,12 @@ extern ex_sss_boot_ctx_t gex_sss_chip_ctx;
 #define ENABLE_REENTRANCY 0
 
 #if ENABLE_REENTRANCY
-#define MAX_SPAKE_CRYPTO_OBJECT         20
-#define OBJ_ID_TABLE_IDX_OBJID          0
-#define OBJ_ID_TABLE_IDX_STATUS         1
-#define OBJ_ID_TABLE_OBJID_STATUS_USED  1
-#define OBJ_ID_TABLE_OBJID_STATUS_FREE  0
-#define LIMIT_CRYPTO_OBJECTS            2
+#define MAX_SPAKE_CRYPTO_OBJECT 20
+#define OBJ_ID_TABLE_IDX_OBJID 0
+#define OBJ_ID_TABLE_IDX_STATUS 1
+#define OBJ_ID_TABLE_OBJID_STATUS_USED 1
+#define OBJ_ID_TABLE_OBJID_STATUS_FREE 0
+#define LIMIT_CRYPTO_OBJECTS 2
 #endif
 
 #if ENABLE_REENTRANCY
@@ -70,7 +69,6 @@ void se05x_delete_key(int keyid);
 /* Set key in se05x */
 CHIP_ERROR se05x_set_key(int keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart, sss_cipher_type_t cipherType);
 
-
 #if ENABLE_REENTRANCY
 
 /* Init crypto object mutext */
@@ -90,6 +88,5 @@ void setObjID(SE05x_CryptoObjectID_t objId, uint8_t status);
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /*_CHIP_CRYPTO_PAL_HSM_SE05X_UTILS_*/
