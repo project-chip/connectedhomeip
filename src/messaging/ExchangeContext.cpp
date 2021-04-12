@@ -165,19 +165,6 @@ exit:
 
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
-    if (mTransport != nullptr)
-    {
-        if (mDelegate != nullptr)
-        {
-            mDelegate->ReleaseTransport(mTransport);
-        }
-        else
-        {
-            Platform::Delete(mTransport);
-        }
-        mTransport = nullptr;
-    }
-
     // Clear protocol callbacks
     if (mDelegate != nullptr)
     {
@@ -290,6 +277,19 @@ void ExchangeContext::Free()
     // be clear of any outstanding messages for this context and
     // the boolean parameter passed to DoClose() should not matter.
     ExchangeManager * em = mExchangeMgr;
+
+    if (mTransport != nullptr)
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->ReleaseTransport(mTransport);
+        }
+        else
+        {
+            Platform::Delete(mTransport);
+        }
+        mTransport = nullptr;
+    }
 
     DoClose(false);
     mExchangeMgr = nullptr;
