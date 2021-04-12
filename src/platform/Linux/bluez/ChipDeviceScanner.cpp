@@ -230,6 +230,35 @@ void ChipDeviceScanner::ReportDevice(BluezDevice1 * device)
     mDelegate->OnDeviceScanned(device, deviceInfo);
 }
 
+void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
+{
+    if (device == nullptr)
+    {
+        return;
+    }
+
+    if (strcmp(bluez_device1_get_adapter(device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mAdapter))) != 0)
+    {
+        return;
+    }
+
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
+
+    if (!BluezGetChipDeviceInfo(*device, deviceInfo))
+    {
+        return;
+    }
+
+    const auto devicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(device));
+    GError * error = nullptr;
+
+    if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &error))
+    {
+        ChipLogDetail(Ble, "Failed to remove device %s: %s", devicePath, error->message);
+        g_error_free(error);
+    }
+}
+
 int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GError * error = nullptr;
@@ -238,10 +267,10 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     self->mInterfaceChangedSignal =
         g_signal_connect(self->mManager, "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
 
-    ChipLogProgress(Ble, "BLE scanning through known devices.");
+    ChipLogProgress(Ble, "BLE removing known devices.");
     for (BluezObject & object : BluezObjectList(self->mManager))
     {
-        self->ReportDevice(bluez_object_get_device1(&object));
+        self->RemoveDevice(bluez_object_get_device1(&object));
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
