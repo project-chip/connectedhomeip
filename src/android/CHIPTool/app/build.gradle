@@ -65,6 +65,16 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.work:work-runtime:2.3.3"
     implementation 'com.google.code.gson:gson:2.8.5'
+
+    // Barcode model dependencies
+    implementation 'com.google.mlkit:barcode-scanning:16.1.1'
+    def camerax_version = "1.0.0-beta07"
+    // CameraX core library using camera2 implementation
+    implementation "androidx.camera:camera-camera2:$camerax_version"
+    // CameraX Lifecycle Library
+    implementation "androidx.camera:camera-lifecycle:$camerax_version"
+    // CameraX View class
+    implementation "androidx.camera:camera-view:1.0.0-alpha14"
 }
 repositories {
     mavenCentral()
