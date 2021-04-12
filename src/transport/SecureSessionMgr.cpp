@@ -380,6 +380,10 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         // Queue the message as needed for sync with destination node.
         if (mCB != nullptr)
         {
+            // We should encode the packetHeader into the buffer before storing the buffer into the queue.
+            // The encoded packetHeader needs to be peeled off during re-processing after the peer message
+            // counter is synced.
+            ReturnOnFailure(packetHeader.EncodeBeforeData(msg));
             err = mCB->QueueReceivedMessageAndSync(state, std::move(msg));
             VerifyOrReturn(err == CHIP_NO_ERROR);
         }
