@@ -512,6 +512,10 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
     INET_FAULT_INJECT(FaultInjection::kFault_Send, return INET_ERROR_UNKNOWN_INTERFACE;);
     INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, return INET_ERROR_NO_MEMORY;);
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    chip::System::Layer & lSystemLayer = SystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     if (!msg.HasSoleOwnership())
@@ -626,6 +630,13 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
 
     res = GetSocket(destAddr.Type());
     SuccessOrExit(res);
+
+    if (mState == kState_Ready)
+    {
+        mState = kState_Listening;
+        // Wake the thread calling select so that it starts selecting on the new socket.
+        lSystemLayer.WakeSelect();
+    }
 
     res = IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
