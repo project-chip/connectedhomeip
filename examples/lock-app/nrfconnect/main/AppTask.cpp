@@ -93,7 +93,7 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
     ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 
 #ifdef CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
@@ -372,7 +372,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
     else
     {
-        ShareQRCodeOverNFC(chip::RendezvousInformationFlags::kBLE);
+        ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
 #endif
 

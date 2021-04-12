@@ -90,7 +90,7 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertFalse(payload.requiresCustomFlow);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
-    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationWiFi);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
 }
 
 - (void)testQRCodeParserWithOptionalData
@@ -109,7 +109,7 @@
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertFalse(payload.requiresCustomFlow);
-    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationWiFi);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"1"]);
 
     NSArray<CHIPOptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];

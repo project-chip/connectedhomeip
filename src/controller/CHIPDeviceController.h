@@ -28,11 +28,13 @@
 
 #pragma once
 
+#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/ExchangeMgrDelegate.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
@@ -54,6 +56,9 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
+#if CHIP_ENABLE_INTERACTION_MODEL
+    app::InteractionModelDelegate * imDelegate = nullptr;
+#endif
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -113,7 +118,10 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
+class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
+                                    public Messaging::ExchangeMgrDelegate,
+                                    public PersistentStorageResultDelegate,
+                                    public app::InteractionModelDelegate
 {
 public:
     DeviceController();
@@ -158,6 +166,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    void PersistDevice(Device * device);
+
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     virtual void ReleaseDevice(Device * device);
@@ -198,10 +208,11 @@ protected:
 
     NodeId mLocalDeviceId;
     DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionManager;
-    Messaging::ExchangeManager * mExchangeManager;
+    SecureSessionMgr * mSessionMgr;
+    Messaging::ExchangeManager * mExchangeMgr;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
+    System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
@@ -217,19 +228,19 @@ protected:
     Transport::AdminPairingTable mAdmins;
 
 private:
-    //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
+    //////////// ExchangeDelegate Implementation ///////////////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle msgBuf) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    //////////// ExchangeMgrDelegate Implementation ///////////////
+    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     void ReleaseAllDevices();
-
-    System::Layer * mSystemLayer;
 };
 
 /**
@@ -355,6 +366,10 @@ private:
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
+
+    void OnSessionEstablishmentTimeout();
+
+    static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
     uint16_t mNextKeyId = 0;
 };

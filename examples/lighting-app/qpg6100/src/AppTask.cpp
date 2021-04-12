@@ -102,7 +102,7 @@ int AppTask::Init()
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     return err;
 }

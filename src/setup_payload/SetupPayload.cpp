@@ -53,8 +53,9 @@ bool SetupPayload::isValidQRCodePayload()
     {
         return false;
     }
-
-    if (rendezvousInformation > RendezvousInformationFlags::kAllMask)
+    chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
+                                              RendezvousInformationFlag::kSoftAP);
+    if (!rendezvousInformation.HasOnly(allvalid))
     {
         return false;
     }
@@ -69,7 +70,7 @@ bool SetupPayload::isValidQRCodePayload()
         return false;
     }
 
-    if (version == 0 && rendezvousInformation == RendezvousInformationFlags::kNone && discriminator == 0 && setUpPINCode == 0)
+    if (version == 0 && !rendezvousInformation.HasAny(allvalid) && discriminator == 0 && setUpPINCode == 0)
     {
         return false;
     }

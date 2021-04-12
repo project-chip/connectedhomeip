@@ -23,8 +23,6 @@ config("includes") {
   include_dirs = [
     ".",
     "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
   ]
 }
 

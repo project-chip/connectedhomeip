@@ -95,10 +95,16 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 
 exit:
     Reset();
-
     if (mpDelegate != nullptr)
     {
-        mpDelegate->CommandResponseProcessed(this);
+        if (err != CHIP_NO_ERROR)
+        {
+            mpDelegate->CommandResponseError(this, err);
+        }
+        else
+        {
+            mpDelegate->CommandResponseProcessed(this);
+        }
     }
 }
 
@@ -110,7 +116,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
     if (mpDelegate != nullptr)
     {
-        mpDelegate->CommandResponseTimeout(this);
+        mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
 }
 
@@ -128,13 +134,11 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     StatusElement::Parser statusElementParser;
 
     mCommandIndex++;
-
     err = aCommandElement.GetCommandPath(&commandPath);
     SuccessOrExit(err);
 
     err = commandPath.GetClusterId(&clusterId);
     SuccessOrExit(err);
-
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
@@ -147,7 +151,6 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         // Response has status element since either there is error in command response or it is empty response
         err = statusElementParser.CheckSchemaValidity();
         SuccessOrExit(err);
-
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)

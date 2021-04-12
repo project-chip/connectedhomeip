@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
+#include <app/reporting/Engine.h>
 
 namespace chip {
 namespace app {
@@ -34,7 +35,6 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     // Error if already initialized.
     VerifyOrExit(apDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     mpExchangeCtx     = nullptr;
     mpDelegate        = apDelegate;
     mSuppressResponse = true;
@@ -91,11 +91,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
-    SuccessOrExit(err);
-
-    // Todo: Once status report support is added, we would shutdown only when there is error or when this is last chunk of report
 exit:
-    Shutdown();
     return err;
 }
 
@@ -146,6 +142,10 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     {
         err = CHIP_NO_ERROR;
     }
+
+    MoveToState(HandlerState::Reportable);
+
+    err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 
 exit:
     ChipLogFunctError(err);

@@ -46,6 +46,7 @@
 #include <vector>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <server/Mdns.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
@@ -271,10 +272,12 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi      = "Reset WiFi";
-        std::string resetToFactory = "Reset to factory";
+        std::string resetWiFi              = "Reset WiFi";
+        std::string resetToFactory         = "Reset to factory";
+        std::string forceWifiCommissioning = "Force WiFi commissioning";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
+        options.emplace_back(forceWifiCommissioning);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -290,6 +293,11 @@ public:
         else if (i == 1)
         {
             ConfigurationMgr().InitiateFactoryReset();
+        }
+        else if (i == 2)
+        {
+            app::Mdns::AdvertiseCommisioning();
+            OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }
 
@@ -362,7 +370,8 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 bool isRendezvousBLE()
 {
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
+    return flags.Has(RendezvousInformationFlag::kBLE);
 }
 
 std::string createSetupPayload()
@@ -406,7 +415,7 @@ std::string createSetupPayload()
     payload.version               = 0;
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+    payload.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
     payload.vendorID              = vendorId;
     payload.productID             = productId;
 

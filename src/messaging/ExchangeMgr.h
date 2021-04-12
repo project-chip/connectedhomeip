@@ -29,6 +29,7 @@
 #include <messaging/Channel.h>
 #include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
@@ -176,19 +177,6 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
-    /**
-     * @brief
-     *   Called when a cached group message that was waiting for message counter
-     *   sync shold be reprocessed.
-     *
-     * @param packetHeader  The message header
-     * @param payloadHeader The payload header
-     * @param session       The handle to the secure session
-     * @param msgBuf        The received message
-     */
-    void HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                    const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
-
     // Channel public APIs
     ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
 
@@ -209,6 +197,8 @@ public:
 
     void IncrementContextsInUse();
     void DecrementContextsInUse();
+
+    void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
@@ -251,6 +241,8 @@ private:
     uint16_t mNextExchangeId;
     uint16_t mNextKeyId;
     State mState;
+
+    ExchangeMgrDelegate * mDelegate;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
@@ -269,8 +261,6 @@ private:
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
-    static bool IsMsgCounterSyncMessage(const PayloadHeader & payloadHeader);
-
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
@@ -282,6 +272,8 @@ private:
     // TransportMgrDelegate interface for rendezvous sessions
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                            System::PacketBufferHandle msgBuf) override;
+
+    CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf) override;
 };
 
 } // namespace Messaging

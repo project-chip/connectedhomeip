@@ -105,7 +105,7 @@ If packages are already installed then simply activate it.
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
-          $ idf make flash monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py flash monitor ESPPORT=/dev/ttyUSB0
 
 3.  The device should boot up and connect to your network. When that happens you
     will see a log like this in the monitor.
@@ -125,7 +125,7 @@ If packages are already installed then simply activate it.
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
-    $ idf make erase_flash ESPPORT=/dev/ttyUSB0
+    $ idf.py erase_flash ESPPORT=/dev/ttyUSB0
 
 The demo application supports temperaturemeasurement and basic cluster.
 

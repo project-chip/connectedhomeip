@@ -79,6 +79,7 @@ public:
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
@@ -345,6 +346,11 @@ inline CHIP_ERROR ThreadStackManager::GetFactoryAssignedEUI64(uint8_t (&buf)[8])
 inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     return static_cast<ImplClass *>(this)->_GetExternalIPv6Address(addr);
+}
+
+inline CHIP_ERROR ThreadStackManager::GetPollPeriod(uint32_t & buf)
+{
+    return static_cast<ImplClass *>(this)->_GetPollPeriod(buf);
 }
 
 inline CHIP_ERROR ThreadStackManager::JoinerStart()

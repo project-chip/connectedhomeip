@@ -52,6 +52,9 @@ namespace {
 #define CHIP_ADV_SHORT_UUID_LEN 2
 #define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFEAF
 
+// FreeeRTOS sw timer
+TimerHandle_t sbleAdvTimeoutTimer;
+
 // Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -69,8 +72,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
-    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+    mFlags.Set(Flags::kFastAdvertisingEnabled);
     mNumGAPCons = 0;
+
     for (int i = 0; i < kMaxConnections; i++)
     {
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
@@ -86,7 +90,17 @@ CHIP_ERROR BLEManagerImpl::_Init()
     appCbacks.cccCback      = _handleTXCharCCCDWrite;
     qvCHIP_BleInit(&appCbacks);
 
+    // Create FreeRTOS sw timer for BLE timeouts and interval change.
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
+                                       1,                   // == default timer period (mS)
+                                       false,               // no timer reload (==one-shot)
+                                       (void *) this,       // init timer id = ble obj context
+                                       BleAdvTimeoutHandler // timer callback handler
+    );
+    VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
+
 exit:
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::Init() complete");
 
@@ -131,10 +145,10 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     switch (mode)
     {
     case BLEAdvertisingMode::kFastAdvertising:
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        mFlags.Set(Flags::kFastAdvertisingEnabled);
         break;
     case BLEAdvertisingMode::kSlowAdvertising:
-        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        mFlags.Clear(Flags::kFastAdvertisingEnabled);
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -162,6 +176,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
     if (devName != nullptr && devName[0] != 0)
     {
         err = MapBLEError(qvCHIP_BleSetDeviceName(devName));
+        SuccessOrExit(err);
+
+        mFlags.Set(Flags::kDeviceNameSet);
     }
 
 exit:
@@ -201,6 +218,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleConnectionError(event->CHIPoBLEConnectionError.ConId, event->CHIPoBLEConnectionError.Reason);
     }
     break;
+
     // Generic CHIP events
     case DeviceEventType::kFabricMembershipChange:
     case DeviceEventType::kServiceProvisioningChange:
@@ -391,7 +409,7 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
     // Otherwise, stop advertising if currently active.
-    else
+    else if (mFlags.Has(Flags::kAdvertising))
     {
         err = StopAdvertising();
         SuccessOrExit(err);
@@ -472,30 +490,50 @@ exit:
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
+    uint32_t bleAdvTimeout;
     uint16_t intervalMin;
     uint16_t intervalMax;
-    ChipLogProgress(DeviceLayer, "CHIPoBLE start advertising");
+
+    // If already advertising, stop it, before changing values
+    if (mFlags.Has(Flags::kAdvertising))
+    {
+        err = MapBLEError(qvCHIP_BleStopAdvertising());
+        SuccessOrExit(err);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "CHIPoBLE start advertising");
+        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    }
 
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
-    mFlags.Set(Flags::kAdvertising);
+    mFlags.Clear(Flags::kRestartAdvertising);
 
-    if ((mNumGAPCons == 0 && !ConfigurationMgr().IsPairedToAccount()) || mFlags.Has(Flags::kFastAdvertisingEnabled))
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
-        intervalMin = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
-        intervalMax = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        intervalMin   = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        intervalMax   = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        bleAdvTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
     }
     else
     {
-        intervalMin = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        intervalMax = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        intervalMin   = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        intervalMax   = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        bleAdvTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
     }
 
     qvCHIP_BleSetAdvInterval(intervalMin, intervalMax);
 
     err = MapBLEError(qvCHIP_BleStartAdvertising());
     SuccessOrExit(err);
+
+    mFlags.Set(Flags::kAdvertising);
+    StartBleAdvTimeoutTimer(bleAdvTimeout);
 
 exit:
     return err;
@@ -508,11 +546,12 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     err = MapBLEError(qvCHIP_BleStopAdvertising());
     SuccessOrExit(err);
 
+    CancelBleAdvTimeoutTimer();
     // Transition to the not Advertising state...
     if (mFlags.Has(Flags::kAdvertising))
     {
         mFlags.Clear(Flags::kAdvertising);
-        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
@@ -657,7 +696,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         if (pDmEvt->hdr.status != QVCHIP_HCI_SUCCESS)
         {
             ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_START_IND error: %d", (int) pDmEvt->advSetStart.hdr.status);
-            ExitNow();
+            return;
         }
 
         sInstance.mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
@@ -680,33 +719,10 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         break;
     }
     case QVCHIP_DM_ADV_STOP_IND: {
-        if (pDmEvt->advSetStop.status != QVCHIP_HCI_SUCCESS)
+        if (pDmEvt->hdr.status != QVCHIP_HCI_SUCCESS)
         {
             ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
-            ExitNow();
-        }
-
-        sInstance.mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
-
-        // Transition to the not Advertising state...
-        if (sInstance.mFlags.Has(Flags::kAdvertising))
-        {
-            sInstance.mFlags.Clear(Flags::kAdvertising);
-
-            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-            // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-            ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-            // Post a CHIPoBLEAdvertisingChange(Stopped) event.
-            {
-                ChipDeviceEvent advChange;
-                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                PlatformMgr().PostEvent(&advChange);
-            }
+            return;
         }
         break;
     }
@@ -765,9 +781,6 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         break;
     }
     }
-
-exit:
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 /* Process ATT Messages */
@@ -893,6 +906,45 @@ bool BLEManagerImpl::IsSubscribed(uint16_t conId)
 void BLEManagerImpl::_handleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event)
 {
     sInstance.HandleTXCharCCCDWrite(event);
+}
+
+void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+{
+    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    }
+    else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
+    {
+        // Advertisement time expired. Stop advertising
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
+        BLEMgr().SetAdvertisingEnabled(false);
+    }
+}
+
+void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
+{
+    if (xTimerStop(sbleAdvTimeoutTimer, 0) == pdFAIL)
+    {
+        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+    }
+}
+
+void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
+    {
+        CancelBleAdvTimeoutTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), 100) != pdPASS)
+    {
+        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
+    }
 }
 
 } // namespace Internal
