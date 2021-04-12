@@ -56,16 +56,9 @@ static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
 static chip::Shell::Shell sShellSocketSubcommands;
 
-constexpr size_t kMaxTcpActiveConnectionCount = 2;
-constexpr size_t kMaxTcpPendingPackets        = 2;
-constexpr NodeId kSourceNodeId                = 123654;
-constexpr NodeId kDestinationNodeId           = 111222333;
-constexpr uint32_t kMessageId                 = 18;
 EventFlags socketEvent;
 uint32_t socketMsgReceiveFlag           = 0x1;
 uint32_t socketConnectionCompeletedFlag = 0x2;
-
-using TCPImpl = TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
 
 class ServerCallback : public SecureSessionMgrDelegate
 {
@@ -110,14 +103,14 @@ void HandleDNSResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount
 
 void OnTcpMessageSent(Inet::TCPEndPoint * endPoint, uint16_t Length)
 {
-    streamer_printf(streamer_get(), "INFO: socket message sent\r\n");
+    streamer_printf(streamer_get(), "INFO: TCP socket message sent\r\n");
 }
 
 void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
 {
     streamer_t * sout = streamer_get();
 
-    streamer_printf(sout, "INFO: socket message received\r\n");
+    streamer_printf(sout, "INFO: TCP socket message received\r\n");
     streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
                     strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
     socketEvent.set(socketMsgReceiveFlag);
@@ -125,28 +118,22 @@ void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHand
 
 void OnConnectionCompleted(Inet::TCPEndPoint * endPoint, INET_ERROR error)
 {
-    streamer_printf(streamer_get(), "INFO: socket connection completed\r\n");
+    streamer_printf(streamer_get(), "INFO: TCP socket connection completed\r\n");
     socketEvent.set(socketConnectionCompeletedFlag);
 }
 
-class SocketTransportMgrDelegate : public TransportMgrDelegate
+void OnUdpMessageReceived(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
 {
-public:
-    SocketTransportMgrDelegate() {}
-    ~SocketTransportMgrDelegate() override {}
+    char peerAddrStr[PeerAddress::kMaxToStringSize];
+    streamer_t * sout       = streamer_get();
+    PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
+    peerAddress.ToString(peerAddrStr, sizeof(peerAddrStr));
 
-    void OnMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle msgBuf) override
-    {
-        char info[PeerAddress::kMaxToStringSize];
-        char msg[msgBuf->DataLength() + 1] = { 0 };
-
-        source.ToString(info, sizeof(info));
-        strncpy(msg, (char *) msgBuf->Start(), msgBuf->DataLength());
-        streamer_printf(streamer_get(), "Received message \"%s\" from %s\r\n", msg, info);
-
-        socketEvent.set(socketMsgReceiveFlag);
-    }
-};
+    streamer_printf(sout, "INFO: UDP socket message received from %s\r\n", peerAddrStr);
+    streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                    strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+    socketEvent.set(socketMsgReceiveFlag);
+}
 
 int cmd_date_help_iterator(shell_command_t * command, void * arg)
 {
@@ -407,8 +394,8 @@ struct ChipSocket
 
     union
     {
-        TCPImpl tcpSocket;
-        UDP udpSocket;
+        TCPEndPoint * tcpSocket;
+        UDPEndPoint * udpSocket;
     };
     Type type;
 };
@@ -439,7 +426,7 @@ static int socket_echo_parse_args(char ** argv, ChipSocket & sock, IPAddress & a
     return CHIP_NO_ERROR;
 }
 
-int cmd_socket_echo(int argc, char ** argv)
+int cmd_socket_client(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
@@ -448,12 +435,9 @@ int cmd_socket_echo(int argc, char ** argv)
     ChipSocket sock;
     uint16_t port;
     char addrStr[16];
+    bool waitForResponse = false;
 
     PacketBufferHandle buffer;
-    PacketHeader header;
-
-    TransportMgrBase gTransportMgrBase;
-    SocketTransportMgrDelegate gSocketTransportMgrDelegate;
 
     streamer_t * sout = streamer_get();
     IPAddress addr;
@@ -468,21 +452,9 @@ int cmd_socket_echo(int argc, char ** argv)
         ExitNow(error = err;);
     }
 
-    if (sock.type == Type::kUdp)
+    if ((argc == 5) && (strcmp(argv[4], "wait") == 0))
     {
-        new (&sock.udpSocket) UDP();
-        err = sock.udpSocket.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
-    }
-    else
-    {
-        new (&sock.tcpSocket) TCPImpl;
-        err = sock.tcpSocket.Init(TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(addr.Type()));
-    }
-
-    if (err != INET_NO_ERROR)
-    {
-        streamer_printf(sout, "ERROR: create %s endpoint failed\r\n", argv[0]);
-        ExitNow(error = err;);
+        waitForResponse = true;
     }
 
     msgLen = strlen(msg);
@@ -494,52 +466,87 @@ int cmd_socket_echo(int argc, char ** argv)
         ExitNow(error = CHIP_ERROR_INTERNAL;);
     }
 
-    gTransportMgrBase.SetSecureSessionMgr((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
-    gTransportMgrBase.SetRendezvousSession((TransportMgrDelegate *) &gSocketTransportMgrDelegate);
-    if (sock.type == Type::kUdp)
+    if (sock.type == Type::kTcp)
     {
-        gTransportMgrBase.Init((Base *) &sock.udpSocket);
+        err = DeviceLayer::InetLayer.NewTCPEndPoint(&sock.tcpSocket);
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: Create TCP socket failed\r\n");
+            ExitNow(error = err;);
+        }
+
+        sock.tcpSocket->OnConnectComplete = OnConnectionCompleted;
+
+        if (waitForResponse)
+        {
+            sock.tcpSocket->OnDataReceived = OnTcpMessageReceived;
+        }
+
+        socketEvent.clear();
+
+        streamer_printf(sout, "INFO: connect to TCP server address: %s port: %d\r\n", addr.ToString(addrStr, sizeof(addrStr)),
+                        port);
+        err = sock.tcpSocket->Connect(addr, port, 0);
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: TCP socket connect failed\r\n");
+            ExitNow(error = err;);
+        }
+
+        if (socketEvent.wait_all(socketConnectionCompeletedFlag, 5000) & osFlagsError)
+        {
+            streamer_printf(sout, "ERROR: TCP socket connection is not completed\r\n");
+            ExitNow(error = CHIP_ERROR_DEVICE_CONNECT_TIMEOUT;);
+        }
+
+        socketEvent.clear();
+
+        streamer_printf(sout, "INFO: TCP socket send message\r\n");
+        error = sock.tcpSocket->Send(std::move(buffer));
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: TCP socket send failed\r\n");
+            ExitNow(error = err;);
+        }
     }
     else
     {
-        gTransportMgrBase.Init((Base *) &sock.tcpSocket);
+        err = DeviceLayer::InetLayer.NewUDPEndPoint(&sock.udpSocket);
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: Create UDP endpoint failed\r\n");
+            ExitNow(error = err;);
+        }
+
+        if (waitForResponse)
+        {
+            sock.udpSocket->OnMessageReceived = OnUdpMessageReceived;
+        }
+
+        socketEvent.clear();
+
+        err = sock.udpSocket->SendTo(addr, port, std::move(buffer));
+        if (err != INET_NO_ERROR)
+        {
+            streamer_printf(sout, "ERROR: UDP socket send failed\r\n");
+            ExitNow(error = err;);
+        }
     }
 
-    header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
-
-    socketEvent.clear();
-
-    streamer_printf(sout, "INFO: send %s message %s to address: %s port: %d\r\n", argv[0], msg,
-                    addr.ToString(addrStr, sizeof(addrStr)), port);
-    if (sock.type == Type::kUdp)
-    {
-        err = sock.udpSocket.SendMessage(header, PeerAddress::UDP(addr, port), std::move(buffer));
-    }
-    else
-    {
-        err = sock.tcpSocket.SendMessage(header, PeerAddress::TCP(addr, port), std::move(buffer));
-    }
-
-    if (err != INET_NO_ERROR)
-    {
-        streamer_printf(sout, "ERROR: send socket message failed\r\n");
-        ExitNow(error = err;);
-    }
-
-    if (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError)
+    if (waitForResponse && (socketEvent.wait_all(socketMsgReceiveFlag, 5000) & osFlagsError))
     {
         streamer_printf(sout, "ERROR: socket message does not received\r\n");
         error = CHIP_ERROR_TIMEOUT;
     }
 
 exit:
-    if (sock.type == Type::kTcp)
+    if (sock.type == Type::kTcp && sock.tcpSocket)
     {
-        sock.tcpSocket.~TCP();
+        sock.tcpSocket->Free();
     }
-    else if (sock.type == Type::kUdp)
+    else if (sock.type == Type::kUdp && sock.udpSocket)
     {
-        sock.udpSocket.~UDP();
+        sock.udpSocket->Free();
     }
     return error;
 }
@@ -708,6 +715,8 @@ exit:
     return error;
 }
 
+constexpr size_t kMaxTcpActiveConnectionCount = 2;
+constexpr size_t kMaxTcpPendingPackets        = 2;
 ServerCallback gCallbacks;
 TransportMgr<UDP> gUDPManager;
 TransportMgr<TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
@@ -833,15 +842,20 @@ static const shell_command_t cmds_network[] = { { &cmd_network_interface, "inter
 static const shell_command_t cmds_socket_root = { &cmd_socket_dispatch, "socket", "Socket layer commands" };
 
 static const shell_command_t cmds_socket[] = {
-    { &cmd_socket_echo, "echo",
-      "Connect and send test message to echo server via specific socket. Usage: socket echo <type> <ip> <port> <message>, example: "
-      "socket echo TCP 127.0.0.1 7 Hello" },
+    { &cmd_socket_client, "client",
+      "Create client and send test message to server via specific socket.\n"
+      "\tUsage: socket client <type>[UDP/TCP] <ip> <port> <message> <wait for response flag>[wait - optional]\n"
+      "\tExample: socket echo TCP 127.0.0.1 7 Hello wait" },
     { &cmd_socket_bsd, "bsd",
-      "BSD IP communication test via specific socket. Send message in loopback. Usage: socket echo <type> <message>" },
+      "BSD IP communication test via specific socket. Send message in loopback.\n"
+      "\tUsage: socket echo <type> <message>" },
     { &cmd_socket_example, "example",
-      "Socket example which sends HTTP request to ifconfig.io and receives a response. Usage: socket example" },
+      "Socket example which sends HTTP request to ifconfig.io and receives a response.\n"
+      "\tUsage: socket example" },
     { &cmd_socket_server, "server",
-      "Create CHIP server for communication testing. Usage: socket server <type> <port>, Usage: socket server UDP 7" },
+      "Create CHIP server for communication testing.\n"
+      "\tUsage: socket server <type> <port>\n"
+      "\tExample: socket server UDP 7" },
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
 
