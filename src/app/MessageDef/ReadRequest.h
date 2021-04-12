@@ -170,4 +170,3 @@ private:
 }; // namespace ReadRequest
 }; // namespace app
 }; // namespace chip
-

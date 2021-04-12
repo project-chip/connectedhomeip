@@ -80,4 +80,3 @@ private:
 }; // namespace CommandList
 }; // namespace app
 }; // namespace chip
-

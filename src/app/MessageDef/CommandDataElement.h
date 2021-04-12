@@ -150,4 +150,3 @@ private:
 }; // namespace CommandDataElement
 }; // namespace app
 }; // namespace chip
-

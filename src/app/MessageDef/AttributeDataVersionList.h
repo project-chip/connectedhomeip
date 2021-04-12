@@ -111,4 +111,3 @@ private:
 }; // namespace AttributeDataVersionList
 }; // namespace app
 }; // namespace chip
-

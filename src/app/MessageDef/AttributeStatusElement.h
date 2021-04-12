@@ -134,4 +134,3 @@ public:
 
 }; // namespace app
 }; // namespace chip
-

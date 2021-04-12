@@ -264,4 +264,3 @@ private:
 }; // namespace EventDataElement
 }; // namespace app
 }; // namespace chip
-

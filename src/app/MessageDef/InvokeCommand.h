@@ -121,4 +121,3 @@ private:
 }; // namespace InvokeCommand
 }; // namespace app
 }; // namespace chip
-

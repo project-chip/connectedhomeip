@@ -80,4 +80,3 @@ private:
 }; // namespace AttributePathList
 }; // namespace app
 }; // namespace chip
-

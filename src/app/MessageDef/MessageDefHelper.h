@@ -126,4 +126,3 @@ static void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 #endif
 }; // namespace app
 }; // namespace chip
-
