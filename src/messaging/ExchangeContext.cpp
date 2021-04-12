@@ -261,7 +261,11 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
-    Init(em->GetReliableMessageMgr());
+    SetDropAckDebug(false);
+    SetAckPending(false);
+    SetPeerRequestedAck(false);
+    SetMsgRcvdFromPeer(false);
+    SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),

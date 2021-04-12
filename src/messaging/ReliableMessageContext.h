@@ -49,7 +49,6 @@ class ReliableMessageContext
 public:
     ReliableMessageContext();
 
-    void Init(ReliableMessageMgr * manager);
     void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
 
     /**
@@ -230,13 +229,14 @@ private:
     void ReleaseContext();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
+    ExchangeContext * GetExchangeContext();
+    ReliableMessageMgr * GetReliableMessageMgr();
 
 private:
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
     friend class ExchangeMessageDispatch;
 
-    ReliableMessageMgr * mManager;
     ReliableMessageProtocolConfig mConfig;
     uint16_t mNextAckTimeTick; // Next time for triggering Solo Ack
 };
