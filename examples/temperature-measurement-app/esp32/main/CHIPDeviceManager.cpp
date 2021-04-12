@@ -54,7 +54,7 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
-    mCB = cb;
+    mCB                              = cb;
     RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
 
     // Initialize the CHIP stack.
