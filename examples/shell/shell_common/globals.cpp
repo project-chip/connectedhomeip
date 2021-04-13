@@ -17,14 +17,11 @@
 
 #include <Globals.h>
 
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-chip::Messaging::ExchangeManager gExchangeManager;
-chip::SecureSessionMgr gSessionManager;
-chip::Inet::IPAddress gDestAddr;
-
-chip::Transport::AdminId gAdminId = 0;
+#include <protocols/secure_channel/PASESession.h>
+#include <stack/Stack.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
+chip::Stack<TransportConfigurationWithTcp> gStack(chip::kTestControllerNodeId);
+#else
+chip::Stack<> gStack(chip::kTestControllerNodeId);
 #endif
-chip::TransportMgr<chip::Transport::UDP> gUDPManager;

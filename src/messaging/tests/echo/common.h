@@ -24,15 +24,33 @@
 
 #pragma once
 
-#include <messaging/ExchangeMgr.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
+#include <stack/Stack.h>
+#include <transport/raw/TCP.h>
 
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
-constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
+class TransportConfigurationWithTcp : chip::TransportConfiguration
+{
+public:
+    static constexpr size_t kMaxTcpActiveConnectionCount = 4;
+    static constexpr size_t kMaxTcpPendingPackets        = 4;
 
-extern chip::Messaging::ExchangeManager gExchangeManager;
-extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
+    using transport =
+        chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>, chip::Transport::UDP>;
 
-void InitializeChip(void);
-void ShutdownChip(void);
+    CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
+    {
+        return mTransportManager.Init(
+            chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort),
+            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort));
+    }
+
+    chip::TransportMgrBase & Get() { return mTransportManager; }
+    void SetListenPort(uint16_t port) { mPort = port; }
+
+private:
+    transport mTransportManager;
+    uint16_t mPort = CHIP_PORT;
+};
+
+extern const chip::NodeId gLocalDeviceId;
+
+chip::Stack<TransportConfigurationWithTcp> & GetChipStack();
