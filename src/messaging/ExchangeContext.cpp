@@ -379,7 +379,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // If the context was expecting a response to a previously sent message, this message
     // is implicitly that response.
     SetResponseExpected(false);
-
+    ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called6, %p", this);
     if (mDelegate != nullptr)
     {
         mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
@@ -395,7 +395,7 @@ exit:
     // This call should also do the needful of closing the ExchangeContext if the protocol has
     // already made a prior call to Close().
     Release();
-
+    ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called7, %p", this);
     return err;
 }
 

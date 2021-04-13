@@ -235,11 +235,10 @@ CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, C
 
 CHIP_ERROR Command::ClearExistingExchangeContext()
 {
-    // Discard any existing exchange context. Effectively we can only have one Echo exchange with
-    // a single node at any one time.
+    // Give up any existing exchange context.
     if (mpExchangeCtx != nullptr)
     {
-        mpExchangeCtx->Abort();
+        mpExchangeCtx->Close();
         mpExchangeCtx = nullptr;
     }
 
