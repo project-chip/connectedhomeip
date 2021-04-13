@@ -46,7 +46,8 @@ class Lighting final : public generated::Lighting<Lighting>
 public:
     pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
-        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, AppEvent::kEventType_Button, 0, NULL);
+        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
+                                     AppEvent::kEventType_Button, 0, NULL);
         return pw::OkStatus();
     }
 
