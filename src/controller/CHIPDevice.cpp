@@ -371,5 +371,18 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
 }
 
+void Device::InitCommandSender()
+{
+    if (mCommandSender != nullptr)
+    {
+        mCommandSender->Shutdown();
+        mCommandSender = nullptr;
+    }
+#if CHIP_ENABLE_INTERACTION_MODEL
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+    ChipLogFunctError(err);
+#endif
+}
+
 } // namespace Controller
 } // namespace chip
