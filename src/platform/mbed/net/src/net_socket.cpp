@@ -7,6 +7,8 @@
 
 #include "common.h"
 
+#include "mbed-trace/mbed_trace.h"
+
 using namespace mbed;
 using namespace rtos;
 
@@ -66,7 +68,7 @@ int mbed_socket(int family, int type, int proto)
     }
 
     BSDSocket * socket = &sockets[index];
-    return socket->open(type);
+    return socket->open(family, type);
 }
 
 int mbed_socketpair(int family, int type, int proto, int sv[2])
@@ -313,7 +315,7 @@ int mbed_accept(int fd, struct sockaddr * addr, socklen_t * addrlen)
         return -1;
     }
 
-    return sockets[index].open(BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);
+    return sockets[index].open(addr->sa_family, BSDSocket::MBED_TCP_SOCKET, (InternetSocket *) newSocket);
 }
 
 ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
