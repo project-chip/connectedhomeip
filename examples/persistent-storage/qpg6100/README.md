@@ -17,7 +17,7 @@ An example application showing the use
 
 ![QPG6100 DK board](../../platform/qpg6100/doc/QPG6100_DK_Board.jpg)
 
-Several example applications are provided to to demonstrate a CHIP  
+Several example applications are provided to demonstrate a CHIP  
 device, with Thread connectivity, using BLE to perform CHIP provisioning  
 on the Qorvo QPG6100 SDK. More information about each application can be  
 found in the APPLICATION.md file found in the qpg6100 directory of the  

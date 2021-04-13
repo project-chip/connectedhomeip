@@ -37,10 +37,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     qvStatus_t result;
     size_t actual_read_bytes;
 
-    if ((key == NULL) || (value == NULL))
-    {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    VerifyOrExit((key != NULL) && (value != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = qvCHIP_KvsGet(key, value, value_size, &actual_read_bytes, offset_bytes);
     if (result == QV_STATUS_BUFFER_TOO_SMALL)
@@ -49,7 +46,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
     else if (result != QV_STATUS_NO_ERROR)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
     if (read_bytes_size)
     {
@@ -65,15 +62,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     CHIP_ERROR err = CHIP_NO_ERROR;
     qvStatus_t result;
 
-    if ((key == NULL) || (value == NULL))
-    {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    VerifyOrExit((key != NULL) && (value != NULL), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     result = qvCHIP_KvsPut(key, value, value_size);
     if (result != QV_STATUS_NO_ERROR)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
 exit:
@@ -85,15 +79,12 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     CHIP_ERROR err = CHIP_NO_ERROR;
     qvStatus_t result;
 
-    if (key == NULL)
-    {
-        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    VerifyOrExit(key != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = qvCHIP_KvsDelete(key);
     if (result != QV_STATUS_NO_ERROR)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
 exit:
