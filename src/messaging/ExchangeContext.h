@@ -207,6 +207,8 @@ private:
     ExchangeACL * mExchangeACL     = nullptr;
     ExchangeTransport * mTransport = nullptr;
 
+    ApplicationExchangeTransport mAppTransport;
+
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
 

@@ -117,7 +117,6 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
-    VerifyOrReturnError(mTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
@@ -166,20 +165,6 @@ exit:
 
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
-    if (mTransport != nullptr && clearRetransTable)
-    {
-        if (mDelegate != nullptr)
-        {
-            mDelegate->ReleaseTransport(mTransport);
-        }
-        else
-        {
-            Platform::Delete(mTransport);
-        }
-
-        mTransport = nullptr;
-    }
-
     // Clear protocol callbacks
     if (mDelegate != nullptr)
     {
@@ -261,17 +246,15 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
 
     if (mDelegate != nullptr)
     {
-        mTransport = mDelegate->AllocTransport(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        VerifyOrDie(mTransport != nullptr);
+        mTransport = mDelegate->GetTransport(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
     }
     else
     {
         // By default, let's allocate the application transport. This is the most commonly used and secure transport.
-        ApplicationExchangeTransport * transport = Platform::New<Messaging::ApplicationExchangeTransport>();
-        VerifyOrDie(transport != nullptr);
-        transport->Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        mTransport = transport;
+        mAppTransport.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+        mTransport = &mAppTransport;
     }
+    VerifyOrDie(mTransport != nullptr);
 
     mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
@@ -376,8 +359,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 {
     Protocols::Id protocolId = payloadHeader.GetProtocolID();
     uint8_t messageType      = payloadHeader.GetMessageType();
-
-    VerifyOrReturnError(mTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference

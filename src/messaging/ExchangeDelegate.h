@@ -77,23 +77,14 @@ public:
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 
-    virtual ExchangeTransport * AllocTransport(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
+    virtual ExchangeTransport * GetTransport(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
     {
-        ApplicationExchangeTransport * transport = chip::Platform::New<Messaging::ApplicationExchangeTransport>();
-        if (transport != nullptr)
-        {
-            transport->Init(rmMgr, sessionMgr);
-        }
-        return transport;
+        mTransport.Init(rmMgr, sessionMgr);
+        return &mTransport;
     }
 
-    virtual void ReleaseTransport(ExchangeTransport * transport)
-    {
-        if (transport != nullptr)
-        {
-            chip::Platform::Delete(transport);
-        }
-    };
+private:
+    ApplicationExchangeTransport mTransport;
 };
 
 } // namespace Messaging

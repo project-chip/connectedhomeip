@@ -200,11 +200,10 @@ public:
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeTransport * AllocTransport(Messaging::ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
+    Messaging::ExchangeTransport * GetTransport(Messaging::ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
     {
         return &mTransport;
     }
-    void ReleaseTransport(Messaging::ExchangeTransport * transport) override {}
 
 private:
     enum Spake2pErrorType : uint8_t
