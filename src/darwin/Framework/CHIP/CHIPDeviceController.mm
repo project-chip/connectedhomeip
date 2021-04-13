@@ -21,6 +21,9 @@
 #import "CHIPError.h"
 #import "CHIPLogging.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
+#import "gen/CHIPClustersObjc.h"
+
+#include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
 #include <support/CHIPMem.h>
@@ -51,7 +54,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
-
 @end
 
 @implementation CHIPDeviceController
@@ -150,7 +152,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             }
         }
 
-        errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+        chip::Controller::ControllerInitParams params {
+            .storageDelegate = _persistentStorageDelegateBridge,
+            .mDeviceAddressUpdateDelegate = _pairingDelegateBridge,
+        };
+
+        errorCode = _cppCommissioner->Init(_localDeviceId, params, _pairingDelegateBridge);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
@@ -288,24 +295,32 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     _listenPort = port;
 }
 
+- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+        chip::Controller::Device * device = nullptr;
+
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
+        }
+
+        if (errorCode != CHIP_NO_ERROR) {
+            return;
+        }
+
+        errorCode = self.cppCommissioner->UpdateDevice(device, fabricId);
+
+        if (errorCode != CHIP_NO_ERROR) {
+            return;
+        }
+    });
+}
+
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     dispatch_async(_chipWorkQueue, ^{
         self->_pairingDelegateBridge->setDelegate(delegate, queue);
-    });
-}
-
-- (void)sendWiFiCredentials:(NSString *)ssid password:(NSString *)password
-{
-    dispatch_async(_chipWorkQueue, ^{
-        self->_pairingDelegateBridge->SendWiFiCredentials(ssid, password);
-    });
-}
-
-- (void)sendThreadCredentials:(NSData *)threadDataSet
-{
-    dispatch_async(_chipWorkQueue, ^{
-        self->_pairingDelegateBridge->SendThreadCredentials(threadDataSet);
     });
 }
 
