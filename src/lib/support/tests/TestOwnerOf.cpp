@@ -23,10 +23,12 @@
 
 using namespace chip;
 
-class Member {
+class Member
+{
 };
 
-class Base {
+class Base
+{
 public:
     uint32_t Offset0;
     uint32_t Offset4;
@@ -45,10 +47,7 @@ static void TestMemberOwner(nlTestSuite * inSuite, void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF_FN(TestMemberOwner),
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestMemberOwner), NL_TEST_SENTINEL() };
 
 int TestOwnerOf(void)
 {
