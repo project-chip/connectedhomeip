@@ -854,7 +854,7 @@ static const shell_command_t cmds_socket[] = {
       "\tUsage: socket example" },
     { &cmd_socket_server, "server",
       "Create CHIP server for communication testing.\n"
-      "\tUsage: socket server <type> <port>\n"
+      "\tUsage: socket server <type> <port>[optional - default 11097]\n"
       "\tExample: socket server UDP 7" },
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };

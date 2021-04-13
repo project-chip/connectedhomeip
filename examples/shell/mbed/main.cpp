@@ -24,7 +24,9 @@
 #include <lib/support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#ifdef MBED_CONF_MBED_TRACE_ENABLE
 #include "mbed-trace/mbed_trace.h"
+#endif
 
 #include "ChipShellMbedCollection.h"
 #include <ChipShellCollection.h>
