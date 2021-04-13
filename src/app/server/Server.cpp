@@ -496,10 +496,6 @@ void InitServer(AppDelegate * delegate)
     SuccessOrExit(err);
 #endif
 
-    // TODO: This is needed for time being, as ServiceProvisioning is used for opening pairing window.
-    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
-    SuccessOrExit(err);
-
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&gExchangeMgr);
     SuccessOrExit(err);

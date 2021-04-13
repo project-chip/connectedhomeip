@@ -34,7 +34,7 @@ class DLL_EXPORT PairingSession
 {
 public:
     PairingSession() {}
-    virtual ~PairingSession(){};
+    virtual ~PairingSession() {}
 
     /**
      * @brief

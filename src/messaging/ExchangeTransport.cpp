@@ -40,8 +40,8 @@ namespace chip {
 namespace Messaging {
 
 CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeTransport::ExchangeInfo & exchangeInfo,
-                                          ReliableMessageContext & rmCtxt, bool isReliableTransmission, Protocols::Id protocol,
-                                          uint8_t type, System::PacketBufferHandle message)
+                                          ReliableMessageContext & reliableMessageContext, bool isReliableTransmission,
+                                          Protocols::Id protocol, uint8_t type, System::PacketBufferHandle message)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -49,35 +49,37 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
     payloadHeader.SetExchangeID(exchangeInfo.mExchangeId).SetMessageType(protocol, type).SetInitiator(exchangeInfo.mInitiator);
 
     // If there is a pending acknowledgment piggyback it on this message.
-    if (rmCtxt.HasPeerRequestedAck())
+    if (reliableMessageContext.HasPeerRequestedAck())
     {
-        payloadHeader.SetAckId(rmCtxt.mPendingPeerAckId);
+        payloadHeader.SetAckId(reliableMessageContext.mPendingPeerAckId);
 
         // Set AckPending flag to false since current outgoing message is going to serve as the ack on this exchange.
-        rmCtxt.SetAckPending(false);
+        reliableMessageContext.SetAckPending(false);
 
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", rmCtxt.mPendingPeerAckId);
+            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
+                            reliableMessageContext.mPendingPeerAckId);
         }
 #endif
     }
 
-    if (!IsTransportReliable() && rmCtxt.AutoRequestAck() && mReliableMessageMgr != nullptr && isReliableTransmission)
+    if (!IsTransportReliable() && reliableMessageContext.AutoRequestAck() && mReliableMessageMgr != nullptr &&
+        isReliableTransmission)
     {
         payloadHeader.SetNeedsAck(true);
 
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
         // Add to Table for subsequent sending
-        ReturnErrorOnFailure(mReliableMessageMgr->AddToRetransTable(&rmCtxt, &entry));
+        ReturnErrorOnFailure(mReliableMessageMgr->AddToRetransTable(&reliableMessageContext, &entry));
 
         CHIP_ERROR err = SendMessageImpl(session, payloadHeader, std::move(message), &entry->retainedBuf);
         if (err != CHIP_NO_ERROR)
         {
             // Remove from table
-            ChipLogError(ExchangeManager, "Failed to send message with err %ld", long(err));
+            ChipLogError(ExchangeManager, "Failed to send message with err %s", ::chip::ErrorStr(err));
             mReliableMessageMgr->ClearRetransTable(*entry);
             ReturnErrorOnFailure(err);
         }
@@ -97,18 +99,19 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
 }
 
 CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                                ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo)
+                                                ReliableMessageContext & reliableMessageContext,
+                                                MessageReliabilityInfo & reliabilityInfo)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 
     if (!IsTransportReliable())
     {
-        if (rmInfo.mHasAck)
+        if (reliabilityInfo.mHasAck)
         {
-            ReturnErrorOnFailure(rmCtxt.HandleRcvdAck(rmInfo.mAckId));
+            ReturnErrorOnFailure(reliableMessageContext.HandleRcvdAck(reliabilityInfo.mAckId));
         }
 
-        if (rmInfo.mNeedsAck)
+        if (reliabilityInfo.mNeedsAck)
         {
             MessageFlags msgFlags;
 
@@ -117,9 +120,9 @@ CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type,
             msgFlags.Set(MessageFlagValues::kPeerRequestedAck);
 
             // Also set the flag in the exchange context indicating an ack requested;
-            rmCtxt.SetPeerRequestedAck(true);
+            reliableMessageContext.SetPeerRequestedAck(true);
 
-            ReturnErrorOnFailure(rmCtxt.HandleNeedsAck(rmInfo.mMessageId, msgFlags));
+            ReturnErrorOnFailure(reliableMessageContext.HandleNeedsAck(reliabilityInfo.mMessageId, msgFlags));
         }
     }
 

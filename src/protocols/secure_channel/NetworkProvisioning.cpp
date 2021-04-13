@@ -61,10 +61,15 @@ NetworkProvisioning::~NetworkProvisioning()
 #endif
 }
 
-void NetworkProvisioning::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+void NetworkProvisioning::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                             const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
     HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), payload);
+
+    // Currently, the only mechanism to get this callback is via unsolicited message handler.
+    // That means that we now own the reference to exchange context. Let's free the reference since we no longer
+    // need it.
+    exchangeContext->Release();
 }
 
 CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf)
@@ -187,11 +192,11 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendMessageUsingExchange(uint8_t msgType, System::PacketBufferHandle msgPayload)
 {
-    Messaging::ExchangeContext * ctxt = mExchangeMgr->NewContext(mSession, this);
-    VerifyOrReturnError(ctxt != nullptr, CHIP_ERROR_INTERNAL);
-    CHIP_ERROR err = ctxt->SendMessage(Protocols::NetworkProvisioning::Id, msgType, std::move(msgPayload),
-                                       Messaging::SendMessageFlags::kNoAutoRequestAck);
-    ctxt->Release();
+    Messaging::ExchangeContext * exchangeContext = mExchangeMgr->NewContext(mSession, this);
+    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INTERNAL);
+    CHIP_ERROR err = exchangeContext->SendMessage(Protocols::NetworkProvisioning::Id, msgType, std::move(msgPayload),
+                                                  Messaging::SendMessageFlags::kNoAutoRequestAck);
+    exchangeContext->Release();
     return err;
 }
 

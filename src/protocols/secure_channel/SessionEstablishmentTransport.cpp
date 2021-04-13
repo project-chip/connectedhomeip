@@ -65,23 +65,26 @@ bool SessionEstablishmentTransport::MessagePermitted(uint16_t protocol, uint8_t 
     switch (protocol)
     {
     case Protocols::SecureChannel::Id.GetProtocolId():
-        switch (static_cast<Protocols::SecureChannel::MsgType>(type))
+        switch (type)
         {
-        case Protocols::SecureChannel::MsgType::PBKDFParamRequest:
-        case Protocols::SecureChannel::MsgType::PBKDFParamResponse:
-        case Protocols::SecureChannel::MsgType::PASE_Spake2p1:
-        case Protocols::SecureChannel::MsgType::PASE_Spake2p2:
-        case Protocols::SecureChannel::MsgType::PASE_Spake2p3:
-        case Protocols::SecureChannel::MsgType::PASE_Spake2pError:
-        case Protocols::SecureChannel::MsgType::CASE_SigmaR1:
-        case Protocols::SecureChannel::MsgType::CASE_SigmaR2:
-        case Protocols::SecureChannel::MsgType::CASE_SigmaR3:
-        case Protocols::SecureChannel::MsgType::CASE_SigmaErr:
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PBKDFParamRequest):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PBKDFParamResponse):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Spake2p1):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Spake2p2):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Spake2p3):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::PASE_Spake2pError):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR1):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR2):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaR3):
+        case static_cast<uint8_t>(Protocols::SecureChannel::MsgType::CASE_SigmaErr):
             return true;
 
         default:
             break;
         }
+
+    default:
+        break;
     }
     return false;
 }

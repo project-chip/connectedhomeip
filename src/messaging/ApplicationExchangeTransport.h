@@ -38,11 +38,11 @@ public:
 
     virtual ~ApplicationExchangeTransport() {}
 
-    CHIP_ERROR Init(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
+    CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr, SecureSessionMgr * sessionMgr)
     {
         ReturnErrorCodeIf(sessionMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mSessionMgr = sessionMgr;
-        return ExchangeTransport::Init(rmMgr);
+        return ExchangeTransport::Init(reliableMessageMgr);
     }
 
     CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,

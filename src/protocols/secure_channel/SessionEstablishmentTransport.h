@@ -48,7 +48,8 @@ public:
     }
 
     CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                 Messaging::ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo) override;
+                                 Messaging::ReliableMessageContext & reliableMessageContext,
+                                 MessageReliabilityInfo & reliabilityInfo) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 

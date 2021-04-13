@@ -102,9 +102,9 @@ public:
     const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
 
     //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle payload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override {}
 
 private:
     NetworkProvisioningDelegate * mDelegate = nullptr;

@@ -51,15 +51,15 @@ public:
     ExchangeTransport() {}
     virtual ~ExchangeTransport() {}
 
-    CHIP_ERROR Init(ReliableMessageMgr * rmMgr)
+    CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr)
     {
-        mReliableMessageMgr = rmMgr;
+        mReliableMessageMgr = reliableMessageMgr;
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, ExchangeTransport::ExchangeInfo & exchangeInfo,
-                           ReliableMessageContext & rmCtxt, bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
-                           System::PacketBufferHandle message);
+                           ReliableMessageContext & reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
+                           uint8_t type, System::PacketBufferHandle message);
 
     virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
                                      EncryptedPacketBufferHandle * retainedMessage) const
@@ -68,7 +68,7 @@ public:
     }
 
     virtual CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                         ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo);
+                                         ReliableMessageContext & reliableMessageContext, MessageReliabilityInfo & reliabilityInfo);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
