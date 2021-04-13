@@ -65,7 +65,8 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
 
         ReturnErrorOnFailure(
             transport->Init(this, sessionMgr, mParams.GetBleLayer(), mParams.GetDiscriminator(), mParams.GetConnectionObject()));
-        ReturnErrorOnFailure(mPairingSession.Transport().Init(transport, nullptr));
+        ReturnErrorOnFailure(mPairingSession.Transport().Init(transport, mTransportMgr));
+        mPairingSession.Transport().SetPeerAddress(mParams.GetPeerAddress());
     }
 #else
     {
@@ -92,6 +93,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
     if (mTransportMgr != nullptr && params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
         ReturnErrorOnFailure(mPairingSession.Transport().Init(nullptr, mTransportMgr));
+        mPairingSession.Transport().SetPeerAddress(mParams.GetPeerAddress());
     }
 
     return CHIP_NO_ERROR;

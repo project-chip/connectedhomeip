@@ -37,7 +37,7 @@ CHIP_ERROR SessionEstablishmentTransport::SendMessageImpl(SecureSessionHandle se
     ChipLogProgress(Ble, "SessionEstablishmentTransport::SendMessageImpl mBLETransport %p, mTransportMgr %p", mBLETransport,
                     mTransportMgr);
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
-    if (mBLETransport != nullptr)
+    if (mBLETransport != nullptr && mPeerAddress.GetTransportType() == Transport::Type::kBle)
     {
         ChipLogProgress(Ble, "Sending message using BLE transport");
         return mBLETransport->SendMessage(PacketHeader(), Transport::PeerAddress::BLE(), std::move(message));

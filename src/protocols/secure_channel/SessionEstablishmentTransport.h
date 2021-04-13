@@ -42,7 +42,6 @@ public:
     CHIP_ERROR Init(Transport::BLE * transport, TransportMgrBase * transportMgr)
     {
         ReturnErrorCodeIf(transport == nullptr && transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        ReturnErrorCodeIf(transport != nullptr && transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mBLETransport = transport;
         mTransportMgr = transportMgr;
         return CHIP_NO_ERROR;
@@ -52,6 +51,8 @@ public:
                                  Messaging::ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
+
+    void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
 
 protected:
     CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
