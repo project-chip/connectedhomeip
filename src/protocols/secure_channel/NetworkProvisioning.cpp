@@ -64,12 +64,6 @@ NetworkProvisioning::~NetworkProvisioning()
 void NetworkProvisioning::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                             const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
-    VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
-                   ChipLogProgress(NetworkProvisioning, "Received message on invalid exchange context"));
-    if (mExchangeCtxt == nullptr)
-    {
-        mExchangeCtxt = ec->Retain();
-    }
     HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), payload);
 }
 
@@ -191,6 +185,16 @@ exit:
     return err;
 }
 
+CHIP_ERROR NetworkProvisioning::SendMessageUsingExchange(uint8_t msgType, System::PacketBufferHandle msgPayload)
+{
+    Messaging::ExchangeContext * ctxt = mExchangeMgr->NewContext(mSession, this);
+    VerifyOrReturnError(ctxt != nullptr, CHIP_ERROR_INTERNAL);
+    CHIP_ERROR err = ctxt->SendMessage(Protocols::NetworkProvisioning::Id, msgType, std::move(msgPayload),
+                                       Messaging::SendMessageFlags::kNoAutoRequestAck);
+    ctxt->Release();
+    return err;
+}
+
 CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 {
     char * addrStr;
@@ -200,12 +204,10 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     addrStr = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
     buffer->SetDataLength(static_cast<uint16_t>(strlen(addrStr) + 1));
 
-    ChipLogProgress(NetworkProvisioning, "Sending IP Address. mExchangeCtxt %p\n", mExchangeCtxt);
-    VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(NetworkProvisioning, "Sending IP Address\n");
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
 
-    err = mExchangeCtxt->SendMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
-                                     std::move(buffer), Messaging::SendMessageFlags::kNoAutoRequestAck);
+    err = SendMessageUsingExchange(NetworkProvisioning::MsgTypes::kIPAddressAssigned, std::move(buffer));
     SuccessOrExit(err);
 
 exit:
@@ -242,20 +244,13 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     {
         Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(bufferSize), bufferSize);
 
-        ChipLogProgress(NetworkProvisioning, "Sending Network Creds. mExchangeCtxt %p\n", mExchangeCtxt);
+        ChipLogProgress(NetworkProvisioning, "Sending Network Creds\n");
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit(EncodeString(ssid, bbuf));
         SuccessOrExit(EncodeString(passwd, bbuf));
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        if (mExchangeCtxt != nullptr)
-        {
-            mExchangeCtxt->Release();
-        }
-        mExchangeCtxt = mExchangeMgr->NewContext(mSession, this);
-        VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
-        err = mExchangeCtxt->SendMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kWiFiAssociationRequest,
-                                         bbuf.Finalize(), Messaging::SendMessageFlags::kNoAutoRequestAck);
+        err = SendMessageUsingExchange(NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -296,14 +291,8 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
     bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    if (mExchangeCtxt != nullptr)
-    {
-        mExchangeCtxt->Release();
-    }
-    mExchangeCtxt = mExchangeMgr->NewContext(mSession, this);
-    VerifyOrExit(mExchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
-    err = mExchangeCtxt->SendMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kThreadAssociationRequest,
-                                     bbuf.Finalize(), Messaging::SendMessageFlags::kNoAutoRequestAck);
+
+    err = SendMessageUsingExchange(NetworkProvisioning::MsgTypes::kThreadAssociationRequest, bbuf.Finalize());
 
 exit:
     if (CHIP_NO_ERROR != err)

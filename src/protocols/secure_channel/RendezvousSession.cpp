@@ -327,8 +327,6 @@ CHIP_ERROR RendezvousSession::Pair(uint32_t setupPINCode)
     Messaging::ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), &mPairingSession);
     ReturnErrorCodeIf(ctxt == nullptr, CHIP_ERROR_INTERNAL);
 
-    ChipLogProgress(Ble, "RendezvousSession::Pair new exchange context for pairing %p", ctxt);
-
     UpdateState(State::kSecurePairing);
     CHIP_ERROR err = mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, mNextKeyId++, ctxt, this);
     ctxt->Release();

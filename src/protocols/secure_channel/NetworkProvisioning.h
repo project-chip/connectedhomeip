@@ -109,8 +109,7 @@ public:
 private:
     NetworkProvisioningDelegate * mDelegate = nullptr;
 
-    Messaging::ExchangeManager * mExchangeMgr  = nullptr;
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     Inet::IPAddress mDeviceAddress = Inet::IPAddress::Any;
 
@@ -140,6 +139,8 @@ private:
                                    size_t & consumed);
 
     CHIP_ERROR DecodeThreadAssociationRequest(const System::PacketBufferHandle & msgBuf);
+
+    CHIP_ERROR SendMessageUsingExchange(uint8_t msgType, System::PacketBufferHandle msgPayload);
 
 #if CONFIG_DEVICE_LAYER
     static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);

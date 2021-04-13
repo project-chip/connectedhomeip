@@ -93,8 +93,6 @@ void PASESession::Clear()
     mComputeVerifier = true;
     mConnectionState.Reset();
 
-    ChipLogProgress(Ble, "PASESession::Clear() release exchange context %p", mExchangeCtxt);
-
     if (mExchangeCtxt != nullptr)
     {
         mExchangeCtxt->Release();
