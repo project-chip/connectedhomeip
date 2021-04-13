@@ -91,7 +91,7 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
     enum
     {
         CTNS   = kCertType_NotSpecified,
-        CTCA   = kCertType_CA,
+        CTCA   = kCertType_ICA,
         CTNode = kCertType_Node,
         CTFS   = kCertType_FirmwareSigning,
     };

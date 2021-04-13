@@ -441,8 +441,8 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         VerifyOrExit(cert->mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) && cert->mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign),
                      err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
-        // Verify that the certificate type is set to "CA".
-        VerifyOrExit(certType == kCertType_CA, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        // Verify that the certificate type is set to Root or ICA.
+        VerifyOrExit(certType == kCertType_ICA || certType == kCertType_Root, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
         // If a path length constraint was included, verify the cert depth vs. the specified constraint.
         //
@@ -632,9 +632,9 @@ bool ChipRDN::IsEqual(const ChipRDN & other) const
         return false;
     }
 
-    if (IsChipIdX509Attr(mAttrOID))
+    if (IsChipDNAttr(mAttrOID))
     {
-        return mAttrValue.mChipId == other.mAttrValue.mChipId;
+        return mAttrValue.mChipVal == other.mAttrValue.mChipVal;
     }
     else
     {
@@ -670,16 +670,21 @@ uint8_t ChipDN::RDNCount() const
     return count;
 }
 
-CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t chipId)
+CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     uint8_t rdnCount = RDNCount();
 
     VerifyOrExit(rdnCount < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES, err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(IsChipIdX509Attr(oid), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(IsChipDNAttr(oid), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    rdn[rdnCount].mAttrOID           = oid;
-    rdn[rdnCount].mAttrValue.mChipId = chipId;
+    if (IsChip32bitDNAttr(oid))
+    {
+        VerifyOrExit(val <= UINT32_MAX, err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    rdn[rdnCount].mAttrOID            = oid;
+    rdn[rdnCount].mAttrValue.mChipVal = val;
 
 exit:
     return err;
@@ -691,7 +696,7 @@ CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, const uint8_t * val, uint32
     uint8_t rdnCount = RDNCount();
 
     VerifyOrExit(rdnCount < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES, err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(!IsChipIdX509Attr(oid), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!IsChipDNAttr(oid), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(oid != kOID_NotSpecified, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     rdn[rdnCount].mAttrOID                  = oid;
@@ -713,11 +718,17 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
-        if (rdn[i].mAttrOID == kOID_AttributeType_ChipCAId)
+        if (rdn[i].mAttrOID == kOID_AttributeType_ChipRootId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
-            lCertType = kCertType_CA;
+            lCertType = kCertType_Root;
+        }
+        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipICAId)
+        {
+            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
+
+            lCertType = kCertType_ICA;
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_ChipNodeId)
         {
@@ -725,7 +736,7 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 
             lCertType = kCertType_Node;
         }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipSoftwarePublisherId)
+        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFirmwareSigningId)
         {
             VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
@@ -733,6 +744,9 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
         }
         else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFabricId)
         {
+            // Only one fabricId attribute is allowed per DN.
+            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
+
             fabricIdPresent = true;
         }
     }

@@ -215,7 +215,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
     enum
     {
         CTNS   = kCertType_NotSpecified,
-        CTCA   = kCertType_CA,
+        CTCA   = kCertType_ICA,
         CTNode = kCertType_Node,
         CTFS   = kCertType_FirmwareSigning,
     };
@@ -592,11 +592,11 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
     static TestCase sTestCases[] = {
         // Cert                        ExpectedCertType
         // =============================================================
-        {  TestCert::kRoot01,          kCertType_CA              },
-        {  TestCert::kRoot02,          kCertType_CA              },
-        {  TestCert::kICA01,           kCertType_CA              },
-        {  TestCert::kICA02,           kCertType_CA              },
-        {  TestCert::kICA01_1,         kCertType_CA              },
+        {  TestCert::kRoot01,          kCertType_Root            },
+        {  TestCert::kRoot02,          kCertType_Root            },
+        {  TestCert::kICA01,           kCertType_ICA             },
+        {  TestCert::kICA02,           kCertType_ICA             },
+        {  TestCert::kICA01_1,         kCertType_ICA             },
         {  TestCert::kFWSign01,        kCertType_FirmwareSigning },
         {  TestCert::kNode01_01,       kCertType_Node            },
         {  TestCert::kNode01_02,       kCertType_Node            },

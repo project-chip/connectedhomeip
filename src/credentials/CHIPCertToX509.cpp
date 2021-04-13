@@ -70,7 +70,7 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
     uint32_t asn1Tag;
     const uint8_t * asn1AttrVal;
     uint32_t asn1AttrValLen;
-    uint8_t chipIdStr[17];
+    uint8_t chipAttrStr[17];
 
     // Enter the List TLV element that represents the DN in TLV format.
     err = reader.EnterContainer(outerContainer);
@@ -106,28 +106,41 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
                 //
                 attrOID = GetOID(kOIDCategory_AttributeType, static_cast<uint8_t>(tlvTagNum & 0x7f));
 
-                // If the attribute is one of the CHIP-defined X.509 attributes that contains a CHIP id...
-                if (IsChipIdX509Attr(attrOID))
+                // If the attribute is one of the CHIP-defined DN attributes.
+                if (IsChipDNAttr(attrOID))
                 {
                     // Verify that the underlying TLV data type is unsigned integer.
                     VerifyOrExit(elemType == kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-                    // Read the value of the CHIP id.
-                    uint64_t chipId;
-                    err = reader.Get(chipId);
+                    // Read the value of the CHIP attribute.
+                    uint64_t chipAttr;
+                    err = reader.Get(chipAttr);
                     SuccessOrExit(err);
 
-                    // Generate the string representation of the id that will appear in the ASN.1 attribute.
-                    // For CHIP ids the string representation is *always* 16 uppercase hex characters.
-                    snprintf(reinterpret_cast<char *>(chipIdStr), sizeof(chipIdStr), "%016" PRIX64, chipId);
-                    asn1AttrVal    = chipIdStr;
-                    asn1AttrValLen = 16;
+                    // Generate the string representation of the CHIP attribute that will appear in the ASN.1 attribute.
+                    if (IsChip64bitDNAttr(attrOID))
+                    {
+                        // For CHIP 64-bit attribute the string representation is 16 uppercase hex characters.
+                        snprintf(reinterpret_cast<char *>(chipAttrStr), sizeof(chipAttrStr), "%016" PRIX64, chipAttr);
+                        asn1AttrVal    = chipAttrStr;
+                        asn1AttrValLen = 16;
+                    }
+                    else
+                    {
+                        VerifyOrExit(chipAttr <= UINT32_MAX, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
+
+                        // For CHIP 32-bit attribute the string representation is 8 uppercase hex characters.
+                        snprintf(reinterpret_cast<char *>(chipAttrStr), sizeof(chipAttrStr), "%08" PRIX32,
+                                 static_cast<uint32_t>(chipAttr));
+                        asn1AttrVal    = chipAttrStr;
+                        asn1AttrValLen = 8;
+                    }
 
                     // The ASN.1 tag for CHIP id attributes is always UTF8String.
                     asn1Tag = kASN1UniversalTag_UTF8String;
 
                     // Save the CHIP-specific id value in the caller's DN structure.
-                    err = dn.AddAttribute(attrOID, chipId);
+                    err = dn.AddAttribute(attrOID, chipAttr);
                     SuccessOrExit(err);
                 }
 

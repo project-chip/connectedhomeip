@@ -46,7 +46,7 @@ using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
 
-static ASN1_ERROR ParseChipIdAttribute(ASN1Reader & reader, uint64_t & chipIdOut)
+static ASN1_ERROR ParseChipAttribute(ASN1Reader & reader, uint64_t & chipAttrOut)
 {
     ASN1_ERROR err        = ASN1_NO_ERROR;
     const uint8_t * value = nullptr;
@@ -56,20 +56,20 @@ static ASN1_ERROR ParseChipIdAttribute(ASN1Reader & reader, uint64_t & chipIdOut
     value = reader.GetValue();
     VerifyOrExit(value != nullptr, err = ASN1_ERROR_INVALID_ENCODING);
 
-    chipIdOut = 0;
+    chipAttrOut = 0;
 
     for (uint32_t i = 0; i < kChipIdUTF8Length; i++)
     {
-        chipIdOut <<= 4;
+        chipAttrOut <<= 4;
         uint8_t ch = value[i];
         if (ch >= '0' && ch <= '9')
         {
-            chipIdOut |= (ch - '0');
+            chipAttrOut |= (ch - '0');
         }
         // CHIP Id attribute encodings only support uppercase chars.
         else if (ch >= 'A' && ch <= 'F')
         {
-            chipIdOut |= (ch - 'A' + 10);
+            chipAttrOut |= (ch - 'A' + 10);
         }
         else
         {
@@ -116,8 +116,8 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                                       reader.GetTag() == kASN1UniversalTag_IA5String),
                                  err = ASN1_ERROR_UNSUPPORTED_ENCODING);
 
-                    // CHIP id attributes must be UTF8Strings.
-                    if (IsChipIdX509Attr(attrOID))
+                    // CHIP attributes must be UTF8Strings.
+                    if (IsChipDNAttr(attrOID))
                     {
                         VerifyOrExit(reader.GetTag() == kASN1UniversalTag_UTF8String, err = ASN1_ERROR_INVALID_ENCODING);
                     }
@@ -130,16 +130,16 @@ static CHIP_ERROR ConvertDistinguishedName(ASN1Reader & reader, TLVWriter & writ
                         tlvTagNum |= 0x80;
                     }
 
-                    // If the attribute is a CHIP-defined attribute that contains a 64-bit CHIP id...
-                    if (IsChipIdX509Attr(attrOID))
+                    // If the attribute is a CHIP-defined attribute that contains a 64-bit or 32-bit value.
+                    if (IsChipDNAttr(attrOID))
                     {
-                        // Parse the attribute string into a 64-bit CHIP id.
-                        uint64_t chipId;
-                        err = ParseChipIdAttribute(reader, chipId);
+                        // Parse the attribute string into a CHIP attribute.
+                        uint64_t chipAttr;
+                        err = ParseChipAttribute(reader, chipAttr);
                         SuccessOrExit(err);
 
-                        // Write the CHIP id into the TLV.
-                        err = writer.Put(ContextTag(tlvTagNum), chipId);
+                        // Write the CHIP attribute value into the TLV.
+                        err = writer.Put(ContextTag(tlvTagNum), chipAttr);
                         SuccessOrExit(err);
                     }
 

@@ -99,9 +99,10 @@ enum
 enum
 {
     kCertType_NotSpecified    = 0x00, /**< The certificate's type has not been specified. */
-    kCertType_CA              = 0x01, /**< A CHIP CA certificate. */
-    kCertType_Node            = 0x02, /**< A CHIP node certificate. */
-    kCertType_FirmwareSigning = 0x03, /**< A CHIP firmware signing certificate. */
+    kCertType_Root            = 0x01, /**< A CHIP Root certificate. */
+    kCertType_ICA             = 0x02, /**< A CHIP Intermediate CA certificate. */
+    kCertType_Node            = 0x03, /**< A CHIP node certificate. */
+    kCertType_FirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -189,7 +190,7 @@ struct ChipRDN
 {
     union
     {
-        uint64_t mChipId; /**< CHIP specific DN attribute value. */
+        uint64_t mChipVal; /**< CHIP specific DN attribute value. */
         struct
         {
             const uint8_t * mValue; /**< Pointer to the DN attribute value. */
@@ -219,11 +220,11 @@ public:
      * @brief Add CHIP-specific attribute to the DN.
      *
      * @param oid     CHIP-specific OID for DN attribute.
-     * @param chipId  CHIP-specific DN attribute value.
+     * @param val     CHIP-specific DN attribute value.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t chipId);
+    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t val);
 
     /**
      * @brief Add string attribute to the DN.
@@ -667,12 +668,29 @@ CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, u
 CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time);
 
 /**
- *  @return  True if the OID represents a CHIP-defined X.509 distinguished named attribute.
+ *  @return  True if the OID represents a CHIP-defined 64-bit distinguished named attribute.
  **/
-inline bool IsChipIdX509Attr(chip::ASN1::OID oid)
+inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipCAId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipSoftwarePublisherId || oid == chip::ASN1::kOID_AttributeType_ChipFabricId);
+    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipFirmwareSigningId ||
+            oid == chip::ASN1::kOID_AttributeType_ChipICAId || oid == chip::ASN1::kOID_AttributeType_ChipRootId ||
+            oid == chip::ASN1::kOID_AttributeType_ChipFabricId);
+}
+
+/**
+ *  @return  True if the OID represents a CHIP-defined 32-bit distinguished named attribute.
+ **/
+inline bool IsChip32bitDNAttr(chip::ASN1::OID oid)
+{
+    return (oid == chip::ASN1::kOID_AttributeType_ChipAuthTag1 || oid == chip::ASN1::kOID_AttributeType_ChipAuthTag2);
+}
+
+/**
+ *  @return  True if the OID represents a CHIP-defined distinguished named attribute.
+ **/
+inline bool IsChipDNAttr(chip::ASN1::OID oid)
+{
+    return (IsChip64bitDNAttr(oid) || IsChip32bitDNAttr(oid));
 }
 
 } // namespace Credentials
