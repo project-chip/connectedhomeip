@@ -60,4 +60,3 @@ int TestOwnerOf(void)
 }
 
 CHIP_REGISTER_TEST_SUITE(TestOwnerOf)
-
