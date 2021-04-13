@@ -56,8 +56,6 @@
 
 bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
 {
-    EmberAfStatus status;
-
     // if we are disabled then we can only respond to read or write commands
     // or identify cluster (see device enabled attr of basic cluster)
     if (!emberAfIsDeviceEnabled(cmd->apsFrame->destinationEndpoint) && cmd->apsFrame->clusterId != ZCL_IDENTIFY_CLUSTER_ID)
@@ -98,12 +96,6 @@ bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
     }
 #endif
 
-    // Pass the command to the generated command parser for processing
-    status = emberAfClusterSpecificCommandParse(cmd);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfSendDefaultResponse(cmd, status);
-    }
-
-    return true;
+    // All cluster messages (commands) will go through the IM now, return false to indicate an error.
+    return false;
 }
