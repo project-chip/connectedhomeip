@@ -51,6 +51,7 @@ target_sources(app PRIVATE
                ${LOCK_COMMON}/gen/attribute-size.cpp
                ${LOCK_COMMON}/gen/call-command-handler.cpp
                ${LOCK_COMMON}/gen/callback-stub.cpp
+               ${LOCK_COMMON}/gen/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp
@@ -65,6 +66,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/binding-table.cpp
                ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
                ${CHIP_ROOT}/src/app/util/client-api.cpp
+               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
