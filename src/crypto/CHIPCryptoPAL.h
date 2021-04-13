@@ -509,6 +509,8 @@ public:
     /**
      * @brief Compute the first round of the protocol.
      *
+     * @param pab      X value from commissioner.
+     * @param pab_len  X length.
      * @param out     The output first round Spake2+ contribution.
      * @param out_len The output first round Spake2+ contribution length.
      *
