@@ -84,5 +84,5 @@
 	branch = feature-chip
 [submodule "wifi-ism43362"]
 	path = third_party/wifi-ism43362/repo
-	url = https://github.com/ARMmbed/wifi-ism43362.git
+	url = https://github.com/ATmobica/wifi-ism43362.git
 	branch = master
