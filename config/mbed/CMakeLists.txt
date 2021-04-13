@@ -203,6 +203,7 @@ chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
+chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_RENDEZVOUS)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
