@@ -117,6 +117,7 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
+    VerifyOrReturnError(mTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
@@ -165,14 +166,23 @@ exit:
 
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
+    if (mTransport != nullptr && clearRetransTable)
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->ReleaseTransport(mTransport);
+        }
+        else
+        {
+            Platform::Delete(mTransport);
+        }
+
+        mTransport = nullptr;
+    }
+
     // Clear protocol callbacks
     if (mDelegate != nullptr)
     {
-        if (mTransport != nullptr)
-        {
-            mDelegate->ReleaseTransport(mTransport);
-            mTransport = nullptr;
-        }
         mDelegate->OnExchangeClosing(this);
     }
     mDelegate = nullptr;
@@ -283,19 +293,6 @@ void ExchangeContext::Free()
     // the boolean parameter passed to DoClose() should not matter.
     ExchangeManager * em = mExchangeMgr;
 
-    if (mTransport != nullptr)
-    {
-        if (mDelegate != nullptr)
-        {
-            mDelegate->ReleaseTransport(mTransport);
-        }
-        else
-        {
-            Platform::Delete(mTransport);
-        }
-        mTransport = nullptr;
-    }
-
     DoClose(false);
     mExchangeMgr = nullptr;
 
@@ -380,7 +377,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     Protocols::Id protocolId = payloadHeader.GetProtocolID();
     uint8_t messageType      = payloadHeader.GetMessageType();
 
-    VerifyOrDie(mTransport != nullptr);
+    VerifyOrReturnError(mTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
