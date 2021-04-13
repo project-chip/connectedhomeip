@@ -21,7 +21,7 @@
  *      Source implementation for a generic shell API for CHIP examples.
  */
 
-#include "shell.h"
+#include "shell_core.h"
 #include "commands.h"
 
 #include <core/CHIPError.h>

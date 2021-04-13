@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,33 +14,15 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/lib/core/core.gni")
-
-static_library("shell") {
-  output_name = "libCHIPShell"
+static_library("chip-zephyr-shell") {
+  output_name = "libCHIPZephyrShell"
   output_dir = "${root_out_dir}/lib"
 
-  sources = [
-    "commands.cpp",
-    "commands.h",
-    "shell_core.cpp",
-    "shell_core.h",
-    "streamer.cpp",
-    "streamer.h",
-  ]
-
-  if (chip_target_style == "unix") {
-    sources += [ "streamer_stdio.cpp" ]
-  }
-
-  if (current_os == "zephyr") {
-    sources += [ "streamer_zephyr.cpp" ]
-  }
+  sources = [ "ChipShell.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-  ]
+  public_deps = [ "${chip_root}/src/app/server" ]
+
+  complete_static_lib = true
 }
