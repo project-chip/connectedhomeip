@@ -56,7 +56,7 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::Byte
 
 /**
  * @brief OTA Software Update Server Cluster QueryImage Command callback
- * 
+ *
  * @param vendorId The Vendor ID applying to the OTA Client’s Node. Should match the value in the Basic Information Cluster.
  * @param productId The Product ID applying to the OTA Client’s Node. Should match the value in the Basic Information Cluster.
  * @param imageType A Vendor-specific numerical value that may help an OTA Server select the correct payload.
