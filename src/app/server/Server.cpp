@@ -36,6 +36,7 @@
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
+#include <stack/Stack.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
@@ -97,7 +98,73 @@ class ServerStorageDelegate : public PersistentStorageDelegate
     }
 };
 
-ServerStorageDelegate gServerStorage;
+class ServerStorageConfig : public StorageConfiguration
+{
+public:
+    CHIP_ERROR Init()
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+        err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
+        SuccessOrExit(err);
+#elif CHIP_DEVICE_LAYER_TARGET_LINUX
+        PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
+#endif
+
+        return err;
+    }
+
+    CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+
+    PersistentStorageDelegate * Get() { return &mServerStorage; }
+
+private:
+    ServerStorageDelegate mServerStorage;
+};
+
+class ServerTransportConfig : chip::TransportConfiguration
+{
+public:
+    using transport = chip::TransportMgr<chip::Transport::UDP
+#if INET_CONFIG_ENABLE_IPV4
+                                         ,
+                                         chip::Transport::UDP
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                         ,
+                                         chip::Transport::BLE<kMaxBlePendingPackets>
+#endif
+                                         >;
+
+    CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
+    {
+        return mTransportManager.Init(UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv6)
+#if INET_CONFIG_ENABLE_IPV4
+                                          ,
+                                      UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4)
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                          ,
+                                      BleListenParameters(bleLayer)
+#endif
+        );
+    }
+
+    chip::TransportMgrBase & Get() { return mTransportManager; }
+    void SetListenPort(uint16_t port) { mPort = port; }
+
+private:
+    transport mTransportManager;
+    uint16_t mPort = CHIP_PORT;
+};
+
+static chip::Stack<ServerStorageConfig> gStack(chip::kTestDeviceNodeId);
+
+PersistentStorageDelegate & GetGlobalStorage()
+{
+    return *gStack.GetStorage();
+}
 
 CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvailableId)
 {
@@ -164,7 +231,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
         StorablePeerConnection connection;
-        if (CHIP_NO_ERROR == connection.FetchFromKVS(gServerStorage, keyId))
+        if (CHIP_NO_ERROR == connection.FetchFromKVS(GetGlobalStorage(), keyId))
         {
             connection.GetPASESession(session);
 
@@ -189,7 +256,7 @@ void EraseAllSessionsUpTo(uint16_t nextSessionKeyId)
 
     for (uint16_t keyId = 0; keyId < nextSessionKeyId; keyId++)
     {
-        StorablePeerConnection::DeleteFromKVS(gServerStorage, keyId);
+        StorablePeerConnection::DeleteFromKVS(GetGlobalStorage(), keyId);
     }
 }
 
@@ -231,7 +298,6 @@ private:
 };
 
 DeviceDiscriminatorCache gDeviceDiscriminatorCache;
-AdminPairingTable gAdminPairings;
 AdminId gNextAvailableAdminId = 0;
 
 class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDelegate
@@ -263,7 +329,7 @@ public:
             mDelegate->OnPairingWindowClosed();
         }
 
-        AdminPairingInfo * admin = gAdminPairings.FindAdminWithId(mAdmin);
+        AdminPairingInfo * admin = gStack.GetAdmins().FindAdminWithId(mAdmin);
         if (admin != nullptr)
         {
             ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
@@ -282,11 +348,8 @@ private:
     bool isBLE = true;
 };
 
-DemoTransportMgr gTransports;
-SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
 CASEServer gCASEServer;
-Messaging::ExchangeManager gExchangeMgr;
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
 static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
@@ -305,11 +368,12 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     AdminId admin                = gNextAvailableAdminId;
-    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
+    AdminPairingInfo * adminInfo = gStack.GetAdmins().AssignAdminId(admin);
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gStack.GetExchangeManager(), &gStack.GetTransportManager(),
+                                            &gStack.GetSecureSessionManager(), adminInfo);
 }
 
 class ServerCallback : public ExchangeDelegate
@@ -399,7 +463,6 @@ private:
     SecureSessionMgr * mSessionMgr = nullptr;
 };
 
-secure_channel::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -433,15 +496,16 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
         // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
         // can continue sending messages to accessory as next available admin will also be 0.
         // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
-        gAdminPairings.Reset();
+        gStack.GetAdmins().Reset();
     }
 
     AdminId admin                = gNextAvailableAdminId;
-    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
+    AdminPairingInfo * adminInfo = gStack.GetAdmins().AssignAdminId(admin);
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gStack.GetExchangeManager(), &gStack.GetTransportManager(),
+                                            &gStack.GetSecureSessionManager(), adminInfo);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
@@ -477,55 +541,22 @@ void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Platform::MemoryInit();
+    err = gStack.Init();
+    SuccessOrExit(err);
 
-    InitDataModelHandler(&gExchangeMgr);
+    InitDataModelHandler(&gStack.GetExchangeManager());
     gCallbacks.SetDelegate(delegate);
 
-#if CHIP_DEVICE_LAYER_TARGET_DARWIN
-    err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
-    SuccessOrExit(err);
-#elif CHIP_DEVICE_LAYER_TARGET_LINUX
-    PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
-#endif
-
-    err = gRendezvousServer.Init(delegate, &gServerStorage);
+    err = gRendezvousServer.Init(delegate, &GetGlobalStorage());
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
 
-    err = gAdminPairings.Init(&gServerStorage);
-    SuccessOrExit(err);
-
-    // Init transport before operations with secure session mgr.
-    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6)
-
-#if INET_CONFIG_ENABLE_IPV4
-                               ,
-                           UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4)
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-                               ,
-                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
-#endif
-    );
-
-    SuccessOrExit(err);
-
-    err =
-        gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings, &gMessageCounterManager);
-    SuccessOrExit(err);
-
-    err = gExchangeMgr.Init(&gSessions);
-    SuccessOrExit(err);
-    err = gMessageCounterManager.Init(&gExchangeMgr);
-    SuccessOrExit(err);
-
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gStack.GetExchangeManager(), nullptr);
     SuccessOrExit(err);
 
 #if defined(CHIP_APP_USE_ECHO)
-    err = InitEchoHandler(&gExchangeMgr);
+    err = InitEchoHandler(&gStack.GetExchangeManager());
     SuccessOrExit(err);
 #endif
 
@@ -541,10 +572,10 @@ void InitServer(AppDelegate * delegate)
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
 
         // Restore any previous admin pairings
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllAdminPairingsFromKVS(gAdminPairings, gNextAvailableAdminId),
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllAdminPairingsFromKVS(gStack.GetAdmins(), gNextAvailableAdminId),
                      ChipLogError(AppServer, "Could not restore admin table"));
 
-        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gSessions, gRendezvousServer),
+        VerifyOrExit(CHIP_NO_ERROR == RestoreAllSessionsFromKVS(gStack.GetSecureSessionManager(), gRendezvousServer),
                      ChipLogError(AppServer, "Could not restore previous sessions"));
     }
     else
@@ -560,17 +591,18 @@ void InitServer(AppDelegate * delegate)
     PlatformMgr().AddEventHandler(ChipEventHandler, {});
 #endif
 
-    gCallbacks.SetSessionMgr(&gSessions);
+    gCallbacks.SetSessionMgr(&gStack.GetSecureSessionManager());
 
     // Register to receive unsolicited legacy ZCL messages from the exchange manager.
-    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
+    err = gStack.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
-    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
+    err = gStack.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gExchangeMgr, &gTransports, &gSessions, &GetGlobalAdminPairingTable());
+    err = gCASEServer.ListenForSessionEstablishment(&gStack.GetExchangeManager(), &gStack.GetTransportManager(),
+                                                    &gStack.GetSecureSessionManager(), &GetGlobalAdminPairingTable());
     SuccessOrExit(err);
 
 exit:
@@ -591,11 +623,11 @@ CHIP_ERROR AddTestPairing()
     PASESession * testSession    = nullptr;
     PASESessionSerializable serializedTestSession;
 
-    for (const AdminPairingInfo & admin : gAdminPairings)
+    for (const AdminPairingInfo & admin : gStack.GetAdmins())
         if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
             ExitNow();
 
-    adminInfo = gAdminPairings.AssignAdminId(gNextAvailableAdminId);
+    adminInfo = gStack.GetAdmins().AssignAdminId(gNextAvailableAdminId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     adminInfo->SetNodeId(chip::kTestDeviceNodeId);
@@ -603,8 +635,9 @@ CHIP_ERROR AddTestPairing()
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
+    SuccessOrExit(err = gStack.GetSecureSessionManager().NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() },
+                                                                    chip::kTestControllerNodeId, testSession,
+                                                                    SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:
@@ -615,12 +648,12 @@ exit:
     }
 
     if (err != CHIP_NO_ERROR && adminInfo != nullptr)
-        gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
+        gStack.GetAdmins().ReleaseAdminId(gNextAvailableAdminId);
 
     return err;
 }
 
 AdminPairingTable & GetGlobalAdminPairingTable()
 {
-    return gAdminPairings;
+    return gStack.GetAdmins();
 }

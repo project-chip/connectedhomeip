@@ -42,6 +42,8 @@
 
 #define IM_CLIENT_PORT (CHIP_PORT + 1)
 
+const chip::NodeId gLocalDeviceId = chip::kTestControllerNodeId;
+
 namespace {
 // Max value for the number of message request sent.
 
@@ -53,11 +55,6 @@ constexpr chip::Transport::AdminId gAdminId       = 0;
 
 // The ReadClient object.
 chip::app::ReadClient * gpReadClient = nullptr;
-
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Command was attempted to be sent.
@@ -209,10 +206,10 @@ CHIP_ERROR EstablishSecureSession()
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
-                                         chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(
+        chip::Optional<chip::Transport::PeerAddress>::Value(
+            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
+        chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -351,9 +348,7 @@ int main(int argc, char * argv[])
     std::mutex mutex;
     std::unique_lock<std::mutex> lock(mutex);
     MockInteractionModelApp mockDelegate;
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
-    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    chip::Transport::AdminPairingInfo * adminInfo;
 
     if (argc <= 1)
     {
@@ -367,26 +362,14 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    InitializeChip();
+    GetChipStack().Init();
+
+    adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
-    err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                     .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-                                     .SetListenPort(IM_CLIENT_PORT));
-    SuccessOrExit(err);
-
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
-                               &gMessageCounterManager);
-    SuccessOrExit(err);
-
-    err = gExchangeManager.Init(&gSessionManager);
-    SuccessOrExit(err);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    SuccessOrExit(err);
-
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&GetChipStack().GetExchangeManager(), &mockDelegate);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.
@@ -455,7 +438,8 @@ int main(int argc, char * argv[])
 
     gpReadClient->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    ShutdownChip();
+
+    GetChipStack().Shutdown();
 
 exit:
     if (err != CHIP_NO_ERROR || (gCommandRespCount != kMaxCommandMessageCount + kTotalFailureCommandMessageCount))

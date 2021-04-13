@@ -25,12 +25,10 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <messaging/ExchangeMgr.h>
+#include <stack/Stack.h>
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
-
-extern chip::Messaging::ExchangeManager gExchangeManager;
 
 constexpr chip::ClusterId kTestClusterId     = 6;
 constexpr chip::CommandId kTestCommandId     = 40;
@@ -41,6 +39,7 @@ constexpr chip::FieldId kTestFieldId2        = 2;
 constexpr uint8_t kTestFieldValue1           = 1;
 constexpr uint8_t kTestFieldValue2           = 2;
 constexpr chip::EventId kLivenessChangeEvent = 1;
-void InitializeChip(void);
-void ShutdownChip(void);
 void TLVPrettyPrinter(const char * aFormat, ...);
+
+extern const chip::NodeId gLocalDeviceId;
+chip::Stack<> & GetChipStack();
