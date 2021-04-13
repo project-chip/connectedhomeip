@@ -82,6 +82,7 @@ bool SessionEstablishmentTransport::MessagePermitted(uint16_t protocol, uint8_t 
         default:
             break;
         }
+        break;
 
     default:
         break;

@@ -62,6 +62,7 @@ bool ApplicationExchangeTransport::MessagePermitted(uint16_t protocol, uint8_t t
         default:
             break;
         }
+        break;
 
     default:
         break;
