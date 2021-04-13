@@ -370,7 +370,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     {
         VerifyOrExit(
             admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(Inet, "Secure transport received message, but destination node ID doesn't match our node ID, discarding"));
+            ChipLogError(Inet, "Secure transport received a message, but destination node ID doesn't match our node ID, discarding"));
     }
     mPeerConnections.MarkConnectionActive(state);
 
