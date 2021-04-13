@@ -135,9 +135,14 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
-uint64_t ReliableMessageContext::GetCurrentRetransmitTimeoutTick()
+uint64_t ReliableMessageContext::GetInitialRetransmitTimeoutTick()
 {
-    return (HasRcvdMsgFromPeer() ? mConfig.mActiveRetransTimeoutTick : mConfig.mInitialRetransTimeoutTick);
+    return mConfig.mInitialRetransTimeoutTick;
+}
+
+uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
+{
+    return mConfig.mActiveRetransTimeoutTick;
 }
 
 /**

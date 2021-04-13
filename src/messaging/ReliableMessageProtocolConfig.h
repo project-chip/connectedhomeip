@@ -122,10 +122,11 @@ struct ReliableMessageProtocolConfig
     uint8_t mMaxRetrans;                 /**< Configurable max value for retransmissions in the ExchangeContext. */
 };
 
-const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS };
+const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = {
+    CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+    CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+    CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+};
 
 // clang-format on
 
