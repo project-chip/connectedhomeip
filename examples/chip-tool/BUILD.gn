@@ -20,10 +20,6 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [ "." ]
-}
-
 chip_data_model("data_model") {
   cluster_sources = [ "media-playback-client" ]
 
@@ -45,9 +41,7 @@ executable("chip-tool") {
     "main.cpp",
   ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":data_model",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
@@ -55,7 +49,7 @@ executable("chip-tool") {
     "${chip_root}/third_party/inipp",
   ]
 
-  public_configs = [ ":includes" ]
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }

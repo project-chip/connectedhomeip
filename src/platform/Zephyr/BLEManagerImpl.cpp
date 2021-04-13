@@ -32,6 +32,7 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <bluetooth/addr.h>
 #include <logging/log.h>
 #include <sys/byteorder.h>
 #include <sys/util.h>
@@ -83,6 +84,24 @@ BT_GATT_SERVICE_DEFINE(CHIPoBLE_Service,
 // This value should be adjusted accordingly if the service declaration changes.
 constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 
+void InitRandomStaticAddress()
+{
+#if !CONFIG_BT_PRIVACY
+    // When the BT privacy feature is disabled, generate a random static address once per boot.
+    // This must be done before bt_enable() has been called.
+    bt_addr_le_t addr;
+
+    int error = bt_addr_le_create_static(&addr);
+    VerifyOrReturn(error == 0, ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error));
+
+    error = bt_id_create(&addr, nullptr);
+    VerifyOrReturn(error == 0, ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error));
+
+    ChipLogProgress(DeviceLayer, "BLE address was set to %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4],
+                    addr.a.val[3], addr.a.val[2], addr.a.val[1], addr.a.val[0]);
+#endif
+}
+
 } // unnamed namespace
 
 BLEManagerImpl BLEManagerImpl::sInstance;
@@ -98,6 +117,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
+    InitRandomStaticAddress();
     err = bt_enable(NULL);
     VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
 
@@ -183,8 +203,6 @@ struct BLEManagerImpl::ServiceData
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
 } __attribute__((packed));
 
-static_assert((CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT / 1000) <= CONFIG_BT_RPA_TIMEOUT,
-              "BLE advertising timeout is too long relative to RPA timeout");
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
@@ -216,16 +234,19 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!isAdvertisingRerun)
     {
-// If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
         ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+#if CONFIG_BT_PRIVACY
+        static_assert((CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT / 1000) <= CONFIG_BT_RPA_TIMEOUT,
+                      "BLE advertising timeout is too long relative to RPA timeout");
         // Generate new private BLE address
-        struct bt_le_oob bleOobInfo;
+        bt_le_oob bleOobInfo;
         err = bt_le_oob_get_local(advParams.id, &bleOobInfo);
-        (void) bleOobInfo;
         VerifyOrExit(err == CHIP_NO_ERROR, err = MapErrorZephyr(err));
+#endif // CONFIG_BT_PRIVACY
     }
 
     // Restart advertising

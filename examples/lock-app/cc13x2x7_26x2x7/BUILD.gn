@@ -39,6 +39,7 @@ ti_simplelink_sdk("sdk") {
 
 ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
+
   outputs = [
     "ti_devices_config.c",
     "ti_radio_config.c",
@@ -62,6 +63,7 @@ ti_sysconfig("sysconfig") {
     #"ti_ble_app_config.opt",
     #"ti_build_config.opt",
   ]
+
   public_configs = [ ":sdk_dmm_config" ]
 
   cflags = [
@@ -74,23 +76,7 @@ ti_sysconfig("sysconfig") {
 }
 
 ti_simplelink_executable("lock_app") {
-  include_dirs = [
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-    "${project_dir}",
-    "${project_dir}/main",
-    "${project_dir}/main/include",
-  ]
-  defines = []
   output_name = "chip-${ti_simplelink_board}-lock-example.out"
-
-  public_deps = [
-    ":sdk",
-    ":sysconfig",
-    "${chip_root}/examples/lock-app/lock-common",
-    "${chip_root}/src/lib",
-    "${openthread_root}:libopenthread-cli-ftd",
-  ]
 
   sources = [
     "${project_dir}/main/AppTask.cpp",
@@ -99,12 +85,24 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/main.cpp",
   ]
 
+  deps = [
+    ":sdk",
+    ":sysconfig",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/lib",
+    "${openthread_root}:libopenthread-cli-ftd",
+  ]
+
+  include_dirs = [
+    "${project_dir}",
+    "${project_dir}/main",
+  ]
+
   cflags = [
     "-Wno-implicit-fallthrough",
     "-Wno-sign-compare",
+    "-Wconversion",
   ]
-
-  output_dir = root_out_dir
 
   ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
 
@@ -114,6 +112,8 @@ ti_simplelink_executable("lock_app") {
                 root_build_dir),
     "-T" + rebase_path(ldscript, root_build_dir),
   ]
+
+  output_dir = root_out_dir
 }
 
 group("cc13x2x7_26x2x7") {

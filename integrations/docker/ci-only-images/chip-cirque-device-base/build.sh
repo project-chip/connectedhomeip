@@ -33,6 +33,19 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 # version
 VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
 
+GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
+
+# The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
+# Using the same ot-br-posix version as chip
+OT_BR_POSIX=$REPO_DIR/third_party/ot-br-posix/repo
+OT_BR_POSIX_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/ot-br-posix/repo)
+
+# For chip-cirque-device-base image we use the checkout of ot-br-posix repo
+# This is used for not pollute master branch checkout when someone pulls ot-br-posix
+# If this fails, the script will still rebuild the image.
+CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
+IMAGE_SAVE_PATH="$CIRQUE_CACHE_PATH"/"$IMAGE"_"$OT_BR_POSIX_CHECKOUT".tar
+
 [[ ${*/--help//} != "${*}" ]] && {
     set +x
     echo "Usage: $me <OPTIONS>
@@ -40,11 +53,7 @@ VERSION=${DOCKER_BUILD_VERSION:-$(cat version)}
   Build and (optionally tag as latest, push) a docker image from Dockerfile in CWD
 
   Options:
-   --try-download  try to download latest image from dockerhub and skip whole
-                   build procedure if the expected image version is downloaded.
    --no-cache      passed as a docker build argument
-   --latest        update latest to the current built (or downloaded) version (\"$VERSION\")
-   --push          push image(s) to docker.io (requires docker login for \"$ORG\")
    --help          get this message
 
 "
@@ -60,17 +69,6 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-if [[ ${*/--try-download//} != "${*}" ]]; then
-    docker pull "$ORG"/"$IMAGE":"$VERSION"
-    if [[ $? -eq 0 ]]; then
-        # tag it as latest for this version, note: this should only be used on CI
-        [[ ${*/--latest//} != "${*}" ]] && {
-            docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
-        }
-        exit 0
-    fi
-fi
-
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
@@ -80,28 +78,26 @@ done
 BUILD_ARGS=()
 if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
+else
+    if docker load -i "$IMAGE_SAVE_PATH"; then
+        echo "Loaded docker image from Github action cache."
+        BUILD_ARGS+=(--cache-from "$ORG/$IMAGE")
+    fi
 fi
 
 SOURCE=${BASH_SOURCE[0]}
 SOURCE_DIR=$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
 REPO_DIR="$SOURCE_DIR/../../../../"
 
-# The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
-# Using the same ot-br-posix version as chip
-OT_BR_POSIX=$REPO_DIR/third_party/ot-br-posix/repo
-OT_BR_POSIX_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/ot-br-posix/repo)
+docker build -t "$ORG/$IMAGE" -f "$SOURCE_DIR/Dockerfile" "${BUILD_ARGS[@]}" --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT" "$SOURCE_DIR"
 
-docker build -t "$ORG/$IMAGE:$VERSION" -f "$SOURCE_DIR/Dockerfile" "${BUILD_ARGS[@]}" --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT" "$SOURCE_DIR"
-
-[[ ${*/--latest//} != "${*}" ]] && {
-    docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
-}
-
-[[ ${*/--push//} != "${*}" ]] && {
-    docker push "$ORG"/"$IMAGE":"$VERSION"
-    [[ ${*/--latest//} != "${*}" ]] && {
-        docker push "$ORG"/"$IMAGE":latest
-    }
-}
+if [[ -n GITHUB_ACTION_RUN ]]; then
+    # Save cache
+    mkdir -p "$CIRQUE_CACHE_PATH"
+    docker save -o "$IMAGE_SAVE_PATH" "$ORG/$IMAGE"
+    echo "Saved docker image for future run: "
+    ls -lh "$IMAGE_SAVE_PATH"
+    chmod 644 "$IMAGE_SAVE_PATH"
+fi
 
 exit 0

@@ -86,6 +86,10 @@ private:
     /// Check if a given device is a CHIP device and if yes, report it as discovered
     void ReportDevice(BluezDevice1 * device);
 
+    /// Check if a given device is a CHIP device and if yes, remove it from the adapter
+    /// so that it can be re-discovered if it's still advertising.
+    void RemoveDevice(BluezDevice1 * device);
+
     GDBusObjectManager * mManager         = nullptr;
     BluezAdapter1 * mAdapter              = nullptr;
     GCancellable * mCancellable           = nullptr;
