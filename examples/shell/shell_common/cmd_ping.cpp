@@ -203,8 +203,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+    err = gStack.GetSecureSessionManager().NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                                      SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -239,7 +239,7 @@ void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingTable admins;
+    Inet::IPAddress gDestAddr;
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
     uint32_t maxEchoCount                   = 0;
@@ -250,55 +250,28 @@ void StartPinging(streamer_t * stream, char * destination)
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
+    gStack.Init();
+
+    adminInfo = gStack.GetAdmins().AssignAdminId(gAdminId, kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(gDestAddr.Type())
-                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
-#endif
-
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(gDestAddr.Type())
-                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
-
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
-        SuccessOrExit(err);
-
-        err = gExchangeManager.Init(&gSessionManager);
-        SuccessOrExit(err);
     }
     else
 #endif
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
-
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
-        SuccessOrExit(err);
-
-        err = gExchangeManager.Init(&gSessionManager);
-        SuccessOrExit(err);
     }
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession(stream, peerAddress);
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { kTestDeviceNodeId, 0, gAdminId });
+    err = gEchoClient.Init(&gStack.GetExchangeManager(), { kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
@@ -333,14 +306,14 @@ void StartPinging(streamer_t * stream, char * destination)
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    gTCPManager.Disconnect(peerAddress);
-    gTCPManager.Close();
+    gStack.GetTransportManager().Disconnect(peerAddress);
 #endif
-    gUDPManager.Close();
+
+    gStack.GetTransportManager().Close();
 
     gEchoClient.Shutdown();
-    gExchangeManager.Shutdown();
-    gSessionManager.Shutdown();
+
+    gStack.Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR))

@@ -25,39 +25,12 @@
 #include <errno.h>
 
 #include "common.h"
+
 #include <core/CHIPCore.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
-#include <support/ErrorStr.h>
+#include <stack/Stack.h>
 
-// The ExchangeManager global object.
-chip::Messaging::ExchangeManager gExchangeManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-
-void InitializeChip(void)
+chip::Stack<TransportConfigurationWithTcp> & GetChipStack()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    printf("Init CHIP Stack\r\n");
-
-    // Initialize System memory and resources
-    err = chip::Platform::MemoryInit();
-    SuccessOrExit(err);
-
-    // Initialize the CHIP stack.
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("Failed to init CHIP Stack with err: %s\r\n", chip::ErrorStr(err));
-        exit(EXIT_FAILURE);
-    }
-}
-
-void ShutdownChip(void)
-{
-    gExchangeManager.Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
+    static chip::Stack<TransportConfigurationWithTcp> gStack(gLocalDeviceId);
+    return gStack;
 }

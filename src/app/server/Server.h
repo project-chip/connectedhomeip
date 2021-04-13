@@ -28,17 +28,6 @@
 
 constexpr size_t kMaxBlePendingPackets = 1;
 
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
-#if INET_CONFIG_ENABLE_IPV4
-                                            ,
-                                            chip::Transport::UDP
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-                                            ,
-                                            chip::Transport::BLE<kMaxBlePendingPackets>
-#endif
-                                            >;
-
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server
  * assumes the platform's networking has been setup already.
