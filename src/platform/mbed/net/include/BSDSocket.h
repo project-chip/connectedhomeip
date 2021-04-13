@@ -20,13 +20,11 @@
 
 #include "OpenFileHandleAsFileDescriptor.h"
 #include "common.h"
-#include "mbed-trace/mbed_trace.h"
 #include <atomic>
 #include <mstd_atomic>
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>
 
-#define TRACE_GROUP "BSDS"
 namespace mbed {
 
 struct BSDSocket : public FileHandle
@@ -37,192 +35,32 @@ struct BSDSocket : public FileHandle
         MBED_TCP_SOCKET = SOCK_STREAM,
         MBED_UDP_SOCKET = SOCK_DGRAM
     };
+
+    enum
+    {
+        MBED_IPV4_SOCKET = AF_INET,
+        MBED_IPV6_SOCKET = AF_INET6
+    };
     BSDSocket(){};
     ~BSDSocket(){};
 
-    int open(int type, InternetSocket * socket = nullptr)
-    {
-        if (socket != nullptr)
-        {
-            _socket            = socket;
-            _factory_allocated = true;
-        }
-        else
-        {
-            switch (type)
-            {
-            case MBED_TCP_SOCKET: {
-                _socket = new TCPSocket();
-            }
-            break;
-            case MBED_UDP_SOCKET: {
-                _socket = new UDPSocket();
-            }
-            break;
-            default:
-                tr_err("Socket type not supported");
-                set_errno(ESOCKTNOSUPPORT);
-                return -1;
-            };
+    int open(int family, int type, InternetSocket * socket = nullptr);
 
-            if (_socket->open(NetworkInterface::get_default_instance()) != NSAPI_ERROR_OK)
-            {
-                close();
-                tr_err("Open socket failed");
-                set_errno(ENOBUFS);
-                return -1;
-            }
-        }
-
-        _type = type;
-
-        _flags.store(0);
-        _socket->sigio([&]() {
-            tr_debug("Socket %d event", _fd);
-            auto current = _flags.load();
-            if (current & POLLOUT)
-            {
-                current &= ~POLLOUT;
-            }
-
-            if (!(current & POLLIN))
-            {
-                current |= POLLIN;
-            }
-            _flags.store(current);
-            if (_callback)
-            {
-                _callback();
-            }
-        });
-
-        _socket->set_blocking(true);
-
-        _fd = bind_to_fd(this);
-        if (_fd < 0)
-        {
-            close();
-            tr_err("Bind socket to fd failed");
-            set_errno(ENFILE);
-            return -1;
-        }
-
-        tr_info("Open %s socket with fd %d", type == MBED_TCP_SOCKET ? "TCP" : "UDP", _fd);
-
-        return _fd;
-    }
-
-    int close() override
-    {
-        if (_factory_allocated)
-        {
-            _socket->close();
-        }
-        else
-        {
-            delete _socket;
-        }
-
-        _socket = nullptr;
-
-        tr_info("Close %s socket fd %d", _type == MBED_TCP_SOCKET ? "TCP" : "UDP", _fd);
-
-        _fd                = -1;
-        _callback          = nullptr;
-        _factory_allocated = false;
-        _flags.store(0);
-        if (socketName)
-        {
-            socketName.set_ip_bytes(nullptr, NSAPI_UNSPEC);
-        }
-    }
-
-    ssize_t read(void * buffer, size_t size) override
-    {
-        tr_info("Read from socket fd %d", _fd);
-        while (true)
-        {
-            auto current = _flags.load();
-            auto success = _flags.compare_exchange_weak(current, (current & ~POLLIN));
-            if (success)
-            {
-                break;
-            }
-        }
-
-        return 0;
-    }
-
-    ssize_t write(const void * buffer, size_t size) override
-    {
-        tr_info("Write to socket fd %d", _fd);
-        while (true)
-        {
-            auto current = _flags.load();
-            auto success = _flags.compare_exchange_weak(current, (current | POLLOUT));
-            if (success)
-            {
-                break;
-            }
-        }
-
-        return 0;
-    }
-
-    off_t seek(off_t offset, int whence = SEEK_SET) override { return -ESPIPE; }
-
-    int set_blocking(bool blocking) override
-    {
-        tr_info("Set socket fd %d blocking: %s", _fd, blocking ? "true" : "false");
-        _blocking = blocking;
-        if (_socket != nullptr)
-        {
-            _socket->set_blocking(_blocking);
-        }
-
-        return 0;
-    }
-
-    bool is_blocking() const override { return _blocking; }
-
-    int enable_input(bool enabled) override
-    {
-        tr_info("Set socket fd %d input enable: %s\n", _fd, enabled ? "true" : "false");
-        _inputEnable = enabled;
-        return 0;
-    }
-
-    bool is_input_enable() { return _inputEnable; }
-
-    int enable_output(bool enabled) override
-    {
-        tr_info("Set socket fd %d output enable: %s", _fd, enabled ? "true" : "false");
-        _outputEnable = enabled;
-        return 0;
-    }
-
-    bool is_output_enable() { return _outputEnable; }
-
-    short poll(short events) const override
-    {
-        auto state = _flags.load();
-        return (state & events);
-    }
-
-    void sigio(Callback<void()> func) override
-    {
-        _callback = func;
-        if (_callback && poll(POLLIN))
-        {
-            _callback();
-        }
-    }
-
-    bool isSocketOpen() { return _fd >= 0; }
-
-    InternetSocket * getNetSocket() { return _socket; }
-
-    int getSocketType() { return _type; }
+    int close() override;
+    ssize_t read(void * buffer, size_t size) override;
+    ssize_t write(const void * buffer, size_t size) override;
+    off_t seek(off_t offset, int whence = SEEK_SET) override;
+    int set_blocking(bool blocking) override;
+    bool is_blocking() const override;
+    int enable_input(bool enabled) override;
+    bool is_input_enable();
+    int enable_output(bool enabled) override;
+    bool is_output_enable();
+    short poll(short events) const override;
+    void sigio(Callback<void()> func) override;
+    bool isSocketOpen();
+    InternetSocket * getNetSocket();
+    int getSocketType();
 
     SocketAddress socketName;
 
