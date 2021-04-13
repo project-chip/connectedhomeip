@@ -34,6 +34,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <stack/Stack.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
@@ -44,12 +45,7 @@
 #include <nlunit-test.h>
 
 namespace chip {
-static System::Layer gSystemLayer;
-static SecureSessionMgr gSessionManager;
-static Messaging::ExchangeManager gExchangeManager;
-static TransportMgr<Transport::UDP> gTransportManager;
-static secure_channel::MessageCounterManager gMessageCounterManager;
-static const Transport::AdminId gAdminId = 0;
+static Stack<> gStack(chip::kTestDeviceNodeId);
 constexpr ClusterId kTestClusterId       = 6;
 constexpr EndpointId kTestEndpointId     = 1;
 constexpr chip::FieldId kTestFieldId1    = 1;
@@ -107,9 +103,9 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     AttributePathList::Builder attributePathListBuilder;
     AttributePath::Builder attributePathBuilder;
 
-    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err = InteractionModelEngine::GetInstance()->Init(&gStack.GetExchangeManager(), nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    Messaging::ExchangeContext * exchangeCtx = gStack.GetExchangeManager().NewContext({ 0, 0, 0 }, nullptr);
     TestExchangeDelegate delegate;
     exchangeCtx->SetDelegate(&delegate);
 
@@ -143,27 +139,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 namespace {
 void InitializeChip(nlTestSuite * apSuite)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(chip::gAdminId, chip::kTestDeviceNodeId);
-
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    chip::gSystemLayer.Init(nullptr);
-
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
-                                     &chip::gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gExchangeManager.Init(&chip::gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = chip::gMessageCounterManager.Init(&chip::gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, chip::gStack.Init() == CHIP_NO_ERROR);
 }
 
 // clang-format off

@@ -45,6 +45,8 @@
 
 #define ECHO_CLIENT_PORT (CHIP_PORT + 1)
 
+const chip::NodeId gLocalDeviceId = chip::kTestControllerNodeId;
+
 namespace {
 
 // Max value for the number of EchoRequests sent.
@@ -58,9 +60,6 @@ constexpr chip::Transport::AdminId gAdminId = 0;
 // The EchoClient object.
 chip::Protocols::Echo::EchoClient gEchoClient;
 
-chip::TransportMgr<chip::Transport::UDP> gUDPManager;
-chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecureSessionMgr gSessionManager;
 chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.
@@ -137,8 +136,7 @@ CHIP_ERROR EstablishSecureSession()
     }
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSession::SessionRole::kInitiator, gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -201,7 +199,6 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
 
     if (argc <= 1)
@@ -227,48 +224,20 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    InitializeChip();
+    GetChipStack().GetTransportConfig().SetListenPort(ECHO_CLIENT_PORT);
+    GetChipStack().Init();
 
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-
-    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestControllerNodeId);
+    adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    if (gUseTCP)
-    {
-        err = gTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-                                   .SetListenPort(ECHO_CLIENT_PORT));
-        SuccessOrExit(err);
-
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins,
-                                   &gMessageCounterManager);
-        SuccessOrExit(err);
-    }
-    else
-    {
-        err = gUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                   .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-                                   .SetListenPort(ECHO_CLIENT_PORT));
-        SuccessOrExit(err);
-
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
-                                   &gMessageCounterManager);
-        SuccessOrExit(err);
-    }
-
-    err = gExchangeManager.Init(&gSessionManager);
-    SuccessOrExit(err);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    SuccessOrExit(err);
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { chip::kTestDeviceNodeId, 0, gAdminId });
+    err = gEchoClient.Init(&GetChipStack().GetExchangeManager(), { chip::kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
@@ -278,7 +247,7 @@ int main(int argc, char * argv[])
 
     gEchoClient.Shutdown();
 
-    ShutdownChip();
+    GetChipStack().Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR) || (gEchoRespCount != kMaxEchoCount))

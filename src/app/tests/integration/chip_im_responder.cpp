@@ -42,6 +42,8 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
+const chip::NodeId gLocalDeviceId = chip::kTestDeviceNodeId;
+
 namespace chip {
 namespace app {
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
@@ -123,10 +125,7 @@ exit:
 } // namespace chip
 
 namespace {
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
 LivenessEventGenerator gLivenessGenerator;
 
 uint8_t gDebugEventBuffer[2048];
@@ -153,39 +152,25 @@ int main(int argc, char * argv[])
     chip::app::InteractionModelDelegate mockDelegate;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
     const chip::Transport::AdminId gAdminId = 0;
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    chip::Transport::AdminPairingInfo * adminInfo;
 
+    GetChipStack().Init();
+
+    adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    InitializeChip();
-
-    err = gTransportManager.Init(
-        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&GetChipStack().GetExchangeManager(), &mockDelegate);
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
-                               &gMessageCounterManager);
-    SuccessOrExit(err);
+    InitializeEventLogging(&GetChipStack().GetExchangeManager());
 
-    err = gExchangeManager.Init(&gSessionManager);
-    SuccessOrExit(err);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    SuccessOrExit(err);
-
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
-    SuccessOrExit(err);
-
-    InitializeEventLogging(&gExchangeManager);
-
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
+    err = GetChipStack().GetSecureSessionManager().NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
                                      gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
 
-    MockEventGenerator::GetInstance()->Init(&gExchangeManager, &gLivenessGenerator, 1000, true);
+    MockEventGenerator::GetInstance()->Init(&GetChipStack().GetExchangeManager(), &gLivenessGenerator, 1000, true);
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
@@ -200,7 +185,7 @@ exit:
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
 
-    ShutdownChip();
+    GetChipStack().Shutdown();
 
     return EXIT_SUCCESS;
 }

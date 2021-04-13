@@ -37,6 +37,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <stack/Stack.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
@@ -48,46 +49,22 @@
 
 namespace {
 
+static chip::Stack<> gStack(chip::kTestDeviceNodeId);
+
 static const chip::NodeId kTestDeviceNodeId     = 0x18B4300000000001ULL;
 static const chip::ClusterId kLivenessClusterId = 0x00000022;
 static const uint32_t kLivenessChangeEvent      = 1;
 static const chip::EndpointId kTestEndpointId   = 2;
 static const uint64_t kLivenessDeviceStatus     = chip::TLV::ContextTag(1);
-static const chip::Transport::AdminId gAdminId  = 0;
-static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-static chip::System::Layer gSystemLayer;
 
 static uint8_t gDebugEventBuffer[128];
 static uint8_t gInfoEventBuffer[128];
 static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-chip::SecureSessionMgr gSessionManager;
-chip::Messaging::ExchangeManager gExchangeManager;
-chip::secure_channel::MessageCounterManager gMessageCounterManager;
-
 void InitializeChip(nlTestSuite * apSuite)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    chip::Transport::AdminPairingTable admins;
-    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, kTestDeviceNodeId);
-
-    NL_TEST_ASSERT(apSuite, adminInfo != nullptr);
-
-    err = chip::Platform::MemoryInit();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    gSystemLayer.Init(nullptr);
-
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gExchangeManager.Init(&gSessionManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, gStack.Init() == CHIP_NO_ERROR);
 }
 
 void InitializeEventLogging()
@@ -99,7 +76,7 @@ void InitializeEventLogging()
     };
 
     chip::app::EventManagement::CreateEventManagement(
-        &gExchangeManager, sizeof(logStorageResources) / sizeof(logStorageResources[0]), gCircularEventBuffer, logStorageResources);
+        &gStack.GetExchangeManager(), sizeof(logStorageResources) / sizeof(logStorageResources[0]), gCircularEventBuffer, logStorageResources);
 }
 
 void SimpleDumpWriter(const char * aFormat, ...)

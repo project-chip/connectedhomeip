@@ -142,7 +142,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     }
 
     // Create a new exchange context.
-    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
+    gExchangeCtx = gStack.GetExchangeManager().NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
     VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     size = gSendArguments.GetPayloadSize();
@@ -205,7 +205,7 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
+    err = gStack.GetSecureSessionManager().NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
                                      gAdminId);
 
 exit:
@@ -226,7 +226,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Transport::AdminPairingTable admins;
+    Inet::IPAddress gDestAddr;
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
 
@@ -236,45 +236,21 @@ void ProcessCommand(streamer_t * stream, char * destination)
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    adminInfo = admins.AssignAdminId(gAdminId, kTestControllerNodeId);
+    adminInfo = gStack.GetAdmins().AssignAdminId(gAdminId, kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(gDestAddr.Type())
-                               .SetListenPort(gSendArguments.GetPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
-#endif
-
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                               .SetAddressType(gDestAddr.Type())
-                               .SetListenPort(gSendArguments.GetPort() + 1));
-    VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gSendArguments.IsUsingTCP())
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
-
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
-        SuccessOrExit(err);
     }
     else
 #endif
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
-
-        err =
-            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
-        SuccessOrExit(err);
     }
 
-    err = gExchangeManager.Init(&gSessionManager);
-    SuccessOrExit(err);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP server.
     err = EstablishSecureSession(stream, peerAddress);
@@ -287,13 +263,11 @@ void ProcessCommand(streamer_t * stream, char * destination)
     sleep(2);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    gTCPManager.Disconnect(peerAddress);
-    gTCPManager.Close();
+    gStack.GetTransportManager().Disconnect(peerAddress);
 #endif
-    gUDPManager.Close();
 
-    gExchangeManager.Shutdown();
-    gSessionManager.Shutdown();
+    gStack.GetTransportManager().Close();
+    gStack.Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR))

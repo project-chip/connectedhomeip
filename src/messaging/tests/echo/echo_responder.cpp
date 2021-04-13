@@ -39,13 +39,12 @@
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
+const chip::NodeId gLocalDeviceId = chip::kTestDeviceNodeId;
+
 namespace {
 
 // The EchoServer object.
 chip::Protocols::Echo::EchoServer gEchoServer;
-chip::TransportMgr<chip::Transport::UDP> gUDPManager;
-chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
@@ -60,10 +59,8 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
-    bool useTCP      = false;
     bool disableEcho = false;
 
-    chip::Transport::AdminPairingTable admins;
     chip::Transport::AdminPairingInfo * adminInfo = nullptr;
 
     const chip::Transport::AdminId gAdminId = 0;
@@ -74,56 +71,23 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "--tcp") == 0))
-    {
-        useTCP = true;
-    }
-
     if ((argc == 2) && (strcmp(argv[1], "--disable") == 0))
     {
         disableEcho = true;
     }
 
-    InitializeChip();
+    GetChipStack().Init();
 
-    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    if (useTCP)
-    {
-        err = gTCPManager.Init(
-            chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
-        SuccessOrExit(err);
-
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins,
-                                   &gMessageCounterManager);
-        SuccessOrExit(err);
-    }
-    else
-    {
-        err = gUDPManager.Init(
-            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
-        SuccessOrExit(err);
-
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
-                                   &gMessageCounterManager);
-        SuccessOrExit(err);
-    }
-
-    err = gExchangeManager.Init(&gSessionManager);
-    SuccessOrExit(err);
-
-    err = gMessageCounterManager.Init(&gExchangeManager);
-    SuccessOrExit(err);
 
     if (!disableEcho)
     {
-        err = gEchoServer.Init(&gExchangeManager);
+        err = gEchoServer.Init(&GetChipStack().GetExchangeManager());
         SuccessOrExit(err);
     }
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
-                                     gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder, gAdminId);
     SuccessOrExit(err);
 
     if (!disableEcho)
@@ -148,7 +112,7 @@ exit:
         gEchoServer.Shutdown();
     }
 
-    ShutdownChip();
+    GetChipStack().Shutdown();
 
     return EXIT_SUCCESS;
 }
