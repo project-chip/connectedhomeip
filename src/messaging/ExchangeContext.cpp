@@ -143,8 +143,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         }
     }
 
-    err = mTransport->SendMessage(mSecureSession, exchangeInfo, mReliableMessageContext, reliableTransmissionRequested, protocolId,
-                                  msgType, std::move(msgBuf));
+    err = GetTransport()->SendMessage(mSecureSession, exchangeInfo, mReliableMessageContext, reliableTransmissionRequested,
+                                      protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -230,6 +230,16 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
+ExchangeTransport * ExchangeContext::GetTransport()
+{
+    if (mDelegate != nullptr)
+    {
+        return mDelegate->GetTransport(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+    }
+
+    return mExchangeMgr->GetDefaultExchangeTransport();
+}
+
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                                          ExchangeDelegate * delegate)
 {
@@ -243,18 +253,6 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mSecureSession = session;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
     mDelegate = delegate;
-
-    if (mDelegate != nullptr)
-    {
-        mTransport = mDelegate->GetTransport(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-    }
-    else
-    {
-        // By default, let's allocate the application transport. This is the most commonly used and secure transport.
-        mAppTransport.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        mTransport = &mAppTransport;
-    }
-    VerifyOrDie(mTransport != nullptr);
 
     mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
@@ -368,8 +366,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     ExchangeTransport::MessageReliabilityInfo reliabilityInfo = { packetHeader.GetMessageId(), payloadHeader.IsAckMsg(),
                                                                   payloadHeader.GetAckId().ValueOr(0), payloadHeader.NeedsAck() };
-    CHIP_ERROR err = mTransport->OnMessageReceived(protocolId.GetProtocolId(), messageType, peerAddress, mReliableMessageContext,
-                                                   reliabilityInfo);
+    CHIP_ERROR err = GetTransport()->OnMessageReceived(protocolId.GetProtocolId(), messageType, peerAddress,
+                                                       mReliableMessageContext, reliabilityInfo);
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.

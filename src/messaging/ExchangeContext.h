@@ -152,7 +152,7 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
-    const ExchangeTransport * GetTransport() const { return mTransport; }
+    ExchangeTransport * GetTransport();
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
@@ -205,9 +205,6 @@ private:
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
     ExchangeACL * mExchangeACL     = nullptr;
-    ExchangeTransport * mTransport = nullptr;
-
-    ApplicationExchangeTransport mAppTransport;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.

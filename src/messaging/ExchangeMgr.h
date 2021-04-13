@@ -210,6 +210,12 @@ public:
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
     size_t GetContextsInUse() const { return mContextsInUse; }
 
+    ExchangeTransport * GetDefaultExchangeTransport()
+    {
+        mDefaultExchangeTransport.Init(GetReliableMessageMgr(), GetSessionMgr());
+        return &mDefaultExchangeTransport;
+    }
+
 private:
     enum class State
     {
@@ -248,6 +254,9 @@ private:
     MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     Transport::AdminId mAdminId = 0;
+
+    // By default allocate the application transport. This is the most commonly used and secure transport.
+    ApplicationExchangeTransport mDefaultExchangeTransport;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
