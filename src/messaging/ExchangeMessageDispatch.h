@@ -34,20 +34,6 @@ class ReliableMessageContext;
 class ExchangeMessageDispatch
 {
 public:
-    struct ExchangeInfo
-    {
-        bool mInitiator;
-        uint16_t mExchangeId;
-    };
-
-    struct MessageReliabilityInfo
-    {
-        uint32_t mMessageId;
-        bool mHasAck;
-        uint32_t mAckId;
-        bool mNeedsAck;
-    };
-
     ExchangeMessageDispatch() {}
     virtual ~ExchangeMessageDispatch() {}
 
@@ -57,7 +43,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendMessage(SecureSessionHandle session, ExchangeMessageDispatch::ExchangeInfo & exchangeInfo,
+    CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext & reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle message);
 
@@ -67,8 +53,9 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    virtual CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                         ReliableMessageContext & reliableMessageContext, MessageReliabilityInfo & reliabilityInfo);
+    virtual CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
+                                         const Transport::PeerAddress & peerAddress,
+                                         ReliableMessageContext & reliableMessageContext);
 
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;

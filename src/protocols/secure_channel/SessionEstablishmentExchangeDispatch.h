@@ -47,9 +47,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                 Messaging::ReliableMessageContext & reliableMessageContext,
-                                 MessageReliabilityInfo & reliabilityInfo) override;
+    CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
+                                 const Transport::PeerAddress & peerAddress,
+                                 Messaging::ReliableMessageContext & reliableMessageContext) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
@@ -61,7 +61,12 @@ protected:
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
-    bool IsTransportReliable() override { return (mBLETransport != nullptr); }
+    bool IsTransportReliable() override
+    {
+        // If we are not using BLE as the transport, the underlying transport is UDP based.
+        // (return true only if BLE is being used as the transport)
+        return (mTransportMgr == nullptr);
+    }
 
 private:
     Transport::BLE * mBLETransport   = nullptr;

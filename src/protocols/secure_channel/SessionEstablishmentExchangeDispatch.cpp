@@ -50,11 +50,11 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(uint16_t protocol, uint8_t type,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
-                                                                   ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo)
+                                                                   ReliableMessageContext & reliableMessageContext)
 {
-    ReturnErrorOnFailure(ExchangeMessageDispatch::OnMessageReceived(protocol, type, peerAddress, rmCtxt, rmInfo));
+    ReturnErrorOnFailure(ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext));
     mPeerAddress = peerAddress;
 
     return CHIP_NO_ERROR;

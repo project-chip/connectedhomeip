@@ -39,14 +39,14 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, ExchangeMessageDispatch::ExchangeInfo & exchangeInfo,
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                                                 ReliableMessageContext & reliableMessageContext, bool isReliableTransmission,
                                                 Protocols::Id protocol, uint8_t type, System::PacketBufferHandle message)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 
     PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(exchangeInfo.mExchangeId).SetMessageType(protocol, type).SetInitiator(exchangeInfo.mInitiator);
+    payloadHeader.SetExchangeID(exchangeId).SetMessageType(protocol, type).SetInitiator(isInitiator);
 
     // If there is a pending acknowledgment piggyback it on this message.
     if (reliableMessageContext.HasPeerRequestedAck())
@@ -98,20 +98,21 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, Exc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                                      ReliableMessageContext & reliableMessageContext,
-                                                      MessageReliabilityInfo & reliabilityInfo)
+CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
+                                                      const Transport::PeerAddress & peerAddress,
+                                                      ReliableMessageContext & reliableMessageContext)
 {
-    ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
+                      CHIP_ERROR_INVALID_ARGUMENT);
 
     if (!IsTransportReliable())
     {
-        if (reliabilityInfo.mHasAck)
+        if (payloadHeader.IsAckMsg() && payloadHeader.GetAckId().HasValue())
         {
-            ReturnErrorOnFailure(reliableMessageContext.HandleRcvdAck(reliabilityInfo.mAckId));
+            ReturnErrorOnFailure(reliableMessageContext.HandleRcvdAck(payloadHeader.GetAckId().Value()));
         }
 
-        if (reliabilityInfo.mNeedsAck)
+        if (payloadHeader.NeedsAck())
         {
             MessageFlags msgFlags;
 
@@ -122,7 +123,7 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint16_t protocol, uint8_t
             // Also set the flag in the exchange context indicating an ack requested;
             reliableMessageContext.SetPeerRequestedAck(true);
 
-            ReturnErrorOnFailure(reliableMessageContext.HandleNeedsAck(reliabilityInfo.mMessageId, msgFlags));
+            ReturnErrorOnFailure(reliableMessageContext.HandleNeedsAck(messageId, msgFlags));
         }
     }
 
