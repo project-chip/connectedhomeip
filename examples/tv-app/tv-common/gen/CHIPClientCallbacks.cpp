@@ -20,6 +20,7 @@
 #include "gen/CHIPClientCallbacks.h"
 
 #include "gen/enums.h"
+#include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -696,7 +697,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-bool emberAfDoorLockClusterLockDoorResponseCallback(uint8_t status)
+bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::Command * apCommandObj, uint8_t status)
 {
     ChipLogProgress(Zcl, "LockDoorResponse:");
     LogStatus(status);
@@ -717,7 +718,7 @@ bool emberAfDoorLockClusterLockDoorResponseCallback(uint8_t status)
     return true;
 }
 
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(uint8_t status)
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::Command * apCommandObj, uint8_t status)
 {
     ChipLogProgress(Zcl, "UnlockDoorResponse:");
     LogStatus(status);

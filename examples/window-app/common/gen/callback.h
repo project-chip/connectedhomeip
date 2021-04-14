@@ -24,6 +24,7 @@
 #include "af-types.h"
 #include "basic-types.h"
 
+#include <app/Command.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -126,47 +127,49 @@ void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
  * @brief Window Covering Cluster WindowCoveringDownClose Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback();
+bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Command * apCommandObj);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
  * @param percentageLiftValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(uint8_t percentageLiftValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * apCommandObj,
+                                                                          uint8_t percentageLiftValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
  * @param liftValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(uint16_t liftValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command * apCommandObj, uint16_t liftValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
  * @param percentageTiltValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(uint8_t percentageTiltValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * apCommandObj,
+                                                                          uint8_t percentageTiltValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
  * @param tiltValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(uint16_t tiltValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command * apCommandObj, uint16_t tiltValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringStop Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringStopCallback();
+bool emberAfWindowCoveringClusterWindowCoveringStopCallback(chip::app::Command * apCommandObj);
 
 /**
  * @brief Window Covering Cluster WindowCoveringUpOpen Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback();
+bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(chip::app::Command * apCommandObj);
 
 //
 // Non-Cluster Related Callbacks

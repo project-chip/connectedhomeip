@@ -24,6 +24,7 @@
 #include "af-types.h"
 #include "basic-types.h"
 
+#include <app/Command.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -1140,49 +1141,49 @@ void emberAfTemperatureMeasurementClusterClientTickCallback(chip::EndpointId end
  * @param status
  */
 
-bool emberAfDoorLockClusterClearAllPinsResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearAllPinsResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster ClearAllRfidsResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterClearAllRfidsResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster ClearHolidayScheduleResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster ClearPinResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterClearPinResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearPinResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster ClearRfidResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterClearRfidResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearRfidResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster ClearWeekdayScheduleResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster ClearYeardayScheduleResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster GetHolidayScheduleResponse Command callback
@@ -1193,8 +1194,9 @@ bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(uint8_t status);
  * @param operatingModeDuringHoliday
  */
 
-bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(uint8_t scheduleId, uint8_t status, uint32_t localStartTime,
-                                                              uint32_t localEndTime, uint8_t operatingModeDuringHoliday);
+bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t scheduleId, uint8_t status,
+                                                              uint32_t localStartTime, uint32_t localEndTime,
+                                                              uint8_t operatingModeDuringHoliday);
 
 /**
  * @brief Door Lock Cluster GetLogRecordResponse Command callback
@@ -1207,8 +1209,9 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(uint8_t scheduleId
  * @param pin
  */
 
-bool emberAfDoorLockClusterGetLogRecordResponseCallback(uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin);
+bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::Command * apCommandObj, uint16_t logEntryId, uint32_t timestamp,
+                                                        uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode,
+                                                        uint16_t userId, uint8_t * pin);
 
 /**
  * @brief Door Lock Cluster GetPinResponse Command callback
@@ -1218,7 +1221,8 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(uint16_t logEntryId, uin
  * @param pin
  */
 
-bool emberAfDoorLockClusterGetPinResponseCallback(uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin);
+bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::Command * apCommandObj, uint16_t userId, uint8_t userStatus,
+                                                  uint8_t userType, uint8_t * pin);
 
 /**
  * @brief Door Lock Cluster GetRfidResponse Command callback
@@ -1228,7 +1232,8 @@ bool emberAfDoorLockClusterGetPinResponseCallback(uint16_t userId, uint8_t userS
  * @param rfid
  */
 
-bool emberAfDoorLockClusterGetRfidResponseCallback(uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid);
+bool emberAfDoorLockClusterGetRfidResponseCallback(chip::app::Command * apCommandObj, uint16_t userId, uint8_t userStatus,
+                                                   uint8_t userType, uint8_t * rfid);
 
 /**
  * @brief Door Lock Cluster GetUserTypeResponse Command callback
@@ -1236,7 +1241,7 @@ bool emberAfDoorLockClusterGetRfidResponseCallback(uint16_t userId, uint8_t user
  * @param userType
  */
 
-bool emberAfDoorLockClusterGetUserTypeResponseCallback(uint16_t userId, uint8_t userType);
+bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::app::Command * apCommandObj, uint16_t userId, uint8_t userType);
 
 /**
  * @brief Door Lock Cluster GetWeekdayScheduleResponse Command callback
@@ -1250,9 +1255,9 @@ bool emberAfDoorLockClusterGetUserTypeResponseCallback(uint16_t userId, uint8_t 
  * @param endMinute
  */
 
-bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask,
-                                                              uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-                                                              uint8_t endMinute);
+bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t scheduleId,
+                                                              uint16_t userId, uint8_t status, uint8_t daysMask, uint8_t startHour,
+                                                              uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
 
 /**
  * @brief Door Lock Cluster GetYeardayScheduleResponse Command callback
@@ -1263,71 +1268,72 @@ bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(uint8_t scheduleId
  * @param localEndTime
  */
 
-bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(uint8_t scheduleId, uint16_t userId, uint8_t status,
-                                                              uint32_t localStartTime, uint32_t localEndTime);
+bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t scheduleId,
+                                                              uint16_t userId, uint8_t status, uint32_t localStartTime,
+                                                              uint32_t localEndTime);
 
 /**
  * @brief Door Lock Cluster LockDoorResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterLockDoorResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster SetHolidayScheduleResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster SetPinResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterSetPinResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterSetPinResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster SetRfidResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterSetRfidResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterSetRfidResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster SetUserTypeResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterSetUserTypeResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterSetUserTypeResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster SetWeekdayScheduleResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster SetYeardayScheduleResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster UnlockDoorResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief Door Lock Cluster UnlockWithTimeoutResponse Command callback
  * @param status
  */
 
-bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(uint8_t status);
+bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::app::Command * apCommandObj, uint8_t status);
 
 /**
  * @brief General Commissioning Cluster ArmFailSafeResponse Command callback
@@ -1335,7 +1341,8 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(uint8_t status);
  * @param debugText
  */
 
-bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(uint8_t errorCode, uint8_t * debugText);
+bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Command * apCommandObj, uint8_t errorCode,
+                                                                   uint8_t * debugText);
 
 /**
  * @brief General Commissioning Cluster CommissioningCompleteResponse Command callback
@@ -1343,7 +1350,8 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(uint8_t error
  * @param debugText
  */
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(uint8_t errorCode, uint8_t * debugText);
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::Command * apCommandObj, uint8_t errorCode,
+                                                                             uint8_t * debugText);
 
 /**
  * @brief General Commissioning Cluster SetFabricResponse Command callback
@@ -1351,7 +1359,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(uin
  * @param debugText
  */
 
-bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(uint8_t errorCode, uint8_t * debugText);
+bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(chip::app::Command * apCommandObj, uint8_t errorCode,
+                                                                 uint8_t * debugText);
 
 /**
  * @brief Groups Cluster AddGroupResponse Command callback
@@ -1359,7 +1368,7 @@ bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(uint8_t errorCo
  * @param groupId
  */
 
-bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId);
+bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId);
 
 /**
  * @brief Groups Cluster GetGroupMembershipResponse Command callback
@@ -1368,7 +1377,7 @@ bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t group
  * @param groupList
  */
 
-bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, uint8_t groupCount,
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::Command * apCommandObj, uint8_t capacity, uint8_t groupCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
@@ -1377,7 +1386,7 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, ui
  * @param groupId
  */
 
-bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId);
+bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId);
 
 /**
  * @brief Groups Cluster ViewGroupResponse Command callback
@@ -1386,14 +1395,15 @@ bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t gr
  * @param groupName
  */
 
-bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                   uint8_t * groupName);
 
 /**
  * @brief Identify Cluster IdentifyQueryResponse Command callback
  * @param timeout
  */
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout);
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * apCommandObj, uint16_t timeout);
 
 /**
  * @brief Scenes Cluster AddSceneResponse Command callback
@@ -1402,7 +1412,8 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout);
  * @param sceneId
  */
 
-bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterAddSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                  uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster GetSceneMembershipResponse Command callback
@@ -1413,7 +1424,8 @@ bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t group
  * @param sceneList
  */
 
-bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint8_t capacity,
+                                                            uint16_t groupId, uint8_t sceneCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
 
 /**
@@ -1422,7 +1434,7 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint
  * @param groupId
  */
 
-bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_t groupId);
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId);
 
 /**
  * @brief Scenes Cluster RemoveSceneResponse Command callback
@@ -1431,7 +1443,8 @@ bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_
  * @param sceneId
  */
 
-bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                     uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster StoreSceneResponse Command callback
@@ -1440,7 +1453,8 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t gr
  * @param sceneId
  */
 
-bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                    uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster ViewSceneResponse Command callback
@@ -1452,8 +1466,8 @@ bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t gro
  * @param extensionFieldSets
  */
 
-bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                                   uint8_t * sceneName,
+bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                   uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                                    /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 //
