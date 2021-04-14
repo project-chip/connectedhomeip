@@ -55,35 +55,14 @@ using namespace rtos;
 static chip::Shell::Shell sShellDateSubcommands;
 static chip::Shell::Shell sShellNetworkSubcommands;
 static chip::Shell::Shell sShellSocketSubcommands;
+static chip::Shell::Shell sShellServerSubcommands;
+
+constexpr size_t kMaxTcpActiveConnectionCount = 2;
+constexpr size_t kMaxTcpPendingPackets        = 2;
 
 EventFlags socketEvent;
 uint32_t socketMsgReceiveFlag           = 0x1;
 uint32_t socketConnectionCompeletedFlag = 0x2;
-
-class ServerCallback : public SecureSessionMgrDelegate
-{
-public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
-    {
-        char src_addr[PeerAddress::kMaxToStringSize];
-        auto state            = mgr->GetPeerConnectionState(session);
-        const size_t data_len = buffer->DataLength();
-
-        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-        streamer_printf(streamer_get(), "INFO: received packet from: %zu bytes\r\n", src_addr, static_cast<size_t>(data_len));
-    }
-
-    void OnReceiveError(CHIP_ERROR error, const PeerAddress & source, SecureSessionMgr * mgr) override
-    {
-        streamer_printf(streamer_get(), "ERROR: packet received error: %s\r\n", ErrorStr(error));
-    }
-
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
-    {
-        streamer_printf(streamer_get(), "INFO: Received a new connection\r\n");
-    }
-};
 
 void HandleDNSResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray)
 {
@@ -113,6 +92,7 @@ void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHand
     streamer_printf(sout, "INFO: TCP socket message received\r\n");
     streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
                     strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+    buffer.FreeHead();
     socketEvent.set(socketMsgReceiveFlag);
 }
 
@@ -132,10 +112,11 @@ void OnUdpMessageReceived(Inet::IPEndPointBasis * endPoint, System::PacketBuffer
     streamer_printf(sout, "INFO: UDP socket message received from %s\r\n", peerAddrStr);
     streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
                     strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
+    buffer.FreeHead();
     socketEvent.set(socketMsgReceiveFlag);
 }
 
-int cmd_date_help_iterator(shell_command_t * command, void * arg)
+int cmd_common_help_iterator(shell_command_t * command, void * arg)
 {
     streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
     return 0;
@@ -143,7 +124,7 @@ int cmd_date_help_iterator(shell_command_t * command, void * arg)
 
 int cmd_date_help(int argc, char ** argv)
 {
-    sShellDateSubcommands.ForEachCommand(cmd_date_help_iterator, nullptr);
+    sShellDateSubcommands.ForEachCommand(cmd_common_help_iterator, nullptr);
     return 0;
 }
 
@@ -238,15 +219,9 @@ exit:
     return error;
 }
 
-int cmd_network_help_iterator(shell_command_t * command, void * arg)
-{
-    streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
-    return 0;
-}
-
 int cmd_network_help(int argc, char ** argv)
 {
-    sShellNetworkSubcommands.ForEachCommand(cmd_network_help_iterator, nullptr);
+    sShellNetworkSubcommands.ForEachCommand(cmd_common_help_iterator, nullptr);
     return 0;
 }
 
@@ -375,15 +350,9 @@ exit:
     return error;
 }
 
-int cmd_socket_help_iterator(shell_command_t * command, void * arg)
-{
-    streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
-    return 0;
-}
-
 int cmd_socket_help(int argc, char ** argv)
 {
-    sShellSocketSubcommands.ForEachCommand(cmd_socket_help_iterator, nullptr);
+    sShellSocketSubcommands.ForEachCommand(cmd_common_help_iterator, nullptr);
     return 0;
 }
 
@@ -715,39 +684,131 @@ exit:
     return error;
 }
 
-constexpr size_t kMaxTcpActiveConnectionCount = 2;
-constexpr size_t kMaxTcpPendingPackets        = 2;
-ServerCallback gCallbacks;
-TransportMgr<UDP> gUDPManager;
-TransportMgr<TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-SecureSessionMgr gSessionManager;
-SecurePairingUsingTestSecret gTestPairing(Optional<NodeId>::Value(kUndefinedNodeId), static_cast<uint16_t>(0),
-                                          static_cast<uint16_t>(0));
-AdminPairingTable admins;
+/* Server commands */
+class ChipServer
+{
+public:
+    ChipServer() {}
+    ~ChipServer() {}
 
-int cmd_socket_server(int argc, char ** argv)
+    enum
+    {
+        CHIP_SERVER_OFF = 0,
+        CHIP_SERVER_ON
+    };
+    union
+    {
+        TransportMgr<UDP> * udp;
+        TransportMgr<TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> * tcp;
+    };
+
+    SecureSessionMgr * sessionManager;
+
+    Type type     = Type::kUndefined;
+    uint16_t port = CHIP_PORT;
+    uint8_t state = CHIP_SERVER_OFF;
+
+    void displayState()
+    {
+        InterfaceAddressIterator intIterator;
+        char addrStr[16];
+        streamer_t * sout = streamer_get();
+
+        if (state == CHIP_SERVER_OFF)
+        {
+            streamer_printf(sout, "INFO: CHIP server is disabled\r\n");
+        }
+        else
+        {
+            streamer_printf(sout, "INFO: %s CHIP server is enabled and listen on port %d\r\n", type == Type::kUdp ? "UDP" : "TCP",
+                            port);
+            if (intIterator.IsUp())
+            {
+                streamer_printf(sout, "INFO: network interface IP address %s\r\n",
+                                intIterator.GetAddress().ToString(addrStr, sizeof(addrStr)));
+            }
+            else
+            {
+                streamer_printf(sout, "WARN: Network interface is down\r\n");
+            }
+        }
+    }
+};
+
+static ChipServer gChipServer;
+
+int cmd_server_dispatch(int argc, char ** argv)
+{
+    if (0 == argc)
+    {
+        gChipServer.displayState();
+        return CHIP_NO_ERROR;
+    }
+
+    return sShellServerSubcommands.ExecCommand(argc, argv);
+}
+
+int cmd_server_help(int argc, char ** argv)
+{
+    sShellServerSubcommands.ForEachCommand(cmd_common_help_iterator, nullptr);
+    return 0;
+}
+
+class ServerCallback : public SecureSessionMgrDelegate
+{
+public:
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+    {
+        char src_addr[PeerAddress::kMaxToStringSize];
+        auto state            = mgr->GetPeerConnectionState(session);
+        const size_t data_len = buffer->DataLength();
+
+        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
+        streamer_printf(streamer_get(), "INFO: received packet from: %zu bytes\r\n", src_addr, static_cast<size_t>(data_len));
+    }
+
+    void OnReceiveError(CHIP_ERROR error, const PeerAddress & source, SecureSessionMgr * mgr) override
+    {
+        streamer_printf(streamer_get(), "ERROR: packet received error: %s\r\n", ErrorStr(error));
+    }
+
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    {
+        streamer_printf(streamer_get(), "INFO: Received a new connection\r\n");
+    }
+};
+
+static ServerCallback gCallbacks;
+static SecurePairingUsingTestSecret gTestPairing(Optional<NodeId>::Value(kUndefinedNodeId), static_cast<uint16_t>(0),
+                                                 static_cast<uint16_t>(0));
+static AdminPairingTable gAdmin;
+
+int cmd_server_on(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
-    Type type;
     const AdminId gAdminId       = 0;
     AdminPairingInfo * adminInfo = nullptr;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-    uint16_t port = CHIP_PORT;
-    InterfaceAddressIterator intIterator;
-    char addrStr[16];
 
     streamer_t * sout = streamer_get();
 
     VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
+    if (gChipServer.state != ChipServer::CHIP_SERVER_OFF)
+    {
+        streamer_printf(sout, "ERROR: CHIP server already enabled\r\n");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     if (strcmp(argv[0], "UDP") == 0)
     {
-        type = Type::kUdp;
+        gChipServer.type = Type::kUdp;
     }
     else if (strcmp(argv[0], "TCP") == 0)
     {
-        type = Type::kTcp;
+        gChipServer.type = Type::kTcp;
     }
     else
     {
@@ -757,23 +818,37 @@ int cmd_socket_server(int argc, char ** argv)
 
     if (argc > 1)
     {
-        port = atoi(argv[1]);
+        gChipServer.port = atoi(argv[1]);
     }
 
-    adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+    adminInfo = gAdmin.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    if (type == Type::kUdp)
+    gChipServer.sessionManager = new SecureSessionMgr();
+    if (gChipServer.sessionManager == nullptr)
     {
-        err = gUDPManager.Init(
-            Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(port));
+        streamer_printf(sout, "ERROR: Sesion manager create failed\r\n");
+        ExitNow(error = CHIP_ERROR_INTERNAL;);
+    }
+
+    if (gChipServer.type == Type::kUdp)
+    {
+        gChipServer.udp = new TransportMgr<UDP>();
+        if (gChipServer.udp == nullptr)
+        {
+            streamer_printf(sout, "ERROR: UDP manager create failed\r\n");
+            ExitNow(error = CHIP_ERROR_INTERNAL;);
+        }
+        err = gChipServer.udp->Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
+                                        .SetAddressType(Inet::kIPAddressType_IPv4)
+                                        .SetListenPort(gChipServer.port));
         if (err != INET_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: UDP manager intialization failed\r\n");
             ExitNow(error = err;);
         }
 
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err = gChipServer.sessionManager->Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, gChipServer.udp, &gAdmin);
         if (err != INET_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
@@ -782,15 +857,22 @@ int cmd_socket_server(int argc, char ** argv)
     }
     else
     {
-        err = gTCPManager.Init(
-            Transport::TcpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(port));
+        gChipServer.tcp = new TransportMgr<TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>>();
+        if (gChipServer.tcp == nullptr)
+        {
+            streamer_printf(sout, "ERROR: TCP manager create failed\r\n");
+            ExitNow(error = CHIP_ERROR_INTERNAL;);
+        }
+        err = gChipServer.tcp->Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
+                                        .SetAddressType(Inet::kIPAddressType_IPv4)
+                                        .SetListenPort(gChipServer.port));
         if (err != INET_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: TCP manager intialization failed\r\n");
             ExitNow(error = err;);
         }
 
-        err = gSessionManager.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err = gChipServer.sessionManager->Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, gChipServer.tcp, &gAdmin);
         if (err != INET_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
@@ -798,29 +880,73 @@ int cmd_socket_server(int argc, char ** argv)
         }
     }
 
-    gSessionManager.SetDelegate(&gCallbacks);
+    gChipServer.sessionManager->SetDelegate(&gCallbacks);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
+    err = gChipServer.sessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
     if (err != INET_NO_ERROR)
     {
         streamer_printf(sout, "ERROR: set new pairing failed\r\n");
         ExitNow(error = err;);
     }
 
-    if (intIterator.IsUp())
-    {
-        streamer_printf(sout, "INFO: network interface IP address %s\r\n",
-                        intIterator.GetAddress().ToString(addrStr, sizeof(addrStr)));
-    }
-    else
-    {
-        streamer_printf(sout, "WARN: Network interface is down\r\n");
-    }
+    gChipServer.state = ChipServer::CHIP_SERVER_ON;
 
-    streamer_printf(sout, "INFO: %s server listen on port %d\r\n", argv[0], port);
+    gChipServer.displayState();
 
 exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        if (gChipServer.sessionManager)
+        {
+            delete gChipServer.sessionManager;
+        }
+
+        if (gChipServer.type == Type::kUdp && gChipServer.udp)
+        {
+            delete gChipServer.udp;
+        }
+
+        if (gChipServer.type == Type::kTcp && gChipServer.tcp)
+        {
+            delete gChipServer.tcp;
+        }
+    }
     return error;
+}
+
+int cmd_server_off(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    if (gChipServer.state != ChipServer::CHIP_SERVER_ON)
+    {
+        streamer_printf(sout, "ERROR: CHIP server already disabled\r\n");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (gChipServer.sessionManager)
+    {
+        delete gChipServer.sessionManager;
+    }
+
+    if (gChipServer.type == Type::kUdp && gChipServer.udp)
+    {
+        delete gChipServer.udp;
+    }
+
+    if (gChipServer.type == Type::kTcp && gChipServer.tcp)
+    {
+        delete gChipServer.tcp;
+    }
+
+    gChipServer.state = ChipServer::CHIP_SERVER_OFF;
+
+    gChipServer.type = Type::kUndefined;
+    gChipServer.port = CHIP_PORT;
+
+    gChipServer.displayState();
+
+    return CHIP_NO_ERROR;
 }
 
 static const shell_command_t cmds_date_root = { &cmd_date_dispatch, "date", "Display the current time, or set the system date." };
@@ -852,20 +978,31 @@ static const shell_command_t cmds_socket[] = {
     { &cmd_socket_example, "example",
       "Socket example which sends HTTP request to ifconfig.io and receives a response.\n"
       "\tUsage: socket example" },
-    { &cmd_socket_server, "server",
-      "Create CHIP server for communication testing.\n"
-      "\tUsage: socket server <type> <port>[optional - default 11097]\n"
-      "\tExample: socket server UDP 7" },
     { &cmd_socket_help, "help", "Display help for each socket subcommands" }
 };
+
+static const shell_command_t cmds_server_root = { &cmd_server_dispatch, "server", "Enable/disable CHIP server" };
+
+static const shell_command_t cmds_server[] = { { &cmd_server_on, "on",
+                                                 "Create CHIP server for communication testing.\n"
+                                                 "\tUsage: server on <type> <port>[optional - default 11097]\n"
+                                                 "\tExample: server on UDP 7" },
+                                               { &cmd_server_off, "off",
+                                                 "Shutdown current CHIP server instance.\n"
+                                                 "\tUsage: server off" },
+                                               { &cmd_server_help, "help", "Display help for each server subcommands" } };
 
 void cmd_mbed_utils_init()
 {
     sShellDateSubcommands.RegisterCommands(cmds_date, ArraySize(cmds_date));
     sShellNetworkSubcommands.RegisterCommands(cmds_network, ArraySize(cmds_network));
     sShellSocketSubcommands.RegisterCommands(cmds_socket, ArraySize(cmds_socket));
+    sShellServerSubcommands.RegisterCommands(cmds_server, ArraySize(cmds_server));
     shell_register(&cmds_date_root, 1);
     shell_register(&cmds_test_config, 1);
     shell_register(&cmds_network_root, 1);
     shell_register(&cmds_socket_root, 1);
+    shell_register(&cmds_server_root, 1);
+
+    // chip::DeviceLayer::ConnectivityMgrImpl().ProvisionWiFiNetwork("ARMtest", "ARM&chip2021");
 }
