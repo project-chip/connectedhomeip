@@ -2523,12 +2523,12 @@
 #define emberAfApplicationBasicClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, __VA_ARGS__)
 // Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
 #define emberAfApplicationBasicClusterFlush()
-#define emberAfApplicationBasicClusterDebugExec(x)                                                                                      \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER))                                                                   \
+#define emberAfApplicationBasicClusterDebugExec(x)                                                                                 \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER))                                                             \
     {                                                                                                                              \
         x;                                                                                                                         \
     }
-#define emberAfApplicationBasicClusterPrintBuffer(buffer, len, withSpace)                                                               \
+#define emberAfApplicationBasicClusterPrintBuffer(buffer, len, withSpace)                                                          \
     emberAfPrintBuffer(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, (buffer), (len), (withSpace))
 #define emberAfApplicationBasicClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, (buffer))
 #else
