@@ -279,7 +279,8 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * apCommandObj, uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime)
+bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * apCommandObj, uint8_t onOffControl, uint16_t onTime,
+                                               uint16_t offWaitTime)
 {
     EmberAfStatus status;
     uint16_t onTimeAttribute, offWaitTimeAttribute;

@@ -56,20 +56,22 @@
 #include "../scenes-client/scenes-client.h"
 #include <app/Command.h>
 
-bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterEnhancedAddSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                          uint8_t sceneId)
 {
     return emberAfPluginScenesClientParseAddSceneResponse(emberAfCurrentCommand(), status, groupId, sceneId);
 }
 
-bool emberAfScenesClusterEnhancedViewSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId, uint8_t sceneId,
-                                                           uint16_t transitionTime, uint8_t * sceneName,
+bool emberAfScenesClusterEnhancedViewSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupId,
+                                                           uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                                            uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesClientParseViewSceneResponse(emberAfCurrentCommand(), status, groupId, sceneId, transitionTime,
                                                            sceneName, extensionFieldSets);
 }
 
-bool emberAfScenesClusterCopySceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupIdFrom, uint8_t sceneIdFrom)
+bool emberAfScenesClusterCopySceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint16_t groupIdFrom,
+                                                   uint8_t sceneIdFrom)
 {
     emberAfScenesClusterPrintln("RX: CopySceneResponse 0x%x, 0x%2x, 0x%x", status, groupIdFrom, sceneIdFrom);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

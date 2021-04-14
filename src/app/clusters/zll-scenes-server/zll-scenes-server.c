@@ -58,8 +58,8 @@
 
 #define ZCL_SCENES_CLUSTER_MODE_COPY_ALL_SCENES_MASK EMBER_BIT(0)
 
-bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::Command * apCommandObj, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                                  uint8_t * extensionFieldSets)
+bool emberAfScenesClusterEnhancedAddSceneCallback(chip::app::Command * apCommandObj, uint16_t groupId, uint8_t sceneId,
+                                                  uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
@@ -70,8 +70,8 @@ bool emberAfScenesClusterEnhancedViewSceneCallback(chip::app::Command * apComman
     return emberAfPluginScenesServerParseViewScene(emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterCopySceneCallback(chip::app::Command * apCommandObj, uint8_t mode, uint16_t groupIdFrom, uint8_t sceneIdFrom, uint16_t groupIdTo,
-                                           uint8_t sceneIdTo)
+bool emberAfScenesClusterCopySceneCallback(chip::app::Command * apCommandObj, uint8_t mode, uint16_t groupIdFrom,
+                                           uint8_t sceneIdFrom, uint16_t groupIdTo, uint8_t sceneIdTo)
 {
     EmberStatus sendStatus;
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
