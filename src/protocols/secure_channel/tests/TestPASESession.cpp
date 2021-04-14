@@ -248,6 +248,8 @@ static nlTestSuite sSuite =
 };
 // clang-format on
 
+// TODO: TestPASESession is currently disabled due to lacking convenient way of creating exchange context
+
 /**
  *  Main
  */

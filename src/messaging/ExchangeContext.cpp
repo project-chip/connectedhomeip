@@ -125,6 +125,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
+    VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
     {
@@ -235,7 +237,7 @@ ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
         return mDelegate->GetMessageDispatch(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
     }
 
-    return mExchangeMgr->GetDefaultExchangeMessageDispatch();
+    return nullptr;
 }
 
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
@@ -359,8 +361,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    CHIP_ERROR err =
-        GetMessageDispatch()->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    err = GetMessageDispatch()->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.

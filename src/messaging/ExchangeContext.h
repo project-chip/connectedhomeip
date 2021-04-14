@@ -65,7 +65,7 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
-    virtual ~ExchangeContext() {}
+    ~ExchangeContext() {}
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -111,8 +111,8 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    virtual CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
-                                   const SendFlags & sendFlags);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                           const SendFlags & sendFlags);
 
     /**
      * A strongly-message-typed version of SendMessage.
@@ -188,7 +188,7 @@ public:
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                             ExchangeDelegate * delegate);
-    virtual void Free();
+    void Free();
     void Reset();
 
     void SetResponseTimeout(Timeout timeout);
