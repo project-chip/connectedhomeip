@@ -67,7 +67,7 @@ CHIP_ERROR Command::Reset()
     SuccessOrExit(err);
 
     commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
-    err = commandListBuilder.GetError();
+    err                = commandListBuilder.GetError();
     SuccessOrExit(err);
     MoveToState(CommandState::Initialized);
 
@@ -147,19 +147,21 @@ exit:
 
 CHIP_ERROR Command::PrepareCommand(const CommandParams * const apCommandParams)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    CommandDataElement::Builder commandDataElement =
+        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
     err = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    if(apCommandParams != nullptr)
+    if (apCommandParams != nullptr)
     {
         err = ConstructCommandPath(*apCommandParams, commandDataElement);
         SuccessOrExit(err);
     }
 
-    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure, mDataElementContainerType);
+    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure,
+                                                         mDataElementContainerType);
 exit:
     ChipLogFunctError(err);
     return err;
@@ -172,10 +174,10 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
 
 CHIP_ERROR Command::FinishCommand()
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
+    err                                            = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
     SuccessOrExit(err);
     commandDataElement.EndOfCommandDataElement();
     err = commandDataElement.GetError();
@@ -224,7 +226,7 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     CommandList::Builder commandListBuilder;
     VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
     commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
-    err = commandListBuilder.GetError();
+    err                = commandListBuilder.GetError();
     SuccessOrExit(err);
 
     mInvokeCommandBuilder.EndOfInvokeCommand();

@@ -97,13 +97,13 @@ CHIP_ERROR SendCommandRequest(void)
 
     uint8_t effectIdentifier = 1; // Dying light
     uint8_t effectVariant    = 1;
-    chip::TLV::TLVWriter *writer;
+    chip::TLV::TLVWriter * writer;
 
     err = gpCommandSender->PrepareCommand(&commandParams);
     SuccessOrExit(err);
 
     writer = gpCommandSender->GetCommandDataElementTLVWriter();
-    err = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
+    err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
     SuccessOrExit(err);
 
     err = writer->Put(chip::TLV::ContextTag(2), effectVariant);

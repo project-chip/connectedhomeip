@@ -78,13 +78,13 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
         printf("responder constructing command data in command");
 
-        chip::TLV::TLVWriter *writer;
+        chip::TLV::TLVWriter * writer;
 
         err = apCommandObj->PrepareCommand(&commandParams);
         SuccessOrExit(err);
 
         writer = apCommandObj->GetCommandDataElementTLVWriter();
-        err = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
+        err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
         SuccessOrExit(err);
 
         err = writer->Put(chip::TLV::ContextTag(2), effectVariant);

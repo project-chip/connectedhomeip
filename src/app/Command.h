@@ -160,8 +160,8 @@ protected:
 
 private:
     friend class TestCommandInteraction;
-    CommandState mState = CommandState::Uninitialized;
-    TLV::TLVType mDataElementContainerType      = TLV::kTLVType_NotSpecified;
+    CommandState mState                    = CommandState::Uninitialized;
+    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 };
 } // namespace app

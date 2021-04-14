@@ -186,7 +186,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     commandHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
     err                          = commandHandler.PrepareCommand(&commandParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err                          = commandHandler.FinishCommand();
+    err = commandHandler.FinishCommand();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.SendCommandResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
