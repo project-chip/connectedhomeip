@@ -1041,7 +1041,7 @@ void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)
     // Send a zero-length response.
     memset(&rsp, 0, sizeof(esp_gatt_rsp_t));
     rsp.attr_value.handle = param->read.handle;
-    err                   = MapBLEError(esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp));
+    err = MapBLEError(esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id, ESP_GATT_OK, &rsp));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
@@ -1068,7 +1068,7 @@ void BLEManagerImpl::HandleTXCharCCCDRead(esp_ble_gatts_cb_param_t * param)
         rsp.attr_value.value[0] = conState->Subscribed ? 1 : 0;
     }
     err = MapBLEError(esp_ble_gatts_send_response(mAppIf, param->read.conn_id, param->read.trans_id,
-                                      (conState != NULL) ? ESP_GATT_OK : ESP_GATT_INTERNAL_ERROR, &rsp));
+                                                  (conState != NULL) ? ESP_GATT_OK : ESP_GATT_INTERNAL_ERROR, &rsp));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_response() failed: %s", ErrorStr(err));
