@@ -134,8 +134,8 @@ void * __wrap_realloc(void * ptr, size_t new_size)
         void * new_ptr = pvPortMalloc(new_size);
         if (new_ptr)
         {
-        	/* If passed-in `ptr` was NULL, `realloc(NULL, size)`
-        	 must be equivalent to `malloc(size)`. */
+            /* If passed-in `ptr` was NULL, `realloc(NULL, size)`
+             must be equivalent to `malloc(size)`. */
             if (ptr)
             {
                 size_t old_ptr_size = xPortMallocUsableSize(ptr);
