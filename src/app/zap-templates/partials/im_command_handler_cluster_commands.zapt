@@ -1,9 +1,5 @@
 {{#if (zcl_command_arguments_count this.id)}}
-// We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-// When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-// Any error value TLVUnpackError means we have received an illegal value.
-CHIP_ERROR TLVError = CHIP_NO_ERROR;
-CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+expectArgumentCount = {{ zcl_command_arguments_count this.id }};
 {{#zcl_command_arguments}}
 {{#if (isOctetString type)}}
 chip::ByteSpan {{asSymbol label}};
@@ -12,22 +8,38 @@ const uint8_t * {{asSymbol label}};
 {{else}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
 {{/if}}
-bool {{asSymbol label}}Exists = false;
 {{/zcl_command_arguments}}
-uint32_t validArgumentCount = 0;
+bool argExists[{{zcl_command_arguments_count this.id}}];
+
+memset(argExists, 0, sizeof argExists);
 
 while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
 {
-  switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+  // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+  // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+  if (!TLV::IsContextTag(aDataTlv.GetTag()))
+  {
+    continue;
+  }
+  currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+  if (currentDecodeTagId < {{zcl_command_arguments_count this.id}})
+  {
+    if (argExists[currentDecodeTagId])
+    {
+      ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+      TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+      break;
+    }
+    else
+    {
+      argExists[currentDecodeTagId] = true;
+      validArgumentCount++;
+    }
+  }
+  switch (currentDecodeTagId)
   {
 {{#zcl_command_arguments}}
     case {{index}}:
-      if ({{asSymbol label}}Exists)
-      {
-            ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-            TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-            break;
-      }
 {{#if (isOctetString type)}}
     {
         const uint8_t * data = nullptr;
@@ -43,11 +55,6 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
 {{else}}
       TLVUnpackError = aDataTlv.Get({{asSymbol label}});
 {{/if}}
-      if (CHIP_NO_ERROR == TLVUnpackError)
-      {
-            {{asSymbol label}}Exists = true;
-            validArgumentCount++;
-      }
       break;
 {{/zcl_command_arguments}}
     default:
@@ -55,37 +62,26 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
       ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
       break;
   }
-  if (TLVUnpackError != CHIP_NO_ERROR)
+  if (CHIP_NO_ERROR != TLVUnpackError)
   {
-    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32, TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
     break;
   }
 }
 
 if (CHIP_END_OF_TLV == TLVError)
 {
-      // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-      TLVError = CHIP_NO_ERROR;
-}
-else
-{
-      ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+  // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+  TLVError = CHIP_NO_ERROR;
 }
 {{/if}}
 
 {{#if (zcl_command_arguments_count this.id)}}
-// TODO(#5590) We should encode a response of status code for invalid TLV.
 if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && {{zcl_command_arguments_count this.id}} == validArgumentCount)
 {
 {{/if}}
 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
 emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(apCommandObj{{#zcl_command_arguments}}, {{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
+return;
 {{#if (zcl_command_arguments_count this.id)}}
-}
-else
-{
-      apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeGeneralFailure);
-      ChipLogProgress(Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32, {{zcl_command_arguments_count this.id}}, validArgumentCount, TLVError, TLVUnpackError);
 }
 {{/if}}
