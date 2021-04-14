@@ -32,6 +32,7 @@
 #include "esp_log.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include <app/Command.h>
 #include <app/server/Mdns.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
@@ -174,7 +175,7 @@ exit:
     return;
 }
 
-bool emberAfBasicClusterMfgSpecificPingCallback(void)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command *)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
