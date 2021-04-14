@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include <transport/PASESession.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+#include <protocols/secure_channel/PASESession.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {

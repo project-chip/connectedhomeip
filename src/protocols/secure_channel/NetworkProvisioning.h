@@ -24,11 +24,14 @@
 #pragma once
 
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/Protocols.h>
 #include <support/BufferWriter.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/RendezvousSessionDelegate.h>
+#include <transport/SecureSessionMgr.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -70,7 +73,7 @@ public:
     virtual ~NetworkProvisioningDelegate() {}
 };
 
-class DLL_EXPORT NetworkProvisioning
+class DLL_EXPORT NetworkProvisioning : public Messaging::ExchangeDelegate
 {
 public:
     enum MsgTypes : uint8_t
@@ -80,7 +83,7 @@ public:
         kThreadAssociationRequest = 2
     };
 
-    void Init(NetworkProvisioningDelegate * delegate);
+    void Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session, NetworkProvisioningDelegate * delegate);
 
     ~NetworkProvisioning();
 
@@ -98,10 +101,19 @@ public:
      */
     const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
 
+    //// ExchangeDelegate Implementation ////
+    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle payload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override {}
+
 private:
     NetworkProvisioningDelegate * mDelegate = nullptr;
 
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+
     Inet::IPAddress mDeviceAddress = Inet::IPAddress::Any;
+
+    SecureSessionHandle mSession;
 
     /**
      * @brief
@@ -127,6 +139,8 @@ private:
                                    size_t & consumed);
 
     CHIP_ERROR DecodeThreadAssociationRequest(const System::PacketBufferHandle & msgBuf);
+
+    CHIP_ERROR SendMessageUsingExchange(uint8_t msgType, System::PacketBufferHandle msgPayload);
 
 #if CONFIG_DEVICE_LAYER
     static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
