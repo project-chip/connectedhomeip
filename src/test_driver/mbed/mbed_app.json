@@ -8,6 +8,7 @@
             "platform.stdio-baud-rate": 115200,
             "lwip.ipv6-enabled": true,
             "lwip.raw-socket-enabled": true,
+            "lwip.pbuf-pool-size": 16,
             "nsapi.default-wifi-security": "WPA_WPA2",
             "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
             "nsapi.default-wifi-password": "\"YOUR_PASSWORD\""
