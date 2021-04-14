@@ -267,6 +267,7 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
 
 void ExchangeContext::Free()
 {
+    ChipLogProgress(Inet, "ExchangeContext::Free is called, %p", this);
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
 
     // Ideally, in this scenario, the retransmit table should
@@ -325,13 +326,17 @@ CHIP_ERROR ExchangeContext::StartResponseTimer()
 
 void ExchangeContext::CancelResponseTimer()
 {
+    ChipLogProgress(Inet, "CancelResponseTimer, %p", this);
+    if (mExchangeMgr->GetSessionMgr() == nullptr)
+        ChipLogProgress(Inet, "CancelResponseTimer session manager is nullptr");
     System::Layer * lSystemLayer = mExchangeMgr->GetSessionMgr()->SystemLayer();
     if (lSystemLayer == nullptr)
     {
+        ChipLogProgress(Inet, "lSystemLayer is nullptr");
         // this is an assertion error, which shall never happen
         return;
     }
-
+    ChipLogProgress(Inet, "lSystemLayer is not nullptr");
     lSystemLayer->CancelTimer(HandleResponseTimeout, this);
 }
 

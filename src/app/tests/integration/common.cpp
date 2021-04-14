@@ -58,7 +58,9 @@ exit:
 void ShutdownChip(void)
 {
     gExchangeManager.Shutdown();
+    printf("gExchangeManager.Shutdown");
     chip::DeviceLayer::PlatformMgr().Shutdown();
+    printf("PlatformMgr().Shutdown ");
 }
 
 void TLVPrettyPrinter(const char * aFormat, ...)

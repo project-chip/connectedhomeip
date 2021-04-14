@@ -102,7 +102,7 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
 void SecureSessionMgr::Shutdown()
 {
     CancelExpiryTimer();
-
+    ChipLogProgress(Inet, "SecureSessionMgr::Shutdow is called");
     mState        = State::kNotReady;
     mLocalNodeId  = kUndefinedNodeId;
     mSystemLayer  = nullptr;
