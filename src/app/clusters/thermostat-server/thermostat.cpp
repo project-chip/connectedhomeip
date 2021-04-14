@@ -70,8 +70,8 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(uint8_t numberOfTransitio
 bool emberAfThermostatClusterSetpointRaiseLowerCallback(uint8_t mode, int8_t amount)
 {
     bool result             = false;
-    EndpointId endpoint     = 1;                                    // Hard code to 1 for now/
-    int32_t HeatingSetpoint = 2000, CoolingSetpoint = 2600;         // Set to defaults to be safe
+    EndpointId endpoint     = 1;                            // Hard code to 1 for now/
+    int32_t HeatingSetpoint = 2000, CoolingSetpoint = 2600; // Set to defaults to be safe
     EmberAfStatus status;
     switch (mode)
     {
