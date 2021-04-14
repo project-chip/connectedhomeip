@@ -85,6 +85,8 @@ public:
     CHIP_ERROR SetThreadProvision(ByteSpan aDataset);
     CHIP_ERROR SetThreadEnabled(bool val);
 
+    bool IsThreadAttached();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
                              size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
@@ -120,7 +122,6 @@ private:
     void OnPlatformEvent(const ChipDeviceEvent * event);
     bool IsThreadEnabled();
     bool IsThreadProvisioned();
-    bool IsThreadAttached();
     CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();

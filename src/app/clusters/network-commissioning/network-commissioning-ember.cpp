@@ -16,6 +16,10 @@
  *    limitations under the License.
  */
 
+/**
+ * @file  Wrappers for namespaced network commissioning cluster implementation.
+ */
+
 #include "network-commissioning.h"
 
 #include <cstring>
@@ -35,30 +39,24 @@ using namespace chip;
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
                                                                 uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), operationalDataset, breadcrumb, timeoutMs);
-    emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
-                                                                                             : EMBER_ZCL_STATUS_FAILURE);
+    chip::app::clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(commandObj, emberAfCurrentEndpoint(),
+                                                                                         operationalDataset, breadcrumb, timeoutMs);
     return true;
 }
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, ByteSpan ssid, ByteSpan credentials,
                                                               uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), ssid, credentials, breadcrumb, timeoutMs);
-    emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
-                                                                                             : EMBER_ZCL_STATUS_FAILURE);
+    chip::app::clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(commandObj, emberAfCurrentEndpoint(), ssid,
+                                                                                       credentials, breadcrumb, timeoutMs);
     return true;
 }
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, ByteSpan networkID,
                                                              uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(
-        nullptr, emberAfCurrentEndpoint(), networkID, breadcrumb, timeoutMs);
-    emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
-                                                                                             : EMBER_ZCL_STATUS_FAILURE);
+    chip::app::clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(commandObj, emberAfCurrentEndpoint(),
+                                                                                      networkID, breadcrumb, timeoutMs);
     return true;
 }
 

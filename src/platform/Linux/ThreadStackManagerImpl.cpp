@@ -112,6 +112,7 @@ void ThreadStackManagerImpl::_ThreadDevcieRoleChangedHandler(DeviceRole role)
 
     if (attached != mAttached)
     {
+        mAttached  = (role != DeviceRole::OTBR_DEVICE_ROLE_DETACHED && role != DeviceRole::OTBR_DEVICE_ROLE_DISABLED);
         event.Type = DeviceEventType::kThreadConnectivityChange;
         event.ThreadConnectivityChange.Result =
             attached ? ConnectivityChange::kConnectivity_Established : ConnectivityChange::kConnectivity_Lost;
