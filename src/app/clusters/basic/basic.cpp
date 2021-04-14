@@ -20,6 +20,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include <app/Command.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <gen/att-storage.h>

@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "af.h"
+#include <app/Command.h>
 #include <app/util/attribute-storage.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>

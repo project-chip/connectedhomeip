@@ -7,6 +7,7 @@
 #include "af-types.h"
 #include "basic-types.h"
 
+#include <app/Command.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -119,7 +120,7 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}TickCal
 {{/if}}
 */
 
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * apCommandObj{{#zcl_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/zcl_command_arguments}});
 
 {{/if}}
 {{/if}}

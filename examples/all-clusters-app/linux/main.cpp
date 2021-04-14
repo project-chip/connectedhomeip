@@ -22,6 +22,7 @@
 #include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include <app/Command.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/server/Mdns.h>
 #include <app/util/af-types.h>
@@ -45,7 +46,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {}
 
-bool emberAfBasicClusterMfgSpecificPingCallback(void)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command *)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;

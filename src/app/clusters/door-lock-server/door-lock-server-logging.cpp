@@ -47,6 +47,7 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
+#include <app/Command.h>
 #include <support/CodeUtils.h>
 
 using namespace chip;
@@ -117,7 +118,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * apCommandObj, uint16_t entryId)
 {
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
