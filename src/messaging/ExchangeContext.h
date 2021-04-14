@@ -65,8 +65,6 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
-    ~ExchangeContext() {}
-
     /**
      *  Determine whether the context is the initiator of the exchange.
      *
