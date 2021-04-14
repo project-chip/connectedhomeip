@@ -63,7 +63,6 @@ static size_t xBlockAllocatedBit = ((size_t) 1) << ((sizeof(size_t) * heapBITS_P
 
 extern "C" {
 
-
 /* xPortMallocUsableSize relies on heap4 implementation.
 It returns the size of an allocated block and it is
 called by __wrap_realloc in order to avoid the case when
@@ -114,16 +113,16 @@ void * __wrap_calloc(size_t num, size_t size)
 {
     size_t total_size = num * size;
 
-    //Handle overflow from (num * size)
+    // Handle overflow from (num * size)
     if ((size != 0) && ((total_size / size) != num))
     {
-    	return nullptr;
+        return nullptr;
     }
 
     void * ptr = pvPortMalloc(total_size);
     if (ptr)
     {
-    	memset(ptr, 0, total_size);
+        memset(ptr, 0, total_size);
     }
 
     return ptr;
@@ -147,8 +146,8 @@ void * __wrap_realloc(void * ptr, size_t new_size)
                 }
                 else
                 {
-                	/* Return old pointer if the newly allocated size is smaller
-                	or equal to the allocated size for old_ptr */
+                    /* Return old pointer if the newly allocated size is smaller
+                    or equal to the allocated size for old_ptr */
                     return ptr;
                 }
             }
