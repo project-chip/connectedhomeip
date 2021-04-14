@@ -125,6 +125,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
+    ChipLogProgress(ExchangeManager, "Trying to send message using dispatch %p", GetMessageDispatch());
+
     VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // If a response message is expected...
@@ -241,7 +243,7 @@ ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
 }
 
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                         ExchangeDelegate * delegate)
+                                         ExchangeDelegateBase * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -345,7 +347,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeDelegate * delegate = ec->GetDelegate();
+    ExchangeDelegateBase * delegate = ec->GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)

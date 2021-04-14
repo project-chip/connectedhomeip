@@ -155,13 +155,11 @@ private:
 
     PASESession mPairingSession;
     NetworkProvisioning mNetworkProvision;
-    TransportMgrBase * mTransportMgr;
-    uint16_t mNextKeyId                           = 0;
-    SecureSessionMgr * mSecureSessionMgr          = nullptr;
-    SecureSessionHandle * mPairingSessionHandle   = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
-
-    //    SessionEstablishmentExchangeDispatch mExchangeMessageDispatch;
+    TransportMgrBase * mTransportMgr;
+    uint16_t mNextKeyId                         = 0;
+    SecureSessionMgr * mSecureSessionMgr        = nullptr;
+    SecureSessionHandle * mPairingSessionHandle = nullptr;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
 

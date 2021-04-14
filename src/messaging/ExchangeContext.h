@@ -144,8 +144,8 @@ public:
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                              const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
-    ExchangeDelegate * GetDelegate() const { return mDelegate; }
-    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
+    ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
     void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
@@ -187,7 +187,7 @@ public:
     void Abort();
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegate * delegate);
+                            ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
 
@@ -202,9 +202,9 @@ private:
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ReliableMessageContext mReliableMessageContext;
-    ExchangeDelegate * mDelegate   = nullptr;
-    ExchangeManager * mExchangeMgr = nullptr;
-    ExchangeACL * mExchangeACL     = nullptr;
+    ExchangeDelegateBase * mDelegate = nullptr;
+    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeACL * mExchangeACL       = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
