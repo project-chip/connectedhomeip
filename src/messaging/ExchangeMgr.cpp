@@ -70,8 +70,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     VerifyOrReturnError(mState == State::kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSessionMgr = sessionMgr;
-
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
 
@@ -92,6 +90,8 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     err = mMessageCounterSyncMgr.Init(this);
     ReturnErrorOnFailure(err);
 
+    err = mDefaultExchangeMessageDispatch.Init(&mReliableMessageMgr, sessionMgr);
+
     mState = State::kState_Initialized;
 
     return err;
@@ -102,10 +102,10 @@ CHIP_ERROR ExchangeManager::Shutdown()
     mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
-    if (mSessionMgr != nullptr)
+    SecureSessionMgr * sessionMgr = mDefaultExchangeMessageDispatch.GetSessionMgr();
+    if (sessionMgr != nullptr)
     {
-        mSessionMgr->SetDelegate(nullptr);
-        mSessionMgr = nullptr;
+        sessionMgr->SetDelegate(nullptr);
     }
 
     mState = State::kState_NotInitialized;

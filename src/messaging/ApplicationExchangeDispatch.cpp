@@ -20,26 +20,26 @@
  *      This file provides implementation of Application Channel class.
  */
 
-#include <messaging/ApplicationExchangeTransport.h>
+#include <messaging/ApplicationExchangeDispatch.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ApplicationExchangeTransport::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                                         System::PacketBufferHandle && message,
-                                                         EncryptedPacketBufferHandle * retainedMessage)
+CHIP_ERROR ApplicationExchangeDispatch::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                                        System::PacketBufferHandle && message,
+                                                        EncryptedPacketBufferHandle * retainedMessage)
 {
     return mSessionMgr->SendMessage(session, payloadHeader, std::move(message), retainedMessage);
 }
 
-CHIP_ERROR ApplicationExchangeTransport::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
-                                                       EncryptedPacketBufferHandle * retainedMessage) const
+CHIP_ERROR ApplicationExchangeDispatch::ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
+                                                      EncryptedPacketBufferHandle * retainedMessage) const
 {
     return mSessionMgr->SendEncryptedMessage(session, std::move(message), retainedMessage);
 }
 
-bool ApplicationExchangeTransport::MessagePermitted(uint16_t protocol, uint8_t type)
+bool ApplicationExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
 {
     // TODO: Change this check to only include the protocol and message types that are allowed
     switch (protocol)

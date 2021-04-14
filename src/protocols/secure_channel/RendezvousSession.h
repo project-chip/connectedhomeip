@@ -28,7 +28,7 @@
 #include <protocols/secure_channel/NetworkProvisioning.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <protocols/secure_channel/SessionEstablishmentTransport.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/BufferWriter.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/RendezvousSessionDelegate.h>
@@ -161,7 +161,7 @@ private:
     SecureSessionHandle * mPairingSessionHandle   = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
 
-    //    SessionEstablishmentTransport mExchangeTransport;
+    //    SessionEstablishmentExchangeDispatch mExchangeMessageDispatch;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
 

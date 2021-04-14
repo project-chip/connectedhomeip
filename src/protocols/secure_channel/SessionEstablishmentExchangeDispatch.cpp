@@ -22,7 +22,7 @@
 
 #include <core/CHIPError.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionEstablishmentTransport.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 
 #include <transport/BLE.h>
 
@@ -30,11 +30,11 @@ namespace chip {
 
 using namespace Messaging;
 
-CHIP_ERROR SessionEstablishmentTransport::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
-                                                          System::PacketBufferHandle && message,
-                                                          EncryptedPacketBufferHandle * retainedMessage)
+CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                                                 System::PacketBufferHandle && message,
+                                                                 EncryptedPacketBufferHandle * retainedMessage)
 {
-    ChipLogProgress(Ble, "SessionEstablishmentTransport::SendMessageImpl mBLETransport %p, mTransportMgr %p", mBLETransport,
+    ChipLogProgress(Ble, "SessionEstablishmentExchangeDispatch::SendMessageImpl mBLETransport %p, mTransportMgr %p", mBLETransport,
                     mTransportMgr);
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
     if (mBLETransport != nullptr && mPeerAddress.GetTransportType() == Transport::Type::kBle)
@@ -50,17 +50,17 @@ CHIP_ERROR SessionEstablishmentTransport::SendMessageImpl(SecureSessionHandle se
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-CHIP_ERROR SessionEstablishmentTransport::OnMessageReceived(uint16_t protocol, uint8_t type,
-                                                            const Transport::PeerAddress & peerAddress,
-                                                            ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo)
+CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(uint16_t protocol, uint8_t type,
+                                                                   const Transport::PeerAddress & peerAddress,
+                                                                   ReliableMessageContext & rmCtxt, MessageReliabilityInfo & rmInfo)
 {
-    ReturnErrorOnFailure(ExchangeTransport::OnMessageReceived(protocol, type, peerAddress, rmCtxt, rmInfo));
+    ReturnErrorOnFailure(ExchangeMessageDispatch::OnMessageReceived(protocol, type, peerAddress, rmCtxt, rmInfo));
     mPeerAddress = peerAddress;
 
     return CHIP_NO_ERROR;
 }
 
-bool SessionEstablishmentTransport::MessagePermitted(uint16_t protocol, uint8_t type)
+bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
 {
     switch (protocol)
     {

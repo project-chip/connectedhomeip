@@ -761,7 +761,7 @@ void PASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
         mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
     }
 
-    mConnectionState.SetPeerAddress(mTransport.GetPeerAddress());
+    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {

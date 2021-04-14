@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <messaging/ExchangeTransport.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <transport/TransportMgr.h>
 
 namespace chip {
@@ -32,12 +32,12 @@ namespace Transport {
 class BLE;
 }
 
-class SessionEstablishmentTransport : public Messaging::ExchangeTransport
+class SessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    SessionEstablishmentTransport() {}
+    SessionEstablishmentExchangeDispatch() {}
 
-    virtual ~SessionEstablishmentTransport() {}
+    virtual ~SessionEstablishmentExchangeDispatch() {}
 
     CHIP_ERROR Init(Transport::BLE * transport, TransportMgrBase * transportMgr)
     {

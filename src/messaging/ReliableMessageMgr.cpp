@@ -26,7 +26,7 @@
 #include <messaging/ReliableMessageMgr.h>
 
 #include <messaging/ErrorCategory.h>
-#include <messaging/ExchangeTransport.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
@@ -346,7 +346,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     VerifyOrReturnError(rc != nullptr, err);
 
-    const ExchangeTransport * transport = rc->mExchange->GetTransport();
+    const ExchangeMessageDispatch * transport = rc->mExchange->GetMessageDispatch();
     VerifyOrExit(transport != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = transport->ResendMessage(rc->mExchange->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);

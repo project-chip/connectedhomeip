@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines ExchangeTransport class. The object of this
+ *      This file defines ExchangeMessageDispatch class. The object of this
  *      class can be used by CHIP protocols to send and receive messages.
  */
 
@@ -31,7 +31,7 @@ namespace Messaging {
 class ReliableMessageMgr;
 class ReliableMessageContext;
 
-class ExchangeTransport
+class ExchangeMessageDispatch
 {
 public:
     struct ExchangeInfo
@@ -48,8 +48,8 @@ public:
         bool mNeedsAck;
     };
 
-    ExchangeTransport() {}
-    virtual ~ExchangeTransport() {}
+    ExchangeMessageDispatch() {}
+    virtual ~ExchangeMessageDispatch() {}
 
     CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr)
     {
@@ -57,7 +57,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR SendMessage(SecureSessionHandle session, ExchangeTransport::ExchangeInfo & exchangeInfo,
+    CHIP_ERROR SendMessage(SecureSessionHandle session, ExchangeMessageDispatch::ExchangeInfo & exchangeInfo,
                            ReliableMessageContext & reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle message);
 

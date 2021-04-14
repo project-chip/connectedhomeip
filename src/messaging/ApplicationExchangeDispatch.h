@@ -24,29 +24,31 @@
 
 #pragma once
 
-#include <messaging/ExchangeTransport.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
 namespace Messaging {
 
-class ApplicationExchangeTransport : public ExchangeTransport
+class ApplicationExchangeDispatch : public ExchangeMessageDispatch
 {
 public:
-    ApplicationExchangeTransport() {}
+    ApplicationExchangeDispatch() {}
 
-    virtual ~ApplicationExchangeTransport() {}
+    virtual ~ApplicationExchangeDispatch() {}
 
     CHIP_ERROR Init(ReliableMessageMgr * reliableMessageMgr, SecureSessionMgr * sessionMgr)
     {
         ReturnErrorCodeIf(sessionMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mSessionMgr = sessionMgr;
-        return ExchangeTransport::Init(reliableMessageMgr);
+        return ExchangeMessageDispatch::Init(reliableMessageMgr);
     }
 
     CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
                              EncryptedPacketBufferHandle * retainedMessage) const override;
+
+    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
 protected:
     CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,

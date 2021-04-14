@@ -29,9 +29,9 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
-#include <messaging/ExchangeTransport.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionEstablishmentTransport.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
@@ -194,15 +194,16 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentTransport & Transport() { return mTransport; }
+    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeTransport * GetTransport(Messaging::ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) override
+    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
+                                                            SecureSessionMgr * sessionMgr) override
     {
-        return &mTransport;
+        return &mMessageDispatch;
     }
 
 private:
@@ -256,7 +257,7 @@ private:
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
 
-    SessionEstablishmentTransport mTransport;
+    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct Spake2pErrorMsg
     {

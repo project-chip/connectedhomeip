@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <messaging/ApplicationExchangeTransport.h>
-#include <messaging/ExchangeTransport.h>
+#include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
@@ -77,14 +77,14 @@ public:
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 
-    virtual ExchangeTransport * GetTransport(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
     {
-        mTransport.Init(rmMgr, sessionMgr);
-        return &mTransport;
+        mMessageDispatch.Init(rmMgr, sessionMgr);
+        return &mMessageDispatch;
     }
 
 private:
-    ApplicationExchangeTransport mTransport;
+    ApplicationExchangeDispatch mMessageDispatch;
 };
 
 } // namespace Messaging

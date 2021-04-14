@@ -42,7 +42,7 @@ namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
-class ExchangeTransport;
+class ExchangeMessageDispatch;
 
 class ExchangeContextDeletor
 {
@@ -152,7 +152,7 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
-    ExchangeTransport * GetTransport();
+    ExchangeMessageDispatch * GetMessageDispatch();
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {

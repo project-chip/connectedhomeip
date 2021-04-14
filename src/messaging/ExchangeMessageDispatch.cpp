@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file provides implementation of ExchangeTransport class.
+ *      This file provides implementation of ExchangeMessageDispatch class.
  */
 
 #ifndef __STDC_FORMAT_MACROS
@@ -30,7 +30,7 @@
 
 #include <inttypes.h>
 
-#include <messaging/ExchangeTransport.h>
+#include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/secure_channel/Constants.h>
@@ -39,9 +39,9 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeTransport::ExchangeInfo & exchangeInfo,
-                                          ReliableMessageContext & reliableMessageContext, bool isReliableTransmission,
-                                          Protocols::Id protocol, uint8_t type, System::PacketBufferHandle message)
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, ExchangeMessageDispatch::ExchangeInfo & exchangeInfo,
+                                                ReliableMessageContext & reliableMessageContext, bool isReliableTransmission,
+                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle message)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -98,9 +98,9 @@ CHIP_ERROR ExchangeTransport::SendMessage(SecureSessionHandle session, ExchangeT
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExchangeTransport::OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
-                                                ReliableMessageContext & reliableMessageContext,
-                                                MessageReliabilityInfo & reliabilityInfo)
+CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint16_t protocol, uint8_t type, const Transport::PeerAddress & peerAddress,
+                                                      ReliableMessageContext & reliableMessageContext,
+                                                      MessageReliabilityInfo & reliabilityInfo)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol, type), CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -200,7 +200,7 @@ public:
 
     void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
-    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
+    SecureSessionMgr * GetSessionMgr() const { return mDefaultExchangeMessageDispatch.GetSessionMgr(); }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
@@ -210,11 +210,7 @@ public:
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
     size_t GetContextsInUse() const { return mContextsInUse; }
 
-    ExchangeTransport * GetDefaultExchangeTransport()
-    {
-        mDefaultExchangeTransport.Init(GetReliableMessageMgr(), GetSessionMgr());
-        return &mDefaultExchangeTransport;
-    }
+    ExchangeMessageDispatch * GetDefaultExchangeMessageDispatch() { return &mDefaultExchangeMessageDispatch; }
 
 private:
     enum class State
@@ -249,14 +245,13 @@ private:
     State mState;
 
     ExchangeMgrDelegate * mDelegate;
-    SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     Transport::AdminId mAdminId = 0;
 
     // By default allocate the application transport. This is the most commonly used and secure transport.
-    ApplicationExchangeTransport mDefaultExchangeTransport;
+    ApplicationExchangeDispatch mDefaultExchangeMessageDispatch;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
