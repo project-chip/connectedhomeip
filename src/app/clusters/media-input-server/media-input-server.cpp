@@ -38,29 +38,30 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfMediaInputClusterSelectInputCallback(unsigned char)
+bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * apCommandObj, unsigned char)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-bool emberAfMediaInputClusterHideInputStatusCallback()
-{
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
-}
-
-bool emberAfMediaInputClusterRenameInputCallback(unsigned char, unsigned char *)
+bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * apCommandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaInputClusterShowInputStatusCallback()
+bool emberAfMediaInputClusterRenameInputCallback(chip::app::Command * apCommandObj, unsigned char, unsigned char *)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * apCommandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

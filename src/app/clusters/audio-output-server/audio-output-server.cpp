@@ -38,16 +38,17 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfAudioOutputClusterRenameOutputCallback(unsigned char, unsigned char *)
+bool emberAfAudioOutputClusterRenameOutputCallback(chip::app::Command * apCommandObj, unsigned char, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfAudioOutputClusterSelectOutputCallback(unsigned char)
+bool emberAfAudioOutputClusterSelectOutputCallback(chip::app::Command * apCommandObj, unsigned char)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
