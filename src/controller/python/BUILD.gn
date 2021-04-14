@@ -60,7 +60,7 @@ shared_library("ChipDeviceCtrl") {
     "chip/internal/CommissionerImpl.cpp",
     "chip/logging/LoggingRedirect.cpp",
     "chip/native/StackInit.cpp",
-    "chip/setup_payload/SetupPayload.cpp",
+    "chip/setup_payload/Parser.cpp",
   ]
 
   if (chip_enable_ble) {
