@@ -176,7 +176,7 @@ public:
      * @brief A function to retrieve the vector of OptionalQRCodeInfo infos
      * @return Returns a vector of optionalQRCodeInfos
      **/
-    std::vector<OptionalQRCodeInfo> getAllOptionalVendorData();
+    std::vector<OptionalQRCodeInfo> getAllOptionalVendorData() const;
 
     /** @brief A function to add a string serial number
      * @param serialNumber string serial number
@@ -194,7 +194,7 @@ public:
      * @param outSerialNumber retrieved string serial number
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR getSerialNumber(std::string & outSerialNumber);
+    CHIP_ERROR getSerialNumber(std::string & outSerialNumber) const;
 
     /** @brief A function to remove the serial number from the payload
      * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
@@ -245,7 +245,7 @@ private:
      * @param info retrieved OptionalQRCodeInfoExtension object
      * @return Returns a CHIP_ERROR_KEY_NOT_FOUND on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info);
+    CHIP_ERROR getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info) const;
 
     /** @brief A function to retrieve the associated expected numeric value for a tag
      * @param tag 8 bit [0-255] tag number
