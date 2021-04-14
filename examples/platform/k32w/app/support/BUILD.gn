@@ -14,13 +14,12 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
-import("//build_overrides/pigweed.gni")
 
 config("support_config") {
   include_dirs = [ "../../.." ]
 
   # Link options that provides replace dynamic memory operations in standard
-  # library with the pigweed malloc.
+  # library with the FreeRTOS malloc in platform code.
   ldflags = [
     # memory allocation -- these must be re-entrant and do locking
     "-Wl,--wrap=malloc",

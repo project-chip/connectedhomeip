@@ -18,9 +18,8 @@
 
 /**
  *    @file
- *      This file implements heap memory allocation APIs for CHIP. These functions are platform
- *      specific and might be C Standard Library heap functions re-direction in most of cases.
- *
+ *      This file contains platform specific implementations for stdlib malloc/calloc/realloc/free
+ *      functions, so that CHIPPlatformMemory* works as intended with the platform's heap.
  */
 
 #include "FreeRTOS.h"
@@ -65,9 +64,9 @@ extern "C" {
 
 /* xPortMallocUsableSize relies on heap4 implementation.
 It returns the size of an allocated block and it is
-called by __wrap_realloc in order to avoid the case when
-the newly allocated size is smaller than the older one
-and memcpy copies beyond new_size */
+called by __wrap_realloc.
+Thus it is validated in __wrap_realloc function that the allocated size
+of the old_ptr is smaller than the allocated size of new_ptr */
 size_t xPortMallocUsableSize(void * pv)
 {
     uint8_t * puc = (uint8_t *) pv;
@@ -135,6 +134,8 @@ void * __wrap_realloc(void * ptr, size_t new_size)
         void * new_ptr = pvPortMalloc(new_size);
         if (new_ptr)
         {
+        	/* If passed-in `ptr` was NULL, `realloc(NULL, size)`
+        	 must be equivalent to `malloc(size)`. */
             if (ptr)
             {
                 size_t old_ptr_size = xPortMallocUsableSize(ptr);
