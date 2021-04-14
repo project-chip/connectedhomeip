@@ -44,7 +44,7 @@ using namespace chip::TestCerts;
 enum
 {
     kStandardCertsCount = 3,
-    kTestCertBufSize    = 1024, // Size of buffer needed to hold any of the test certificates
+    kTestCertBufSize    = 2048, // Size of buffer needed to hold any of the test certificates
                                 // (in either CHIP or DER form), or to decode the certificates.
 };
 
@@ -249,11 +249,6 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
                                                                          { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
                                                                          { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       } } },
 
-        // // Basic validation of a firmware signing certificate.
-        // {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kFWSign01,  sGenTBSHashFlag,  sNullLoadFlag       },
-        //                                                                  { TestCert::kICA01_1,   sGenTBSHashFlag,  sNullLoadFlag       },
-        //                                                                  { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       } } },
-
         // Basic validation of node certificates chaining up to another root.
         {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
                                                                          { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
@@ -265,6 +260,12 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
                                                                          { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
                                                                          { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
         {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_02, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_03, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_04, sGenTBSHashFlag,  sNullLoadFlag       },
                                                                          { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
                                                                          { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
 

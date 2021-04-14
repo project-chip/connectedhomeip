@@ -40,7 +40,8 @@ namespace chip {
 namespace Credentials {
 
 static constexpr uint32_t kKeyIdentifierLength                 = 20;
-static constexpr uint32_t kChipIdUTF8Length                    = 16;
+static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
+static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 
 /** Data Element Tags for the CHIP Certificate

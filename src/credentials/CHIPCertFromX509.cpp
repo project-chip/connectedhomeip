@@ -49,16 +49,15 @@ using namespace chip::Protocols;
 static ASN1_ERROR ParseChipAttribute(ASN1Reader & reader, uint64_t & chipAttrOut)
 {
     ASN1_ERROR err        = ASN1_NO_ERROR;
-    const uint8_t * value = nullptr;
-
-    VerifyOrExit(reader.GetValueLen() == kChipIdUTF8Length, err = ASN1_ERROR_INVALID_ENCODING);
-
-    value = reader.GetValue();
-    VerifyOrExit(value != nullptr, err = ASN1_ERROR_INVALID_ENCODING);
+    const uint8_t * value = reader.GetValue();
+    uint32_t valueLen     = reader.GetValueLen();
 
     chipAttrOut = 0;
 
-    for (uint32_t i = 0; i < kChipIdUTF8Length; i++)
+    VerifyOrExit(value != nullptr, err = ASN1_ERROR_INVALID_ENCODING);
+    VerifyOrExit(valueLen == kChip32bitAttrUTF8Length || valueLen == kChip64bitAttrUTF8Length, err = ASN1_ERROR_INVALID_ENCODING);
+
+    for (uint32_t i = 0; i < valueLen; i++)
     {
         chipAttrOut <<= 4;
         uint8_t ch = value[i];

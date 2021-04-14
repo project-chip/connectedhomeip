@@ -50,6 +50,8 @@ enum TestCert
     kNode01_02 = 8,
     kNode02_01 = 9,
     kNode02_02 = 10,
+    kNode02_03 = 11,
+    kNode02_04 = 12,
 };
 
 // Special flags to alter how certificates are fetched/loaded.
@@ -183,6 +185,28 @@ extern const uint8_t sTestCert_Node02_02_PrivateKey[];
 extern const uint8_t sTestCert_Node02_02_PrivateKey_Len;
 extern const uint8_t sTestCert_Node02_02_SubjectKeyId[];
 extern const uint8_t sTestCert_Node02_02_SubjectKeyId_Len;
+
+extern const uint8_t sTestCert_Node02_03_Chip[];
+extern const uint32_t sTestCert_Node02_03_Chip_Len;
+extern const uint8_t sTestCert_Node02_03_DER[];
+extern const uint32_t sTestCert_Node02_03_DER_Len;
+extern const uint8_t sTestCert_Node02_03_PublicKey[];
+extern const uint8_t sTestCert_Node02_03_PublicKey_Len;
+extern const uint8_t sTestCert_Node02_03_PrivateKey[];
+extern const uint8_t sTestCert_Node02_03_PrivateKey_Len;
+extern const uint8_t sTestCert_Node02_03_SubjectKeyId[];
+extern const uint8_t sTestCert_Node02_03_SubjectKeyId_Len;
+
+extern const uint8_t sTestCert_Node02_04_Chip[];
+extern const uint32_t sTestCert_Node02_04_Chip_Len;
+extern const uint8_t sTestCert_Node02_04_DER[];
+extern const uint32_t sTestCert_Node02_04_DER_Len;
+extern const uint8_t sTestCert_Node02_04_PublicKey[];
+extern const uint8_t sTestCert_Node02_04_PublicKey_Len;
+extern const uint8_t sTestCert_Node02_04_PrivateKey[];
+extern const uint8_t sTestCert_Node02_04_PrivateKey_Len;
+extern const uint8_t sTestCert_Node02_04_SubjectKeyId[];
+extern const uint8_t sTestCert_Node02_04_SubjectKeyId_Len;
 
 } // namespace TestCerts
 } // namespace chip
