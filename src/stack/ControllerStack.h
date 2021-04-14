@@ -31,12 +31,14 @@ namespace Controller {
 class DeviceCommissioner;
 }
 
-class ControllerStack : public virtual Stack {
+class ControllerStack : public virtual Stack
+{
 public:
     virtual ~ControllerStack() {}
 
-    virtual CHIP_ERROR InitController(PersistentStorageDelegate * storageDelegate, Controller::DevicePairingDelegate * pairingDelegate) = 0;
-    virtual CHIP_ERROR Shutdown() = 0;
+    virtual CHIP_ERROR InitController(PersistentStorageDelegate * storageDelegate,
+                                      Controller::DevicePairingDelegate * pairingDelegate) = 0;
+    virtual CHIP_ERROR Shutdown()                                                          = 0;
 
     virtual Controller::DeviceCommissioner & GetDeviceCommissioner() = 0;
 };

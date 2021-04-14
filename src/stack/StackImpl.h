@@ -36,11 +36,17 @@
 namespace chip {
 
 /* ========================== SystemLayer Configuration ========================== */
-struct SystemLayerConfiguration {};
-template<typename T> struct IsSystemLayerConfiguration : std::is_base_of<SystemLayerConfiguration, T> {};
+struct SystemLayerConfiguration
+{
+};
+template <typename T>
+struct IsSystemLayerConfiguration : std::is_base_of<SystemLayerConfiguration, T>
+{
+};
 
 #if CONFIG_DEVICE_LAYER
-class DefaultSystemLayer : SystemLayerConfiguration {
+class DefaultSystemLayer : SystemLayerConfiguration
+{
 public:
     CHIP_ERROR Init() { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
@@ -48,28 +54,32 @@ public:
     System::Layer & Get() { return DeviceLayer::SystemLayer; }
 };
 #else
-class DefaultSystemLayer : SystemLayerConfiguration {
+class DefaultSystemLayer : SystemLayerConfiguration
+{
 public:
-    CHIP_ERROR Init() {
-        return mSystemLayer.Init(nullptr);
-    }
+    CHIP_ERROR Init() { return mSystemLayer.Init(nullptr); }
 
-    CHIP_ERROR Shutdown() {
-        return mSystemLayer.Shutdown();
-    }
+    CHIP_ERROR Shutdown() { return mSystemLayer.Shutdown(); }
 
     System::Layer & Get() { return mSystemLayer; }
+
 private:
     System::Layer mSystemLayer;
 };
 #endif // CONFIG_DEVICE_LAYER
 
 /* ========================== InetLayer Configuration ========================== */
-struct InetLayerConfiguration {};
-template<typename T> struct IsInetLayerConfiguration : std::is_base_of<InetLayerConfiguration, T> {};
+struct InetLayerConfiguration
+{
+};
+template <typename T>
+struct IsInetLayerConfiguration : std::is_base_of<InetLayerConfiguration, T>
+{
+};
 
 #if CONFIG_DEVICE_LAYER
-class DefaultInetLayer : InetLayerConfiguration {
+class DefaultInetLayer : InetLayerConfiguration
+{
 public:
     CHIP_ERROR Init(System::Layer & aSystemLayer) { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
@@ -77,29 +87,35 @@ public:
     Inet::InetLayer & Get() { return DeviceLayer::InetLayer; }
 };
 #else
-class DefaultInetLayer : InetLayerConfiguration {
+class DefaultInetLayer : InetLayerConfiguration
+{
 public:
-    CHIP_ERROR Init(System::Layer & aSystemLayer) {
-        return mInetLayer.Init(aSystemLayer, nullptr);
-    }
+    CHIP_ERROR Init(System::Layer & aSystemLayer) { return mInetLayer.Init(aSystemLayer, nullptr); }
 
-    CHIP_ERROR Shutdown() {
-        return mInetLayer.Shutdown();
-    }
+    CHIP_ERROR Shutdown() { return mInetLayer.Shutdown(); }
 
     Inet::InetLayer & Get() { return mInetLayer; }
+
 private:
     Inet::InetLayer mInetLayer;
 };
 #endif // CONFIG_DEVICE_LAYER
 
 /* ========================== BleLayer Configuration ========================== */
-struct BleLayerConfiguration {};
-template<typename T> struct IsBleLayerConfiguration : std::is_base_of<BleLayerConfiguration, T> {};
+struct BleLayerConfiguration
+{
+};
+template <typename T>
+struct IsBleLayerConfiguration : std::is_base_of<BleLayerConfiguration, T>
+{
+};
 
-class DefaultBleLayer : BleLayerConfiguration {
+class DefaultBleLayer : BleLayerConfiguration
+{
 public:
-    template<typename T> CHIP_ERROR Init(T* stack) {
+    template <typename T>
+    CHIP_ERROR Init(T * stack)
+    {
         return CHIP_NO_ERROR;
     }
 
@@ -107,23 +123,30 @@ public:
 };
 
 /* ========================== Transport Configuration ========================== */
-struct TransportConfiguration {};
-template<typename T> struct IsTransportConfiguration : std::is_base_of<TransportConfiguration, T> {};
+struct TransportConfiguration
+{
+};
+template <typename T>
+struct IsTransportConfiguration : std::is_base_of<TransportConfiguration, T>
+{
+};
 
-class DefaultTransport : TransportConfiguration {
+class DefaultTransport : TransportConfiguration
+{
 public:
     using transport = TransportMgr<Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-                                    ,
-                                    Transport::UDP /* IPv4 */
+                                   ,
+                                   Transport::UDP /* IPv4 */
 #endif
-          >;
+                                   >;
 
-    CHIP_ERROR Init(Inet::InetLayer & inetLayer) {
+    CHIP_ERROR Init(Inet::InetLayer & inetLayer)
+    {
         return mTransportManager.Init(
             Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mPort)
 #if INET_CONFIG_ENABLE_IPV4
-            ,
+                ,
             Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mPort)
 #endif
         );
@@ -138,12 +161,14 @@ private:
 };
 
 /* ========================== StackImpl ========================== */
-template<typename... Configurations>
-class StackImpl : public virtual Stack {
+template <typename... Configurations>
+class StackImpl : public virtual Stack
+{
 private:
-    using SystemLayerConfig = typename first_if_any_or_default<IsSystemLayerConfiguration, DefaultSystemLayer, Configurations...>::type;
+    using SystemLayerConfig =
+        typename first_if_any_or_default<IsSystemLayerConfiguration, DefaultSystemLayer, Configurations...>::type;
     using InetLayerConfig = typename first_if_any_or_default<IsInetLayerConfiguration, DefaultInetLayer, Configurations...>::type;
-    using BleLayerConfig = typename first_if_any_or_default<IsBleLayerConfiguration, DefaultBleLayer, Configurations...>::type;
+    using BleLayerConfig  = typename first_if_any_or_default<IsBleLayerConfiguration, DefaultBleLayer, Configurations...>::type;
     using TransportConfig = typename first_if_any_or_default<IsTransportConfiguration, DefaultTransport, Configurations...>::type;
 
 public:
@@ -168,12 +193,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Shutdown() override {
+    CHIP_ERROR Shutdown() override
+    {
         mExchangeManager.Shutdown();
         mSessionManager.Shutdown();
 
         Ble::BleLayer * ble = GetBleLayer();
-        if (ble != nullptr) ble->Shutdown();
+        if (ble != nullptr)
+            ble->Shutdown();
         mInetLayer.Shutdown();
         mSystemLayer.Shutdown();
 #if CONFIG_DEVICE_LAYER
@@ -182,10 +209,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ResetTransport() override
-    {
-        return mTransport.Init(mInetLayer.Get());
-    }
+    CHIP_ERROR ResetTransport() override { return mTransport.Init(mInetLayer.Get()); }
 
     TransportConfig & GetTransportConfig() { return mTransport; }
 

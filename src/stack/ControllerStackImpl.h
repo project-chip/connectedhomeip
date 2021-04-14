@@ -26,20 +26,23 @@
 namespace chip {
 
 /* ========================== ControllerStackImpl ========================== */
-template<typename... Configurations>
-class ControllerStackImpl : public ControllerStack, public StackImpl<Configurations...> {
+template <typename... Configurations>
+class ControllerStackImpl : public ControllerStack, public StackImpl<Configurations...>
+{
 public:
     ControllerStackImpl(NodeId localDeviceId) : StackImpl<Configurations...>(localDeviceId) {}
     ~ControllerStackImpl() override {}
 
-    CHIP_ERROR InitController(PersistentStorageDelegate * storageDelegate, Controller::DevicePairingDelegate * pairingDelegate) override
+    CHIP_ERROR InitController(PersistentStorageDelegate * storageDelegate,
+                              Controller::DevicePairingDelegate * pairingDelegate) override
     {
         ReturnErrorOnFailure(StackImpl<Configurations...>::Init());
         ReturnErrorOnFailure(mDeviceCommissioner.Init(this, storageDelegate, pairingDelegate));
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Shutdown() override {
+    CHIP_ERROR Shutdown() override
+    {
         ReturnErrorOnFailure(mDeviceCommissioner.Shutdown());
         ReturnErrorOnFailure(StackImpl<Configurations...>::Shutdown());
         return CHIP_NO_ERROR;

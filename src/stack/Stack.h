@@ -36,22 +36,23 @@ namespace app {
 class InteractionModelEngine;
 }
 
-class Stack {
+class Stack
+{
 public:
     virtual ~Stack() {}
 
-    virtual CHIP_ERROR Init() = 0;
+    virtual CHIP_ERROR Init()     = 0;
     virtual CHIP_ERROR Shutdown() = 0;
 
-    virtual NodeId GetLocalNodeId() = 0;
+    virtual NodeId GetLocalNodeId()          = 0;
     virtual System::Layer & GetSystemLayer() = 0;
     virtual Inet::InetLayer & GetInetLayer() = 0;
-    virtual Ble::BleLayer * GetBleLayer() = 0;
+    virtual Ble::BleLayer * GetBleLayer()    = 0;
 
-    virtual TransportMgrBase & GetTransportManager() = 0;
-    virtual CHIP_ERROR ResetTransport() = 0;
-    virtual SecureSessionMgr & GetSecureSessionManager() = 0;
-    virtual Transport::AdminPairingTable & GetAdmins() = 0;
+    virtual TransportMgrBase & GetTransportManager()          = 0;
+    virtual CHIP_ERROR ResetTransport()                       = 0;
+    virtual SecureSessionMgr & GetSecureSessionManager()      = 0;
+    virtual Transport::AdminPairingTable & GetAdmins()        = 0;
     virtual Messaging::ExchangeManager & GetExchangeManager() = 0;
 #ifdef CHIP_ENABLE_INTERACTION_MODEL
     virtual app::InteractionModelEngine & GetInteractionModelEngine() = 0;
