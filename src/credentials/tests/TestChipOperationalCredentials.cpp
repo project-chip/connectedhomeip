@@ -91,29 +91,28 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
     enum
     {
         CTNS   = kCertType_NotSpecified,
-        CTCA   = kCertType_CA,
+        CTCA   = kCertType_ICA,
         CTNode = kCertType_Node,
         CTFS   = kCertType_FirmwareSigning,
-        CTAD   = kCertType_AppDefinedBase,
     };
 
     // clang-format off
     static const ValidationTestCase sValidationTestCases[] = {
-        //            Reqd                                    Exp   Exp                             Cert             Cert
-        // Subj Valid Cert                                    Cert  TA     Cert                     Decode           Load
-        // Ind  Flags Type    Expected Result                 Index Index  Type                     Flags            Flags
+        //            Reqd                                    Exp   Exp                           Cert              Cert
+        // Subj Valid Cert                                    Cert  TA     Cert                   Decode            Load
+        // Ind  Flags Type    Expected Result                 Index Index  Type                   Flags             Flags
         // ==================================================================================================================================
 
         // Basic validation of leaf certificate with different Trusted Anchor indexes to be used on TrustedRootID Search.
-        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-        {  2,   0,    CTNS,   CHIP_ERROR_CERT_NOT_FOUND,      2,    2, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCerts::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCerts::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCerts::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCerts::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCerts::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCerts::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_ERROR_CERT_NOT_FOUND,      2,    2, { { TestCerts::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCerts::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCerts::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
     };
     // clang-format on
     static const size_t sNumValidationTestCases = sizeof(sValidationTestCases) / sizeof(sValidationTestCases[0]);
@@ -127,7 +126,7 @@ static void TestChipOperationalCredentials_CertValidation(nlTestSuite * inSuite,
         certSet.Init(kMaxCertsPerTestCase, kTestCertBufSize);
         for (size_t i2 = 0; i2 < kMaxCertsPerTestCase; i2++)
         {
-            if (testCase.InputCerts[i2].Type != TestCertTypes::kNone)
+            if (testCase.InputCerts[i2].Type != TestCerts::kNone)
             {
                 err = LoadTestCert(certSet, testCase.InputCerts[i2].Type, testCase.InputCerts[i2].LoadFlags,
                                    testCase.InputCerts[i2].DecodeFlags);
