@@ -1,6 +1,7 @@
 {
     "macros": [
-        "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""
+        "MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\"",
+        "MBED_CONF_APP_MAIN_STACK_SIZE=8192"
     ],
     "target_overrides": {
         "*": {
@@ -32,3 +33,4 @@
         }
     }
 }
+
