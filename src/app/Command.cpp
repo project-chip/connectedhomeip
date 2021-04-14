@@ -67,7 +67,8 @@ CHIP_ERROR Command::Reset()
     SuccessOrExit(err);
 
     commandListBuilder = mInvokeCommandBuilder.CreateCommandListBuilder();
-    SuccessOrExit(commandListBuilder.GetError());
+    err = commandListBuilder.GetError();
+    SuccessOrExit(err);
     MoveToState(CommandState::Initialized);
 
     mCommandIndex = 0;
@@ -123,6 +124,7 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
     }
 
 exit:
+    ChipLogFunctError(err);
     return err;
 }
 
@@ -136,86 +138,56 @@ void Command::Shutdown()
 
     mpExchangeMgr = nullptr;
     mpDelegate    = nullptr;
-    MoveToState(CommandState::Uninitialized);
+    ClearState();
 
     mCommandIndex = 0;
 exit:
     return;
 }
 
-chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
-{
-    mCommandDataBuf = chip::System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    if (mCommandDataBuf.IsNull())
-    {
-        ChipLogDetail(DataManagement, "Unable to allocate packet buffer");
-    }
-
-    mCommandDataWriter.Init(mCommandDataBuf.Retain());
-
-    return mCommandDataWriter;
-}
-
-CHIP_ERROR Command::AddCommand(chip::EndpointId aEndpointId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
-                               chip::CommandId aCommandId, BitFlags<CommandPathFlags> aFlags)
-{
-    CommandParams commandParams(aEndpointId, aGroupId, aClusterId, aCommandId, aFlags);
-
-    return AddCommand(commandParams);
-}
-
-CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
+CHIP_ERROR Command::PrepareCommand(const CommandParams * const apCommandParams)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
-    const uint8_t * commandData = nullptr;
-    uint32_t commandLen         = 0;
 
-    if (!mCommandDataBuf.IsNull())
+    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    err = commandDataElement.GetError();
+    SuccessOrExit(err);
+
+    if(apCommandParams != nullptr)
     {
-        commandData = mCommandDataBuf->Start();
-        commandLen  = mCommandDataBuf->DataLength();
-    }
-
-    if (commandLen > 0 && commandData != nullptr)
-    {
-        // Command argument list can be empty.
-        VerifyOrExit(commandLen >= 2, err = CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrExit(commandData[0] == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        commandData += 1;
-        commandLen -= 1;
-    }
-
-    {
-        CommandDataElement::Builder commandDataElement =
-            mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-
-        err = Command::ConstructCommandPath(aCommandParams, commandDataElement);
-        SuccessOrExit(err);
-
-        if (commandLen > 0 && commandData != nullptr)
-        {
-            // Copy the application data into a new TLV structure field contained with the
-            // command structure.  NOTE: The TLV writer will take care of moving the app data
-            // to the correct location within the buffer.
-            err = mInvokeCommandBuilder.GetWriter()->PutPreEncodedContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data),
-                                                                            chip::TLV::kTLVType_Structure, commandData, commandLen);
-            SuccessOrExit(err);
-        }
-        commandDataElement.EndOfCommandDataElement();
-
-        err = commandDataElement.GetError();
+        err = ConstructCommandPath(*apCommandParams, commandDataElement);
         SuccessOrExit(err);
     }
-    MoveToState(CommandState::AddCommand);
 
+    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure, mDataElementContainerType);
 exit:
-    mCommandDataBuf = nullptr;
     ChipLogFunctError(err);
     return err;
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder & aCommandDataElement)
+TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
+{
+    return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
+}
+
+CHIP_ERROR Command::FinishCommand()
+{
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+
+    CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
+    err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
+    SuccessOrExit(err);
+    commandDataElement.EndOfCommandDataElement();
+    err = commandDataElement.GetError();
+    SuccessOrExit(err);
+    MoveToState(CommandState::AddCommand);
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder aCommandDataElement)
 {
     CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
     if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
@@ -249,9 +221,11 @@ CHIP_ERROR Command::ClearExistingExchangeContext()
 CHIP_ERROR Command::FinalizeCommandsMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    CommandList::Builder commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
-    SuccessOrExit(commandListBuilder.GetError());
+    CommandList::Builder commandListBuilder;
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    commandListBuilder = mInvokeCommandBuilder.GetCommandListBuilder().EndOfCommandList();
+    err = commandListBuilder.GetError();
+    SuccessOrExit(err);
 
     mInvokeCommandBuilder.EndOfInvokeCommand();
     err = mInvokeCommandBuilder.GetError();
@@ -259,10 +233,6 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
 
     err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
     SuccessOrExit(err);
-
-    VerifyOrExit(mCommandMessageBuf->EnsureReservedSize(System::PacketBuffer::kDefaultHeaderReserve),
-                 err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
 exit:
     ChipLogFunctError(err);
     return err;

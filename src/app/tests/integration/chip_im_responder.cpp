@@ -68,10 +68,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     uint8_t effectIdentifier = 1; // Dying light
     uint8_t effectVariant    = 1;
 
-    chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
-
-    chip::TLV::TLVWriter writer = apCommandObj->CreateCommandDataElementTLVWriter();
-
     if (statusCodeFlipper)
     {
         printf("responder constructing status code in command");
@@ -81,22 +77,20 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     else
     {
         printf("responder constructing command data in command");
-        err = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
+
+        chip::TLV::TLVWriter *writer;
+
+        err = apCommandObj->PrepareCommand(&commandParams);
         SuccessOrExit(err);
 
-        err = writer.Put(chip::TLV::ContextTag(1), effectIdentifier);
+        writer = apCommandObj->GetCommandDataElementTLVWriter();
+        err = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
         SuccessOrExit(err);
 
-        err = writer.Put(chip::TLV::ContextTag(2), effectVariant);
+        err = writer->Put(chip::TLV::ContextTag(2), effectVariant);
         SuccessOrExit(err);
 
-        err = writer.EndContainer(dummyType);
-        SuccessOrExit(err);
-
-        err = writer.Finalize();
-        SuccessOrExit(err);
-
-        err = apCommandObj->AddCommand(commandParams);
+        err = apCommandObj->FinishCommand();
         SuccessOrExit(err);
     }
     statusCodeFlipper = !statusCodeFlipper;
