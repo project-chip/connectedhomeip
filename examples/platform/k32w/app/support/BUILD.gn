@@ -15,10 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/pigweed.gni")
-import("$dir_pw_build/facade.gni")
-import("$dir_pw_build/target_types.gni")
-import("$dir_pw_malloc/backend.gni")
-import("$dir_pw_unit_test/test.gni")
+
 
 config("support_config") {
   include_dirs = [ "../../.." ]
@@ -42,18 +39,12 @@ config("support_config") {
   ]
 }
 
-pw_facade("pw_malloc") {
-  public_configs = [ ":support_config" ]
-  public = [ "Memconfig.h" ]
-  backend = pw_malloc_BACKEND
-}
 
 source_set("freertos_mbedtls_utils") {
   sources = [
     "FreeRtosMbedtlsUtils.c",
     "FreeRtosMbedtlsUtils.h",
     "Memconfig.cpp",
-    "Memconfig.h",
   ]
 
   #TODO: not sure this is required, maybe we should make this dependant on mbedtls
