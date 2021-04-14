@@ -175,8 +175,6 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     rc->SetConfig({
         1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
-        3, // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
     });
 
     gSendMessageCount = 0;

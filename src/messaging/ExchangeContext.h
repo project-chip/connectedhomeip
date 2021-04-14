@@ -194,7 +194,7 @@ private:
     ExchangeDelegateBase * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr   = nullptr;
     ExchangeACL * mExchangeACL       = nullptr;
-    void * mAppState               = nullptr;
+    void * mAppState                 = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
