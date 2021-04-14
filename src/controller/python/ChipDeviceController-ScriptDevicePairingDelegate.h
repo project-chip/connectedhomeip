@@ -28,6 +28,7 @@
 #include <controller/CHIPDeviceController.h>
 
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <support/ThreadOperationalDataset.h>
 #include <transport/RendezvousSessionDelegate.h>
 
 namespace chip {
@@ -42,8 +43,7 @@ class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelega
 public:
     ~ScriptDevicePairingDelegate() = default;
     void SetWifiCredential(const char * ssid, const char * password);
-    void SetThreadCredential(uint8_t channel, uint16_t panId,
-                             uint8_t (&masterKey)[chip::DeviceLayer::Internal::kThreadMasterKeyLength]);
+    void SetThreadCredential(uint8_t channel, uint16_t panId, uint8_t (&masterKey)[chip::Thread::kSizeMasterKey]);
     void SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback);
 
     void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) override;
@@ -59,7 +59,7 @@ private:
     char mWifiPassword[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
 
     // Thread Provisioning Data
-    chip::DeviceLayer::Internal::DeviceNetworkInfo mThreadInfo = {};
+    chip::Thread::OperationalDataset mThreadInfo = {};
 
     enum class Mode
     {

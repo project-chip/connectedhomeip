@@ -244,13 +244,12 @@ pychip_ScriptDevicePairingDelegate_SetThreadCredential(chip::Controller::DeviceC
                                                        const char * masterKeyStr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t masterKey[chip::DeviceLayer::Internal::kThreadMasterKeyLength];
+    uint8_t masterKey[chip::Thread::kSizeMasterKey];
     (void) devCtrl;
 
-    VerifyOrExit(strlen(masterKeyStr) == 2 * chip::DeviceLayer::Internal::kThreadMasterKeyLength,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(strlen(masterKeyStr) == 2 * chip::Thread::kSizeMasterKey, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    for (size_t i = 0; i < chip::DeviceLayer::Internal::kThreadMasterKeyLength; i++)
+    for (size_t i = 0; i < chip::Thread::kSizeMasterKey; i++)
         VerifyOrExit(sscanf(&masterKeyStr[2 * i], "%2hhx", &masterKey[i]) == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     sPairingDelegate.SetThreadCredential(channel, panId, masterKey);
