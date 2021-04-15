@@ -125,7 +125,14 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
-    VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
+    ApplicationExchangeDispatch defaultDispatch;
+
+    if (dispatch == nullptr)
+    {
+        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+        dispatch = &defaultDispatch;
+    }
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
@@ -143,8 +150,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         }
     }
 
-    err = GetMessageDispatch()->SendMessage(mSecureSession, mExchangeId, IsInitiator(), mReliableMessageContext,
-                                            reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), mReliableMessageContext, reliableTransmissionRequested,
+                                protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -361,10 +368,16 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
+    ApplicationExchangeDispatch defaultDispatch;
 
-    err = GetMessageDispatch()->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
+    if (dispatch == nullptr)
+    {
+        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+        dispatch = &defaultDispatch;
+    }
+
+    CHIP_ERROR err = dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
