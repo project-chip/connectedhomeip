@@ -26,7 +26,9 @@
 namespace {
 
 pthread_t sPlatformMainThread;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 uint32_t sBluetoothAdapterId = 0;
+#endif
 
 void * PlatformMainLoop(void *)
 {
