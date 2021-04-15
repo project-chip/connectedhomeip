@@ -27,8 +27,6 @@ jobs:
                 type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_IMAGE: chip-build-openssl
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'

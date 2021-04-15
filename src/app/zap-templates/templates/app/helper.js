@@ -37,7 +37,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
  */
 function user_cluster_has_enabled_manufacturer_command(name, side, options)
 {
-  return queryImpexp.exportendPointTypeIds(this.global.db, this.global.sessionId)
+  return queryImpexp.exportEndPointTypeIds(this.global.db, this.global.sessionId)
       .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
       .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
                 this.global.db, endpointsAndClusters))
@@ -193,7 +193,7 @@ function asChipUnderlyingType(label, type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit = [ 'Identify', 'Groups', 'Scenes', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
+var endpointClusterWithInit = [ 'Basic', 'Identify', 'Groups', 'Scenes', 'On/off', 'Level Control', 'Color Control', 'IAS Zone' ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];

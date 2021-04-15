@@ -61,14 +61,18 @@ public:
         kMaxFirmwareRevisionLength = 32,
     };
 
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize);
     CHIP_ERROR GetVendorId(uint16_t & vendorId);
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize);
     CHIP_ERROR GetProductId(uint16_t & productId);
+    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR GetProductRevision(uint16_t & productRev);
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-    CHIP_ERROR GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen);
+    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize);
+    CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev);
     CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
                                     uint8_t & second);
     CHIP_ERROR GetDeviceId(uint64_t & deviceId);
@@ -207,6 +211,14 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
+ * Name of the vendor that produced the device.
+ */
+inline CHIP_ERROR ConfigurationManager::GetVendorName(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetVendorName(buf, bufSize);
+}
+
+/**
  * Id of the vendor that produced the device.
  */
 inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
@@ -215,11 +227,27 @@ inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
 }
 
 /**
+ * Name of the product assigned by the vendor.
+ */
+inline CHIP_ERROR ConfigurationManager::GetProductName(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetProductName(buf, bufSize);
+}
+
+/**
  * Device product id assigned by the vendor.
  */
 inline CHIP_ERROR ConfigurationManager::GetProductId(uint16_t & productId)
 {
     return static_cast<ImplClass *>(this)->_GetProductId(productId);
+}
+
+/**
+ * Product revision string assigned by the vendor.
+ */
+inline CHIP_ERROR ConfigurationManager::GetProductRevisionString(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetProductRevisionString(buf, bufSize);
 }
 
 /**
@@ -250,9 +278,14 @@ inline CHIP_ERROR ConfigurationManager::GetManufacturingDate(uint16_t & year, ui
     return static_cast<ImplClass *>(this)->_GetManufacturingDate(year, month, dayOfMonth);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
+inline CHIP_ERROR ConfigurationManager::GetFirmwareRevisionString(char * buf, size_t bufSize)
 {
-    return static_cast<ImplClass *>(this)->_GetFirmwareRevision(buf, bufSize, outLen);
+    return static_cast<ImplClass *>(this)->_GetFirmwareRevisionString(buf, bufSize);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(uint32_t & firmwareRev)
+{
+    return static_cast<ImplClass *>(this)->_GetFirmwareRevision(firmwareRev);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,

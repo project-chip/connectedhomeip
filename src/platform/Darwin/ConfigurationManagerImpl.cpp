@@ -33,18 +33,22 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <TargetConditionals.h>
+#if TARGET_OS_OSX
 #include <CoreFoundation/CoreFoundation.h>
 
 #include <IOKit/IOKitLib.h>
 #include <IOKit/network/IOEthernetController.h>
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/network/IONetworkInterface.h>
+#endif // TARGET_OS_OSX
 
 namespace chip {
 namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
+#if TARGET_OS_OSX
 CHIP_ERROR FindInterfaces(io_iterator_t * primaryInterfaceIterator)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -122,6 +126,7 @@ exit:
 
     return err;
 }
+#endif // TARGET_OS_OSX
 
 /** Singleton instance of the ConfigurationManager implementation object.
  */
@@ -141,6 +146,7 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
+#if TARGET_OS_OSX
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     io_iterator_t primaryInterfaceIterator;
@@ -151,6 +157,9 @@ CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
     IOObjectRelease(primaryInterfaceIterator);
 
     return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // TARGET_OS_OSX
 }
 
 bool ConfigurationManagerImpl::_CanFactoryReset()

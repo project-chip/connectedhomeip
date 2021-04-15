@@ -33,7 +33,7 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
+#include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
@@ -86,18 +86,12 @@ private:
 class EncryptedPacketBufferHandle final : private System::PacketBufferHandle
 {
 public:
-    EncryptedPacketBufferHandle() : mMsgId(0) {}
-    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) :
-        PacketBufferHandle(std::move(aBuffer)), mMsgId(aBuffer.mMsgId)
-    {}
+    EncryptedPacketBufferHandle() {}
+    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
-    void operator=(EncryptedPacketBufferHandle && aBuffer)
-    {
-        PacketBufferHandle::operator=(std::move(aBuffer));
-        mMsgId                      = aBuffer.mMsgId;
-    }
+    void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 
-    uint32_t GetMsgId() const { return mMsgId; }
+    uint32_t GetMsgId() const;
 
     /**
      * Creates a copy of the data in this packet.
@@ -132,15 +126,9 @@ private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
     friend class SecureSessionMgr;
 
-    EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)), mMsgId(0) {}
+    EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
 
-    void operator=(PacketBufferHandle && aBuffer)
-    {
-        PacketBufferHandle::operator=(std::move(aBuffer));
-        mMsgId                      = 0;
-    }
-
-    uint32_t mMsgId; // The message identifier of the CHIP message awaiting acknowledgment.
+    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 };
 
 /**
@@ -161,11 +149,13 @@ public:
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
+     * @param source        The sender's address
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, const Transport::PeerAddress & source,
+                                   System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -239,7 +229,6 @@ public:
      *   returns success, the encrypted data that was sent, as well as various other information needed
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf);
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
     CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
@@ -265,7 +254,7 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
 
     /**
@@ -379,6 +368,11 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
+
+    void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                               System::PacketBufferHandle msg);
+    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                         System::PacketBufferHandle msg);
 };
 
 namespace MessagePacketBuffer {

@@ -14,12 +14,13 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
+
 import("${chip_root}/src/platform/device.gni")
 
 config("shell_common_config") {
   include_dirs = [
     ".",
-    "./include",
+    "include",
     "${chip_root}/src/lib/shell",
   ]
 

@@ -268,7 +268,7 @@ CHIP_ERROR QPG6100Config::MapNVMError(qvStatus_t aStatus)
     case QV_STATUS_KEY_LEN_TOO_SMALL:
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     case QV_STATUS_INVALID_DATA:
-        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     default:
         break;
     }

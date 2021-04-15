@@ -23,9 +23,11 @@ config("chip_examples_project_config") {
 
 source_set("openthread_core_config_efr32_chip_examples") {
   sources = [ "project_include/OpenThreadConfig.h" ]
+
   public_deps = [
     "${chip_root}/third_party/openthread/platforms/efr32:openthread_core_config_efr32",
     "${efr32_sdk_build_root}:efr32_sdk",
   ]
+
   public_configs = [ ":chip_examples_project_config" ]
 }

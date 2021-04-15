@@ -34,14 +34,20 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/ExchangeMgrDelegate.h>
+#include <protocols/secure_channel/RendezvousSession.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#include <controller/DeviceAddressUpdateDelegate.h>
+#include <mdns/Resolver.h>
+#endif
 
 namespace chip {
 
@@ -57,6 +63,9 @@ struct ControllerInitParams
     Inet::InetLayer * inetLayer                 = nullptr;
 #if CHIP_ENABLE_INTERACTION_MODEL
     app::InteractionModelDelegate * imDelegate = nullptr;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
 };
 
@@ -117,8 +126,12 @@ public:
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate,
+class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
+                                    public Messaging::ExchangeMgrDelegate,
                                     public PersistentStorageResultDelegate,
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+                                    public Mdns::ResolverDelegate,
+#endif
                                     public app::InteractionModelDelegate
 {
 public:
@@ -164,6 +177,18 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    /**
+     * @brief
+     *   This function update the device informations asynchronously using mdns.
+     *   If new device informations has been found, it will be persisted.
+     *
+     * @param[in] device    The input device object to update
+     * @param[in] fabricId  The fabricId used for mdns resolution
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR UpdateDevice(Device * device, uint64_t fabricId);
+
     void PersistDevice(Device * device);
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
@@ -206,9 +231,12 @@ protected:
 
     NodeId mLocalDeviceId;
     DeviceTransportMgr * mTransportMgr;
-    SecureSessionMgr * mSessionManager;
-    Messaging::ExchangeManager * mExchangeManager;
+    SecureSessionMgr * mSessionMgr;
+    Messaging::ExchangeManager * mExchangeMgr;
     PersistentStorageDelegate * mStorageDelegate;
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+#endif
     Inet::InetLayer * mInetLayer;
     System::Layer * mSystemLayer;
 
@@ -226,15 +254,23 @@ protected:
     Transport::AdminPairingTable mAdmins;
 
 private:
-    //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
+    //////////// ExchangeDelegate Implementation ///////////////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle msgBuf) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    //////////// ExchangeMgrDelegate Implementation ///////////////
+    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    //////////// ResolverDelegate Implementation ///////////////
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
 };

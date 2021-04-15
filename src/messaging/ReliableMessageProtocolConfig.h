@@ -91,11 +91,11 @@ namespace Messaging {
  */
 #ifndef CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 #ifdef PBUF_POOL_SIZE
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (PBUF_POOL_SIZE)
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE std::min(PBUF_POOL_SIZE, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
 #elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE)
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE std::min(CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
 #else
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE 15
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 #endif // PBUF_POOL_SIZE
 #endif // CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 
@@ -122,10 +122,11 @@ struct ReliableMessageProtocolConfig
     uint8_t mMaxRetrans;                 /**< Configurable max value for retransmissions in the ExchangeContext. */
 };
 
-const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS };
+const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = {
+    CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+    CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
+    CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+};
 
 // clang-format on
 
