@@ -278,7 +278,7 @@ else
             break;
         }
         case ZCL_BARRIER_CONTROL_STOP_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfBarrierControlClusterBarrierControlStopCallback();
                     break;
@@ -2483,13 +2483,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_CLEAR_ALL_PINS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfDoorLockClusterClearAllPinsCallback();
                     break;
         }
         case ZCL_CLEAR_ALL_RFIDS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfDoorLockClusterClearAllRfidsCallback();
                     break;
@@ -4344,7 +4344,7 @@ else
             break;
         }
         case ZCL_COMMISSIONING_COMPLETE_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfGeneralCommissioningClusterCommissioningCompleteCallback();
                     break;
@@ -4733,7 +4733,7 @@ else
             break;
         }
         case ZCL_REMOVE_ALL_GROUPS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfGroupsClusterRemoveAllGroupsCallback();
                     break;
@@ -5051,7 +5051,7 @@ else
             break;
         }
         case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfIdentifyClusterIdentifyQueryCallback();
                     break;
@@ -5765,7 +5765,7 @@ else
             break;
         }
         case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfLevelControlClusterStopWithOnOffCallback();
                     break;
@@ -5791,7 +5791,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_SLEEP_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfLowPowerClusterSleepCallback();
                     break;
@@ -5817,37 +5817,37 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_MEDIA_FAST_FORWARD_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaFastForwardCallback();
                     break;
         }
         case ZCL_MEDIA_NEXT_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaNextCallback();
                     break;
         }
         case ZCL_MEDIA_PAUSE_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaPauseCallback();
                     break;
         }
         case ZCL_MEDIA_PLAY_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaPlayCallback();
                     break;
         }
         case ZCL_MEDIA_PREVIOUS_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaPreviousCallback();
                     break;
         }
         case ZCL_MEDIA_REWIND_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaRewindCallback();
                     break;
@@ -5981,13 +5981,13 @@ else
             break;
         }
         case ZCL_MEDIA_START_OVER_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaStartOverCallback();
                     break;
         }
         case ZCL_MEDIA_STOP_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfMediaPlaybackClusterMediaStopCallback();
                     break;
@@ -6497,19 +6497,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_OFF_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterOffCallback();
                     break;
         }
         case ZCL_ON_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterOnCallback();
                     break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterToggleCallback();
                     break;
