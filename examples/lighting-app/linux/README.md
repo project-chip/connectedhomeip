@@ -9,7 +9,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
-    -   [Commandline Arguments](#command-ling-args)
+    -   [Commandline Arguments](#command-line-args)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
 
 <hr>
@@ -35,7 +35,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
 
-<a name="command-ling-args"></a>
+<a name="command-line-args"></a>
 
 ## Commandline arguments
 
