@@ -19,7 +19,7 @@
 
 namespace chip {
 
-/// Convenience typess to make it clear what different number types mean
+/// Convenience types to make it clear what different number types mean
 using NodeId   = uint64_t;
 using FabricId = uint64_t;
 

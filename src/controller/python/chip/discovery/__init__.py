@@ -169,7 +169,7 @@ def _DiscoverFailure(fabric: int, node: int, errorCode: int):
   logging.error("Discovery failure, error %d", errorCode)
 
 
-def FindAddressAsync(fabricid, nodeid, callback, timeout_ms=1000):
+def FindAddressAsync(fabricid: int, nodeid: int, callback, timeout_ms=1000):
     """Discovers the IP address(es) of a node.
 
     Args:
