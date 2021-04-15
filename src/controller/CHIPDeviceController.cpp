@@ -591,7 +591,12 @@ exit:
 
 void DeviceController::OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error)
 {
-    ChipLogError(Controller, "Error resolving node %" PRIu64 ": %s", ErrorStr(error));
+    ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
+
+    if (mDeviceAddressUpdateDelegate != nullptr)
+    {
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeId, error);
+    }
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 

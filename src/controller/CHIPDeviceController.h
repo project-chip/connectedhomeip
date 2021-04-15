@@ -45,7 +45,8 @@
 #include <transport/raw/UDP.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#include <controller/DeviceAddressUpdater.h>
+#include <controller/DeviceAddressUpdateDelegate.h>
+#include <mdns/Resolver.h>
 #endif
 
 namespace chip {
