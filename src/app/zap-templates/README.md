@@ -17,7 +17,7 @@ Run ZAP with UI to configure endpoints and clusters
 ### How to generate files for all applications
 
 When any of the `.zapt` templates has been changed, all examples applications
-needs to be updated. You can regenerate all files with:
+need to be updated. You can regenerate all files with:
 
 ```
 ./scripts/tools/zap_regen_all.py
