@@ -9,6 +9,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
+    -   [Commandline Arguments](#command-ling-args)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
 
 <hr>
@@ -33,6 +34,27 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
+
+<a name="command-ling-args"></a>
+
+## Commandline arguments
+
+-   `--wifi`
+
+    Enables WiFi management feature. Required for WiFi commissioning.
+
+-   `--thread`
+
+    Enables Thread management feature, requires ot-br-posix dbus daemon running.
+    Required for Thread commissioning.
+
+-   `--ble-device <interface id>`
+
+    Use specific bluetooth interface for BLE advertisement and connections.
+
+    `interface id`: the number after `hci` when listing BLE interfaces by
+    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
+    interface. Default: `0`.
 
 <a name="running-complete-example"></a>
 
