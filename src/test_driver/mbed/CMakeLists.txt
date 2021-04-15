@@ -30,6 +30,7 @@ target_include_directories(${APP_TARGET} PRIVATE
 )
 
 target_sources(${APP_TARGET} PRIVATE
+               ${CMAKE_CURRENT_SOURCE_DIR}/arch.c
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
 )
 
