@@ -42,7 +42,9 @@
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include "Mdns.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -274,6 +276,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     void RendezvousComplete() const override
     {
         // Once rendezvous completed, assume we are operational
@@ -282,6 +285,7 @@ public:
             ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
         }
     }
+#endif
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
     void SetBLE(bool ble) { isBLE = ble; }
@@ -528,7 +532,9 @@ void InitServer(AppDelegate * delegate)
 
 // Starting mDNS server only for Thread devices due to problem reported in issue #5076.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     app::Mdns::StartServer();
+#endif
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);
