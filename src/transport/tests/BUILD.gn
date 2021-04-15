@@ -23,12 +23,12 @@ chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   sources = [
-#    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
-#    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
+    #    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
+    #    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
   ]
 
   test_sources = [
-#    "TestCASESession.cpp",
+    #    "TestCASESession.cpp",
     "TestPASESession.cpp",
     "TestPeerConnections.cpp",
     "TestSecureSession.cpp",

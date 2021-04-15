@@ -29,21 +29,13 @@ config("includes") {
   ]
 }
 copy("libcertifier_cfg_copy") {
-  sources = [
-    "${chip_root}/third_party/certifier/libcertifier.cfg",
-  ]
-  outputs = [
-    "$root_out_dir/libcertifier.cfg"
-  ]
+  sources = [ "${chip_root}/third_party/certifier/libcertifier.cfg" ]
+  outputs = [ "$root_out_dir/libcertifier.cfg" ]
 }
 
 copy("libcertifier_cert_copy") {
-  sources = [
-    "${chip_root}/third_party/certifier/libcertifier-cert.crt",
-  ]
-  outputs = [
-    "$root_out_dir/libcertifier-cert.crt"
-  ]
+  sources = [ "${chip_root}/third_party/certifier/libcertifier-cert.crt" ]
+  outputs = [ "$root_out_dir/libcertifier-cert.crt" ]
 }
 
 executable("chip-tool-server") {
@@ -55,9 +47,15 @@ executable("chip-tool-server") {
   ]
 
   if (is_debug) {
-    defines = [ "BUILD_RELEASE=0", "CHIP_LOG_FILTERING=0" ]
+    defines = [
+      "BUILD_RELEASE=0",
+      "CHIP_LOG_FILTERING=0",
+    ]
   } else {
-    defines = [ "BUILD_RELEASE=1", "CHIP_LOG_FILTERING=1" ]
+    defines = [
+      "BUILD_RELEASE=1",
+      "CHIP_LOG_FILTERING=1",
+    ]
   }
 
   if (chip_app_use_interaction_model) {
@@ -67,10 +65,10 @@ executable("chip-tool-server") {
   public_configs = [ ":includes" ]
 
   deps = [
+    ":libcertifier_cert_copy",
+    ":libcertifier_cfg_copy",
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
-    ":libcertifier_cfg_copy",
-    ":libcertifier_cert_copy"
   ]
 
   output_dir = root_out_dir

@@ -18,36 +18,35 @@ import("//build_overrides/nlunit_test.gni")
 import("${build_root}/chip/tools.gni")
 
 executable("commissioning") {
-    sources = [ "main.cpp" ]
+  sources = [ "main.cpp" ]
 
-    cflags = [ "-Wconversion" ]
+  cflags = [ "-Wconversion" ]
 
-    public_deps = [
-        "${chip_root}/src/transport",
-        "${nlunit_test_root}:nlunit-test",
-    ]
+  public_deps = [
+    "${chip_root}/src/transport",
+    "${nlunit_test_root}:nlunit-test",
+  ]
 
-    output_dir = root_out_dir
+  output_dir = root_out_dir
 }
 
-
 executable("commissioner") {
-    sources = [ 
-        "commands/common/Command.cpp",
-        "commands/common/Commands.cpp",
-        "commands/pairing/PairingCommand.cpp",
-        "config/PersistentStorage.cpp",
-        "commissioner.cpp", 
-    ]
+  sources = [
+    "commands/common/Command.cpp",
+    "commands/common/Commands.cpp",
+    "commands/pairing/PairingCommand.cpp",
+    "commissioner.cpp",
+    "config/PersistentStorage.cpp",
+  ]
 
-    cflags = [ "-Wconversion" ]
+  cflags = [ "-Wconversion" ]
 
-    public_deps = [
-        "${chip_root}/src/transport",
-        "${nlunit_test_root}:nlunit-test",
-        "${chip_root}/src/lib",
-        "${chip_root}/third_party/inipp",
-    ]
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/transport",
+    "${chip_root}/third_party/inipp",
+    "${nlunit_test_root}:nlunit-test",
+  ]
 
-    output_dir = root_out_dir
+  output_dir = root_out_dir
 }

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/certifier.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
-import("//build_overrides/certifier.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 config("includes") {
@@ -22,11 +22,9 @@ config("includes") {
     ".",
     "${chip_root}/third_party/certifier/repo/include",
     "${chip_root}/third_party/certifier/repo/internal_headers",
-    "$root_out_dir", 
+    "$root_out_dir",
   ]
-  libs = [
-    "curl",
-  ]
+  libs = [ "curl" ]
 }
 
 action("generate_dac_chain") {
@@ -41,6 +39,8 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
     "AdminPairingTable.cpp",
     "AdminPairingTable.h",
     "CASESession.cpp",
@@ -70,8 +70,6 @@ static_library("transport") {
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -84,6 +82,7 @@ static_library("transport") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${certifier_root}:certifier",
     "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
@@ -94,7 +93,6 @@ static_library("transport") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",
-    "${certifier_root}:certifier",
   ]
 
   data_deps = [ ":generate_dac_chain" ]

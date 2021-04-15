@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
+import("//build_overrides/certifier.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
-import("//build_overrides/certifier.gni")
 
 import("//src/lwip/lwip.gni")
 import("//src/platform/device.gni")
@@ -62,6 +62,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   # This is a real toolchain. Build CHIP.
   group("default") {
     deps = [
+      "${certifier_root}:certifier",
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
@@ -82,7 +83,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${nlassert_root}:nlassert",
       "${nlio_root}:nlio",
       "${nlunit_test_root}:nlunit-test",
-      "${certifier_root}:certifier",
     ]
 
     if (chip_device_platform != "none") {
