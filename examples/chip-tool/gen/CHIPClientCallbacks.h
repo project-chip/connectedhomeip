@@ -103,6 +103,12 @@ typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint16_t
 typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                                        uint8_t * sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+typedef void (*ThermostatClusterCurrentWeeklyScheduleCallback)(void * context, uint8_t numberOfTransitionsForSequence,
+                                                               uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+typedef void (*ThermostatClusterRelayStatusLogCallback)(void * context, uint16_t timeOfDay, uint16_t relayStatus,
+                                                        int16_t localTemperature, uint8_t humidityInPercentage, int16_t setpoint,
+                                                        uint16_t unreadEntries);
 
 // List specific responses
 typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16_t count, _DeviceType * entries);
