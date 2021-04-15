@@ -27,14 +27,9 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeDelegate.h>
-#include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/SessionEstablishmentDelegate.h>
@@ -65,7 +60,7 @@ struct PASESessionSerializable
 
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT PASESession
 {
 public:
     PASESession();
@@ -111,13 +106,26 @@ public:
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
-     * @param exchangeCtxt     The exchange context to send and receive messages with the peer
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t myKeyId,
-                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                    SessionEstablishmentDelegate * delegate);
+
+    /**
+     * @brief
+     *   Create a pairing request using given PASE verifier.
+     *
+     * @param peerAddress      Address of peer to pair
+     * @param verifier         PASE verifier to be used for SPAKE2P pairing
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param delegate         Callback object
+     *
+     * @return CHIP_ERROR      The result of initialization
+     */
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const PASEVerifier & verifier, uint16_t myKeyId,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -142,7 +150,19 @@ public:
      *                    initialized once pairing is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
+    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
+
+    /**
+     * @brief
+     *   Handler for peer's messages, exchanged during pairing handshake.
+     *
+     * @param packetHeader      Message header for the received message
+     * @param peerAddress Source of the message
+     * @param msg         Message sent by the peer
+     * @return CHIP_ERROR The result of message processing
+     */
+    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                         System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -150,7 +170,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
+    uint16_t GetPeerKeyId() { return mConnectionState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -158,11 +178,7 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
-
-    const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
-
-    const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
+    uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
 
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
@@ -194,18 +210,6 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
-    //// ExchangeDelegate Implementation ////
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SecureSessionMgr * sessionMgr) override
-    {
-        return &mMessageDispatch;
-    }
-
 private:
     enum Spake2pErrorType : uint8_t
     {
@@ -221,19 +225,21 @@ private:
     CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
 
     CHIP_ERROR SendPBKDFParamRequest();
-    CHIP_ERROR HandlePBKDFParamRequest(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamRequest(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendPBKDFParamResponse();
-    CHIP_ERROR HandlePBKDFParamResponse(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandlePBKDFParamResponse(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendMsg1();
 
-    CHIP_ERROR HandleMsg1_and_SendMsg2(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg2_and_SendMsg3(const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg1_and_SendMsg2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg2_and_SendMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     void SendErrorMsg(Spake2pErrorType errorCode);
-    void HandleErrorMsg(const System::PacketBufferHandle & msg);
+    void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
+
+    CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
@@ -254,10 +260,6 @@ private:
     uint32_t mIterationCount = 0;
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
-
-    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct Spake2pErrorMsg
     {
@@ -323,6 +325,12 @@ public:
 
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, uint16_t myKeyId,
                     SessionEstablishmentDelegate * delegate)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                 System::PacketBufferHandle msg) override
     {
         return CHIP_NO_ERROR;
     }

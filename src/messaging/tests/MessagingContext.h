@@ -18,7 +18,6 @@
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/secure_channel/PASESession.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>

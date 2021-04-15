@@ -27,7 +27,6 @@
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <protocols/secure_channel/PASESession.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
@@ -93,8 +92,7 @@ class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
-                           SecureSessionMgr * mgr) override
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));

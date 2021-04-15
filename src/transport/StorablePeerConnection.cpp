@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <app/server/StorablePeerConnection.h>
 #include <core/CHIPEncoding.h>
 #include <support/SafeInt.h>
+#include <transport/StorablePeerConnection.h>
 
 namespace chip {
 

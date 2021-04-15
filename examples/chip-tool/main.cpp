@@ -24,7 +24,7 @@
 #include "commands/payload/Commands.h"
 #include "commands/reporting/Commands.h"
 
-#include <protocols/secure_channel/PASESession.h>
+#include <transport/PASESession.h>
 
 // ================================================================================
 // Main Code
