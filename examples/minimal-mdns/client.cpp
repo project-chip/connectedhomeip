@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <memory>
 #include <vector>
+#include <string>
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
@@ -151,7 +152,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "query-port", kArgumentRequired, kOptionQueryPort },
     { "timeout-ms", kArgumentRequired, kOptionRuntimeMs },
     { "multicast-reply", kNoArgument, kOptionMulticastReplies },
-    nullptr,
+    {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",

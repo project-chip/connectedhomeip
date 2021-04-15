@@ -120,10 +120,18 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gOptions.pairingHint = Optional<uint8_t>::Value(static_cast<uint8_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
-        gOptions.fabricId = atoll(aValue);
+        if (sscanf(aValue, "%" SCNx64, &gOptions.fabricId) != 1)
+        {
+            PrintArgError("%s: Invalid fabric id: %s\n", aValue);
+            return false;
+        }
         return true;
     case kOptionOperationalNodeId:
-        gOptions.nodeId = atoll(aValue);
+        if (sscanf(aValue, "%" SCNx64, &gOptions.nodeId) != 1)
+        {
+            PrintArgError("%s: Invalid node id: %s\n", aValue);
+            return false;
+        }
         return true;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -146,7 +154,7 @@ OptionDef cmdLineOptionsDef[] = {
 
     { "fabrid-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
-    nullptr,
+    {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
