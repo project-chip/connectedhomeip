@@ -22,6 +22,7 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
+#import "app/util/af.h"
 #import "gen/CHIPClientCallbacks.h"
 #import "gen/CHIPClustersObjc.h"
 
@@ -1803,6 +1804,228 @@ public:
             });
         }
     };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorDeviceListAttributeCallbackBridge : public Callback::Callback<DescriptorDeviceListListAttributeCallback> {
+public:
+    CHIPDescriptorDeviceListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorDeviceListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorDeviceListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _DeviceType * entries)
+    {
+        CHIPDescriptorDeviceListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorDeviceListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:entries[i].type], @"type",
+                                                  [NSNumber numberWithUnsignedShort:entries[i].revision], @"revision", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorServerListAttributeCallbackBridge : public Callback::Callback<DescriptorServerListListAttributeCallback> {
+public:
+    CHIPDescriptorServerListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorServerListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorServerListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
+    {
+        CHIPDescriptorServerListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorServerListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorClientListAttributeCallbackBridge : public Callback::Callback<DescriptorClientListListAttributeCallback> {
+public:
+    CHIPDescriptorClientListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorClientListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorClientListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
+    {
+        CHIPDescriptorClientListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorClientListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorPartsListAttributeCallbackBridge : public Callback::Callback<DescriptorPartsListListAttributeCallback> {
+public:
+    CHIPDescriptorPartsListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorPartsListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorPartsListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::EndpointId * entries)
+    {
+        CHIPDescriptorPartsListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorPartsListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGroupKeyManagementGroupsAttributeCallbackBridge
+    : public Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> {
+public:
+    CHIPGroupKeyManagementGroupsAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPGroupKeyManagementGroupsAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _GroupState * entries)
+    {
+        CHIPGroupKeyManagementGroupsAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId],
+                                                  @"VendorId", [NSNumber numberWithUnsignedShort:entries[i].VendorGroupId],
+                                                  @"VendorGroupId", [NSNumber numberWithUnsignedShort:entries[i].GroupKeySetIndex],
+                                                  @"GroupKeySetIndex", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge
+    : public Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> {
+public:
+    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _GroupKey * entries)
+    {
+        CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
+                    [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex], @"GroupKeyIndex",
+                    [NSData dataWithBytes:entries[i].GroupKeyRoot + 1u length:emberAfStringLength(entries[i].GroupKeyRoot)],
+                    @"GroupKeyRoot", [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime],
+                    @"GroupKeyEpochStartTime", [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy],
+                    @"GroupKeySecurityPolicy", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
 
 private:
     ResponseHandler mHandler;
@@ -4763,6 +4986,102 @@ private:
     return &_cppCluster;
 }
 
+- (void)readAttributeDeviceList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorDeviceListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorDeviceListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeDeviceList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeServerList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorServerListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorServerListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeServerList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClientList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorClientListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorClientListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClientList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributePartsList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorPartsListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorPartsListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributePartsList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
 {
     CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
@@ -5696,6 +6015,54 @@ private:
 - (Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
+}
+
+- (void)readAttributeGroups:(ResponseHandler)completionHandler
+{
+    CHIPGroupKeyManagementGroupsAttributeCallbackBridge * onSuccess
+        = new CHIPGroupKeyManagementGroupsAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeGroups(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeGroupKeys:(ResponseHandler)completionHandler
+{
+    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * onSuccess
+        = new CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeGroupKeys(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
 }
 
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
