@@ -47,11 +47,11 @@ qpg6100_executable("persistent_storage") {
   public_deps = [
     ":sdk",
     "${chip_root}/src/lib",
+    "${chip_root}/src/app",
   ]
 
   include_dirs += [
     "${qpg6100_project_dir}/include",
-    "${chip_root}/src/app/util",
     "${examples_plat_dir}",
     "${examples_plat_dir}/app/include",
   ]
