@@ -438,6 +438,26 @@ class ChipClusters:
             },
             "TemperatureMeasurement": {
             },
+            "Thermostat": {
+                "ClearWeeklySchedule": {
+                },
+                "GetRelayStatusLog": {
+                },
+                "GetWeeklySchedule": {
+                    "daysToReturn": "int",
+                    "modeToReturn": "int",
+                },
+                "SetWeeklySchedule": {
+                    "numberOfTransitionsForSequence": "int",
+                    "dayOfWeekForSequence": "int",
+                    "modeForSequence": "int",
+                    "payload": "int",
+                },
+                "SetpointRaiseLower": {
+                    "mode": "int",
+                    "amount": "int",
+                },
+            },
             "WindowCovering": {
                 "WindowCoveringDownClose": {
                 },
@@ -608,6 +628,14 @@ class ChipClusters:
                 "MeasuredValue",
                 "MinMeasuredValue",
                 "MaxMeasuredValue",
+                "ClusterRevision",
+            ],
+            "Thermostat": [
+                "LocalTemperature",
+                "OccupiedCoolingSetpoint",
+                "OccupiedHeatingSetpoint",
+                "ControlSequenceOfOperation",
+                "SystemMode",
                 "ClusterRevision",
             ],
             "WindowCovering": [
@@ -972,6 +1000,26 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene(
                 device, ZCLendpoint, ZCLgroupid, groupId, sceneId
         )
+    def ClusterThermostat_CommandClearWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterThermostat_CommandGetRelayStatusLog(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterThermostat_CommandGetWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, daysToReturn: int, modeToReturn: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule(
+                device, ZCLendpoint, ZCLgroupid, daysToReturn, modeToReturn
+        )
+    def ClusterThermostat_CommandSetWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, numberOfTransitionsForSequence: int, dayOfWeekForSequence: int, modeForSequence: int, payload: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule(
+                device, ZCLendpoint, ZCLgroupid, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload
+        )
+    def ClusterThermostat_CommandSetpointRaiseLower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, mode: int, amount: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower(
+                device, ZCLendpoint, ZCLgroupid, mode, amount
+        )
     def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(
                 device, ZCLendpoint, ZCLgroupid
@@ -1227,6 +1275,18 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeSystemMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1854,6 +1914,40 @@ class ChipClusters:
         # Cluster TemperatureMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster Thermostat
+        # Cluster Thermostat Command ClearWeeklySchedule
+        self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.restype = ctypes.c_uint32
+        # Cluster Thermostat Command GetRelayStatusLog
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.restype = ctypes.c_uint32
+        # Cluster Thermostat Command GetWeeklySchedule
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.restype = ctypes.c_uint32
+        # Cluster Thermostat Command SetWeeklySchedule
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.restype = ctypes.c_uint32
+        # Cluster Thermostat Command SetpointRaiseLower
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_int8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute LocalTemperature
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute OccupiedCoolingSetpoint
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute OccupiedHeatingSetpoint
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute SystemMode
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WindowCovering
         # Cluster WindowCovering Command WindowCoveringDownClose
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
