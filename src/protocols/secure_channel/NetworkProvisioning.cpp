@@ -19,10 +19,10 @@
 #include <core/CHIPSafeCasts.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/NetworkProvisioning.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
-#include <transport/NetworkProvisioning.h>
 #include <transport/SecureSessionMgr.h>
 
 #if CONFIG_DEVICE_LAYER
@@ -38,14 +38,18 @@ namespace chip {
 constexpr char kAPInterfaceNamePrefix[]      = "ap";
 constexpr char kLoobackInterfaceNamePrefix[] = "lo";
 
-void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate)
+void NetworkProvisioning::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session,
+                               NetworkProvisioningDelegate * delegate)
 {
-    mDelegate = delegate;
+    mExchangeMgr = exchangeMgr;
+    mDelegate    = delegate;
 #if CONFIG_DEVICE_LAYER
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
 #endif
 #endif
+    exchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::NetworkProvisioning::Id, this);
+    mSession = session;
 }
 
 NetworkProvisioning::~NetworkProvisioning()
@@ -55,6 +59,17 @@ NetworkProvisioning::~NetworkProvisioning()
     DeviceLayer::PlatformMgr().RemoveEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
 #endif
 #endif
+}
+
+void NetworkProvisioning::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                                            const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
+{
+    HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), payload);
+
+    // Currently, the only mechanism to get this callback is via unsolicited message handler.
+    // That means that we now own the reference to exchange context. Let's free the reference since we no longer
+    // need it.
+    exchangeContext->Release();
 }
 
 CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf)
@@ -175,6 +190,16 @@ exit:
     return err;
 }
 
+CHIP_ERROR NetworkProvisioning::SendMessageUsingExchange(uint8_t msgType, System::PacketBufferHandle msgPayload)
+{
+    Messaging::ExchangeContext * exchangeContext = mExchangeMgr->NewContext(mSession, this);
+    VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INTERNAL);
+    CHIP_ERROR err = exchangeContext->SendMessage(Protocols::NetworkProvisioning::Id, msgType, std::move(msgPayload),
+                                                  Messaging::SendMessageFlags::kNoAutoRequestAck);
+    exchangeContext->Release();
+    return err;
+}
+
 CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 {
     char * addrStr;
@@ -184,12 +209,10 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     addrStr = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
     buffer->SetDataLength(static_cast<uint16_t>(strlen(addrStr) + 1));
 
-    ChipLogProgress(NetworkProvisioning, "Sending IP Address. Delegate %p\n", mDelegate);
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(NetworkProvisioning, "Sending IP Address\n");
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
 
-    err = mDelegate->SendSecureMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
-                                       std::move(buffer));
+    err = SendMessageUsingExchange(NetworkProvisioning::MsgTypes::kIPAddressAssigned, std::move(buffer));
     SuccessOrExit(err);
 
 exit:
@@ -226,15 +249,13 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     {
         Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(bufferSize), bufferSize);
 
-        ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
-        VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        ChipLogProgress(NetworkProvisioning, "Sending Network Creds\n");
         VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit(EncodeString(ssid, bbuf));
         SuccessOrExit(EncodeString(passwd, bbuf));
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        err = mDelegate->SendSecureMessage(Protocols::NetworkProvisioning::Id,
-                                           NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, bbuf.Finalize());
+        err = SendMessageUsingExchange(NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -261,7 +282,6 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
     Encoding::LittleEndian::PacketBufferWriter bbuf(MessagePacketBuffer::New(credentialSize), credentialSize);
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
-    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!bbuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     bbuf.Put(threadData.ThreadNetworkName, sizeof(threadData.ThreadNetworkName));
@@ -276,8 +296,8 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
     bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    err = mDelegate->SendSecureMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kThreadAssociationRequest,
-                                       bbuf.Finalize());
+
+    err = SendMessageUsingExchange(NetworkProvisioning::MsgTypes::kThreadAssociationRequest, bbuf.Finalize());
 
 exit:
     if (CHIP_NO_ERROR != err)

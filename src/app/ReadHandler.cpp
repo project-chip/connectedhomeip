@@ -112,9 +112,10 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     err = readRequestParser.Init(reader);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = readRequestParser.CheckSchemaValidity();
     SuccessOrExit(err);
-
+#endif
     err = readRequestParser.GetEventPathList(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
