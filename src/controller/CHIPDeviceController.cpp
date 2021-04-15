@@ -391,16 +391,20 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
+    uint16_t index;
 
-    VerifyOrReturn(packetHeader.GetSourceNodeId().HasValue(),
-                   ChipLogError(Controller, "OnMessageReceived was called for unknown source node"));
+    VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
 
-    uint16_t index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
-    VerifyOrReturn(index < kNumMaxActiveDevices,
-                   ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
+    VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(),
+                 ChipLogError(Controller, "OnMessageReceived was called for unknown source node"));
+
+    index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
+    VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
     mActiveDevices[index].OnMessageReceived(packetHeader, payloadHeader, std::move(msgBuf));
+
+exit:
+    ec->Close();
 }
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
