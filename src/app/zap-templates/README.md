@@ -58,7 +58,7 @@ To generate the application additional files, the command is:
 ./scripts/tools/zap/generate.py <path to *.zap file> -t <path to templates.json file>
 ```
 
-For example, to generate `chip-tool` additiona files the command is:
+For example, to generate `chip-tool` additional files the command is:
 
 ```
 ./scripts/tools/zap/generate.py examples/chip-tool/chip-tool.zap -t examples/chip-tool/templates/templates.json
