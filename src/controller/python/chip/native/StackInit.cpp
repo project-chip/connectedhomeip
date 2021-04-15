@@ -70,11 +70,13 @@ void pychip_native_init()
     }
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#ifndef CONFIG_DEVICE_LAYER
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
+#endif
     int result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
     int tmpErrno = errno;
 
