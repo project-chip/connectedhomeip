@@ -28,7 +28,7 @@ public:
     CHIPPersistentStorageDelegateBridge();
     ~CHIPPersistentStorageDelegateBridge();
 
-    void setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue);
+    void setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate, _Nullable dispatch_queue_t queue);
 
     void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
 

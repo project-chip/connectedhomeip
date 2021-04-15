@@ -71,7 +71,7 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags rendezvousFlags)
 {
     // Get QR Code and emulate its content using NFC tag
     std::string QRCode;
-    ReturnOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE));
+    ReturnOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
 
     // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
     std::replace(QRCode.begin(), QRCode.end(), ' ', '_');

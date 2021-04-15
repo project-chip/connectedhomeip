@@ -20,10 +20,10 @@
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
-#include <app/server/DataModelHandler.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
-#include <app/server/SessionManager.h>
+#include <app/server/StorablePeerConnection.h>
+#include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -41,7 +41,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/StorablePeerConnection.h>
 
 #include "Mdns.h"
 
@@ -58,7 +57,7 @@ constexpr bool isRendezvousBypassed()
 #if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
     return true;
 #elif defined(CONFIG_RENDEZVOUS_MODE)
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
+    return static_cast<RendezvousInformationFlag>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlag::kNone;
 #else
     return false;
 #endif
@@ -297,7 +296,7 @@ private:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
-
+Messaging::ExchangeManager gExchangeMgr;
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
 static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
@@ -320,27 +319,26 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
-class ServerCallback : public SecureSessionMgrDelegate
+class ServerCallback : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle buffer) override
     {
-        auto state = mgr->GetPeerConnectionState(session);
-        char src_addr[PeerAddress::kMaxToStringSize];
-
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(!buffer.IsNull(), ChipLogProgress(AppServer, "Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
+        VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
+        VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), ChipLogError(AppServer, "Unknown source for received message"));
 
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
+        VerifyOrExit(mSessionMgr != nullptr, ChipLogError(AppServer, "SecureSessionMgr is not initilized yet"));
 
-        state->GetPeerAddress().ToString(src_addr);
+        VerifyOrExit(packetHeader.GetSourceNodeId().Value() != kUndefinedNodeId,
+                     ChipLogError(AppServer, "Unknown source for received message"));
 
-        ChipLogProgress(AppServer, "Packet received from %s: %u bytes", src_addr, buffer->DataLength());
+        ChipLogProgress(AppServer, "Packet received from Node:%x: %u bytes", packetHeader.GetSourceNodeId().Value(),
+                        buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
@@ -387,35 +385,29 @@ public:
         }
         else
         {
-            HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
+            HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
         }
 
     exit:;
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
+    void OnResponseTimeout(ExchangeContext * ec) override
     {
-        ChipLogProgress(AppServer, "Packet received error: %s", ErrorStr(error));
+        ChipLogProgress(AppServer, "Failed to receive response");
         if (mDelegate != nullptr)
         {
             mDelegate->OnReceiveError();
         }
     }
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
-    {
-        ChipLogProgress(AppServer, "Received a new connection.");
-    }
-
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
+    void SetSessionMgr(SecureSessionMgr * mgr) { mSessionMgr = mgr; }
 
 private:
-    AppDelegate * mDelegate = nullptr;
+    AppDelegate * mDelegate        = nullptr;
+    SecureSessionMgr * mSessionMgr = nullptr;
 };
 
-#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
-Messaging::ExchangeManager gExchangeMgr;
-#endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -424,6 +416,11 @@ SecurePairingUsingTestSecret gTestPairing;
 SecureSessionMgr & chip::SessionManager()
 {
     return gSessions;
+}
+
+Messaging::ExchangeManager & chip::ExchangeManager()
+{
+    return gExchangeMgr;
 }
 
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
@@ -460,7 +457,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -491,12 +488,8 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL || defined(CHIP_APP_USE_ECHO)
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
-#else
-    gSessions.SetDelegate(&gCallbacks);
-#endif
 
 #if CHIP_ENABLE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
@@ -537,6 +530,16 @@ void InitServer(AppDelegate * delegate)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     app::Mdns::StartServer();
 #endif
+
+    gCallbacks.SetSessionMgr(&gSessions);
+
+    // Register to receive unsolicited legacy ZCL messages from the exchange manager.
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
+    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+
+    // Register to receive unsolicited Service Provisioning messages from the exchange manager.
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
+    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
 exit:
     if (err != CHIP_NO_ERROR)

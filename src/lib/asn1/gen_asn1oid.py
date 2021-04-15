@@ -116,9 +116,12 @@ oids = [
     ( "AttributeType",  "Pseudonym",               15,      [ joint_iso_ccitt(2), ds(5), 4, 65 ]                                                            ),
     ( "AttributeType",  "DomainComponent",         16,      [ itu_t(0), 9, 2342, 19200300, 100, 1, 25 ]                                                     ),
     ( "AttributeType",  "ChipNodeId",              17,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 1 ] ),
-    ( "AttributeType",  "ChipCAId",                18,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 2 ] ),
-    ( "AttributeType",  "ChipSoftwarePublisherId", 19,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 3 ] ),
-    ( "AttributeType",  "ChipFabricId",            20,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 4 ] ),
+    ( "AttributeType",  "ChipFirmwareSigningId",   18,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 2 ] ),
+    ( "AttributeType",  "ChipICAId",               19,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 3 ] ),
+    ( "AttributeType",  "ChipRootId",              20,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 4 ] ),
+    ( "AttributeType",  "ChipFabricId",            21,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 5 ] ),
+    ( "AttributeType",  "ChipAuthTag1",            22,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 6 ] ),
+    ( "AttributeType",  "ChipAuthTag2",            23,      [ iso(1), organization(3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 7 ] ),
 
     # Elliptic Curves
     ( "EllipticCurve",  "prime256v1",              1,       [ iso(1), member_body(2), us(840), ansi_X9_62(10045), curves(3), prime(1), 7 ]                  ),

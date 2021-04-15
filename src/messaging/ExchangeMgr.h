@@ -29,6 +29,7 @@
 #include <messaging/Channel.h>
 #include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
@@ -41,7 +42,7 @@ namespace chip {
 namespace Messaging {
 
 class ExchangeContext;
-class ExchangeDelegate;
+class ExchangeDelegateBase;
 
 static constexpr int16_t kAnyMessageType = -1;
 
@@ -97,7 +98,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -113,7 +114,7 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegateBase * delegate);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -128,13 +129,13 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType, ExchangeDelegateBase * delegate);
 
     /**
      * A strongly-message-typed version of RegisterUnsolicitedMessageHandlerForType.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegate * delegate)
+    CHIP_ERROR RegisterUnsolicitedMessageHandlerForType(MessageType msgType, ExchangeDelegateBase * delegate)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return RegisterUnsolicitedMessageHandlerForType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(),
@@ -197,6 +198,8 @@ public:
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
+    void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
+
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
@@ -226,7 +229,7 @@ private:
             return ProtocolId == aProtocolId && MessageType == aMessageType;
         }
 
-        ExchangeDelegate * Delegate;
+        ExchangeDelegateBase * Delegate;
         Protocols::Id ProtocolId;
         // Message types are normally 8-bit unsigned ints, but we use
         // kAnyMessageType, which is negative, to represent a wildcard handler,
@@ -238,6 +241,8 @@ private:
     uint16_t mNextExchangeId;
     uint16_t mNextKeyId;
     State mState;
+
+    ExchangeMgrDelegate * mDelegate;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
@@ -251,15 +256,17 @@ private:
     BitMapObjectPool<ChannelContext, CHIP_CONFIG_MAX_ACTIVE_CHANNELS> mChannelContexts;
     BitMapObjectPool<ChannelContextHandleAssociation, CHIP_CONFIG_MAX_CHANNEL_HANDLES> mChannelHandles;
 
-    ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                   ExchangeDelegateBase * delegate);
 
-    CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
+    CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
+                           const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                           SecureSessionMgr * msgLayer) override;
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;

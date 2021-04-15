@@ -18,7 +18,6 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
@@ -30,6 +29,7 @@ static_library("controller") {
     "CHIPDeviceController.h",
     "DeviceAddressUpdater.cpp",
     "DeviceAddressUpdater.h",
+    "EmptyDataModelHandler.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -41,6 +41,7 @@ static_library("controller") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]

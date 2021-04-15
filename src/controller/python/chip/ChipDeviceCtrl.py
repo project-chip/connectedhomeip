@@ -169,25 +169,30 @@ class ChipDeviceController(object):
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         device = c_void_p(None)
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
-        )
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
 
         commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
         im.ClearCommandStatus(commandSenderHandle)
-        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
+        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args, commandSenderHandle != 0)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(commandSenderHandle, 1)
         return (0, None)
 
-    def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid):
+    def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         device = c_void_p(None)
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
-        )
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
 
-        self._Cluster.ReadAttribute(device, cluster, attribute, endpoint, groupid)
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
+        im.ClearCommandStatus(commandSenderHandle)
+        res = self._Cluster.ReadAttribute(device, cluster, attribute, endpoint, groupid, commandSenderHandle != 0)
+        if blocking:
+            # We only send 1 command by this function, so index is always 0
+            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
 
     def ZCLCommandList(self):
         return self._Cluster.ListClusterCommands()

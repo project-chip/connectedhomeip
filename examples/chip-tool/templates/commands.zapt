@@ -109,13 +109,40 @@ static void On{{asCamelCased parent.name false}}Cluster{{asCamelCased name false
 {{/if}}
 {{/all_user_clusters}}
 
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+static void On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse(void * context, uint16_t count, {{chipType}} * entries)
+{
+    ChipLogProgress(chipTool, "On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        {{#if isStruct}}
+        ChipLogProgress(chipTool, "{{type}}[%lu]:", i);
+        {{#chip_attribute_list_entryTypes}}
+        ChipLogProgress(chipTool, "  {{name}}: {{asPrintFormat type}}", entries[i].{{name}});
+        {{/chip_attribute_list_entryTypes}}
+        {{else}}
+        ChipLogProgress(chipTool, "{{type}}[%lu]: {{asPrintFormat type}}", i, entries[i]);
+        {{/if}}
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
 {{> clusters_header}}
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 constexpr chip::ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4}};
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 {{> cluster_header}}
 
 {{#chip_server_cluster_commands}}
@@ -229,7 +256,11 @@ public:
     }
 
 private:
+{{#if isList}}
+    chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(On{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeResponse, this);
+{{else}}
     chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asCallbackAttributeType atomicTypeId}}AttributeCallback>(On{{asCallbackAttributeType atomicTypeId}}AttributeResponse, this);
+{{/if}}
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
@@ -284,7 +315,9 @@ public:
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         {{#unless (isDiscreteType)}}
+        {{#unless (isString type)}}
         AddArgument("change", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mChange);
+        {{/unless}}
         {{/unless}}
         ModelCommand::AddArguments();
     }
@@ -319,18 +352,20 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     {{#unless (isDiscreteType)}}
+    {{#unless (isString type)}}
     {{chipType}} mChange;
+    {{/unless}}
     {{/unless}}
 };
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
-{{#chip_clusters}}
+{{#chip_client_clusters}}
 void registerCluster{{asCamelCased name false}}(Commands & commands)
 {
     const char * clusterName = "{{asCamelCased name false}}";
@@ -353,11 +388,11 @@ void registerCluster{{asCamelCased name false}}(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 
 void registerClusters(Commands & commands)
 {
-{{#chip_clusters}}
+{{#chip_client_clusters}}
     registerCluster{{asCamelCased name false}}(commands);
-{{/chip_clusters}}
+{{/chip_client_clusters}}
 }

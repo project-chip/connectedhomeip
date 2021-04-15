@@ -32,8 +32,8 @@
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
 #include <support/DLLUtil.h>
-#include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -63,10 +63,14 @@ public:
     /**
      * Initialize a BLE transport to a given peripheral or a given device name.
      *
-     * @param delegate      the delegate that will receive BLE events
-     * @param params        BLE configuration parameters for this transport
+     * @param delegate          the delegate that will receive BLE events
+     * @param transportDelegate the delegate object to receive incoming messages
+     * @param bleLayer          the instance of BleLayer to use
+     * @param discriminator     device advertisement discriminator
+     * @param connObj           BLE connection object
      */
-    CHIP_ERROR Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params);
+    CHIP_ERROR Init(RendezvousSessionDelegate * delegate, TransportMgrDelegate * transportDelegate, Ble::BleLayer * bleLayer,
+                    uint16_t discriminator, BLE_CONNECTION_OBJECT connObj);
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                            System::PacketBufferHandle msgBuf) override;
@@ -106,6 +110,7 @@ private:
     State mState                          = State::kNotReady; ///< State of the BLE transport
     Ble::BLEEndPoint * mBleEndPoint       = nullptr;          ///< BLE endpoint used by transport
     RendezvousSessionDelegate * mDelegate = nullptr;          ///< BLE events from transport
+    TransportMgrDelegate * mTransport     = nullptr;
 };
 
 } // namespace Transport

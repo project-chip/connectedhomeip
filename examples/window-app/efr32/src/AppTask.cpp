@@ -211,12 +211,12 @@ int AppTask::Init()
 
 // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    if (!GetQRCode(mQRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
+    if (!GetQRCode(mQRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
     {
         EFR32_LOG("Getting QR code failed!");
     }
 #else
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintQRCode(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 #endif
     mResetWarning = false;
     // Force LCD refresh
