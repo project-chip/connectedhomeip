@@ -60,7 +60,7 @@ static_library("framework") {
 }
 
 chip_data_model("darwin_data_model") {
-  cluster_sources = [ ]
+  cluster_sources = []
 
   zap_pregenerated_dir = "gen"
 
