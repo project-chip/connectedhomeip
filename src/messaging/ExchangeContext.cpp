@@ -125,8 +125,6 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
-    ChipLogProgress(ExchangeManager, "Trying to send message using dispatch %p", GetMessageDispatch());
-
     VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // If a response message is expected...
