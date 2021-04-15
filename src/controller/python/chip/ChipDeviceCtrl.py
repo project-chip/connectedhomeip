@@ -74,17 +74,11 @@ class ChipDeviceController(object):
         self._InitLib()
 
         devCtrl = c_void_p(None)
-        addressUpdater = c_void_p(None)
         res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), controllerNodeId)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        res = self._dmLib.pychip_DeviceAddressUpdater_New(pointer(addressUpdater), devCtrl)
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
-
         self.devCtrl = devCtrl
-        self.addressUpdater = addressUpdater
         self._ChipStack.devCtrl = devCtrl
 
         self._Cluster = ChipClusters(self._ChipStack)
@@ -121,7 +115,6 @@ class ChipDeviceController(object):
 
     def __del__(self):
         if self.devCtrl != None:
-            self._dmLib.pychip_DeviceAddressUpdater_Delete(self.addressUpdater)
             self._dmLib.pychip_DeviceController_DeleteDeviceController(self.devCtrl)
             self.devCtrl = None
 
@@ -251,12 +244,6 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = c_uint32
-
-            self._dmLib.pychip_DeviceAddressUpdater_New.argtypes = [POINTER(c_void_p), c_void_p]
-            self._dmLib.pychip_DeviceAddressUpdater_New.restype = c_uint32
-
-            self._dmLib.pychip_DeviceAddressUpdater_Delete.argtypes = [c_void_p]
-            self._dmLib.pychip_DeviceAddressUpdater_Delete.restype = None
 
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [_DeviceAddressUpdateDelegate_OnUpdateComplete]
             self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
