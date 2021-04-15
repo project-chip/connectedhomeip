@@ -1853,7 +1853,7 @@ private:
 - (void)readAttributeVendorName:(ResponseHandler)completionHandler
 {
     CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], true);
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -1900,7 +1900,7 @@ private:
 - (void)readAttributeApplicationName:(ResponseHandler)completionHandler
 {
     CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], true);
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -1947,7 +1947,7 @@ private:
 - (void)readAttributeApplicationId:(ResponseHandler)completionHandler
 {
     CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], true);
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;

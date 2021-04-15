@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <cassert>
+#include <iostream>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
@@ -32,8 +34,10 @@
 
 #include "Server.h"
 
-#include <cassert>
-#include <iostream>
+#include <support/ErrorStr.h>
+
+#include "include/application-basic/ApplicationBasicManager.h"
+#include "include/endpoint-configuration/EndpointConfigurationStorage.h"
 
 using namespace chip;
 using namespace chip::Inet;
