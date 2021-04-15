@@ -139,7 +139,7 @@ int mbed_bind(int fd, const struct sockaddr * addr, socklen_t addrlen)
         return -1;
     }
 
-    tr_info("Bind fd %d address %s", fd, sockAddr.get_ip_address());
+    tr_info("Bind fd %d address %s port %d", fd, sockAddr.get_ip_address(), sockAddr.get_port());
 
     auto ret = socket->getNetSocket()->bind(sockAddr);
     if ((ret != NSAPI_ERROR_OK) && (ret != NSAPI_ERROR_UNSUPPORTED))
