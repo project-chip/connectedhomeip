@@ -22,8 +22,8 @@ assert(chip_build_tools)
 
 chip_data_model("data_model") {
   cluster_sources = [
-     "media-playback-client",
-     "thermostat-client",
+    "media-playback-client",
+    "thermostat-client",
   ]
 
   zap_pregenerated_dir = "gen"
