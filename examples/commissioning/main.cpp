@@ -1,10 +1,10 @@
-#include <cstdio>
 #include <cassert>
+#include <core/CHIPSafeCasts.h>
+#include <cstdio>
 #include <cstring>
 #include <nlunit-test.h>
-#include <core/CHIPSafeCasts.h>
-#include <transport/PASESession.h>
 #include <support/CHIPMem.h>
+#include <transport/PASESession.h>
 
 using namespace chip;
 using namespace Crypto;
@@ -55,23 +55,23 @@ int main(int argc, char ** args)
         return FAILURE;
     }
 
-//    // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
-    auto * pairingAccessory = chip::Platform::New<PASESession>();
+    //    // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
+    auto * pairingAccessory    = chip::Platform::New<PASESession>();
     auto * pairingCommissioner = chip::Platform::New<PASESession>();
 
     delegateCommissioner.peer = pairingAccessory;
     delegateAccessory.peer    = pairingCommissioner;
 
     assert(pairingAccessory->WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
-                                                   &delegateAccessory) == CHIP_NO_ERROR);
+                                            &delegateAccessory) == CHIP_NO_ERROR);
     assert(pairingCommissioner->Pair(Transport::PeerAddress(Transport::Type::kTcp), 1234, Optional<NodeId>::Value(2), 1, 0,
-                                            &delegateCommissioner) == CHIP_NO_ERROR);
+                                     &delegateCommissioner) == CHIP_NO_ERROR);
 
-//    auto * testPairingSession1 = chip::Platform::New<PASESession>();
-//    auto * testPairingSession2 = chip::Platform::New<PASESession>();
-//    SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
-//    void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
-//                                  PASESession & deserialized)
+    //    auto * testPairingSession1 = chip::Platform::New<PASESession>();
+    //    auto * testPairingSession2 = chip::Platform::New<PASESession>();
+    //    SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
+    //    void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, PASESession & pairingCommissioner,
+    //                                  PASESession & deserialized)
 
     assert(pairingCommissioner->Serialize(serialized) == CHIP_NO_ERROR);
 
@@ -82,7 +82,6 @@ int main(int argc, char ** args)
 
     assert(strncmp(Uint8::to_char(serialized.inner), Uint8::to_char(serialized2.inner), sizeof(serialized)) == 0);
     printf("Successfully encoded and decoded!\n");
-
 
     // Let's try encrypting using original session, and decrypting using deserialized
     {
@@ -105,7 +104,6 @@ int main(int argc, char ** args)
     assert(session2.Decrypt(encrypted, sizeof(plain_text), output, packetHeader, mac) == CHIP_NO_ERROR);
 
     assert(memcmp(plain_text, output, sizeof(plain_text)) == 0);
-
 
     assert(session2.Encrypt(plain_text, sizeof(plain_text), encrypted, packetHeader, mac) == CHIP_NO_ERROR);
 
