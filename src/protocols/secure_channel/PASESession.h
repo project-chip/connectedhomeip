@@ -294,44 +294,50 @@ constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
  * rendezvous. Once all the non-test usecases start supporting
  * rendezvous, this class will be moved to the test code.
  */
-class SecurePairingUsingTestSecret : public PASESession
+class SecurePairingUsingTestSecret : public PairingSession
 {
 public:
-    SecurePairingUsingTestSecret()
+    SecurePairingUsingTestSecret() {}
+
+    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId) : mPeerKeyID(peerKeyId), mLocalKeyID(localKeyId) {}
+
+    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override
     {
-        const char * secret = "Test secret for key derivation";
-        size_t secretLen    = strlen(secret);
-        mKeLen              = secretLen;
-        memmove(mKe, secret, mKeLen);
-        mConnectionState.SetPeerKeyID(0);
-        mConnectionState.SetLocalKeyID(0);
-        mPairingComplete = true;
+        VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+        size_t secretLen = strlen(kTestSecret);
+
+        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen, nullptr, 0, info, info_len);
     }
 
-    SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId)
+    CHIP_ERROR ToSerializable(PASESessionSerializable & serializable)
     {
-        const char * secret = "Test secret for key derivation";
-        size_t secretLen    = strlen(secret);
-        mKeLen              = secretLen;
-        memmove(mKe, secret, mKeLen);
-        mConnectionState.SetPeerKeyID(peerKeyId);
-        mConnectionState.SetLocalKeyID(localKeyId);
-        mPairingComplete = true;
-    }
+        size_t secretLen = strlen(kTestSecret);
 
-    ~SecurePairingUsingTestSecret() override {}
+        memset(&serializable, 0, sizeof(serializable));
+        serializable.mKeLen           = static_cast<uint16_t>(secretLen);
+        serializable.mPairingComplete = 1;
+        serializable.mLocalKeyId      = mLocalKeyID;
+        serializable.mPeerKeyId       = mPeerKeyID;
 
-    CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                              uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
-    {
+        memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, uint16_t myKeyId,
-                    SessionEstablishmentDelegate * delegate)
-    {
-        return CHIP_NO_ERROR;
-    }
+    uint16_t GetPeerKeyId() override { return mPeerKeyID; }
+
+    uint16_t GetLocalKeyId() override { return mLocalKeyID; }
+
+    const char * GetI2RSessionInfo() const override { return "i2r"; }
+
+    const char * GetR2ISessionInfo() const override { return "r2i"; }
+
+private:
+    const char * kTestSecret = "Test secret for key derivation";
+
+    uint16_t mPeerKeyID  = 0;
+    uint16_t mLocalKeyID = 0;
 };
 
 typedef struct PASESessionSerialized
