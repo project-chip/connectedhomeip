@@ -29,6 +29,8 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     vprintf(msg, v);
     printf("\n");
 
+    fflush(stdout);
+
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
 }

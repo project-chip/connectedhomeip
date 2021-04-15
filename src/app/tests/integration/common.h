@@ -30,7 +30,7 @@
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
 
-extern chip::Messaging::ExchangeManager gExchangeManager;
+extern chip::Messaging::ExchangeManager * gExchangeManager;
 
 constexpr chip::ClusterId kTestClusterId   = 6;
 constexpr chip::CommandId kTestCommandId   = 40;

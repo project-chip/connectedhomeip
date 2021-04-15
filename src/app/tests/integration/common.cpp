@@ -31,7 +31,7 @@
 #include <support/ErrorStr.h>
 
 // The ExchangeManager global object.
-chip::Messaging::ExchangeManager gExchangeManager;
+chip::Messaging::ExchangeManager * gExchangeManager;
 
 void InitializeChip(void)
 {
@@ -47,18 +47,14 @@ void InitializeChip(void)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+    gExchangeManager = chip::Platform::New<chip::Messaging::ExchangeManager>();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Failed to init CHIP Stack with err: %s\r\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
-}
-
-void ShutdownChip(void)
-{
-    gExchangeManager.Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 void TLVPrettyPrinter(const char * aFormat, ...)

@@ -108,8 +108,8 @@ exit:
 } // namespace chip
 
 namespace {
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
+chip::TransportMgr<chip::Transport::UDP> * gTransportManager;
+chip::SecureSessionMgr * gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
@@ -127,21 +127,24 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gTransportManager.Init(
+    gTransportManager = chip::Platform::New<chip::TransportMgr<chip::Transport::UDP>>();
+    gSessionManager   = chip::Platform::New<chip::SecureSessionMgr>();
+
+    err = gTransportManager->Init(
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager->Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, gTransportManager, &admins);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager->Init(gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
-                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
+    err = gSessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                      chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
@@ -155,10 +158,6 @@ exit:
         printf("IM responder failed, err:%s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
-
-    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-
-    ShutdownChip();
 
     return EXIT_SUCCESS;
 }

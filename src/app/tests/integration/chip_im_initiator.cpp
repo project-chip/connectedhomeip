@@ -56,9 +56,9 @@ chip::app::CommandSender * gpCommandSender = nullptr;
 // The ReadClient object.
 chip::app::ReadClient * gpReadClient = nullptr;
 
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
+chip::TransportMgr<chip::Transport::UDP> * gTransportManager;
 
-chip::SecureSessionMgr gSessionManager;
+chip::SecureSessionMgr * gSessionManager;
 
 chip::Inet::IPAddress gDestAddr;
 
@@ -166,10 +166,10 @@ CHIP_ERROR EstablishSecureSession()
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
-                                         chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+    err = gSessionManager->NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
+                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
+                                      chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                      chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -303,18 +303,21 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 
-    err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                     .SetAddressType(chip::Inet::kIPAddressType_IPv4)
-                                     .SetListenPort(IM_CLIENT_PORT));
+    gTransportManager = chip::Platform::New<chip::TransportMgr<chip::Transport::UDP>>();
+    gSessionManager   = chip::Platform::New<chip::SecureSessionMgr>();
+
+    err = gTransportManager->Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
+                                      .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager->Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, gTransportManager, &admins);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager->Init(gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.
@@ -358,10 +361,6 @@ int main(int argc, char * argv[])
             printf("read request: No response received\n");
         }
     }
-
-    gpCommandSender->Shutdown();
-    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    ShutdownChip();
 
 exit:
     if (err != CHIP_NO_ERROR || (gCommandRespCount != kMaxCommandMessageCount))

@@ -418,13 +418,13 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
     Retain();
-    ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called, %p", this);
+
     if (payloadHeader.IsAckMsg())
     {
         err = mReliableMessageContext.HandleRcvdAck(payloadHeader.GetAckId().Value());
         SuccessOrExit(err);
     }
-    ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called1");
+
     if (payloadHeader.NeedsAck())
     {
         MessageFlags msgFlags;
@@ -439,16 +439,14 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         err = mReliableMessageContext.HandleNeedsAck(messageId, msgFlags);
         SuccessOrExit(err);
     }
-    ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called2");
+
     //  The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
     {
-        ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called3");
         ExitNow(err = CHIP_NO_ERROR);
     }
     else
     {
-        ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called4");
         // Since we got the response, cancel the response timer.
         CancelResponseTimer();
 
@@ -458,12 +456,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         if (mDelegate != nullptr)
         {
-            ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called5");
             mDelegate->OnMessageReceived(this, packetHeader, payloadHeader, std::move(msgBuf));
         }
         else
         {
-            ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called6");
             DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
         }
     }
@@ -473,7 +469,7 @@ exit:
     // This call should also do the needful of closing the ExchangeContext if the protocol has
     // already made a prior call to Close().
     Release();
-    ChipLogProgress(Inet, "ExchangeContext::HandleMessage is called7, %p", this);
+
     return err;
 }
 
