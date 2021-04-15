@@ -150,8 +150,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         }
     }
 
-    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), mReliableMessageContext, reliableTransmissionRequested,
-                                protocolId, msgType, std::move(msgBuf));
+    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -382,7 +382,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         dispatch = &defaultDispatch;
     }
 
-    CHIP_ERROR err = dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
+    CHIP_ERROR err =
+        dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.

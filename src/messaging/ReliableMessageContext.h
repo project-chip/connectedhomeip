@@ -57,6 +57,8 @@ public:
      */
     CHIP_ERROR FlushAcks();
 
+    uint32_t GetPendingPeerAckId() { return mPendingPeerAckId; }
+
     /**
      *  Get the initial retransmission interval. It would be the time to wait before
      *  retransmission after first failure.
@@ -191,8 +193,6 @@ public:
     void SetOccupied(bool inOccupied);
 
 protected:
-    uint32_t mPendingPeerAckId;
-
     enum class Flags : uint16_t
     {
         /// When set, signifies that this context is the initiator of the exchange.
@@ -239,6 +239,7 @@ private:
 
     ReliableMessageProtocolConfig mConfig;
     uint16_t mNextAckTimeTick; // Next time for triggering Solo Ack
+    uint32_t mPendingPeerAckId;
 };
 
 } // namespace Messaging

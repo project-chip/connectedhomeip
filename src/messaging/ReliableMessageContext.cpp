@@ -39,7 +39,7 @@ namespace chip {
 namespace Messaging {
 
 ReliableMessageContext::ReliableMessageContext() :
-    mPendingPeerAckId(0), mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0)
+    mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mPendingPeerAckId(0)
 {}
 
 void ReliableMessageContext::RetainContext()
