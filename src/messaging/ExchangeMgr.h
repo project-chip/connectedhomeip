@@ -54,6 +54,8 @@ static constexpr int16_t kAnyMessageType = -1;
  */
 class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate, public TransportMgrDelegate
 {
+    friend class ExchangeContext;
+
 public:
     ExchangeManager();
     ExchangeManager(const ExchangeManager &) = delete;
