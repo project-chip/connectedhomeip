@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <credentials/CHIPOperationalCredentials.h>
 #include <transport/PASESession.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
@@ -30,6 +31,8 @@ namespace chip {
 
 // The largest supported value for Rendezvous discriminators
 const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
+
+using namespace Credentials;
 
 class DLL_EXPORT RendezvousAdvertisementDelegate
 {
@@ -102,6 +105,45 @@ public:
         return *this;
     }
 
+    bool HasOpCredSet() const { return mHasOpCredSet; }
+    const OperationalCredentialSet * GetOpCredSet() const { return mOpCredSet; }
+    RendezvousParameters & SetOpCredSet(OperationalCredentialSet * opCredSet)
+    {
+        mOpCredSet    = opCredSet;
+        mHasOpCredSet = true;
+        return *this;
+    }
+
+    SessionEstablisher::SecureSessionType GetSecureSessionType() const
+    {
+        SessionEstablisher::SecureSessionType secureSessionType = SessionEstablisher::SecureSessionType::kUnexpected;
+
+        if (mHasOpCredSet ^ (mHasPASEVerifier || (mSetupPINCode != 0)))
+        {
+            if (mHasOpCredSet)
+            {
+                secureSessionType = SessionEstablisher::SecureSessionType::kCASESession;
+            }
+            else
+            {
+                secureSessionType = SessionEstablisher::SecureSessionType::kPASESession;
+            }
+        }
+        return secureSessionType;
+    }
+
+    const void * GetSecureSessionArg() const
+    {
+        switch (GetSecureSessionType())
+        {
+        case SessionEstablisher::SecureSessionType::kPASESession:
+            return &mSetupPINCode;
+        case SessionEstablisher::SecureSessionType::kCASESession:
+            return mOpCredSet;
+        default:
+            return nullptr;
+        }
+    }
     bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
 
     const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
@@ -142,6 +184,10 @@ private:
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
 
+    OperationalCredentialSet * mOpCredSet;
+    bool mHasOpCredSet = false;
+
+    RendezvousAdvertisementDelegate mDefaultAdvDelegate;
     RendezvousAdvertisementDelegate * mAdvDelegate = nullptr;
 
 #if CONFIG_NETWORK_LAYER_BLE

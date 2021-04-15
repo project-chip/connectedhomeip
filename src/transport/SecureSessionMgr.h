@@ -28,6 +28,7 @@
 #include <utility>
 
 #include <core/CHIPCore.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
@@ -42,6 +43,8 @@
 #include <transport/raw/Tuple.h>
 
 namespace chip {
+
+using namespace Credentials;
 
 class SecureSessionMgr;
 
@@ -173,7 +176,13 @@ public:
      * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                                 SessionEstablisher::SecureSessionType secureSessionType)
+    {}
+
+    virtual void OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr, OperationalCredentialSet * opCredSet,
+                                      const CertificateKeyId & trustedRootId)
+    {}
 
     /**
      * @brief
@@ -252,8 +261,11 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SessionEstablisher * pairing,
                           PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+
+    CHIP_ERROR OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                const CertificateKeyId & trustedRootId);
 
     /**
      * @brief

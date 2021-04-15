@@ -40,9 +40,10 @@ namespace chip {
 namespace Credentials {
 
 static constexpr uint32_t kKeyIdentifierLength                 = 20;
-static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
-static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
+static constexpr uint32_t kChipIdUTF8Length                    = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
+
+using namespace Crypto;
 
 /** Data Element Tags for the CHIP Certificate
  */
@@ -89,7 +90,9 @@ enum
  * Certificate types are not carried as attributes of the corresponding certificates, but
  * rather are derived from the certificate's structure and/or the context in which it is used.
  * The certificate type enumeration includes a set of pre-defined values describing commonly
- * used certificate applications.
+ * used certificate applications.  Developers can also extend the certificate type value
+ * range with application-specific types that described custom certificates or certificates
+ * with unique security properties.
  *
  * Certificate types are primarily used in the implementation of access control policies,
  * where access to application features is influenced by the type of certificate presented
@@ -100,10 +103,11 @@ enum
 enum
 {
     kCertType_NotSpecified    = 0x00, /**< The certificate's type has not been specified. */
-    kCertType_Root            = 0x01, /**< A CHIP Root certificate. */
-    kCertType_ICA             = 0x02, /**< A CHIP Intermediate CA certificate. */
+    kCertType_CA              = 0x01, /**< A CHIP CA certificate. */
+    kCertType_ICA             = 0x02, /**< A CHIP ICA certificate. */
     kCertType_Node            = 0x03, /**< A CHIP node certificate. */
     kCertType_FirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. */
+    kCertType_AppDefinedBase  = 0x7F, /**< Application-specific certificate types should have values >= this value. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -181,88 +185,33 @@ enum
     kNullCertTime = 0
 };
 
+#define RDN_NUM 2
+
 /**
- *  @struct ChipRDN
+ *  @struct ChipDN
  *
- *  @brief
- *    A data structure representing a Relative Distinguished Name (RDN) in a CHIP certificate.
- */
-struct ChipRDN
-{
-    union
-    {
-        uint64_t mChipVal; /**< CHIP specific DN attribute value. */
-        struct
-        {
-            const uint8_t * mValue; /**< Pointer to the DN attribute value. */
-            uint32_t mLen;          /**< DN attribute length. */
-        } mString;                  /**< DN attribute structure when encoded as a string. */
-    } mAttrValue;                   /**< DN attribute value union: string or unsigned integer. */
-    chip::ASN1::OID mAttrOID;       /**< DN attribute CHIP OID. */
-
-    bool IsEqual(const ChipRDN & other) const;
-    bool IsEmpty() const { return mAttrOID == chip::ASN1::kOID_NotSpecified; }
-    void Clear() { mAttrOID = chip::ASN1::kOID_NotSpecified; }
-};
-
-/**
  *  @brief
  *    A data structure representing a Distinguished Name (DN) in a CHIP certificate.
  */
-class ChipDN
+struct ChipDN
 {
-public:
-    ChipDN();
-    ~ChipDN();
-
-    void Clear();
-
-    /**
-     * @brief Add CHIP-specific attribute to the DN.
-     *
-     * @param oid     CHIP-specific OID for DN attribute.
-     * @param val     CHIP-specific DN attribute value.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, uint64_t val);
-
-    /**
-     * @brief Add string attribute to the DN.
-     *
-     * @param oid     String OID for DN attribute.
-     * @param val     Pointer to the DN string attribute. The value in the argument buffer should
-     *                remain valid while the object is in use.
-     * @param valLen  Length of the DN string attribute.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR AddAttribute(chip::ASN1::OID oid, const uint8_t * val, uint32_t valLen);
-
-    /**
-     * @brief Determine type of a CHIP certificate.
-     *        This method performs an assessment of a certificate's type based on the structure
-     *        of its subject DN.
-     *
-     * @param certType  A reference to the certificate type value.
-     *
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR GetCertType(uint8_t & certType) const;
+    union
+    {
+        uint64_t mChipId; /**< CHIP specific DN attribute value. */
+        struct
+        {
+            const uint8_t * mValue;    /**< Pointer to the DN attribute value. */
+            uint32_t mLen;             /**< DN attribute length. */
+        } mString;                     /**< DN attribute structure when encoded as a string. */
+    } mAttrValue[RDN_NUM];             /**< DN attribute value union: string or unsigned integer. */
+    chip::ASN1::OID mAttrOID[RDN_NUM]; /**< DN attribute CHIP OID. */
 
     bool IsEqual(const ChipDN & other) const;
-
-    /**
-     * @brief Determine if DN is empty (doesn't have DN attributes).
-     *
-     * @return true if DN is empty, false otherwise.
-     **/
-    bool IsEmpty() const { return RDNCount() == 0; }
-
-protected:
-    ChipRDN rdn[CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES];
-
-    uint8_t RDNCount() const;
+    bool IsEmpty() const;
+    void Clear();
+    void Add(chip::ASN1::OID attrOID, uint64_t chipId);
+    void Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen);
+    bool Has(chip::ASN1::OID attrOID) const;
 };
 
 /**
@@ -300,6 +249,9 @@ struct ChipCertificateData
 
     void Clear();
 
+    const uint8_t * mCertificateBegin;
+    uint16_t mCertificateLen;
+
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
     CertificateKeyId mSubjectKeyId;             /**< Certificate Subject public key identifier. */
@@ -315,6 +267,7 @@ struct ChipCertificateData
     BitFlags<KeyUsageFlags> mKeyUsageFlags;     /**< Certificate key usage extensions flags. */
     BitFlags<KeyPurposeFlags> mKeyPurposeFlags; /**< Certificate extended key usage extensions flags. */
     uint8_t mPathLenConstraint;                 /**< Basic constraint: path length. */
+    uint8_t mCertType;                          /**< Certificate type. */
     struct
     {
         const uint8_t * R; /**< Pointer to the R element of the signature, encoded as ASN.1 DER Integer. */
@@ -435,7 +388,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, const uint8_t * chipCert = nullptr,
+                        uint32_t chipCertLen = 0);
 
     /**
      * @brief Load CHIP certificates into set.
@@ -464,6 +418,24 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR LoadCerts(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
+
+    /**
+     * @brief Add trusted anchor key to the certificate set.
+     *        It is required that the public key and public key Id in the pubKey and pubKeyId buffers
+     *        stay valid while the certificate set is used.
+     *        In case of an error the certificate set is left in the same state as prior to this call.
+     *
+     * @param caId         CA certificate CHIP identifier.
+     * @param curveOID     Elliptic curve CHIP OID.
+     * @param pubKey       Trusted public key.
+     * @param pubKeyLen    The length of the trusted public key.
+     * @param pubKeyId     Trusted public key identifier.
+     * @param pubKeyIdLen  The length of the trusted public key identifier.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR AddTrustedKey(uint64_t caId, chip::ASN1::OID curveOID, const uint8_t * pubKey, uint8_t pubKeyLen,
+                             const uint8_t * pubKeyId, uint8_t pubKeyIdLen);
 
     /**
      * @brief Find certificate in the set.
@@ -626,6 +598,8 @@ CHIP_ERROR DecodeChipDN(chip::TLV::TLVReader & reader, ChipDN & dn);
 CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509CertLen, uint8_t * chipCertBuf,
                                      uint32_t chipCertBufSize, uint32_t & chipCertLen);
 
+CHIP_ERROR ExtractPubkeyFromX509Cert(const uint8_t * x509Cert, uint32_t x509CertLen, P256PublicKey & pubkey);
+
 /**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.
  *
@@ -639,6 +613,23 @@ CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509Cert
  **/
 CHIP_ERROR ConvertChipCertToX509Cert(const uint8_t * chipCert, uint32_t chipCertLen, uint8_t * x509CertBuf,
                                      uint32_t x509CertBufSize, uint32_t & x509CertLen);
+
+/**
+ * Determine type of a CHIP certificate.
+ *
+ * This function performs an assessment of a certificate's type and sets cert.mCertType value
+ * based on the structure of its subject DN and the extensions present. Applications are free
+ * to override this assessment by setting cert.mCertType to another value, including an
+ * application-defined one.
+ *
+ * In general, applications will only trust a peer's certificate if it chains to a trusted
+ * root certificate.  However, the type assigned to a certificate can influence the *nature*
+ * of this trust, e.g. to allow or disallow access to certain features.  Because of this,
+ * changes to this algorithm can have VERY SIGNIFICANT and POTENTIALLY CATASTROPHIC effects
+ * on overall system security, and should not be made without a thorough understanding of
+ * the implications.
+ **/
+CHIP_ERROR DetermineCertType(ChipCertificateData & cert);
 
 /**
  * @brief
@@ -669,29 +660,22 @@ CHIP_ERROR ASN1ToChipEpochTime(const chip::ASN1::ASN1UniversalTime & asn1Time, u
 CHIP_ERROR ChipEpochToASN1Time(uint32_t epochTime, chip::ASN1::ASN1UniversalTime & asn1Time);
 
 /**
- *  @return  True if the OID represents a CHIP-defined 64-bit distinguished named attribute.
+ *  @return  True if the OID represents a CHIP-defined X.509 distinguished named attribute.
  **/
-inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
+inline bool IsChipX509Attr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipFirmwareSigningId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipICAId || oid == chip::ASN1::kOID_AttributeType_ChipRootId ||
-            oid == chip::ASN1::kOID_AttributeType_ChipFabricId);
+    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipCAId ||
+            oid == chip::ASN1::kOID_AttributeType_ChipICAId || oid == chip::ASN1::kOID_AttributeType_ChipFabricId);
 }
 
 /**
- *  @return  True if the OID represents a CHIP-defined 32-bit distinguished named attribute.
+ *  @return  True if the OID represents a CHIP-defined X.509 distinguished named attribute
+ *           that contains a 64-bit CHIP id.
  **/
-inline bool IsChip32bitDNAttr(chip::ASN1::OID oid)
+inline bool IsChipIdX509Attr(chip::ASN1::OID oid)
 {
-    return (oid == chip::ASN1::kOID_AttributeType_ChipAuthTag1 || oid == chip::ASN1::kOID_AttributeType_ChipAuthTag2);
-}
-
-/**
- *  @return  True if the OID represents a CHIP-defined distinguished named attribute.
- **/
-inline bool IsChipDNAttr(chip::ASN1::OID oid)
-{
-    return (IsChip64bitDNAttr(oid) || IsChip32bitDNAttr(oid));
+    return (oid == chip::ASN1::kOID_AttributeType_ChipNodeId || oid == chip::ASN1::kOID_AttributeType_ChipCAId ||
+            oid == chip::ASN1::kOID_AttributeType_ChipICAId);
 }
 
 } // namespace Credentials

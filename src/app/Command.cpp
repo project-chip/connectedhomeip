@@ -93,10 +93,9 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
     err = invokeCommandParser.Init(reader);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = invokeCommandParser.CheckSchemaValidity();
     SuccessOrExit(err);
-#endif
+
     err = invokeCommandParser.GetCommandList(&commandListParser);
     SuccessOrExit(err);
 
@@ -110,6 +109,9 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle && payload,
         CommandDataElement::Parser commandElement;
 
         err = commandElement.Init(commandListReader);
+        SuccessOrExit(err);
+
+        err = commandElement.CheckSchemaValidity();
         SuccessOrExit(err);
 
         err = ProcessCommandDataElement(commandElement);

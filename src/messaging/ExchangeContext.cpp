@@ -473,5 +473,16 @@ exit:
     return err;
 }
 
+CHIP_ERROR ExchangeContext::OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                             const CertificateKeyId & trustedRootId)
+{
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnReceiveCredentials(session, GetExchangeMgr()->GetSessionMgr(), opCredSet, trustedRootId);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Messaging
 } // namespace chip

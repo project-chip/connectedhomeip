@@ -35,7 +35,8 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr size_t kOperationalCredentialsMax = 5;
+static constexpr size_t kOperationalCredentialsMax     = 5;
+static constexpr size_t kOperationalCertificateMaxSize = 1024;
 
 using namespace Crypto;
 
@@ -43,6 +44,20 @@ struct NodeCredential
 {
     uint8_t * mCredential;
     uint16_t mLen;
+};
+
+struct OperationalCredentialSerializable
+{
+    uint16_t mNodeCredentialLen;
+    uint8_t mNodeCredential[kOperationalCertificateMaxSize];
+    uint16_t mNodeKeypairLen;
+    uint8_t mNodeKeypair[kP256_PublicKey_Length + kP256_PrivateKey_Length];
+    uint16_t mRootCertificateLen;
+    uint8_t mRootCertificate[kOperationalCertificateMaxSize];
+    uint16_t mCACertificateLen;
+    uint8_t mCACertificate[kOperationalCertificateMaxSize];
+    uint16_t mLeafCertificateLen;
+    uint8_t mLeafCertificate[kOperationalCertificateMaxSize];
 };
 
 struct NodeCredentialMap
@@ -218,6 +233,17 @@ public:
 
     CHIP_ERROR SetDevOpCred(const CertificateKeyId & trustedRootId, const uint8_t * chipDeviceCredentials,
                             uint16_t chipDeviceCredentialsLen);
+
+    /**
+     * @brief TODO Serialize the CASESession to the given serializable data structure for secure pairing
+     **/
+    CHIP_ERROR ToSerializable(const CertificateKeyId & trustedRootId, OperationalCredentialSerializable & output);
+
+    /** @brief TODO Reconstruct secure pairing class from the serializable data structure.
+     *
+     * @return TODO Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR FromSerializable(const OperationalCredentialSerializable & output);
 
     P256Keypair & GetDevOpCredKeypair(const CertificateKeyId & trustedRootId) { return *GetNodeKeypairAt(trustedRootId); }
 

@@ -28,12 +28,30 @@ chip_data_model("data_model") {
   use_default_client_callbacks = true
 }
 
+copy("libcertifier_cfg_copy") {
+  sources = [
+    "${chip_root}/third_party/certifier/libcertifier.cfg",
+  ]
+  outputs = [
+    "$root_out_dir/libcertifier.cfg"
+  ]
+}
+
+copy("libcertifier_cert_copy") {
+  sources = [
+    "${chip_root}/third_party/certifier/libcertifier-cert.crt",
+  ]
+  outputs = [
+    "$root_out_dir/libcertifier-cert.crt"
+  ]
+}
+
 executable("chip-tool") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
+    "commands/commissioning/CommissioningCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
-    "commands/discover/DiscoverCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
@@ -48,6 +66,8 @@ executable("chip-tool") {
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
+    ":libcertifier_cfg_copy",
+    ":libcertifier_cert_copy",
   ]
 
   cflags = [ "-Wconversion" ]

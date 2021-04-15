@@ -139,6 +139,9 @@ public:
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                              System::PacketBufferHandle msgBuf);
 
+    CHIP_ERROR OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                const CertificateKeyId & trustedRootId);
+
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
     void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }

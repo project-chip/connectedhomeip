@@ -20,11 +20,14 @@
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds = 120;
+constexpr uint16_t kWaitDurationInSeconds = 240;
 
 CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
     err = mCommissioner.Init(localId, &storage, this);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
@@ -32,7 +35,7 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
     err = mCommissioner.ServiceEvents();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
 
-    err = RunInternal(remoteId);
+    err = RunInternal(localId, remoteId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", chip::ErrorStr(err)));
 
 exit:
@@ -41,7 +44,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
+CHIP_ERROR PairingCommand::RunInternal(NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -55,10 +58,10 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = PairWithoutSecurity(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
     case PairingMode::Ble:
-        err = Pair(remoteId, PeerAddress::BLE());
+        err = Pair(remoteId, PeerAddress::BLE(), mPairingType, localId);
         break;
     case PairingMode::SoftAP:
-        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort), mPairingType, localId);
         break;
     }
     WaitForResponse(kWaitDurationInSeconds);
@@ -66,10 +69,29 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     return err;
 }
 
-CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
+CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address, char * pairingType, NodeId localId)
 {
-    RendezvousParameters params =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    RendezvousParameters params;
+
+    if (!strcmp("PASE", pairingType))
+    {
+        params.SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    }
+    else if (!strcmp("CASE", pairingType))
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // 1. Get Device
+        err = mCommissioner.GetDevice(remoteId, &mDevice);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+        // 2. Unpair
+        err = mCommissioner.UnpairDevice(remoteId);
+        // 3. Get Op Cred Set (add pub get method)
+        mDevice->DeserializeOperationalCredentials();
+        // 4. run pair device
+        params.SetOpCredSet(mDevice->GetOperationalCredentialSet()).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    exit:
+        VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    }
 
     return mCommissioner.PairDevice(remoteId, params);
 }

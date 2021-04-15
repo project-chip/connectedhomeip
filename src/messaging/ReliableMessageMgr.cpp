@@ -152,7 +152,7 @@ void ReliableMessageMgr::ExecuteActions()
         if (err == CHIP_NO_ERROR)
         {
             // If the retransmission was successful, update the passive timer
-            entry.nextRetransTimeTick = static_cast<uint16_t>(rc->GetActiveRetransmitTimeoutTick());
+            entry.nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
 #if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", entry.retainedBuf.GetMsgId(),
                             entry.sendCount);
@@ -288,7 +288,7 @@ void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     VerifyOrDie(entry != nullptr && entry->rc != nullptr);
 
-    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetInitialRetransmitTimeoutTick() +
+    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetCurrentRetransmitTimeoutTick() +
                                                        GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
 
     // Check if the timer needs to be started and start it.

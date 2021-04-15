@@ -24,6 +24,7 @@
 #pragma once
 
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -54,6 +55,10 @@ public:
      */
     virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    System::PacketBufferHandle payload) = 0;
+
+    virtual void OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr, OperationalCredentialSet * opCredSet,
+                                      const CertificateKeyId & trustedRootId)
+    {}
 
     /**
      * @brief

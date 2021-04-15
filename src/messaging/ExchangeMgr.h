@@ -266,7 +266,8 @@ private:
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                         SessionEstablisher::SecureSessionType secureSessionType) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     // TransportMgrDelegate interface for rendezvous sessions

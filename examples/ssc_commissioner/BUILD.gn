@@ -1,0 +1,77 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/chip/tools.gni")
+
+assert(chip_build_tools)
+
+config("includes") {
+  include_dirs = [ "." ]
+}
+
+copy("libcertifier_cfg_copy") {
+  sources = [
+    "${chip_root}/third_party/certifier/libcertifier.cfg",
+  ]
+  outputs = [
+    "$root_out_dir/libcertifier.cfg"
+  ]
+}
+
+copy("libcertifier_cert_copy") {
+  sources = [
+    "${chip_root}/third_party/certifier/libcertifier-cert.crt",
+  ]
+  outputs = [
+    "$root_out_dir/libcertifier-cert.crt"
+  ]
+}
+
+executable("ssc-commissioner") {
+  sources = [
+    "${chip_root}/src/app/util/binding-table.cpp",
+    "${chip_root}/src/app/util/client-api.cpp",
+    "${chip_root}/src/app/util/ember-print.cpp",
+    "${chip_root}/src/app/util/message.cpp",
+    "${chip_root}/src/app/util/util.cpp",
+    "config/PersistentStorage.cpp",
+    "gen/CHIPClientCallbacks.cpp",
+    "gen/call-command-handler.cpp",
+    "gen/callback-stub.cpp",
+    "main.cpp",
+  ]
+
+  if (is_debug) {
+    defines = [ "BUILD_RELEASE=0", "CHIP_LOG_FILTERING=0" ]
+  } else {
+    defines = [ "BUILD_RELEASE=1", "CHIP_LOG_FILTERING=1" ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/inipp",
+    ":libcertifier_cfg_copy",
+    ":libcertifier_cert_copy",
+  ]
+
+  public_configs = [ ":includes" ]
+
+  output_dir = root_out_dir
+}

@@ -19,6 +19,7 @@
 #include "commands/common/Commands.h"
 
 #include "commands/clusters/Commands.h"
+#include "commands/commissioning/Commands.h"
 #include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
@@ -38,6 +39,7 @@ int main(int argc, char * argv[])
     registerCommandsPayload(commands);
     registerCommandsPairing(commands);
     registerCommandsReporting(commands);
+    registerCommandsCommissioning(commands);
     registerClusters(commands);
 
     return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);

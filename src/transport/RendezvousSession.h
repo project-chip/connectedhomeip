@@ -26,6 +26,7 @@
 #include <protocols/Protocols.h>
 #include <support/BufferWriter.h>
 #include <transport/AdminPairingTable.h>
+#include <transport/CASESession.h>
 #include <transport/NetworkProvisioning.h>
 #include <transport/PASESession.h>
 #include <transport/RendezvousParameters.h>
@@ -95,16 +96,19 @@ public:
     CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
                     Transport::AdminPairingInfo * admin);
 
+    void Close();
+
     /**
      * @brief
      *  Return the associated pairing session.
      *
      * @return PASESession The associated pairing session
      */
-    PASESession & GetPairingSession() { return mPairingSession; }
+    SessionEstablisher * GetPairingSession() { return mPairingSession; }
 
     Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
+    SessionEstablisher::SecureSessionType GetSecureSessionType() const { return mParams.GetSecureSessionType(); }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
@@ -150,10 +154,8 @@ public:
 private:
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle msgBuf);
-    CHIP_ERROR Pair(uint32_t setupPINCode);
-    CHIP_ERROR Pair(const PASEVerifier & verifier);
-    CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
+    CHIP_ERROR Pair(const void * secureSessionArg);
+    CHIP_ERROR WaitForPairing(const void * secureSessionArg, SessionEstablisher::SessionParameter sessionParameter);
 
     CHIP_ERROR HandleSecureMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                    System::PacketBufferHandle msgBuf);
@@ -161,7 +163,7 @@ private:
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
-    PASESession mPairingSession;
+    SessionEstablisher * mPairingSession = nullptr;
     NetworkProvisioning mNetworkProvision;
     Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
     TransportMgrBase * mTransportMgr;

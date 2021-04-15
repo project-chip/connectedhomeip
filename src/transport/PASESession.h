@@ -32,6 +32,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
+#include <transport/SessionEstablisher.h>
 #include <transport/SessionEstablishmentDelegate.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -58,9 +59,17 @@ struct PASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
+struct PASESessionParameters
+{
+    uint32_t mSetUpPinCode;
+    uint32_t mPbkdf2IterCount;
+    const uint8_t * mSalt;
+    size_t mSaltLen;
+};
+
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession
+class DLL_EXPORT PASESession : public SessionEstablisher
 {
 public:
     PASESession();
@@ -87,6 +96,9 @@ public:
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                               uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
+    virtual CHIP_ERROR WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                      SessionEstablishmentDelegate * delegate);
+
     /**
      * @brief
      *   Initialize using PASE verifier and wait for pairing requests.
@@ -98,6 +110,22 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+
+    /**
+     * @brief
+     *   Create a pairing request using peer's setup PIN code.
+     *
+     * @param peerAddress      Address of peer to pair
+     * @param arg              TBD
+     * @param myNodeId         Optional node id of local node
+     * @param peerNodeId       Node id assigned to the peer node by commissioner
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param delegate         Callback object
+     *
+     * @return CHIP_ERROR      The result of initialization
+     */
+    virtual CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                            SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -180,7 +208,7 @@ public:
      */
     uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
 
-    Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
+    virtual Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -200,15 +228,24 @@ public:
      **/
     CHIP_ERROR ToSerializable(PASESessionSerializable & output);
 
+    CHIP_ERROR ToSerializable(void * output) { return ToSerializable(*static_cast<PASESessionSerializable *>(output)); }
+
     /** @brief Reconstruct secure pairing class from the serializable data structure.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR FromSerializable(const PASESessionSerializable & output);
 
+    CHIP_ERROR FromSerializable(const void * output)
+    {
+        return FromSerializable(*static_cast<const PASESessionSerializable *>(output));
+    }
+
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
     void Clear();
+
+    SecureSessionType GetSecureSessionType() { return SecureSessionType::kPASESession; }
 
 private:
     enum Spake2pErrorType : uint8_t
@@ -323,8 +360,20 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    virtual CHIP_ERROR WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                      SessionEstablishmentDelegate * delegate) override
+    {
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, uint16_t myKeyId,
                     SessionEstablishmentDelegate * delegate)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                            SessionEstablishmentDelegate * delegate) override
     {
         return CHIP_NO_ERROR;
     }

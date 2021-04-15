@@ -123,7 +123,8 @@ int AppTask::Init()
 
     // Print the current software version
     char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
-    err = ConfigurationMgr().GetFirmwareRevisionString(currentFirmwareRev, sizeof(currentFirmwareRev));
+    size_t currentFirmwareRevLen;
+    err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");

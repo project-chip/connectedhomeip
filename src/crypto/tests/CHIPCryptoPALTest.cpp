@@ -32,6 +32,7 @@
 #include "SPAKE2P_POINT_RW_test_vectors.h"
 #include "SPAKE2P_POINT_VALID_test_vectors.h"
 #include "SPAKE2P_RFC_test_vectors.h"
+#include "X509_PKCS7Extraction_test_vectors.h"
 
 #include <crypto/CHIPCryptoPAL.h>
 
@@ -1355,6 +1356,25 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, numOfTestsRan == numOfTestVectors);
 }
 
+static void TestX509_PKCS7Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    X509DerCertificate x509list[3];
+    uint32_t max_certs = sizeof(x509list) / sizeof(X509DerCertificate);
+
+    err = LoadCertsFromPKCS7(reinterpret_cast<const uint8_t *>(pem_pkcs7_blob), x509list, &max_certs);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = memcmp(certificate_blob_leaf, x509list[0], x509list[0].Length());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = memcmp(certificate_blob_intermediate, x509list[1], x509list[1].Length());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = memcmp(certificate_blob_root, x509list[2], x509list[2].Length());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -1409,6 +1429,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Spake2p_spake2p PointLoad/PointWrite", TestSPAKE2P_spake2p_PointLoadWrite),
     NL_TEST_DEF("Test Spake2p_spake2p PointIsValid", TestSPAKE2P_spake2p_PointIsValid),
     NL_TEST_DEF("Test Spake2+ against RFC test vectors", TestSPAKE2P_RFC),
+    NL_TEST_DEF("Test x509 Certificate Extraction from PKCS7", TestX509_PKCS7Extraction),
     NL_TEST_SENTINEL()
 };
 

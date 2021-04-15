@@ -175,7 +175,7 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId, uint16_t myKeyId,
+CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
                              SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -185,8 +185,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
-    mDelegate    = delegate;
-    mLocalNodeId = myNodeId.ValueOr(kUndefinedNodeId);
+    mDelegate = delegate;
     mConnectionState.SetLocalKeyID(myKeyId);
     mOpCredSet = operationalCredentialSet;
 
@@ -198,20 +197,41 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 }
 
 CHIP_ERROR
-CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                         uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                         SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
+    err = Init(operationalCredentialSet, myKeyId, delegate);
     SuccessOrExit(err);
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR1;
     mPairingComplete = false;
 
-    ChipLogDetail(Inet, "Waiting for SigmaR1 msg");
+    ChipLogProgress(Inet, "Waiting for SigmaR1 msg");
 
 exit:
+    return err;
+}
+
+CHIP_ERROR CASESession::WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                       SessionEstablishmentDelegate * delegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mySessionParameters != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(sessionParameter == SessionParameter::kCertificateCredentialSet, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = WaitForSessionEstablishment(
+        const_cast<OperationalCredentialSet *>(static_cast<const OperationalCredentialSet *>(mySessionParameters)), myKeyId,
+        delegate);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+    }
     return err;
 }
 
@@ -233,16 +253,15 @@ CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType ms
 }
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress,
-                                         OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                         NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+                                         OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                         SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
+    err = Init(operationalCredentialSet, myKeyId, delegate);
     SuccessOrExit(err);
 
     mConnectionState.SetPeerAddress(peerAddress);
-    mConnectionState.SetPeerNodeId(peerNodeId);
 
     err = SendSigmaR1();
     SuccessOrExit(err);
@@ -252,6 +271,21 @@ exit:
     {
         Clear();
     }
+    return err;
+}
+
+CHIP_ERROR CASESession::Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                             SessionEstablishmentDelegate * delegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(arg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = EstablishSession(peerAddress, const_cast<OperationalCredentialSet *>(static_cast<const OperationalCredentialSet *>(arg)),
+                           myKeyId, delegate);
+    SuccessOrExit(err);
+
+exit:
     return err;
 }
 
@@ -331,7 +365,7 @@ CHIP_ERROR CASESession::SendSigmaR1()
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR1, std::move(msg_R1)));
 
-    ChipLogDetail(Inet, "Sent SigmaR1 msg");
+    ChipLogProgress(Inet, "Sent SigmaR1 msg");
 
     return CHIP_NO_ERROR;
 }
@@ -358,7 +392,7 @@ CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System:
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buflen >= fixed_buflen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    ChipLogDetail(Inet, "Received SigmaR1 msg");
+    ChipLogProgress(Inet, "Received SigmaR1 msg");
 
     err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
     SuccessOrExit(err);
@@ -531,7 +565,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
     err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR2, std::move(msg_R2));
     SuccessOrExit(err);
 
-    ChipLogDetail(Inet, "Sent SigmaR2 msg");
+    ChipLogProgress(Inet, "Sent SigmaR2 msg");
 
 exit:
 
@@ -775,7 +809,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR3, std::move(msg_R3));
     SuccessOrExit(err);
 
-    ChipLogDetail(Inet, "Sent SigmaR3 msg");
+    ChipLogProgress(Inet, "Sent SigmaR3 msg");
 
     err = mCommissioningHash.Finish(mMessageDigest);
     SuccessOrExit(err);
@@ -1050,8 +1084,8 @@ CHIP_ERROR CASESession::SetEffectiveTime(void)
     ASN1UniversalTime effectiveTime;
 
     effectiveTime.Year   = 2021;
-    effectiveTime.Month  = 2;
-    effectiveTime.Day    = 12;
+    effectiveTime.Month  = 4;
+    effectiveTime.Day    = 30;
     effectiveTime.Hour   = 10;
     effectiveTime.Minute = 10;
     effectiveTime.Second = 10;

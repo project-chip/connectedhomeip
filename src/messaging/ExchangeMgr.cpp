@@ -370,11 +370,12 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
     return ChannelHandle{ association };
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                                      SessionEstablisher::SecureSessionType secureSessionType)
 {
     if (mDelegate != nullptr)
     {
-        mDelegate->OnNewConnection(session, this);
+        mDelegate->OnNewConnection(session, this, secureSessionType);
     }
 
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {

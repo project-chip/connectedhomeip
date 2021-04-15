@@ -33,6 +33,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
+#include <transport/SessionEstablisher.h>
 #include <transport/SessionEstablishmentDelegate.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -65,7 +66,7 @@ struct CASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
-class DLL_EXPORT CASESession
+class DLL_EXPORT CASESession : public SessionEstablisher
 {
 public:
     CASESession();
@@ -88,8 +89,11 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                           uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                           SessionEstablishmentDelegate * delegate);
+
+    virtual CHIP_ERROR WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                      SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -106,8 +110,23 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, OperationalCredentialSet * operationalCredentialSet,
-                                Optional<NodeId> myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                SessionEstablishmentDelegate * delegate);
+                                uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+
+    /**
+     * @brief
+     *   Create a pairing request using peer's setup PIN code.
+     *
+     * @param peerAddress      Address of peer to pair
+     * @param arg              TBD
+     * @param myNodeId         Optional node id of local node
+     * @param peerNodeId       Node id assigned to the peer node by commissioner
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param delegate         Callback object
+     *
+     * @return CHIP_ERROR      The result of initialization
+     */
+    virtual CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                            SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -175,10 +194,19 @@ public:
      **/
     CHIP_ERROR ToSerializable(CASESessionSerializable & output);
 
+    CHIP_ERROR ToSerializable(void * output) { return ToSerializable(*static_cast<CASESessionSerializable *>(output)); }
+
     /**
      * @brief Reconstruct secure pairing class from the serializable data structure.
      **/
     CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
+
+    CHIP_ERROR FromSerializable(const void * output)
+    {
+        return FromSerializable(*static_cast<const CASESessionSerializable *>(output));
+    }
+
+    SecureSessionType GetSecureSessionType() { return SecureSessionType::kCASESession; }
 
 private:
     enum SigmaErrorType : uint8_t
@@ -190,8 +218,7 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);

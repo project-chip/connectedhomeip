@@ -745,6 +745,11 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::NewCertificateSigningRequestDER(uint8_t * out_csr, size_t & csr_length)
+{
+    return CHIP_NO_ERROR;
+}
+
 typedef struct Spake2p_Context
 {
     mbedtls_ecp_group curve;
@@ -1086,6 +1091,31 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointIsValid(void * R)
         return CHIP_ERROR_INTERNAL;
     }
 
+    return CHIP_NO_ERROR;
+}
+
+// TODO
+CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs)
+{
+    return CHIP_NO_ERROR;
+}
+
+// TODO
+CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t n_cert)
+{
+    return CHIP_NO_ERROR;
+}
+
+// TODO
+CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs)
+{
+    return CHIP_NO_ERROR;
+}
+
+// TODO
+CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen)
+{
     return CHIP_NO_ERROR;
 }
 

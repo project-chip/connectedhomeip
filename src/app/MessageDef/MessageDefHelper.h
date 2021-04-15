@@ -23,15 +23,37 @@
 
 #pragma once
 
+#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_HELPER_H
+#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_HELPER_H
+
+// __STDC_FORMAT_MACROS must be defined for PRIX64 to be defined for pre-C++11 clib
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif // __STDC_FORMAT_MACROS
+
+// __STDC_LIMIT_MACROS must be defined for UINT8_MAX and INT32_MAX to be defined for pre-C++11 clib
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif // __STDC_LIMIT_MACROS
+
+// __STDC_CONSTANT_MACROS must be defined for INT64_C and UINT64_C to be defined for pre-C++11 clib
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif // __STDC_CONSTANT_MACROS
+
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 
+#ifndef CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#define CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK 1
+#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+
 namespace chip {
 namespace app {
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
+#if CHIP_DETAIL_LOGGING
 
 namespace {
 // this is used to run in signle thread for IM message debug purpose
@@ -116,13 +138,16 @@ static void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 
     va_end(args);
 }
-#else
+#else // CHIP_DETAIL_LOGGING
 #define PRETTY_PRINT_CHECKPOINT()
 #define PRETTY_PRINT(fmt, ...)
 #define PRETTY_PRINT(fmt, ...)
 #define PRETTY_PRINT_SAMELINE(fmt, ...)
 #define PRETTY_PRINT_INCDEPTH()
 #define PRETTY_PRINT_DECDEPTH()
-#endif
+#endif // CHIP_DETAIL_LOGGING
+
 }; // namespace app
 }; // namespace chip
+
+#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_HELPER_H

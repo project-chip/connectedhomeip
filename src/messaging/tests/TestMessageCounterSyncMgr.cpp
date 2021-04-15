@@ -92,7 +92,9 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override {}
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                         SessionEstablisher::SecureSessionType secureSessionType) override
+    {}
 
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override {}
 

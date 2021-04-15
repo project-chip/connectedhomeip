@@ -82,7 +82,7 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
+        ChipLogProgress(AppServer, "Device completed Secure Session handshake");
         if (mDelegate != nullptr)
         {
             mDelegate->OnRendezvousStarted();
@@ -90,7 +90,7 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
         break;
 
     case RendezvousSessionDelegate::SecurePairingFailed:
-        ChipLogProgress(AppServer, "Failed in SPAKE2+ handshake");
+        ChipLogProgress(AppServer, "Failed in Secure Session handshake");
         if (mDelegate != nullptr)
         {
             mDelegate->OnRendezvousStopped();

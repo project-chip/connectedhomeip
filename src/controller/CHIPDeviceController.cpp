@@ -167,22 +167,12 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, params.imDelegate);
     SuccessOrExit(err);
 #endif
 
     mExchangeMgr->SetDelegate(this);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-    SuccessOrExit(err);
-
-    if (params.mDeviceAddressUpdateDelegate != nullptr)
-    {
-        mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     InitDataModelHandler();
 
@@ -339,15 +329,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    return Mdns::Resolver::Instance().ResolveNodeId(device->GetDeviceId(), fabricId, chip::Inet::kIPAddressType_Any);
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
-}
-
 void DeviceController::PersistDevice(Device * device)
 {
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
@@ -400,7 +381,7 @@ void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
-    mActiveDevices[index].OnMessageReceived(packetHeader, payloadHeader, std::move(msgBuf));
+    mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
 }
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
@@ -408,7 +389,8 @@ void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
 }
 
-void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr,
+                                       SessionEstablisher::SecureSessionType secureSessionType)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
@@ -416,7 +398,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::E
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
-    mActiveDevices[index].OnNewConnection(session);
+    mActiveDevices[index].OnNewConnection(this, session, secureSessionType);
 }
 
 void DeviceController::OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
@@ -567,34 +549,6 @@ exit:
 
 void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-void DeviceController::OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData)
-{
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    err = GetDevice(nodeId, &device);
-    SuccessOrExit(err);
-
-    err = device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, nodeData.mInterfaceId));
-    SuccessOrExit(err);
-
-    PersistDevice(device);
-
-exit:
-    if (mDeviceAddressUpdateDelegate != nullptr)
-    {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeId, err);
-    }
-    return;
-};
-
-void DeviceController::OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Error resolving node %" PRIu64 ": %s", ErrorStr(error));
-};
-#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
-
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
@@ -709,7 +663,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                    mSessionMgr, admin);
     SuccessOrExit(err);
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId());
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId(),
+                 mOpenPairingWindow);
 
     mSystemLayer->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
 
@@ -762,7 +717,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mAdminId);
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mAdminId, mOpenPairingWindow);
 
     device->Serialize(serialized);
 
@@ -805,16 +760,7 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
     // TODO: Send unpairing message to the remote device.
 
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-    if (mDeviceBeingPaired < kNumMaxActiveDevices)
-    {
-        Device * device = &mActiveDevices[mDeviceBeingPaired];
-        if (device->GetDeviceId() == remoteDeviceId)
-        {
-            FreeRendezvousSession();
-        }
-    }
+    FreeRendezvousSession();
 
     if (mStorageDelegate != nullptr)
     {
@@ -850,7 +796,10 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // already persisted. The application will use GetDevice()
         // method to get access to the device, which will fetch
         // the device information from the persistent storage.
-        DeviceController::ReleaseDevice(mDeviceBeingPaired);
+
+        // This is wrong to release the device because releasing
+        // causes resetting fo the internal connection state
+        // DeviceController::ReleaseDevice(mDeviceBeingPaired);
     }
 
     mDeviceBeingPaired = kNumMaxActiveDevices;
@@ -873,6 +822,8 @@ void DeviceCommissioner::OnRendezvousComplete()
     Device * device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
+    // We need to kick the device since we are not a valid secure pairing delegate when using IM.
+    device->InitCommandSender();
 
     PersistDevice(device);
 
@@ -891,8 +842,18 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
+        ChipLogDetail(Controller, "Remote device completed Secure Session handshake\n");
+        switch (mRendezvousSession->GetSecureSessionType())
+        {
+        case SessionEstablisher::SecureSessionType::kPASESession:
+            mRendezvousSession->GetPairingSession()->ToSerializable(device->GetPairing());
+            break;
+        case SessionEstablisher::SecureSessionType::kCASESession:
+            mRendezvousSession->GetPairingSession()->ToSerializable(device->GetCASEPairing());
+            break;
+        default:
+            break;
+        }
 
         if (!mIsIPRendezvous && mPairingDelegate != nullptr)
         {
@@ -902,7 +863,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
         break;
 
     case RendezvousSessionDelegate::SecurePairingFailed:
-        ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
+        ChipLogDetail(Controller, "Remote device failed in Secure Session/SPAKE2+ handshake\n");
         mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
         break;
 
@@ -955,6 +916,35 @@ void DeviceCommissioner::ReleaseDevice(Device * device)
 {
     PersistDeviceList();
     DeviceController::ReleaseDevice(device);
+}
+
+void DeviceCommissioner::OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr,
+                                              OperationalCredentialSet * opCredSet, const CertificateKeyId & trustedRootId)
+{
+    // TODO: Retrieve discriminator...
+    /*uint16_t mDiscriminator     = 3840;
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetOpCredSet(opCredSet)
+                                      .SetDiscriminator(mDiscriminator)
+                                      .SetPeerAddress(mgr->GetPeerConnectionState(session)->GetPeerAddress());
+
+    UnpairDevice(session.GetPeerNodeId());
+
+    PairDevice(session.GetPeerNodeId(), params);*/
+
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnReceiveCredentials was called in incorrect state"));
+
+    uint16_t index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
+    VerifyOrReturn(index < kNumMaxActiveDevices,
+                   ChipLogDetail(Controller, "OnReceiveCredentials was called for unknown device, ignoring it."));
+
+    mActiveDevices[index].OnReceiveCredentials(session, mgr);
+
+    mActiveDevices[index].GetOperationalCredentialSet()->ToSerializable(trustedRootId, *mActiveDevices[index].GetOpCredPairing());
+
+    mDeviceBeingPaired = index;
+
+    OnRendezvousComplete();
 }
 
 void DeviceCommissioner::OnSessionEstablishmentTimeout()

@@ -130,27 +130,19 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetVendorName(char * buf, size_t bufSize)
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-    return CHIP_NO_ERROR;
-}
+#ifdef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+    if (CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION[0] != 0)
+    {
+        outLen = min(bufSize, sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION) - 1);
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION, outLen);
+        return CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
 
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductName(char * buf, size_t bufSize)
-{
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevisionString(char * buf, size_t bufSize)
-{
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
-    return CHIP_NO_ERROR;
+    outLen = 0;
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template <class ImplClass>
@@ -246,14 +238,6 @@ template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StorePrimary802154MACAddress(const uint8_t * buf)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisionString(char * buf, size_t bufSize)
-{
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING);
-    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>

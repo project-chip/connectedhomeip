@@ -250,18 +250,28 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                                        PairingDirection direction, Transport::AdminId admin, Transport::Base * transport)
+CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                                        SessionEstablisher * pairing, PairingDirection direction, Transport::AdminId admin,
+                                        Transport::Base * transport)
 {
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
+    PeerConnectionState * state_duplicate =
+        mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), Transport::kAnyKeyId, nullptr);
 
     // Find any existing connection with the same node and key ID
     if (state && (state->GetAdminId() == Transport::kUndefinedAdminId || state->GetAdminId() == admin))
     {
         mPeerConnections.MarkConnectionExpired(
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+    }
+
+    // Find any existing connection with the same node and old key ID
+    if (state_duplicate)
+    {
+        mPeerConnections.MarkConnectionExpired(
+            state_duplicate, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New pairing for device 0x%08" PRIx32 "%08" PRIx32 ", key %d!!", static_cast<uint32_t>(peerNodeId >> 32),
@@ -313,8 +323,19 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 
         if (mCB != nullptr)
         {
-            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
+            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this, pairing->GetSecureSessionType());
         }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SecureSessionMgr::OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                              const CertificateKeyId & trustedRootId)
+{
+    if (mCB != nullptr)
+    {
+        mCB->OnReceiveCredentials(session, this, opCredSet, trustedRootId);
     }
 
     return CHIP_NO_ERROR;

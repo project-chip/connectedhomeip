@@ -15,6 +15,9 @@ reedsolo>=1.5.3,<=1.5.4
 bitstring>=3.1.6
 ecdsa>=0.16.0
 
+# certifier
+pyOpenssl
+
 # cirque tests
 requests>=2.24.0
 
