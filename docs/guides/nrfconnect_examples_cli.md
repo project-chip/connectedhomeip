@@ -92,14 +92,16 @@ The nRF Connect SDK examples let you use several CHIP-specific CLI commands.
 
 These commands are not available in the standard Zephyr shell.
 
-They are currently used for testing purposes and allow only to get some information about
-CHIP stack state, but not to modify it.
+They are currently used for testing purposes and allow only to get some
+information about CHIP stack state, but not to modify it.
 
-To enable using CHIP commands, set the `CONFIG_CHIP_ZEPHYR_SHELL=y` Kconfig option in the `prj.conf` file of the given example.
+To enable using CHIP commands, set the `CONFIG_CHIP_ZEPHYR_SHELL=y` Kconfig
+option in the `prj.conf` file of the given example.
 
 ### Listing CHIP-specific commands
-To list all available CHIP-specific commands, enter `chip` in the command line and press the Tab key.
-This will list the available commands:
+
+To list all available CHIP-specific commands, enter `chip` in the command line
+and press the Tab key. This will list the available commands:
 
 ```shell
 uart:~$ chip
@@ -112,7 +114,9 @@ See the following subsections for the description of each CHIP-specific command.
 
 #### `qrcode`
 
-Prints the device [onboarding QR code payload](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device). Takes no arguments.
+Prints the device
+[onboarding QR code payload](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device).
+Takes no arguments.
 
 ```shell
 uart:~$ chip qrcode
@@ -121,7 +125,9 @@ CH:H34.GHY00 0C9SS0
 
 #### `qrcodeurl`
 
-Prints the URL to view the [device onboarding QR code](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device) in a web browser. Takes no arguments.
+Prints the URL to view the
+[device onboarding QR code](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/nrfconnect_android_commissioning.md#preparing-accessory-device)
+in a web browser. Takes no arguments.
 
 ```shell
 uart:~$ chip qrcodeurl
@@ -166,7 +172,8 @@ uart:~$ chip productid
 
 #### `manualpairingcode`
 
-Prints the pairing code for the manual onboarding of a device. Takes no arguments.
+Prints the pairing code for the manual onboarding of a device. Takes no
+arguments.
 
 ```shell
 uart:~$ chip manualpairingcode
@@ -175,7 +182,9 @@ uart:~$ chip manualpairingcode
 
 #### `bleadvertising`
 
-Prints the information about the Bluetooth LE advertising status, either `0` if the advertising is disabled on the device or `1` if it is enabled. Takes no arguments.
+Prints the information about the Bluetooth LE advertising status, either `0` if
+the advertising is disabled on the device or `1` if it is enabled. Takes no
+arguments.
 
 ```shell
 uart:~$ chip bleadvertising
@@ -184,7 +193,9 @@ uart:~$ chip bleadvertising
 
 #### `nfcemulation`
 
-Prints the information about the NFC tag emulation status, either `0` if the emulation is disabled on the device or `1` if it is enabled (1). Takes no arguments.
+Prints the information about the NFC tag emulation status, either `0` if the
+emulation is disabled on the device or `1` if it is enabled (1). Takes no
+arguments.
 
 ```shell
 uart:~$ chip nfcemulation
