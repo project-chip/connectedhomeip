@@ -55,15 +55,6 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-// TODO: This is a placeholder delegate for exchange context created in Device::SendMessage()
-//       Delete this class when Device::SendMessage() is obsoleted.
-class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
-{
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override
-    {}
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-};
 
 CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
 {
@@ -94,9 +85,6 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
     // unsolicited message handler, and we also need to set flag kNoAutoRequestAck since there is no persistent exchange to
     // receive the ack message. This logic need to be deleted after we converting all legacy ZCL messages to IM messages.
     sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-
-    DeviceExchangeDelegate delegate;
-    exchange->SetDelegate(&delegate);
 
     CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
 

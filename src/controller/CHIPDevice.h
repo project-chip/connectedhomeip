@@ -33,10 +33,10 @@
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>

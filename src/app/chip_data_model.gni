@@ -146,7 +146,6 @@ template("chip_data_model") {
       "${chip_root}/src/app",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/support",
-      "${chip_root}/src/protocols/secure_channel",
     ]
 
     if (!defined(public_configs)) {
