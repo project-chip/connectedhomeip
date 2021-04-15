@@ -20,11 +20,11 @@
 #include <stdint.h>
 
 #include "af-structs.h"
+#include "app/util/util.h"
 #include "call-command-handler.h"
 #include "callback.h"
 #include "cluster-id.h"
 #include "command-id.h"
-#include "app/util/util.h"
 
 using namespace chip;
 
@@ -55,7 +55,6 @@ EmberAfStatus emberAfTargetNavigatorClusterClientCommandParse(EmberAfClusterComm
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWakeOnLanClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
-
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
     if (wasHandled)
@@ -76,7 +75,6 @@ static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecifi
     }
 }
 
-
 // Main command parsing controller.
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 {
@@ -86,94 +84,94 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
     {
         switch (cmd->apsFrame->clusterId)
         {
-        case ZCL_ACCOUNT_LOGIN_CLUSTER_ID :
+        case ZCL_ACCOUNT_LOGIN_CLUSTER_ID:
             result = emberAfAccountLoginClusterClientCommandParse(cmd);
             break;
-        case ZCL_APPLICATION_BASIC_CLUSTER_ID :
+        case ZCL_APPLICATION_BASIC_CLUSTER_ID:
             // No commands are enabled for cluster Application Basic
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_APPLICATION_LAUNCHER_CLUSTER_ID :
+        case ZCL_APPLICATION_LAUNCHER_CLUSTER_ID:
             result = emberAfApplicationLauncherClusterClientCommandParse(cmd);
             break;
-        case ZCL_AUDIO_OUTPUT_CLUSTER_ID :
+        case ZCL_AUDIO_OUTPUT_CLUSTER_ID:
             // No commands are enabled for cluster Audio Output
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_BARRIER_CONTROL_CLUSTER_ID :
+        case ZCL_BARRIER_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Barrier Control
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_BASIC_CLUSTER_ID :
+        case ZCL_BASIC_CLUSTER_ID:
             // No commands are enabled for cluster Basic
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_COLOR_CONTROL_CLUSTER_ID :
+        case ZCL_COLOR_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Color Control
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_CONTENT_LAUNCH_CLUSTER_ID :
+        case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
             result = emberAfContentLaunchClusterClientCommandParse(cmd);
             break;
-        case ZCL_DESCRIPTOR_CLUSTER_ID :
+        case ZCL_DESCRIPTOR_CLUSTER_ID:
             // No commands are enabled for cluster Descriptor
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_DOOR_LOCK_CLUSTER_ID :
+        case ZCL_DOOR_LOCK_CLUSTER_ID:
             result = emberAfDoorLockClusterClientCommandParse(cmd);
             break;
-        case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID :
+        case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
             result = emberAfGeneralCommissioningClusterClientCommandParse(cmd);
             break;
-        case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID :
+        case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
             // No commands are enabled for cluster Group Key Management
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_GROUPS_CLUSTER_ID :
+        case ZCL_GROUPS_CLUSTER_ID:
             result = emberAfGroupsClusterClientCommandParse(cmd);
             break;
-        case ZCL_IDENTIFY_CLUSTER_ID :
+        case ZCL_IDENTIFY_CLUSTER_ID:
             result = emberAfIdentifyClusterClientCommandParse(cmd);
             break;
-        case ZCL_KEYPAD_INPUT_CLUSTER_ID :
+        case ZCL_KEYPAD_INPUT_CLUSTER_ID:
             result = emberAfKeypadInputClusterClientCommandParse(cmd);
             break;
-        case ZCL_LEVEL_CONTROL_CLUSTER_ID :
+        case ZCL_LEVEL_CONTROL_CLUSTER_ID:
             // No commands are enabled for cluster Level Control
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_LOW_POWER_CLUSTER_ID :
+        case ZCL_LOW_POWER_CLUSTER_ID:
             // No commands are enabled for cluster Low Power
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_MEDIA_INPUT_CLUSTER_ID :
+        case ZCL_MEDIA_INPUT_CLUSTER_ID:
             // No commands are enabled for cluster Media Input
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_MEDIA_PLAYBACK_CLUSTER_ID :
+        case ZCL_MEDIA_PLAYBACK_CLUSTER_ID:
             result = emberAfMediaPlaybackClusterClientCommandParse(cmd);
             break;
-        case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID :
+        case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
             result = emberAfNetworkCommissioningClusterClientCommandParse(cmd);
             break;
-        case ZCL_ON_OFF_CLUSTER_ID :
+        case ZCL_ON_OFF_CLUSTER_ID:
             // No commands are enabled for cluster On/off
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_SCENES_CLUSTER_ID :
+        case ZCL_SCENES_CLUSTER_ID:
             result = emberAfScenesClusterClientCommandParse(cmd);
             break;
-        case ZCL_TV_CHANNEL_CLUSTER_ID :
+        case ZCL_TV_CHANNEL_CLUSTER_ID:
             result = emberAfTvChannelClusterClientCommandParse(cmd);
             break;
-        case ZCL_TARGET_NAVIGATOR_CLUSTER_ID :
+        case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
             result = emberAfTargetNavigatorClusterClientCommandParse(cmd);
             break;
-        case ZCL_TEMP_MEASUREMENT_CLUSTER_ID :
+        case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             // No commands are enabled for cluster Temperature Measurement
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_WAKE_ON_LAN_CLUSTER_ID :
+        case ZCL_WAKE_ON_LAN_CLUSTER_ID:
             // No commands are enabled for cluster Wake on LAN
             result = status(false, true, cmd->mfgSpecific);
             break;
@@ -206,16 +204,16 @@ EmberAfStatus emberAfAccountLoginClusterClientCommandParse(EmberAfClusterCommand
         switch (cmd->commandId)
         {
         case ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t * setupPIN;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t * setupPIN;
 
-  if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  setupPIN = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            setupPIN = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfAccountLoginClusterGetSetupPINResponseCallback(setupPIN);
+            wasHandled = emberAfAccountLoginClusterGetSetupPINResponseCallback(setupPIN);
             break;
         }
         default: {
@@ -235,23 +233,23 @@ EmberAfStatus emberAfApplicationLauncherClusterClientCommandParse(EmberAfCluster
         switch (cmd->commandId)
         {
         case ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint8_t * data;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint8_t * data;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  data = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            data = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfApplicationLauncherClusterLaunchAppResponseCallback(status, data);
+            wasHandled = emberAfApplicationLauncherClusterLaunchAppResponseCallback(status, data);
             break;
         }
         default: {
@@ -271,43 +269,43 @@ EmberAfStatus emberAfContentLaunchClusterClientCommandParse(EmberAfClusterComman
         switch (cmd->commandId)
         {
         case ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t * data;
-uint8_t contentLaunchStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t * data;
+            uint8_t contentLaunchStatus;
 
-  if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  data = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(data) + 1u);
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  contentLaunchStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            data          = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(data) + 1u);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            contentLaunchStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfContentLaunchClusterLaunchContentResponseCallback(data, contentLaunchStatus);
+            wasHandled = emberAfContentLaunchClusterLaunchContentResponseCallback(data, contentLaunchStatus);
             break;
         }
         case ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t * data;
-uint8_t contentLaunchStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t * data;
+            uint8_t contentLaunchStatus;
 
-  if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  data = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(data) + 1u);
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  contentLaunchStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            data          = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(data) + 1u);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            contentLaunchStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfContentLaunchClusterLaunchURLResponseCallback(data, contentLaunchStatus);
+            wasHandled = emberAfContentLaunchClusterLaunchURLResponseCallback(data, contentLaunchStatus);
             break;
         }
         default: {
@@ -327,498 +325,502 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
         switch (cmd->commandId)
         {
         case ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(status);
             break;
         }
         case ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(status);
             break;
         }
         case ZCL_CLEAR_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(status);
             break;
         }
         case ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearPinResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearPinResponseCallback(status);
             break;
         }
         case ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(status);
             break;
         }
         case ZCL_CLEAR_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(status);
             break;
         }
         case ZCL_CLEAR_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(status);
             break;
         }
         case ZCL_GET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t scheduleId;
-uint8_t status;
-uint32_t localStartTime;
-uint32_t localEndTime;
-uint8_t operatingModeDuringHoliday;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t scheduleId;
+            uint8_t status;
+            uint32_t localStartTime;
+            uint32_t localEndTime;
+            uint8_t operatingModeDuringHoliday;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  scheduleId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 4)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  localStartTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
-    if (cmd->bufLen < payloadOffset + 4)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  localEndTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  operatingModeDuringHoliday = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            scheduleId    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            localStartTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset  = static_cast<uint16_t>(payloadOffset + 4);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            localEndTime  = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            operatingModeDuringHoliday = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(scheduleId, status, localStartTime, localEndTime, operatingModeDuringHoliday);
+            wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(scheduleId, status, localStartTime, localEndTime,
+                                                                                  operatingModeDuringHoliday);
             break;
         }
         case ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t logEntryId;
-uint32_t timestamp;
-uint8_t eventType;
-uint8_t source;
-uint8_t eventIdOrAlarmCode;
-uint16_t userId;
-uint8_t * pin;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t logEntryId;
+            uint32_t timestamp;
+            uint8_t eventType;
+            uint8_t source;
+            uint8_t eventIdOrAlarmCode;
+            uint16_t userId;
+            uint8_t * pin;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  logEntryId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 4)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  timestamp = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  eventType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  source = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  eventIdOrAlarmCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            logEntryId    = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            timestamp     = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            eventType     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            source        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            eventIdOrAlarmCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset      = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userId        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin);
+            wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(logEntryId, timestamp, eventType, source,
+                                                                            eventIdOrAlarmCode, userId, pin);
             break;
         }
         case ZCL_GET_PIN_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t userId;
-uint8_t userStatus;
-uint8_t userType;
-uint8_t * pin;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t userId;
+            uint8_t userStatus;
+            uint8_t userType;
+            uint8_t * pin;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userId        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userStatus    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userType      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetPinResponseCallback(userId, userStatus, userType, pin);
+            wasHandled = emberAfDoorLockClusterGetPinResponseCallback(userId, userStatus, userType, pin);
             break;
         }
         case ZCL_GET_RFID_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t userId;
-uint8_t userStatus;
-uint8_t userType;
-uint8_t * rfid;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t userId;
+            uint8_t userStatus;
+            uint8_t userType;
+            uint8_t * rfid;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  rfid = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userId        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userStatus    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userType      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            rfid = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(userId, userStatus, userType, rfid);
+            wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(userId, userStatus, userType, rfid);
             break;
         }
         case ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t userId;
-uint8_t userType;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t userId;
+            uint8_t userType;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userId        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(userId, userType);
+            wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(userId, userType);
             break;
         }
         case ZCL_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t scheduleId;
-uint16_t userId;
-uint8_t status;
-uint8_t daysMask;
-uint8_t startHour;
-uint8_t startMinute;
-uint8_t endHour;
-uint8_t endMinute;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t scheduleId;
+            uint16_t userId;
+            uint8_t status;
+            uint8_t daysMask;
+            uint8_t startHour;
+            uint8_t startMinute;
+            uint8_t endHour;
+            uint8_t endMinute;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  scheduleId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  daysMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  startHour = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  startMinute = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  endHour = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  endMinute = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            scheduleId    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userId        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            daysMask      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            startHour     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            startMinute   = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            endHour       = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            endMinute = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(scheduleId, userId, status, daysMask, startHour, startMinute, endHour, endMinute);
+            wasHandled = emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(scheduleId, userId, status, daysMask, startHour,
+                                                                                  startMinute, endHour, endMinute);
             break;
         }
         case ZCL_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t scheduleId;
-uint16_t userId;
-uint8_t status;
-uint32_t localStartTime;
-uint32_t localEndTime;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t scheduleId;
+            uint16_t userId;
+            uint8_t status;
+            uint32_t localStartTime;
+            uint32_t localEndTime;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  scheduleId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  userId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 4)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  localStartTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
-    if (cmd->bufLen < payloadOffset + 4)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  localEndTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            scheduleId    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            userId        = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            localStartTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset  = static_cast<uint16_t>(payloadOffset + 4);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            localEndTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterGetYeardayScheduleResponseCallback(scheduleId, userId, status, localStartTime, localEndTime);
+            wasHandled =
+                emberAfDoorLockClusterGetYeardayScheduleResponseCallback(scheduleId, userId, status, localStartTime, localEndTime);
             break;
         }
         case ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(status);
             break;
         }
         case ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(status);
             break;
         }
         case ZCL_SET_PIN_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterSetPinResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetPinResponseCallback(status);
             break;
         }
         case ZCL_SET_RFID_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(status);
             break;
         }
         case ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(status);
             break;
         }
         case ZCL_SET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(status);
             break;
         }
         case ZCL_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(status);
             break;
         }
         case ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(status);
             break;
         }
         case ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(status);
             break;
         }
         default: {
@@ -838,63 +840,63 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
         switch (cmd->commandId)
         {
         case ZCL_ARM_FAIL_SAFE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_COMMISSIONING_COMPLETE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfGeneralCommissioningClusterSetFabricResponseCallback(errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterSetFabricResponseCallback(errorCode, debugText);
             break;
         }
         default: {
@@ -914,93 +916,93 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
         switch (cmd->commandId)
         {
         case ZCL_ADD_GROUP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfGroupsClusterAddGroupResponseCallback(status, groupId);
+            wasHandled = emberAfGroupsClusterAddGroupResponseCallback(status, groupId);
             break;
         }
         case ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t capacity;
-uint8_t groupCount;
-/* TYPE WARNING: array array defaults to */ uint8_t *  groupList;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t capacity;
+            uint8_t groupCount;
+            /* TYPE WARNING: array array defaults to */ uint8_t * groupList;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  capacity = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupCount = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    groupList = cmd->buffer + payloadOffset;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            capacity      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupCount    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            groupList     = cmd->buffer + payloadOffset;
 
-wasHandled = emberAfGroupsClusterGetGroupMembershipResponseCallback(capacity, groupCount, groupList);
+            wasHandled = emberAfGroupsClusterGetGroupMembershipResponseCallback(capacity, groupCount, groupList);
             break;
         }
         case ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(status, groupId);
+            wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(status, groupId);
             break;
         }
         case ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
-uint8_t * groupName;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
+            uint8_t * groupName;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId       = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfGroupsClusterViewGroupResponseCallback(status, groupId, groupName);
+            wasHandled = emberAfGroupsClusterViewGroupResponseCallback(status, groupId, groupName);
             break;
         }
         default: {
@@ -1020,16 +1022,16 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
         switch (cmd->commandId)
         {
         case ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint16_t timeout;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t timeout;
 
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+            wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
             break;
         }
         default: {
@@ -1049,16 +1051,16 @@ EmberAfStatus emberAfKeypadInputClusterClientCommandParse(EmberAfClusterCommand 
         switch (cmd->commandId)
         {
         case ZCL_SEND_KEY_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfKeypadInputClusterSendKeyResponseCallback(status);
+            wasHandled = emberAfKeypadInputClusterSendKeyResponseCallback(status);
             break;
         }
         default: {
@@ -1078,133 +1080,133 @@ EmberAfStatus emberAfMediaPlaybackClusterClientCommandParse(EmberAfClusterComman
         switch (cmd->commandId)
         {
         case ZCL_MEDIA_FAST_FORWARD_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_NEXT_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaNextResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaNextResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_PAUSE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaPauseResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaPauseResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_PLAY_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaPlayResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaPlayResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_PREVIOUS_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaPreviousResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaPreviousResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_REWIND_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaRewindResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaRewindResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_SKIP_BACKWARD_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_SKIP_FORWARD_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_START_OVER_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaStartOverResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaStartOverResponseCallback(mediaPlaybackStatus);
             break;
         }
         case ZCL_MEDIA_STOP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t mediaPlaybackStatus;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t mediaPlaybackStatus;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            mediaPlaybackStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfMediaPlaybackClusterMediaStopResponseCallback(mediaPlaybackStatus);
+            wasHandled = emberAfMediaPlaybackClusterMediaStopResponseCallback(mediaPlaybackStatus);
             break;
         }
         default: {
@@ -1224,168 +1226,169 @@ EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfCluste
         switch (cmd->commandId)
         {
         case ZCL_ADD_THREAD_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_ADD_WI_FI_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_ENABLE_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_REMOVE_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_SCAN_NETWORKS_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
-/* TYPE WARNING: array array defaults to */ uint8_t *  wifiScanResults;
-/* TYPE WARNING: array array defaults to */ uint8_t *  threadScanResults;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
+            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults;
+            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(debugText) + 1u);
-  wifiScanResults = cmd->buffer + payloadOffset;
-  threadScanResults = cmd->buffer + payloadOffset;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText         = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset     = static_cast<uint16_t>(payloadOffset + emberAfStringLength(debugText) + 1u);
+            wifiScanResults   = cmd->buffer + payloadOffset;
+            threadScanResults = cmd->buffer + payloadOffset;
 
-wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(errorCode, debugText, wifiScanResults, threadScanResults);
+            wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(errorCode, debugText, wifiScanResults,
+                                                                                        threadScanResults);
             break;
         }
         case ZCL_UPDATE_THREAD_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(errorCode, debugText);
             break;
         }
         case ZCL_UPDATE_WI_FI_NETWORK_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t errorCode;
-uint8_t * debugText;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t errorCode;
+            uint8_t * debugText;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  errorCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            errorCode     = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(errorCode, debugText);
+            wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(errorCode, debugText);
             break;
         }
         default: {
@@ -1405,220 +1408,221 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
         switch (cmd->commandId)
         {
         case ZCL_ADD_SCENE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
-uint8_t sceneId;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
+            uint8_t sceneId;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId       = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfScenesClusterAddSceneResponseCallback(status, groupId, sceneId);
+            wasHandled = emberAfScenesClusterAddSceneResponseCallback(status, groupId, sceneId);
             break;
         }
         case ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint8_t capacity;
-uint16_t groupId;
-uint8_t sceneCount;
-/* TYPE WARNING: array array defaults to */ uint8_t *  sceneList;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint8_t capacity;
+            uint16_t groupId;
+            uint8_t sceneCount;
+            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  capacity = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-  if (status==0)
-{
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  sceneCount = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-  }
-else
-{
-  sceneCount = UINT8_MAX;
-}
-if (status==0)
-{
-  sceneList = cmd->buffer + payloadOffset;
-}
-else
-{
-  sceneList = NULL;
-}
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            capacity      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId       = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (status == 0)
+            {
+                if (cmd->bufLen < payloadOffset + 1)
+                {
+                    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+                }
+                sceneCount    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            }
+            else
+            {
+                sceneCount = UINT8_MAX;
+            }
+            if (status == 0)
+            {
+                sceneList = cmd->buffer + payloadOffset;
+            }
+            else
+            {
+                sceneList = NULL;
+            }
 
-wasHandled = emberAfScenesClusterGetSceneMembershipResponseCallback(status, capacity, groupId, sceneCount, sceneList);
+            wasHandled = emberAfScenesClusterGetSceneMembershipResponseCallback(status, capacity, groupId, sceneCount, sceneList);
             break;
         }
         case ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(status, groupId);
+            wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(status, groupId);
             break;
         }
         case ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
-uint8_t sceneId;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
+            uint8_t sceneId;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId       = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(status, groupId, sceneId);
+            wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(status, groupId, sceneId);
             break;
         }
         case ZCL_STORE_SCENE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
-uint8_t sceneId;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
+            uint8_t sceneId;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId       = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfScenesClusterStoreSceneResponseCallback(status, groupId, sceneId);
+            wasHandled = emberAfScenesClusterStoreSceneResponseCallback(status, groupId, sceneId);
             break;
         }
         case ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint16_t groupId;
-uint8_t sceneId;
-uint16_t transitionTime;
-uint8_t * sceneName;
-/* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint16_t groupId;
+            uint8_t sceneId;
+            uint16_t transitionTime;
+            uint8_t * sceneName;
+            /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-    if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-  if (status==0)
-{
-  if (cmd->bufLen < payloadOffset + 2)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
-  }
-else
-{
-  transitionTime = UINT16_MAX;
-}
-if (status==0)
-{
-  if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  sceneName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(sceneName) + 1u);
-}
-else
-{
-  sceneName = NULL;
-}
-if (status==0)
-{
-  extensionFieldSets = cmd->buffer + payloadOffset;
-}
-else
-{
-  extensionFieldSets = NULL;
-}
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            groupId       = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            sceneId       = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (status == 0)
+            {
+                if (cmd->bufLen < payloadOffset + 2)
+                {
+                    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+                }
+                transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset  = static_cast<uint16_t>(payloadOffset + 2);
+            }
+            else
+            {
+                transitionTime = UINT16_MAX;
+            }
+            if (status == 0)
+            {
+                if (cmd->bufLen < payloadOffset + 1u)
+                {
+                    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+                }
+                sceneName     = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset = static_cast<uint16_t>(payloadOffset + emberAfStringLength(sceneName) + 1u);
+            }
+            else
+            {
+                sceneName = NULL;
+            }
+            if (status == 0)
+            {
+                extensionFieldSets = cmd->buffer + payloadOffset;
+            }
+            else
+            {
+                extensionFieldSets = NULL;
+            }
 
-wasHandled = emberAfScenesClusterViewSceneResponseCallback(status, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
+            wasHandled = emberAfScenesClusterViewSceneResponseCallback(status, groupId, sceneId, transitionTime, sceneName,
+                                                                       extensionFieldSets);
             break;
         }
         default: {
@@ -1638,18 +1642,18 @@ EmberAfStatus emberAfTvChannelClusterClientCommandParse(EmberAfClusterCommand * 
         switch (cmd->commandId)
         {
         case ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-/* TYPE WARNING: array array defaults to */ uint8_t *  ChannelMatch;
-uint8_t ErrorType;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch;
+            uint8_t ErrorType;
 
-  ChannelMatch = cmd->buffer + payloadOffset;
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  ErrorType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            ChannelMatch = cmd->buffer + payloadOffset;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            ErrorType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfTvChannelClusterChangeChannelResponseCallback(ChannelMatch, ErrorType);
+            wasHandled = emberAfTvChannelClusterChangeChannelResponseCallback(ChannelMatch, ErrorType);
             break;
         }
         default: {
@@ -1669,23 +1673,23 @@ EmberAfStatus emberAfTargetNavigatorClusterClientCommandParse(EmberAfClusterComm
         switch (cmd->commandId)
         {
         case ZCL_NAVIGATE_TARGET_RESPONSE_COMMAND_ID: {
-        uint16_t payloadOffset = cmd->payloadStartIndex;
-uint8_t status;
-uint8_t * data;
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t status;
+            uint8_t * data;
 
-  if (cmd->bufLen < payloadOffset + 1)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-    payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
-    if (cmd->bufLen < payloadOffset + 1u)
-  {
-    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-  }
-  data = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            status        = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            data = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-wasHandled = emberAfTargetNavigatorClusterNavigateTargetResponseCallback(status, data);
+            wasHandled = emberAfTargetNavigatorClusterNavigateTargetResponseCallback(status, data);
             break;
         }
         default: {
