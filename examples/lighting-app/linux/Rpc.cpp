@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,26 +17,28 @@
  */
 
 #include "Rpc.h"
-#include "AppTask.h"
-#include "PigweedLogger.h"
-#include "PigweedLoggerMutex.h"
-#include "pigweed/RpcService.h"
 
+#include "LightingManager.h"
+#include <platform/CHIPDeviceError.h>
+
+/* ignore GCC Wconversion warnings for pigweed */
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
 #include "button_service/button_service.rpc.pb.h"
 #include "device_service/device_service.rpc.pb.h"
 #include "lighting_service/lighting_service.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
+#include "pw_rpc_system_server/rpc_server.h"
 #include "pw_stream/sys_io_stream.h"
-#include "pw_sys_io/sys_io.h"
-#include "pw_sys_io_nrfconnect/init.h"
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 
-#include <array>
-#include <kernel.h>
-#include <logging/log.h>
-
-LOG_MODULE_DECLARE(app);
+#include <thread>
 
 namespace chip {
 namespace rpc {
@@ -46,8 +48,7 @@ class Lighting final : public generated::Lighting<Lighting>
 public:
     pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
-        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
-                                     AppEvent::kEventType_Button, 0, NULL);
+        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
         return pw::OkStatus();
     }
 
@@ -63,47 +64,39 @@ class Button final : public generated::Button<Button>
 public:
     pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
     {
-        GetAppTask().ButtonEventHandler(request.pushed << request.idx /* button_state */, 1 << request.idx /* has_changed */);
-        return pw::OkStatus();
+        return pw::Status::Unavailable();
     }
 };
 
 class Device final : public generated::Device<Device>
 {
 public:
-    pw::Status FactoryReset(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    pw::Status FactoryReset(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
-        // TODO: Clear data from KVS
-        DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
-        return pw::OkStatus();
-    }
-    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        NVIC_SystemReset();
-        // WILL NOT RETURN
-        return pw::OkStatus();
-    }
-    pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
-    {
-        // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
         return pw::Status::Unimplemented();
     }
+
+    pw::Status Reboot(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
+
+    pw::Status TriggerOta(ServerContext &, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+        return pw::Status::Unimplemented();
+    }
+
     pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
     {
+        // Temporary fake values used for testing.
         response.vendor_id        = 1234;
         response.product_id       = 5678;
-        response.software_version = 0;
+        response.software_version = 1;
         return pw::OkStatus();
     }
 };
 
 namespace {
-
-constexpr size_t kRpcTaskSize = 4096;
-constexpr int kRpcPriority    = 5;
-
-K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);
-struct k_thread rpc_thread_data;
 
 chip::rpc::Button button_service;
 chip::rpc::Lighting lighting_service;
@@ -118,17 +111,19 @@ void RegisterServices(pw::rpc::Server & server)
 
 } // namespace
 
-k_tid_t Init()
+void RunRpcService()
 {
-    pw_sys_io_Init();
-    k_tid_t tid = k_thread_create(&rpc_thread_data, rpc_stack_area, K_THREAD_STACK_SIZEOF(rpc_stack_area), RunRpcService, NULL,
-                                  NULL, NULL, kRpcPriority, 0, K_NO_WAIT);
-    return tid;
+    pw::rpc::system_server::Init();
+    RegisterServices(pw::rpc::system_server::Server());
+    pw::rpc::system_server::Start();
 }
 
-void RunRpcService(void *, void *, void *)
+int Init()
 {
-    Start(RegisterServices, &logger_mutex);
+    int err = 0;
+    std::thread rpc_service(RunRpcService);
+    rpc_service.detach();
+    return err;
 }
 
 } // namespace rpc

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,16 +18,12 @@
 
 #pragma once
 
-#include <kernel.h>
-
 namespace chip {
 namespace rpc {
 
-class Button;
+class LightingService;
 
-void RunRpcService(void *, void *, void *);
-
-k_tid_t Init();
+int Init();
 
 } // namespace rpc
 } // namespace chip
