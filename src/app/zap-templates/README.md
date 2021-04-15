@@ -25,7 +25,7 @@ needs to be updated. You can regenerate all files with:
 
 ### How to generate files for a single application
 
-By default generated files are located into a `gen/` folder next to the
+By default generated files are located in a `gen/` folder next to the
 application `zap` file that has been created during the application
 configuration.
 
