@@ -200,7 +200,7 @@ void ExchangeContext::Close()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (mExchangeMgr->mContextPool.begin()), mExchangeId, __func__);
+    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId, __func__);
 #endif
 
     DoClose(false);
