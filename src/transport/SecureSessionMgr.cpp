@@ -31,14 +31,12 @@
 
 #include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
-#include <transport/RendezvousSession.h>
 #include <transport/SecureMessageCodec.h>
-#include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
 #include <inttypes.h>
@@ -250,8 +248,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PASESession * pairing,
-                                        PairingDirection direction, Transport::AdminId admin, Transport::Base * transport)
+CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                                        PairingSession * pairing, PairingDirection direction, Transport::AdminId admin,
+                                        Transport::Base * transport)
 {
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
@@ -292,21 +291,26 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     {
         switch (direction)
         {
-        case PairingDirection::kInitiator:
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
-                                                              strlen(kSpake2pI2RSessionInfo), state->GetSenderSecureSession()));
+        case PairingDirection::kInitiator: {
+            const char * i2rInfo = pairing->GetI2RSessionInfo();
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(i2rInfo), strlen(i2rInfo),
+                                                              state->GetSenderSecureSession()));
 
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pR2ISessionInfo),
-                                                              strlen(kSpake2pR2ISessionInfo), state->GetReceiverSecureSession()));
+            const char * r2iInfo = pairing->GetR2ISessionInfo();
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(r2iInfo), strlen(r2iInfo),
+                                                              state->GetReceiverSecureSession()));
+        }
+        break;
+        case PairingDirection::kResponder: {
+            const char * i2rInfo = pairing->GetR2ISessionInfo();
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(i2rInfo), strlen(i2rInfo),
+                                                              state->GetSenderSecureSession()));
 
-            break;
-        case PairingDirection::kResponder:
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pR2ISessionInfo),
-                                                              strlen(kSpake2pR2ISessionInfo), state->GetSenderSecureSession()));
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
-                                                              strlen(kSpake2pI2RSessionInfo), state->GetReceiverSecureSession()));
-
-            break;
+            const char * r2iInfo = pairing->GetI2RSessionInfo();
+            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(r2iInfo), strlen(r2iInfo),
+                                                              state->GetReceiverSecureSession()));
+        }
+        break;
         default:
             return CHIP_ERROR_INVALID_ARGUMENT;
         };
@@ -347,11 +351,34 @@ void SecureSessionMgr::HandleGroupMessageReceived(const PacketHeader & packetHea
 void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
                                          System::PacketBufferHandle msg)
 {
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    {
+        SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
+    }
+    else
+    {
+        MessageDispatch(packetHeader, peerAddress, std::move(msg));
+    }
+}
+
+void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                       System::PacketBufferHandle msg)
+{
+    if (mCB != nullptr)
+    {
+        PayloadHeader payloadHeader;
+        ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
+        mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress, std::move(msg), this);
+    }
+}
+
+void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                             System::PacketBufferHandle msg)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
 
-    PacketBufferHandle origMsg;
     PayloadHeader payloadHeader;
 
     Transport::AdminPairingInfo * admin = nullptr;
@@ -365,8 +392,10 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     }
 
     admin = mAdmins->FindAdmin(state->GetAdminId());
-    VerifyOrExit(admin != nullptr, ChipLogError(Inet, "Secure transport received packet for unknown admin pairing, discarding"));
-    if (packetHeader.GetDestinationNodeId().HasValue())
+    VerifyOrExit(admin != nullptr,
+                 ChipLogError(Inet, "Secure transport received packet for unknown admin (%p, %d) pairing, discarding", state,
+                              state->GetAdminId()));
+    if (packetHeader.GetDestinationNodeId().HasValue() && admin->GetNodeId() != kUndefinedNodeId)
     {
         VerifyOrExit(
             admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
@@ -396,11 +425,20 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     }
 
     // Decode the message
-    VerifyOrReturn(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg));
+    VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
+                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
-    if (state->GetPeerNodeId() == kUndefinedNodeId && packetHeader.GetSourceNodeId().HasValue())
+    if (packetHeader.GetSourceNodeId().HasValue())
     {
-        state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
+        if (state->GetPeerNodeId() == kUndefinedNodeId)
+        {
+            state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
+        }
+    }
+
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        admin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
     }
 
     // TODO: once mDNS address resolution is available reconsider if this is required
@@ -424,7 +462,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
     if (mCB != nullptr)
     {
         SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session, std::move(msg), this);
+        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, std::move(msg), this);
     }
 
 exit:

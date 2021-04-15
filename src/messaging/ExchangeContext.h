@@ -42,6 +42,7 @@ namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
+class ExchangeMessageDispatch;
 
 class ExchangeContextDeletor
 {
@@ -129,6 +130,8 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
+     *  @param[in]    peerAddress   The address of the sender
+     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -137,15 +140,17 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
-    ExchangeDelegate * GetDelegate() const { return mDelegate; }
-    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
+    ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
     void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+
+    ExchangeMessageDispatch * GetMessageDispatch();
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
@@ -180,7 +185,7 @@ public:
     void Abort();
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegate * delegate);
+                            ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
 
@@ -195,9 +200,9 @@ private:
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ReliableMessageContext mReliableMessageContext;
-    ExchangeDelegate * mDelegate   = nullptr;
-    ExchangeManager * mExchangeMgr = nullptr;
-    ExchangeACL * mExchangeACL     = nullptr;
+    ExchangeDelegateBase * mDelegate = nullptr;
+    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeACL * mExchangeACL       = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
