@@ -37,7 +37,7 @@ namespace app {
 namespace WriteResponse {
 enum
 {
-    kCsTag_StatusList        = 0,
+    kCsTag_StatusList = 0,
 };
 
 class Parser : public chip::app::Parser

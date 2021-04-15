@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "AttributeDataVersionList.h"
 #include "AttributeDataList.h"
+#include "AttributeDataVersionList.h"
 #include "Builder.h"
 #include "Parser.h"
 #include <core/CHIPCore.h>
@@ -159,6 +159,6 @@ private:
     AttributeDataList::Builder mAttributeDataListBuilder;
     AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
 };
-};
-};
-};
+}; // namespace WriteRequest
+}; // namespace app
+}; // namespace chip

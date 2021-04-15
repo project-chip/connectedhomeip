@@ -165,7 +165,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
+CHIP_ERROR
+WriteRequest::Parser::GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -247,5 +248,5 @@ WriteRequest::Builder & WriteRequest::Builder::EndOfWriteRequest()
     EndOfContainer();
     return *this;
 }
-};
-};
+}; // namespace app
+}; // namespace chip

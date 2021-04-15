@@ -379,7 +379,7 @@ void ParseStatusList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = statusListParser.CheckSchemaValidity();
-NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
 }
 
@@ -856,7 +856,7 @@ void ParseWriteRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     WriteRequest::Parser writeRequestParser;
-    bool suppressResponse   = false;
+    bool suppressResponse = false;
     AttributeDataList::Parser attributeDataList;
     AttributeDataVersionList::Parser attributeDataVersionList;
     bool moreChunkedMessages = false;
@@ -906,7 +906,7 @@ void ParseWriteResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = writeResponseParser.CheckSchemaValidity();
-NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
     err = writeResponseParser.GetStatusList(&statusListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

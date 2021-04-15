@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include "StatusElement.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
+#include "StatusElement.h"
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -74,6 +74,6 @@ public:
 private:
     StatusElement::Builder mStatusElementBuilder;
 };
-};
-};
-};
+}; // namespace StatusList
+}; // namespace app
+}; // namespace chip
