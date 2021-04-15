@@ -108,4 +108,3 @@ private:
 }; // namespace WriteResponse
 }; // namespace app
 }; // namespace chip
-
