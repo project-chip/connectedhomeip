@@ -101,6 +101,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+    ChipLogError(ExchangeManager, "ExchangeManager::Shutdown");
     mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
