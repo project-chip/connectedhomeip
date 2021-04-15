@@ -120,25 +120,18 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
-    CommandDataElement::Builder commandDataElement =
-        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
 
-    if (apCommandParams != nullptr)
-    {
-        err = ConstructCommandPath(*apCommandParams, commandDataElement);
-        SuccessOrExit(err);
-    }
+    err = PrepareCommand(apCommandParams);
+    SuccessOrExit(err);
 
-    statusElementBuilder = commandDataElement.CreateStatusElementBuilder();
+    statusElementBuilder =
+        mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
     statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
         .EndOfStatusElement();
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
-    commandDataElement.EndOfCommandDataElement();
-    err = commandDataElement.GetError();
-    SuccessOrExit(err);
-    MoveToState(CommandState::AddCommand);
+    err = FinishCommand();
 
 exit:
     ChipLogFunctError(err);
