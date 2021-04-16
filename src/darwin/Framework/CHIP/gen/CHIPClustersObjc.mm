@@ -22,9 +22,9 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
-#import "app/util/af.h"
-#import "gen/CHIPClientCallbacks.h"
 #import "gen/CHIPClustersObjc.h"
+#import "gen/CHIPClientCallbacks.h"
+#import "app/util/af.h"
 
 #include <controller/CHIPClusters.h>
 #include <lib/support/Span.h>
@@ -106,17 +106,19 @@ public:
         CHIPStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPStringAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                if (callback->mOctetString) {
-                    NSData * data = [NSData dataWithBytes:value.data() length:value.size()];
-                    callback->mHandler(nil, @ { @"value" : data });
-                } else {
-                    NSString * str = [[NSString alloc] initWithBytes:value.data()
-                                                              length:value.size()
-                                                            encoding:NSUTF8StringEncoding];
-                    callback->mHandler(nil, @ { @"value" : str });
+                if (callback->mOctetString)
+                {
+                    NSData *data = [NSData dataWithBytes: value.data() length: value.size()];
+                    callback->mHandler(nil, @{ @"value": data });
+                }
+                else
+                {
+                    NSString * str = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
+                    callback->mHandler(nil, @{ @"value": str });
                 }
 
-                if (!callback->mKeepAlive) {
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -148,8 +150,9 @@ public:
         CHIPBooleanAttributeCallbackBridge * callback = reinterpret_cast<CHIPBooleanAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithBool:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithBool:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -180,8 +183,9 @@ public:
         CHIPInt8uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt8uAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithUnsignedChar:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedChar:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -212,8 +216,9 @@ public:
         CHIPInt8sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt8sAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithChar:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithChar:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -244,8 +249,9 @@ public:
         CHIPInt16uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt16uAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithUnsignedShort:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedShort:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -276,8 +282,9 @@ public:
         CHIPInt32uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt32uAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithUnsignedLong:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedLong:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -308,8 +315,9 @@ public:
         CHIPInt64uAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt64uAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithUnsignedLongLong:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithUnsignedLongLong:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -340,8 +348,9 @@ public:
         CHIPInt16sAttributeCallbackBridge * callback = reinterpret_cast<CHIPInt16sAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : [NSNumber numberWithShort:value] });
-                if (!callback->mKeepAlive) {
+                callback->mHandler(nil, @{ @"value": [NSNumber numberWithShort:value] });
+                if (!callback->mKeepAlive)
+                {
                     callback->Cancel();
                     delete callback;
                 }
@@ -355,25 +364,21 @@ private:
     bool mKeepAlive;
 };
 
-class CHIPDoorLockClusterClearAllPinsResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterClearAllPinsResponseCallback> {
+class CHIPDoorLockClusterClearAllPinsResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearAllPinsResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearAllPinsResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearAllPinsResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearAllPinsResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearAllPinsResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearAllPinsResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearAllPinsResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -385,25 +390,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback> {
+class CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -415,25 +416,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback> {
+class CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -445,24 +442,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterClearPinResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearPinResponseCallback> {
+class CHIPDoorLockClusterClearPinResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearPinResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearPinResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearPinResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearPinResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearPinResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearPinResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearPinResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearPinResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearPinResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearPinResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -474,24 +468,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterClearRfidResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearRfidResponseCallback> {
+class CHIPDoorLockClusterClearRfidResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearRfidResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearRfidResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearRfidResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearRfidResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearRfidResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearRfidResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearRfidResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearRfidResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearRfidResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearRfidResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -503,25 +494,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback> {
+class CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -533,25 +520,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback> {
+class CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -563,31 +546,25 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback> {
+class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(
-        void * context, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
+    static void CallbackFn(void * context, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
     {
-        CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"scheduleId" : [NSNumber numberWithUnsignedChar:scheduleId],
-                    @"localStartTime" : [NSNumber numberWithUnsignedLong:localStartTime],
-                    @"localEndTime" : [NSNumber numberWithUnsignedLong:localEndTime],
-                    @"operatingModeDuringHoliday" : [NSNumber numberWithUnsignedChar:operatingModeDuringHoliday],
-                });
+                callback->mHandler(nil, @{
+                  @"scheduleId": [NSNumber numberWithUnsignedChar:scheduleId],
+                                    @"localStartTime": [NSNumber numberWithUnsignedLong:localStartTime],
+                                    @"localEndTime": [NSNumber numberWithUnsignedLong:localEndTime],
+                                    @"operatingModeDuringHoliday": [NSNumber numberWithUnsignedChar:operatingModeDuringHoliday],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -599,33 +576,27 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetLogRecordResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterGetLogRecordResponseCallback> {
+class CHIPDoorLockClusterGetLogRecordResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetLogRecordResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetLogRecordResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetLogRecordResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetLogRecordResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-        uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
+    static void CallbackFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode, uint16_t userId, uint8_t * pin)
     {
-        CHIPDoorLockClusterGetLogRecordResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetLogRecordResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetLogRecordResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetLogRecordResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"logEntryId" : [NSNumber numberWithUnsignedShort:logEntryId],
-                    @"timestamp" : [NSNumber numberWithUnsignedLong:timestamp],
-                    @"eventType" : [NSNumber numberWithUnsignedChar:eventType],
-                    @"source" : [NSNumber numberWithUnsignedChar:source],
-                    @"eventIdOrAlarmCode" : [NSNumber numberWithUnsignedChar:eventIdOrAlarmCode],
-                    @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"pin" : [NSString stringWithFormat:@"%s", pin],
+                callback->mHandler(nil, @{
+                  @"logEntryId": [NSNumber numberWithUnsignedShort:logEntryId],
+                                    @"timestamp": [NSNumber numberWithUnsignedLong:timestamp],
+                                    @"eventType": [NSNumber numberWithUnsignedChar:eventType],
+                                    @"source": [NSNumber numberWithUnsignedChar:source],
+                                    @"eventIdOrAlarmCode": [NSNumber numberWithUnsignedChar:eventIdOrAlarmCode],
+                                    @"userId": [NSNumber numberWithUnsignedShort:userId],
+                                    @"pin": [NSString stringWithFormat:@"%s", pin],
                 });
                 callback->Cancel();
                 delete callback;
@@ -638,28 +609,24 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetPinResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetPinResponseCallback> {
+class CHIPDoorLockClusterGetPinResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetPinResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetPinResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetPinResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetPinResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetPinResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetPinResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * pin)
     {
-        CHIPDoorLockClusterGetPinResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetPinResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetPinResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetPinResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"userStatus" : [NSNumber numberWithUnsignedChar:userStatus],
-                    @"userType" : [NSNumber numberWithUnsignedChar:userType],
-                    @"pin" : [NSString stringWithFormat:@"%s", pin],
+                callback->mHandler(nil, @{
+                  @"userId": [NSNumber numberWithUnsignedShort:userId],
+                                    @"userStatus": [NSNumber numberWithUnsignedChar:userStatus],
+                                    @"userType": [NSNumber numberWithUnsignedChar:userType],
+                                    @"pin": [NSString stringWithFormat:@"%s", pin],
                 });
                 callback->Cancel();
                 delete callback;
@@ -672,28 +639,24 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetRfidResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetRfidResponseCallback> {
+class CHIPDoorLockClusterGetRfidResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetRfidResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetRfidResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetRfidResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetRfidResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetRfidResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetRfidResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, uint8_t * rfid)
     {
-        CHIPDoorLockClusterGetRfidResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetRfidResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetRfidResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetRfidResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"userStatus" : [NSNumber numberWithUnsignedChar:userStatus],
-                    @"userType" : [NSNumber numberWithUnsignedChar:userType],
-                    @"rfid" : [NSString stringWithFormat:@"%s", rfid],
+                callback->mHandler(nil, @{
+                  @"userId": [NSNumber numberWithUnsignedShort:userId],
+                                    @"userStatus": [NSNumber numberWithUnsignedChar:userStatus],
+                                    @"userType": [NSNumber numberWithUnsignedChar:userType],
+                                    @"rfid": [NSString stringWithFormat:@"%s", rfid],
                 });
                 callback->Cancel();
                 delete callback;
@@ -706,27 +669,23 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetUserTypeResponseCallback> {
+class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetUserTypeResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetUserTypeResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetUserTypeResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetUserTypeResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t userId, uint8_t userType)
     {
-        CHIPDoorLockClusterGetUserTypeResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetUserTypeResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetUserTypeResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetUserTypeResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"userType" : [NSNumber numberWithUnsignedChar:userType],
-                });
+                callback->mHandler(nil, @{
+                  @"userId": [NSNumber numberWithUnsignedShort:userId],
+                                    @"userType": [NSNumber numberWithUnsignedChar:userType],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -738,34 +697,28 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback> {
+class CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
-        uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+    static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
     {
-        CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"scheduleId" : [NSNumber numberWithUnsignedChar:scheduleId],
-                    @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"daysMask" : [NSNumber numberWithUnsignedChar:daysMask],
-                    @"startHour" : [NSNumber numberWithUnsignedChar:startHour],
-                    @"startMinute" : [NSNumber numberWithUnsignedChar:startMinute],
-                    @"endHour" : [NSNumber numberWithUnsignedChar:endHour],
-                    @"endMinute" : [NSNumber numberWithUnsignedChar:endMinute],
-                });
+                callback->mHandler(nil, @{
+                  @"scheduleId": [NSNumber numberWithUnsignedChar:scheduleId],
+                                    @"userId": [NSNumber numberWithUnsignedShort:userId],
+                                    @"daysMask": [NSNumber numberWithUnsignedChar:daysMask],
+                                    @"startHour": [NSNumber numberWithUnsignedChar:startHour],
+                                    @"startMinute": [NSNumber numberWithUnsignedChar:startMinute],
+                                    @"endHour": [NSNumber numberWithUnsignedChar:endHour],
+                                    @"endMinute": [NSNumber numberWithUnsignedChar:endMinute],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -777,30 +730,25 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback> {
+class CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
     {
-        CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"scheduleId" : [NSNumber numberWithUnsignedChar:scheduleId],
-                    @"userId" : [NSNumber numberWithUnsignedShort:userId],
-                    @"localStartTime" : [NSNumber numberWithUnsignedLong:localStartTime],
-                    @"localEndTime" : [NSNumber numberWithUnsignedLong:localEndTime],
-                });
+                callback->mHandler(nil, @{
+                  @"scheduleId": [NSNumber numberWithUnsignedChar:scheduleId],
+                                    @"userId": [NSNumber numberWithUnsignedShort:userId],
+                                    @"localStartTime": [NSNumber numberWithUnsignedLong:localStartTime],
+                                    @"localEndTime": [NSNumber numberWithUnsignedLong:localEndTime],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -812,24 +760,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterLockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterLockDoorResponseCallback> {
+class CHIPDoorLockClusterLockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterLockDoorResponseCallback>
+{
 public:
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterLockDoorResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterLockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterLockDoorResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterLockDoorResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterLockDoorResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterLockDoorResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterLockDoorResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterLockDoorResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -841,25 +786,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback> {
+class CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -871,24 +812,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterSetPinResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetPinResponseCallback> {
+class CHIPDoorLockClusterSetPinResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetPinResponseCallback>
+{
 public:
-    CHIPDoorLockClusterSetPinResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterSetPinResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterSetPinResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterSetPinResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterSetPinResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterSetPinResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterSetPinResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterSetPinResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterSetPinResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -900,24 +838,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterSetRfidResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetRfidResponseCallback> {
+class CHIPDoorLockClusterSetRfidResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetRfidResponseCallback>
+{
 public:
-    CHIPDoorLockClusterSetRfidResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterSetRfidResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterSetRfidResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterSetRfidResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterSetRfidResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterSetRfidResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterSetRfidResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterSetRfidResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterSetRfidResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -929,24 +864,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterSetUserTypeResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetUserTypeResponseCallback> {
+class CHIPDoorLockClusterSetUserTypeResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetUserTypeResponseCallback>
+{
 public:
-    CHIPDoorLockClusterSetUserTypeResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterSetUserTypeResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterSetUserTypeResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterSetUserTypeResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterSetUserTypeResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterSetUserTypeResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterSetUserTypeResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterSetUserTypeResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterSetUserTypeResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -958,25 +890,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback> {
+class CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -988,25 +916,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback> {
+class CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge : public Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback>
+{
 public:
-    CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1018,24 +942,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterUnlockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterUnlockDoorResponseCallback> {
+class CHIPDoorLockClusterUnlockDoorResponseCallbackBridge : public Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>
+{
 public:
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterUnlockDoorResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterUnlockDoorResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterUnlockDoorResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1047,25 +968,21 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge
-    : public Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback> {
+class CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge : public Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback>
+{
 public:
-    CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge() {};
 
     static void CallbackFn(void * context)
     {
-        CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge * callback = reinterpret_cast<CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {});
+                callback->mHandler(nil, @{
+                });
                 callback->Cancel();
                 delete callback;
             });
@@ -1077,27 +994,49 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
-    : public Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback> {
+class CHIPFabricClusterGetFabricIdResponseCallbackBridge : public Callback::Callback<FabricClusterGetFabricIdResponseCallback>
+{
 public:
-    CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
+    CHIPFabricClusterGetFabricIdResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<FabricClusterGetFabricIdResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+
+    ~CHIPFabricClusterGetFabricIdResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, chip::FabricId fabricId)
     {
-    }
+        CHIPFabricClusterGetFabricIdResponseCallbackBridge * callback = reinterpret_cast<CHIPFabricClusterGetFabricIdResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @{
+                  @"fabricId": [NSNumber numberWithUnsignedLongLong:fabricId],
+                                  });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge : public Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>
+{
+public:
+    CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge * callback = reinterpret_cast<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1110,27 +1049,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
-    : public Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> {
+class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge : public Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>
+{
 public:
-    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * callback = reinterpret_cast<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1143,27 +1077,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge
-    : public Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> {
+class CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge : public Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>
+{
 public:
-    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * callback = reinterpret_cast<CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1176,26 +1105,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterAddGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterAddGroupResponseCallback> {
+class CHIPGroupsClusterAddGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterAddGroupResponseCallback>
+{
 public:
-    CHIPGroupsClusterAddGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterAddGroupResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGroupsClusterAddGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterAddGroupResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGroupsClusterAddGroupResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        CHIPGroupsClusterAddGroupResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterAddGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGroupsClusterAddGroupResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterAddGroupResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                });
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1207,30 +1132,24 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge
-    : public Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> {
+class CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge : public Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>
+{
 public:
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge() {};
 
-    static void CallbackFn(
-        void * context, uint8_t capacity, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
+    static void CallbackFn(void * context, uint8_t capacity, uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t *  groupList)
     {
-        CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
-                    @"groupCount" : [NSNumber numberWithUnsignedChar:groupCount],
-                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @{
+                  @"capacity": [NSNumber numberWithUnsignedChar:capacity],
+                                    @"groupCount": [NSNumber numberWithUnsignedChar:groupCount],
+                                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
                 delete callback;
@@ -1243,26 +1162,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterRemoveGroupResponseCallback> {
+class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterRemoveGroupResponseCallback>
+{
 public:
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterRemoveGroupResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGroupsClusterRemoveGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterRemoveGroupResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGroupsClusterRemoveGroupResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        CHIPGroupsClusterRemoveGroupResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterRemoveGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGroupsClusterRemoveGroupResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterRemoveGroupResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                });
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1274,26 +1189,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupsClusterViewGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterViewGroupResponseCallback> {
+class CHIPGroupsClusterViewGroupResponseCallbackBridge : public Callback::Callback<GroupsClusterViewGroupResponseCallback>
+{
 public:
-    CHIPGroupsClusterViewGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupsClusterViewGroupResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGroupsClusterViewGroupResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupsClusterViewGroupResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGroupsClusterViewGroupResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t * groupName)
     {
-        CHIPGroupsClusterViewGroupResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGroupsClusterViewGroupResponseCallbackBridge * callback = reinterpret_cast<CHIPGroupsClusterViewGroupResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"groupName" : [NSString stringWithFormat:@"%s", groupName],
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                    @"groupName": [NSString stringWithFormat:@"%s", groupName],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1306,27 +1217,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
-    : public Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback> {
+class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge : public Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>
+{
 public:
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t timeout)
     {
-        CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * callback = reinterpret_cast<CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"timeout" : [NSNumber numberWithUnsignedShort:timeout],
-                });
+                callback->mHandler(nil, @{
+                  @"timeout": [NSNumber numberWithUnsignedShort:timeout],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1338,27 +1244,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1371,27 +1272,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1404,27 +1300,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1437,27 +1328,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1470,27 +1356,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1503,33 +1384,26 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback> {
+class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText,
-        /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-        /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
+    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText, /* TYPE WARNING: array array defaults to */ uint8_t *  wifiScanResults, /* TYPE WARNING: array array defaults to */ uint8_t *  threadScanResults)
     {
-        CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
-                    // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
-                    // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
+                  // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // Conversion from this type to Objc is not properly implemented yet
+                  // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
                 delete callback;
@@ -1542,27 +1416,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1575,27 +1444,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge
-    : public Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> {
+class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge : public Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>
+{
 public:
-    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * callback = reinterpret_cast<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
+                callback->mHandler(nil, @{
+                  @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
+                                    @"debugText": [NSString stringWithFormat:@"%s", debugText],
                 });
                 callback->Cancel();
                 delete callback;
@@ -1608,27 +1472,23 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback> {
+class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback>
+{
 public:
-    CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterAddSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterAddSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPScenesClusterAddSceneResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        CHIPScenesClusterAddSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterAddSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPScenesClusterAddSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterAddSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                });
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1640,31 +1500,25 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterGetSceneMembershipResponseCallbackBridge
-    : public Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback> {
+class CHIPScenesClusterGetSceneMembershipResponseCallbackBridge : public Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>
+{
 public:
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterGetSceneMembershipResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPScenesClusterGetSceneMembershipResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-        /* TYPE WARNING: array array defaults to */ uint8_t * sceneList)
+    static void CallbackFn(void * context, uint8_t capacity, uint16_t groupId, uint8_t sceneCount, /* TYPE WARNING: array array defaults to */ uint8_t *  sceneList)
     {
-        CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterGetSceneMembershipResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterGetSceneMembershipResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"capacity" : [NSNumber numberWithUnsignedChar:capacity],
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneCount" : [NSNumber numberWithUnsignedChar:sceneCount],
-                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @{
+                  @"capacity": [NSNumber numberWithUnsignedChar:capacity],
+                                    @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                    @"sceneCount": [NSNumber numberWithUnsignedChar:sceneCount],
+                                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
                 delete callback;
@@ -1677,27 +1531,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterRemoveAllScenesResponseCallbackBridge
-    : public Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback> {
+class CHIPScenesClusterRemoveAllScenesResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>
+{
 public:
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterRemoveAllScenesResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPScenesClusterRemoveAllScenesResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId)
     {
-        CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterRemoveAllScenesResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterRemoveAllScenesResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                });
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1709,27 +1558,23 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterRemoveSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveSceneResponseCallback> {
+class CHIPScenesClusterRemoveSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterRemoveSceneResponseCallback>
+{
 public:
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterRemoveSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPScenesClusterRemoveSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterRemoveSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPScenesClusterRemoveSceneResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        CHIPScenesClusterRemoveSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterRemoveSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPScenesClusterRemoveSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterRemoveSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                });
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1741,27 +1586,23 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterStoreSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterStoreSceneResponseCallback> {
+class CHIPScenesClusterStoreSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterStoreSceneResponseCallback>
+{
 public:
-    CHIPScenesClusterStoreSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterStoreSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPScenesClusterStoreSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterStoreSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPScenesClusterStoreSceneResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId)
     {
-        CHIPScenesClusterStoreSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterStoreSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPScenesClusterStoreSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterStoreSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                });
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
+                                  });
                 callback->Cancel();
                 delete callback;
             });
@@ -1773,31 +1614,26 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPScenesClusterViewSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterViewSceneResponseCallback> {
+class CHIPScenesClusterViewSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterViewSceneResponseCallback>
+{
 public:
-    CHIPScenesClusterViewSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<ScenesClusterViewSceneResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPScenesClusterViewSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<ScenesClusterViewSceneResponseCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPScenesClusterViewSceneResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
+    static void CallbackFn(void * context, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets)
     {
-        CHIPScenesClusterViewSceneResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPScenesClusterViewSceneResponseCallbackBridge * callback = reinterpret_cast<CHIPScenesClusterViewSceneResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"groupId" : [NSNumber numberWithUnsignedShort:groupId],
-                    @"sceneId" : [NSNumber numberWithUnsignedChar:sceneId],
-                    @"transitionTime" : [NSNumber numberWithUnsignedShort:transitionTime],
-                    @"sceneName" : [NSString stringWithFormat:@"%s", sceneName],
-                    // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
-                    // Conversion from this type to Objc is not properly implemented yet
+                callback->mHandler(nil, @{
+                  @"groupId": [NSNumber numberWithUnsignedShort:groupId],
+                                    @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
+                                    @"transitionTime": [NSNumber numberWithUnsignedShort:transitionTime],
+                                    @"sceneName": [NSString stringWithFormat:@"%s", sceneName],
+                  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
                 delete callback;
@@ -1810,31 +1646,33 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDescriptorDeviceListAttributeCallbackBridge : public Callback::Callback<DescriptorDeviceListListAttributeCallback> {
+
+class CHIPDescriptorDeviceListAttributeCallbackBridge : public Callback::Callback<DescriptorDeviceListListAttributeCallback>
+{
 public:
-    CHIPDescriptorDeviceListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DescriptorDeviceListListAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDescriptorDeviceListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DescriptorDeviceListListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDescriptorDeviceListAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, _DeviceType * entries)
     {
-        CHIPDescriptorDeviceListAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPDescriptorDeviceListAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDescriptorDeviceListAttributeCallbackBridge * callback = reinterpret_cast<CHIPDescriptorDeviceListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             id values[count];
-            for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:entries[i].type], @"type",
-                                                  [NSNumber numberWithUnsignedShort:entries[i].revision], @"revision", nil];
+            for (uint16_t i = 0; i < count; i++)
+            {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [NSNumber numberWithUnsignedLong:entries[i].type],
+                    @"type",
+                    [NSNumber numberWithUnsignedShort:entries[i].revision],
+                    @"revision",
+                nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : array });
+                callback->mHandler(nil, @{ @"value": array });
                 callback->Cancel();
                 delete callback;
             });
@@ -1846,30 +1684,27 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDescriptorServerListAttributeCallbackBridge : public Callback::Callback<DescriptorServerListListAttributeCallback> {
+class CHIPDescriptorServerListAttributeCallbackBridge : public Callback::Callback<DescriptorServerListListAttributeCallback>
+{
 public:
-    CHIPDescriptorServerListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DescriptorServerListListAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDescriptorServerListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DescriptorServerListListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDescriptorServerListAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
     {
-        CHIPDescriptorServerListAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPDescriptorServerListAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDescriptorServerListAttributeCallbackBridge * callback = reinterpret_cast<CHIPDescriptorServerListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             id values[count];
-            for (uint16_t i = 0; i < count; i++) {
+            for (uint16_t i = 0; i < count; i++)
+            {
                 values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : array });
+                callback->mHandler(nil, @{ @"value": array });
                 callback->Cancel();
                 delete callback;
             });
@@ -1881,30 +1716,27 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDescriptorClientListAttributeCallbackBridge : public Callback::Callback<DescriptorClientListListAttributeCallback> {
+class CHIPDescriptorClientListAttributeCallbackBridge : public Callback::Callback<DescriptorClientListListAttributeCallback>
+{
 public:
-    CHIPDescriptorClientListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DescriptorClientListListAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDescriptorClientListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DescriptorClientListListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDescriptorClientListAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
     {
-        CHIPDescriptorClientListAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPDescriptorClientListAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDescriptorClientListAttributeCallbackBridge * callback = reinterpret_cast<CHIPDescriptorClientListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             id values[count];
-            for (uint16_t i = 0; i < count; i++) {
+            for (uint16_t i = 0; i < count; i++)
+            {
                 values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : array });
+                callback->mHandler(nil, @{ @"value": array });
                 callback->Cancel();
                 delete callback;
             });
@@ -1916,30 +1748,27 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPDescriptorPartsListAttributeCallbackBridge : public Callback::Callback<DescriptorPartsListListAttributeCallback> {
+class CHIPDescriptorPartsListAttributeCallbackBridge : public Callback::Callback<DescriptorPartsListListAttributeCallback>
+{
 public:
-    CHIPDescriptorPartsListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<DescriptorPartsListListAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPDescriptorPartsListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<DescriptorPartsListListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPDescriptorPartsListAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, chip::EndpointId * entries)
     {
-        CHIPDescriptorPartsListAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPDescriptorPartsListAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPDescriptorPartsListAttributeCallbackBridge * callback = reinterpret_cast<CHIPDescriptorPartsListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             id values[count];
-            for (uint16_t i = 0; i < count; i++) {
+            for (uint16_t i = 0; i < count; i++)
+            {
                 values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : array });
+                callback->mHandler(nil, @{ @"value": array });
                 callback->Cancel();
                 delete callback;
             });
@@ -1951,34 +1780,75 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupKeyManagementGroupsAttributeCallbackBridge
-    : public Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> {
+class CHIPFabricFabricsListAttributeCallbackBridge : public Callback::Callback<FabricFabricsListListAttributeCallback>
+{
 public:
-    CHIPGroupKeyManagementGroupsAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
+    CHIPFabricFabricsListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<FabricFabricsListListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+
+    ~CHIPFabricFabricsListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _FabricDescriptor * entries)
     {
+        CHIPFabricFabricsListAttributeCallbackBridge * callback = reinterpret_cast<CHIPFabricFabricsListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++)
+            {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
+                    @"FabricId",
+                    [NSNumber numberWithUnsignedShort:entries[i].VendorId],
+                    @"VendorId",
+                    [NSData dataWithBytes:entries[i].label+1u length:emberAfStringLength(entries[i].label)],
+                    @"label",
+                    [NSNumber numberWithUnsignedLongLong:entries[i].NodeId],
+                    @"NodeId",
+                nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @{ @"value": array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
     }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGroupKeyManagementGroupsAttributeCallbackBridge : public Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>
+{
+public:
+    CHIPGroupKeyManagementGroupsAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGroupKeyManagementGroupsAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, _GroupState * entries)
     {
-        CHIPGroupKeyManagementGroupsAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGroupKeyManagementGroupsAttributeCallbackBridge * callback = reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             id values[count];
-            for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId],
-                                                  @"VendorId", [NSNumber numberWithUnsignedShort:entries[i].VendorGroupId],
-                                                  @"VendorGroupId", [NSNumber numberWithUnsignedShort:entries[i].GroupKeySetIndex],
-                                                  @"GroupKeySetIndex", nil];
+            for (uint16_t i = 0; i < count; i++)
+            {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [NSNumber numberWithUnsignedShort:entries[i].VendorId],
+                    @"VendorId",
+                    [NSNumber numberWithUnsignedShort:entries[i].VendorGroupId],
+                    @"VendorGroupId",
+                    [NSNumber numberWithUnsignedShort:entries[i].GroupKeySetIndex],
+                    @"GroupKeySetIndex",
+                nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : array });
+                callback->mHandler(nil, @{ @"value": array });
                 callback->Cancel();
                 delete callback;
             });
@@ -1990,37 +1860,38 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge
-    : public Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> {
+class CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge : public Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>
+{
 public:
-    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
+    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
 
     ~CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge() {};
 
     static void CallbackFn(void * context, uint16_t count, _GroupKey * entries)
     {
-        CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * callback
-            = reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
+        CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * callback = reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
             id values[count];
-            for (uint16_t i = 0; i < count; i++) {
-                values[i] = [[NSDictionary alloc]
-                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
-                    [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex], @"GroupKeyIndex",
-                    [NSData dataWithBytes:entries[i].GroupKeyRoot + 1u length:emberAfStringLength(entries[i].GroupKeyRoot)],
-                    @"GroupKeyRoot", [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime],
-                    @"GroupKeyEpochStartTime", [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy],
-                    @"GroupKeySecurityPolicy", nil];
+            for (uint16_t i = 0; i < count; i++)
+            {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:
+                    [NSNumber numberWithUnsignedShort:entries[i].VendorId],
+                    @"VendorId",
+                    [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex],
+                    @"GroupKeyIndex",
+                    [NSData dataWithBytes:entries[i].GroupKeyRoot+1u length:emberAfStringLength(entries[i].GroupKeyRoot)],
+                    @"GroupKeyRoot",
+                    [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime],
+                    @"GroupKeyEpochStartTime",
+                    [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy],
+                    @"GroupKeySecurityPolicy",
+                nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
             dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ { @"value" : array });
+                callback->mHandler(nil, @{ @"value": array });
                 callback->Cancel();
                 delete callback;
             });
@@ -2031,6 +1902,7 @@ private:
     ResponseHandler mHandler;
     dispatch_queue_t mQueue;
 };
+
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
@@ -2042,7 +1914,8 @@ private:
 {
     if (self = [super init]) {
         Controller::ClusterBase * cppCluster = [self getCluster];
-        if (cppCluster == nullptr) {
+        if (cppCluster == nullptr)
+        {
             return nil;
         }
 
@@ -2062,6 +1935,8 @@ private:
 }
 @end
 
+
+
 @interface CHIPApplicationBasic ()
 @property (readonly) Controller::ApplicationBasicCluster cppCluster;
 @end
@@ -2073,10 +1948,10 @@ private:
     return &_cppCluster;
 }
 
+
 - (void)readAttributeVendorName:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2122,8 +1997,7 @@ private:
 
 - (void)readAttributeApplicationName:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2169,8 +2043,7 @@ private:
 
 - (void)readAttributeApplicationId:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2260,7 +2133,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPBarrierControl ()
 @property (readonly) Controller::BarrierControlCluster cppCluster;
@@ -2433,7 +2308,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPBasic ()
 @property (readonly) Controller::BasicCluster cppCluster;
@@ -2494,8 +2371,7 @@ private:
 
 - (void)readAttributeVendorName:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2541,8 +2417,7 @@ private:
 
 - (void)readAttributeProductName:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2588,8 +2463,7 @@ private:
 
 - (void)readAttributeUserLabel:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2626,8 +2500,7 @@ private:
     }
 
     NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-    CHIP_ERROR err = self.cppCluster.WriteAttributeUserLabel(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) data.bytes, data.length));
+    CHIP_ERROR err = self.cppCluster.WriteAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2637,8 +2510,7 @@ private:
 
 - (void)readAttributeLocation:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2675,8 +2547,7 @@ private:
     }
 
     NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-    CHIP_ERROR err = self.cppCluster.WriteAttributeLocation(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) data.bytes, data.length));
+    CHIP_ERROR err = self.cppCluster.WriteAttributeLocation(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2709,8 +2580,7 @@ private:
 
 - (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2756,8 +2626,7 @@ private:
 
 - (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -2801,7 +2670,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPBinding ()
 @property (readonly) Controller::BindingCluster cppCluster;
@@ -2814,11 +2685,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)bind:(uint64_t)nodeId
-              groupId:(uint16_t)groupId
-           endpointId:(uint8_t)endpointId
-            clusterId:(uint16_t)clusterId
-    completionHandler:(ResponseHandler)completionHandler
+- (void)bind:(uint64_t)nodeId groupId:(uint16_t)groupId endpointId:(uint8_t)endpointId clusterId:(uint16_t)clusterId completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -2840,11 +2707,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)unbind:(uint64_t)nodeId
-              groupId:(uint16_t)groupId
-           endpointId:(uint8_t)endpointId
-            clusterId:(uint16_t)clusterId
-    completionHandler:(ResponseHandler)completionHandler
+- (void)unbind:(uint64_t)nodeId groupId:(uint16_t)groupId endpointId:(uint8_t)endpointId clusterId:(uint16_t)clusterId completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -2890,7 +2753,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPColorControl ()
 @property (readonly) Controller::ColorControlCluster cppCluster;
@@ -2903,11 +2768,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)moveColor:(int16_t)rateX
-                rateY:(int16_t)rateY
-          optionsMask:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)moveColor:(int16_t)rateX rateY:(int16_t)rateY optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -2922,21 +2783,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveColorTemperature:(uint8_t)moveMode
-                        rate:(uint16_t)rate
-     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
-     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
-                 optionsMask:(uint8_t)optionsMask
-             optionsOverride:(uint8_t)optionsOverride
-           completionHandler:(ResponseHandler)completionHandler
+- (void)moveColorTemperature:(uint8_t)moveMode rate:(uint16_t)rate colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -2951,19 +2805,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate,
-        colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveHue:(uint8_t)moveMode
-                 rate:(uint8_t)rate
-          optionsMask:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)moveHue:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -2978,19 +2827,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveSaturation:(uint8_t)moveMode
-                  rate:(uint8_t)rate
-           optionsMask:(uint8_t)optionsMask
-       optionsOverride:(uint8_t)optionsOverride
-     completionHandler:(ResponseHandler)completionHandler
+- (void)moveSaturation:(uint8_t)moveMode rate:(uint8_t)rate optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3005,20 +2849,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToColor:(uint16_t)colorX
-               colorY:(uint16_t)colorY
-       transitionTime:(uint16_t)transitionTime
-          optionsMask:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)moveToColor:(uint16_t)colorX colorY:(uint16_t)colorY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3033,19 +2871,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColor(
-        onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToColor(onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToColorTemperature:(uint16_t)colorTemperature
-                transitionTime:(uint16_t)transitionTime
-                   optionsMask:(uint8_t)optionsMask
-               optionsOverride:(uint8_t)optionsOverride
-             completionHandler:(ResponseHandler)completionHandler
+- (void)moveToColorTemperature:(uint16_t)colorTemperature transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3060,20 +2893,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(
-        onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToHue:(uint8_t)hue
-            direction:(uint8_t)direction
-       transitionTime:(uint16_t)transitionTime
-          optionsMask:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)moveToHue:(uint8_t)hue direction:(uint8_t)direction transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3088,20 +2915,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHue(
-        onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToHue(onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToHueAndSaturation:(uint8_t)hue
-                    saturation:(uint8_t)saturation
-                transitionTime:(uint16_t)transitionTime
-                   optionsMask:(uint8_t)optionsMask
-               optionsOverride:(uint8_t)optionsOverride
-             completionHandler:(ResponseHandler)completionHandler
+- (void)moveToHueAndSaturation:(uint8_t)hue saturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3116,19 +2937,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToSaturation:(uint8_t)saturation
-          transitionTime:(uint16_t)transitionTime
-             optionsMask:(uint8_t)optionsMask
-         optionsOverride:(uint8_t)optionsOverride
-       completionHandler:(ResponseHandler)completionHandler
+- (void)moveToSaturation:(uint8_t)saturation transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3143,20 +2959,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToSaturation(onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)stepColor:(int16_t)stepX
-                stepY:(int16_t)stepY
-       transitionTime:(uint16_t)transitionTime
-          optionsMask:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)stepColor:(int16_t)stepX stepY:(int16_t)stepY transitionTime:(uint16_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3171,22 +2981,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColor(
-        onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepColor(onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)stepColorTemperature:(uint8_t)stepMode
-                    stepSize:(uint16_t)stepSize
-              transitionTime:(uint16_t)transitionTime
-     colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum
-     colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum
-                 optionsMask:(uint8_t)optionsMask
-             optionsOverride:(uint8_t)optionsOverride
-           completionHandler:(ResponseHandler)completionHandler
+- (void)stepColorTemperature:(uint8_t)stepMode stepSize:(uint16_t)stepSize transitionTime:(uint16_t)transitionTime colorTemperatureMinimum:(uint16_t)colorTemperatureMinimum colorTemperatureMaximum:(uint16_t)colorTemperatureMaximum optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3201,20 +3003,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize,
-        transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)stepHue:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint8_t)transitionTime
-          optionsMask:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)stepHue:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3229,20 +3025,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepHue(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepHue(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)stepSaturation:(uint8_t)stepMode
-              stepSize:(uint8_t)stepSize
-        transitionTime:(uint8_t)transitionTime
-           optionsMask:(uint8_t)optionsMask
-       optionsOverride:(uint8_t)optionsOverride
-     completionHandler:(ResponseHandler)completionHandler
+- (void)stepSaturation:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint8_t)transitionTime optionsMask:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3257,17 +3047,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    CHIP_ERROR err = self.cppCluster.StepSaturation(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)stopMoveStep:(uint8_t)optionsMask
-      optionsOverride:(uint8_t)optionsOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)stopMoveStep:(uint8_t)optionsMask optionsOverride:(uint8_t)optionsOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3313,10 +3100,7 @@ private:
     }
 }
 
-- (void)configureAttributeCurrentHue:(uint16_t)minInterval
-                         maxInterval:(uint16_t)maxInterval
-                              change:(uint8_t)change
-                   completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeCurrentHue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3331,8 +3115,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3340,7 +3124,7 @@ private:
     }
 }
 
-- (void)reportAttributeCurrentHue:(ResponseHandler)reportHandler
+- (void) reportAttributeCurrentHue:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -3378,10 +3162,7 @@ private:
     }
 }
 
-- (void)configureAttributeCurrentSaturation:(uint16_t)minInterval
-                                maxInterval:(uint16_t)maxInterval
-                                     change:(uint8_t)change
-                          completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeCurrentSaturation:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3396,8 +3177,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3405,7 +3186,7 @@ private:
     }
 }
 
-- (void)reportAttributeCurrentSaturation:(ResponseHandler)reportHandler
+- (void) reportAttributeCurrentSaturation:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -3466,10 +3247,7 @@ private:
     }
 }
 
-- (void)configureAttributeCurrentX:(uint16_t)minInterval
-                       maxInterval:(uint16_t)maxInterval
-                            change:(uint16_t)change
-                 completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeCurrentX:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3484,8 +3262,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3493,7 +3271,7 @@ private:
     }
 }
 
-- (void)reportAttributeCurrentX:(ResponseHandler)reportHandler
+- (void) reportAttributeCurrentX:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -3531,10 +3309,7 @@ private:
     }
 }
 
-- (void)configureAttributeCurrentY:(uint16_t)minInterval
-                       maxInterval:(uint16_t)maxInterval
-                            change:(uint16_t)change
-                 completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeCurrentY:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3549,8 +3324,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3558,7 +3333,7 @@ private:
     }
 }
 
-- (void)reportAttributeCurrentY:(ResponseHandler)reportHandler
+- (void) reportAttributeCurrentY:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -3598,8 +3373,7 @@ private:
 
 - (void)readAttributeCompensationText:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],false);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -3643,10 +3417,7 @@ private:
     }
 }
 
-- (void)configureAttributeColorTemperature:(uint16_t)minInterval
-                               maxInterval:(uint16_t)maxInterval
-                                    change:(uint16_t)change
-                         completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeColorTemperature:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint16_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -3661,8 +3432,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3670,7 +3441,7 @@ private:
     }
 }
 
-- (void)reportAttributeColorTemperature:(ResponseHandler)reportHandler
+- (void) reportAttributeColorTemperature:(ResponseHandler)reportHandler
 {
     CHIPInt16uAttributeCallbackBridge * onReport = new CHIPInt16uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -3747,7 +3518,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorControlOptions(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4230,7 +4001,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeWhitePointX(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4276,7 +4047,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeWhitePointY(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4322,7 +4093,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointRX(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4368,7 +4139,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointRY(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4414,7 +4185,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointRIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4460,7 +4231,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointGX(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4506,7 +4277,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointGY(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4552,7 +4323,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointGIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4598,7 +4369,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointBX(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4644,7 +4415,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointBY(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4690,7 +4461,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointBIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4943,7 +4714,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeStartUpColorTemperatureMireds(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -4973,7 +4744,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPDescriptor ()
 @property (readonly) Controller::DescriptorCluster cppCluster;
@@ -4986,10 +4759,10 @@ private:
     return &_cppCluster;
 }
 
+
 - (void)readAttributeDeviceList:(ResponseHandler)completionHandler
 {
-    CHIPDescriptorDeviceListAttributeCallbackBridge * onSuccess
-        = new CHIPDescriptorDeviceListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDescriptorDeviceListAttributeCallbackBridge * onSuccess = new CHIPDescriptorDeviceListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5012,8 +4785,7 @@ private:
 
 - (void)readAttributeServerList:(ResponseHandler)completionHandler
 {
-    CHIPDescriptorServerListAttributeCallbackBridge * onSuccess
-        = new CHIPDescriptorServerListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDescriptorServerListAttributeCallbackBridge * onSuccess = new CHIPDescriptorServerListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5036,8 +4808,7 @@ private:
 
 - (void)readAttributeClientList:(ResponseHandler)completionHandler
 {
-    CHIPDescriptorClientListAttributeCallbackBridge * onSuccess
-        = new CHIPDescriptorClientListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDescriptorClientListAttributeCallbackBridge * onSuccess = new CHIPDescriptorClientListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5060,8 +4831,7 @@ private:
 
 - (void)readAttributePartsList:(ResponseHandler)completionHandler
 {
-    CHIPDescriptorPartsListAttributeCallbackBridge * onSuccess
-        = new CHIPDescriptorPartsListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDescriptorPartsListAttributeCallbackBridge * onSuccess = new CHIPDescriptorPartsListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5105,7 +4875,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPDoorLock ()
 @property (readonly) Controller::DoorLockCluster cppCluster;
@@ -5120,8 +4892,7 @@ private:
 
 - (void)clearAllPins:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearAllPinsResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearAllPinsResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearAllPinsResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearAllPinsResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5143,8 +4914,7 @@ private:
 }
 - (void)clearAllRfids:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5166,8 +4936,7 @@ private:
 }
 - (void)clearHolidaySchedule:(uint8_t)scheduleId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5189,8 +4958,7 @@ private:
 }
 - (void)clearPin:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearPinResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearPinResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearPinResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearPinResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5212,8 +4980,7 @@ private:
 }
 - (void)clearRfid:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearRfidResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearRfidResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearRfidResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearRfidResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5235,8 +5002,7 @@ private:
 }
 - (void)clearWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5258,8 +5024,7 @@ private:
 }
 - (void)clearYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5281,8 +5046,7 @@ private:
 }
 - (void)getHolidaySchedule:(uint8_t)scheduleId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5304,8 +5068,7 @@ private:
 }
 - (void)getLogRecord:(uint16_t)logIndex completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetLogRecordResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetLogRecordResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5327,8 +5090,7 @@ private:
 }
 - (void)getPin:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetPinResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetPinResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetPinResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetPinResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5350,8 +5112,7 @@ private:
 }
 - (void)getRfid:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetRfidResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetRfidResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetRfidResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetRfidResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5373,8 +5134,7 @@ private:
 }
 - (void)getUserType:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetUserTypeResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetUserTypeResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5396,8 +5156,7 @@ private:
 }
 - (void)getWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5419,8 +5178,7 @@ private:
 }
 - (void)getYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5442,8 +5200,7 @@ private:
 }
 - (void)lockDoor:(NSString *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterLockDoorResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterLockDoorResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5456,23 +5213,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)[pin dataUsingEncoding:NSUTF8StringEncoding].bytes, [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setHolidaySchedule:(uint8_t)scheduleId
-                localStartTime:(uint32_t)localStartTime
-                  localEndTime:(uint32_t)localEndTime
-    operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday
-             completionHandler:(ResponseHandler)completionHandler
+- (void)setHolidaySchedule:(uint8_t)scheduleId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime operatingModeDuringHoliday:(uint8_t)operatingModeDuringHoliday completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5485,22 +5235,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setPin:(uint16_t)userId
-           userStatus:(uint8_t)userStatus
-             userType:(uint8_t)userType
-                  pin:(NSString *)pin
-    completionHandler:(ResponseHandler)completionHandler
+- (void)setPin:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType pin:(NSString *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterSetPinResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterSetPinResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterSetPinResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterSetPinResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5513,23 +5257,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*)[pin dataUsingEncoding:NSUTF8StringEncoding].bytes, [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setRfid:(uint16_t)userId
-           userStatus:(uint8_t)userStatus
-             userType:(uint8_t)userType
-                   id:(NSString *)id
-    completionHandler:(ResponseHandler)completionHandler
+- (void)setRfid:(uint16_t)userId userStatus:(uint8_t)userStatus userType:(uint8_t)userType id:(NSString *)id completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterSetRfidResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterSetRfidResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterSetRfidResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterSetRfidResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5542,9 +5279,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-        chip::ByteSpan((const uint8_t *) [id dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [id lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType, chip::ByteSpan((const uint8_t*)[id dataUsingEncoding:NSUTF8StringEncoding].bytes, [id lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5553,8 +5288,7 @@ private:
 }
 - (void)setUserType:(uint16_t)userId userType:(uint8_t)userType completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterSetUserTypeResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterSetUserTypeResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterSetUserTypeResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterSetUserTypeResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5574,17 +5308,9 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setWeekdaySchedule:(uint8_t)scheduleId
-                    userId:(uint16_t)userId
-                  daysMask:(uint8_t)daysMask
-                 startHour:(uint8_t)startHour
-               startMinute:(uint8_t)startMinute
-                   endHour:(uint8_t)endHour
-                 endMinute:(uint8_t)endMinute
-         completionHandler:(ResponseHandler)completionHandler
+- (void)setWeekdaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId daysMask:(uint8_t)daysMask startHour:(uint8_t)startHour startMinute:(uint8_t)startMinute endHour:(uint8_t)endHour endMinute:(uint8_t)endMinute completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5597,22 +5323,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setYeardaySchedule:(uint8_t)scheduleId
-                    userId:(uint16_t)userId
-            localStartTime:(uint32_t)localStartTime
-              localEndTime:(uint32_t)localEndTime
-         completionHandler:(ResponseHandler)completionHandler
+- (void)setYeardaySchedule:(uint8_t)scheduleId userId:(uint16_t)userId localStartTime:(uint32_t)localStartTime localEndTime:(uint32_t)localEndTime completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5625,8 +5345,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
+    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5635,8 +5354,7 @@ private:
 }
 - (void)unlockDoor:(NSString *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5649,9 +5367,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)[pin dataUsingEncoding:NSUTF8StringEncoding].bytes, [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5660,8 +5376,7 @@ private:
 }
 - (void)unlockWithTimeout:(uint16_t)timeoutInSeconds pin:(NSString *)pin completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge * onSuccess
-        = new CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge * onSuccess = new CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5674,9 +5389,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds,
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds, chip::ByteSpan((const uint8_t*)[pin dataUsingEncoding:NSUTF8StringEncoding].bytes, [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5707,9 +5420,7 @@ private:
     }
 }
 
-- (void)configureAttributeLockState:(uint16_t)minInterval
-                        maxInterval:(uint16_t)maxInterval
-                  completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeLockState:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -5724,8 +5435,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5733,7 +5444,7 @@ private:
     }
 }
 
-- (void)reportAttributeLockState:(ResponseHandler)reportHandler
+- (void) reportAttributeLockState:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -5773,8 +5484,7 @@ private:
 
 - (void)readAttributeActuatorEnabled:(ResponseHandler)completionHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onSuccess
-        = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5818,26 +5528,24 @@ private:
     }
 }
 
+
 @end
 
-@interface CHIPGeneralCommissioning ()
-@property (readonly) Controller::GeneralCommissioningCluster cppCluster;
+
+@interface CHIPFabric ()
+@property (readonly) Controller::FabricCluster cppCluster;
 @end
 
-@implementation CHIPGeneralCommissioning
+@implementation CHIPFabric
 
 - (Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
 }
 
-- (void)armFailSafe:(uint16_t)expiryLengthSeconds
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
+- (void)getFabricId:(ResponseHandler)completionHandler
 {
-    CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge * onSuccess
-        = new CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPFabricClusterGetFabricIdResponseCallbackBridge * onSuccess = new CHIPFabricClusterGetFabricIdResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5850,8 +5558,135 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ArmFailSafe(onSuccess->Cancel(), onFailure->Cancel(), expiryLengthSeconds, breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.GetFabricId(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)removeFabric:(uint64_t)fabricId nodeId:(uint64_t)nodeId vendorId:(uint16_t)vendorId completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.RemoveFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricId, nodeId, vendorId);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)updateFabricLabel:(NSData *)fabricLabel completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.UpdateFabricLabel(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)fabricLabel.bytes, fabricLabel.length));
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeFabricsList:(ResponseHandler)completionHandler
+{
+    CHIPFabricFabricsListAttributeCallbackBridge * onSuccess = new CHIPFabricFabricsListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeFabricsList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+
+@end
+
+
+@interface CHIPGeneralCommissioning ()
+@property (readonly) Controller::GeneralCommissioningCluster cppCluster;
+@end
+
+@implementation CHIPGeneralCommissioning
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)armFailSafe:(uint16_t)expiryLengthSeconds breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge * onSuccess = new CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ArmFailSafe(onSuccess->Cancel(), onFailure->Cancel(), expiryLengthSeconds, breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5860,8 +5695,7 @@ private:
 }
 - (void)commissioningComplete:(ResponseHandler)completionHandler
 {
-    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * onSuccess
-        = new CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * onSuccess = new CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5881,14 +5715,9 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setFabric:(NSData *)fabricId
-         fabricSecret:(NSData *)fabricSecret
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
+- (void)setFabric:(NSData *)fabricId fabricSecret:(NSData *)fabricSecret breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * onSuccess
-        = new CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * onSuccess = new CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5901,9 +5730,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) fabricId.bytes, fabricId.length),
-        chip::ByteSpan((const uint8_t *) fabricSecret.bytes, fabricSecret.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)fabricId.bytes, fabricId.length), chip::ByteSpan((const uint8_t*)fabricSecret.bytes, fabricSecret.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5913,8 +5740,7 @@ private:
 
 - (void)readAttributeFabricId:(ResponseHandler)completionHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], true);
+    CHIPStringAttributeCallbackBridge * onSuccess = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue],true);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5974,7 +5800,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeBreadcrumb(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -6004,7 +5830,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPGroupKeyManagement ()
 @property (readonly) Controller::GroupKeyManagementCluster cppCluster;
@@ -6017,10 +5845,10 @@ private:
     return &_cppCluster;
 }
 
+
 - (void)readAttributeGroups:(ResponseHandler)completionHandler
 {
-    CHIPGroupKeyManagementGroupsAttributeCallbackBridge * onSuccess
-        = new CHIPGroupKeyManagementGroupsAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGroupKeyManagementGroupsAttributeCallbackBridge * onSuccess = new CHIPGroupKeyManagementGroupsAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6043,8 +5871,7 @@ private:
 
 - (void)readAttributeGroupKeys:(ResponseHandler)completionHandler
 {
-    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * onSuccess
-        = new CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * onSuccess = new CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6088,7 +5915,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPGroups ()
 @property (readonly) Controller::GroupsCluster cppCluster;
@@ -6103,8 +5932,7 @@ private:
 
 - (void)addGroup:(uint16_t)groupId groupName:(NSString *)groupName completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGroupsClusterAddGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterAddGroupResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6117,9 +5945,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId,
-        chip::ByteSpan((const uint8_t *) [groupName dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId, chip::ByteSpan((const uint8_t*)[groupName dataUsingEncoding:NSUTF8StringEncoding].bytes, [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6141,9 +5967,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId,
-        chip::ByteSpan((const uint8_t *) [groupName dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    CHIP_ERROR err = self.cppCluster.AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId, chip::ByteSpan((const uint8_t*)[groupName dataUsingEncoding:NSUTF8StringEncoding].bytes, [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6152,8 +5976,7 @@ private:
 }
 - (void)getGroupMembership:(uint8_t)groupCount groupList:(uint16_t)groupList completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge * onSuccess = new CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6197,8 +6020,7 @@ private:
 }
 - (void)removeGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGroupsClusterRemoveGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterRemoveGroupResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6220,8 +6042,7 @@ private:
 }
 - (void)viewGroup:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess
-        = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGroupsClusterViewGroupResponseCallbackBridge * onSuccess = new CHIPGroupsClusterViewGroupResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6288,7 +6109,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPIdentify ()
 @property (readonly) Controller::IdentifyCluster cppCluster;
@@ -6325,8 +6148,7 @@ private:
 }
 - (void)identifyQuery:(ResponseHandler)completionHandler
 {
-    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess
-        = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge * onSuccess = new CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6386,7 +6208,7 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), value);
-    if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -6416,7 +6238,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPLevelControl ()
 @property (readonly) Controller::LevelControlCluster cppCluster;
@@ -6429,11 +6253,7 @@ private:
     return &_cppCluster;
 }
 
-- (void)move:(uint8_t)moveMode
-                 rate:(uint8_t)rate
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)move:(uint8_t)moveMode rate:(uint8_t)rate optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -6455,11 +6275,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToLevel:(uint8_t)level
-       transitionTime:(uint16_t)transitionTime
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)moveToLevel:(uint8_t)level transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -6474,17 +6290,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
+    CHIP_ERROR err = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)moveToLevelWithOnOff:(uint8_t)level
-              transitionTime:(uint16_t)transitionTime
-           completionHandler:(ResponseHandler)completionHandler
+- (void)moveToLevelWithOnOff:(uint8_t)level transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -6528,12 +6341,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)step:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
-           optionMask:(uint8_t)optionMask
-       optionOverride:(uint8_t)optionOverride
-    completionHandler:(ResponseHandler)completionHandler
+- (void)step:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime optionMask:(uint8_t)optionMask optionOverride:(uint8_t)optionOverride completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -6548,18 +6356,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Step(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    CHIP_ERROR err = self.cppCluster.Step(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)stepWithOnOff:(uint8_t)stepMode
-             stepSize:(uint8_t)stepSize
-       transitionTime:(uint16_t)transitionTime
-    completionHandler:(ResponseHandler)completionHandler
+- (void)stepWithOnOff:(uint8_t)stepMode stepSize:(uint8_t)stepSize transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -6649,10 +6453,7 @@ private:
     }
 }
 
-- (void)configureAttributeCurrentLevel:(uint16_t)minInterval
-                           maxInterval:(uint16_t)maxInterval
-                                change:(uint8_t)change
-                     completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeCurrentLevel:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(uint8_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -6667,8 +6468,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6676,7 +6477,7 @@ private:
     }
 }
 
-- (void)reportAttributeCurrentLevel:(ResponseHandler)reportHandler
+- (void) reportAttributeCurrentLevel:(ResponseHandler)reportHandler
 {
     CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -6714,7 +6515,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPLowPower ()
 @property (readonly) Controller::LowPowerCluster cppCluster;
@@ -6773,7 +6576,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPNetworkCommissioning ()
 @property (readonly) Controller::NetworkCommissioningCluster cppCluster;
@@ -6786,13 +6591,9 @@ private:
     return &_cppCluster;
 }
 
-- (void)addThreadNetwork:(NSData *)operationalDataset
-              breadcrumb:(uint64_t)breadcrumb
-               timeoutMs:(uint32_t)timeoutMs
-       completionHandler:(ResponseHandler)completionHandler
+- (void)addThreadNetwork:(NSData *)operationalDataset breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6805,22 +6606,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)addWiFiNetwork:(NSData *)ssid
-           credentials:(NSData *)credentials
-            breadcrumb:(uint64_t)breadcrumb
-             timeoutMs:(uint32_t)timeoutMs
-     completionHandler:(ResponseHandler)completionHandler
+- (void)addWiFiNetwork:(NSData *)ssid credentials:(NSData *)credentials breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6833,22 +6628,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
-        chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)ssid.bytes, ssid.length), chip::ByteSpan((const uint8_t*)credentials.bytes, credentials.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)disableNetwork:(NSData *)networkID
-            breadcrumb:(uint64_t)breadcrumb
-             timeoutMs:(uint32_t)timeoutMs
-     completionHandler:(ResponseHandler)completionHandler
+- (void)disableNetwork:(NSData *)networkID breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6861,21 +6650,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)networkID.bytes, networkID.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)enableNetwork:(NSData *)networkID
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
+- (void)enableNetwork:(NSData *)networkID breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6888,8 +6672,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)networkID.bytes, networkID.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6918,13 +6701,9 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)removeNetwork:(NSData *)networkID
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
+- (void)removeNetwork:(NSData *)networkID breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6937,21 +6716,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)networkID.bytes, networkID.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)scanNetworks:(NSData *)ssid
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
+- (void)scanNetworks:(NSData *)ssid breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6964,21 +6738,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ScanNetworks(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.ScanNetworks(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)ssid.bytes, ssid.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)updateThreadNetwork:(NSData *)operationalDataset
-                 breadcrumb:(uint64_t)breadcrumb
-                  timeoutMs:(uint32_t)timeoutMs
-          completionHandler:(ResponseHandler)completionHandler
+- (void)updateThreadNetwork:(NSData *)operationalDataset breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6991,22 +6760,16 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)updateWiFiNetwork:(NSData *)ssid
-              credentials:(NSData *)credentials
-               breadcrumb:(uint64_t)breadcrumb
-                timeoutMs:(uint32_t)timeoutMs
-        completionHandler:(ResponseHandler)completionHandler
+- (void)updateWiFiNetwork:(NSData *)ssid credentials:(NSData *)credentials breadcrumb:(uint64_t)breadcrumb timeoutMs:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * onSuccess
-        = new CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge * onSuccess = new CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7019,9 +6782,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
-        chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)ssid.bytes, ssid.length), chip::ByteSpan((const uint8_t*)credentials.bytes, credentials.length), breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7052,7 +6813,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPOnOff ()
 @property (readonly) Controller::OnOffCluster cppCluster;
@@ -7134,8 +6897,7 @@ private:
 
 - (void)readAttributeOnOff:(ResponseHandler)completionHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onSuccess
-        = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7156,9 +6918,7 @@ private:
     }
 }
 
-- (void)configureAttributeOnOff:(uint16_t)minInterval
-                    maxInterval:(uint16_t)maxInterval
-              completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeOnOff:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -7173,6 +6933,7 @@ private:
         return;
     }
 
+
     CHIP_ERROR err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
@@ -7181,10 +6942,9 @@ private:
     }
 }
 
-- (void)reportAttributeOnOff:(ResponseHandler)reportHandler
+- (void) reportAttributeOnOff:(ResponseHandler)reportHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onReport
-        = new CHIPBooleanAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
+    CHIPBooleanAttributeCallbackBridge * onReport = new CHIPBooleanAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
         reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7220,7 +6980,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPScenes ()
 @property (readonly) Controller::ScenesCluster cppCluster;
@@ -7233,17 +6995,9 @@ private:
     return &_cppCluster;
 }
 
-- (void)addScene:(uint16_t)groupId
-              sceneId:(uint8_t)sceneId
-       transitionTime:(uint16_t)transitionTime
-            sceneName:(NSString *)sceneName
-            clusterId:(uint16_t)clusterId
-               length:(uint8_t)length
-                value:(uint8_t)value
-    completionHandler:(ResponseHandler)completionHandler
+- (void)addScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime sceneName:(NSString *)sceneName clusterId:(uint16_t)clusterId length:(uint8_t)length value:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPScenesClusterAddSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterAddSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7256,10 +7010,7 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime,
-        chip::ByteSpan((const uint8_t *) [sceneName dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [sceneName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
-        clusterId, length, value);
+    CHIP_ERROR err = self.cppCluster.AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime, chip::ByteSpan((const uint8_t*)[sceneName dataUsingEncoding:NSUTF8StringEncoding].bytes, [sceneName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]), clusterId, length, value);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7268,8 +7019,7 @@ private:
 }
 - (void)getSceneMembership:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPScenesClusterGetSceneMembershipResponseCallbackBridge * onSuccess = new CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7289,10 +7039,7 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)recallScene:(uint16_t)groupId
-              sceneId:(uint8_t)sceneId
-       transitionTime:(uint16_t)transitionTime
-    completionHandler:(ResponseHandler)completionHandler
+- (void)recallScene:(uint16_t)groupId sceneId:(uint8_t)sceneId transitionTime:(uint16_t)transitionTime completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -7316,8 +7063,7 @@ private:
 }
 - (void)removeAllScenes:(uint16_t)groupId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPScenesClusterRemoveAllScenesResponseCallbackBridge * onSuccess = new CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7339,8 +7085,7 @@ private:
 }
 - (void)removeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPScenesClusterRemoveSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterRemoveSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7362,8 +7107,7 @@ private:
 }
 - (void)storeScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPScenesClusterStoreSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterStoreSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7385,8 +7129,7 @@ private:
 }
 - (void)viewScene:(uint16_t)groupId sceneId:(uint8_t)sceneId completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess
-        = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPScenesClusterViewSceneResponseCallbackBridge * onSuccess = new CHIPScenesClusterViewSceneResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7478,8 +7221,7 @@ private:
 
 - (void)readAttributeSceneValid:(ResponseHandler)completionHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onSuccess
-        = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -7546,7 +7288,9 @@ private:
     }
 }
 
+
 @end
+
 
 @interface CHIPTemperatureMeasurement ()
 @property (readonly) Controller::TemperatureMeasurementCluster cppCluster;
@@ -7558,6 +7302,7 @@ private:
 {
     return &_cppCluster;
 }
+
 
 - (void)readAttributeMeasuredValue:(ResponseHandler)completionHandler
 {
@@ -7582,10 +7327,7 @@ private:
     }
 }
 
-- (void)configureAttributeMeasuredValue:(uint16_t)minInterval
-                            maxInterval:(uint16_t)maxInterval
-                                 change:(int16_t)change
-                      completionHandler:(ResponseHandler)completionHandler
+- (void) configureAttributeMeasuredValue:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval change:(int16_t)change completionHandler:(ResponseHandler)completionHandler
 {
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
@@ -7600,8 +7342,8 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeMeasuredValue(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeMeasuredValue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7609,7 +7351,7 @@ private:
     }
 }
 
-- (void)reportAttributeMeasuredValue:(ResponseHandler)reportHandler
+- (void) reportAttributeMeasuredValue:(ResponseHandler)reportHandler
 {
     CHIPInt16sAttributeCallbackBridge * onReport = new CHIPInt16sAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
     if (!onReport) {
@@ -7693,4 +7435,6 @@ private:
     }
 }
 
+
 @end
+

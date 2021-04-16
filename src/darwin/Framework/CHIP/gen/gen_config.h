@@ -26,6 +26,7 @@
 /**** Network Section ****/
 #define EMBER_SUPPORTED_NETWORKS (1)
 
+
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
@@ -36,6 +37,7 @@
 #define EMBER_AF_COLOR_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DESCRIPTOR_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_DOOR_LOCK_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_FABRIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_GROUPS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -76,6 +78,10 @@
 // Use this macro to check if the client side of the Door Lock cluster is included
 #define ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_DOOR_LOCK_CLIENT
+
+// Use this macro to check if the client side of the Fabric cluster is included
+#define ZCL_USING_FABRIC_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_FABRIC_CLIENT
 
 // Use this macro to check if the client side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT

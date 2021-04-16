@@ -44,8 +44,7 @@ void copyListMember(uint8_t * dest, uint8_t * src, bool write, uint16_t * offset
     *offset = static_cast<uint16_t>(*offset + length);
 }
 
-uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
-                         int32_t index)
+uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src, int32_t index)
 {
     if (index == -1)
     {
@@ -58,12 +57,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         if (write)
         {
             // src is a pointer to native-endian uint16_t, dest is pointer to buffer that should hold little-endian value
-            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t *>(src));
+            emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t*>(src));
         }
         else
         {
             // src is pointer to buffer holding little-endian value, dest is a pointer to native-endian uint16_t
-            *reinterpret_cast<uint16_t *>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
+            *reinterpret_cast<uint16_t*>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
         }
         return kSizeLengthInBytes;
     }
@@ -82,113 +81,126 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0000: // device list
-        {
-            entryLength = 6;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0000: // device list
             {
-                ChipLogError(Zcl, "Index %l is invalid.", index);
-                return 0;
+                entryLength = 6;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                // Struct _DeviceType
+                _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
+                copyListMember(write ? dest : (uint8_t *)&entry->type, write ? (uint8_t *)&entry->type : src, write, &entryOffset, sizeof(entry->type)); // DEVICE_TYPE_ID
+                copyListMember(write ? dest : (uint8_t *)&entry->revision, write ? (uint8_t *)&entry->revision : src, write, &entryOffset, sizeof(entry->revision)); // INT16U
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            // Struct _DeviceType
-            _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->type, write ? (uint8_t *) &entry->type : src, write, &entryOffset,
-                           sizeof(entry->type)); // DEVICE_TYPE_ID
-            copyListMember(write ? dest : (uint8_t *) &entry->revision, write ? (uint8_t *) &entry->revision : src, write,
-                           &entryOffset, sizeof(entry->revision)); // INT16U
-            break;
-        }
-        case 0x0001: // server list
-        {
-            entryLength = 2;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0001: // server list
             {
-                ChipLogError(Zcl, "Index %l is invalid.", index);
-                return 0;
+                entryLength = 2;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
-            break;
-        }
-        case 0x0002: // client list
-        {
-            entryLength = 2;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0002: // client list
             {
-                ChipLogError(Zcl, "Index %l is invalid.", index);
-                return 0;
+                entryLength = 2;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
-            break;
-        }
-        case 0x0003: // parts list
-        {
-            entryLength = 1;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0003: // parts list
             {
-                ChipLogError(Zcl, "Index %l is invalid.", index);
-                return 0;
+                entryLength = 1;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_ID
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_ID
-            break;
-        }
-        }
-        break;
+      }
+      break;
+    }
+    case 0xFC03: // Fabric Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+            case 0x0000: // fabrics list
+            {
+                entryLength = 50;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                // Struct _FabricDescriptor
+                _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+                copyListMember(write ? dest : (uint8_t *)&entry->FabricId, write ? (uint8_t *)&entry->FabricId : src, write, &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
+                copyListMember(write ? dest : (uint8_t *)&entry->label, write ? (uint8_t *)&entry->label : src, write, &entryOffset, 32); // OCTET_STRING
+                copyListMember(write ? dest : (uint8_t *)&entry->NodeId, write ? (uint8_t *)&entry->NodeId : src, write, &entryOffset, sizeof(entry->NodeId)); // NODE_ID
+                break;
+            }
+      }
+      break;
     }
     case 0xF004: // Group Key Management Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0000: // groups
-        {
-            entryLength = 6;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0000: // groups
             {
-                ChipLogError(Zcl, "Index %l is invalid.", index);
-                return 0;
+                entryLength = 6;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                // Struct _GroupState
+                _GroupState * entry = reinterpret_cast<_GroupState *>(write ? src : dest);
+                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
+                copyListMember(write ? dest : (uint8_t *)&entry->VendorGroupId, write ? (uint8_t *)&entry->VendorGroupId : src, write, &entryOffset, sizeof(entry->VendorGroupId)); // INT16U
+                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeySetIndex, write ? (uint8_t *)&entry->GroupKeySetIndex : src, write, &entryOffset, sizeof(entry->GroupKeySetIndex)); // INT16U
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            // Struct _GroupState
-            _GroupState * entry = reinterpret_cast<_GroupState *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
-                           &entryOffset, sizeof(entry->VendorId)); // INT16U
-            copyListMember(write ? dest : (uint8_t *) &entry->VendorGroupId, write ? (uint8_t *) &entry->VendorGroupId : src, write,
-                           &entryOffset, sizeof(entry->VendorGroupId)); // INT16U
-            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeySetIndex, write ? (uint8_t *) &entry->GroupKeySetIndex : src,
-                           write, &entryOffset, sizeof(entry->GroupKeySetIndex)); // INT16U
-            break;
-        }
-        case 0x0001: // group keys
-        {
-            entryLength = 29;
-            if (((index - 1) * entryLength) > (am->size - entryLength))
+            case 0x0001: // group keys
             {
-                ChipLogError(Zcl, "Index %l is invalid.", index);
-                return 0;
+                entryLength = 29;
+                if (((index - 1) * entryLength) > (am->size - entryLength))
+                {
+                    ChipLogError(Zcl, "Index %l is invalid.", index);
+                    return 0;
+                }
+                entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+                // Struct _GroupKey
+                _GroupKey * entry = reinterpret_cast<_GroupKey *>(write ? src : dest);
+                copyListMember(write ? dest : (uint8_t *)&entry->VendorId, write ? (uint8_t *)&entry->VendorId : src, write, &entryOffset, sizeof(entry->VendorId)); // INT16U
+                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeyIndex, write ? (uint8_t *)&entry->GroupKeyIndex : src, write, &entryOffset, sizeof(entry->GroupKeyIndex)); // INT16U
+                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeyRoot, write ? (uint8_t *)&entry->GroupKeyRoot : src, write, &entryOffset, 16); // OCTET_STRING
+                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeyEpochStartTime, write ? (uint8_t *)&entry->GroupKeyEpochStartTime : src, write, &entryOffset, sizeof(entry->GroupKeyEpochStartTime)); // INT64U
+                copyListMember(write ? dest : (uint8_t *)&entry->GroupKeySecurityPolicy, write ? (uint8_t *)&entry->GroupKeySecurityPolicy : src, write, &entryOffset, sizeof(entry->GroupKeySecurityPolicy)); // GroupKeySecurityPolicy
+                break;
             }
-            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
-            // Struct _GroupKey
-            _GroupKey * entry = reinterpret_cast<_GroupKey *>(write ? src : dest);
-            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
-                           &entryOffset, sizeof(entry->VendorId)); // INT16U
-            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyIndex, write ? (uint8_t *) &entry->GroupKeyIndex : src, write,
-                           &entryOffset, sizeof(entry->GroupKeyIndex)); // INT16U
-            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyRoot, write ? (uint8_t *) &entry->GroupKeyRoot : src, write,
-                           &entryOffset, 16); // OCTET_STRING
-            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyEpochStartTime,
-                           write ? (uint8_t *) &entry->GroupKeyEpochStartTime : src, write, &entryOffset,
-                           sizeof(entry->GroupKeyEpochStartTime)); // INT64U
-            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeySecurityPolicy,
-                           write ? (uint8_t *) &entry->GroupKeySecurityPolicy : src, write, &entryOffset,
-                           sizeof(entry->GroupKeySecurityPolicy)); // GroupKeySecurityPolicy
-            break;
-        }
-        }
-        break;
+      }
+      break;
     }
     }
 
@@ -212,37 +224,46 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x001D: // Descriptor Cluster
         switch (attributeId)
         {
-        case 0x0000: // device list
+            case 0x0000: // device list
             // Struct _DeviceType
             entryLength = 6;
             break;
-        case 0x0001: // server list
+            case 0x0001: // server list
             // chip::ClusterId
             entryLength = 2;
             break;
-        case 0x0002: // client list
+            case 0x0002: // client list
             // chip::ClusterId
             entryLength = 2;
             break;
-        case 0x0003: // parts list
+            case 0x0003: // parts list
             // chip::EndpointId
             entryLength = 1;
             break;
         }
-        break;
+    break;
+    case 0xFC03: // Fabric Cluster
+        switch (attributeId)
+        {
+            case 0x0000: // fabrics list
+            // Struct _FabricDescriptor
+            entryLength = 50;
+            break;
+        }
+    break;
     case 0xF004: // Group Key Management Cluster
         switch (attributeId)
         {
-        case 0x0000: // groups
+            case 0x0000: // groups
             // Struct _GroupState
             entryLength = 6;
             break;
-        case 0x0001: // group keys
+            case 0x0001: // group keys
             // Struct _GroupKey
             entryLength = 29;
             break;
         }
-        break;
+    break;
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);
