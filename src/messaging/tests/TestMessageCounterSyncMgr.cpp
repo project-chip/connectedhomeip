@@ -228,7 +228,8 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, &mockAppDelegate);
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq,
+                                                                            &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));

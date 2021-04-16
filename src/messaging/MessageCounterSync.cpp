@@ -41,16 +41,15 @@ CHIP_ERROR MessageCounterSyncMgr::Init(Messaging::ExchangeManager * exchangeMgr)
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
-    // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    // TODO: Register for specific message types, as CASE and PASE share the same protocol ID
-    return mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
+    // Register to receive unsolicited Message Counter Synchronization Request messages from the exchange manager.
+    return mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, this);
 }
 
 void MessageCounterSyncMgr::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
         mExchangeMgr = nullptr;
     }
 }
