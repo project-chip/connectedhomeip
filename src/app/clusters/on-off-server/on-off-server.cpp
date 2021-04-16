@@ -166,7 +166,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool emberAfOnOffClusterOffCallback(chip::app::Command * apCommandObj)
+bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_OFF_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -179,7 +179,7 @@ bool emberAfOnOffClusterOffCallback(chip::app::Command * apCommandObj)
     return true;
 }
 
-bool emberAfOnOffClusterOnCallback(chip::app::Command * apCommandObj)
+bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_ON_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -192,7 +192,7 @@ bool emberAfOnOffClusterOnCallback(chip::app::Command * apCommandObj)
     return true;
 }
 
-bool emberAfOnOffClusterToggleCallback(chip::app::Command * apCommandObj)
+bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER

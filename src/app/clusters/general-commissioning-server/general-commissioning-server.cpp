@@ -27,7 +27,7 @@
 
 using namespace chip;
 
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * apCommandObj, uint16_t expiryLengthSeconds,
+bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
                                                            uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
@@ -35,15 +35,15 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * 
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::Command * apCommandObj)
+bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetFabricCallback(chip::app::Command * apCommandObj, ByteSpan fabricId,
-                                                         ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfGeneralCommissioningClusterSetFabricCallback(chip::app::Command * commandObj, ByteSpan fabricId, ByteSpan fabricSecret,
+                                                         uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

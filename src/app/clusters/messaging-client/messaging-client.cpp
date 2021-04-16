@@ -121,7 +121,7 @@ void emberAfMessagingClusterClientTickCallback(EndpointId endpoint)
     }
 }
 
-bool emberAfMessagingClusterDisplayMessageCallback(chip::app::Command * apCommandObj, uint32_t messageId, uint8_t messageControl,
+bool emberAfMessagingClusterDisplayMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl,
                                                    uint32_t startTime, uint16_t durationInMinutes, uint8_t * msg,
                                                    uint8_t optionalExtendedMessageControl)
 {
@@ -242,7 +242,7 @@ kickout:
     return true;
 }
 
-bool emberAfMessagingClusterCancelMessageCallback(chip::app::Command * apCommandObj, uint32_t messageId, uint8_t messageControl)
+bool emberAfMessagingClusterCancelMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
     uint8_t ep          = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);

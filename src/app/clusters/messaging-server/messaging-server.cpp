@@ -86,7 +86,7 @@ void emberAfMessagingClusterServerInitCallback(EndpointId endpoint)
     msgTable[ep].messageStatusControl &= ~VALID;
 }
 
-bool emberAfMessagingClusterGetLastMessageCallback(chip::app::Command * apCommandObj)
+bool emberAfMessagingClusterGetLastMessageCallback(chip::app::Command * commandObj)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
     EmberAfPluginMessagingServerMessage message;
@@ -109,10 +109,10 @@ bool emberAfMessagingClusterGetLastMessageCallback(chip::app::Command * apComman
 #if defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_0) || defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1B) ||                                   \
     defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_0) || defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1) ||                                    \
     defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1A)
-bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * apCommandObj, uint32_t messageId,
+bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * commandObj, uint32_t messageId,
                                                         uint32_t confirmationTime)
 #else
-bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * apCommandObj, uint32_t messageId,
+bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * commandObj, uint32_t messageId,
                                                         uint32_t confirmationTime, uint8_t messageConfirmationControl,
                                                         uint8_t * messageResponse)
 #endif

@@ -41,7 +41,7 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * apCommandObj, unsigned char *, unsigned char *)
+bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, unsigned char *, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

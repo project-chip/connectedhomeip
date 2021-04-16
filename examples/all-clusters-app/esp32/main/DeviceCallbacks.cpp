@@ -175,7 +175,7 @@ exit:
     return;
 }
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command *)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;

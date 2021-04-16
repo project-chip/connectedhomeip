@@ -41,14 +41,14 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * apCommandObj, unsigned char *)
+bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * commandObj, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * apCommandObj, unsigned char *, unsigned char *)
+bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * commandObj, unsigned char *, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

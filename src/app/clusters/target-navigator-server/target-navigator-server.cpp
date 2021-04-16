@@ -41,7 +41,7 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * apCommandObj, unsigned char, unsigned char *)
+bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * commandObj, unsigned char, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
