@@ -70,8 +70,8 @@ bool emberAfScenesClusterEnhancedViewSceneCallback(chip::app::Command * commandO
     return emberAfPluginScenesServerParseViewScene(emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterCopySceneCallback(chip::app::Command * commandObj, uint8_t mode, uint16_t groupIdFrom,
-                                           uint8_t sceneIdFrom, uint16_t groupIdTo, uint8_t sceneIdTo)
+bool emberAfScenesClusterCopySceneCallback(chip::app::Command * commandObj, uint8_t mode, uint16_t groupIdFrom, uint8_t sceneIdFrom,
+                                           uint16_t groupIdTo, uint8_t sceneIdTo)
 {
     EmberStatus sendStatus;
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;

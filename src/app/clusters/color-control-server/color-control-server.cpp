@@ -574,7 +574,7 @@ bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj
     switch (hueMoveMode)
     {
     case EMBER_ZCL_HUE_DIRECTION_SHORTEST_DISTANCE:
-        if (((uint8_t) (currentHue - hue)) > HALF_MAX_UINT8T)
+        if (((uint8_t)(currentHue - hue)) > HALF_MAX_UINT8T)
         {
             direction = MOVE_MODE_UP;
         }
@@ -584,7 +584,7 @@ bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj
         }
         break;
     case EMBER_ZCL_HUE_DIRECTION_LONGEST_DISTANCE:
-        if (((uint8_t) (currentHue - hue)) > HALF_MAX_UINT8T)
+        if (((uint8_t)(currentHue - hue)) > HALF_MAX_UINT8T)
         {
             direction = MOVE_MODE_DOWN;
         }
@@ -968,7 +968,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj
     else
     {
         colorXTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t) (rateX * -1);
+        unsignedRate                     = (uint16_t)(rateX * -1);
     }
     transitionTimeX                      = computeTransitionTimeFromStateAndRate(&colorXTransitionState, unsignedRate);
     colorXTransitionState.stepsRemaining = transitionTimeX;
@@ -987,7 +987,7 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj
     else
     {
         colorYTransitionState.finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                     = (uint16_t) (rateY * -1);
+        unsignedRate                     = (uint16_t)(rateY * -1);
     }
     transitionTimeY                      = computeTransitionTimeFromStateAndRate(&colorYTransitionState, unsignedRate);
     colorYTransitionState.stepsRemaining = transitionTimeY;
@@ -1388,8 +1388,8 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint
         else
         {
             uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel) /
-                (uint32_t) (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
-            newColorTemp = (uint16_t) ((uint32_t) tempPhysMax - tempDelta);
+                (uint32_t)(MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+            newColorTemp = (uint16_t)((uint32_t) tempPhysMax - tempDelta);
         }
 
         // Apply new color temp.
@@ -1536,15 +1536,15 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
     else if (p->up)
     {
         newHue32 = (uint32_t) subtractHue(p->finalHue, p->initialHue);
-        newHue32 *= ((uint32_t) (p->stepsRemaining));
-        newHue32 /= ((uint32_t) (p->stepsTotal));
+        newHue32 *= ((uint32_t)(p->stepsRemaining));
+        newHue32 /= ((uint32_t)(p->stepsTotal));
         p->currentHue = subtractHue((uint8_t) p->finalHue, (uint8_t) newHue32);
     }
     else
     {
         newHue32 = (uint32_t) subtractHue(p->initialHue, p->finalHue);
-        newHue32 *= ((uint32_t) (p->stepsRemaining));
-        newHue32 /= ((uint32_t) (p->stepsTotal));
+        newHue32 *= ((uint32_t)(p->stepsRemaining));
+        newHue32 /= ((uint32_t)(p->stepsTotal));
 
         p->currentHue = addHue((uint8_t) p->finalHue, (uint8_t) newHue32);
     }
@@ -1629,16 +1629,16 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
     }
     else if (p->finalValue > p->initialValue)
     {
-        newValue32u = ((uint32_t) (p->finalValue - p->initialValue));
-        newValue32u *= ((uint32_t) (p->stepsRemaining));
-        newValue32u /= ((uint32_t) (p->stepsTotal));
+        newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
+        newValue32u *= ((uint32_t)(p->stepsRemaining));
+        newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
     }
     else
     {
-        newValue32u = ((uint32_t) (p->initialValue - p->finalValue));
-        newValue32u *= ((uint32_t) (p->stepsRemaining));
-        newValue32u /= ((uint32_t) (p->stepsTotal));
+        newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
+        newValue32u *= ((uint32_t)(p->stepsRemaining));
+        newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
     }
 

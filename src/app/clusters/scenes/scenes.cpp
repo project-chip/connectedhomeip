@@ -717,7 +717,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
     if (enhanced)
     {
         entry.transitionTime      = transitionTime / 10;
-        entry.transitionTime100ms = (uint8_t) (transitionTime - entry.transitionTime * 10);
+        entry.transitionTime100ms = (uint8_t)(transitionTime - entry.transitionTime * 10);
     }
     else
     {
