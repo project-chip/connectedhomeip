@@ -56,7 +56,7 @@ CHIP_ERROR WriteResponse::Parser::CheckSchemaValidity() const
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    StatusList::Parser statusList;
+    AttributeStatusList::Parser attributeStatusList;
     PRETTY_PRINT("WriteResponse =");
     PRETTY_PRINT("{");
 
@@ -68,16 +68,16 @@ CHIP_ERROR WriteResponse::Parser::CheckSchemaValidity() const
         VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
-        case kCsTag_StatusList:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_StatusList);
+        case kCsTag_AttributeStatusList:
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeStatusList)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_AttributeStatusList);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-            statusList.Init(reader);
+            attributeStatusList.Init(reader);
 
             PRETTY_PRINT_INCDEPTH();
 
-            err = statusList.CheckSchemaValidity();
+            err = attributeStatusList.CheckSchemaValidity();
             SuccessOrExit(err);
 
             PRETTY_PRINT_DECDEPTH();
@@ -103,17 +103,17 @@ exit:
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR WriteResponse::Parser::GetStatusList(StatusList::Parser * const apStatusList) const
+CHIP_ERROR WriteResponse::Parser::GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
 
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusList), reader);
+    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeStatusList), reader);
     SuccessOrExit(err);
 
     VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
-    err = apStatusList->Init(reader);
+    err = apAttributeStatusList->Init(reader);
     SuccessOrExit(err);
 
 exit:
@@ -127,16 +127,16 @@ CHIP_ERROR WriteResponse::Builder::Init(chip::TLV::TLVWriter * const apWriter)
     return InitAnonymousStructure(apWriter);
 }
 
-StatusList::Builder & WriteResponse::Builder::CreateStatusListBuilder()
+AttributeStatusList::Builder & WriteResponse::Builder::CreateAttributeStatusListBuilder()
 {
     // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusListBuilder.ResetError(mError));
+    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeStatusListBuilder.ResetError(mError));
 
-    mError = mStatusListBuilder.Init(mpWriter, kCsTag_StatusList);
+    mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
     ChipLogFunctError(mError);
 
 exit:
-    return mStatusListBuilder;
+    return mAttributeStatusListBuilder;
 }
 
 WriteResponse::Builder & WriteResponse::Builder::EndOfWriteResponse()
