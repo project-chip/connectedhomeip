@@ -1827,6 +1827,104 @@ CHIP_ERROR chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(chip::C
 }
 
 // End of Cluster TemperatureMeasurement
+// Cluster Thermostat
+
+CHIP_ERROR chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ClearWeeklySchedule(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_AppendCommand_Thermostat_GetRelayStatusLog(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.GetRelayStatusLog(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_AppendCommand_Thermostat_GetWeeklySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId, uint8_t daysToReturn, uint8_t modeToReturn)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.GetWeeklySchedule(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), daysToReturn,
+                                     modeToReturn);
+}
+CHIP_ERROR chip_ime_AppendCommand_Thermostat_SetWeeklySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId, uint8_t numberOfTransitionsForSequence,
+                                                               uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                                               uint8_t payload)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.SetWeeklySchedule(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                     numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload);
+}
+CHIP_ERROR chip_ime_AppendCommand_Thermostat_SetpointRaiseLower(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId, uint8_t mode, int8_t amount)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.SetpointRaiseLower(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), mode, amount);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_LocalTemperature(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                              chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeLocalTemperature(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOccupiedCoolingSetpoint(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOccupiedHeatingSetpoint(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(chip::Controller::Device * device,
+                                                                        chip::EndpointId ZCLendpointId,
+                                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeControlSequenceOfOperation(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_SystemMode(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                        chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeSystemMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+CHIP_ERROR chip_ime_ReadAttribute_Thermostat_ClusterRevision(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                             chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::ThermostatCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster Thermostat
 // Cluster WindowCovering
 
 CHIP_ERROR chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(chip::Controller::Device * device,

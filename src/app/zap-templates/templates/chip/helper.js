@@ -462,7 +462,8 @@ function asObjectiveCNumberType(label, type)
   {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      switch (zclType) {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
       case 'uint8_t':
         return 'UnsignedChar';
       case 'uint16_t':

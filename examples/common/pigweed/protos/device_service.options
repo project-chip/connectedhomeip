@@ -1,0 +1,2 @@
+
+chip.rpc.DeviceInfo.serial_number max_size:32  // length defined in chip spec 8.2.3.1

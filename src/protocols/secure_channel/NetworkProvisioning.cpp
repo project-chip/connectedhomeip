@@ -69,7 +69,7 @@ void NetworkProvisioning::OnMessageReceived(Messaging::ExchangeContext * exchang
     // Currently, the only mechanism to get this callback is via unsolicited message handler.
     // That means that we now own the reference to exchange context. Let's free the reference since we no longer
     // need it.
-    exchangeContext->Release();
+    exchangeContext->Close();
 }
 
 CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf)
@@ -196,7 +196,7 @@ CHIP_ERROR NetworkProvisioning::SendMessageUsingExchange(uint8_t msgType, System
     VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INTERNAL);
     CHIP_ERROR err = exchangeContext->SendMessage(Protocols::NetworkProvisioning::Id, msgType, std::move(msgPayload),
                                                   Messaging::SendMessageFlags::kNoAutoRequestAck);
-    exchangeContext->Release();
+    exchangeContext->Close();
     return err;
 }
 

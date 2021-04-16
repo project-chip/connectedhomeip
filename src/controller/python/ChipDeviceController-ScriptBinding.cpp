@@ -49,7 +49,6 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
-#include <controller/DeviceAddressUpdater.h>
 #include <mdns/Resolver.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -80,8 +79,7 @@ chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 extern "C" {
 CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceCommissioner ** outDevCtrl,
                                                        chip::NodeId localDeviceId);
-CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
-                                                          chip::Controller::DeviceAddressUpdater * addressUpdater);
+CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl);
 CHIP_ERROR
 pychip_DeviceController_GetAddressAndPort(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId, char * outAddress,
                                           uint64_t maxAddressLen, uint16_t * outPort);
@@ -103,10 +101,6 @@ CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::DeviceCommissioner * devCtrl,
                                                           chip::Controller::DevicePairingDelegate_OnPairingCompleteFunct callback);
 
-// Discovery
-CHIP_ERROR pychip_DeviceAddressUpdater_New(chip::Controller::DeviceAddressUpdater ** outAddressUpdater,
-                                           chip::Controller::DeviceCommissioner * devCtrl);
-void pychip_DeviceAddressUpdater_Delete(chip::Controller::DeviceAddressUpdater * addressUpdater);
 void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
     chip::Controller::DeviceAddressUpdateDelegate_OnUpdateComplete callback);
 CHIP_ERROR pychip_Resolver_ResolveNode(uint64_t fabricid, chip::NodeId nodeid);
@@ -131,9 +125,8 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
                                                        chip::NodeId localDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ControllerInitParams initParams{
-        .storageDelegate = &sStorageDelegate,
-    };
+    ControllerInitParams initParams{ .storageDelegate              = &sStorageDelegate,
+                                     .mDeviceAddressUpdateDelegate = &sDeviceAddressUpdateDelegate };
 
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
@@ -154,18 +147,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId)
-{
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    ReturnErrorOnFailure(
-        DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true));
-#endif
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
-                                                          chip::Controller::DeviceAddressUpdater * addressUpdater)
+CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
 {
     if (devCtrl != NULL)
     {
@@ -283,28 +265,6 @@ pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::Devi
 {
     sPairingDelegate.SetKeyExchangeCallback(callback);
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR pychip_DeviceAddressUpdater_New(chip::Controller::DeviceAddressUpdater ** outAddressUpdater,
-                                           chip::Controller::DeviceCommissioner * devCtrl)
-{
-    auto addressUpdater = std::make_unique<chip::Controller::DeviceAddressUpdater>();
-
-    VerifyOrReturnError(addressUpdater.get() != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(addressUpdater->Init(devCtrl, &sDeviceAddressUpdateDelegate));
-    ReturnErrorOnFailure(Mdns::Resolver::Instance().SetResolverDelegate(addressUpdater.get()));
-
-    *outAddressUpdater = addressUpdater.release();
-    return CHIP_NO_ERROR;
-}
-
-void pychip_DeviceAddressUpdater_Delete(chip::Controller::DeviceAddressUpdater * addressUpdater)
-{
-    if (addressUpdater != nullptr)
-    {
-        Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
-        delete addressUpdater;
-    }
 }
 
 void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(

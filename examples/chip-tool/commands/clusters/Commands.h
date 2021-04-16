@@ -582,6 +582,7 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
+| Thermostat                                                          | 0x0201 |
 \*----------------------------------------------------------------------------*/
 
 constexpr chip::ClusterId kApplicationBasicClusterId       = 0x050D;
@@ -601,6 +602,7 @@ constexpr chip::ClusterId kNetworkCommissioningClusterId   = 0x0031;
 constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
 constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
 constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr chip::ClusterId kThermostatClusterId             = 0x0201;
 
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationBasic                                            | 0x050D |
@@ -9276,6 +9278,610 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster Thermostat                                                  | 0x0201 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ClearWeeklySchedule                                               |   0x03 |
+| * GetRelayStatusLog                                                 |   0x04 |
+| * GetWeeklySchedule                                                 |   0x02 |
+| * SetWeeklySchedule                                                 |   0x01 |
+| * SetpointRaiseLower                                                |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * LocalTemperature                                                  | 0x0000 |
+| * OccupiedCoolingSetpoint                                           | 0x0011 |
+| * OccupiedHeatingSetpoint                                           | 0x0012 |
+| * ControlSequenceOfOperation                                        | 0x001B |
+| * SystemMode                                                        | 0x001C |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ClearWeeklySchedule
+ */
+class ThermostatClearWeeklySchedule : public ModelCommand
+{
+public:
+    ThermostatClearWeeklySchedule() : ModelCommand("clear-weekly-schedule") { ModelCommand::AddArguments(); }
+    ~ThermostatClearWeeklySchedule()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x03) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ClearWeeklySchedule(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command GetRelayStatusLog
+ */
+class ThermostatGetRelayStatusLog : public ModelCommand
+{
+public:
+    ThermostatGetRelayStatusLog() : ModelCommand("get-relay-status-log") { ModelCommand::AddArguments(); }
+    ~ThermostatGetRelayStatusLog()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x04) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.GetRelayStatusLog(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command GetWeeklySchedule
+ */
+class ThermostatGetWeeklySchedule : public ModelCommand
+{
+public:
+    ThermostatGetWeeklySchedule() : ModelCommand("get-weekly-schedule")
+    {
+        AddArgument("daysToReturn", 0, UINT8_MAX, &mDaysToReturn);
+        AddArgument("modeToReturn", 0, UINT8_MAX, &mModeToReturn);
+        ModelCommand::AddArguments();
+    }
+    ~ThermostatGetWeeklySchedule()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x02) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.GetWeeklySchedule(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mDaysToReturn, mModeToReturn);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mDaysToReturn;
+    uint8_t mModeToReturn;
+};
+
+/*
+ * Command SetWeeklySchedule
+ */
+class ThermostatSetWeeklySchedule : public ModelCommand
+{
+public:
+    ThermostatSetWeeklySchedule() : ModelCommand("set-weekly-schedule")
+    {
+        AddArgument("numberOfTransitionsForSequence", 0, UINT8_MAX, &mNumberOfTransitionsForSequence);
+        AddArgument("dayOfWeekForSequence", 0, UINT8_MAX, &mDayOfWeekForSequence);
+        AddArgument("modeForSequence", 0, UINT8_MAX, &mModeForSequence);
+        AddArgument("payload", 0, UINT8_MAX, &mPayload);
+        ModelCommand::AddArguments();
+    }
+    ~ThermostatSetWeeklySchedule()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.SetWeeklySchedule(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mNumberOfTransitionsForSequence,
+                                         mDayOfWeekForSequence, mModeForSequence, mPayload);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mNumberOfTransitionsForSequence;
+    uint8_t mDayOfWeekForSequence;
+    uint8_t mModeForSequence;
+    uint8_t mPayload;
+};
+
+/*
+ * Command SetpointRaiseLower
+ */
+class ThermostatSetpointRaiseLower : public ModelCommand
+{
+public:
+    ThermostatSetpointRaiseLower() : ModelCommand("setpoint-raise-lower")
+    {
+        AddArgument("mode", 0, UINT8_MAX, &mMode);
+        AddArgument("amount", INT8_MIN, INT8_MAX, &mAmount);
+        ModelCommand::AddArguments();
+    }
+    ~ThermostatSetpointRaiseLower()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.SetpointRaiseLower(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMode, mAmount);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mMode;
+    int8_t mAmount;
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverThermostatAttributes : public ModelCommand
+{
+public:
+    DiscoverThermostatAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverThermostatAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute LocalTemperature
+ */
+class ReadThermostatLocalTemperature : public ModelCommand
+{
+public:
+    ReadThermostatLocalTemperature() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "local-temperature");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatLocalTemperature()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class ReportThermostatLocalTemperature : public ModelCommand
+{
+public:
+    ReportThermostatLocalTemperature() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "local-temperature");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportThermostatLocalTemperature()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x06) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        CHIP_ERROR err = cluster.ReportAttributeLocalTemperature(onReportCallback->Cancel());
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+
+        return cluster.ConfigureAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mMinInterval,
+                                                          mMaxInterval, mChange);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    int16_t mChange;
+};
+
+/*
+ * Attribute OccupiedCoolingSetpoint
+ */
+class ReadThermostatOccupiedCoolingSetpoint : public ModelCommand
+{
+public:
+    ReadThermostatOccupiedCoolingSetpoint() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "occupied-cooling-setpoint");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatOccupiedCoolingSetpoint()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOccupiedCoolingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatOccupiedCoolingSetpoint : public ModelCommand
+{
+public:
+    WriteThermostatOccupiedCoolingSetpoint() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "occupied-cooling-setpoint");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatOccupiedCoolingSetpoint()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeOccupiedCoolingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute OccupiedHeatingSetpoint
+ */
+class ReadThermostatOccupiedHeatingSetpoint : public ModelCommand
+{
+public:
+    ReadThermostatOccupiedHeatingSetpoint() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "occupied-heating-setpoint");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatOccupiedHeatingSetpoint()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeOccupiedHeatingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatOccupiedHeatingSetpoint : public ModelCommand
+{
+public:
+    WriteThermostatOccupiedHeatingSetpoint() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "occupied-heating-setpoint");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatOccupiedHeatingSetpoint()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeOccupiedHeatingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+/*
+ * Attribute ControlSequenceOfOperation
+ */
+class ReadThermostatControlSequenceOfOperation : public ModelCommand
+{
+public:
+    ReadThermostatControlSequenceOfOperation() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "control-sequence-of-operation");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatControlSequenceOfOperation()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeControlSequenceOfOperation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatControlSequenceOfOperation : public ModelCommand
+{
+public:
+    WriteThermostatControlSequenceOfOperation() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "control-sequence-of-operation");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatControlSequenceOfOperation()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeControlSequenceOfOperation(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute SystemMode
+ */
+class ReadThermostatSystemMode : public ModelCommand
+{
+public:
+    ReadThermostatSystemMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "system-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatSystemMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeSystemMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteThermostatSystemMode : public ModelCommand
+{
+public:
+    WriteThermostatSystemMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "system-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteThermostatSystemMode()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeSystemMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadThermostatClusterRevision : public ModelCommand
+{
+public:
+    ReadThermostatClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
 void registerClusterApplicationBasic(Commands & commands)
@@ -9637,6 +10243,32 @@ void registerClusterTemperatureMeasurement(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterThermostat(Commands & commands)
+{
+    const char * clusterName = "Thermostat";
+
+    commands_list clusterCommands = {
+        make_unique<ThermostatClearWeeklySchedule>(),
+        make_unique<ThermostatGetRelayStatusLog>(),
+        make_unique<ThermostatGetWeeklySchedule>(),
+        make_unique<ThermostatSetWeeklySchedule>(),
+        make_unique<ThermostatSetpointRaiseLower>(),
+        make_unique<DiscoverThermostatAttributes>(),
+        make_unique<ReadThermostatLocalTemperature>(),
+        make_unique<ReportThermostatLocalTemperature>(),
+        make_unique<ReadThermostatOccupiedCoolingSetpoint>(),
+        make_unique<WriteThermostatOccupiedCoolingSetpoint>(),
+        make_unique<ReadThermostatOccupiedHeatingSetpoint>(),
+        make_unique<WriteThermostatOccupiedHeatingSetpoint>(),
+        make_unique<ReadThermostatControlSequenceOfOperation>(),
+        make_unique<WriteThermostatControlSequenceOfOperation>(),
+        make_unique<ReadThermostatSystemMode>(),
+        make_unique<WriteThermostatSystemMode>(),
+        make_unique<ReadThermostatClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 
 void registerClusters(Commands & commands)
 {
@@ -9657,4 +10289,5 @@ void registerClusters(Commands & commands)
     registerClusterOnOff(commands);
     registerClusterScenes(commands);
     registerClusterTemperatureMeasurement(commands);
+    registerClusterThermostat(commands);
 }

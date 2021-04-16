@@ -19,7 +19,7 @@
 #pragma once
 
 #include "DiscoverCommand.h"
-#include <controller/DeviceAddressUpdater.h>
+#include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
 
 class Resolve : public DiscoverCommand, public chip::Mdns::ResolverDelegate

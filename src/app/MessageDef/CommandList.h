@@ -63,9 +63,14 @@ public:
     /**
      *  @brief Initialize a CommandDataElement::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataList::Builder
+     *  @return A reference to CommandDataElement::Builder
      */
     CommandDataElement::Builder & CreateCommandDataElementBuilder();
+
+    /**
+     *  @return A reference to CommandDataElement::Builder
+     */
+    CommandDataElement::Builder & GetCommandDataElementBuilder() { return mCommandDataElementBuilder; };
 
     /**
      *  @brief Mark the end of this CommandList

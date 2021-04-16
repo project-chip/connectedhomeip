@@ -39,6 +39,7 @@ public:
         delete onReportLevelControlCurrentLevelCallback;
         delete onReportOnOffOnOffCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
+        delete onReportThermostatLocalTemperatureCallback;
     }
 
     void AddReportCallbacks(uint8_t endpointId) override
@@ -61,6 +62,8 @@ public:
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel());
         callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0402, 0x0000,
                                        onReportTemperatureMeasurementMeasuredValueCallback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, 0x0201, 0x0000,
+                                       onReportThermostatLocalTemperatureCallback->Cancel());
     }
 
     static void OnDefaultSuccessResponse(void * context) { ChipLogProgress(chipTool, "Default Success Response"); }
@@ -113,6 +116,8 @@ private:
     chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
 };
 
