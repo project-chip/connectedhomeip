@@ -60,6 +60,12 @@ if("BlueNRG_MS" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
+if("WHD" IN_LIST MBED_TARGET_LABELS)
+    target_link_libraries(${APP_TARGET}
+        mbed-cy_psoc6_common_network mbed-emac mbed-cy_psoc6_whd
+    )
+endif()
+
 target_link_libraries(${APP_TARGET} mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)
 
 mbed_set_post_build(${APP_TARGET})
