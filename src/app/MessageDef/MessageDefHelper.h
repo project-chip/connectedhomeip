@@ -47,7 +47,7 @@ void DecreaseDepth();
 #define PRETTY_PRINT_INCDEPTH()                                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        IncreaseDepth(); \
+        IncreaseDepth();                                                                                                           \
     } while (0)
 #define PRETTY_PRINT_DECDEPTH()                                                                                                    \
     do                                                                                                                             \
@@ -61,5 +61,5 @@ void DecreaseDepth();
 #define PRETTY_PRINT_INCDEPTH()
 #define PRETTY_PRINT_DECDEPTH()
 #endif
-};
-};
+}; // namespace app
+}; // namespace chip

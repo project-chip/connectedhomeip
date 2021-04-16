@@ -21,11 +21,11 @@
  *
  */
 
+#include "MessageDefHelper.h"
 #include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "MessageDefHelper.h"
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -37,7 +37,7 @@ namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
 char gLineBuffer[256];
 size_t gCurLineBufferSize = 0;
-}
+} // namespace
 
 void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 {
@@ -84,13 +84,13 @@ void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 }
 void IncreaseDepth()
 {
-    gPrettyPrintingDepthLevel ++;
+    gPrettyPrintingDepthLevel++;
 }
 
 void DecreaseDepth()
 {
-    gPrettyPrintingDepthLevel --;
+    gPrettyPrintingDepthLevel--;
 }
 #endif
-};
-};
+}; // namespace app
+}; // namespace chip
