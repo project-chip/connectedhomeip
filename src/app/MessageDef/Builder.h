@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_BUILDER_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_BUILDER_H
-
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
@@ -73,6 +70,21 @@ public:
      */
     chip::TLV::TLVWriter * GetWriter() { return mpWriter; };
 
+    /**
+     * Checkpoint the current tlv state into a TLVWriter
+     *
+     * @param[out] aPoint A writer to checkpoint the state of the TLV writer into.
+     *                    This writer must not outlive the builder
+     */
+    void Checkpoint(chip::TLV::TLVWriter & aPoint) { aPoint = *mpWriter; };
+
+    /**
+     * Rollback the request state to the checkpointed TLVWriter
+     *
+     * @param[in] aPoint A that captured the state via Checkpoint() at some point in the past
+     */
+    void Rollback(const chip::TLV::TLVWriter & aPoint) { *mpWriter = aPoint; }
+
 protected:
     CHIP_ERROR mError;
     chip::TLV::TLVWriter * mpWriter;
@@ -85,5 +97,3 @@ protected:
 };
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_BUILDER_H

@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "af.h"
 #include "debug-printing.h"
 
 #include <platform/CHIPDeviceConfig.h>
@@ -57,7 +58,7 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
     if (buffer != nullptr && length > 0)
     {
         constexpr uint16_t kBufferSize = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
-        const char * perByteFormatStr  = withSpace ? "%02hhX " : "%02hhX";
+        const char * perByteFormatStr  = withSpace ? "%02X " : "%02X";
         const uint8_t perByteCharCount = withSpace ? 3 : 2;
         const uint16_t bytesPerBuffer  = static_cast<uint16_t>((kBufferSize - 1) / perByteCharCount);
         char result[kBufferSize];
@@ -85,5 +86,5 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 
 void emberAfPrintString(int category, const uint8_t * string)
 {
-    emberAfPrint(category, "%s", string);
+    emberAfPrint(category, "%.*s", emberAfStringLength(string), string + 1);
 }

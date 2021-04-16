@@ -23,6 +23,7 @@ network.
 -   [Device UI](#device-ui)
 -   [Building](#building)
 -   [Flashing and debugging](#flashdebug)
+-   [Known Issues](#knownissues)
 -   [Testing the example](#testing-the-example)
 
 <hr>
@@ -58,8 +59,9 @@ devices.
 ### Bluetooth LE Advertising
 
 In this example, to commission the device onto a Project CHIP network, it must
-be discoverable over Bluetooth LE. Bluetooth LE advertising is started
-automatically when the device is powered up.
+be discoverable over Bluetooth LE. For security reasons, you must start
+Bluetooth LE advertising manually after powering up the device by pressing
+Button USERINTERFACE.
 
 ### Bluetooth LE Rendezvous
 
@@ -107,22 +109,25 @@ bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
 unlocked). The LED will flash whenever the simulated bolt is in motion from one
 position to another.
 
-**Button SW2** can be used to change the state of the simulated bolt. This can
-be used to mimic a user manually operating the lock. The button behaves as a
-toggle, swapping the state every time it is pressed.
-
-**Button SW3** can be used to reset the device to a default state. Pressing and
+**Button SW2** can be used to reset the device to a default state. Pressing and
 holding Button SW3 for 6 seconds initiates a factory reset. After an initial
 period of 3 seconds, LED2 D2 and D3 will flash in unison to signal the pending
 reset. Holding the button past 6 seconds will cause the device to reset its
 persistent configuration and initiate a reboot. The reset action can be
 cancelled by releasing the button at any point before the 6 second limit.
 
+**Button SW3** can be used to change the state of the simulated bolt. This can
+be used to mimic a user manually operating the lock. The button behaves as a
+toggle, swapping the state every time it is pressed.
+
 **Button SW4** can be used for joining a predefined Thread network advertised by
 a Border Router. Default parameters for a Thread network are hard-coded and are
 being used if this button is pressed.
 
 The remaining two LEDs (D1/D2) and button (SW1) are unused.
+
+Directly on the development board, **Button USERINTERFACE** can be used for
+enabling Bluetooth LE advertising for a predefined period of time.
 
 <a name="building"></a>
 
@@ -144,7 +149,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.2_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/mr2_fixes/patch_k32w_mr2_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/repo$ cd examples/lock-app/k32w/
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
@@ -179,6 +184,13 @@ Program the firmware using the official
 All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w061-lock-example.bin_ if DK6Programmer is
 used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
+
+<a name="knownissues"></a>
+
+## Known issues
+
+-   When cross-compiling on Linux - Log messages from the Plug&Trust middleware
+    stack may not echo to the console.
 
 ## Testing the example
 

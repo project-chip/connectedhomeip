@@ -51,15 +51,23 @@
     return _cppDevice;
 }
 
-- (BOOL)openPairingWindow:(NSTimeInterval)duration error:(NSError * __autoreleasing *)error
+- (BOOL)openPairingWindow:(NSUInteger)duration error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::SetupPayload setupPayload;
 
+    if (duration > UINT32_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return NO;
+    }
+
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(
-        duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
+        (uint32_t) duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -73,7 +81,7 @@
     return YES;
 }
 
-- (NSString *)openPairingWindowWithPIN:(NSTimeInterval)duration
+- (NSString *)openPairingWindowWithPIN:(NSUInteger)duration
                          discriminator:(NSUInteger)discriminator
                               setupPIN:(NSUInteger)setupPIN
                                  error:(NSError * __autoreleasing *)error
@@ -81,6 +89,14 @@
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::SetupPayload setupPayload;
+
+    if (duration > UINT32_MAX) {
+        CHIP_LOG_ERROR("Error: Duration %tu is too large. Max value %d", duration, UINT32_MAX);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE];
+        }
+        return nil;
+    }
 
     if (discriminator > 0xfff) {
         CHIP_LOG_ERROR("Error: Discriminator %tu is too large. Max value %d", discriminator, 0xfff);
@@ -97,7 +113,7 @@
 
     [self.lock lock];
     err = self.cppDevice->OpenPairingWindow(
-        duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
+        (uint32_t) duration, chip::Controller::Device::PairingWindowOption::kTokenWithProvidedPIN, setupPayload);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {

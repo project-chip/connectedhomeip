@@ -26,7 +26,6 @@
  */
 
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 
@@ -59,7 +58,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
     packetHeader
         .SetSourceNodeId(localNodeId) //
         .SetMessageId(msgId)          //
-        .SetEncryptionKeyID(state->GetLocalKeyID());
+        .SetEncryptionKeyID(state->GetPeerKeyID());
 
     if (state->GetPeerNodeId() != kUndefinedNodeId)
     {

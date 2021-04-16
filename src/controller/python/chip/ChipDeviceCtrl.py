@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2021 Project CHIP Authors
 #    Copyright (c) 2019-2020 Google, LLC.
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
@@ -31,13 +31,15 @@ import time
 from threading import Thread
 from ctypes import *
 from .ChipStack import *
-from .ChipCluster import *
+from .clusters.CHIPClusters import *
+from .interaction_model import delegate as im
 import enum
 
 
 __all__ = ["ChipDeviceController"]
 
 _DevicePairingDelegate_OnPairingCompleteFunct = CFUNCTYPE(None, c_uint32)
+_DeviceAddressUpdateDelegate_OnUpdateComplete = CFUNCTYPE(None, c_uint64, c_uint32)
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truely multiple instances so this is temporary.
@@ -61,37 +63,53 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
-        self._ChipStack = ChipStack()
+        if bluetoothAdapter is None:
+            bluetoothAdapter = 0
+        self._ChipStack = ChipStack(bluetoothAdapter=bluetoothAdapter)
         self._dmLib = None
 
         self._InitLib()
 
         devCtrl = c_void_p(None)
-        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl))
+        res = self._dmLib.pychip_DeviceController_NewDeviceController(pointer(devCtrl), controllerNodeId)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
         self.devCtrl = devCtrl
         self._ChipStack.devCtrl = devCtrl
 
-        self._Cluster = ChipCluster(self._ChipStack)
+        self._Cluster = ChipClusters(self._ChipStack)
         self._Cluster.InitLib(self._dmLib)
 
         def HandleKeyExchangeComplete(err):
             if err != 0:
                 print("Failed to establish secure session to device: {}".format(err))
-                self._ChipStack.callbackRes = False
+                self._ChipStack.callbackRes = self._ChipStack.ErrorToException(err)
             else:
                 print("Secure Session to Device Established")
                 self._ChipStack.callbackRes = True
             self.state = DCState.IDLE
             self._ChipStack.completeEvent.set()
 
+        def HandleAddressUpdateComplete(nodeid, err):
+            if err != 0:
+                print("Failed to update node address: {}".format(err))
+            else:
+                print("Node address has been updated")
+            self.state = DCState.IDLE
+            self._ChipStack.callbackRes = err
+            self._ChipStack.completeEvent.set()
+
+        im.InitIMDelegate()
+
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(HandleKeyExchangeComplete)
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(self.devCtrl, self.cbHandleKeyExchangeCompleteFunct)
+
+        self.cbOnAddressUpdateComplete = _DeviceAddressUpdateDelegate_OnUpdateComplete(HandleAddressUpdateComplete)
+        self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(self.cbOnAddressUpdateComplete)
 
         self.state = DCState.IDLE
 
@@ -127,15 +145,53 @@ class ChipDeviceController(object):
             lambda: self._dmLib.pychip_DeviceController_ConnectIP(self.devCtrl, ipaddr, setupPinCode, nodeid)
         )
 
-    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
-        device = c_void_p(None)
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
+    def ResolveNode(self, fabricid, nodeid):
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_Resolver_ResolveNode(fabricid, nodeid)
         )
-        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
-    def ZCLList(self):
-        return self._Cluster.ListClusters()
+    def GetAddressAndPort(self, nodeid):
+        address = create_string_buffer(64)
+        port = c_uint16(0)
+
+        error = self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_GetAddressAndPort(self.devCtrl, nodeid, address, 64, pointer(port))
+        )
+
+        return (address.value.decode(), port.value) if error == 0 else None
+
+    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
+        device = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
+        im.ClearCommandStatus(commandSenderHandle)
+        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args, commandSenderHandle != 0)
+        if blocking:
+            # We only send 1 command by this function, so index is always 0
+            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+        return (0, None)
+
+    def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
+        device = c_void_p(None)
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device)))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+
+        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
+        im.ClearCommandStatus(commandSenderHandle)
+        res = self._Cluster.ReadAttribute(device, cluster, attribute, endpoint, groupid, commandSenderHandle != 0)
+        if blocking:
+            # We only send 1 command by this function, so index is always 0
+            return im.WaitCommandIndexStatus(commandSenderHandle, 1)
+
+    def ZCLCommandList(self):
+        return self._Cluster.ListClusterCommands()
+
+    def ZCLAttributeList(self):
+        return self._Cluster.ListClusterAttributes()
 
     def SetLogFilter(self, category):
         if category < 0 or category > pow(2, 8):
@@ -168,17 +224,11 @@ class ChipDeviceController(object):
         if self._dmLib is None:
             self._dmLib = CDLL(self._ChipStack.LocateChipDLL())
 
-            self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [
-                POINTER(c_void_p)
-            ]
+            self._dmLib.pychip_DeviceController_NewDeviceController.argtypes = [POINTER(c_void_p), c_uint64]
             self._dmLib.pychip_DeviceController_NewDeviceController.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [
-                c_void_p
-            ]
-            self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = (
-                c_uint32
-            )
+            self._dmLib.pychip_DeviceController_DeleteDeviceController.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceController_DeleteDeviceController.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_ConnectBLE.argtypes = [c_void_p, c_uint16, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectBLE.restype = c_uint32
@@ -186,11 +236,23 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [c_void_p, c_char_p, c_uint32, c_uint64]
             self._dmLib.pychip_DeviceController_ConnectIP.restype = c_uint32
 
+            self._dmLib.pychip_DeviceController_GetAddressAndPort.argtypes = [c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
+            self._dmLib.pychip_DeviceController_GetAddressAndPort.restype = c_uint32
+
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [c_void_p, c_char_p, c_char_p]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.restype = c_uint32
 
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = c_uint32
 
+            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.argtypes = [_DeviceAddressUpdateDelegate_OnUpdateComplete]
+            self._dmLib.pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete.restype = None
+
+            self._dmLib.pychip_Resolver_ResolveNode.argtypes = [c_uint64, c_uint64]
+            self._dmLib.pychip_Resolver_ResolveNode.restype = c_uint32
+
             self._dmLib.pychip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
             self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
+            self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64

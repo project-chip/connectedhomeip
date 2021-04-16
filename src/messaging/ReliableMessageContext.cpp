@@ -135,9 +135,14 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
-uint64_t ReliableMessageContext::GetCurrentRetransmitTimeoutTick()
+uint64_t ReliableMessageContext::GetInitialRetransmitTimeoutTick()
 {
-    return (HasRcvdMsgFromPeer() ? mConfig.mActiveRetransTimeoutTick : mConfig.mInitialRetransTimeoutTick);
+    return mConfig.mInitialRetransTimeoutTick;
+}
+
+uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
+{
+    return mConfig.mActiveRetransTimeoutTick;
 }
 
 /**
@@ -181,7 +186,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     return err;
 }
 
-CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> MsgFlags)
+CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> MsgFlags)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -259,8 +264,12 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     // Send the null message
     if (mExchange != nullptr)
     {
+#if !defined(NDEBUG)
+        ChipLogProgress(ExchangeManager, "Sending Standalone Ack for MsgId:%08" PRIX32, mPendingPeerAckId);
+#endif
+
         err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
-                                     BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
+                                     BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
     else
     {

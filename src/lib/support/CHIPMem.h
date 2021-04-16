@@ -81,30 +81,6 @@ extern void MemoryShutdown();
  *
  * @param[in]  size             Specifies requested memory size in bytes.
  *
- * @param[in]  isLongTermAlloc  A Boolean indicating whether (true) or not (false) the
- *                              requested memory block is for long term use. A long term
- *                              allocation is memory that should stay allocated until secure
- *                              session/handshake is complete. Examples of a long term
- *                              allocation include blocks allocated for CASE/PASE objects
- *                              and their context data. A short term allocation is a memory
- *                              needed to perform specific operation and can be released
- *                              immediately after that. This input helps to optimize memory
- *                              utilization in a memory constrained system. Use of this parameter
- *                              is arbitrary and depends on function implementer. For example,
- *                              this parameter is ignored when the C Standard Library malloc()
- *                              is used.
- *
- * @retval  Pointer to a memory block in case of success.
- * @retval  NULL-pointer if memory allocation fails.
- *
- */
-extern void * MemoryAlloc(size_t size, bool isLongTermAlloc);
-
-/**
- * This function is called by the CHIP layer to allocate a block of memory of "size" bytes.
- *
- * @param[in]  size             Specifies requested memory size in bytes.
- *
  * @retval  Pointer to a memory block in case of success.
  * @retval  NULL-pointer if memory allocation fails.
  *
@@ -165,7 +141,12 @@ extern void MemoryFree(void * p);
 template <typename T, typename... Args>
 inline T * New(Args &&... args)
 {
-    return new (MemoryAlloc(sizeof(T))) T(std::forward<Args>(args)...);
+    void * p = MemoryAlloc(sizeof(T));
+    if (p != nullptr)
+    {
+        return new (p) T(std::forward<Args>(args)...);
+    }
+    return nullptr;
 }
 
 /**

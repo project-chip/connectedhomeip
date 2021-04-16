@@ -12,17 +12,52 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tests.gni")
+import("${chip_root}/build/chip/tests.gni")
 
 assert(chip_build_tests)
 
 template("chip_test_group") {
   _test_group_name = target_name
 
+  # Generate a .a file with all of the tests in it.
+  _build_monolithic_library = defined(invoker.build_monolithic_library) &&
+                              invoker.build_monolithic_library
+
+  if (_build_monolithic_library) {
+    _target_type = "static_library"
+  } else {
+    _target_type = "group"
+  }
+
+  _lib_target_name = "${_test_group_name}_lib"
+
+  target(_target_type, _lib_target_name) {
+    forward_variables_from(invoker,
+                           "*",
+                           [
+                             "build_monolithic_library",
+                             "deps",
+                           ])
+
+    deps = []
+    foreach(_test, invoker.deps) {
+      deps += [ get_label_info(_test, "label_no_toolchain") + "_lib" ]
+    }
+
+    if (_build_monolithic_library) {
+      complete_static_lib = true
+    }
+  }
+
   group("${_test_group_name}") {
-    deps = invoker.deps
+    deps = []
+    data_deps = invoker.deps
+
+    if (_build_monolithic_library) {
+      deps += [ ":${_lib_target_name}" ]
+    }
   }
 
   if (chip_link_tests) {

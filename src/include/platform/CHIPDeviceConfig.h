@@ -119,6 +119,15 @@
 // -------------------- Device Identification Configuration --------------------
 
 /**
+ * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
+ *
+ * Human readable vendor name for the organization responsible for producing the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "TEST_VENDOR"
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * The CHIP-assigned vendor id for the organization responsible for producing the device.
@@ -128,13 +137,12 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+ * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME
  *
- * Enables the use of a hard-coded default serial number if none
- * is found in Chip NV storage.
+ * Human readable name of the device model.
  */
-#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "TEST_PRODUCT"
 #endif
 
 /**
@@ -145,6 +153,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 65279
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION_STRING
+ *
+ * Human readable string identifying version of the product assigned by the device vendor.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING "TEST_VERSION"
 #endif
 
 /**
@@ -165,12 +182,31 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
  *
  * A string identifying the firmware revision running on the device.
  */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "prerelease"
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+ *
+ * A monothonic number identifying the firmware revision running on the device.
+ */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION "prerelease"
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+ *
+ * Enables the use of a hard-coded default serial number if none
+ * is found in Chip NV storage.
+ */
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 #endif
 
 /**
@@ -392,27 +428,67 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
  *
- * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in fast advertising mode.
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in fast advertising mode. The minimum interval should be less and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX.
  *
- * Defaults to 320 (200ms).
+ * Defaults to 32 (20 ms).
  */
-#ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL 320
+#ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN 32
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
  *
- * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
- * in slow advertisement mode.
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in fast advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN.
  *
- * Defaults to 3200 (20000ms).
+ * Defaults to 96 (60 ms).
  */
-#ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL
-#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL 3200
+#ifndef CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX 96
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN
+ *
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertising mode. The minimum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX.
+ *
+ * Defaults to 240 (150 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN 240
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
+ *
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in slow advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN.
+ *
+ * Defaults to 1920 (1200 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 1920
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be switched from the fast
+ * advertising to the slow advertising, counting from the moment of advertisement commencement.
+ *
+ * Defaults to 30000 (30 seconds).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
 /**
@@ -530,6 +606,26 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 #define CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING 0
+#endif
+
+// -------------------- Service Discovery Configuration -----------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_MDNS
+ *
+ * Enable support to use MDNS for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
 #endif
 
 // -------------------- Thread Configuration --------------------

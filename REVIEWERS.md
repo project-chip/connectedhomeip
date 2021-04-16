@@ -1,14 +1,11 @@
-The following individuals can be chosen as, and act as required reviewers on any
-PR
+People from the following groups can be chosen as, and act as required reviewers
+on any PR
 
-| Name                                            | Company             |
-| ----------------------------------------------- | ------------------- |
-| [anush-apple](https://github.com/anush-apple)   | Apple, Inc.         |
-| [msandstedt](https://github.com/msandstedt)     | Samsung SmartThings |
-| [chrisdecenzo](https://github.com/chrisdecenzo) | Amazon, Inc.        |
-| [hawk248](https://github.com/hawk248)           | Comcast, Inc.       |
-| [jelderton](https://github.com/jelderton)       | Comcast, Inc.       |
-| [andy31415](https://github.com/andy31415)       | Google, Inc.        |
-| [robszewczyk](https://github.com/robszewczyk)   | Google, Inc.        |
-| [saurabhst](https://github.com/saurabhst)       | Samsung SmartThings |
-| [woody-apple](https://github.com/woody-apple)   | Apple, Inc.         |
+| Group                                                                             | Company              |
+| --------------------------------------------------------------------------------- | -------------------- |
+| [reviewers-apple](https://github.com/orgs/project-chip/teams/reviewers-apple)     | Apple, Inc.          |
+| [reviewers-comcast](https://github.com/orgs/project-chip/teams/reviewers-comcast) | Comcast, Inc.        |
+| [reviewers-google](https://github.com/orgs/project-chip/teams/reviewers-google)   | Google, Inc.         |
+| [reviewers-nordic](https://github.com/orgs/project-chip/teams/reviewers-nordic)   | Nordic Semiconductor |
+| [reviewers-samsung](https://github.com/orgs/project-chip/teams/reviewers-samsung) | Samsung SmartThings  |
+| [reviewers-silabs](https://github.com/orgs/project-chip/teams/reviewers-silabs)   | Silicon Labs         |

@@ -64,17 +64,3 @@ void freertos_mbedtls_mutex_free(void)
 {
     mbedtls_threading_free_alt();
 }
-
-void * pvPortCallocRtos(size_t num, size_t size)
-{
-    size_t totalAllocSize = (size_t)(num * size);
-
-    void * p = pvPortMalloc(totalAllocSize);
-
-    if (p)
-    {
-        memset(p, 0, totalAllocSize);
-    }
-
-    return p;
-}

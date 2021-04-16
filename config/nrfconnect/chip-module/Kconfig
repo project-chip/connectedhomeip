@@ -20,6 +20,7 @@ menuconfig CHIP
 	select CPLUSPLUS
 	imply LIB_CPLUSPLUS
 	imply REQUIRES_FULL_LIBC
+	imply CBPRINTF_LIBC_SUBSTS
 	imply POSIX_API if !ARCH_POSIX
 	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
@@ -88,11 +89,13 @@ config CHIP_NFC_COMMISSIONING
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
 
-config CHIP_ENABLE_RENDEZVOUS_BYPASS
-	bool "Enable Rendezvous bypass"
-	default n
+config CHIP_ENABLE_DNSSD_SRP
+	bool "Enable support for service registration"
+	default y
+	imply OPENTHREAD_ECDSA
+	imply OPENTHREAD_SRP_CLIENT
 	help
-	  Enables bypassing rendezvous for the test purposes.
+	  Enables DNS-SD SRP client support
 
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"

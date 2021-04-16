@@ -16,8 +16,8 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 
-import("${build_root}/chip/buildconfig_header.gni")
-import("${build_root}/chip/tests.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/inet/inet.gni")
 import("core.gni")
 
@@ -56,6 +56,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MEMORY_DEBUG_CHECKS=${chip_config_memory_debug_checks}",
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
+    "CHIP_ENABLE_INTERACTION_MODEL=${chip_enable_interaction_model}",
   ]
 }
 

@@ -49,6 +49,9 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
 
     mMsgLayerWasActive = false;
 
+    // Arrange for CHIP core errors to be translated to text
+    RegisterCHIPLayerErrorFormatter();
+
     // Arrange for Device Layer errors to be translated to text.
     RegisterDeviceLayerErrorFormatter();
 
@@ -99,6 +102,12 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
+    // Initialize the NFC Manager.
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC
+    err = NFCMgr().Init();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "NFC Manager initialization failed: %s", ErrorStr(err)));
+#endif
+
     // TODO Initialize CHIP Event Logging.
 
     // TODO Initialize the Time Sync Manager object.
@@ -108,6 +117,22 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     // TODO Initialize the Software Update Manager object.
 
 exit:
+    return err;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
+{
+    CHIP_ERROR err;
+    ChipLogError(DeviceLayer, "System Layer shutdown");
+    err = SystemLayer.Shutdown();
+    ChipLogError(DeviceLayer, "Inet Layer shutdown");
+    err = InetLayer.Shutdown();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    ChipLogError(DeviceLayer, "BLE layer shutdown");
+    err = BLEMgr().GetBleLayer()->Shutdown();
+#endif
     return err;
 }
 

@@ -18,16 +18,7 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-  ]
-}
-
-executable("bridge-app-server") {
+executable("chip-bridge-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
@@ -35,22 +26,18 @@ executable("bridge-app-server") {
     "main.cpp",
   ]
 
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
-  public_configs = [ ":includes" ]
-
   deps = [
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/src/lib",
   ]
 
+  cflags = [ "-Wconversion" ]
+
+  include_dirs = [ "include" ]
+
   output_dir = root_out_dir
 }
 
 group("linux") {
-  deps = [ ":bridge-app-server" ]
+  deps = [ ":chip-bridge-app" ]
 }

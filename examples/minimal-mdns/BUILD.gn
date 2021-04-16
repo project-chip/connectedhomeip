@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${build_root}/chip/tools.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 static_library("minimal-mdns-example-common") {
   sources = [
@@ -23,6 +23,8 @@ static_library("minimal-mdns-example-common") {
     "PacketReporter.cpp",
     "PacketReporter.h",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib",
@@ -33,13 +35,13 @@ static_library("minimal-mdns-example-common") {
 executable("minimal-mdns-client") {
   sources = [ "client.cpp" ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/mdns/minimal",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }
@@ -47,14 +49,14 @@ executable("minimal-mdns-client") {
 executable("minimal-mdns-server") {
   sources = [ "server.cpp" ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/mdns/minimal",
     "${chip_root}/src/lib/mdns/minimal/responders",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }
@@ -62,13 +64,13 @@ executable("minimal-mdns-server") {
 executable("mdns-advertiser") {
   sources = [ "advertiser.cpp" ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/mdns",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }

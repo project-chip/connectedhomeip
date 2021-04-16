@@ -38,22 +38,28 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kNone);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kThread;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kEthernet;
+    inPayload.rendezvousInformation =
+        RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kAllMask;
+    inPayload.rendezvousInformation =
+        RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
@@ -93,7 +99,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     input[2] = 0;
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL10");
     input[2] = 40;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1.");
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1/");
     input[2] = 41;
     NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL101");
     input[2] = 255;
@@ -111,17 +117,17 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     // largest optimizated encoding value
     input[0] = ((kRadix * kRadix) - 1) % 256;
     input[1] = ((kRadix * kRadix) - 1) / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "..");
+    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "//");
     // can't optimize
     input[0] = ((kRadix * kRadix)) % 256;
     input[1] = ((kRadix * kRadix)) / 256;
     NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "001");
 
     // fun with strings
-    NL_TEST_ASSERT(inSuite, base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1) == "GHF.KGL+48-G5LGK35");
+    NL_TEST_ASSERT(inSuite, base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1) == "GHF/KGL-48.G5LGK35");
 
     vector<uint8_t> decoded = vector<uint8_t>();
-    NL_TEST_ASSERT(inSuite, base41Decode("GHF.KGL+48-G5LGK35", decoded) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, base41Decode("GHF/KGL-48.G5LGK35", decoded) == CHIP_NO_ERROR);
 
     string hello_world;
     for (uint8_t b : decoded)
@@ -169,7 +175,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, decoded.size() == 1 && decoded[0] == 255);
     NL_TEST_ASSERT(inSuite, base41Decode("A6", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == 256);
-    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is (41*41)-1, or 1680, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, base41Decode("//", decoded) == CHIP_NO_ERROR); // this is (41*41)-1, or 1680, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == (kRadix * kRadix) - 1);
 }
 
@@ -194,9 +200,11 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
-    test_payload = payload;
-    test_payload.rendezvousInformation =
-        static_cast<RendezvousInformationFlags>(static_cast<uint16_t>(RendezvousInformationFlags::kAllMask) + 1);
+    test_payload                       = payload;
+    RendezvousInformationFlags invalid = RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
+    invalid.SetRaw(static_cast<uint16_t>(invalid.Raw() + 1));
+    test_payload.rendezvousInformation = invalid;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator

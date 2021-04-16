@@ -43,7 +43,8 @@
 #include "af-event.h"
 #include "af-main.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
+#include <app/reporting/reporting.h>
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
@@ -56,11 +57,20 @@
 #include <app/clusters/groups-server/groups-server.h>
 #endif // EMBER_AF_PLUGIN_GROUPS_SERVER
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
-#include <app/reporting/reporting.h>
-#endif // EMBER_AF_PLUGIN_REPORTING
-
 using namespace chip;
+
+// Function for Compatibility
+namespace chip {
+namespace app {
+namespace Compatibility {
+bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status);
+bool __attribute__((weak)) IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
+{
+    return false;
+}
+} // namespace Compatibility
+} // namespace app
+} // namespace chip
 
 //------------------------------------------------------------------------------
 // Forward Declarations
@@ -128,6 +138,9 @@ void emberAfPluginBarrierControlServerInitCallback(void);
 #endif
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
 void emberAfPluginDoorLockServerInitCallback(void);
+#endif
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+void emberAfPluginDescriptorServerInitCallback(void);
 #endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -276,9 +289,9 @@ void emberAfInit(void)
     // initialize event management system
     emAfInitEvents();
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
+    // Initialize the reporting plugin
     emberAfPluginReportingInitCallback();
-#endif
+
 #ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
     emberAfPluginTemperatureMeasurementServerInitCallback();
 #endif
@@ -287,6 +300,9 @@ void emberAfInit(void)
 #endif
 #ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
     emberAfPluginDoorLockServerInitCallback();
+#endif
+#ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
+    emberAfPluginDescriptorServerInitCallback();
 #endif
 
     emAfCallInits();
@@ -315,17 +331,15 @@ void emberAfStackDown(void)
     // (Issue 77101) Also don't clear the table if the stack has gone down as a
     // a result of losing its parent or some other transient state where a future
     // rejoin is expected to get us back online.
-    if (false
+    if ((false)
         // emberStackIsPerformingRejoin() == false
         // && emberNetworkState() == EMBER_NO_NETWORK
     )
     {
-#ifdef EMBER_AF_PLUGIN_REPORTING
         // the report table should be cleared when the stack comes down.
         // going to a new network means new report devices should be discovered.
         // if the table isnt cleared the device keeps trying to send messages.
         emberAfClearReportTableCallback();
-#endif // EMBER_AF_PLUGIN_REPORTING
     }
 
     emberAfRegistrationAbortCallback();
@@ -777,6 +791,12 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
                                                    EmberAfMessageSentFunction callback)
 {
     uint8_t frameControl;
+
+    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
+    {
+        // If the compatibility can handle this response
+        return EMBER_SUCCESS;
+    }
 
     // Default Response commands are only sent in response to unicast commands.
     if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)

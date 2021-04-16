@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -82,11 +82,11 @@ public:
     static const char * _WiFiAPStateToStr(ConnectivityManager::WiFiAPState state);
 
 protected:
-    enum Flags
+    enum class ConnectivityFlags : uint16_t
     {
-        kFlag_HaveIPv4InternetConnectivity = 0x0001,
-        kFlag_HaveIPv6InternetConnectivity = 0x0002,
-        kFlag_AwaitingConnectivity         = 0x0010,
+        kHaveIPv4InternetConnectivity = 0x0001,
+        kHaveIPv6InternetConnectivity = 0x0002,
+        kAwaitingConnectivity         = 0x0010,
     };
 
 private:

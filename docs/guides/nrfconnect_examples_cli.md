@@ -22,7 +22,7 @@ development kit:
 
     $ minicom -D /dev/ttyACM0 -b 115200
 
-When you reboot the board, you will see the boot logs in the console, similar to
+When you reboot the kit, you will see the boot logs in the console, similar to
 the following messages:
 
 ```shell

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -116,7 +116,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
         wifi_config_t stationConfig;
 
         memset(&stationConfig, 0, sizeof(stationConfig));
-        esp_wifi_set_config(ESP_IF_WIFI_STA, &stationConfig);
+        esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
         SystemLayer.ScheduleWork(DriveStationState, NULL);
         SystemLayer.ScheduleWork(DriveAPState, NULL);
@@ -360,7 +360,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     uint16_t freq;
     uint16_t bssid;
 
-    err = esp_wifi_get_config(ESP_IF_WIFI_STA, &wifiConfig);
+    err = esp_wifi_get_config(WIFI_IF_STA, &wifiConfig);
     if (err != ESP_OK)
     {
         ChipLogError(DeviceLayer, "esp_wifi_get_config() failed: %s", ErrorStr(err));
@@ -401,7 +401,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiAPState                    = kWiFiAPState_NotActive;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
-    mFlags                          = 0;
+    mFlags.SetRaw(0);
 
     // TODO Initialize the Chip Addressing and Routing Module.
 
@@ -424,7 +424,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
             memcpy(wifiConfig.sta.password, CONFIG_DEFAULT_WIFI_PASSWORD, strlen(CONFIG_DEFAULT_WIFI_PASSWORD) + 1);
             wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
             wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
-            err                        = esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig);
+            err                        = esp_wifi_set_config(WIFI_IF_STA, &wifiConfig);
             if (err != ESP_OK)
             {
                 ChipLogError(DeviceLayer, "esp_wifi_set_config() failed: %s", chip::ErrorStr(err));
@@ -867,18 +867,17 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 
     uint16_t discriminator;
     SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
-
-    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%04u", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
-             discriminator);
+    snprintf((char *) wifiConfig.ap.ssid, sizeof(wifiConfig.ap.ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX,
+             discriminator, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
     wifiConfig.ap.channel         = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
     wifiConfig.ap.authmode        = WIFI_AUTH_OPEN;
     wifiConfig.ap.max_connection  = CHIP_DEVICE_CONFIG_WIFI_AP_MAX_STATIONS;
     wifiConfig.ap.beacon_interval = CHIP_DEVICE_CONFIG_WIFI_AP_BEACON_INTERVAL;
     ChipLogProgress(DeviceLayer, "Configuring WiFi AP: SSID %s, channel %u", wifiConfig.ap.ssid, wifiConfig.ap.channel);
-    err = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifiConfig);
+    err = esp_wifi_set_config(WIFI_IF_AP, &wifiConfig);
     if (err != ESP_OK)
     {
-        ChipLogError(DeviceLayer, "esp_wifi_set_config(ESP_IF_WIFI_AP) failed: %s", chip::ErrorStr(err));
+        ChipLogError(DeviceLayer, "esp_wifi_set_config(WIFI_IF_AP) failed: %s", chip::ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -902,10 +901,10 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 
 void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
 {
-    bool haveIPv4Conn = false;
-    bool haveIPv6Conn = false;
-    bool hadIPv4Conn  = GetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity);
-    bool hadIPv6Conn  = GetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity);
+    bool haveIPv4Conn      = false;
+    bool haveIPv6Conn      = false;
+    const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
     IPAddress addr;
 
     // If the WiFi station is currently in the connected state...
@@ -962,8 +961,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (haveIPv4Conn != hadIPv4Conn || haveIPv6Conn != hadIPv6Conn)
     {
         // Update the current state.
-        SetFlag(mFlags, kFlag_HaveIPv4InternetConnectivity, haveIPv4Conn);
-        SetFlag(mFlags, kFlag_HaveIPv6InternetConnectivity, haveIPv6Conn);
+        mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
+            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
 
         // Alert other components of the state change.
         ChipDeviceEvent event;
@@ -998,6 +997,11 @@ void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const ip_event_got_i
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
@@ -1007,6 +1011,11 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
@@ -1021,6 +1030,11 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
+    PlatformMgr().PostEvent(&event);
 }
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}

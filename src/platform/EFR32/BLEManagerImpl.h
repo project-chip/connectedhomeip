@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +25,11 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "FreeRTOS.h"
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,7 +38,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the EFR32 platforms.
+ * Concrete implementation of the BLEManager singleton object for the EFR32 platforms.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -51,9 +53,8 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -90,14 +91,14 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 
     // ===== Private members reserved for use by this class only.
 
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AdvertisingEnabled     = 0x0001,
-        kFlag_FastAdvertisingEnabled = 0x0002,
-        kFlag_Advertising            = 0x0004,
-        kFlag_RestartAdvertising     = 0x0008,
-        kFlag_EFRBLEStackInitialized = 0x0010,
-        kFlag_DeviceNameSet          = 0x0020,
+        kAdvertisingEnabled     = 0x0001,
+        kFastAdvertisingEnabled = 0x0002,
+        kAdvertising            = 0x0004,
+        kRestartAdvertising     = 0x0008,
+        kEFRBLEStackInitialized = 0x0010,
+        kDeviceNameSet          = 0x0020,
     };
 
     enum
@@ -121,7 +122,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     CHIPoBLEConState mBleConnections[kMaxConnections];
     uint8_t mIndConfId[kMaxConnections];
     CHIPoBLEServiceMode mServiceMode;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     // The advertising set handle allocated from Bluetooth stack.
     uint8_t advertising_set_handle = 0xff;
@@ -142,10 +143,13 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     bool RemoveConnection(uint8_t connectionHandle);
     void AddConnection(uint8_t connectionHandle, uint8_t bondingHandle);
+    void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
+    void CancelBleAdvTimeoutTimer(void);
     CHIPoBLEConState * GetConnectionState(uint8_t conId, bool allocate = false);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate = false);
     static void DriveBLEState(intptr_t arg);
     static void bluetoothStackEventHandler(void * p_arg);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
 };
 
 /**
@@ -182,12 +186,7 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 } // namespace Internal

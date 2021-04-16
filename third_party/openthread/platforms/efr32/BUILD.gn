@@ -56,7 +56,6 @@ source_set("libopenthread-efr32") {
     "${openthread_root}/examples/platforms/efr32/src/misc.c",
     "${openthread_root}/examples/platforms/efr32/src/radio.c",
     "${openthread_root}/examples/platforms/efr32/src/system.c",
-    "${openthread_root}/examples/platforms/efr32/src/uart.c",
     "${openthread_root}/third_party/silabs/rail_config/rail_config.c",
   ]
 

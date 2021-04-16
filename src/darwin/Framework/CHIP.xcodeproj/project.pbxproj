@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */; };
 		1EC4CE3A25CC263E00D7304F /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3825CC263E00D7304F /* reporting.cpp */; };
 		1EC4CE3B25CC263E00D7304F /* reporting-default-configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3925CC263E00D7304F /* reporting-default-configuration.cpp */; };
 		1EC4CE3D25CC265200D7304F /* DataModelHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3C25CC265200D7304F /* DataModelHandler.cpp */; };
@@ -28,6 +29,7 @@
 		1EC4CE6025CC26E900D7304F /* CHIPClientCallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5C25CC26E900D7304F /* CHIPClientCallbacks.cpp */; };
 		1EC4CE6225CC271B00D7304F /* af-event.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE6125CC271B00D7304F /* af-event.cpp */; };
 		1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1ED0B8CC260125E100D19DB5 /* media-playback-client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1ED0B8CB260125E100D19DB5 /* media-playback-client.cpp */; };
 		2C222AD0255C620600E446B9 /* CHIPDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ACE255C620600E446B9 /* CHIPDevice.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C222AD1255C620600E446B9 /* CHIPDevice.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C222ACF255C620600E446B9 /* CHIPDevice.mm */; };
 		2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */; };
@@ -66,9 +68,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "gen/attribute-size.cpp"; sourceTree = "<group>"; };
 		1EC4CE3825CC263E00D7304F /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
 		1EC4CE3925CC263E00D7304F /* reporting-default-configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "reporting-default-configuration.cpp"; path = "../../../app/reporting/reporting-default-configuration.cpp"; sourceTree = "<group>"; };
-		1EC4CE3C25CC265200D7304F /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/server/DataModelHandler.cpp; sourceTree = "<group>"; };
+		1EC4CE3C25CC265200D7304F /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/util/DataModelHandler.cpp; sourceTree = "<group>"; };
 		1EC4CE3E25CC267600D7304F /* binding-table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "binding-table.cpp"; path = "../../../app/util/binding-table.cpp"; sourceTree = "<group>"; };
 		1EC4CE3F25CC267600D7304F /* ember-print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-print.cpp"; path = "../../../app/util/ember-print.cpp"; sourceTree = "<group>"; };
 		1EC4CE4025CC267600D7304F /* process-global-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-global-message.cpp"; path = "../../../app/util/process-global-message.cpp"; sourceTree = "<group>"; };
@@ -87,6 +90,7 @@
 		1EC4CE5C25CC26E900D7304F /* CHIPClientCallbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClientCallbacks.cpp; path = gen/CHIPClientCallbacks.cpp; sourceTree = "<group>"; };
 		1EC4CE6125CC271B00D7304F /* af-event.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "af-event.cpp"; path = "../../../app/util/af-event.cpp"; sourceTree = "<group>"; };
 		1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClustersObjc.h; path = gen/CHIPClustersObjc.h; sourceTree = "<group>"; };
+		1ED0B8CB260125E100D19DB5 /* media-playback-client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "media-playback-client.cpp"; path = "../../../app/clusters/media-playback-client/media-playback-client.cpp"; sourceTree = "<group>"; };
 		2C222ACE255C620600E446B9 /* CHIPDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevice.h; sourceTree = "<group>"; };
 		2C222ACF255C620600E446B9 /* CHIPDevice.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDevice.mm; sourceTree = "<group>"; };
 		2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevice_Internal.h; sourceTree = "<group>"; };
@@ -142,6 +146,7 @@
 		1EC4CE3525CC259700D7304F /* CHIPApp */ = {
 			isa = PBXGroup;
 			children = (
+				1ED0B8CB260125E100D19DB5 /* media-playback-client.cpp */,
 				1EC4CE6125CC271B00D7304F /* af-event.cpp */,
 				1EC4CE4925CC267700D7304F /* af-main-common.cpp */,
 				1EC4CE4125CC267600D7304F /* attribute-size.cpp */,
@@ -166,6 +171,7 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
+				1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */,
 				1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */,
 				1EC4CE5A25CC26E900D7304F /* call-command-handler.cpp */,
 				1EC4CE5B25CC26E900D7304F /* callback-stub.cpp */,
@@ -404,8 +410,10 @@
 				1EC4CE6225CC271B00D7304F /* af-event.cpp in Sources */,
 				1EC4CE4E25CC267700D7304F /* attribute-size.cpp in Sources */,
 				1EC4CE4D25CC267700D7304F /* process-global-message.cpp in Sources */,
+				1ED0B8CC260125E100D19DB5 /* media-playback-client.cpp in Sources */,
 				1EC4CE5125CC267700D7304F /* message.cpp in Sources */,
 				1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */,
+				1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				1EC4CE5E25CC26E900D7304F /* call-command-handler.cpp in Sources */,
 				1EC4CE3B25CC263E00D7304F /* reporting-default-configuration.cpp in Sources */,
@@ -535,6 +543,7 @@
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+					"$(TEMP_DIR)/out/gen/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -542,6 +551,8 @@
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
+					"-framework",
+					CoreData,
 					"-framework",
 					Foundation,
 					"-framework",
@@ -661,6 +672,7 @@
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					.,
+					"$(TEMP_DIR)/out/gen/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

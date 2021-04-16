@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -89,8 +89,8 @@ enum class FlagValues : uint16_t
 
 };
 
-using Flags   = BitFlags<uint16_t, FlagValues>;
-using ExFlags = BitFlags<uint8_t, ExFlagValues>;
+using Flags   = BitFlags<FlagValues>;
+using ExFlags = BitFlags<ExFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |8 bit Security Flags|
@@ -322,20 +322,17 @@ private:
 class PayloadHeader
 {
 public:
+    constexpr PayloadHeader() { SetProtocol(Protocols::NotSpecified); }
     PayloadHeader & operator=(const PayloadHeader &) = default;
-
-    /**
-     * Gets the vendor id in the current message.
-     *
-     * NOTE: the vendor id is optional and may be missing.
-     */
-    const Optional<uint16_t> & GetVendorId() const { return mVendorId; }
 
     /** Get the Session ID from this header. */
     uint16_t GetExchangeID() const { return mExchangeID; }
 
     /** Get the Protocol ID from this header. */
-    uint16_t GetProtocolID() const { return mProtocolID; }
+    Protocols::Id GetProtocolID() const { return mProtocolID; }
+
+    /** Check whether the header has a given protocol */
+    bool HasProtocol(Protocols::Id protocol) const { return mProtocolID == protocol; }
 
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
@@ -346,7 +343,7 @@ public:
     bool HasMessageType(MessageType type) const
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        return mProtocolID == Protocols::MessageTypeTraits<MessageType>::ProtocolId && HasMessageType(static_cast<uint8_t>(type));
+        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(static_cast<uint8_t>(type));
     }
 
     /**
@@ -355,32 +352,6 @@ public:
      * NOTE: the Acknowledged Message Counter is optional and may be missing.
      */
     const Optional<uint32_t> & GetAckId() const { return mAckId; }
-
-    /** Set the vendor id for this header. */
-    PayloadHeader & SetVendorId(uint16_t id)
-    {
-        mVendorId.SetValue(id);
-        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent);
-
-        return *this;
-    }
-
-    /** Set the vendor id for this header. */
-    PayloadHeader & SetVendorId(Optional<uint16_t> id)
-    {
-        mVendorId = id;
-        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent, id.HasValue());
-
-        return *this;
-    }
-
-    /** Clear the vendor id for this header. */
-    PayloadHeader & ClearVendorId()
-    {
-        mVendorId.ClearValue();
-
-        return *this;
-    }
 
     /**
      * Set the message type for this header.  This requires setting the protocol
@@ -391,9 +362,9 @@ public:
      * message type and hence can't automatically determine the protocol from
      * the message type.
      */
-    PayloadHeader & SetMessageType(uint16_t protocol, uint8_t type)
+    PayloadHeader & SetMessageType(Protocols::Id protocol, uint8_t type)
     {
-        mProtocolID  = protocol;
+        SetProtocol(protocol);
         mMessageType = type;
         return *this;
     }
@@ -404,8 +375,7 @@ public:
     PayloadHeader & SetMessageType(MessageType type)
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
-        mMessageType = static_cast<uint8_t>(type);
-        mProtocolID  = Protocols::MessageTypeTraits<MessageType>::ProtocolId;
+        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(type));
         return *this;
     }
 
@@ -550,6 +520,14 @@ public:
     }
 
 private:
+    constexpr void SetProtocol(Protocols::Id protocol)
+    {
+        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent, protocol.GetVendorId() != VendorId::Common);
+        mProtocolID = protocol;
+    }
+
+    constexpr bool HaveVendorId() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_VendorIdPresent); }
+
     /// Packet type (application data, security control packets, e.g. pairing,
     /// configuration, rekey etc)
     uint8_t mMessageType = 0;
@@ -557,11 +535,8 @@ private:
     /// Security session identifier
     uint16_t mExchangeID = 0;
 
-    /// Vendor identifier
-    Optional<uint16_t> mVendorId;
-
     /// Protocol identifier
-    uint16_t mProtocolID = 0;
+    Protocols::Id mProtocolID = Protocols::NotSpecified;
 
     /// Bit flag indicators for CHIP Exchange header
     Header::ExFlags mExchangeFlags;

@@ -3,8 +3,8 @@
 This article describes how to use
 [CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to
 commission an NXP K32W061 DK6 running
-[NXP K32W Lock Example Application](../../examples/lock-app/k32w/README.md) onto
-a CHIP-enabled Thread network.
+[NXP K32W Lock/Light Example Application](../../examples/lock-light-app/k32w/README.md)
+onto a CHIP-enabled Thread network.
 
 <hr>
 
@@ -12,7 +12,7 @@ a CHIP-enabled Thread network.
 -   [Requirements](#requirements)
 -   [Building and programming OpenThread RCP firmware](#building-rcp-firmware)
 -   [Configuring PC as Thread Border Router](#configuring-pc)
--   [Building and programming NXP K32W Lock Example Application](#building-example)
+-   [Building and programming NXP K32W Lock/Light Example Application](#building-example)
 -   [Building and installing Android CHIPTool](#building-chiptool)
 -   [Forming a Thread network on the Border Router](#form-thread)
 -   [Preparing accessory device](#preparing-accessory)
@@ -27,7 +27,8 @@ a CHIP-enabled Thread network.
 
 The commissioning process is composed of the following main stages:
 
--   K32W061 (CHIP accessory) device is in BLE advertising mode;
+-   K32W061 (CHIP accessory) device is put in BLE advertisment mode by pressing
+    the USERINTERFACE button;
 -   CHIPTool discovers the CHIP accessory over BLE;
 -   CHIPTool establishes a secure channel with the accessory using a SPAKE2+
     handshake;
@@ -45,7 +46,7 @@ with a spare Wi-Fi card and an
 device.
 
 The following diagram shows the connectivity between network components required
-to allow communication between devices running the CHIPTool and Lock
+to allow communication between devices running the CHIPTool and Lock/Light
 applications:
 
 ![nxp_hw_connectivity](../../examples/platform/k32w/doc/images/nxp_hw_connectivity.JPG)
@@ -84,7 +85,8 @@ OpenThread RCP firmware is required to allow the PC to communicate with Thread
 devices. Run the commands mentioned in the following steps to build and program
 the RCP firmware onto an K32W061 DK6:
 
-1.  Clone the OpenThread repository into the current directory:
+1.  Clone the OpenThread repository into the current directory (we recommand
+    using commit ced158e65a00dd5394c04548b7b187d3a3f11eef):
 
         $ git clone https://github.com/openthread/openthread.git
 
@@ -122,8 +124,8 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 1.  Set up Thread Border Router package by following steps
     [3,4,5](https://openthread.io/guides/border-router/build) from the official
     documentation. Use NETWORK_MANAGER=0 as the Wi-Fi AP will be set manually at
-    the next step.
-
+    the next step. Also, we recommend using commit
+    83babaf236cad8471be28185d8d4351d37564919 for ot-br-posix repository.
 2.  Configure the Wi-Fi AP
 
     -   Install the required package:
@@ -306,11 +308,15 @@ To make your PC work as a Thread Border Router, complete the following tasks:
 
 <a name="building-example"></a>
 
-## Building and programming NXP K32W Lock Example Application
+## Building and programming NXP K32W Lock/Light Example Application
 
 See
 [NXP K32W Lock Example Application README](../../examples/lock-app/k32w/README.md)
-to learn how to build and program the example onto an K32W061 DK6.
+to learn how to build and program the lock example onto an K32W061 DK6.
+
+See
+[NXP K32W Light Example Application README](../../examples/lighting-app/k32w/README.md)
+to learn how to build and program the light example onto an K32W061 DK6.
 
 <hr>
 
@@ -414,14 +420,16 @@ following steps:
 1. Enable _Bluetooth_ and _Location_ services on your smartphone;
 2. Connect the smartphone to _OT-BR_ WiFi network;
 3. Open the CHIPTool application on your smartphone;
-4. Tap the _PROVISION CHIP DEVICE WITH THREAD_ button and scan the commissioning
+4. Push the USERINTERFACE button on the K32W board. This will start the BLE
+   advertising process;
+5. Tap the _PROVISION CHIP DEVICE WITH THREAD_ button and scan the commissioning
    QR code. Several notifications will appear, informing you of commissioning
    progress with scanning, connection, and pairing. At the end of this process,
    the Thread network settings screen appears.
 
     ![chiptool_main_screen](../../examples/platform/k32w/doc/images/chiptool_main_screen.png)
 
-5. In the Thread network settings screen, use the default settings and tap the
+6. In the Thread network settings screen, use the default settings and tap the
    _SAVE NETWORK_ button to send a Thread provisioning message to the accessory
    device. You will see the "Network provisioning completed" message when the
    accessory device successfully joins the Thread network.
@@ -442,10 +450,11 @@ following steps:
 
 2. Verify that the text box on the screen is not empty and contains the IPv6
    address of the accessory device.
-3. Tap the following buttons to change the lock state:
+3. Tap the following buttons to change the lock/light state:
 
-    - _ON_ and _OFF_ buttons lock and unlock the door, respectively.
-    - _TOGGLE_ changes the lock state to the opposite.
+    - _ON_ and _OFF_ buttons lock/turn on and unlock/turn off the door/light
+      bulb, respectively.
+    - _TOGGLE_ changes the lock/light state to the opposite.
 
-The _LED D3_ on the device turns on or off based on the changes of the lock
-state.
+The _LED D3_ on the device turns on or off based on the changes of the
+lock/light state.

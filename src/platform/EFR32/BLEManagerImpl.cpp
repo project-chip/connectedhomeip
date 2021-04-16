@@ -28,9 +28,11 @@
 
 #include <platform/internal/BLEManager.h>
 
+#include "FreeRTOS.h"
 #include "sl_bt_api.h"
 #include "sl_bt_stack_config.h"
 #include "sl_bt_stack_init.h"
+#include "timers.h"
 #include <ble/CHIPBleServiceData.h>
 #include <platform/EFR32/freertos_bluetooth.h>
 #include <support/CodeUtils.h>
@@ -65,7 +67,7 @@ namespace {
 #define TIMER_MS_2_TIMERTICK(ms) ((TIMER_CLK_FREQ * ms) / 1000)
 #define TIMER_S_2_TIMERTICK(s) (TIMER_CLK_FREQ * s)
 
-#define BLE_MAX_BUFFER_SIZE (3150)
+#define BLE_MAX_BUFFER_SIZE (3076)
 #define BLE_MAX_ADVERTISERS (1)
 #define BLE_CONFIG_MAX_PERIODIC_ADVERTISING_SYNC (0)
 #define BLE_CONFIG_MAX_SOFTWARE_TIMERS (4)
@@ -74,9 +76,22 @@ namespace {
 #define BLE_CONFIG_RF_PATH_GAIN_TX (0)
 #define BLE_CONFIG_RF_PATH_GAIN_RX (0)
 
+TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
+
 /* Bluetooth stack configuration parameters (see "UG136: Silicon Labs Bluetooth C Application Developer's Guide" for
  * details on each parameter) */
 static sl_bt_configuration_t config;
+
+/** @brief Table of used BGAPI classes */
+static const struct sli_bgapi_class * const bt_class_table[] = { SL_BT_BGAPI_CLASS(system),      SL_BT_BGAPI_CLASS(advertiser),
+                                                                 SL_BT_BGAPI_CLASS(gap),         SL_BT_BGAPI_CLASS(scanner),
+                                                                 SL_BT_BGAPI_CLASS(connection),  SL_BT_BGAPI_CLASS(gatt),
+                                                                 SL_BT_BGAPI_CLASS(gatt_server), SL_BT_BGAPI_CLASS(nvm),
+                                                                 SL_BT_BGAPI_CLASS(sm),          NULL };
+
+StackType_t bluetoothEventStack[CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t bluetoothEventTaskStruct;
+static TaskHandle_t BluetoothEventTaskHandle;
 
 const uint8_t UUID_CHIPoBLEService[]       = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
                                          0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 };
@@ -103,15 +118,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 extern "C" sl_status_t initialize_bluetooth()
 {
     sl_status_t ret = sl_bt_init_stack(&config);
-    sl_bt_class_system_init();
-    sl_bt_class_advertiser_init();
-    sl_bt_class_gap_init();
-    sl_bt_class_scanner_init();
-    sl_bt_class_connection_init();
-    sl_bt_class_gatt_init();
-    sl_bt_class_gatt_server_init();
-    sl_bt_class_nvm_init();
-    sl_bt_class_sm_init();
+    sl_bt_init_classes(bt_class_table);
     sl_bt_init_multiprotocol();
     return ret;
 }
@@ -164,14 +171,25 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(ret == bg_err_success, err = MapBLEError(ret));
 
     // Create the Bluetooth Application task
-    xTaskCreate(bluetoothStackEventHandler,                                       /* Function that implements the task. */
-                CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,                             /* Text name for the task. */
-                CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t), /* Number of indexes in the xStack array. */
-                this,                                                             /* Parameter passed into the task. */
-                CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY,                         /* Priority at which the task is created. */
-                NULL);                                                            /* Variable to hold the task's data structure. */
+    BluetoothEventTaskHandle =
+        xTaskCreateStatic(bluetoothStackEventHandler,               /* Function that implements the task. */
+                          CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,     /* Text name for the task. */
+                          ArraySize(bluetoothEventStack),           /* Number of indexes in the xStack array. */
+                          this,                                     /* Parameter passed into the task. */
+                          CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY, /* Priority at which the task is created. */
+                          bluetoothEventStack,                      /* Pointer to task heap */
+                          &bluetoothEventTaskStruct);               /* Variable that holds the task struct */
 
-    mFlags = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
+    // Create FreeRTOS sw timer for BLE timeouts and interval change.
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
+                                       1,                   // == default timer period (mS)
+                                       false,               // no timer reload (==one-shot)
+                                       (void *) this,       // init timer id = ble obj context
+                                       BleAdvTimeoutHandler // timer callback handler
+    );
+
+    mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:
@@ -315,9 +333,9 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 
     VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (GetFlag(mFlags, kFlag_AdvertisingEnabled) != val)
+    if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
-        SetFlag(mFlags, kFlag_AdvertisingEnabled, val);
+        mFlags.Set(Flags::kAdvertisingEnabled, val);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
@@ -325,20 +343,22 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
-    if (GetFlag(mFlags, kFlag_FastAdvertisingEnabled) != val)
+    switch (mode)
     {
-        SetFlag(mFlags, kFlag_FastAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    case BLEAdvertisingMode::kFastAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
+        break;
+    case BLEAdvertisingMode::kSlowAdvertising:
+        mFlags.Set(Flags::kFastAdvertisingEnabled, false);
+        break;
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-exit:
-    return err;
+    mFlags.Set(Flags::kRestartAdvertising);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -366,7 +386,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         strcpy(mDeviceName, deviceName);
-        SetFlag(mFlags, kFlag_DeviceNameSet, true);
+        mFlags.Set(Flags::kDeviceNameSet);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
         static_assert(kMaxDeviceNameLength <= UINT16_MAX, "deviceName length might not fit in a uint8_t");
         ret = sl_bt_gatt_server_write_attribute_value(gattdb_device_name, 0, strlen(deviceName), (uint8_t *) deviceName);
@@ -539,14 +559,15 @@ void BLEManagerImpl::DriveBLEState(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Check if BLE stack is initialized
-    VerifyOrExit(GetFlag(mFlags, kFlag_EFRBLEStackInitialized), /* */);
+    VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized), /* */);
 
     // Start advertising if needed...
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && GetFlag(mFlags, kFlag_AdvertisingEnabled))
+    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && mFlags.Has(Flags::kAdvertisingEnabled) &&
+        NumConnections() < kMaxConnections)
     {
         // Start/re-start advertising if not already started, or if there is a pending change
         // to the advertising configuration.
-        if (!GetFlag(mFlags, kFlag_Advertising) || GetFlag(mFlags, kFlag_RestartAdvertising))
+        if (!mFlags.Has(Flags::kAdvertising) || mFlags.Has(Flags::kRestartAdvertising))
         {
             err = StartAdvertising();
             SuccessOrExit(err);
@@ -554,7 +575,7 @@ void BLEManagerImpl::DriveBLEState(void)
     }
 
     // Otherwise, stop advertising if it is enabled.
-    else if (GetFlag(mFlags, kFlag_Advertising))
+    else if (mFlags.Has(Flags::kAdvertising))
     {
         err = StopAdvertising();
         SuccessOrExit(err);
@@ -587,7 +608,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     SuccessOrExit(err);
 
-    if (!GetFlag(mFlags, kFlag_DeviceNameSet))
+    if (!mFlags.Has(Flags::kDeviceNameSet))
     {
         snprintf(mDeviceName, sizeof(mDeviceName), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, (uint32_t) 0);
 
@@ -676,21 +697,49 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
     sl_status_t ret;
+    const uint8_t kResolvableRandomAddrType = 2; // Private resolvable random address type
+    bd_addr unusedBdAddr;                        // We can ignore this field when setting random address.
     uint32_t interval_min;
     uint32_t interval_max;
+    uint32_t BleAdvTimeoutMs;
     uint16_t numConnectionss = NumConnections();
     uint8_t connectableAdv =
         (numConnectionss < kMaxConnections) ? sl_bt_advertiser_connectable_scannable : sl_bt_advertiser_scannable_non_connectable;
 
+    // If already advertising, stop it, before changing values
+    if (mFlags.Has(Flags::kAdvertising))
+    {
+        sl_bt_advertiser_stop(sInstance.advertising_set_handle);
+    }
+    else
+    {
+        ChipLogDetail(DeviceLayer, "Start BLE advertissement");
+        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    }
+
     err = ConfigureAdvertisingData();
     SuccessOrExit(err);
 
-    ClearFlag(mFlags, kFlag_RestartAdvertising);
+    sl_bt_advertiser_set_random_address(advertising_set_handle, kResolvableRandomAddrType, unusedBdAddr, &unusedBdAddr);
+    (void) unusedBdAddr;
 
-    interval_min = interval_max =
-        ((numConnectionss == 0 && !ConfigurationMgr().IsPairedToAccount()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled))
-        ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
-        : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
+    mFlags.Clear(Flags::kRestartAdvertising);
+
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        interval_min    = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN;
+        interval_max    = CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX;
+        BleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
+    }
+    else
+    {
+        interval_min    = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+        interval_max    = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        BleAdvTimeoutMs = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
+    }
 
     ret = sl_bt_advertiser_set_timing(advertising_set_handle, interval_min, interval_max, 0, 0);
     err = MapBLEError(ret);
@@ -700,7 +749,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (SL_STATUS_OK == ret)
     {
-        SetFlag(mFlags, kFlag_Advertising, true);
+        StartBleAdvTimeoutTimer(BleAdvTimeoutMs);
+        mFlags.Set(Flags::kAdvertising);
     }
 
     err = MapBLEError(ret);
@@ -714,16 +764,22 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     sl_status_t ret;
 
-    if (GetFlag(mFlags, kFlag_Advertising))
+    if (mFlags.Has(Flags::kAdvertising))
     {
-        ClearFlag(mFlags, kFlag_Advertising);
-        ClearFlag(mFlags, kFlag_RestartAdvertising);
+        mFlags.Clear(Flags::kAdvertising).Clear(Flags::kRestartAdvertising);
+        mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         ret = sl_bt_advertiser_stop(advertising_set_handle);
         sl_bt_advertiser_delete_set(advertising_set_handle);
         advertising_set_handle = 0xff;
         err                    = MapBLEError(ret);
         SuccessOrExit(err);
+
+        CancelBleAdvTimeoutTimer();
+        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising has stopped
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     }
 
 exit:
@@ -754,7 +810,7 @@ void BLEManagerImpl::UpdateMtu(volatile sl_bt_msg_t * evt)
 
 void BLEManagerImpl::HandleBootEvent(void)
 {
-    SetFlag(mFlags, kFlag_EFRBLEStackInitialized, true);
+    mFlags.Set(Flags::kEFRBLEStackInitialized);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -768,7 +824,6 @@ void BLEManagerImpl::HandleConnectEvent(volatile sl_bt_msg_t * evt)
 
     AddConnection(connHandle, bondingHandle);
 
-    // SetFlag(mFlags, kFlag_RestartAdvertising, true);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
@@ -808,7 +863,8 @@ void BLEManagerImpl::HandleConnectionCloseEvent(volatile sl_bt_msg_t * evt)
 
         // Arrange to re-enable connectable advertising in case it was disabled due to the
         // maximum connection limit being reached.
-        SetFlag(mFlags, kFlag_RestartAdvertising, true);
+        mFlags.Set(Flags::kRestartAdvertising);
+        mFlags.Set(Flags::kFastAdvertisingEnabled);
         PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 }
@@ -1025,6 +1081,45 @@ uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)
     }
 
     return freeIndex;
+}
+
+void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
+{
+    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
+        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    }
+    else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
+    {
+        // Advertisement time expired. Stop advertising
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertissement");
+        BLEMgr().SetAdvertisingEnabled(false);
+    }
+}
+
+void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
+{
+    if (xTimerStop(sbleAdvTimeoutTimer, 0) == pdFAIL)
+    {
+        ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
+    }
+}
+
+void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sbleAdvTimeoutTimer))
+    {
+        CancelBleAdvTimeoutTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sbleAdvTimeoutTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
+    {
+        ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
+    }
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)

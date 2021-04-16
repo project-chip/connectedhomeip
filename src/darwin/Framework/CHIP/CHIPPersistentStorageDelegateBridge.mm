@@ -26,7 +26,8 @@ CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
 
-void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue)
+void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(
+    _Nullable id<CHIPPersistentStorageDelegate> delegate, _Nullable dispatch_queue_t queue)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate && queue) {
@@ -39,27 +40,18 @@ void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistent
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::PersistentStorageResultDelegate * delegate)
+void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate) {
             mCallback = delegate;
 
-            mCompletionHandler = ^(NSString * key, NSString * value) {
-                chip::PersistentStorageResultDelegate * callback = mCallback;
-                if (callback) {
-                    dispatch_async(mWorkQueue, ^{
-                        callback->OnValue([key UTF8String], [value UTF8String]);
-                    });
-                }
-            };
-
             mSetStatusHandler = ^(NSString * key, NSError * status) {
                 chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kSET,
-                            [CHIPError errorToCHIPErrorCode:status]);
+                        callback->OnPersistentStorageStatus([key UTF8String],
+                            chip::PersistentStorageResultDelegate::Operation::kSET, [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
             };
@@ -68,42 +60,20 @@ void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::PersistentStorageRes
                 chip::PersistentStorageResultDelegate * callback = mCallback;
                 if (callback) {
                     dispatch_async(mWorkQueue, ^{
-                        callback->OnStatus([key UTF8String], chip::PersistentStorageResultDelegate::Operation::kDELETE,
-                            [CHIPError errorToCHIPErrorCode:status]);
+                        callback->OnPersistentStorageStatus([key UTF8String],
+                            chip::PersistentStorageResultDelegate::Operation::kDELETE, [CHIPError errorToCHIPErrorCode:status]);
                     });
                 }
             };
         } else {
             mCallback = nil;
-            mCompletionHandler = nil;
             mSetStatusHandler = nil;
             mDeleteStatusHandler = nil;
         }
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
-{
-    NSString * keyString = [NSString stringWithUTF8String:key];
-    dispatch_async(mWorkQueue, ^{
-        NSLog(@"PersistentStorageDelegate Get Value for Key: %@", keyString);
-
-        id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
-        if (strongDelegate && mQueue) {
-            dispatch_async(mQueue, ^{
-                [strongDelegate CHIPGetKeyValue:keyString handler:mCompletionHandler];
-            });
-        } else {
-            NSString * value = [mDefaultPersistentStorage objectForKey:keyString];
-            NSLog(@"PersistentStorageDelegate Get Value for Key: %@, value %@", keyString, value);
-            if (mCompletionHandler) {
-                mCompletionHandler(keyString, value);
-            }
-        }
-    });
-}
-
-CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
     __block CHIP_ERROR error = CHIP_NO_ERROR;
     NSString * keyString = [NSString stringWithUTF8String:key];
@@ -120,21 +90,29 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, ch
         }
 
         if (valueString != nil) {
-            if (value != nullptr) {
-                size = strlcpy(value, [valueString UTF8String], size);
+            if (([valueString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] + 1) > UINT16_MAX) {
+                error = CHIP_ERROR_BUFFER_TOO_SMALL;
             } else {
-                size = [valueString length];
+                if (value != nullptr) {
+                    size = (uint16_t) strlcpy(value, [valueString UTF8String], size);
+                    if (size < [valueString lengthOfBytesUsingEncoding:NSUTF8StringEncoding]) {
+                        error = CHIP_ERROR_NO_MEMORY;
+                    }
+                } else {
+                    size = (uint16_t) [valueString lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
+                    error = CHIP_ERROR_NO_MEMORY;
+                }
+                // Increment size to account for null termination
+                size += 1;
             }
-            // Increment size to account for null termination
-            size += 1;
         } else {
-            error = CHIP_ERROR_INVALID_ARGUMENT;
+            error = CHIP_ERROR_KEY_NOT_FOUND;
         }
     });
     return error;
 }
 
-void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const char * value)
+void CHIPPersistentStorageDelegateBridge::AsyncSetKeyValue(const char * key, const char * value)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     NSString * valueString = [NSString stringWithUTF8String:value];
@@ -155,7 +133,7 @@ void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const ch
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::DeleteKeyValue(const char * key)
+void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_async(mWorkQueue, ^{

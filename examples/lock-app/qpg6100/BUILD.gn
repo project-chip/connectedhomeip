@@ -27,30 +27,29 @@ qpg6100_project_dir = "${chip_root}/examples/lock-app/qpg6100"
 examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
 
 qpg6100_sdk("sdk") {
-  include_dirs = [
-    "${chip_root}/src/platform/qpg6100",
-    "${examples_plat_dir}/project_include",
-  ]
-
   sources = [
     "${examples_plat_dir}/app/include/Service.h",
     "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
   ]
 
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
+  include_dirs = [
+    "${chip_root}/src/platform/qpg6100",
+    "${examples_plat_dir}/project_include",
+  ]
 }
 
 qpg6100_executable("lock_app") {
-  include_dirs = []
-  defines = []
   output_name = "chip-qpg6100-lock-example.out"
 
-  public_deps = [
+  sources = [
+    "${examples_plat_dir}/app/Service.cpp",
+    "${examples_plat_dir}/app/main.cpp",
+    "src/AppTask.cpp",
+    "src/BoltLockManager.cpp",
+    "src/ZclCallbacks.cpp",
+  ]
+
+  deps = [
     ":sdk",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
@@ -61,27 +60,19 @@ qpg6100_executable("lock_app") {
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
   ]
 
-  include_dirs += [
-    "${qpg6100_project_dir}/include/",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
+  include_dirs = [
+    "${qpg6100_project_dir}/include",
     "${examples_plat_dir}",
     "${examples_plat_dir}/app/include",
   ]
 
-  sources = [
-    "${examples_plat_dir}/app/Service.cpp",
-    "src/AppTask.cpp",
-    "src/BoltLockManager.cpp",
-    "src/ZclCallbacks.cpp",
-    "src/main.cpp",
-  ]
-
-  output_dir = root_out_dir
+  cflags = [ "-Wconversion" ]
 
   ldscript = "${qpg6100_sdk_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  output_dir = root_out_dir
 }
 
 group("qpg6100") {

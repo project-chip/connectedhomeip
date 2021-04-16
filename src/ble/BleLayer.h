@@ -267,6 +267,7 @@ public:
     BLE_ERROR NewBleConnection(void * appState, uint16_t connDiscriminator,
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
+    BLE_ERROR CancelBleIncompleteConnection();
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
 
     chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)

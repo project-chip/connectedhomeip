@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -52,7 +52,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the K32W platforms.
+ * Concrete implementation of the BLEManager singleton object for the K32W platforms.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -68,9 +68,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -107,15 +106,16 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    enum
+    enum class Flags : uint8_t
     {
-        kFlag_AdvertisingEnabled      = 0x0001,
-        kFlag_FastAdvertisingEnabled  = 0x0002,
-        kFlag_Advertising             = 0x0004,
-        kFlag_RestartAdvertising      = 0x0008,
-        kFlag_K32WBLEStackInitialized = 0x0010,
-        kFlag_DeviceNameSet           = 0x0020,
+        kAdvertisingEnabled      = 0x0001,
+        kFastAdvertisingEnabled  = 0x0002,
+        kAdvertising             = 0x0004,
+        kRestartAdvertising      = 0x0008,
+        kK32WBLEStackInitialized = 0x0010,
+        kDeviceNameSet           = 0x0020,
     };
+    BitFlags<BLEManagerImpl::Flags> mFlags;
 
     enum
     {
@@ -228,6 +228,9 @@ private:
     static void blekw_connection_timeout_cb(TimerHandle_t timer);
     static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
     static void blekw_new_data_received_notification(uint32_t mask);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void CancelBleAdvTimeoutTimer(void);
+    static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
     static CHIP_ERROR blekw_controller_init(void);
     static CHIP_ERROR blekw_host_init(void);
     static void Host_Task(osaTaskParam_t argument);

@@ -28,17 +28,32 @@ step. To install these components manually, follow these steps:
 Currently building in VSCode _and_ deploying from native is not supported, so
 make sure the IDF_PATH has been exported(See the manual setup steps above).
 
--   In the root of the example directory, sync the CHIP tree's submodules and
-    source `idf.sh`. Note: This does not have to be repeated for incremental
-    builds.
+-   Setting up the environment
 
-          $ source idf.sh
+To download and install packages.
+
+        $ cd ${HOME}/tools/esp-idf
+        $ ./install.sh
+        $ . ./export.sh
+        $ cd {path-to-connectedhomeip}
+        $ source ./scripts/bootstrap.sh
+        $ source ./scripts/activate.sh
+        $ cd {path-to-connectedhomeip-examples}
+
+If packages are already installed then simply activate it.
+
+        $ cd ${HOME}/tools/esp-idf
+        $ ./install.sh
+        $ . ./export.sh
+        $ cd {path-to-connectedhomeip}
+        $ source ./scripts/activate.sh
+        $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
 
         To choose from the different configuration options, run menuconfig
 
-          $ idf make menuconfig
+          $ idf.py menuconfig
 
         Select ESP32 based `Device Type` through `Demo`->`Device Type`.
         The device types that are currently supported include `ESP32-DevKitC` (default),
@@ -52,12 +67,9 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
         `Component config`->`CHIP Device Layer`->`WiFi Station Options`->`Default WiFi SSID` and
         `Default WiFi Password` respectively.
 
-        To use the default configuration options, run the default config
-          $ idf make defconfig
+-   To build the demo application.
 
--   Run make to build the demo application.
-
-          $ idf make
+          $ idf.py build
 
 -   After building the application, to flash it outside of VSCode, connect your
     device via USB. Then run the following command to flash the demo application
@@ -68,7 +80,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     before flashing. For ESP32-DevKitC devices this is labeled in the
     [functional description diagram](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/hw-reference/esp32/get-started-devkitc.html#functional-description).
 
-          $ idf make flash monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py flash monitor ESPPORT=/dev/ttyUSB0
 
     Note: Some users might have to install the
     [VCP driver](https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers)
@@ -81,7 +93,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
 -   If desired, the monitor can be run again like so:
 
-          $ idf make monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py monitor ESPPORT=/dev/ttyUSB0
 
 ## Using the Echo Server
 
@@ -93,7 +105,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
-          $ idf make flash monitor ESPPORT=/dev/ttyUSB0
+          $ idf.py flash monitor ESPPORT=/dev/ttyUSB0
 
 3.  The device should boot up and connect to your network. When that happens you
     will see a log like this in the monitor.
@@ -113,7 +125,7 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
-    $ idf make erase_flash ESPPORT=/dev/ttyUSB0
+    $ idf.py erase_flash ESPPORT=/dev/ttyUSB0
 
 The demo application supports temperaturemeasurement and basic cluster.
 

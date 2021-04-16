@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_PATH_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_PATH_H
-
 #include "Builder.h"
 #include "Parser.h"
 #include <core/CHIPCore.h>
@@ -39,11 +36,11 @@ namespace app {
 namespace AttributePath {
 enum
 {
-    kCsTag_NodeId              = 0,
-    kCsTag_EndpointId          = 1,
-    kCsTag_NamespacedClusterId = 2,
-    kCsTag_FieldId             = 3,
-    kCsTag_ListIndex           = 4,
+    kCsTag_NodeId     = 0,
+    kCsTag_EndpointId = 1,
+    kCsTag_ClusterId  = 2,
+    kCsTag_FieldId    = 3,
+    kCsTag_ListIndex  = 4,
 };
 
 class Parser : public chip::app::Parser
@@ -58,6 +55,7 @@ public:
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -72,7 +70,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
-
+#endif
     /**
      *  @brief Get a TLVReader for the NodeId. Next() must be called before accessing them.
      *
@@ -104,7 +102,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetNamespacedClusterId(chip::ClusterId * const apClusterId) const;
+    CHIP_ERROR GetClusterId(chip::ClusterId * const apClusterId) const;
 
     /**
      *  @brief Get a TLVReader for the FieldId. Next() must be called before accessing them.
@@ -171,13 +169,13 @@ public:
     AttributePath::Builder & EndpointId(const chip::EndpointId aEndpointId);
 
     /**
-     *  @brief Inject NamespacedClusterId into the TLV stream.
+     *  @brief Inject ClusterId into the TLV stream.
      *
-     *  @param [in] aNamespacedClusterId NamespacedClusterId for this attribute path
+     *  @param [in] aClusterId ClusterId for this attribute path
      *
      *  @return A reference to *this
      */
-    AttributePath::Builder & NamespacedClusterId(const chip::ClusterId aNamespacedClusterId);
+    AttributePath::Builder & ClusterId(const chip::ClusterId aClusterId);
 
     /**
      *  @brief Inject FieldId into the TLV stream.
@@ -212,5 +210,3 @@ private:
 
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_PATH_H

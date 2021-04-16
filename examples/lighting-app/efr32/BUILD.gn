@@ -17,10 +17,15 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
-import("$dir_pw_protobuf_compiler/proto.gni")
 import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
+
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+}
 
 assert(current_os == "freertos")
 
@@ -30,7 +35,12 @@ examples_plat_dir = "${chip_root}/examples/platform/efr32"
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
-  enable_pw_rpc = false
+
+  # PIN code for PASE session establishment.
+  setupPinCode = 73141520
+
+  # Monitor & log memory usage at runtime.
+  enable_heap_monitoring = false
 }
 
 show_qr_code = true
@@ -41,6 +51,11 @@ if (efr32_board == "BRD4166A") {
 }
 
 efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
@@ -48,41 +63,36 @@ efr32_sdk("sdk") {
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
   ]
 
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  defines = [
+    "BOARD_ID=${efr32_board}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
+    "SL_HEAP_SIZE=(10 * 1024)",
   ]
 
-  defines = []
-  if (is_debug) {
-    defines += [ "BUILD_RELEASE=0" ]
-  } else {
-    defines += [ "BUILD_RELEASE=1" ]
-  }
-
-  defines += [ "BOARD_ID=${efr32_board}" ]
-
-  if (enable_pw_rpc) {
+  if (chip_enable_pw_rpc) {
     defines += [
-      "HAL_VCOM_ENABLE = 1",
+      "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
     ]
   }
 }
 
-if (enable_pw_rpc) {
-  pw_proto_library("pw_light_service_proto") {
-    sources = [ "${chip_root}/examples/lighting-app/lighting-common/pigweed_lighting.proto" ]
-    inputs = [ "${chip_root}/examples/lighting-app/lighting-common/pigweed_lighting.options" ]
-  }
-}
-
 efr32_executable("lighting_app") {
-  include_dirs = []
-  defines = []
   output_name = "chip-efr32-lighting-example.out"
 
-  public_deps = [
+  sources = [
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/Service.cpp",
+    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_plat_dir}/uart.c",
+    "src/AppTask.cpp",
+    "src/ButtonHandler.cpp",
+    "src/LightingManager.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lighting-app/lighting-common",
@@ -94,82 +104,53 @@ efr32_executable("lighting_app") {
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
   ]
 
-  include_dirs += [
-    "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-    "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
+  include_dirs = [ "include" ]
 
-  sources = [
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
-    "${examples_plat_dir}/LEDWidget.cpp",
-    "${examples_plat_dir}/Service.cpp",
-    "${examples_plat_dir}/init_otSystem.c",
-    "src/AppTask.cpp",
-    "src/ButtonHandler.cpp",
-    "src/LightingManager.cpp",
-    "src/ZclCallbacks.cpp",
-    "src/main.cpp",
-  ]
+  defines = []
 
   if (show_qr_code) {
     sources += [ "${examples_plat_dir}/display/lcd.c" ]
-
     defines += [ "DISPLAY_ENABLED" ]
   }
 
-  if (enable_pw_rpc) {
-    public_deps += [
-      ":pw_light_service_proto.nanopb_rpc",
+  if (chip_enable_pw_rpc) {
+    defines += [ "PW_RPC_ENABLED" ]
+    sources += [
+      "${chip_root}/examples/common/pigweed/RpcService.cpp",
+      "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
+      "${examples_plat_dir}/PigweedLogger.cpp",
+      "src/Rpc.cpp",
+    ]
+
+    deps += [
       "$dir_pw_assert",
       "$dir_pw_checksum",
+      "$dir_pw_hdlc:rpc_channel_output",
+      "$dir_pw_stream",
+      "$dir_pw_stream:sys_io_stream",
+      "$dir_pw_sys_io",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
+      "${chip_root}/examples/lighting-app/lighting-common:lighting_service.nanopb_rpc",
       "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
     ]
 
     include_dirs += [
-      "${examples_plat_dir}/pw_sys_io/public",
-      "${dir_pigweed}/pw_sys_io/public",
-      "${dir_pigweed}/pw_span/public_overrides",
-      "${dir_pigweed}/pw_span/public",
-      "${dir_pigweed}/pw_polyfill/public",
-      "${dir_pigweed}/pw_polyfill/standard_library_public",
-      "${dir_pigweed}/pw_polyfill/public_overrides",
-      "${dir_pigweed}/pw_status/public",
-      "${dir_pigweed}/pw_stream/public",
-      "${dir_pigweed}/pw_preprocessor/public",
-      "${dir_pigweed}/pw_rpc/public",
-      "${dir_pigweed}/pw_rpc/nanopb/public",
-      "${dir_pigweed}/pw_rpc/raw/public",
-      "${dir_pigweed}/pw_rpc/system_server/public",
-      "${dir_pigweed}/pw_protobuf/public",
-      "${dir_pigweed}/pw_result/public",
-      "${dir_pigweed}/pw_varint/public",
-      "${chip_root}/third_party/nanopb/repo",
-      "${chip_root}/src/lib/support",
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/efr32",
-      "out/debug/gen/pw_light_service_proto/third_party/connectedhomeip/examples/lighting-app/lighting-common",
-    ]
-
-    sources += [
-      "${chip_root}/examples/common/pigweed/RpcService.cpp",
-      "${chip_root}/examples/common/pigweed/efr32/PigWeedLoggerMutex.cpp",
-      "${examples_plat_dir}/PigweedLogger.cpp",
-      "${examples_plat_dir}/uart.c",
-      "src/Rpc.cpp",
     ]
   }
 
-  output_dir = root_out_dir
+  if (enable_heap_monitoring) {
+    sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
+    defines += [ "HEAP_MONITORING" ]
+  }
 
   if (efr32_family == "efr32mg12") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG12P.ld"
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG12P.ld"
   } else if (efr32_family == "efr32mg21") {
-    ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
+    ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
@@ -180,10 +161,18 @@ efr32_executable("lighting_app") {
       "-fstack-usage",
     ]
   }
+
+  output_dir = root_out_dir
 }
 
 group("efr32") {
   deps = [ ":lighting_app" ]
+  if (chip_enable_pw_rpc) {
+    deps += [
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app.install",
+      "${chip_root}/examples/lighting-app/lighting-common/py:lighting_app_wheel",
+    ]
+  }
 }
 
 group("default") {

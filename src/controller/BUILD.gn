@@ -13,13 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/common_flags.gni")
 
 static_library("controller") {
   output_name = "libChipController"
 
   sources = [
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
@@ -29,8 +27,8 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
-    "CHIPDeviceController_deprecated.cpp",
-    "CHIPDeviceController_deprecated.h",
+    "DeviceAddressUpdateDelegate.h",
+    "EmptyDataModelHandler.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -38,16 +36,14 @@ static_library("controller") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
 
   defines = []
-
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
 }

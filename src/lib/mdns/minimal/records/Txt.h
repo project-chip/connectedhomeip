@@ -27,7 +27,7 @@ namespace Minimal {
 class TxtResourceRecord : public ResourceRecord
 {
 public:
-    static constexpr uint64_t kDefaultTtl = 10;
+    static constexpr uint64_t kDefaultTtl = 4500; // 75 minutes
 
     TxtResourceRecord(const FullQName & qName, const char ** entries, size_t entryCount) :
         ResourceRecord(QType::TXT, qName), mEntries(entries), mEntryCount(entryCount)

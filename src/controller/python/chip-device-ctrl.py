@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2020-2021 Project CHIP Authors
 #    Copyright (c) 2013-2018 Nest Labs, Inc.
 #    All rights reserved.
 #
@@ -36,6 +36,7 @@ import shlex
 import base64
 import textwrap
 import string
+import re
 from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
@@ -125,7 +126,7 @@ def FormatZCLArguments(args, command):
 
 
 class DeviceMgrCmd(Cmd):
-    def __init__(self, rendezvousAddr=None):
+    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=None):
         self.lastNetworkId = None
 
         Cmd.__init__(self)
@@ -142,7 +143,12 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController()
+        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
+
+        # If we are on Linux and user selects non-default bluetooth adapter.
+        if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
+            self.bleMgr = BleManager(self.devCtrl)
+            self.bleMgr.ble_adapter_select("hci{}".format(bluetoothAdapter))
 
         self.historyFileName = os.path.expanduser(
             "~/.chip-device-ctrl-history")
@@ -167,7 +173,9 @@ class DeviceMgrCmd(Cmd):
         "ble-debug-log",
 
         "connect",
+        "resolve",
         "zcl",
+        "zclread",
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
@@ -291,13 +299,18 @@ class DeviceMgrCmd(Cmd):
         """
         ble-adapter-select
 
-        Start BLE adapter select.
+        Start BLE adapter select, deprecated, you can select adapter by command line arguments.
         """
         if sys.platform.startswith("linux"):
             if not self.bleMgr:
                 self.bleMgr = BleManager(self.devCtrl)
 
             self.bleMgr.ble_adapter_select(line)
+            print(
+                "This change only applies to ble-scan\n"
+                "Please run device controller with --bluetooth-adapter=<adapter-name> to select adapter\n" +
+                "e.g. chip-device-ctrl --bluetooth-adapter hci0"
+            )
         else:
             print(
                 "ble-adapter-select only works in Linux, ble-adapter-select mac_address"
@@ -385,6 +398,27 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
 
+    def do_resolve(self, line):
+        """
+        resolve <fabricid> <nodeid>
+
+        Resolve DNS-SD name corresponding with the given fabric and node IDs and
+        update address of the node in the device controller.
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) == 2:
+                err = self.devCtrl.ResolveNode(int(args[0]), int(args[1]))
+                if err == 0:
+                    address = self.devCtrl.GetAddressAndPort(int(args[1]))
+                    address = "{}:{}".format(*address) if address else "unknown"
+                    print("Current address: " + address)
+            else:
+                self.do_help("resolve")
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
+
     def do_zcl(self, line):
         """
         To send ZCL message to device:
@@ -398,13 +432,13 @@ class DeviceMgrCmd(Cmd):
         """
         try:
             args = shlex.split(line)
+            all_commands = self.devCtrl.ZCLCommandList()
             if len(args) == 1 and args[0] == '?':
-                print(self.devCtrl.ZCLList().keys())
+                print('\n'.join(all_commands.keys()))
             elif len(args) == 2 and args[0] == '?':
-                cluster = self.devCtrl.ZCLList().get(args[1], None)
-                if not cluster:
+                if args[1] not in all_commands:
                     raise exceptions.UnknownCluster(args[1])
-                for commands in cluster.items():
+                for commands in all_commands.get(args[1]).items():
                     args = ", ".join(["{}: {}".format(argName, argType)
                                       for argName, argType in commands[1].items()])
                     print(commands[0])
@@ -413,19 +447,57 @@ class DeviceMgrCmd(Cmd):
                     else:
                         print("  <no arguments>")
             elif len(args) > 4:
-                cluster = self.devCtrl.ZCLList().get(args[0], None)
-                if not cluster:
+                if args[0] not in all_commands:
                     raise exceptions.UnknownCluster(args[0])
-                command = cluster.get(args[1], None)
+                command = all_commands.get(args[0]).get(args[1], None)
                 # When command takes no arguments, (not command) is True
                 if command == None:
                     raise exceptions.UnknownCommand(args[0], args[1])
-                self.devCtrl.ZCLSend(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
+                err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
+                if err != 0:
+                    print("Failed to receive command response: {}".format(res))
+                elif res != None:
+                    print("Received command status response:")
+                    print(res)
+                else:
+                    print("Success, no status code is attached with response.")
             else:
                 self.do_help("zcl")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
+            print(str(ex))
+        except Exception as ex:
+            import traceback
+            print("An exception occurred during processing input:")
+            traceback.print_exc()
+            print(str(ex))
+
+    def do_zclread(self, line):
+        """
+        To read ZCL attribute:
+        zclread <cluster> <attribute> <nodeid> <endpoint> <groupid>
+        """
+        try:
+            args = shlex.split(line)
+            all_attrs = self.devCtrl.ZCLAttributeList()
+            if len(args) == 1 and args[0] == '?':
+                print('\n'.join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == '?':
+                if args[1] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[1])
+                print('\n'.join(all_attrs.get(args[1])))
+            elif len(args) == 5:
+                if args[0] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[0])
+                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(args[2]), int(args[3]), int(args[4]))
+            else:
+                self.do_help("zclread")
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during reading ZCL attribute:")
+            print(str(ex))
+        except Exception as ex:
+            print("An exception occurred during processing input:")
             print(str(ex))
 
     def do_setpairingwificredential(self, line):
@@ -508,16 +580,54 @@ def main():
         help="Device rendezvous address",
         metavar="<ip-address>",
     )
+    optParser.add_option(
+        "-n",
+        "--controller-nodeid",
+        action="store",
+        dest="controllerNodeId",
+        default=0,
+        type='int',
+        help="Controller node ID",
+        metavar="<nodeid>",
+    )
+
+    if sys.platform.startswith("linux"):
+        optParser.add_option(
+            "-b",
+            "--bluetooth-adapter",
+            action="store",
+            dest="bluetoothAdapter",
+            default="hci0",
+            type="str",
+            help="Controller bluetooth adapter ID",
+            metavar="<bluetooth-adapter>",
+        )
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
 
     if len(remainingArgs) != 0:
         print("Unexpected argument: %s" % remainingArgs[0])
         sys.exit(-1)
 
-    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr)
+    adapterId = None
+    if sys.platform.startswith("linux"):
+        if not options.bluetoothAdapter.startswith("hci"):
+            print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+            sys.exit(-1)
+        else:
+            try:
+                adapterId = int(options.bluetoothAdapter[3:])
+            except:
+                print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+                sys.exit(-1)
+
+    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr, controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
     print("Chip Device Controller Shell")
     if options.rendezvousAddr:
         print("Rendezvous address set to %s" % options.rendezvousAddr)
+
+    # Adapter ID will always be 0
+    if adapterId != 0:
+        print("Bluetooth adapter set to hci{}".format(adapterId))
     print()
 
     try:

@@ -44,8 +44,8 @@ namespace {
 
 #if CONFIG_LOG
 
-#if !CONFIG_LOG_IMMEDIATE
-#error "Backend of Zephyr logger based on Pigweed HDLC requires LOG_IMMEDIATE=y"
+#if !CONFIG_LOG_MODE_IMMEDIATE
+#error "Backend of Zephyr logger based on Pigweed HDLC requires LOG_MODE_IMMEDIATE=y"
 #endif
 
 constexpr uint8_t kLogHdlcAddress = 1;   // Send log messages to HDLC address 1 (other than RPC communication)

@@ -59,7 +59,7 @@ CommandDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth
 
     if (aDepth == 0)
     {
-        PRETTY_PRINT("\tCommandDataElement = ");
+        PRETTY_PRINT("\tCommandData = ");
     }
     else
     {
@@ -276,7 +276,7 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
             // check if this tag has appeared before
             VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusElement)), err = CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << kCsTag_StatusElement);
-            VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
             {
                 StatusElement::Parser status;
@@ -364,7 +364,7 @@ CHIP_ERROR CommandDataElement::Parser::GetStatusElement(StatusElement::Parser * 
     err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusElement), reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apStatusElement->Init(reader);
     SuccessOrExit(err);

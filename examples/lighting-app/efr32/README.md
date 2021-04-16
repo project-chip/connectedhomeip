@@ -51,11 +51,9 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+#Mac OS X \$ brew install ninja
 
 -   Supported hardware:
 
@@ -114,7 +112,7 @@ OR use GN/Ninja directly
 -   On the command line:
 
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
-          $ python3 out/debug/chip-efr32-lighting-example.out.flash.py
+          $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -213,10 +211,13 @@ combination with JLinkRTTClient as follows:
         -   _Solid On_ ; Light is on
         -   _Off_ ; Light is off
 
-    **Push Button 0** - Press and Release : If not commissioned, start thread
-    with default configurations (DEBUG)
+    **Push Button 0**
 
-        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+            for 30 seconds. The device will then switch to a slower interval advertisement.
+            After 15 minutes, the adverstiment stops.
+
+        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
             procedure. **LEDs** blink in unison when the factory reset procedure is
             initiated.
@@ -268,26 +269,48 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-          # On Border Router :
-          $ sudo ip addr add dev <Network interface> 2002::2/64
+#On Border Router: \$ sudo ip addr add dev <Network interface> 2002::2/64
 
-          # On PC (Linux) :
-          $ sudo ip addr add dev <Network interface> 2002::1/64
+#On PC(Linux): \$ sudo ip addr add dev <Network interface> 2002::1/64
 
-          # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
+#Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
+via 2002::2
 
 <a name="running-pigweed-rpc-console"></a>
 
 ## Running Pigweed RPC console
 
--   If you build the example with pigweed RPC option you can can interact with
-    the example by UART using the RPC LightingService. Call the following
-    command in your terminal
+-   As part of building the example with RPCs enabled the lighting_app python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/lighting_app_wheels. To install
+    the wheel files without rebuilding:
+    `pip3 install out/debug/lighting_app_wheels/*.whl`
 
-    `python -m pw_hdlc.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 /<CHIP_ROOT>/examples/lighting-app/lighting-common/pigweed_lighting.proto -o /<YourFolder>/pw_log.out`
+-   To use the lighting-app console after it has been installed run:
+    `python3 -m lighting_app.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or realease using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
     RELEASE Test toggling the LED with
-    `rpcs.chip.rpc.LightingService.ButtonEvent(idx=1,action=0)`
+    `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
+
+-   You can also Get and Set the light directly using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True)`
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.
+
+To track memory usage you can set `enable_heap_monitoring = true` either in the
+BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
+console the RAM usage of each individual task and the number of Memory
+allocation and Free. While this is not extensive monitoring you're welcome to
+modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+tracking code inside the `trackAlloc` and `trackFree` function

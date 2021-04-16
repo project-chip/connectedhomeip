@@ -45,39 +45,39 @@ enum class MessageType : uint8_t
     BlockAckEOF   = 0x14,
 };
 
-enum StatusCode : uint16_t
+enum class StatusCode : uint16_t
 {
-    kStatus_None                       = 0x0000,
-    kStatus_Overflow                   = 0x0011,
-    kStatus_LengthTooLarge             = 0x0012,
-    kStatus_LengthTooShort             = 0x0013,
-    kStatus_LengthMismatch             = 0x0014,
-    kStatus_LengthRequired             = 0x0015,
-    kStatus_BadMessageContents         = 0x0016,
-    kStatus_BadBlockCounter            = 0x0017,
-    kStatus_TransferFailedUnknownError = 0x001F,
-    kStatus_ServerBadState             = 0x0020,
-    kStatus_FailureToSend              = 0x0021,
-    kStatus_TransferMethodNotSupported = 0x0050,
-    kStatus_FileDesignatorUnknown      = 0x0051,
-    kStatus_StartOffsetNotSupported    = 0x0052,
-    kStatus_VersionNotSupported        = 0x0053,
-    kStatus_Unknown                    = 0x005F,
+    kNone                       = 0x0000,
+    kOverflow                   = 0x0011,
+    kLengthTooLarge             = 0x0012,
+    kLengthTooShort             = 0x0013,
+    kLengthMismatch             = 0x0014,
+    kLengthRequired             = 0x0015,
+    kBadMessageContents         = 0x0016,
+    kBadBlockCounter            = 0x0017,
+    kUnexpectedMessage          = 0x0018,
+    kTransferFailedUnknownError = 0x001F,
+    kFailureToSend              = 0x0021,
+    kTransferMethodNotSupported = 0x0050,
+    kFileDesignatorUnknown      = 0x0051,
+    kStartOffsetNotSupported    = 0x0052,
+    kVersionNotSupported        = 0x0053,
+    kUnknown                    = 0x005F,
 };
 
-enum TransferControlFlags : uint8_t
+enum class TransferControlFlags : uint8_t
 {
     // first 4 bits reserved for version
-    kControl_SenderDrive   = (1U << 4),
-    kControl_ReceiverDrive = (1U << 5),
-    kControl_Async         = (1U << 6),
+    kSenderDrive   = (1U << 4),
+    kReceiverDrive = (1U << 5),
+    kAsync         = (1U << 6),
 };
 
-enum RangeControlFlags : uint8_t
+enum class RangeControlFlags : uint8_t
 {
-    kRange_DefLen      = (1U),
-    kRange_StartOffset = (1U << 1),
-    kRange_Widerange   = (1U << 4),
+    kDefLen      = (1U),
+    kStartOffset = (1U << 1),
+    kWiderange   = (1U << 4),
 };
 
 /**
@@ -136,7 +136,7 @@ struct TransferInit : public BdxMessage
     bool operator==(const TransferInit &) const;
 
     // Proposed Transfer Control (required)
-    BitFlags<uint8_t, TransferControlFlags> TransferCtlOptions;
+    BitFlags<TransferControlFlags> TransferCtlOptions;
     uint8_t Version = 0; ///< The highest version supported by the sender
 
     // All required
@@ -175,7 +175,7 @@ struct SendAccept : public BdxMessage
     bool operator==(const SendAccept &) const;
 
     // Transfer Control (required, only one should be set)
-    BitFlags<uint8_t, TransferControlFlags> TransferCtlFlags;
+    BitFlags<TransferControlFlags> TransferCtlFlags;
 
     uint8_t Version       = 0; ///< The agreed upon version for the transfer (required)
     uint16_t MaxBlockSize = 0; ///< Chosen max block size to use in transfer (required)
@@ -206,7 +206,7 @@ struct ReceiveAccept : public BdxMessage
     bool operator==(const ReceiveAccept &) const;
 
     // Transfer Control (required, only one should be set)
-    BitFlags<uint8_t, TransferControlFlags> TransferCtlFlags;
+    BitFlags<TransferControlFlags> TransferCtlFlags;
 
     // All required
     uint8_t Version       = 0; ///< The agreed upon version for the transfer
@@ -286,7 +286,7 @@ namespace Protocols {
 template <>
 struct MessageTypeTraits<bdx::MessageType>
 {
-    static constexpr uint16_t ProtocolId = chip::Protocols::kProtocol_BDX;
+    static constexpr const Protocols::Id & ProtocolId() { return BDX::Id; }
 };
 } // namespace Protocols
 

@@ -45,12 +45,11 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceLayer.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/CHIPBleServiceData.h>
-#include <platform/CHIPDeviceConfig.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include <cstdint>
@@ -59,6 +58,23 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+enum ChipAdvType
+{
+    BLUEZ_ADV_TYPE_CONNECTABLE = 0x01,
+    BLUEZ_ADV_TYPE_SCANNABLE   = 0x02,
+    BLUEZ_ADV_TYPE_DIRECTED    = 0x04,
+
+    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_NONSCANNABLE = 0,
+    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_CONNECTABLE,
+    BLUEZ_ADV_TYPE_UNDIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_SCANNABLE,
+    BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE       = BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
+
+    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_NONSCANNABLE = BLUEZ_ADV_TYPE_DIRECTED,
+    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_NONSCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE,
+    BLUEZ_ADV_TYPE_DIRECTED_NONCONNECTABLE_SCANNABLE    = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_SCANNABLE,
+    BLUEZ_ADV_TYPE_DIRECTED_CONNECTABLE_SCANNABLE = BLUEZ_ADV_TYPE_DIRECTED | BLUEZ_ADV_TYPE_CONNECTABLE | BLUEZ_ADV_TYPE_SCANNABLE,
+};
 
 #define BLUEZ_ADDRESS_SIZE 6 ///< BLE address size (in bytes)
 #define BLUEZ_PATH "/org/bluez"
@@ -112,11 +128,6 @@ struct IOChannel
     guint mWatch;
 };
 
-struct BluezDiscoveryRequest
-{
-    uint16_t mDiscriminator;
-};
-
 struct BluezEndpoint
 {
     char * mpOwningName; // Bus owning name
@@ -131,9 +142,9 @@ struct BluezEndpoint
     char * mpServicePath;
 
     // Objects (interfaces) subscibed to by this service
-    GDBusObjectManager * mpObjMgr;
-    BluezAdapter1 * mpAdapter;
-    BluezDevice1 * mpDevice;
+    GDBusObjectManager * mpObjMgr = nullptr;
+    BluezAdapter1 * mpAdapter     = nullptr;
+    BluezDevice1 * mpDevice       = nullptr;
 
     // Objects (interfaces) published by this service
     GDBusObjectManagerServer * mpRoot;
@@ -145,7 +156,7 @@ struct BluezEndpoint
 
     // map device path to the connection
     GHashTable * mpConnMap;
-    uint32_t mNodeId;
+    uint32_t mAdapterId;
     bool mIsCentral;
     char * mpAdvertisingUUID;
     chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
@@ -153,9 +164,7 @@ struct BluezEndpoint
     uint16_t mDuration; ///< Advertisement interval (in ms).
     bool mIsAdvertising;
     char * mpPeerDevicePath;
-
-    // Discovery settings
-    BluezDiscoveryRequest mDiscoveryRequest = {};
+    GCancellable * mpConnectCancellable = nullptr;
 };
 
 struct BluezConnection

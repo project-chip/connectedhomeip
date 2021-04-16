@@ -2,6 +2,7 @@
     "name": "CHIP Application templates",
     "version": "chip-v1",
     "helpers": [
+        "common/ListHelper.js",
         "common/StringHelper.js",
         "templates/app/helper.js",
         "templates/chip/helper.js"
@@ -23,6 +24,10 @@
         {
             "name": "command_handler_cluster_commands",
             "path": "partials/command_handler_cluster_commands.zapt"
+        },
+        {
+            "name": "im_command_handler_cluster_commands",
+            "path": "partials/im_command_handler_cluster_commands.zapt"
         }
     ],
     "templates": [
@@ -45,6 +50,11 @@
             "path": "templates/app/attribute-type.zapt",
             "name": "ZCL attribute-type header",
             "output": "attribute-type.h"
+        },
+        {
+            "path": "templates/app/attribute-size-src.zapt",
+            "name": "ZCL attribute-size",
+            "output": "attribute-size.cpp"
         },
         {
             "path": "templates/app/attribute-size.zapt",
@@ -122,12 +132,17 @@
             "output": "CHIPClientCallbacks.cpp"
         },
         {
-            "path": "templates/chip/CHIPClustersObjc.zapt",
+            "path": "templates/app/im-cluster-command-handler.zapt",
+            "name": "CHIP Client Callbacks for Interaction Model",
+            "output": "IMClusterCommandHandler.cpp"
+        },
+        {
+            "path": "templates/app/CHIPClustersObjc.zapt",
             "name": "Objc ZCL API Header",
             "output": "CHIPClustersObjc.h"
         },
         {
-            "path": "templates/chip/CHIPClustersObjc-src.zapt",
+            "path": "templates/app/CHIPClustersObjc-src.zapt",
             "name": "Objc ZCL API",
             "output": "CHIPClustersObjc.mm"
         }

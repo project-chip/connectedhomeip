@@ -26,6 +26,8 @@
 
 #pragma once
 
+#ifdef __cplusplus
+
 #include <core/CHIPError.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
@@ -120,7 +122,7 @@ namespace chip {
 // Generic min() and max() functions
 //
 template <typename _T>
-inline const _T & min(const _T & a, const _T & b)
+constexpr inline const _T & min(const _T & a, const _T & b)
 {
     if (b < a)
         return b;
@@ -129,7 +131,7 @@ inline const _T & min(const _T & a, const _T & b)
 }
 
 template <typename _T>
-inline const _T & max(const _T & a, const _T & b)
+constexpr inline const _T & max(const _T & a, const _T & b)
 {
     if (a < b)
         return b;
@@ -155,6 +157,128 @@ inline const _T & max(const _T & a, const _T & b)
  *
  */
 #define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
+
+/**
+ *  @def ReturnErrorOnFailure(expr)
+ *
+ *  @brief
+ *    Returns the error code if the expression returns something different
+ *    than CHIP_NO_ERROR.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnErrorOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define ReturnErrorOnFailure(expr)                                                                                                 \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnOnFailure(expr)
+ *
+ *  @brief
+ *    Returns if the expression returns something different than CHIP_NO_ERROR
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnOnFailure(channel->SendMsg(msg));
+ *  @endcode
+ *
+ *  @param[in]  expr        A scalar expression to be evaluated against CHIP_NO_ERROR.
+ */
+#define ReturnOnFailure(expr)                                                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        CHIP_ERROR __err = (expr);                                                                                                 \
+        if (__err != CHIP_NO_ERROR)                                                                                                \
+        {                                                                                                                          \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def VerifyOrReturn(expr, ...)
+ *
+ *  @brief
+ *    Returns from the void function if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ * @code
+ *    VerifyOrReturn(param != nullptr, LogError("param is nullptr"));
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ */
+#define VerifyOrReturn(expr, ...)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def VerifyOrReturnError(expr, code)
+ *
+ *  @brief
+ *    Returns a specified error code if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    VerifyOrReturnError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        A value to return if @a expr is false.
+ */
+#define VerifyOrReturnError(expr, code)                                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
+/**
+ *  @def ReturnErrorCodeIf(expr, code)
+ *
+ *  @brief
+ *    Returns a specified error code if expression evaluates to true
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
+ *    ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INVALID_STATE);
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ *  @param[in]  code        A value to return if @a expr is false.
+ */
+#define ReturnErrorCodeIf(expr, code)                                                                                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (expr)                                                                                                                  \
+        {                                                                                                                          \
+            return code;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
 
 /**
  *  @def SuccessOrExit(aStatus)
@@ -356,24 +480,7 @@ inline void chipDie(void)
 #define VerifyOrDieWithMsg(aCondition, aModule, aMessage, ...)                                                                     \
     nlABORT_ACTION(aCondition, ChipLogDetail(aModule, aMessage, ##__VA_ARGS__))
 
-/**
- * @def ArraySize(aArray)
- *
- * @brief
- *   Returns the size of an array in number of elements.
- *
- * Example Usage:
- *
- * @code
- * int numbers[10];
- * SortNumbers(numbers, ArraySize(numbers));
- * @endcode
- *
- * @return      The size of an array in number of elements.
- */
-#define ArraySize(a) (sizeof(a) / sizeof((a)[0]))
-
-#if defined(__cplusplus) && (__cplusplus >= 201103L)
+#if (__cplusplus >= 201103L)
 
 #ifndef __FINAL
 #define __FINAL final
@@ -401,10 +508,9 @@ inline void chipDie(void)
 #define __CONSTEXPR constexpr
 #endif
 
-#endif // defined(__cplusplus) && (__cplusplus >= 201103L)
+#endif // (__cplusplus >= 201103L)
 
-#if defined(__cplusplus) &&                                                                                                        \
-    ((__cplusplus >= 201703L) || (defined(__GNUC__) && (__GNUC__ >= 7)) || (defined(__clang__)) && (__clang_major__ >= 4))
+#if ((__cplusplus >= 201703L) || (defined(__GNUC__) && (__GNUC__ >= 7)) || (defined(__clang__)) && (__clang_major__ >= 4))
 #define CHECK_RETURN_VALUE [[nodiscard]]
 #elif defined(__GNUC__) && (__GNUC__ >= 4)
 #define CHECK_RETURN_VALUE __attribute__((warn_unused_result))
@@ -419,3 +525,26 @@ inline void chipDie(void)
 #else
 #define FALLTHROUGH (void) 0
 #endif
+
+#endif // __cplusplus
+
+/**
+ * @def ArraySize(aArray)
+ *
+ * @brief
+ *   Returns the size of an array in number of elements.
+ *
+ * Example Usage:
+ *
+ * @code
+ * int numbers[10];
+ * SortNumbers(numbers, ArraySize(numbers));
+ * @endcode
+ *
+ * @return      The size of an array in number of elements.
+ *
+ * @note Clever template-based solutions seem to fail when ArraySize is used
+ *       with a variable-length array argument, so we just do the C-compatible
+ *       thing in C++ as well.
+ */
+#define ArraySize(a) (sizeof(a) / sizeof((a)[0]))

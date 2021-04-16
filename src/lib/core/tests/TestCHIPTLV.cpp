@@ -1344,9 +1344,13 @@ void CheckSimpleWriteRead(nlTestSuite * inSuite, void * inContext)
     uint8_t buf[2048];
     TLVWriter writer;
     TLVReader reader;
+    uint32_t remainingFreedLen;
 
     writer.Init(buf, sizeof(buf));
     writer.ImplicitProfileId = TestProfile_2;
+
+    remainingFreedLen = writer.GetRemainingFreeLength();
+    NL_TEST_ASSERT(inSuite, sizeof(buf) == remainingFreedLen);
 
     WriteEncoding1(inSuite, writer);
 
@@ -1457,8 +1461,7 @@ static CHIP_ERROR FindContainerWithElement(const TLVReader & aReader, size_t aDe
 
     if (TLVTypeIsContainer(reader.GetType()))
     {
-        err = reader.EnterContainer(containerType);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
         err = chip::TLV::Utilities::Find(reader, *tag, result, false);
 
@@ -1473,7 +1476,6 @@ static CHIP_ERROR FindContainerWithElement(const TLVReader & aReader, size_t aDe
             err = CHIP_NO_ERROR;
         }
     }
-exit:
     return err;
 }
 
@@ -3529,51 +3531,40 @@ static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite * inSuite, TLVReader & reader)
     do                                                                                                                             \
     {                                                                                                                              \
         TYPE val;                                                                                                                  \
-        err = reader.Get(val);                                                                                                     \
-        SuccessOrExit(err);                                                                                                        \
-        VerifyOrExit(val == (VAL), err = CHIP_ERROR_INVALID_ARGUMENT);                                                             \
+        ReturnErrorOnFailure(reader.Get(val));                                                                                     \
+        VerifyOrReturnError(val == (VAL), CHIP_ERROR_INVALID_ARGUMENT);                                                            \
     } while (0)
 
 #define FUZZ_CHECK_STRING(VAL)                                                                                                     \
     do                                                                                                                             \
     {                                                                                                                              \
         char buf[sizeof(VAL)];                                                                                                     \
-        VerifyOrExit(reader.GetLength() == strlen(VAL), err = CHIP_ERROR_INVALID_ADDRESS);                                         \
-        err = reader.GetString(buf, sizeof(buf));                                                                                  \
-        SuccessOrExit(err);                                                                                                        \
-        VerifyOrExit(strcmp(buf, (VAL)) == 0, err = CHIP_ERROR_INVALID_ADDRESS);                                                   \
+        VerifyOrReturnError(reader.GetLength() == strlen(VAL), CHIP_ERROR_INVALID_ADDRESS);                                        \
+        ReturnErrorOnFailure(reader.GetString(buf, sizeof(buf)));                                                                  \
+        VerifyOrReturnError(strcmp(buf, (VAL)) == 0, CHIP_ERROR_INVALID_ADDRESS);                                                  \
     } while (0)
 
-    err = reader.Next(kTLVType_Structure, ProfileTag(TestProfile_1, 1));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, ProfileTag(TestProfile_1, 1)));
 
     {
         TLVType outerContainer1Type;
 
-        err = reader.EnterContainer(outerContainer1Type);
-        SuccessOrExit(err);
-
-        err = reader.Next(kTLVType_Boolean, ProfileTag(TestProfile_1, 2));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.EnterContainer(outerContainer1Type));
+        ReturnErrorOnFailure(reader.Next(kTLVType_Boolean, ProfileTag(TestProfile_1, 2)));
 
         FUZZ_CHECK_VAL(bool, true);
 
-        err = reader.Next(kTLVType_Boolean, ProfileTag(TestProfile_2, 2));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.Next(kTLVType_Boolean, ProfileTag(TestProfile_2, 2)));
 
         FUZZ_CHECK_VAL(bool, false);
 
-        err = reader.Next(kTLVType_Array, ContextTag(0));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.Next(kTLVType_Array, ContextTag(0)));
 
         {
             TLVType outerContainer2Type;
 
-            err = reader.EnterContainer(outerContainer2Type);
-            SuccessOrExit(err);
-
-            err = reader.Next(kTLVType_SignedInteger, AnonymousTag);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.EnterContainer(outerContainer2Type));
+            ReturnErrorOnFailure(reader.Next(kTLVType_SignedInteger, AnonymousTag));
 
             FUZZ_CHECK_VAL(int8_t, 42);
             FUZZ_CHECK_VAL(int16_t, 42);
@@ -3584,108 +3575,80 @@ static CHIP_ERROR ReadFuzzedEncoding1(nlTestSuite * inSuite, TLVReader & reader)
             FUZZ_CHECK_VAL(uint32_t, 42);
             FUZZ_CHECK_VAL(uint64_t, 42);
 
-            err = reader.Next(kTLVType_SignedInteger, AnonymousTag);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.Next(kTLVType_SignedInteger, AnonymousTag));
 
             FUZZ_CHECK_VAL(int8_t, -17);
             FUZZ_CHECK_VAL(int16_t, -17);
             FUZZ_CHECK_VAL(int32_t, -17);
             FUZZ_CHECK_VAL(int64_t, -17);
 
-            err = reader.Next(kTLVType_SignedInteger, AnonymousTag);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.Next(kTLVType_SignedInteger, AnonymousTag));
 
             FUZZ_CHECK_VAL(int32_t, -170000);
             FUZZ_CHECK_VAL(int64_t, -170000);
 
-            err = reader.Next(kTLVType_UnsignedInteger, AnonymousTag);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.Next(kTLVType_UnsignedInteger, AnonymousTag));
 
             FUZZ_CHECK_VAL(int64_t, 40000000000ULL);
             FUZZ_CHECK_VAL(uint64_t, 40000000000ULL);
 
-            err = reader.Next(kTLVType_Structure, AnonymousTag);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
 
             {
                 TLVType outerContainer3Type;
 
-                err = reader.EnterContainer(outerContainer3Type);
-                SuccessOrExit(err);
-
-                err = reader.ExitContainer(outerContainer3Type);
-                SuccessOrExit(err);
+                ReturnErrorOnFailure(reader.EnterContainer(outerContainer3Type));
+                ReturnErrorOnFailure(reader.ExitContainer(outerContainer3Type));
             }
 
-            err = reader.Next(kTLVType_List, AnonymousTag);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.Next(kTLVType_List, AnonymousTag));
 
             {
                 TLVType outerContainer3Type;
 
-                err = reader.EnterContainer(outerContainer3Type);
-                SuccessOrExit(err);
-
-                err = reader.Next(kTLVType_Null, ProfileTag(TestProfile_1, 17));
-                SuccessOrExit(err);
-
-                err = reader.Next(kTLVType_Null, ProfileTag(TestProfile_2, 900000));
-                SuccessOrExit(err);
-
-                err = reader.Next(kTLVType_Null, AnonymousTag);
-                SuccessOrExit(err);
-
-                err = reader.Next(kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL));
-                SuccessOrExit(err);
+                ReturnErrorOnFailure(reader.EnterContainer(outerContainer3Type));
+                ReturnErrorOnFailure(reader.Next(kTLVType_Null, ProfileTag(TestProfile_1, 17)));
+                ReturnErrorOnFailure(reader.Next(kTLVType_Null, ProfileTag(TestProfile_2, 900000)));
+                ReturnErrorOnFailure(reader.Next(kTLVType_Null, AnonymousTag));
+                ReturnErrorOnFailure(reader.Next(kTLVType_Structure, ProfileTag(TestProfile_2, 4000000000ULL)));
 
                 {
                     TLVType outerContainer4Type;
 
-                    err = reader.EnterContainer(outerContainer4Type);
-                    SuccessOrExit(err);
-
-                    err = reader.Next(kTLVType_UTF8String, CommonTag(70000));
-                    SuccessOrExit(err);
+                    ReturnErrorOnFailure(reader.EnterContainer(outerContainer4Type));
+                    ReturnErrorOnFailure(reader.Next(kTLVType_UTF8String, CommonTag(70000)));
 
                     FUZZ_CHECK_STRING(sLargeString);
 
-                    err = reader.ExitContainer(outerContainer4Type);
-                    SuccessOrExit(err);
+                    ReturnErrorOnFailure(reader.ExitContainer(outerContainer4Type));
                 }
 
-                err = reader.ExitContainer(outerContainer3Type);
-                SuccessOrExit(err);
+                ReturnErrorOnFailure(reader.ExitContainer(outerContainer3Type));
             }
 
-            err = reader.ExitContainer(outerContainer2Type);
-            SuccessOrExit(err);
+            ReturnErrorOnFailure(reader.ExitContainer(outerContainer2Type));
         }
 
-        err = reader.Next(kTLVType_UTF8String, ProfileTag(TestProfile_1, 5));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.Next(kTLVType_UTF8String, ProfileTag(TestProfile_1, 5)));
 
         FUZZ_CHECK_STRING("This is a test");
 
-        err = reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535)));
 
         FUZZ_CHECK_VAL(double, (float) 17.9);
 
-        err = reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.Next(kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536)));
 
         FUZZ_CHECK_VAL(double, (double) 17.9);
 
-        err = reader.ExitContainer(outerContainer1Type);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(reader.ExitContainer(outerContainer1Type));
     }
 
     err = reader.Next();
     if (err == CHIP_END_OF_TLV)
         err = CHIP_NO_ERROR;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 static time_t sFuzzTestDurationSecs = 5;

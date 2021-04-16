@@ -13,9 +13,37 @@
 # limitations under the License.
 
 import("//build_overrides/pigweed.gni")
+
 import("$dir_pw_build/target_types.gni")
+import("pigweed_rpcs.gni")
+
+config("default_config") {
+  include_dirs = [ ".." ]
+}
+
+if (chip_enable_pw_rpc) {
+  import("//build_overrides/pigweed.gni")
+  import("$dir_pw_protobuf_compiler/proto.gni")
+
+  pw_proto_library("device_service") {
+    sources = [ "protos/device_service.proto" ]
+    inputs = [ "protos/device_service.options" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "device_service"
+  }
+
+  pw_proto_library("button_service") {
+    sources = [ "protos/button_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
+    strip_prefix = "protos"
+    prefix = "button_service"
+  }
+}
 
 pw_source_set("system_rpc_server") {
+  sources = [ "system_rpc_server.cc" ]
+
   deps = [
     "$dir_pw_hdlc:pw_rpc",
     "$dir_pw_hdlc:rpc_channel_output",
@@ -23,5 +51,8 @@ pw_source_set("system_rpc_server") {
     "$dir_pw_stream:sys_io_stream",
     dir_pw_log,
   ]
-  sources = [ "system_rpc_server.cc" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_configs = [ ":default_config" ]
 }

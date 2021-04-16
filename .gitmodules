@@ -28,24 +28,24 @@
 	branch = master
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
-	url = https://pigweed.googlesource.com/pigweed/pigweed
-	branch = master
+	url = https://github.com/google/pigweed.git
+	branch = main
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
-	branch = master
+	branch = main
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
-	branch = master
+	branch = main
 [submodule "bluez"]
 	path = third_party/bluez/repo
-	url = https://kernel.googlesource.com/pub/scm/bluetooth/bluez.git
+	url = https://github.com/bluez/bluez.git
 	branch = master
 [submodule "ot-commissioner"]
 	path = third_party/ot-commissioner/repo
 	url = https://github.com/openthread/ot-commissioner
-	branch = master
+	branch = main
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
@@ -74,3 +74,7 @@
 	path = third_party/efr32_sdk/repo
 	url = https://github.com/SiliconLabs/sdk_support.git
 	branch = master
+[submodule "simw-top-mini"]
+	path = third_party/simw-top-mini/repo
+	url = https://github.com/NXP/plug-and-trust.git
+	branch = int/CHIPSE_Release

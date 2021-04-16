@@ -22,7 +22,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 
 #include "Server.h"
 #include "attribute-storage.h"
@@ -84,7 +84,7 @@ int AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     err = LightingMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -102,7 +102,7 @@ int AppTask::Init()
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     return err;
 }
@@ -219,7 +219,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 {
     ChipLogProgress(NotSpecified, "ButtonEventHandler %d, %d", btnIdx, btnPressed);
-    if (btnIdx != APP_ON_OFF_BUTTON && btnIdx != APP_FUNCTION_BUTTON)
+    if (btnIdx != APP_ON_OFF_BUTTON && btnIdx != APP_FUNCTION_BUTTON && btnIdx != APP_LEVEL_BUTTON)
     {
         return;
     }
@@ -234,11 +234,16 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         button_event.Handler = LightingActionEventHandler;
         sAppTask.PostEvent(&button_event);
     }
-    else if (btnIdx == APP_FUNCTION_BUTTON)
+    else if (btnIdx == APP_LEVEL_BUTTON)
     {
-        // TODO hijacked the function button to change level
         button_event.Type    = AppEvent::kEventType_Level;
         button_event.Handler = LightingActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (btnIdx == APP_FUNCTION_BUTTON)
+    {
+        button_event.Type    = AppEvent::kEventType_Level;
+        button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
 }

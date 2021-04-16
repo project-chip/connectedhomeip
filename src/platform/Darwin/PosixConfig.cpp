@@ -79,7 +79,7 @@ CHIP_ERROR PosixConfig::Init()
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -88,7 +88,7 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -97,7 +97,7 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -106,7 +106,7 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -115,7 +115,7 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -124,7 +124,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -133,7 +133,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -142,7 +142,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -151,7 +151,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -160,7 +160,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -169,7 +169,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:
@@ -178,7 +178,7 @@ exit:
 
 CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     SuccessOrExit(err);
 
 exit:

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,13 +70,20 @@ public:
     CHIP_ERROR FlushAcks();
 
     /**
-     *  Get the current retransmit timeout. It would be either the initial or
-     *  the active retransmit timeout based on whether the ExchangeContext has
-     *  an active message exchange going with its peer.
+     *  Get the initial retransmission interval. It would be the time to wait before
+     *  retransmission after first failure.
      *
-     *  @return the current retransmit time.
+     *  @return the initial retransmission interval.
      */
-    uint64_t GetCurrentRetransmitTimeoutTick();
+    uint64_t GetInitialRetransmitTimeoutTick();
+
+    /**
+     *  Get the active retransmit interval. It would be the time to wait before
+     *  retransmission after subsequent failures.
+     *
+     *  @return the active retransmission interval.
+     */
+    uint64_t GetActiveRetransmitTimeoutTick();
 
     /**
      *  Send a SecureChannel::StandaloneAck message.
@@ -203,16 +210,17 @@ private:
         kFlagMsgRcvdFromPeer = 0x0080,
     };
 
-    BitFlags<uint16_t, Flags> mFlags; // Internal state flags
+    BitFlags<Flags> mFlags; // Internal state flags
 
     void Retain();
     void Release();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
-    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags);
+    CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<MessageFlagValues> Flags);
 
 private:
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
+    friend class ExchangeMessageDispatch;
 
     ReliableMessageMgr * mManager;
     ExchangeContext * mExchange;

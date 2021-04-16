@@ -45,6 +45,7 @@ int main()
     cmd_device_init();
     cmd_btp_init();
     cmd_otcli_init();
+    cmd_ping_init();
 
     shell_task(nullptr);
     return 0;

@@ -24,6 +24,13 @@ _bootstrap_or_activate() {
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
     local _CHIP_ROOT="$(cd "${_BOOTSTRAP_PATH%/*}/.." && pwd)"
 
+    local _CONFIG_FILE="scripts/environment.json"
+
+    if [ "$_BOOTSTRAP_NAME" = "no_cipd_bootstrap.sh" ]; then
+        _CONFIG_FILE="scripts/environment_no_cipd.json"
+        _BOOTSTRAP_NAME="bootstrap.sh"
+    fi
+
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
         [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
         git submodule update --init
@@ -66,9 +73,7 @@ EOF
         [ ! -s "$_SETUP_SH" ]; then
         pw_bootstrap --shell-file "$_SETUP_SH" \
             --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
-            --virtualenv-requirements "$_CHIP_ROOT/scripts/requirements.txt" \
-            --cipd-package-file "$_CHIP_ROOT/scripts/pigweed.json" \
-            --virtualenv-gn-target "$_CHIP_ROOT#:python_packages.install"
+            --config-file "$_CHIP_ROOT/$_CONFIG_FILE"
         pw_finalize bootstrap "$_SETUP_SH"
     else
         pw_activate

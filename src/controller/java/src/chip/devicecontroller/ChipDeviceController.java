@@ -46,7 +46,7 @@ public class ChipDeviceController {
     return AndroidChipStack.getInstance().getCallback();
   }
 
-  public void beginConnectDeviceBle(BluetoothGatt bleServer, long setupPincode) {
+  public void pairDevice(BluetoothGatt bleServer, long deviceId, long setupPincode) {
     if (connectionId == 0) {
       bleGatt = bleServer;
 
@@ -58,31 +58,24 @@ public class ChipDeviceController {
       }
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
-      beginConnectDevice(deviceControllerPtr, connectionId, setupPincode);
+      Log.d(TAG, "Pairing device with ID: " + deviceId);
+      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
     }
   }
 
-  public void beginConnectDevice(String ipAddress) {
-    beginConnectDeviceIp(deviceControllerPtr, ipAddress);
+  public void unpairDevice(long deviceId) {
+    unpairDevice(deviceControllerPtr, deviceId);
   }
 
-  public boolean isConnected() {
-    return isConnected(deviceControllerPtr);
+  public void pairTestDeviceWithoutSecurity(String ipAddress) {
+    pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
   }
 
-  public String getIpAddress() {
-    return getIpAddress(deviceControllerPtr);
-  }
-
-  public void beginSendMessage(String message) {
-    beginSendMessage(deviceControllerPtr, message);
-  }
-
-  public void beginSendCommand(ChipCommandType command, int value) {
-    beginSendCommand(deviceControllerPtr, command, value);
+  public void pairDevice(long deviceId, int connectionId, long pinCode) {
+    pairDevice(deviceControllerPtr, deviceId, connectionId, pinCode);
   }
 
   public void sendWiFiCredentials(String ssid, String password) {
@@ -93,8 +86,8 @@ public class ChipDeviceController {
     sendThreadCredentials(deviceControllerPtr, channel, panId, xpanId, masterKey);
   }
 
-  public boolean disconnectDevice() {
-    return disconnectDevice(deviceControllerPtr);
+  public boolean disconnectDevice(long deviceId) {
+    return disconnectDevice(deviceControllerPtr, deviceId);
   }
 
   public void onConnectDeviceComplete() {
@@ -179,29 +172,54 @@ public class ChipDeviceController {
     return true;
   }
 
+  public String getIpAddress(long deviceId) {
+    return getIpAddress(deviceControllerPtr, deviceId);
+  }
+
+  public void sendMessage(long deviceId, String message) {
+    sendMessage(deviceControllerPtr, deviceId, message);
+  }
+
+  public void sendCommand(long deviceId, ChipCommandType command, int value) {
+    sendCommand(deviceControllerPtr, deviceId, command, value);
+  }
+
+  public boolean openPairingWindow(long deviceId, int duration) {
+    return openPairingWindow(deviceControllerPtr, deviceId, duration);
+  }
+
+  public boolean isActive(long deviceId) {
+    return isActive(deviceControllerPtr, deviceId);
+  }
+
   private native long newDeviceController();
 
-  private native void beginConnectDevice(long deviceControllerPtr, int connectionId, long pinCode);
+  private native void pairDevice(
+      long deviceControllerPtr, long deviceId, int connectionId, long pinCode);
 
-  private native void beginConnectDeviceIp(long deviceControllerPtr, String ipAddress);
+  private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
-  private native boolean isConnected(long deviceControllerPtr);
-
-  private native String getIpAddress(long deviceControllerPtr);
-
-  private native void beginSendMessage(long deviceControllerPtr, String message);
-
-  private native void beginSendCommand(
-      long deviceControllerPtr, ChipCommandType command, int value);
+  private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
   private native void sendWiFiCredentials(long deviceControllerPtr, String ssid, String password);
 
   private native void sendThreadCredentials(
       long deviceControllerPtr, int channel, int panId, byte[] xpanId, byte[] masterKey);
 
-  private native boolean disconnectDevice(long deviceControllerPtr);
+  private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
   private native void deleteDeviceController(long deviceControllerPtr);
+
+  private native String getIpAddress(long deviceControllerPtr, long deviceId);
+
+  private native void sendMessage(long deviceControllerPtr, long deviceId, String message);
+
+  private native void sendCommand(
+      long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
+
+  private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
+
+  private native boolean isActive(long deviceControllerPtr, long deviceId);
 
   static {
     System.loadLibrary("CHIPController");

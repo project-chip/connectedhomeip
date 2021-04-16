@@ -18,13 +18,14 @@ cmake_minimum_required(VERSION 3.13.1)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Load NCS/Zephyr build system
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(chip-nrf52840-shell-example)
+project(chip-nrfconnect-shell-example)
 
 target_compile_options(app PRIVATE -Werror)
 
@@ -37,6 +38,7 @@ target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/cmd_device.cpp
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
+    ${APP_ROOT}/shell_common/cmd_ping.cpp    
     ${APP_ROOT}/shell_common/cmd_btp.cpp
     ${APP_ROOT}/standalone/main.cpp
 )

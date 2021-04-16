@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "FreeRTOS.h"
 #include "qvCHIP.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,7 +36,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the platform.
+ * Concrete implementation of the BLEManager singleton object for the platform.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -50,9 +52,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -87,15 +88,16 @@ private:
 
     // ===== Private members reserved for use by this class only.
 
-    enum
+    enum class Flags : uint16_t
     {
-        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kFlag_AdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
-        kFlag_FastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
-        kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
-        kFlag_AdvertisingRefreshNeeded =
-            0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
-        kFlag_DeviceNameSet = 0x0020,
+        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kAdvertisingEnabled       = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
+        kFastAdvertisingEnabled   = 0x0004, /**< The application has enabled fast advertising. */
+        kAdvertising              = 0x0008, /**< The system is currently CHIPoBLE advertising. */
+        kAdvertisingRefreshNeeded = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
+        kDeviceNameSet            = 0x0020, /**< The device name has been set. */
+        kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
+                                            flag is set*/
     };
 
     enum
@@ -106,7 +108,7 @@ private:
     };
 
     CHIPoBLEServiceMode mServiceMode;
-    uint16_t mFlags;
+    BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
     uint16_t mNumGAPCons;
     uint16_t mSubscribedConIds[kMaxConnections];
@@ -125,6 +127,7 @@ private:
     void HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt);
     void HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt);
 
+    CHIP_ERROR MapBLEError(int bleErr) const;
     /* Callbacks from BLE stack*/
     static void ExternalCbHandler(qvCHIP_Ble_MsgHdr_t * pMsg);
     static void HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, qvCHIP_Ble_Attr_t * pAttr);
@@ -136,6 +139,9 @@ private:
 
     /* Handlers for stack events */
     static void _handleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void CancelBleAdvTimeoutTimer(void);
+    static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
 };
 
 /**
@@ -172,17 +178,12 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
+    return mFlags.Has(Flags::kAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)
 {
-    return GetFlag(mFlags, kFlag_Advertising);
+    return mFlags.Has(Flags::kAdvertising);
 }
 
 } // namespace Internal

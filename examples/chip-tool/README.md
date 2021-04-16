@@ -136,7 +136,7 @@ and the `parse-setup-payload` command
 
 #### QR Code with optional Vendor Info
 
-    $ chip-tool chip-tool payload parse-setup-payload "CH:#####"
+    $ chip-tool payload parse-setup-payload "CH:#####"
 
 #### Manual Setup Code
 

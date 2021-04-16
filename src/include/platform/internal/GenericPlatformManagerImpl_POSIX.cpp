@@ -30,8 +30,8 @@
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_POSIX<> template inherits.
-#if CHIP_ENABLE_MDNS
-#include <platform/Linux/MdnsImpl.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+#include "lib/mdns/platform/Mdns.h"
 #endif
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
@@ -46,6 +46,15 @@
 #include <unistd.h>
 
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+namespace chip {
+namespace Mdns {
+void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
+void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
+} // namespace Mdns
+} // namespace chip
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -141,7 +150,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
         InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-#if CHIP_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     chip::Mdns::UpdateMdnsDataset(mReadSet, mWriteSet, mErrorSet, mMaxFd, mNextTimeout);
 #endif
 }
@@ -178,7 +187,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
     ProcessDeviceEvents();
-#if CHIP_ENABLE_MDNS
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     chip::Mdns::ProcessMdns(mReadSet, mWriteSet, mErrorSet);
 #endif
 }
@@ -232,6 +241,8 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
         SystemLayer.WakeSelect();
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
+    // Call up to the base class _Shutdown() to perform the bulk of the shutdown.
+    err = GenericPlatformManagerImpl<ImplClass>::_Shutdown();
 
 exit:
     return System::MapErrorPOSIX(err);

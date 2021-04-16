@@ -19,9 +19,9 @@
 
 #include <app/server/AppDelegate.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <support/ReturnMacros.h>
-#include <transport/RendezvousSession.h>
+#include <protocols/secure_channel/RendezvousSession.h>
 
 namespace chip {
 
@@ -30,8 +30,8 @@ class RendezvousServer : public RendezvousSessionDelegate
 public:
     RendezvousServer();
 
-    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
-                              Transport::AdminPairingInfo * admin);
+    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
+                              TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin);
 
     CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage)
     {

@@ -20,6 +20,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "ServiceNaming.h"
 #include <mdns/minimal/ResponseSender.h>
 #include <mdns/minimal/Server.h>
 #include <mdns/minimal/core/FlatAllocatedQName.h>
@@ -30,8 +31,10 @@
 #include <mdns/minimal/responders/Txt.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
+
+// Enable detailed mDNS logging for received queries
+#undef DETAIL_LOGGING
 
 namespace chip {
 namespace Mdns {
@@ -39,6 +42,7 @@ namespace {
 
 using namespace mdns::Minimal;
 
+#ifdef DETAIL_LOGGING
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -85,6 +89,9 @@ void LogQuery(const QueryData & data)
 
     ChipLogDetail(Discovery, "%s", logString.c_str());
 }
+#else
+void LogQuery(const QueryData & data) {}
+#endif
 
 /// Checks if the current interface is powered on
 /// and not local loopback.
@@ -295,7 +302,7 @@ private:
 
     FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
-    static constexpr size_t kMaxEndPoints           = 10;
+    static constexpr size_t kMaxEndPoints           = 30;
     static constexpr size_t kMaxRecords             = 16;
     static constexpr size_t kMaxAllocatedResponders = 16;
     static constexpr size_t kMaxAllocatedQNameData  = 8;
@@ -319,7 +326,9 @@ private:
 
 void AdvertiserMinMdns::OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+#ifdef DETAIL_LOGGING
     ChipLogDetail(Discovery, "MinMdns received a query.");
+#endif
 
     mCurrentSource = info;
     if (!ParsePacket(data, this))
@@ -390,19 +399,16 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 {
     Clear();
 
-    char uniqueName[64] = "";
+    char nameBuffer[64] = "";
 
     /// need to set server name
-    size_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
-    if (len >= sizeof(uniqueName))
-    {
-        ChipLogError(Discovery, "Failed to allocate QNames.");
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetFabricId(), params.GetNodeId()));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
-    FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
-    FullQName serverName             = AllocateQName(uniqueName, "local");
+    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chip", "_tcp", "local");
+
+    ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
+    FullQName serverName = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -469,7 +475,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
-    FullQName serverName             = AllocateQName(nameBuffer, "local");
+
+    ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
+    FullQName serverName = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -581,11 +589,11 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     char txtVidPid[64];
     if (params.GetProductId().HasValue())
     {
-        sprintf(txtVidPid, "V=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
+        sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
     }
     else
     {
-        sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
+        sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
     char txtPairingInstrHint[128];

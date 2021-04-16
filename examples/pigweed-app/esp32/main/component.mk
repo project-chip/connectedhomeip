@@ -24,6 +24,8 @@ COMPONENT_DEPENDS := chip
 COMPONENT_SRCDIRS :=                                                                \
   .                                                                                 \
   ../../../common/pigweed															\
+  ../../../common/pigweed/esp32                                                     \
+  ../../../platform/esp32                                                           \
 
 COMPONENT_ADD_INCLUDEDIRS += ../third_party/connectedhomeip/third_party/pigweed/repo/pw_sys_io/public 				\
 							../third_party/connectedhomeip/third_party/pigweed/repo/pw_assert/public    			\
@@ -53,11 +55,20 @@ COMPONENT_ADD_INCLUDEDIRS += ../third_party/connectedhomeip/third_party/pigweed/
 							../third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/system_server/public 	\
 							../third_party/connectedhomeip/third_party/nanopb/repo                                  \
 							../../../platform/esp32/pw_sys_io/public 				\
+							../../../platform/esp32                                 \
 							../../../common/pigweed									\
-							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos \
+							../../../common/pigweed/esp32                           \
+							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb \
+							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/nanopb_rpc \
+							../build/chip/gen/third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc/protos.proto_library/pwpb \
 							../../../../src/lib/support    \
 
 COMPONENT_EXTRA_INCLUDES := ${IDF_PATH}/components/freertos/include/freertos/      \
 
 # So "gen/*" files are found by the src/app bits.
 COMPONENT_PRIV_INCLUDEDIRS := .
+
+WRAP_FUNCTIONS = esp_log_write
+WRAP_ARGUMENT := -Wl,--wrap=
+
+COMPONENT_ADD_LDFLAGS = -l$(COMPONENT_NAME) $(addprefix $(WRAP_ARGUMENT),$(WRAP_FUNCTIONS))

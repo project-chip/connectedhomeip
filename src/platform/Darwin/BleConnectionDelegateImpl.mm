@@ -33,12 +33,15 @@
 
 using namespace chip::Ble;
 
+constexpr uint64_t kScanningTimeoutInSeconds = 60;
+
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (strong, nonatomic) dispatch_queue_t workQueue;
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
+@property (nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (unsafe_unretained, nonatomic) uint16_t deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
@@ -55,14 +58,24 @@ using namespace chip::Ble;
 namespace chip {
 namespace DeviceLayer {
     namespace Internal {
+        BleConnection * ble;
+
         void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, const uint16_t deviceDiscriminator)
         {
             ChipLogProgress(Ble, "%s", __FUNCTION__);
-            BleConnection * ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
+            ble = [[BleConnection alloc] initWithDiscriminator:deviceDiscriminator];
             [ble setBleLayer:bleLayer];
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+        }
+
+        BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
+        {
+            ChipLogProgress(Ble, "%s", __FUNCTION__);
+            [ble stop];
+            ble = nil;
+            return BLE_NO_ERROR;
         }
     } // namespace Internal
 } // namespace DeviceLayer
@@ -80,8 +93,16 @@ namespace DeviceLayer {
         self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _deviceDiscriminator = deviceDiscriminator;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
+        _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];
         [_centralManager initWithDelegate:self queue:_workQueue];
+
+        dispatch_source_set_event_handler(_timer, ^{
+            [self stop];
+            _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
+        });
+        dispatch_source_set_timer(
+            _timer, dispatch_walltime(NULL, kScanningTimeoutInSeconds * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
     }
 
     return self;
@@ -148,9 +169,13 @@ namespace DeviceLayer {
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
-    // If the setup discriminator is only 4 bits, only match the lower 4 from the BLE advertisement
-    if (_deviceDiscriminator <= chip::kManualSetupDiscriminatorFieldBitMask) {
-        return _deviceDiscriminator == (discriminator & chip::kManualSetupDiscriminatorFieldBitMask);
+    // If the manual setup discriminator was passed in, only match the most significant 4 bits from the BLE advertisement
+    constexpr uint16_t manualSetupDiscriminatorOffsetInBits
+        = chip::kPayloadDiscriminatorFieldLengthInBits - chip::kManualSetupDiscriminatorFieldLengthInBits;
+    constexpr uint16_t maxManualDiscriminatorValue = (1 << chip::kManualSetupDiscriminatorFieldLengthInBits) - 1;
+    constexpr uint16_t kManualSetupDiscriminatorFieldBitMask = maxManualDiscriminatorValue << manualSetupDiscriminatorOffsetInBits;
+    if (_deviceDiscriminator == (_deviceDiscriminator & kManualSetupDiscriminatorFieldBitMask)) {
+        return _deviceDiscriminator == (discriminator & kManualSetupDiscriminatorFieldBitMask);
     } else {
         // else compare the entire thing
         return _deviceDiscriminator == discriminator;
@@ -275,6 +300,7 @@ namespace DeviceLayer {
 
 - (void)start
 {
+    dispatch_resume(_timer);
     [self startScanning];
 }
 
@@ -300,7 +326,7 @@ namespace DeviceLayer {
     if (!_centralManager) {
         return;
     }
-
+    dispatch_source_cancel(_timer);
     [_centralManager stopScan];
 }
 

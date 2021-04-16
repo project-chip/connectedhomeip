@@ -50,16 +50,14 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
-#endif
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
-#include <app/clusters/on-off-server/on-off.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 #endif // EMBER_AF_PLUGIN_ON_OFF
 
 #ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER

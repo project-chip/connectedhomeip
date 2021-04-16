@@ -44,7 +44,7 @@ inline SetupPayload GetDefaultPayload()
     payload.vendorID              = 12;
     payload.productID             = 1;
     payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
+    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
 
@@ -125,24 +125,6 @@ inline bool CompareBinary(SetupPayload & payload, std::string & expectedBinary)
 
     std::string resultBinary = toBinaryRepresentation(result);
     return (expectedBinary == resultBinary);
-}
-
-inline bool CompareBinaryLength(SetupPayload & payload, size_t expectedTLVLengthInBytes)
-{
-    std::string result;
-    uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-
-    SetupPayload basePayload = GetDefaultPayload();
-    QRCodeSetupPayloadGenerator baseGenerator(basePayload);
-    baseGenerator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
-    std::string baseBinary = toBinaryRepresentation(result);
-
-    QRCodeSetupPayloadGenerator generator(payload);
-    generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
-
-    std::string resultBinary      = toBinaryRepresentation(result);
-    size_t resultTLVLengthInBytes = (resultBinary.size() - baseBinary.size()) / 8;
-    return (expectedTLVLengthInBytes == resultTLVLengthInBytes);
 }
 
 inline bool CheckWriteRead(SetupPayload & inPayload)

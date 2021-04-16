@@ -1016,7 +1016,7 @@ INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
     return res;
 }
 
-INET_ERROR TCPEndPoint::PutBackReceivedData(System::PacketBufferHandle data)
+INET_ERROR TCPEndPoint::SetReceivedDataForTesting(System::PacketBufferHandle data)
 {
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
@@ -1388,7 +1388,16 @@ void TCPEndPoint::DriveReceiving()
     // with the entire receive queue.
     if (!mRcvQueue.IsNull() && ReceiveEnabled && OnDataReceived != nullptr)
     {
-        OnDataReceived(this, std::move(mRcvQueue));
+        // Acknowledgement is done after handling the buffers to allow the
+        // application processing to throttle flow.
+        uint16_t ackLength = mRcvQueue->TotalLength();
+        INET_ERROR err     = OnDataReceived(this, std::move(mRcvQueue));
+        if (err != INET_NO_ERROR)
+        {
+            DoClose(err, false);
+            return;
+        }
+        AckReceive(ackLength);
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete

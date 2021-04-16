@@ -172,14 +172,14 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
 
     const uint8_t expectedOutput[] = {
         //
-        3,    'f',  'o',  'o',  // QNAME part: foo
-        3,    'b',  'a',  'r',  // QNAME part: bar
-        0,                      // QNAME ends
-        0,    255,              // QType ANY (totally fake)
-        0,    1,                // QClass IN
-        0x12, 0xcc, 0x03, 0x00, // TTL
-        0,    8,                // data size
-        's',  'o',  'm',  'e',  'd', 'a', 't', 'a',
+        3,   'f', 'o', 'o', // QNAME part: foo
+        3,   'b', 'a', 'r', // QNAME part: bar
+        0,                  // QNAME ends
+        0,   255,           // QType ANY (totally fake)
+        0,   1,             // QClass IN
+        0,   0,   0,   120, // TTL
+        0,   8,             // data size
+        's', 'o', 'm', 'e', 'd', 'a', 't', 'a',
     };
 
     header.Clear();

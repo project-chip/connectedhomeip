@@ -19,15 +19,27 @@ on:
     pull_request:
 
 jobs:
-    build:
-        name: Generate
-
-        runs-on: ubuntu-20.04 
+    doxygen:
+        name: Build Doxygen
+        runs-on: ubuntu-20.04
+        if: github.actor != 'restyled-io[bot]'
 
         steps:
+            - name: "Print Actor"
+              run: echo ${{github.actor}}
             - name: Checkout
               uses: actions/checkout@v2
               with:
                   submodules: true
             - name: Generate
               run: scripts/helpers/doxygen.sh
+            - name: Extract branch name
+              shell: bash
+              run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+              id: extract_branch
+            - name: Deploy if master
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
+              uses: peaceiris/actions-gh-pages@v3
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./docs/html

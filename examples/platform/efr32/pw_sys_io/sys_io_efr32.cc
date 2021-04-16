@@ -25,7 +25,14 @@
 
 int16_t console_getchar(char * chr)
 {
-    return uartConsoleRead(chr, 1);
+    int16_t retVal = 0;
+
+    // Busy wait for pw_rcp reads
+    while (retVal == 0)
+    {
+        retVal = uartConsoleRead(chr, 1);
+    }
+    return retVal;
 }
 
 int16_t console_putchar(const char * chr)
