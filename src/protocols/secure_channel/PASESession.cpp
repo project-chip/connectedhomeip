@@ -539,12 +539,12 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const System::PacketBufferHandle
     err = mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, &mPASEVerifier[0][0], kSpake2p_WS_Length, mPoint, sizeof(mPoint));
     SuccessOrExit(err);
 
-    // Pass Pa to check abort condition.
-    err = mSpake2p.ComputeRoundOne(buf, buf_len, Y, &Y_len);
-    SuccessOrExit(err);
-
     encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
     msg->ConsumeHead(sizeof(encryptionKeyId));
+
+    // Pass Pa to check abort condition.
+    err = mSpake2p.ComputeRoundOne(msg->Start(), msg->DataLength(), Y, &Y_len);
+    SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Peer assigned session key ID %d", encryptionKeyId);
     mConnectionState.SetPeerKeyID(encryptionKeyId);

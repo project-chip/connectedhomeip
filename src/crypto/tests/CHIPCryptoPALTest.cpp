@@ -35,7 +35,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #if CHIP_CRYPTO_HSM
-#include <crypto/hsm/nxp/CHIPCryptoPALHsm_SE05X.h>
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
 #endif
 #include <core/CHIPError.h>
 #include <nlunit-test.h>
