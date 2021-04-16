@@ -3471,6 +3471,7 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | * EffectiveOperationMode                                            | 0x0011 |
 | * EffectiveControlMode                                              | 0x0012 |
 | * Capacity                                                          | 0x0013 |
+| * OperationMode                                                     | 0x0020 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3558,6 +3559,31 @@ PacketBufferHandle encodePumpConfigurationAndControlClusterConfigureCapacityAttr
         .Put16(minInterval)
         .Put16(maxInterval);
     buf.Put16(static_cast<uint16_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OperationMode
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0020);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint,
+                                                                                       uint8_t operationMode)
+{
+    COMMAND_HEADER("WritePumpConfigurationAndControlOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0020)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(operationMode));
     COMMAND_FOOTER();
 }
 

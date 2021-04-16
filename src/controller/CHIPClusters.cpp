@@ -4094,6 +4094,24 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeCapacity(Callback:
     return RequestAttributeReporting(0x0013, onReportCallback);
 }
 
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodePumpConfigurationAndControlClusterReadOperationModeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
+                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                             Callback::Cancelable * onFailureCallback)
 {

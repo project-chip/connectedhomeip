@@ -1730,6 +1730,15 @@ CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_Capacity(chip::Con
     cluster.Associate(device, ZCLendpointId);
     return cluster.ReadAttributeCapacity(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
+CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode(chip::Controller::Device * device,
+                                                                            chip::EndpointId ZCLendpointId,
+                                                                            chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::PumpConfigurationAndControlCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOperationMode(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
 CHIP_ERROR chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision(chip::Controller::Device * device,
                                                                               chip::EndpointId ZCLendpointId,
                                                                               chip::GroupId /* ZCLgroupId */)

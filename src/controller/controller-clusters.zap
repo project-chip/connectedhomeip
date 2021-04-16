@@ -1452,7 +1452,7 @@
           "mfgCode": null,
           "define": "PUMP_CONFIG_CONTROL_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4927,7 +4927,7 @@
           "mfgCode": null,
           "define": "PUMP_CONFIG_CONTROL_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [],
           "attributes": [
             {

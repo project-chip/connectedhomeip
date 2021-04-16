@@ -1988,6 +1988,7 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 | * EffectiveOperationMode                                            | 0x0011 |
 | * EffectiveControlMode                                              | 0x0012 |
 | * Capacity                                                          | 0x0013 |
+| * OperationMode                                                     | 0x0020 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -2050,6 +2051,23 @@ encodePumpConfigurationAndControlClusterReadCapacityAttribute(uint8_t seqNum, ch
 chip::System::PacketBufferHandle
 encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
                                                                    uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the operation mode attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server write command for the operation mode attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint8_t operationMode);
 
 /**
  * @brief
