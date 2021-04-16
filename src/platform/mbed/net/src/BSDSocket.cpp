@@ -10,33 +10,33 @@ int BSDSocket::open(int family, int type, InternetSocket * socket)
     nsapi_error_t err;
     SocketAddress addr;
 
-    switch (family)
-    {
-    case MBED_IPV4_SOCKET: {
-        err = NetworkInterface::get_default_instance()->get_ip_address(&addr);
-        if ((err != NSAPI_ERROR_OK) || (addr.get_ip_version() != NSAPI_IPv4))
-        {
-            tr_err("IPv4 not supported");
-            set_errno(ESOCKTNOSUPPORT);
-            return -1;
-        }
-    }
-    break;
-    case MBED_IPV6_SOCKET: {
-        err = NetworkInterface::get_default_instance()->get_ipv6_link_local_address(&addr);
-        if ((err != NSAPI_ERROR_OK) || (addr.get_ip_version() != NSAPI_IPv6))
-        {
-            tr_err("IPv6 not supported");
-            set_errno(ESOCKTNOSUPPORT);
-            return -1;
-        }
-    }
-    break;
-    default:
-        tr_err("Socket family not supported");
-        set_errno(ESOCKTNOSUPPORT);
-        return -1;
-    };
+    // switch (family)
+    // {
+    // case MBED_IPV4_SOCKET: {
+    //     err = NetworkInterface::get_default_instance()->get_ip_address(&addr);
+    //     if ((err != NSAPI_ERROR_OK) || (addr.get_ip_version() != NSAPI_IPv4))
+    //     {
+    //         tr_err("IPv4 not supported");
+    //         set_errno(ESOCKTNOSUPPORT);
+    //         return -1;
+    //     }
+    // }
+    // break;
+    // case MBED_IPV6_SOCKET: {
+    //     err = NetworkInterface::get_default_instance()->get_ipv6_link_local_address(&addr);
+    //     if ((err != NSAPI_ERROR_OK) || (addr.get_ip_version() != NSAPI_IPv6))
+    //     {
+    //         tr_err("IPv6 not supported");
+    //         set_errno(ESOCKTNOSUPPORT);
+    //         return -1;
+    //     }
+    // }
+    // break;
+    // default:
+    //     tr_err("Socket family not supported");
+    //     set_errno(ESOCKTNOSUPPORT);
+    //     return -1;
+    // };
 
     if (socket != nullptr)
     {
