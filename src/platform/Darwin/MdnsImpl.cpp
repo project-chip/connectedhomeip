@@ -483,6 +483,11 @@ CHIP_ERROR ChipMdnsStopPublish()
     return MdnsContexts::GetInstance().Removes(ContextType::Register);
 }
 
+CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                           chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context)
 {
