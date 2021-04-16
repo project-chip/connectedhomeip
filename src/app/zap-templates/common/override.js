@@ -15,25 +15,26 @@
  *    limitations under the License.
  */
 
-function atomicType(arg)
-{
+function atomicType(arg) {
   switch (arg.name) {
-  case 'node_id':
-    return 'chip::NodeId';
-  case 'endpoint_id':
-    return 'chip::EndpointId';
-  case 'group_id':
-    return 'chip::GroupId';
-  case 'attribute_id':
-    return 'chip::AttributeId';
-  case 'cluster_id':
-    return 'chip::ClusterId';
-  case 'device_type_id':
-    return 'chip::DeviceTypeId';
-  case 'ieee_address':
-    return 'uint64_t';
-  default:
-    throw 'not overriding';
+    case 'node_id':
+      return 'chip::NodeId';
+    case 'endpoint_id':
+      return 'chip::EndpointId';
+    case 'group_id':
+      return 'chip::GroupId';
+    case 'attribute_id':
+      return 'chip::AttributeId';
+    case 'cluster_id':
+      return 'chip::ClusterId';
+    case 'device_type_id':
+      return 'chip::DeviceTypeId';
+    case 'fabric_id':
+      return 'chip::FabricId';
+    case 'ieee_address':
+      return 'uint64_t';
+    default:
+      throw 'not overriding';
   }
 }
 

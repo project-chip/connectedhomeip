@@ -21,6 +21,7 @@ limitations under the License.
     <type id="0xF4" name="command_id" size="1" description="Command Id" discrete="true" />
     <type id="0xF5" name="node_id" size="8" description="Node Id" discrete="true" />
     <type id="0xF6" name="device_type_id" size="4" description="Device Type Id" discrete="true" />
+    <type id="0xF7" name="fabric_id" size="8" description="Fabric Id" discrete="true" />
   </atomic>
   <enum name="GroupKeySecurityPolicy" type="ENUM8">
     <item name="Standard" value="0x00"/>
@@ -41,5 +42,11 @@ limitations under the License.
    <struct name="DeviceType">
      <item name="type" type="DEVICE_TYPE_ID"/>
      <item name="revision" type="INT16U"/>
+   </struct>
+  <struct name="FabricDescriptor">
+     <item name="FabricId" type="FABRIC_ID"/>
+     <item name="VendorId" type="INT16U"/>
+     <item name="label" type="OCTET_STRING" length="32"/>
+     <item name="NodeId" type="NODE_ID"/>
    </struct>
 </configurator>
