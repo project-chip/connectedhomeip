@@ -306,6 +306,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPDescriptor : CHIPCluster
 
+- (void)readAttributeDeviceList:(ResponseHandler)completionHandler;
+- (void)readAttributeServerList:(ResponseHandler)completionHandler;
+- (void)readAttributeClientList:(ResponseHandler)completionHandler;
+- (void)readAttributePartsList:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -404,6 +408,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
+- (void)readAttributeGroups:(ResponseHandler)completionHandler;
+- (void)readAttributeGroupKeys:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
