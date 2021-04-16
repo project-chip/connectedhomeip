@@ -59,7 +59,7 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
@@ -306,7 +306,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %d", err);
+        ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
     }
 }
 
@@ -331,7 +331,8 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ExchangeManager,
-                     "Message counter synchronization for received message, failed to send synchronization request, err = %d", err);
+                     "Message counter synchronization for received message, failed to send synchronization request, err = %s",
+                     ErrorStr(err));
     }
 
     return err;
@@ -371,6 +372,11 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
 
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnNewConnection(session, this);
+    }
+
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesSession(session, mgr))
         {
@@ -383,6 +389,11 @@ void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSession
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnConnectionExpired(session, this);
+    }
+
     for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.mSecureSession == session)

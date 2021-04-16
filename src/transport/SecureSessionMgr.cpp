@@ -56,6 +56,22 @@ using Transport::PeerConnectionState;
 // TODO: this should be checked within the transport message sending instead of the session management layer.
 static const size_t kMax_SecureSDU_Length = 1024;
 
+uint32_t EncryptedPacketBufferHandle::GetMsgId() const
+{
+    PacketHeader header;
+    uint16_t headerSize = 0;
+    CHIP_ERROR err      = header.Decode((*this)->Start(), (*this)->DataLength(), &headerSize);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        return header.GetMessageId();
+    }
+
+    ChipLogError(Inet, "Failed to decode EncryptedPacketBufferHandle header with error: %s", ErrorStr(err));
+
+    return 0;
+}
+
 SecureSessionMgr::SecureSessionMgr() : mState(State::kNotReady) {}
 
 SecureSessionMgr::~SecureSessionMgr()
@@ -107,12 +123,6 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
     }
 
     return Transport::Type::kUndefined;
-}
-
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf)
-{
-    PayloadHeader unusedPayloadHeader;
-    return SendMessage(session, unusedPayloadHeader, std::move(msgBuf));
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
@@ -196,13 +206,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        encryptedMsg        = msgBuf.Retain();
-        encryptedMsg.mMsgId = packetHeader.GetMessageId();
+        encryptedMsg = msgBuf.Retain();
     }
 
-    ChipLogProgress(Inet, "Sending msg from 0x%08" PRIx32 "%08" PRIx32 "to 0x%08" PRIx32 "%08" PRIx32,
+    ChipLogProgress(Inet,
+                    "Sending msg from 0x%08" PRIx32 "%08" PRIx32 " to 0x%08" PRIx32 "%08" PRIx32 " at utc time: %" PRId64 " msec",
                     static_cast<uint32_t>(localNodeId >> 32), static_cast<uint32_t>(localNodeId),
-                    static_cast<uint32_t>(state->GetPeerNodeId() >> 32), static_cast<uint32_t>(state->GetPeerNodeId()));
+                    static_cast<uint32_t>(state->GetPeerNodeId() >> 32), static_cast<uint32_t>(state->GetPeerNodeId()),
+                    System::Layer::GetClock_MonotonicMS());
 
     if (state->GetTransport() != nullptr)
     {
@@ -369,6 +380,10 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         // Queue the message as needed for sync with destination node.
         if (mCB != nullptr)
         {
+            // We should encode the packetHeader into the buffer before storing the buffer into the queue.
+            // The encoded packetHeader needs to be peeled off during re-processing after the peer message
+            // counter is synced.
+            ReturnOnFailure(packetHeader.EncodeBeforeData(msg));
             err = mCB->QueueReceivedMessageAndSync(state, std::move(msg));
             VerifyOrReturn(err == CHIP_NO_ERROR);
         }

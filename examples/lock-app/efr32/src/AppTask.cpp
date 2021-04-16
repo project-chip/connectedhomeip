@@ -120,7 +120,7 @@ int AppTask::Init()
         appError(err);
     }
 
-    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -144,7 +144,7 @@ int AppTask::Init()
 #ifdef DISPLAY_ENABLED
     std::string QRCode;
 
-    if (GetQRCode(QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
+    if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
     {
         LCDWriteQRCode((uint8_t *) QRCode.c_str());
     }
@@ -153,7 +153,7 @@ int AppTask::Init()
         EFR32_LOG("Getting QR code failed!");
     }
 #else
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 #endif
 
     return err;

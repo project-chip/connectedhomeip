@@ -28,22 +28,7 @@ template("k32w_executable") {
   # even if the build and flashing steps take place on different machines
   # or in different containers.
 
-  flashing_runtime_target = target_name + ".flashing_runtime"
-  copy(flashing_runtime_target) {
-    sources = [
-      "${chip_root}/scripts/flashing/firmware_utils.py",
-      "${chip_root}/scripts/flashing/k32w_firmware_utils.py",
-    ]
-    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
-  }
-
-  flashing_script_generator =
-      "${chip_root}/scripts/flashing/gen_flashing_script.py"
-  flashing_script_name = output_base_name + ".flash.py"
-  flashing_options = [ "k32w" ]
-
   flashable_executable(target_name) {
     forward_variables_from(invoker, "*")
-    data_deps = [ ":${flashing_runtime_target}" ]
   }
 }

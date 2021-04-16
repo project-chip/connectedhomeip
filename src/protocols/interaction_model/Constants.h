@@ -42,6 +42,11 @@ namespace Protocols {
 namespace InteractionModel {
 
 /**
+ * Version of the Interaction Model used by the node.
+ */
+constexpr uint16_t kVersion = 0;
+
+/**
  * SecureChannel Protocol Message Types
  */
 enum class MsgType : uint8_t

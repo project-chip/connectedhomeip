@@ -27,25 +27,25 @@
 namespace chip {
 namespace Controller {
 
-constexpr ClusterId kApplicationBasicClusterId            = 0x050D;
-constexpr ClusterId kBarrierControlClusterId              = 0x0103;
-constexpr ClusterId kBasicClusterId                       = 0x0028;
-constexpr ClusterId kBindingClusterId                     = 0xF000;
-constexpr ClusterId kColorControlClusterId                = 0x0300;
-constexpr ClusterId kDoorLockClusterId                    = 0x0101;
-constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
-constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
-constexpr ClusterId kGroupsClusterId                      = 0x0004;
-constexpr ClusterId kIasZoneClusterId                     = 0x0500;
-constexpr ClusterId kIdentifyClusterId                    = 0x0003;
-constexpr ClusterId kLevelControlClusterId                = 0x0008;
-constexpr ClusterId kLowPowerClusterId                    = 0x0508;
-constexpr ClusterId kNetworkCommissioningClusterId        = 0x0031;
-constexpr ClusterId kOnOffClusterId                       = 0x0006;
-constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
-constexpr ClusterId kScenesClusterId                      = 0x0005;
-constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
-constexpr ClusterId kWindowCoveringClusterId              = 0x0102;
+constexpr ClusterId kApplicationBasicClusterId       = 0x050D;
+constexpr ClusterId kBarrierControlClusterId         = 0x0103;
+constexpr ClusterId kBasicClusterId                  = 0x0028;
+constexpr ClusterId kBindingClusterId                = 0xF000;
+constexpr ClusterId kColorControlClusterId           = 0x0300;
+constexpr ClusterId kDescriptorClusterId             = 0x001D;
+constexpr ClusterId kDoorLockClusterId               = 0x0101;
+constexpr ClusterId kGeneralCommissioningClusterId   = 0x0030;
+constexpr ClusterId kGroupKeyManagementClusterId     = 0xF004;
+constexpr ClusterId kGroupsClusterId                 = 0x0004;
+constexpr ClusterId kIasZoneClusterId                = 0x0500;
+constexpr ClusterId kIdentifyClusterId               = 0x0003;
+constexpr ClusterId kLevelControlClusterId           = 0x0008;
+constexpr ClusterId kLowPowerClusterId               = 0x0508;
+constexpr ClusterId kNetworkCommissioningClusterId   = 0x0031;
+constexpr ClusterId kOnOffClusterId                  = 0x0006;
+constexpr ClusterId kScenesClusterId                 = 0x0005;
+constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr ClusterId kWindowCoveringClusterId         = 0x0102;
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
 {
@@ -304,6 +304,21 @@ private:
     static constexpr CommandId kStepHueCommandId                = 0x02;
     static constexpr CommandId kStepSaturationCommandId         = 0x05;
     static constexpr CommandId kStopMoveStepCommandId           = 0x47;
+};
+
+class DLL_EXPORT DescriptorCluster : public ClusterBase
+{
+public:
+    DescriptorCluster() : ClusterBase(kDescriptorClusterId) {}
+    ~DescriptorCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeServerList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClientList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT DoorLockCluster : public ClusterBase

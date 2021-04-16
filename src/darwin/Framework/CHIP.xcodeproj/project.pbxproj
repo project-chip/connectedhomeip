@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */; };
 		1EC4CE3A25CC263E00D7304F /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3825CC263E00D7304F /* reporting.cpp */; };
 		1EC4CE3B25CC263E00D7304F /* reporting-default-configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3925CC263E00D7304F /* reporting-default-configuration.cpp */; };
 		1EC4CE3D25CC265200D7304F /* DataModelHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3C25CC265200D7304F /* DataModelHandler.cpp */; };
@@ -67,9 +68,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "gen/attribute-size.cpp"; sourceTree = "<group>"; };
 		1EC4CE3825CC263E00D7304F /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
 		1EC4CE3925CC263E00D7304F /* reporting-default-configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "reporting-default-configuration.cpp"; path = "../../../app/reporting/reporting-default-configuration.cpp"; sourceTree = "<group>"; };
-		1EC4CE3C25CC265200D7304F /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/server/DataModelHandler.cpp; sourceTree = "<group>"; };
+		1EC4CE3C25CC265200D7304F /* DataModelHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DataModelHandler.cpp; path = ../../../app/util/DataModelHandler.cpp; sourceTree = "<group>"; };
 		1EC4CE3E25CC267600D7304F /* binding-table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "binding-table.cpp"; path = "../../../app/util/binding-table.cpp"; sourceTree = "<group>"; };
 		1EC4CE3F25CC267600D7304F /* ember-print.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ember-print.cpp"; path = "../../../app/util/ember-print.cpp"; sourceTree = "<group>"; };
 		1EC4CE4025CC267600D7304F /* process-global-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-global-message.cpp"; path = "../../../app/util/process-global-message.cpp"; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
+				1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */,
 				1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */,
 				1EC4CE5A25CC26E900D7304F /* call-command-handler.cpp */,
 				1EC4CE5B25CC26E900D7304F /* callback-stub.cpp */,
@@ -410,6 +413,7 @@
 				1ED0B8CC260125E100D19DB5 /* media-playback-client.cpp in Sources */,
 				1EC4CE5125CC267700D7304F /* message.cpp in Sources */,
 				1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */,
+				1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				1EC4CE5E25CC26E900D7304F /* call-command-handler.cpp in Sources */,
 				1EC4CE3B25CC263E00D7304F /* reporting-default-configuration.cpp in Sources */,
@@ -539,6 +543,7 @@
 					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+					"$(TEMP_DIR)/out/gen/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -667,6 +672,7 @@
 					"$(CHIP_ROOT)/config/ios",
 					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
 					.,
+					"$(TEMP_DIR)/out/gen/include",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";

@@ -323,8 +323,8 @@
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                 /* Application Basic (server): vendor id */   \
             { 0x0002, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
               ZAP_LONG_DEFAULTS_INDEX(538) },                               /* Application Basic (server): application name */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0005, ZAP_TYPE(OCTET_STRING), 32, 0,                                                                               \
               ZAP_LONG_DEFAULTS_INDEX(570) },                            /* Application Basic (server): application id */          \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* Application Basic (server): catalog vendor id */       \
@@ -351,6 +351,9 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
+        (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
         (EmberAfGenericClusterFunction) emberAfDoorLockClusterServerAttributeChangedCallback,                                      \
@@ -398,9 +401,12 @@
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
-            {                                                                                                                      \
-                0x0028, ZAP_ATTRIBUTE_INDEX(14), 12, 254, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 1, Cluster: Basic (server) */                                                                          \
+            { 0x0028,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(14),                                                                                             \
+              12,                                                                                                                  \
+              254,                                                                                                                 \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayBasicServer }, /* Endpoint: 1, Cluster: Basic (server) */                                               \
             {                                                                                                                      \
                 0x0031, ZAP_ATTRIBUTE_INDEX(26), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                          \

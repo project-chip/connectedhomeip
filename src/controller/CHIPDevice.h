@@ -32,6 +32,7 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeMgr.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
@@ -57,9 +58,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr = nullptr;
-    SecureSessionMgr * sessionMgr     = nullptr;
-    Inet::InetLayer * inetLayer       = nullptr;
+    DeviceTransportMgr * transportMgr        = nullptr;
+    SecureSessionMgr * sessionMgr            = nullptr;
+    Messaging::ExchangeManager * exchangeMgr = nullptr;
+    Inet::InetLayer * inetLayer              = nullptr;
 };
 
 class DLL_EXPORT Device
@@ -96,11 +98,13 @@ public:
      * @brief
      *   Send the provided message to the device
      *
-     * @param[in] message   The message to be sent.
+     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
+     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
+     * @param[in] message     The message payload to be sent.
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -108,21 +112,6 @@ public:
      */
     CHIP_ERROR SendCommands();
 
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     */
-    void InitCommandSender()
-    {
-        if (mCommandSender != nullptr)
-        {
-            mCommandSender->Shutdown();
-            mCommandSender = nullptr;
-        }
-#if CHIP_ENABLE_INTERACTION_MODEL
-        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
-#endif
-    }
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
@@ -155,9 +144,14 @@ public:
     {
         mTransportMgr   = params.transportMgr;
         mSessionManager = params.sessionMgr;
+        mExchangeMgr    = params.exchangeMgr;
         mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
+
+#if CHIP_ENABLE_INTERACTION_MODEL
+        InitCommandSender();
+#endif
     }
 
     /**
@@ -214,9 +208,8 @@ public:
      *   Called when a new pairing is being established
      *
      * @param session A handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr);
+    void OnNewConnection(SecureSessionHandle session);
 
     /**
      * @brief
@@ -225,9 +218,8 @@ public:
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr);
+    void OnConnectionExpired(SecureSessionHandle session);
 
     /**
      * @brief
@@ -237,12 +229,9 @@ public:
      *
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] session       A handle to the secure session
      * @param[in] msgBuf        The message buffer
-     * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
@@ -342,6 +331,8 @@ private:
 
     DeviceTransportMgr * mTransportMgr = nullptr;
 
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+
     app::CommandSender * mCommandSender = nullptr;
 
     SecureSessionHandle mSecureSession = {};
@@ -370,7 +361,12 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     *   It's safe to call InitCommandSender multiple times, but only one will be available.
+     */
+    void InitCommandSender();
 
     uint16_t mListenPort;
 

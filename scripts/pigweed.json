@@ -1,7 +1,7 @@
 [
     {
         "path": "gn/gn/${os}-${arch=amd64,arm64}",
-        "tags": ["git_revision:d7cf6238e07f87b51118f9823a1ec024c1f1932b"]
+        "tags": ["git_revision:64b3b9401c1c3ed5f3c43c1cac00b91f83597ab8"]
     },
     {
         "path": "infra/ninja/${os}-${arch=amd64}",
@@ -13,8 +13,8 @@
     },
     {
         "_comment": "TODO(pwbug/93): Package Bazel for Windows.",
-        "path": "pigweed/third_party/bazel/${os=linux,mac}-${arch=amd64}",
-        "tags": ["version:3.2.0"]
+        "path": "fuchsia/third_party/bazel/${os=linux,mac}-${arch=amd64}",
+        "tags": ["version:4.0.0"]
     },
     {
         "path": "pigweed/third_party/bloaty-embedded/${os=linux,mac}-${arch=amd64}",
@@ -39,22 +39,9 @@
         "tags": ["version:3.8.2.chromium.10"]
     },
     {
-        "path": "infra/go/${os}-${arch=amd64}",
-        "tags": ["version:1.13.5"]
-    },
-    {
-        "path": "pigweed/third_party/protoc-gen-go/${os}-${arch=amd64}",
-        "tags": ["version:1.3.2"]
-    },
-    {
         "_comment": "TODO(pwbug/66) Put openocd in cipd for Windows.",
         "path": "pigweed/third_party/openocd/${os=linux,mac}-${arch=amd64}",
         "tags": ["git_revision:e41c0f4906e46d1076ce62a0da5518aa1ca280b8"]
-    },
-    {
-        "_comment": "TODO(pwbug/69) Put rust in cipd for Windows.",
-        "path": "fuchsia/rust/${os=linux,mac}-${arch=amd64}",
-        "tags": ["git_revision:027149919e36ce5645ca5d02d55b97ef52eb55ba"]
     },
     {
         "path": "pigweed/third_party/mingw64-x86_64-win32-seh/${os=windows}-${arch=amd64}",
@@ -62,11 +49,11 @@
     },
     {
         "path": "pigweed/host_tools/${os}-${arch=amd64}",
-        "tags": ["git_revision:01145c97424e9158fd9b96b957176de4bb7e8f0c"]
+        "tags": ["git_revision:2f56efcee3192685898200f6049538ebd809ae36"]
     },
     {
-        "path": "infra/goma/client/${os}-${arch=amd64}",
-        "tags": ["git_revision:be1b7f4547023e809b636dc9572c976ccb33dcac"]
+        "path": "infra/rbe/client/${os=linux,windows}-${arch=amd64}",
+        "tags": ["git_revision:3b3042c16accd40f0d3f7e40002f9ad2099cfe94"]
     },
     {
         "path": "fuchsia/third_party/qemu/${os=linux,mac}-${arch}",
@@ -81,5 +68,9 @@
         "path": "fuchsia/third_party/kythe-libs/${os=linux}-${arch=amd64}",
         "subdir": "kythe",
         "tags": ["version:2020-08-05"]
+    },
+    {
+        "path": "infra/3pp/tools/renode/${os=linux}-${arch=amd64}",
+        "tags": ["version:2@renode-1.11.0+20210306gite7897c1"]
     }
 ]
