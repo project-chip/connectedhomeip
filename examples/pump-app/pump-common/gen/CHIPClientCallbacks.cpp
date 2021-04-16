@@ -272,7 +272,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
             case 0x38: // semi / Semi-precision
             case 0x39: // single / Single precision
             case 0x3A: // double / Double precision
-            case 0x48: // array / Array
             case 0x49: // struct / Structure
             case 0x50: // set / Set
             case 0x51: // bag / Bag
@@ -324,6 +323,17 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 Callback::Callback<StringAttributeCallback> * cb =
                     Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
                 cb->mCall(cb->mContext, chip::ByteSpan(message, length));
+                break;
+            }
+            case 0x48: // array / Array
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t count = chip::Encoding::LittleEndian::Read16(message);
+                ChipLogProgress(Zcl, "  count: %lu", count);
+
+                switch (clusterId)
+                {
+                }
                 break;
             }
 

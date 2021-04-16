@@ -66,37 +66,33 @@
 #define GENERATED_ATTRIBUTE_COUNT 21
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 2 } }, /* Identify (client): cluster revision */  \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },                      /* Identify (server): cluster revision */  \
-            {                                                                                                                      \
-                0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x0000 }                                  \
-            },                                                          /* Identify (server): identify time */                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Groups (server): cluster revision */                    \
-            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Groups (server): name support */                        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Scenes (server): cluster revision */                    \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Scenes (server): scene count */                         \
-            { 0x0001, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x00 } },    /* Scenes (server): current scene */                       \
-            { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0000 } }, /* Scenes (server): current group */                       \
-            { 0x0003, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* Scenes (server): scene valid */                         \
-            { 0x0004, ZAP_TYPE(BITMAP8), 1, 0, { (uint8_t *) 0 } },     /* Scenes (server): name support */                        \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },      /* On/off (server): cluster revision */                    \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* On/off (server): on/off */                              \
-            {                                                                                                                      \
-                0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 }                                                             \
-            },                                                     /* Pump Configuration and Control (server): cluster revision */ \
-            { 0x0000, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max pressure */     \
-            { 0x0001, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max speed */        \
-            { 0x0002, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): max flow */         \
-            {                                                                                                                      \
-                0x0011, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 }                                                                   \
-            }, /* Pump Configuration and Control (server): effective operation mode */                                             \
-            {                                                                                                                      \
-                0x0012, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0 }                                                                   \
-            }, /* Pump Configuration and Control (server): effective control mode */                                               \
-            { 0x0013, ZAP_TYPE(INT16S), 2, 0, { (uint8_t *) 0 } }, /* Pump Configuration and Control (server): capacity */         \
-            {                                                                                                                      \
-                0x0020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) 0x00 }                                     \
-            }, /* Pump Configuration and Control (server): operation mode */                                                       \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                                 \
+          ZAP_SIMPLE_DEFAULT(2) },                                     /* Identify (client): cluster revision */                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* Identify (server): cluster revision */                   \
+            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_SIMPLE_DEFAULT(0x0000) },                                 /* Identify (server): identify time */                 \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Groups (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },       /* Groups (server): name support */                    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Scenes (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Scenes (server): scene count */                     \
+            { 0x0001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Scenes (server): current scene */                   \
+            { 0x0002, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* Scenes (server): current group */                   \
+            { 0x0003, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* Scenes (server): scene valid */                     \
+            { 0x0004, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },       /* Scenes (server): name support */                    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* On/off (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Pump Configuration and Control (server): cluster revision */                        \
+            { 0x0000, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Pump Configuration and Control (server): max pressure */   \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Pump Configuration and Control (server): max speed */      \
+            { 0x0002, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Pump Configuration and Control (server): max flow */       \
+            { 0x0011, ZAP_TYPE(ENUM8), 1, 0,                                                                                       \
+              ZAP_EMPTY_DEFAULT() }, /* Pump Configuration and Control (server): effective operation mode */                       \
+            { 0x0012, ZAP_TYPE(ENUM8), 1, 0,                                                                                       \
+              ZAP_EMPTY_DEFAULT() }, /* Pump Configuration and Control (server): effective control mode */                         \
+            { 0x0013, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Pump Configuration and Control (server): capacity */       \
+            { 0x0020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                            \
+              ZAP_SIMPLE_DEFAULT(0x00) }, /* Pump Configuration and Control (server): operation mode */                            \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -161,7 +157,7 @@
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (2)
+#define ATTRIBUTE_LARGEST (3)
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (0)

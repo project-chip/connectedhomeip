@@ -585,23 +585,24 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
 | TemperatureMeasurement                                              | 0x0402 |
 \*----------------------------------------------------------------------------*/
 
-constexpr chip::ClusterId kApplicationBasicClusterId       = 0x050D;
-constexpr chip::ClusterId kBarrierControlClusterId         = 0x0103;
-constexpr chip::ClusterId kBasicClusterId                  = 0x0028;
-constexpr chip::ClusterId kBindingClusterId                = 0xF000;
-constexpr chip::ClusterId kColorControlClusterId           = 0x0300;
-constexpr chip::ClusterId kDescriptorClusterId             = 0x001D;
-constexpr chip::ClusterId kDoorLockClusterId               = 0x0101;
-constexpr chip::ClusterId kGeneralCommissioningClusterId   = 0x0030;
-constexpr chip::ClusterId kGroupKeyManagementClusterId     = 0xF004;
-constexpr chip::ClusterId kGroupsClusterId                 = 0x0004;
-constexpr chip::ClusterId kIdentifyClusterId               = 0x0003;
-constexpr chip::ClusterId kLevelControlClusterId           = 0x0008;
-constexpr chip::ClusterId kLowPowerClusterId               = 0x0508;
-constexpr chip::ClusterId kNetworkCommissioningClusterId   = 0x0031;
-constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
-constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
-constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr chip::ClusterId kApplicationBasicClusterId            = 0x050D;
+constexpr chip::ClusterId kBarrierControlClusterId              = 0x0103;
+constexpr chip::ClusterId kBasicClusterId                       = 0x0028;
+constexpr chip::ClusterId kBindingClusterId                     = 0xF000;
+constexpr chip::ClusterId kColorControlClusterId                = 0x0300;
+constexpr chip::ClusterId kDescriptorClusterId                  = 0x001D;
+constexpr chip::ClusterId kDoorLockClusterId                    = 0x0101;
+constexpr chip::ClusterId kGeneralCommissioningClusterId        = 0x0030;
+constexpr chip::ClusterId kGroupKeyManagementClusterId          = 0xF004;
+constexpr chip::ClusterId kGroupsClusterId                      = 0x0004;
+constexpr chip::ClusterId kIdentifyClusterId                    = 0x0003;
+constexpr chip::ClusterId kLevelControlClusterId                = 0x0008;
+constexpr chip::ClusterId kLowPowerClusterId                    = 0x0508;
+constexpr chip::ClusterId kNetworkCommissioningClusterId        = 0x0031;
+constexpr chip::ClusterId kOnOffClusterId                       = 0x0006;
+constexpr chip::ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
+constexpr chip::ClusterId kScenesClusterId                      = 0x0005;
+constexpr chip::ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationBasic                                            | 0x050D |
