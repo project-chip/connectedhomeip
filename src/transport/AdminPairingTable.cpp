@@ -33,8 +33,8 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate & kvs)
     ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
 
     StorableAdminPairingInfo info;
-    info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
-    info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
+    info.mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
+    info.mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
     info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 

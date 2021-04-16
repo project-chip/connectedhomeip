@@ -351,7 +351,7 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
         // already know the local node id).
         if (packetHeader.GetDestinationNodeId().HasValue())
         {
-            NodeId destNodeId = packetHeader.GetDestinationNodeId().Value();
+            NodeId destNodeId     = packetHeader.GetDestinationNodeId().Value();
             uint64_t sourceNodeId = packetHeader.GetSourceNodeId().Value();
             ChipLogProgress(Ble, "Received pairing message for 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(destNodeId >> 32),
                             static_cast<uint32_t>(destNodeId));
@@ -405,7 +405,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     // Use the node IDs from the packet header only after it's successfully decrypted
     if (packetHeader.GetDestinationNodeId().HasValue() && !mParams.HasLocalNodeId())
     {
-        NodeId destNodeId = packetHeader.GetDestinationNodeId().Value();
+        NodeId destNodeId     = packetHeader.GetDestinationNodeId().Value();
         uint64_t sourceNodeId = packetHeader.GetSourceNodeId().Value();
         ChipLogProgress(Ble, "Received rendezvous message for 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(destNodeId >> 32),
                         static_cast<uint32_t>(destNodeId));

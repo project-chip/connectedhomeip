@@ -483,8 +483,8 @@ function asObjectiveCNumberType(label, type)
       default:
         error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
         throw error;
-        case 'fabricId':
-        case 'chip::FabricId':
+      case 'fabricId':
+      case 'chip::FabricId':
       }
     })
   }
