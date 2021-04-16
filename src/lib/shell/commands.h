@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "shell.h"
+#include "shell_core.h"
 
 namespace chip {
 namespace Shell {
