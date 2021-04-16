@@ -105,7 +105,7 @@ uint8_t percentageLiftValue;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   percentageLiftValue = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(percentageLiftValue);
             break;
         }
@@ -118,7 +118,7 @@ uint16_t liftValue;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   liftValue = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(liftValue);
             break;
         }
@@ -131,7 +131,7 @@ uint8_t percentageTiltValue;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   percentageTiltValue = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(percentageTiltValue);
             break;
         }
@@ -144,7 +144,7 @@ uint16_t tiltValue;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   tiltValue = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(tiltValue);
             break;
         }

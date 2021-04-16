@@ -5153,4 +5153,3 @@ PacketBufferHandle encodeWindowCoveringClusterReadClusterRevisionAttribute(uint8
        .Put16(0xFFFD);
     COMMAND_FOOTER();
 }
-
