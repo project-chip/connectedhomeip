@@ -142,6 +142,9 @@ void emberAfPluginDoorLockServerInitCallback(void);
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 void emberAfPluginDescriptorServerInitCallback(void);
 #endif
+#ifdef ZCL_USING_FABRIC_CLUSTER_SERVER
+void emberAfPluginFabricServerInitCallback(void);
+#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS

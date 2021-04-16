@@ -29,8 +29,11 @@ namespace chip {
 namespace Transport {
 
 typedef uint16_t AdminId;
-static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
+typedef uint64_t FabricId;
 
+static constexpr AdminId kUndefinedAdminId   = UINT16_MAX;
+static constexpr FabricId kUndefinedFabricId = UINT64_MAX;
+static constexpr uint16_t kUndefinedVendorId = UINT16_MAX;
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
@@ -65,8 +68,14 @@ public:
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
 
+    NodeId GetFabricId() const { return mFabricId; }
+    void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
+
     AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(AdminId adminId) { mAdmin = adminId; }
+
+    AdminId GetVendorId() const { return mVendorId; }
+    void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
     OperationalCredentials & GetOperationalCreds() { return mOpCred; }
@@ -83,8 +92,10 @@ public:
      */
     void Reset()
     {
-        mNodeId = kUndefinedNodeId;
-        mAdmin  = kUndefinedAdminId;
+        mNodeId   = kUndefinedNodeId;
+        mAdmin    = kUndefinedAdminId;
+        mFabricId = kUndefinedFabricId;
+        mVendorId = kUndefinedVendorId;
     }
 
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
@@ -94,8 +105,10 @@ public:
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id);
 
 private:
-    AdminId mAdmin = kUndefinedAdminId;
-    NodeId mNodeId = kUndefinedNodeId;
+    AdminId mAdmin     = kUndefinedAdminId;
+    NodeId mNodeId     = kUndefinedNodeId;
+    FabricId mFabricId = kUndefinedFabricId;
+    uint16_t mVendorId = kUndefinedVendorId;
 
     OperationalCredentials mOpCred;
     AccessControlList mACL;
@@ -106,8 +119,10 @@ private:
 
     struct StorableAdminPairingInfo
     {
-        uint16_t mAdmin;  /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mAdmin;    /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
+        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
     };
 };
 
@@ -189,6 +204,8 @@ public:
     void ReleaseAdminId(AdminId adminId);
 
     AdminPairingInfo * FindAdmin(AdminId adminId);
+
+    AdminPairingInfo * FindAdmin(FabricId fabricId);
 
     void Reset();
 

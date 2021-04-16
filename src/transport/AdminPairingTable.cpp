@@ -35,6 +35,8 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate & kvs)
     StorableAdminPairingInfo info;
     info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
     info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
+    info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
+    info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
     return kvs.SyncSetKeyValue(key, &info, sizeof(info));
 }
@@ -51,6 +53,8 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
 
     mNodeId    = Encoding::LittleEndian::HostSwap64(info.mNodeId);
     AdminId id = Encoding::LittleEndian::HostSwap16(info.mAdmin);
+    mFabricId  = Encoding::LittleEndian::HostSwap64(info.mFabricId);
+    mVendorId  = Encoding::LittleEndian::HostSwap16(info.mVendorId);
     ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
@@ -120,6 +124,19 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(AdminId adminId)
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
         if (mStates[i].IsInitialized() && mStates[i].GetAdminId() == adminId)
+        {
+            return &mStates[i];
+        }
+    }
+
+    return nullptr;
+}
+
+AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId)
+{
+    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    {
+        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId)
         {
             return &mStates[i];
         }

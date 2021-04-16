@@ -33,6 +33,24 @@
 
 using namespace chip;
 
+void emberAfPluginFabricServerInitCallback(void)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    for (uint8_t index = 0; index < emberAfEndpointCount(); index++)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        if (!emberAfContainsCluster(endpoint, ZCL_FABRIC_CLUSTER_ID))
+        {
+            continue;
+        }
+
+        // Loop through admin pairing table list
+        // For each index, write the attribute in
+    }
+    VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, "emberAfPluginFabricServerInitCallback failed"));
+}
+
 bool emberAfFabricClusterRemoveFabricCallback(chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId)
 {
     // Go through admin pairing table and remove the element
@@ -46,9 +64,15 @@ bool emberAfFabricClusterRemoveFabricCallback(chip::FabricId fabricId, chip::Nod
 
 bool emberAfFabricClusterGetFabricIdCallback()
 {
-    emberAfDoorLockClusterPrintln("Fabric: GetFabricId");
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    emberAfDoorLockClusterPrintln("Fabric: GetFabricID");
+    uint64_t fabricID = emberAfCurrentCommand()->source;
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_FABRIC_CLUSTER_ID,
+                              ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID, "y", fabricID);
+    EmberStatus sendStatus = emberAfSendResponse();
+    if (EMBER_SUCCESS != sendStatus)
+    {
+        emberAfDoorLockClusterPrintln("Fabric: failed to send %s response: 0x%x", "get_fabric_id", sendStatus);
+    }
     return true;
 }
 
