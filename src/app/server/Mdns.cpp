@@ -106,6 +106,8 @@ CHIP_ERROR AdvertiseOperational()
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
+    ChipLogProgress(Discovery, "Advertise operational node %" PRIX64 "-%" PRIX64, advertiseParameters.GetFabricId(),
+                    advertiseParameters.GetNodeId());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -146,12 +148,16 @@ CHIP_ERROR AdvertiseCommisioning()
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// (Re-)starts the minmdns server
 void StartServer()
 {
+    ChipLogProgress(Discovery, "Start dns-sd server");
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
     // TODO: advertise this only when really operational once we support both
