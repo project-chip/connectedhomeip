@@ -546,7 +546,6 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(const System::PacketBufferHandle
     err = mSpake2p.ComputeRoundOne(msg->Start(), msg->DataLength(), Y, &Y_len);
     SuccessOrExit(err);
 
-
     ChipLogDetail(Ble, "Peer assigned session key ID %d", encryptionKeyId);
     mConnectionState.SetPeerKeyID(encryptionKeyId);
 
