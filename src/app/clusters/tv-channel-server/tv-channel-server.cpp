@@ -41,20 +41,20 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * apCommandObj, unsigned char *)
+bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * commandObj, unsigned char *)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * apCommandObj, unsigned short, unsigned short)
+bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * commandObj, unsigned short, unsigned short)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * apCommandObj, unsigned short)
+bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * commandObj, unsigned short)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

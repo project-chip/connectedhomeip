@@ -88,7 +88,7 @@ EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
     return EMBER_NOT_FOUND;
 }
 
-bool emberAfBindingClusterBindCallback(chip::app::Command * apCommandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
+bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
                                        ClusterId clusterId)
 {
     ChipLogDetail(Zcl, "RX: BindCallback");
@@ -118,7 +118,7 @@ bool emberAfBindingClusterBindCallback(chip::app::Command * apCommandObj, NodeId
     return true;
 }
 
-bool emberAfBindingClusterUnbindCallback(chip::app::Command * apCommandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
+bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
                                          ClusterId clusterId)
 {
     ChipLogDetail(Zcl, "RX: UnbindCallback");

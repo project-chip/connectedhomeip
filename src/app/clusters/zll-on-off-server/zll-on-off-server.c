@@ -167,7 +167,7 @@ void emberAfOnOffClusterServerTickCallback(uint8_t endpoint)
     emberAfScheduleServerTick(endpoint, ZCL_ON_OFF_CLUSTER_ID, MILLISECOND_TICKS_PER_SECOND / 10);
 }
 
-bool emberAfOnOffClusterOffWithEffectCallback(chip::app::Command * apCommandObj, uint8_t effectId, uint8_t effectVariant)
+bool emberAfOnOffClusterOffWithEffectCallback(chip::app::Command * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_VALUE;
     bool globalSceneControl;
@@ -228,7 +228,7 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::Command * apCommandObj)
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status;
     bool globalSceneControl;
@@ -279,7 +279,7 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * apCommandObj, uint8_t onOffControl, uint16_t onTime,
+bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * commandObj, uint8_t onOffControl, uint16_t onTime,
                                                uint16_t offWaitTime)
 {
     EmberAfStatus status;

@@ -46,13 +46,12 @@
 
 using namespace chip;
 
-bool emberAfScenesClusterAddSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, GroupId groupId,
-                                                  uint8_t sceneId)
+bool emberAfScenesClusterAddSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId, uint8_t sceneId)
 {
     return emberAfPluginScenesClientParseAddSceneResponse(emberAfCurrentCommand(), status, groupId, sceneId);
 }
 
-bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, GroupId groupId,
+bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId,
                                                    uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                                    uint8_t * extensionFieldSets)
 {
@@ -60,7 +59,7 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * apComman
                                                            sceneName, extensionFieldSets);
 }
 
-bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, GroupId groupId,
+bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId,
                                                      uint8_t sceneId)
 {
     emberAfScenesClusterPrintln("RX: RemoveSceneResponse 0x%x, 0x%2x, 0x%x", status, groupId, sceneId);
@@ -68,14 +67,14 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::Command * apComm
     return true;
 }
 
-bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::Command * apCommandObj, uint8_t status, GroupId groupId)
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId)
 {
     emberAfScenesClusterPrintln("RX: RemoveAllScenesResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * apCommandObj, uint8_t status, GroupId groupId,
+bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * commandObj, uint8_t status, GroupId groupId,
                                                     uint8_t sceneId)
 {
     emberAfScenesClusterPrintln("RX: StoreSceneResponse 0x%x, 0x%2x, 0x%x", status, groupId, sceneId);
@@ -83,7 +82,7 @@ bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * apComma
     return true;
 }
 
-bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::Command * apCommandObj, uint8_t status, uint8_t capacity,
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t capacity,
                                                             GroupId groupId, uint8_t sceneCount, uint8_t * sceneList)
 {
     emberAfScenesClusterPrint("RX: GetSceneMembershipResponse 0x%x, 0x%x, 0x%2x", status, capacity, groupId);

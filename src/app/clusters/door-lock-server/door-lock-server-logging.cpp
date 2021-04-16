@@ -118,7 +118,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * apCommandObj, uint16_t entryId)
+bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj, uint16_t entryId)
 {
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
