@@ -116,6 +116,8 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl, chip::ClusterId cluster
  *            destination buffer.
  *     - 'w': uint32_t. The bytes are copied in little-endian format to the
  *            destination buffer.
+ *     - 'y': uint64_t. The bytes are copied in little-endian format to the
+ *            destination buffer.
  *     - 'l': Pointer to a buffer containing a ZigBee long string, with the
  *            first two bytes of the buffer specifying the length of the string
  *            data in little-endian format. The length bytes and the string
