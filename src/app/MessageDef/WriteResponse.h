@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "Builder.h"
 #include "AttributeStatusList.h"
+#include "Builder.h"
 
 #include "Parser.h"
 #include <core/CHIPCore.h>
