@@ -141,7 +141,7 @@ void * __wrap_realloc(void * ptr, size_t new_size)
                 size_t old_ptr_size = xPortMallocUsableSize(ptr);
                 if (new_size > old_ptr_size)
                 {
-                	memset(reinterpret_cast<uint8_t *>(new_ptr) + old_ptr_size, 0, (new_size - old_ptr_size));
+                    memset(reinterpret_cast<uint8_t *>(new_ptr) + old_ptr_size, 0, (new_size - old_ptr_size));
                     memcpy(new_ptr, ptr, old_ptr_size);
                     vPortFree(ptr);
                 }
