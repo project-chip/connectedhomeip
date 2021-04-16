@@ -22,8 +22,8 @@
 
 #pragma once
 
+#include "AttributeStatusList.h"
 #include "Builder.h"
-#include "StatusList.h"
 
 #include "Parser.h"
 #include <core/CHIPCore.h>
@@ -37,7 +37,7 @@ namespace app {
 namespace WriteResponse {
 enum
 {
-    kCsTag_StatusList = 0,
+    kCsTag_AttributeStatusList = 0,
 };
 
 class Parser : public chip::app::Parser
@@ -66,14 +66,14 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 
     /**
-     *  @brief Get a TLVReader for the StatusList. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributeStatusList. Next() must be called before accessing them.
      *
-     *  @param [in] apStatusList    A pointer to apAttributePath
+     *  @param [in] apAttributeStatusList    A pointer to apAttributeStatusList
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetStatusList(StatusList::Parser * const apStatusList) const;
+    CHIP_ERROR GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const;
 };
 
 class Builder : public chip::app::Builder
@@ -89,11 +89,11 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
 
     /**
-     *  @brief Initialize a StatusList::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeStatusList::Builder for writing into the TLV stream
      *
-     *  @return A reference to StatusList::Builder
+     *  @return A reference to AttributeStatusList::Builder
      */
-    StatusList::Builder & CreateStatusListBuilder();
+    AttributeStatusList::Builder & CreateAttributeStatusListBuilder();
 
     /**
      *  @brief Mark the end of this WriteResponse
@@ -103,7 +103,7 @@ public:
     WriteResponse::Builder & EndOfWriteResponse();
 
 private:
-    StatusList::Builder mStatusListBuilder;
+    AttributeStatusList::Builder mAttributeStatusListBuilder;
 };
 }; // namespace WriteResponse
 }; // namespace app

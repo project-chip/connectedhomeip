@@ -59,7 +59,6 @@ CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
     CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributeStatusList::Parser attributeStatusList;
     AttributeDataList::Parser attributeDataList;
     EventList::Parser eventList;
 
@@ -98,22 +97,6 @@ CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
                 err = reader.Get(subscriptionId);
                 SuccessOrExit(err);
                 PRETTY_PRINT("\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
-        case kCsTag_AttributeStatusList:
-            // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeStatusList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributeStatusList);
-            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                attributeStatusList.Init(reader);
-
-                PRETTY_PRINT_INCDEPTH();
-                err = attributeStatusList.CheckSchemaValidity();
-                SuccessOrExit(err);
-                PRETTY_PRINT_DECDEPTH();
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -192,25 +175,6 @@ CHIP_ERROR ReportData::Parser::GetSubscriptionId(uint64_t * const apSubscription
     return GetUnsignedInteger(kCsTag_SubscriptionId, apSubscriptionId);
 }
 
-CHIP_ERROR ReportData::Parser::GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeStatusList), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apAttributeStatusList->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
-}
-
 CHIP_ERROR ReportData::Parser::GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -280,18 +244,6 @@ ReportData::Builder & ReportData::Builder::SubscriptionId(const uint64_t aSubscr
 
 exit:
     return *this;
-}
-
-AttributeStatusList::Builder & ReportData::Builder::CreateAttributeStatusListBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mAttributeStatusListBuilder.ResetError(mError));
-
-    mError = mAttributeStatusListBuilder.Init(mpWriter, kCsTag_AttributeStatusList);
-    ChipLogFunctError(mError);
-
-exit:
-    return mAttributeStatusListBuilder;
 }
 
 AttributeDataList::Builder & ReportData::Builder::CreateAttributeDataListBuilder()
