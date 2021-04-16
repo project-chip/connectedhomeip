@@ -30,11 +30,8 @@ template <class T>
 class Span
 {
 public:
-    constexpr Span() : mDataBuf(nullptr), mDataLen(0) {}
-    constexpr Span(const T * databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
-    template <size_t N>
-    constexpr explicit Span(const T (&databuf)[N]) : Span(databuf, N)
-    {}
+    Span() : mDataBuf(nullptr), mDataLen(0) {}
+    Span(const T * databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return mDataLen; }

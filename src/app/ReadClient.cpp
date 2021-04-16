@@ -183,10 +183,8 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     err = report.Init(reader);
     SuccessOrExit(err);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = report.CheckSchemaValidity();
     SuccessOrExit(err);
-#endif
 
     err = report.GetSuppressResponse(&suppressResponse);
     if (CHIP_END_OF_TLV == err)

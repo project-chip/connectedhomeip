@@ -16,32 +16,32 @@ bool {{asSymbol label}}Exists = false;
 {{/zcl_command_arguments}}
 uint32_t validArgumentCount = 0;
 
-while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
 {
-  switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+  switch (TLV::TagNumFromTag(dataTlv.GetTag()))
   {
 {{#zcl_command_arguments}}
     case {{index}}:
       if ({{asSymbol label}}Exists)
       {
-            ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+            ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
             TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
             break;
       }
 {{#if (isOctetString type)}}
     {
         const uint8_t * data = nullptr;
-        TLVUnpackError = aDataTlv.GetDataPtr(data);
-        {{asSymbol label}} = chip::ByteSpan(data, aDataTlv.GetLength());
+        TLVUnpackError = dataTlv.GetDataPtr(data);
+        {{asSymbol label}} = chip::ByteSpan(data, dataTlv.GetLength());
     }
 {{else if (isString type)}}
       // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
-      TLVUnpackError = aDataTlv.GetDataPtr({{asSymbol label}});
+      TLVUnpackError = dataTlv.GetDataPtr({{asSymbol label}});
 {{else if isArray}}
       // Just for compatibility, we will add array type support in IM later.
-      TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>({{asSymbol label}}));
+      TLVUnpackError = dataTlv.GetDataPtr(const_cast<const uint8_t *&>({{asSymbol label}}));
 {{else}}
-      TLVUnpackError = aDataTlv.Get({{asSymbol label}});
+      TLVUnpackError = dataTlv.Get({{asSymbol label}});
 {{/if}}
       if (CHIP_NO_ERROR == TLVUnpackError)
       {
@@ -57,7 +57,7 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
   }
   if (TLVUnpackError != CHIP_NO_ERROR)
   {
-    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32, TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32, TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
     break;
   }
 }
@@ -82,10 +82,8 @@ if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && {{zcl_comman
 emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
 {{#if (zcl_command_arguments_count this.id)}}
 }
-else
+else if ({{zcl_command_arguments_count this.id}} != validArgumentCount)
 {
-      apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeGeneralFailure);
-      ChipLogProgress(Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32, {{zcl_command_arguments_count this.id}}, validArgumentCount, TLVError, TLVUnpackError);
+      ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, {{zcl_command_arguments_count this.id}}, validArgumentCount);
 }
 {{/if}}

@@ -14,7 +14,28 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("//build_overrides/certifier.gni")
 import("${chip_root}/src/ble/ble.gni")
+
+config("includes") {
+  include_dirs = [
+    ".",
+    "${chip_root}/third_party/certifier/repo/include",
+    "${chip_root}/third_party/certifier/repo/internal_headers",
+    "$root_out_dir", 
+  ]
+  libs = [
+    "curl",
+  ]
+}
+
+action("generate_dac_chain") {
+  script = "${chip_root}/third_party/certifier/generate_dac_chain.py"
+  sources = [ "${chip_root}/third_party/certifier/repo/resources/device-attestation-certificate.p12" ]
+  outputs = [ "$root_out_dir/dac_chain.h" ]
+
+  args = rebase_path(sources, "") + rebase_path(outputs, root_out_dir)
+}
 
 static_library("transport") {
   output_name = "libTransportLayer"
@@ -24,8 +45,17 @@ static_library("transport") {
     "AdminPairingTable.h",
     "CASESession.cpp",
     "CASESession.h",
+    "DeviceAttestation.cpp",
+    "DeviceAttestation.h",
+    "NetworkProvisioning.cpp",
+    "NetworkProvisioning.h",
+    "PASESession.cpp",
+    "PASESession.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
+    "RendezvousParameters.h",
+    "RendezvousSession.cpp",
+    "RendezvousSession.h",
     "RendezvousSessionDelegate.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
@@ -33,10 +63,15 @@ static_library("transport") {
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
+    "SessionEstablisher.h",
     "SessionEstablishmentDelegate.h",
+    "StorablePeerConnection.cpp",
+    "StorablePeerConnection.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -59,5 +94,10 @@ static_library("transport") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",
+    "${certifier_root}:certifier",
   ]
+
+  data_deps = [ ":generate_dac_chain" ]
+
+  public_configs = [ ":includes" ]
 }

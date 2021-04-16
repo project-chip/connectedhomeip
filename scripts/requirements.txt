@@ -34,7 +34,9 @@ colorama==0.4.4
 coloredlogs==15.0
     # via -r requirements.in
 cryptography==3.4.6
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   pyopenssl
 dbus-python==1.2.16 ; sys_platform == "linux"
     # via -r requirements.in
 decorator==4.4.2
@@ -140,6 +142,8 @@ pyobjc-framework-cocoa==7.1 ; sys_platform == "darwin"
     #   -r requirements.in
     #   pyobjc-framework-corebluetooth
 pyobjc-framework-corebluetooth==7.1 ; sys_platform == "darwin"
+    # via -r requirements.in
+pyopenssl==20.0.1
     # via -r requirements.in
 pyparsing==2.3.1
     # via

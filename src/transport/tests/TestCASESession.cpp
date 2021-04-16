@@ -87,12 +87,8 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0, nullptr) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0, &delegate) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForSessionEstablishment(&accessoryDevOpCred, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForSessionEstablishment(&accessoryDevOpCred, 0, &delegate) == CHIP_NO_ERROR);
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
@@ -102,11 +98,11 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     CASESession pairing;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            Optional<NodeId>::Value(1), 2, 0, nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0, nullptr) !=
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0, &delegate) ==
+                       CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
 
@@ -115,8 +111,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     CASESession pairing1;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                             Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0, &delegate) ==
+                       CHIP_ERROR_BAD_REQUEST);
 }
 
 void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
@@ -132,11 +128,10 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     delegateAccessory.peer    = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0,
-                                                                &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.WaitForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        Optional<NodeId>::Value(2), 1, 0, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0,
+                                                        &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
@@ -236,27 +231,27 @@ static const nlTest sTests[] =
 int CASE_TestSecurePairing_Setup(void * inContext)
 {
     CHIP_ERROR error;
-    CertificateKeyId trustedRootId = { .mId = sTestCert_Root01_SubjectKeyId, .mLen = sTestCert_Root01_SubjectKeyId_Len };
+    CertificateKeyId trustedRootId = { .mId = sTestCert_Root_SubjectKeyId, .mLen = sTestCert_Root_SubjectKeyId_Len };
 
     error = chip::Platform::MemoryInit();
     SuccessOrExit(error);
 
-    error = commissionerOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len);
+    error = commissionerOpKeysSerialized.SetLength(sTestCert_Node01_PublicKey_Len + sTestCert_Node01_PrivateKey_Len);
     SuccessOrExit(error);
 
-    memcpy((uint8_t *) (commissionerOpKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (commissionerOpKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
-           sTestCert_Node01_01_PrivateKey_Len);
+    memcpy((uint8_t *) (commissionerOpKeysSerialized), sTestCert_Node01_PublicKey, sTestCert_Node01_PublicKey_Len);
+    memcpy((uint8_t *) (commissionerOpKeysSerialized) + sTestCert_Node01_PublicKey_Len, sTestCert_Node01_PrivateKey,
+           sTestCert_Node01_PrivateKey_Len);
 
     error = commissionerOpKeys.Deserialize(commissionerOpKeysSerialized);
     SuccessOrExit(error);
 
-    error = accessoryOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len);
+    error = accessoryOpKeysSerialized.SetLength(sTestCert_Node01_PublicKey_Len + sTestCert_Node01_PrivateKey_Len);
     SuccessOrExit(error);
 
-    memcpy((uint8_t *) (accessoryOpKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (accessoryOpKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
-           sTestCert_Node01_01_PrivateKey_Len);
+    memcpy((uint8_t *) (accessoryOpKeysSerialized), sTestCert_Node01_PublicKey, sTestCert_Node01_PublicKey_Len);
+    memcpy((uint8_t *) (accessoryOpKeysSerialized) + sTestCert_Node01_PublicKey_Len, sTestCert_Node01_PrivateKey,
+           sTestCert_Node01_PrivateKey_Len);
 
     error = accessoryOpKeys.Deserialize(accessoryOpKeysSerialized);
     SuccessOrExit(error);
@@ -268,27 +263,27 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     SuccessOrExit(error);
 
     // Add the trusted root certificate to the certificate set.
-    error = commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
+    error = commissionerCertificateSet.LoadCert(sTestCert_Root_Chip, sTestCert_Root_Chip_Len,
                                                 BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
-    error = accessoryCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
+    error = accessoryCertificateSet.LoadCert(sTestCert_Root_Chip, sTestCert_Root_Chip_Len,
                                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
-    error = commissionerCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
+    error = commissionerCertificateSet.LoadCert(sTestCert_NodeCA_Chip, sTestCert_NodeCA_Chip_Len,
                                                 BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
-    error = accessoryCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
+    error = accessoryCertificateSet.LoadCert(sTestCert_NodeCA_Chip, sTestCert_NodeCA_Chip_Len,
                                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
     error = commissionerDevOpCred.Init(&commissionerCertificateSet, 1);
     SuccessOrExit(error);
 
-    error = commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
-                                               static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len));
+    error =
+        commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_Chip, static_cast<uint16_t>(sTestCert_Node01_Chip_Len));
     SuccessOrExit(error);
 
     error = commissionerDevOpCred.SetDevOpCredKeypair(trustedRootId, &commissionerOpKeys);
@@ -297,8 +292,7 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     error = accessoryDevOpCred.Init(&accessoryCertificateSet, 1);
     SuccessOrExit(error);
 
-    error = accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
-                                            static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len));
+    error = accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_Chip, static_cast<uint16_t>(sTestCert_Node01_Chip_Len));
     SuccessOrExit(error);
 
     error = accessoryDevOpCred.SetDevOpCredKeypair(trustedRootId, &accessoryOpKeys);

@@ -80,11 +80,10 @@ CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize, uint16_t decodeBu
     mDecodeBuf = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(decodeBufSize));
     VerifyOrExit(mDecodeBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
+    mCertCount           = 0;
     mMaxCerts            = maxCertsArraySize;
     mDecodeBufSize       = decodeBufSize;
     mMemoryAllocInternal = true;
-
-    Clear();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -105,13 +104,12 @@ CHIP_ERROR ChipCertificateSet::Init(ChipCertificateData * certsArray, uint8_t ce
     VerifyOrExit(decodeBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(decodeBufSize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+    mCertCount           = 0;
     mCerts               = certsArray;
     mMaxCerts            = certsArraySize;
     mDecodeBuf           = decodeBuf;
     mDecodeBufSize       = decodeBufSize;
     mMemoryAllocInternal = false;
-
-    Clear();
 
 exit:
     return err;
@@ -137,9 +135,9 @@ void ChipCertificateSet::Release()
 
 void ChipCertificateSet::Clear()
 {
-    for (int i = 0; i < mMaxCerts; i++)
+    for (int i = 0; i < mCertCount; i++)
     {
-        mCerts[i].Clear();
+        mCerts[i].~ChipCertificateData();
     }
 
     mCertCount = 0;
@@ -156,13 +154,14 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
     err = reader.Next(kTLVType_Structure, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate));
     SuccessOrExit(err);
 
-    err = LoadCert(reader, decodeFlags);
+    err = LoadCert(reader, decodeFlags, chipCert, chipCertLen);
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, const uint8_t * chipCert,
+                                        uint32_t chipCertLen)
 {
     CHIP_ERROR err;
     ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
@@ -176,6 +175,9 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
 
     cert = new (&mCerts[mCertCount]) ChipCertificateData();
+
+    cert->mCertificateBegin = chipCert;
+    cert->mCertificateLen   = static_cast<uint16_t>(chipCertLen);
 
     {
         TLVType containerType;
@@ -229,6 +231,10 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     {
         cert->mCertFlags.Set(CertFlags::kIsTrustAnchor);
     }
+
+    // Assign a default type for the certificate based on its subject and attributes.
+    err = DetermineCertType(*cert);
+    SuccessOrExit(err);
 
     mCertCount++;
 
@@ -318,6 +324,43 @@ exit:
         mCertCount = initialCertCount;
     }
 
+    return err;
+}
+
+CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const uint8_t * pubKey, uint8_t pubKeyLen,
+                                             const uint8_t * pubKeyId, uint8_t pubKeyIdLen)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipCertificateData * cert;
+
+    // Verify we have room for the new certificate.
+    VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
+
+    cert = new (&mCerts[mCertCount]) ChipCertificateData();
+
+    cert->mSubjectDN.Add(kOID_AttributeType_ChipCAId, caId);
+
+    cert->mIssuerDN          = cert->mSubjectDN;
+    cert->mPubKeyCurveOID    = curveOID;
+    cert->mPublicKey         = pubKey;
+    cert->mPublicKeyLen      = pubKeyLen;
+    cert->mSubjectKeyId.mId  = pubKeyId;
+    cert->mSubjectKeyId.mLen = pubKeyIdLen;
+    cert->mAuthKeyId         = cert->mSubjectKeyId;
+    cert->mCertType          = kCertType_CA;
+
+    cert->mCertFlags.Set(CertFlags::kExtPresent_BasicConstraints);
+    cert->mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
+    cert->mCertFlags.Set(CertFlags::kExtPresent_SubjectKeyId);
+    cert->mCertFlags.Set(CertFlags::kExtPresent_AuthKeyId);
+    cert->mCertFlags.Set(CertFlags::kIsCA);
+    cert->mCertFlags.Set(CertFlags::kIsTrustAnchor);
+
+    cert->mKeyUsageFlags.Set(KeyUsageFlags::kKeyCertSign);
+
+    mCertCount++;
+
+exit:
     return err;
 }
 
@@ -426,10 +469,6 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     ChipCertificateData * caCert = nullptr;
-    uint8_t certType;
-
-    err = cert->mSubjectDN.GetCertType(certType);
-    SuccessOrExit(err);
 
     // If the depth is greater than 0 then the certificate is required to be a CA certificate...
     if (depth > 0)
@@ -441,8 +480,8 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         VerifyOrExit(cert->mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) && cert->mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign),
                      err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
-        // Verify that the certificate type is set to Root or ICA.
-        VerifyOrExit(certType == kCertType_ICA || certType == kCertType_Root, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        // Verify that the certificate type is set to "CA".
+        VerifyOrExit(cert->mCertType == kCertType_CA, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
         // If a path length constraint was included, verify the cert depth vs. the specified constraint.
         //
@@ -481,7 +520,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
         // If a required certificate type has been specified, verify it against the current certificate's type.
         if (context.mRequiredCertType != kCertType_NotSpecified)
         {
-            VerifyOrExit(certType == context.mRequiredCertType, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(cert->mCertType == context.mRequiredCertType, err = CHIP_ERROR_WRONG_CERT_TYPE);
         }
     }
 
@@ -586,12 +625,21 @@ exit:
     return err;
 }
 
-ChipCertificateData::ChipCertificateData() {}
+ChipCertificateData::ChipCertificateData()
+{
+    Clear();
+}
 
-ChipCertificateData::~ChipCertificateData() {}
+ChipCertificateData::~ChipCertificateData()
+{
+    Clear();
+}
 
 void ChipCertificateData::Clear()
 {
+    mCertificateBegin = nullptr;
+    mCertificateLen   = 0;
+
     mSubjectDN.Clear();
     mIssuerDN.Clear();
     mSubjectKeyId.Clear();
@@ -607,6 +655,7 @@ void ChipCertificateData::Clear()
     mKeyUsageFlags.ClearAll();
     mKeyPurposeFlags.ClearAll();
     mPathLenConstraint = 0;
+    mCertType          = kCertType_NotSpecified;
     mSignature.R       = nullptr;
     mSignature.RLen    = 0;
     mSignature.S       = nullptr;
@@ -625,138 +674,53 @@ void ValidationContext::Reset()
     mRequiredCertType = kCertType_NotSpecified;
 }
 
-bool ChipRDN::IsEqual(const ChipRDN & other) const
+CHIP_ERROR DetermineCertType(ChipCertificateData & cert)
 {
-    if (mAttrOID == kOID_Unknown || mAttrOID == kOID_NotSpecified || mAttrOID != other.mAttrOID)
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // If the certificate subject contains a ChipCAId attribute...
+    if (cert.mSubjectDN.Has(kOID_AttributeType_ChipCAId))
     {
-        return false;
+        // Verify the BasicConstraints isCA flag is true.
+        VerifyOrExit(cert.mCertFlags.Has(CertFlags::kIsCA), err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
+        // Verify the key usage extension is present and contains the 'keyCertSign' flag.
+        VerifyOrExit(cert.mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) && cert.mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign),
+                     err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
+        // Set the certificate type to CA.
+        cert.mCertType = kCertType_CA;
     }
 
-    if (IsChipDNAttr(mAttrOID))
+    // If the certificate subject contains a ChipNodeId attribute set the certificate type to Node.
+    else if (cert.mSubjectDN.Has(kOID_AttributeType_ChipNodeId))
     {
-        return mAttrValue.mChipVal == other.mAttrValue.mChipVal;
+        cert.mCertType = kCertType_Node;
     }
+
+    // If the certificate subject contains a ChipSoftwarePublisherId attribute set the certificate type to FirmwareSigning.
+    /*    else if (cert.mSubjectDN.Has(kOID_AttributeType_ChipSoftwarePublisherId))
+        {
+            cert.mCertType = kCertType_FirmwareSigning;
+        }
+    */
+    else if (cert.mSubjectDN.Has(kOID_AttributeType_ChipICAId))
+    {
+        // Verify the BasicConstraints isCA flag is true.
+        VerifyOrExit(cert.mCertFlags.Has(CertFlags::kIsCA), err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
+        // Verify the key usage extension is present and contains the 'keyCertSign' flag.
+        VerifyOrExit(cert.mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) && cert.mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign),
+                     err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
+        // Set the certificate type to CA.
+        cert.mCertType = kCertType_CA;
+    }
+
     else
     {
-        return (mAttrValue.mString.mLen == other.mAttrValue.mString.mLen &&
-                memcmp(mAttrValue.mString.mValue, other.mAttrValue.mString.mValue, mAttrValue.mString.mLen) == 0);
+        err = CHIP_ERROR_WRONG_CERT_TYPE;
     }
-}
-
-ChipDN::ChipDN() {}
-
-ChipDN::~ChipDN() {}
-
-void ChipDN::Clear()
-{
-    for (uint8_t i = 0; i < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES; i++)
-    {
-        rdn[i].Clear();
-    }
-}
-
-uint8_t ChipDN::RDNCount() const
-{
-    uint8_t count;
-
-    for (count = 0; count < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES; count++)
-    {
-        if (rdn[count].IsEmpty())
-        {
-            break;
-        }
-    }
-
-    return count;
-}
-
-CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, uint64_t val)
-{
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint8_t rdnCount = RDNCount();
-
-    VerifyOrExit(rdnCount < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES, err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(IsChipDNAttr(oid), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (IsChip32bitDNAttr(oid))
-    {
-        VerifyOrExit(val <= UINT32_MAX, err = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    rdn[rdnCount].mAttrOID            = oid;
-    rdn[rdnCount].mAttrValue.mChipVal = val;
-
-exit:
-    return err;
-}
-
-CHIP_ERROR ChipDN::AddAttribute(chip::ASN1::OID oid, const uint8_t * val, uint32_t valLen)
-{
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint8_t rdnCount = RDNCount();
-
-    VerifyOrExit(rdnCount < CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES, err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(!IsChipDNAttr(oid), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(oid != kOID_NotSpecified, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    rdn[rdnCount].mAttrOID                  = oid;
-    rdn[rdnCount].mAttrValue.mString.mValue = val;
-    rdn[rdnCount].mAttrValue.mString.mLen   = valLen;
-
-exit:
-    return err;
-}
-
-CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
-{
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    uint8_t lCertType    = kCertType_NotSpecified;
-    bool fabricIdPresent = false;
-    uint8_t rdnCount     = RDNCount();
-
-    certType = kCertType_NotSpecified;
-
-    for (uint8_t i = 0; i < rdnCount; i++)
-    {
-        if (rdn[i].mAttrOID == kOID_AttributeType_ChipRootId)
-        {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-            lCertType = kCertType_Root;
-        }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipICAId)
-        {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-            lCertType = kCertType_ICA;
-        }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipNodeId)
-        {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-            lCertType = kCertType_Node;
-        }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFirmwareSigningId)
-        {
-            VerifyOrExit(lCertType == kCertType_NotSpecified, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-            lCertType = kCertType_FirmwareSigning;
-        }
-        else if (rdn[i].mAttrOID == kOID_AttributeType_ChipFabricId)
-        {
-            // Only one fabricId attribute is allowed per DN.
-            VerifyOrExit(!fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
-
-            fabricIdPresent = true;
-        }
-    }
-
-    if (lCertType == kCertType_Node)
-    {
-        VerifyOrExit(fabricIdPresent, err = CHIP_ERROR_WRONG_CERT_TYPE);
-    }
-
-    certType = lCertType;
 
 exit:
     return err;
@@ -764,19 +728,106 @@ exit:
 
 bool ChipDN::IsEqual(const ChipDN & other) const
 {
-    bool res         = true;
-    uint8_t rdnCount = RDNCount();
+    if (mAttrOID[0] == chip::ASN1::kOID_AttributeType_ChipNodeId)
+        return other.mAttrOID[0] == chip::ASN1::kOID_AttributeType_ChipNodeId &&
+            mAttrValue[0].mChipId == other.mAttrValue[0].mChipId;
 
-    VerifyOrExit(rdnCount > 0, res = false);
-    VerifyOrExit(rdnCount == other.RDNCount(), res = false);
-
-    for (uint8_t i = 0; i < rdnCount; i++)
+    for (int i = 1; i < RDN_NUM; ++i)
     {
-        VerifyOrExit(rdn[i].IsEqual(other.rdn[i]), res = false);
+        if (mAttrOID[i] == kOID_Unknown || mAttrOID[i] == kOID_NotSpecified)
+            continue;
+
+        int j = 1;
+        for (; j < RDN_NUM; ++j)
+        {
+            if (mAttrOID[i] == other.mAttrOID[j])
+                break;
+        }
+
+        if (j == RDN_NUM)
+            continue;
+
+        if (IsChipX509Attr(mAttrOID[i]))
+        {
+            if (mAttrValue[i].mChipId != other.mAttrValue[j].mChipId)
+                return false;
+        }
+        else
+        {
+            if (mAttrValue[i].mString.mLen != other.mAttrValue[j].mString.mLen ||
+                memcmp(mAttrValue[i].mString.mValue, other.mAttrValue[j].mString.mValue, mAttrValue[i].mString.mLen) != 0)
+                return false;
+        }
+    }
+    return true;
+}
+
+bool ChipDN::IsEmpty() const
+{
+    int i = 0;
+
+    for (; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] != chip::ASN1::kOID_NotSpecified)
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void ChipDN::Clear()
+{
+    int i = 0;
+
+    for (; i < RDN_NUM; ++i)
+    {
+        mAttrOID[i] = chip::ASN1::kOID_NotSpecified;
+    }
+}
+
+void ChipDN::Add(chip::ASN1::OID attrOID, uint64_t chipId)
+{
+    if (attrOID == chip::ASN1::kOID_AttributeType_ChipNodeId)
+    {
+        mAttrOID[0]           = attrOID;
+        mAttrValue[0].mChipId = chipId;
+        return;
     }
 
-exit:
-    return res;
+    for (int i = 1; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
+        {
+            mAttrOID[i]           = attrOID;
+            mAttrValue[i].mChipId = chipId;
+            return;
+        }
+    }
+}
+
+void ChipDN::Add(chip::ASN1::OID attrOID, const uint8_t * strVal, uint32_t strLen)
+{
+    for (int i = 1; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] == chip::ASN1::kOID_NotSpecified || mAttrOID[i] == attrOID)
+        {
+            mAttrOID[i]                  = attrOID;
+            mAttrValue[i].mString.mValue = strVal;
+            mAttrValue[i].mString.mLen   = strLen;
+            return;
+        }
+    }
+}
+
+bool ChipDN::Has(chip::ASN1::OID attrOID) const
+{
+    for (int i = 0; i < RDN_NUM; ++i)
+    {
+        if (mAttrOID[i] == attrOID)
+            return true;
+    }
+    return false;
 }
 
 bool CertificateKeyId::IsEqual(const CertificateKeyId & other) const

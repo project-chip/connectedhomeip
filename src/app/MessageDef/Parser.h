@@ -23,6 +23,9 @@
 
 #pragma once
 
+#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_PARSER_H
+#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_PARSER_H
+
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
@@ -97,3 +100,5 @@ protected:
 };
 }; // namespace app
 }; // namespace chip
+
+#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_PARSER_H

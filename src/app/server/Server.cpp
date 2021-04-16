@@ -22,11 +22,11 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
-#include <app/server/StorablePeerConnection.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
@@ -40,7 +40,10 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/AdminPairingTable.h>
+#include <transport/DeviceAttestation.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/StorablePeerConnection.h>
 
 #include "Mdns.h"
 
@@ -296,10 +299,12 @@ private:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
-Messaging::ExchangeManager gExchangeMgr;
+DeviceAttestation gDeviceAttestation;
+OperationalCredentialSet gOperationalCredentialSet;
+
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
-static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
+static CHIP_ERROR OpenPairingWindowUsingVerifier(ResetAdmins resetAdmins, uint16_t discriminator, PASEVerifier & verifier)
 {
     RendezvousParameters params;
 
@@ -314,15 +319,41 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     params.SetPASEVerifier(verifier);
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+    if (resetAdmins == ResetAdmins::kYes)
+    {
+        gNextAvailableAdminId = 0;
+        gAdminPairings.Reset();
+    }
+
     AdminId admin                = gNextAvailableAdminId;
     AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
-class ServerCallback : public ExchangeDelegate
+static CHIP_ERROR OpenCertificatePairingWindow(ResetAdmins resetAdmins, OperationalCredentialSet * opCredSet)
+{
+    RendezvousParameters params;
+
+    params.SetOpCredSet(opCredSet);
+
+    if (resetAdmins == ResetAdmins::kYes)
+    {
+        gNextAvailableAdminId = 0;
+        gAdminPairings.Reset();
+    }
+
+    AdminId admin                = gNextAvailableAdminId;
+    AdminPairingInfo * adminInfo = gAdminPairings.AssignAdminId(admin);
+    VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
+    gNextAvailableAdminId++;
+
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+}
+
+class ServerCallback : public ExchangeDelegate, public ExchangeMgrDelegate
 {
 public:
     void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
@@ -350,7 +381,7 @@ public:
             PASEVerifier verifier;
 
             ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
-            chip::System::PacketBufferTLVReader reader;
+            System::PacketBufferTLVReader reader;
             reader.Init(std::move(buffer));
             reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
 
@@ -371,6 +402,8 @@ public:
 
             ChipLogProgress(AppServer, "Pairing Window timeout %d seconds", timeout);
 
+            gDeviceAttestation.Close();
+
             if (err != CHIP_NO_ERROR)
             {
                 SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kNo));
@@ -378,10 +411,15 @@ public:
             else
             {
                 ChipLogProgress(AppServer, "Pairing Window discriminator %d", discriminator);
-                err = OpenPairingWindowUsingVerifier(discriminator, verifier);
+                err = OpenPairingWindowUsingVerifier(ResetAdmins::kYes, discriminator, verifier);
                 SuccessOrExit(err);
             }
             ChipLogProgress(AppServer, "Opened the pairing window");
+        }
+        else if (payloadHeader.HasProtocol(chip::Protocols::OpCredentials::Id))
+        {
+            CHIP_ERROR err = gDeviceAttestation.OnMessageReceived(std::move(buffer), exchangeContext);
+            SuccessOrExit(err);
         }
         else
         {
@@ -400,6 +438,27 @@ public:
         }
     }
 
+    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr,
+                         SessionEstablisher::SecureSessionType secureSessionType) override
+    {
+        ChipLogProgress(AppServer, "Received a new connection.");
+        if (!gDeviceAttestation.IsDeviceAttested())
+        {
+            gDeviceAttestation.Init(nullptr, &gOperationalCredentialSet);
+        }
+        else
+        {
+            ChipLogProgress(AppServer, "Established CASE Session After Device Attestation.");
+        }
+    }
+
+    void OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr, OperationalCredentialSet * opCredSet,
+                              const CertificateKeyId & trustedRootId) override
+    {
+        (void) trustedRootId;
+        OpenCertificatePairingWindow(ResetAdmins::kYes, opCredSet);
+    }
+
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
     void SetSessionMgr(SecureSessionMgr * mgr) { mSessionMgr = mgr; }
 
@@ -408,6 +467,7 @@ private:
     SecureSessionMgr * mSessionMgr = nullptr;
 };
 
+Messaging::ExchangeManager gExchangeMgr;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -457,7 +517,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -485,11 +545,16 @@ void InitServer(AppDelegate * delegate)
 #endif
     SuccessOrExit(err);
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
+    err = gSessions.Init(kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
+
+    gExchangeMgr.SetDelegate(&gCallbacks);
+
+    // TODO: create constant
+    gOperationalCredentialSet.Init(3);
 
 #if CHIP_ENABLE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
@@ -539,6 +604,10 @@ void InitServer(AppDelegate * delegate)
 
     // Register to receive unsolicited Service Provisioning messages from the exchange manager.
     err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
+    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+
+    // Register to receive unsolicited Device Attestation messages from the exchange manager.
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::OpCredentials::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
 exit:

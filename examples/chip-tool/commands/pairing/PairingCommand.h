@@ -50,6 +50,7 @@ public:
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
         case PairingMode::SoftAP:
+            AddArgument("pairing-type", &mPairingType);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);
@@ -70,8 +71,8 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
 private:
-    CHIP_ERROR RunInternal(NodeId remoteId);
-    CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
+    CHIP_ERROR RunInternal(NodeId localId, NodeId remoteId);
+    CHIP_ERROR Pair(NodeId remoteId, PeerAddress address, char * pairingType, NodeId localId);
     CHIP_ERROR PairWithoutSecurity(NodeId remoteId, PeerAddress address);
     CHIP_ERROR Unpair(NodeId remoteId);
 
@@ -79,9 +80,11 @@ private:
     Command::AddressWithInterface mRemoteAddr;
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
+    char * mPairingType;
     uint32_t mSetupPINCode;
     char * mSSID;
     char * mPassword;
 
     ChipDeviceCommissioner mCommissioner;
+    ChipDevice * mDevice;
 };

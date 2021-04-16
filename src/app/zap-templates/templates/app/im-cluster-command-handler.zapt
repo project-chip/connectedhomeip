@@ -26,13 +26,13 @@ namespace clusters {
 {{#if (user_cluster_has_enabled_command name side)}}
 namespace {{asCamelCased name false}} {
 
-void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
 {
     {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
     {{else}}
     {{/if}}
     {
-        switch (aCommandId)
+        switch (commandId)
         {
         {{#all_user_cluster_commands}}
         {{#unless mfgCode}}
@@ -48,9 +48,8 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
         {{/all_user_cluster_commands}}
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                            Protocols::SecureChannel::kProtocolCodeGeneralFailure);
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_{{asDelimitedMacro define}}_ID);
+            // TODO: Encode response for command not found
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_{{asDelimitedMacro define}}_ID);
             break;
         }
         }
@@ -83,8 +82,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {{/all_user_clusters}}
     default:
         // Unrecognized cluster ID, error status will apply.
-        apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
-                            Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+        // TODO: Encode response for Cluster not found
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }

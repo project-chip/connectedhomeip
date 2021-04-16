@@ -36,6 +36,8 @@
 namespace chip {
 namespace Crypto {
 
+const size_t kMax_x509_Certificate_Length = 1024;
+
 const size_t kP256_FE_Length     = 32;
 const size_t kP256_Point_Length  = (2 * kP256_FE_Length + 1);
 const size_t kSHA256_Hash_Length = 32;
@@ -262,6 +264,15 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR NewCertificateSigningRequest(uint8_t * csr, size_t & csr_length) override;
+
+    // TODO implementation for MbedTLS
+    /** @brief Generate a new Certificate Signing Request (CSR) in DER.
+     * @param csr Newly generated CSR
+     * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
+     *CSR.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     */
+    CHIP_ERROR NewCertificateSigningRequestDER(uint8_t * out_csr, size_t & csr_length);
 
     /**
      * @brief A function to sign a msg using ECDSA
@@ -856,6 +867,19 @@ private:
  * @param len Specifies secret data size in bytes.
  **/
 void ClearSecretData(uint8_t * buf, uint32_t len);
+
+typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
+
+// TODO implementation for mbedTLS
+// TODO add brief
+CHIP_ERROR LoadCertsFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t * max_certs);
+
+CHIP_ERROR LoadCertFromPKCS7(const uint8_t * pkcs7, X509DerCertificate * x509list, uint32_t n_cert);
+
+CHIP_ERROR GetNumberOfCertsFromPKCS7(const uint8_t * pkcs7, uint32_t * n_certs);
+
+CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
 } // namespace Crypto
 } // namespace chip

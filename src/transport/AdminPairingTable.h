@@ -76,7 +76,7 @@ public:
     AccessControlList & GetACL() { return mACL; }
     void SetACL(const AccessControlList & acl) { mACL = acl; }
 
-    bool IsInitialized() const { return (mAdmin != kUndefinedAdminId); }
+    bool IsInitialized() const { return (mNodeId != kUndefinedNodeId && mAdmin != kUndefinedAdminId); }
 
     /**
      *  Reset the state to a completely uninitialized status.
@@ -100,7 +100,7 @@ private:
     OperationalCredentials mOpCred;
     AccessControlList mACL;
 
-    static constexpr size_t KeySize();
+    static constexpr size_t KeySize(); // { return sizeof(kAdminTableKeyPrefix) + 2 * sizeof(AdminId); }
 
     static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
 

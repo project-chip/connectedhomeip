@@ -33,10 +33,11 @@
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
+#include <transport/DeviceAttestation.h>
+#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -112,6 +113,21 @@ public:
      */
     CHIP_ERROR SendCommands();
 
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     */
+    void InitCommandSender()
+    {
+        if (mCommandSender != nullptr)
+        {
+            mCommandSender->Shutdown();
+            mCommandSender = nullptr;
+        }
+#if CHIP_ENABLE_INTERACTION_MODEL
+        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+#endif
+    }
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
@@ -140,18 +156,20 @@ public:
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin, bool openPairingWindow = false)
     {
-        mTransportMgr   = params.transportMgr;
-        mSessionManager = params.sessionMgr;
-        mExchangeMgr    = params.exchangeMgr;
-        mInetLayer      = params.inetLayer;
-        mListenPort     = listenPort;
-        mAdminId        = admin;
-
-#if CHIP_ENABLE_INTERACTION_MODEL
-        InitCommandSender();
-#endif
+        mTransportMgr      = params.transportMgr;
+        mSessionManager    = params.sessionMgr;
+        mExchangeMgr       = params.exchangeMgr;
+        mInetLayer         = params.inetLayer;
+        mListenPort        = listenPort;
+        mAdminId           = admin;
+        mOpenPairingWindow = openPairingWindow;
+        // TODO: create constant
+        if (!mOperationalCredentialSet.IsInitialized())
+        {
+            mOperationalCredentialSet.Init(3);
+        }
     }
 
     /**
@@ -172,11 +190,17 @@ public:
      * @param[in] admin        Local administrator that's initializing this device object
      */
     void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
-              Transport::AdminId admin)
+              Transport::AdminId admin, bool openPairingWindow = false)
     {
-        Init(params, mListenPort, admin);
+        Init(params, mListenPort, admin, openPairingWindow);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
+
+        // TODO: create constant
+        if (!mOperationalCredentialSet.IsInitialized())
+        {
+            mOperationalCredentialSet.Init(3);
+        }
 
         if (peerAddress.GetTransportType() != Transport::Type::kUdp)
         {
@@ -209,7 +233,10 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnNewConnection(SecureSessionHandle session);
+    void OnNewConnection(Messaging::ExchangeDelegate * exchangeDelegate, SecureSessionHandle session,
+                         SessionEstablisher::SecureSessionType secureSessionType);
+
+    void OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr);
 
     /**
      * @brief
@@ -231,7 +258,8 @@ public:
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
@@ -251,6 +279,8 @@ public:
      * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload);
+
+    CHIP_ERROR Attest();
 
     /**
      * @brief
@@ -274,7 +304,10 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
-    bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
+    bool IsSecureConnected() const
+    {
+        return IsActive() && (mState == ConnectionState::SecureConnected || mState == ConnectionState::PinConnected);
+    }
 
     void Reset()
     {
@@ -283,6 +316,7 @@ public:
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
         mInetLayer      = nullptr;
+        mCASEReady      = false;
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
@@ -291,17 +325,24 @@ public:
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceUdpAddress.SetIPAddress(deviceAddr); }
 
-    PASESessionSerializable & GetPairing() { return mPairing; }
+    PASESessionSerializable * GetPairing() { return &mPASEPairing; }
+    CASESessionSerializable * GetCASEPairing() { return &mCASEPairing; }
+    OperationalCredentialSerializable * GetOpCredPairing() { return &mOpCredPairing; }
 
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
+    CHIP_ERROR DeserializeOperationalCredentials();
+    OperationalCredentialSet * GetOperationalCredentialSet() { return &mOperationalCredentialSet; }
+
 private:
-    enum class ConnectionState
+    enum class ConnectionState : uint8_t
     {
         NotConnected,
         Connecting,
+        PinConnected,
+        DeviceAttested,
         SecureConnected,
     };
 
@@ -320,10 +361,14 @@ private:
 
     Inet::InetLayer * mInetLayer = nullptr;
 
-    bool mActive           = false;
-    ConnectionState mState = ConnectionState::NotConnected;
+    bool mOpenPairingWindow = false;
+    bool mActive            = false;
+    ConnectionState mState  = ConnectionState::NotConnected;
 
-    PASESessionSerializable mPairing;
+    PASESessionSerializable mPASEPairing;
+    CASESessionSerializable mCASEPairing;
+    OperationalCredentialSerializable mOpCredPairing;
+    bool mCASEReady = false;
 
     DeviceStatusDelegate * mStatusDelegate = nullptr;
 
@@ -336,6 +381,12 @@ private:
     app::CommandSender * mCommandSender = nullptr;
 
     SecureSessionHandle mSecureSession = {};
+
+    Transport::DeviceAttestation mDeviceAttestation;
+
+    OperationalCredentialSet mOperationalCredentialSet;
+
+    Messaging::ExchangeContext * mCommissioningExchangeContext;
 
     uint8_t mSequenceNumber = 0;
 
@@ -360,13 +411,6 @@ private:
      * @param[out] didLoad   Were the secure session params loaded by the call to this function.
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     *   It's safe to call InitCommandSender multiple times, but only one will be available.
-     */
-    void InitCommandSender();
 
     uint16_t mListenPort;
 
@@ -416,7 +460,13 @@ constexpr uint16_t kMaxInterfaceName = 32;
 
 typedef struct SerializableDevice
 {
-    PASESessionSerializable mOpsCreds;
+    uint8_t mState;
+    union
+    {
+        PASESessionSerializable mPASE;
+        CASESessionSerializable mCASE;
+        OperationalCredentialSerializable mOpCred;
+    } mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */

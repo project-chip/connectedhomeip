@@ -28,12 +28,13 @@
 #include <utility>
 
 #include <core/CHIPCore.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PairingSession.h>
+#include <transport/PASESession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
@@ -42,6 +43,8 @@
 #include <transport/raw/Tuple.h>
 
 namespace chip {
+
+using namespace Credentials;
 
 class SecureSessionMgr;
 
@@ -149,13 +152,11 @@ public:
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
      * @param session       The handle to the secure session
-     * @param source        The sender's address
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -175,7 +176,13 @@ public:
      * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                                 SessionEstablisher::SecureSessionType secureSessionType)
+    {}
+
+    virtual void OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr, OperationalCredentialSet * opCredSet,
+                                      const CertificateKeyId & trustedRootId)
+    {}
 
     /**
      * @brief
@@ -254,8 +261,11 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SessionEstablisher * pairing,
                           PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+
+    CHIP_ERROR OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                const CertificateKeyId & trustedRootId);
 
     /**
      * @brief
@@ -368,11 +378,6 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
-
-    void SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle msg);
-    void MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                         System::PacketBufferHandle msg);
 };
 
 namespace MessagePacketBuffer {

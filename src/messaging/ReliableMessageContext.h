@@ -70,20 +70,13 @@ public:
     CHIP_ERROR FlushAcks();
 
     /**
-     *  Get the initial retransmission interval. It would be the time to wait before
-     *  retransmission after first failure.
+     *  Get the current retransmit timeout. It would be either the initial or
+     *  the active retransmit timeout based on whether the ExchangeContext has
+     *  an active message exchange going with its peer.
      *
-     *  @return the initial retransmission interval.
+     *  @return the current retransmit time.
      */
-    uint64_t GetInitialRetransmitTimeoutTick();
-
-    /**
-     *  Get the active retransmit interval. It would be the time to wait before
-     *  retransmission after subsequent failures.
-     *
-     *  @return the active retransmission interval.
-     */
-    uint64_t GetActiveRetransmitTimeoutTick();
+    uint64_t GetCurrentRetransmitTimeoutTick();
 
     /**
      *  Send a SecureChannel::StandaloneAck message.
@@ -220,7 +213,6 @@ private:
 private:
     friend class ReliableMessageMgr;
     friend class ExchangeContext;
-    friend class ExchangeMessageDispatch;
 
     ReliableMessageMgr * mManager;
     ExchangeContext * mExchange;

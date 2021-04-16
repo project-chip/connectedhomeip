@@ -38,12 +38,17 @@ namespace Messaging {
 
 CHIP_ERROR MessageCounterSyncMgr::Init(Messaging::ExchangeManager * exchangeMgr)
 {
-    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(exchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    // TODO: Register for specific message types, as CASE and PASE share the same protocol ID
-    return mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
+    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
+
+    ReturnErrorOnFailure(err);
+
+    return err;
 }
 
 void MessageCounterSyncMgr::Shutdown()

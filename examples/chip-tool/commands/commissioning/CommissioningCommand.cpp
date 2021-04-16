@@ -1,0 +1,119 @@
+/*
+ *   Copyright (c) 2020 Project CHIP Authors
+ *   All rights reserved.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+
+#include "CommissioningCommand.h"
+
+using namespace ::chip;
+
+namespace {
+constexpr uint16_t kWaitDurationInSeconds = 40;
+} // namespace
+
+CHIP_ERROR CommissioningCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+
+    err = mCommissioner.Init(localId, &storage, this);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+
+    err = mCommissioner.ServiceEvents();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", ErrorStr(err)));
+
+    err = mCommissioner.GetDevice(remoteId, &mDevice);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
+
+    err = RunInternal();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! CommssioningCommand: %s", ErrorStr(err)));
+
+exit:
+    mCommissioner.ServiceEventSignal();
+    mCommissioner.Shutdown();
+    return err;
+}
+
+CHIP_ERROR CommissioningCommand::RunInternal()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    switch (mCommissioningType)
+    {
+    case CommissioningType::DeviceAttestation:
+        err = mDevice->Attest();
+
+        UpdateWaitForResponse(true);
+        WaitForResponse(kWaitDurationInSeconds);
+        break;
+    case CommissioningType::OpenPairingWindowReq:
+        mSetupPayload.discriminator = mDiscriminator;
+        err = mDevice->OpenPairingWindow(kWaitDurationInSeconds, chip::Controller::Device::PairingWindowOption::kTokenWithRandomPIN,
+                                         mSetupPayload);
+        break;
+    }
+
+    return err;
+}
+
+void CommissioningCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
+{
+    switch (status)
+    {
+    case RendezvousSessionDelegate::Status::SecurePairingSuccess:
+        ChipLogProgress(chipTool, "Secure Pairing Success");
+        break;
+    case RendezvousSessionDelegate::Status::SecurePairingFailed:
+        ChipLogError(chipTool, "Secure Pairing Failed");
+        break;
+    case RendezvousSessionDelegate::Status::NetworkProvisioningSuccess:
+        ChipLogProgress(chipTool, "Network Provisioning Success");
+        break;
+    case RendezvousSessionDelegate::Status::NetworkProvisioningFailed:
+        ChipLogError(chipTool, "Network Provisioning Failed");
+        break;
+    }
+}
+
+void CommissioningCommand::OnPairingComplete(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(chipTool, "Device Attestation Success");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "Device Attestation Failure: %s", chip::ErrorStr(err));
+    }
+
+    SetCommandExitStatus(err == CHIP_NO_ERROR);
+}
+
+void CommissioningCommand::OnPairingDeleted(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(chipTool, "Pairing Deleted Success");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "Pairing Deleted Failure: %s", chip::ErrorStr(err));
+    }
+
+    SetCommandExitStatus(err == CHIP_NO_ERROR);
+}

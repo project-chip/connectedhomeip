@@ -98,14 +98,14 @@ CHIP_ERROR ChipLinuxStorageIni::CommitConfig(const std::string & configFile)
 
     if (ofs.is_open())
     {
-        ChipLogProgress(DeviceLayer, "writing settings to file (%s)", tmpPath.c_str());
+        ChipLogDetail(DeviceLayer, "writing settings to file (%s)", tmpPath.c_str());
 
         mConfigStore.generate(ofs);
         ofs.close();
 
         if (rename(tmpPath.c_str(), configFile.c_str()) == 0)
         {
-            ChipLogError(DeviceLayer, "renamed tmp file to file (%s)", configFile.c_str());
+            ChipLogDetail(DeviceLayer, "renamed tmp file to file (%s)", configFile.c_str());
         }
         else
         {

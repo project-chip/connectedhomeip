@@ -119,15 +119,6 @@
 // -------------------- Device Identification Configuration --------------------
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
- *
- * Human readable vendor name for the organization responsible for producing the device.
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "TEST_VENDOR"
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * The CHIP-assigned vendor id for the organization responsible for producing the device.
@@ -137,12 +128,13 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME
+ * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
- * Human readable name of the device model.
+ * Enables the use of a hard-coded default serial number if none
+ * is found in Chip NV storage.
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "TEST_PRODUCT"
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 #endif
 
 /**
@@ -153,15 +145,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 65279
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION_STRING
- *
- * Human readable string identifying version of the product assigned by the device vendor.
- */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING "TEST_VERSION"
 #endif
 
 /**
@@ -182,31 +165,12 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
  *
  * A string identifying the firmware revision running on the device.
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "prerelease"
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
- *
- * A monothonic number identifying the firmware revision running on the device.
- */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 1
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
- *
- * Enables the use of a hard-coded default serial number if none
- * is found in Chip NV storage.
- */
-#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION "prerelease"
 #endif
 
 /**

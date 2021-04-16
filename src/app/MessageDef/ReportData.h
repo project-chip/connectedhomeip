@@ -23,6 +23,9 @@
 
 #pragma once
 
+#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H
+#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H
+
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
@@ -60,7 +63,6 @@ public:
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -75,7 +77,6 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
-#endif
 
     /**
      *  @brief Check whether a response (a StatusReponse specifically) is to be sent back to the request.
@@ -221,3 +222,5 @@ private:
 
 }; // namespace app
 }; // namespace chip
+
+#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_REPORT_DATA_H

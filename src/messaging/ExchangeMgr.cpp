@@ -85,6 +85,8 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         handler.Reset();
     }
 
+    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
+
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
@@ -113,18 +115,18 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate)
+ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegateBase * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
-                                                                     ExchangeDelegateBase * delegate)
+                                                                     ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
@@ -145,7 +147,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                                ExchangeDelegateBase * delegate)
+                                                ExchangeDelegate * delegate)
 {
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
@@ -161,7 +163,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
     return nullptr;
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
 {
     UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
@@ -210,8 +212,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -231,7 +232,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec.HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+            ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
 
             ExitNow(err = CHIP_NO_ERROR);
         }
@@ -283,7 +284,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             // If rcvd msg is from initiator then this exchange is created as not Initiator.
             // If rcvd msg is not from initiator then this exchange is created as Initiator.
-            // TODO: Figure out which channel to use for the received message
             ec = AllocContext(payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
         }
         else
@@ -296,7 +296,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
                         ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+        ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
 
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
@@ -370,11 +370,12 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
     return ChannelHandle{ association };
 }
 
-void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                                      SessionEstablisher::SecureSessionType secureSessionType)
 {
     if (mDelegate != nullptr)
     {
-        mDelegate->OnNewConnection(session, this);
+        mDelegate->OnNewConnection(session, this, secureSessionType);
     }
 
     mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {

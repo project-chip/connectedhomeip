@@ -148,6 +148,9 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     err = aCommandElement.GetStatusElement(&statusElementParser);
     if (CHIP_NO_ERROR == err)
     {
+        // Response has status element since either there is error in command response or it is empty response
+        err = statusElementParser.CheckSchemaValidity();
+        SuccessOrExit(err);
         err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
