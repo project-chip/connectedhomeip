@@ -32,6 +32,7 @@ chip_data_model("all-clusters-common") {
     "groups-server",
     "ias-zone-server",
     "identify",
+    "fabric",
     "keypad-input-server",
     "level-control",
     "low-power-server",
