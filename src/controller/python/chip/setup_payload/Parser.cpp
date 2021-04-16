@@ -28,7 +28,7 @@ namespace {
 using AttributeVisitor       = void (*)(const char * attrName, const char * attrValue);
 using VendorAttributeVisitor = void (*)(uint8_t tag, const char * attrValue);
 
-void yieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor attrVisitor,
+void YieldSetupPayloadAttributes(const SetupPayload & payload, AttributeVisitor attrVisitor,
                                  VendorAttributeVisitor vendorAttrVisitor)
 {
     attrVisitor("Version", std::to_string(payload.version).c_str());
@@ -62,7 +62,7 @@ extern "C" CHIP_ERROR pychip_SetupPayload_ParseQrCode(const char * qrCode, Attri
     SetupPayload payload;
     ReturnErrorOnFailure(QRCodeSetupPayloadParser(qrCode).populatePayload(payload));
 
-    yieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
+    YieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
     return CHIP_NO_ERROR;
 }
 
@@ -72,6 +72,6 @@ extern "C" CHIP_ERROR pychip_SetupPayload_ParseManualPairingCode(const char * ma
     SetupPayload payload;
     ReturnErrorOnFailure(ManualSetupPayloadParser(manualPairingCode).populatePayload(payload));
 
-    yieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
+    YieldSetupPayloadAttributes(payload, attrVisitor, vendorAttrVisitor);
     return CHIP_NO_ERROR;
 }

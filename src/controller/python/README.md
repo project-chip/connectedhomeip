@@ -233,7 +233,7 @@ Version: 0
 VendorID: 9050
 ProductID: 20043
 RequiresCustomFlow: 0
-RendezvousInformation: 2
+RendezvousInformation: 2 [BLE]
 Discriminator: 3840
 SetUpPINCode: 12345678
 ```

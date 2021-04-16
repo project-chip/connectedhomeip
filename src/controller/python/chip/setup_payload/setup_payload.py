@@ -40,7 +40,7 @@ class SetupPayload:
         self.attribute_visitor = SetupPayload.AttributeVisitor(AddAttribute)
         self.vendor_attribute_visitor = SetupPayload.VendorAttributeVisitor(AddVendorAttribute)
 
-    def ParseQrCode(self, qrCode):
+    def ParseQrCode(self, qrCode: str):
         self.Clear()
         err = self.chipLib.pychip_SetupPayload_ParseQrCode(qrCode.upper().encode(),
                                                            self.attribute_visitor,
@@ -51,7 +51,7 @@ class SetupPayload:
 
         return self
 
-    def ParseManualPairingCode(self, manualPairingCode):
+    def ParseManualPairingCode(self, manualPairingCode: str):
         self.Clear()
         err = self.chipLib.pychip_SetupPayload_ParseManualPairingCode(manualPairingCode.encode(),
                                                                       self.attribute_visitor,
@@ -64,7 +64,9 @@ class SetupPayload:
 
     def Print(self):
         for name, value in self.attributes:
-            print(f"{name}: {value}")
+            decorated_value = self.__DecorateValue(name, value)
+            decorated_value = f" [{decorated_value}]" if decorated_value else ""
+            print(f"{name}: {value}{decorated_value}")
 
         for tag, value in self.vendor_attributes:
             print(f"Vendor attribute '{tag:>3}': {value}")
@@ -72,6 +74,16 @@ class SetupPayload:
     def Clear(self):
         self.attributes.clear()
         self.vendor_attributes.clear()
+
+    def __DecorateValue(self, name, value):
+        if name == "RendezvousInformation":
+            rendezvous_methods = []
+            if int(value) & 0b001: rendezvous_methods += ["SoftAP"]
+            if int(value) & 0b010: rendezvous_methods += ["BLE"]
+            if int(value) & 0b100: rendezvous_methods += ["OnNetwork"]
+            return ', '.join(rendezvous_methods)
+
+        return None
 
     def __InitNativeFunctions(self, chipLib):
         if chipLib.pychip_SetupPayload_ParseQrCode is not None:
