@@ -53,7 +53,7 @@ public:
 class Ethernet : public PairingCommand
 {
 public:
-    Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet) {}
+    Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
 };
 
 void registerCommandsPairing(Commands & commands)
@@ -62,7 +62,7 @@ void registerCommandsPairing(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<Unpair>(),        make_unique<PairBypass>(), make_unique<PairBleWiFi>(),
-        make_unique<PairBleThread>(), make_unique<PairSoftAP>(),  make_unique<Ethernet>(),
+        make_unique<PairBleThread>(), make_unique<PairSoftAP>(), make_unique<Ethernet>(),
     };
 
     commands.Register(clusterName, clusterCommands);

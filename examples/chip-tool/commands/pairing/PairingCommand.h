@@ -37,6 +37,7 @@ enum class PairingNetworkType
     None,
     WiFi,
     Thread,
+    Ethernet,
 };
 
 class PairingCommand : public Command,
@@ -50,6 +51,7 @@ public:
         switch (networkType)
         {
         case PairingNetworkType::None:
+        case PairingNetworkType::Ethernet:
             break;
         case PairingNetworkType::WiFi:
             AddArgument("ssid", &mSSID);
@@ -142,9 +144,5 @@ private:
     ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
-
-    // In theory the endpoint should be 0, or alternatively it should be found using the descriptor
-    // cluster.
-    // But at the moment, endpoint starts from 1.
-    chip::EndpointId mEndpointId = 1;
+    chip::EndpointId mEndpointId = 0;
 };

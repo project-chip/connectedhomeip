@@ -175,6 +175,7 @@ CHIP_ERROR PairingCommand::SetupNetwork()
         SetCommandExitStatus(err == CHIP_NO_ERROR);
         break;
     case PairingNetworkType::WiFi:
+    case PairingNetworkType::Ethernet:
     case PairingNetworkType::Thread:
         err = mCommissioner.GetDevice(mRemoteId, &mDevice);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Setup failure! No pairing for device: %" PRIu64, mRemoteId));
