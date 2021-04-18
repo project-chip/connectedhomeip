@@ -201,18 +201,14 @@ CHIP_ERROR
 CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
                                          uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Init(operationalCredentialSet, myNodeId, myKeyId, delegate));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR1;
     mPairingComplete = false;
 
     ChipLogDetail(Inet, "Waiting for SigmaR1 msg");
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
@@ -974,7 +970,6 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen,
 CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIterator, P256PublicKey & responderID,
                                                          const uint8_t ** responderOpCert, uint16_t & responderOpCertLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipCertificateData chipCertData;
     ChipCertificateData * resultCert = nullptr;
 
@@ -983,32 +978,27 @@ CHIP_ERROR CASESession::Validate_and_RetrieveResponderID(const uint8_t ** msgIte
     *msgIterator += responderOpCertLen;
 
     Encoding::LittleEndian::BufferWriter bbuf(responderID, responderID.Length());
-    err = DecodeChipCert(*responderOpCert, responderOpCertLen, chipCertData);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(DecodeChipCert(*responderOpCert, responderOpCertLen, chipCertData));
 
     bbuf.Put(chipCertData.mPublicKey, chipCertData.mPublicKeyLen);
 
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
     // Validate responder identity located in msg_r2_encrypted
-    err = mOpCredSet->FindCertSet(mTrustedRootId)
-              ->LoadCert(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(
+        mOpCredSet->FindCertSet(mTrustedRootId)
+            ->LoadCert(*responderOpCert, responderOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
 
-    err = SetEffectiveTime();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(SetEffectiveTime());
     // Locate the subject DN and key id that will be used as input the FindValidCert() method.
     {
         const ChipDN & subjectDN              = chipCertData.mSubjectDN;
         const CertificateKeyId & subjectKeyId = chipCertData.mSubjectKeyId;
 
-        err = mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(mOpCredSet->FindValidCert(mTrustedRootId, subjectDN, subjectKeyId, mValidContext, resultCert));
     }
 
-exit:
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CASESession::ConstructSignedCredentials(const uint8_t ** msgIterator, const uint8_t * responderOpCert,

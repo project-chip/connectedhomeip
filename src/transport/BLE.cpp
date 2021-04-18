@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -63,10 +63,8 @@ void BLE::ClearState()
 CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, TransportMgrDelegate * transport, BleLayer * bleLayer,
                      uint16_t discriminator, BLE_CONNECTION_OBJECT connObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(bleLayer, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(bleLayer, CHIP_ERROR_INCORRECT_STATE);
 
     mDelegate  = delegate;
     mTransport = transport;
@@ -77,17 +75,15 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, TransportMgrDelegate 
 
     if (discriminator <= kMaxRendezvousDiscriminatorValue)
     {
-        err = mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), discriminator, OnBleConnectionComplete,
-                                          OnBleConnectionError);
+        return mBleLayer->NewBleConnection(reinterpret_cast<void *>(this), discriminator, OnBleConnectionComplete,
+                                           OnBleConnectionError);
     }
     else if (connObj != 0)
     {
-        err = InitInternal(connObj);
+        return InitInternal(connObj);
     }
-    SuccessOrExit(err);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLE::InitInternal(BLE_CONNECTION_OBJECT connObj)
@@ -112,18 +108,15 @@ exit:
 
 CHIP_ERROR BLE::SetEndPoint(Ble::BLEEndPoint * endPoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(endPoint->mState == BLEEndPoint::kState_Connected, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endPoint->mState == BLEEndPoint::kState_Connected, CHIP_ERROR_INVALID_ARGUMENT);
 
     mBleEndPoint = endPoint;
     SetupEvents(mBleEndPoint);
 
     // Manually trigger the OnConnectComplete callback.
-    OnBleEndPointConnectionComplete(endPoint, err);
+    OnBleEndPointConnectionComplete(endPoint, BLE_NO_ERROR);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
@@ -136,19 +129,13 @@ void BLE::SetupEvents(Ble::BLEEndPoint * endPoint)
 
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
+    ReturnErrorOnFailure(mBleEndPoint->Send(std::move(msgBuf)));
 
-    err = header.EncodeBeforeData(msgBuf);
-    SuccessOrExit(err);
-
-    err = mBleEndPoint->Send(std::move(msgBuf));
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void BLE::OnBleConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
