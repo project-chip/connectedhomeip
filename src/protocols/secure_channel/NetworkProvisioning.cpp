@@ -156,7 +156,7 @@ size_t NetworkProvisioning::EncodedStringSize(const char * str)
 
 CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, Encoding::LittleEndian::BufferWriter & bbuf)
 {
-    const size_t length  = strlen(str);
+    const size_t length = strlen(str);
     VerifyOrReturnError(CanCastTo<uint16_t>(length), CHIP_ERROR_INVALID_ARGUMENT);
     const uint16_t u16len = static_cast<uint16_t>(length);
 
