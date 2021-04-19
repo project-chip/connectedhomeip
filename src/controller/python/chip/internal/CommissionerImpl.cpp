@@ -19,6 +19,8 @@
 #include <controller/CHIPDeviceController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <support/CodeUtils.h>
+#include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "ChipThreadWork.h"
@@ -125,7 +127,7 @@ public:
         mCredentialsDelegate->SendNetworkCredentials(ssid, password);
     }
 
-    void SetThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+    void SetThreadCredentials(chip::ByteSpan threadData)
     {
         if (mCredentialsDelegate == nullptr)
         {
@@ -157,34 +159,47 @@ extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * 
 
 extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
 {
+    chip::Thread::OperationalDataset dataset{};
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
-    // validation/support for opaque blobs. As a result, we try to do some
-    // pre-validation here
-
-    // TODO: there should be uniform 'BLOBL' support within the thread stack
-    if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))
+    struct
     {
-        ChipLogError(Controller, "Received invalid thread credential blob. Expected size %u and got %u bytes instead",
-                     sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo), length);
+        uint64_t mActiveTimestamp;
+        uint8_t mMasterKey[chip::Thread::kSizeMasterKey];
+        uint8_t mPSKc[chip::Thread::kSizePSKc];
+        uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
+        uint8_t mMeshLocalPrefix[chip::Thread::kSizeMeshLocalPrefix];
+        uint16_t mPanId;
+        char mNetworkName[chip::Thread::kSizeNetworkName + 1];
+        uint8_t mChannel;
+    } netInfo;
+
+    assert(length == sizeof(netInfo));
+
+    memcpy(&netInfo, data, length);
+
+    if (netInfo.mNetworkName[0] != 0)
+    {
+        SuccessOrExit(err = dataset.SetNetworkName(netInfo.mNetworkName));
+    }
+
+    SuccessOrExit(err = dataset.SetExtendedPanId(netInfo.mExtendedPanId));
+    SuccessOrExit(err = dataset.SetMeshLocalPrefix(netInfo.mMeshLocalPrefix));
+    SuccessOrExit(err = dataset.SetMasterKey(netInfo.mMasterKey));
+    SuccessOrExit(err = dataset.SetPSKc(netInfo.mPSKc));
+    SuccessOrExit(err = dataset.SetPanId(netInfo.mPanId));
+    SuccessOrExit(err = dataset.SetChannel(netInfo.mChannel));
+    SuccessOrExit(err = dataset.SetActiveTimestamp(netInfo.mActiveTimestamp));
+
+    if (!dataset.IsCommissioned())
+    {
+        ChipLogError(Controller, "Invalid Thread operational dataset");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // unsure about alignment so copy into a properly aligned item
-    chip::DeviceLayer::Internal::DeviceNetworkInfo threadInfo;
-    memcpy(&threadInfo, data, sizeof(threadInfo));
+    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(dataset.AsByteSpan()); });
 
-    // TODO: figure out a proper way to validate this or remove validation once
-    // thread credentials are assumed opaque throughout
-    if ((threadInfo.ThreadChannel != chip::DeviceLayer::Internal::kThreadChannel_NotSpecified) &&
-        ((threadInfo.ThreadChannel < 11) || (threadInfo.ThreadChannel > 26)))
-    {
-        ChipLogError(Controller, "Failed to validate thread info: channel %d is not valid", threadInfo.ThreadChannel);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(threadInfo); });
-
+exit:
     return CHIP_NO_ERROR;
 }
 
