@@ -90,8 +90,6 @@ class MobileDeviceTests():
                 "operationalDataset": bytes.fromhex(TEST_THREAD_NETWORK_DATASET_TLV),
                 "breadcrumb": 0,
                 "timeoutMs": 1000})
-            # Wait for server response, will remove after im is enabled
-            time.sleep(1)
         except Exception as ex:
             self.logger.exception("Failed to send AddThreadNetwork command")
             return False
@@ -104,25 +102,17 @@ class MobileDeviceTests():
         except Exception as ex:
             self.logger.exception("Failed to send EnableNetwork command")
             return False
-        # Wait for thread network join, 15s is the timeout we used in setting up
-        # thread network in cirque tests.
-        # TODO(#5096,#5619): Waiting for EnableNetworkResponse command here.
-        time.sleep(15)
         return True
 
     def TestOnOffCluster(self, nodeid: int):
         self.logger.info("Sending On/Off commands to device {}".format(nodeid))
         try:
             self.devCtrl.ZCLSend("OnOff", "On", nodeid, 1, 0, {})
-            # Wait for server response, will remove after im is enabled
-            time.sleep(1)
         except Exception as ex:
             self.logger.exception("Failed to send On command")
             return False
         try:
             self.devCtrl.ZCLSend("OnOff", "Off", nodeid, 1, 0, {})
-            # Wait for server response, will remove after im is enabled
-            time.sleep(1)
         except Exception as ex:
             self.logger.exception("Failed to send Off command")
             return False

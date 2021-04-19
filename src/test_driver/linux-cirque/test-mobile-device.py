@@ -102,8 +102,16 @@ class TestPythonController(CHIPVirtualHome):
         roles = set()
 
         for device_id in server_ids:
-            reply = self.execute_device_cmd(device_id, 'ot-ctl state')
-            roles.add(reply['output'].split()[0])
+            self.logger.info("Pending network join {}".format(
+                        self.get_device_pretty_id(device_id)))
+            # TODO: This checking should be removed after EnableNetwork is able to return after network attach.
+            for i in range(30):
+                # We can only check the status of ot-agent by query its state.
+                reply = self.execute_device_cmd(device_id, 'ot-ctl state')
+                if not (self.sequenceMatch(reply['output'], ('detached',)) or self.sequenceMatch(reply['output'], ('disabled',))):
+                    roles.add(reply['output'].split()[0])
+                    break
+                time.sleep(1)
         self.assertTrue('leader' in roles)
 
         # Check if the device is attached to the correct thread network.
