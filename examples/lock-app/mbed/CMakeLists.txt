@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.19.0)
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
+get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/config.in
@@ -31,9 +32,11 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/lock-common
                            ${MBED_COMMON}/util/include
+                           ${CHIP_ROOT}/src/app
 )
 
 target_sources(${APP_TARGET} PRIVATE
+               ${LOCK_COMMON}/gen/attribute-size.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/BoltLockManager.cpp
@@ -41,7 +44,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_ROOT}/lock-common/gen/call-command-handler.cpp
                ${APP_ROOT}/lock-common/gen/callback-stub.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
-               ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
+               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
@@ -57,8 +60,11 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
 )
 
 add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
