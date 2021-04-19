@@ -57,11 +57,11 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::Command::CommandParams commandParams = { kTestEndPointId, // Endpoint
-                                                        kTestGroupId,    // GroupId
-                                                        kTestClusterId,  // ClusterId
-                                                        kTestCommandId,  // CommandId
-                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    chip::app::CommandPathParams commandPathParams = { kTestEndPointId, // Endpoint
+                                                       kTestGroupId,    // GroupId
+                                                       kTestClusterId,  // ClusterId
+                                                       kTestCommandId,  // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
 
@@ -71,7 +71,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     if (statusCodeFlipper)
     {
         printf("responder constructing status code in command");
-        apCommandObj->AddStatusCode(&commandParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+        apCommandObj->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                     Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
     }
     else
@@ -80,7 +80,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 
         chip::TLV::TLVWriter * writer;
 
-        err = apCommandObj->PrepareCommand(&commandParams);
+        err = apCommandObj->PrepareCommand(&commandPathParams);
         SuccessOrExit(err);
 
         writer = apCommandObj->GetCommandDataElementTLVWriter();
@@ -98,6 +98,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 exit:
     return;
 }
+
 } // namespace app
 } // namespace chip
 
