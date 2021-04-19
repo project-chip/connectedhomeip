@@ -29,6 +29,7 @@
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include "platform/mbed_rtc_time.h"
 #include <Kernel.h>
 
 namespace chip {
