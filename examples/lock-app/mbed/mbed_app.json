@@ -34,6 +34,21 @@
             "led-active-state": 1,
             "lock-button": "USER_BUTTON",
             "function-button": "NC"
+        },
+        "CY8CPROTO_062_4343W": {
+            "lwip.ipv6-enabled": true,
+            "lwip.raw-socket-enabled": true,
+            "target.network-default-interface-type": "WIFI",
+            "target.macros_add": [
+                "MXCRYPTO_DISABLED",
+                "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
+                "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG"
+            ],
+            "led-active-state": 1,
+            "system-state-led": "LED1",
+            "lock-state-led": "P9_6",
+            "lock-button": "USER_BUTTON",
+            "function-button": "P9_7"
         }
     },
     "config": {

@@ -42,6 +42,28 @@ static Socket * getSocket(int fd)
     return socket->getNetSocket();
 }
 
+struct mbed_socket_option_t
+{
+    int level;
+    int optname;
+};
+
+static mbed_socket_option_t convert_socket_option(int level, int optname)
+{
+    switch (optname)
+    {
+    case SO_REUSEADDR:
+        return { level, NSAPI_REUSEADDR };
+    case SO_KEEPALIVE:
+        return { level, NSAPI_KEEPALIVE };
+    case SO_BROADCAST:
+        return { level, NSAPI_BROADCAST };
+    default:
+        tr_warning("Passing unknown option %d to socket", optname);
+        return { level, optname };
+    }
+}
+
 int getFreeSocketSlotIndex()
 {
     int index = NO_FREE_SOCKET_SLOT;
@@ -736,7 +758,9 @@ int mbed_getsockopt(int fd, int level, int optname, void * optval, socklen_t * o
         return -1;
     }
 
-    auto ret = socket->getsockopt(level, optname, optval, optlen);
+    // Use NSAPI options instead of POSIX one
+    auto opt = convert_socket_option(level, optname);
+    auto ret = socket->getsockopt(opt.level, opt.optname, optval, optlen);
     if (ret < 0)
     {
         tr_err("Get socket option %s [%d]", ret == NSAPI_ERROR_UNSUPPORTED ? "unsupported" : "failed", ret);
@@ -771,10 +795,13 @@ int mbed_setsockopt(int fd, int level, int optname, const void * optval, socklen
         return -1;
     }
 
-    auto ret = socket->setsockopt(level, optname, optval, optlen);
+    // Convert the option to NSAPI option alias
+    auto opt = convert_socket_option(level, optname);
+    auto ret = socket->setsockopt(opt.level, opt.optname, optval, optlen);
     if (ret < 0)
     {
-        tr_err("Set socket option %s [%d]", ret == NSAPI_ERROR_UNSUPPORTED ? "unsupported" : "failed", ret);
+        tr_err("Set socket option %s: level = %d, optname=%d, val=%p, len=%d => [%d]",
+               ret == NSAPI_ERROR_UNSUPPORTED ? "unsupported" : "failed", level, optname, optval, optlen, ret);
         switch (ret)
         {
         case NSAPI_ERROR_NO_SOCKET:

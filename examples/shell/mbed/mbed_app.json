@@ -20,6 +20,10 @@
             "target.macros_add" : ["MBEDTLS_SHA1_C"],
             "target.features_add": ["BLE"],
             "target.extra_labels_add": ["CORDIO"]
+        },
+        "CY8CPROTO_062_4343W": { 
+            "target.network-default-interface-type": "WIFI",
+            "target.macros_add" : ["MBEDTLS_SHA1_C"]
         }
     }
 }

@@ -19,6 +19,7 @@
 
 #include "AppTask.h"
 
+#include "mbedtls/platform.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
@@ -43,6 +44,13 @@ int main()
 
     // note: Make sure to turn the filtering on with CHIP_LOG_FILTERING=1
     chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+
+    ret = mbedtls_platform_setup(NULL);
+    if (ret)
+    {
+        ChipLogError(NotSpecified, "Mbed TLS platform initialization failed with error %d", ret);
+        goto exit;
+    }
 
     ret = chip::Platform::MemoryInit();
     if (ret != CHIP_NO_ERROR)
