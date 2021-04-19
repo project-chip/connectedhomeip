@@ -23,8 +23,8 @@ static_library("shell") {
   sources = [
     "commands.cpp",
     "commands.h",
-    "shell.cpp",
-    "shell.h",
+    "shell_core.cpp",
+    "shell_core.h",
     "streamer.cpp",
     "streamer.h",
   ]

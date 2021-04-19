@@ -392,7 +392,8 @@ public:
             HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
         }
 
-    exit:;
+    exit:
+        exchangeContext->Close();
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override

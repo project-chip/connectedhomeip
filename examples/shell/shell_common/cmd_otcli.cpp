@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 
-#include <lib/shell/shell.h>
+#include <lib/shell/shell_core.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>

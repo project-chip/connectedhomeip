@@ -175,11 +175,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mExchangeMgr->SetDelegate(this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    err = Mdns::Resolver::Instance().SetResolverDelegate(this);
-    SuccessOrExit(err);
-
     if (params.mDeviceAddressUpdateDelegate != nullptr)
     {
+        err = Mdns::Resolver::Instance().SetResolverDelegate(this);
+        SuccessOrExit(err);
+
         mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -240,6 +240,14 @@ CHIP_ERROR DeviceController::Shutdown()
     }
 
     mAdmins.ReleaseAdminId(mAdminId);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    if (mDeviceAddressUpdateDelegate != nullptr)
+    {
+        Mdns::Resolver::Instance().SetResolverDelegate(nullptr);
+        mDeviceAddressUpdateDelegate = nullptr;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     ReleaseAllDevices();
     return CHIP_NO_ERROR;

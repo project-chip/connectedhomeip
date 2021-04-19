@@ -30,7 +30,6 @@
 #include <util/basic-types.h>
 
 #include "AttributeDataList.h"
-#include "AttributeStatusList.h"
 #include "Builder.h"
 #include "EventList.h"
 #include "Parser.h"
@@ -42,10 +41,9 @@ enum
 {
     kCsTag_SuppressResponse    = 0,
     kCsTag_SubscriptionId      = 1,
-    kCsTag_AttributeStatusList = 2,
-    kCsTag_AttributeDataList   = 3,
-    kCsTag_EventDataList       = 4,
-    kCsTag_MoreChunkedMessages = 5,
+    kCsTag_AttributeDataList   = 2,
+    kCsTag_EventDataList       = 3,
+    kCsTag_MoreChunkedMessages = 4,
 };
 
 class Parser : public chip::app::Parser
@@ -97,17 +95,6 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetSubscriptionId(uint64_t * const apSubscriptionId) const;
-
-    /**
-     *  @brief Get a TLVReader for the AttributesStatusList. Next() must be called before accessing them.
-     *
-     *  @param [in] apAttributeStatusList    A pointer to apAttributeStatusList
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Array
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetAttributeStatusList(AttributeStatusList::Parser * const apAttributeStatusList) const;
 
     /**
      *  @brief Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
@@ -178,13 +165,6 @@ public:
     ReportData::Builder & SubscriptionId(const uint64_t aSubscriptionId);
 
     /**
-     *  @brief Initialize a AttributeStatusList::Builder for writing into the TLV stream
-     *
-     *  @return A reference to AttributeStatusList::Builder
-     */
-    AttributeStatusList::Builder & CreateAttributeStatusListBuilder();
-
-    /**
      *  @brief Initialize a AttributeDataList::Builder for writing into the TLV stream
      *
      *  @return A reference to AttributeDataList::Builder
@@ -213,7 +193,6 @@ public:
     ReportData::Builder & EndOfReportData();
 
 private:
-    AttributeStatusList::Builder mAttributeStatusListBuilder;
     AttributeDataList::Builder mAttributeDataListBuilder;
     EventList::Builder mEventDataListBuilder;
 };

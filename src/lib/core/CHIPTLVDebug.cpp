@@ -283,7 +283,7 @@ const char * DecodeType(const TLVType aType)
         break;
 
     case kTLVType_List:
-        retval = "Path";
+        retval = "List";
         break;
 
     default:
