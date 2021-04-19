@@ -69,7 +69,7 @@ set(CHIP_TESTS
     # -lPlatformTests
     # # TODO: raw transport tests fail by running out of TCP/UDP endpoints
     # # -lRawTransportTests
-    # -lRetransmitTests
+    -lRetransmitTests
     # -lSupportTests
     -lSystemLayerTests
     # -lTransportLayerTests
