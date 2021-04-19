@@ -80,37 +80,10 @@ bool ThreadStackManagerImpl::IsInitialized()
 
 void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart(void)
 {
-    // If Thread-over-BLE is enabled, ensure that ToBLE advertising is stopped before
-    // starting CHIPoBLE advertising.  This is accomplished by disabling the OpenThread
-    // IPv6 interface via a call to otIp6SetEnabled(false).
-    //
-    // On platforms where there is no native support for simultaneous BLE advertising
-    // it is necessary to coordinate between the different
-    // advertising modes a CHIP device may employ.  This arises in particular when a
-    // device supports both CHIPoBLE and ToBLE, each of which requires a separate advertising
-    // regime.  The OnCHIPoBLEAdvertisingStart()/OnCHIPoBLEAdvertisingStop() methods handle
-    // the switching between the two modes.
-    //
-#if OPENTHREAD_CONFIG_ENABLE_TOBLE
-    LockThreadStack();
-    otIp6SetEnabled(OTInstance(), false);
-    UnlockThreadStack();
-#endif
 }
 
 void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
 {
-    // If Thread-over-BLE is enabled, and a Thread provision exists, ensure that ToBLE
-    // advertising is re-activated once CHIPoBLE advertising stops.
-    //
-#if OPENTHREAD_CONFIG_ENABLE_TOBLE
-    LockThreadStack();
-    if (otThreadGetDeviceRole(OTInstance()) != OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(OTInstance()))
-    {
-        otIp6SetEnabled(OTInstance(), true);
-    }
-    UnlockThreadStack();
-#endif
 }
 
 } // namespace DeviceLayer
