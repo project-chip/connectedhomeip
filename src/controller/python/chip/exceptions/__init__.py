@@ -21,6 +21,7 @@ __all__ = [
     "DeviceError",
     "InvalidArgumentCount",
     "InvalidArgumentType",
+    "UnknownAttribute",
     "UnknownCluster",
     "UnknownCommand",
 ]
@@ -92,4 +93,13 @@ class UnknownCommand(ClusterError):
         self.command = command
 
     def __str__(self):
-        return "UnknownCommand: cluster: {} command: {}".format(self.cluster, self.command)
+        return "UnknownCommand: cluster: {}, command: {}".format(self.cluster, self.command)
+
+
+class UnknownAttribute(ClusterError):
+    def __init__(self, cluster: str, attribute: str):
+        self.cluster = cluster
+        self.attribute = attribute
+
+    def __str__(self):
+        return "UnknownAttribute: cluster: {}, attribute: {}".format(self.cluster, self.attribute)

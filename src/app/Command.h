@@ -36,6 +36,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
+#include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/CommandDataElement.h>
 #include <app/MessageDef/CommandList.h>
 #include <app/MessageDef/InvokeCommand.h>
@@ -92,13 +93,14 @@ public:
      *  instance.
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          CommandState::NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
 
     /**
      *  Shutdown the CommandSender. This terminates this instance
@@ -119,8 +121,12 @@ public:
     CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
                           chip::CommandId aCommandId, BitFlags<CommandPathFlags> Flags);
     CHIP_ERROR AddCommand(CommandParams & aCommandParams);
-    CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                             const chip::ClusterId aClusterId);
+    virtual CHIP_ERROR AddStatusCode(const CommandParams * apCommandParams,
+                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                     const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    };
 
     /**
      * Gets the inner exchange context object, without ownership.
@@ -142,16 +148,20 @@ protected:
     CHIP_ERROR ClearExistingExchangeContext();
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
+    CHIP_ERROR ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder & aCommandDataElement);
     void ClearState();
     const char * GetStateStr() const;
 
+    InvokeCommand::Builder mInvokeCommandBuilder;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
     chip::System::PacketBufferHandle mCommandMessageBuf;
+    uint8_t mCommandIndex = 0;
 
 private:
+    friend class TestCommandInteraction;
     chip::System::PacketBufferHandle mpBufHandle;
-    InvokeCommand::Builder mInvokeCommandBuilder;
     CommandState mState;
 
     chip::System::PacketBufferHandle mCommandDataBuf;

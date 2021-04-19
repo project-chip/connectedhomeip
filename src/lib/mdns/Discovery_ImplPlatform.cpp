@@ -19,9 +19,9 @@
 
 #include <inttypes.h>
 
+#include "ServiceNaming.h"
 #include "lib/core/CHIPSafeCasts.h"
 #include "lib/mdns/platform/Mdns.h"
-#include "lib/support/ReturnMacros.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
@@ -57,28 +57,33 @@ constexpr uint64_t kUndefinedNodeId = 0;
 namespace chip {
 namespace Mdns {
 
-DiscoveryImplPlatform::DiscoveryImplPlatform()
+DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+
+DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
+
+CHIP_ERROR DiscoveryImplPlatform::Init()
 {
-    mCommissionInstanceName = GetRandU64();
+    if (!mMdnsInitialized)
+    {
+        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
+        mCommissionInstanceName = GetRandU64();
+        mMdnsInitialized        = true;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Start(Inet::InetLayer * inetLayer, uint16_t port)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    if (!mMdnsInitialized)
-    {
-        ReturnErrorOnFailure(ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this));
-        mMdnsInitialized = true;
-    }
-    else
-    {
-        error = ChipMdnsStopPublish();
-    }
+    ReturnErrorOnFailure(Init());
+
+    CHIP_ERROR error = ChipMdnsStopPublish();
 
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize platform mdns: %s", ErrorStr(error));
     }
+
     return error;
 }
 
@@ -135,18 +140,21 @@ exit:
 }
 #endif
 
-CHIP_ERROR DiscoveryImplPlatform::SetupHostname()
+CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
 {
-    uint8_t mac[6];    // 6 byte wifi mac
-    char hostname[13]; // Hostname will be the hex representation of mac.
-
-    ReturnErrorOnFailure(chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
-    for (size_t i = 0; i < sizeof(mac); i++)
+    char nameBuffer[17];
+    CHIP_ERROR error = MakeHostName(nameBuffer, sizeof(nameBuffer), macOrEui64);
+    if (error != CHIP_NO_ERROR)
     {
-        snprintf(&hostname[i * 2], sizeof(hostname) - i * 2, "%02X", mac[i]);
+        ChipLogError(Discovery, "Failed to create mdns hostname: %s", ErrorStr(error));
+        return error;
     }
-    ReturnErrorOnFailure(ChipMdnsSetHostname(hostname));
-
+    error = ChipMdnsSetHostname(nameBuffer);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Failed to setup mdns hostname: %s", ErrorStr(error));
+        return error;
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -173,6 +181,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
     {
@@ -251,15 +262,74 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     mOperationalAdvertisingParams = params;
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, params.GetNodeId(), params.GetFabricId());
+
+    // According to spec CRI and CRA intervals should not exceed 1 hour (3600000 ms).
+    // TODO: That value should be defined in the ReliableMessageProtocolConfig.h,
+    // but for now it is not possible to access it from src/lib/mdns. It should be
+    // refactored after creating common DNS-SD layer.
+    constexpr uint32_t kMaxCRMPRetryInterval = 3600000;
+    // kMaxCRMPRetryInterval max value is 3600000, what gives 7 characters and newline
+    // necessary to represent it in the text form.
+    constexpr uint8_t kMaxCRMPRetryBufferSize = 7 + 1;
+    char crmpRetryIntervalIdleBuf[kMaxCRMPRetryBufferSize];
+    char crmpRetryIntervalActiveBuf[kMaxCRMPRetryBufferSize];
+    TextEntry crmpRetryIntervalEntries[2];
+    size_t textEntrySize = 0;
+    uint32_t crmpRetryIntervalIdle, crmpRetryIntervalActive;
+    int writtenCharactersNumber;
+    params.GetCRMPRetryIntervals(crmpRetryIntervalIdle, crmpRetryIntervalActive);
+
+    // TODO: Issue #5833 - CRMP retry intervals should be updated on the poll period value
+    // change or device type change.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ConnectivityMgr().GetThreadDeviceType() ==
+        chip::DeviceLayer::ConnectivityManager::kThreadDeviceType_SleepyEndDevice)
+    {
+        uint32_t sedPollPeriod;
+        ReturnErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().GetPollPeriod(sedPollPeriod));
+        // Increment default CRMP retry intervals by SED poll period to be on the safe side
+        // and avoid unnecessary retransmissions.
+        crmpRetryIntervalIdle += sedPollPeriod;
+        crmpRetryIntervalActive += sedPollPeriod;
+    }
+#endif
+
+    if (crmpRetryIntervalIdle > kMaxCRMPRetryInterval)
+    {
+        ChipLogProgress(Discovery, "CRMP retry interval idle value exceeds allowed range of 1 hour, using maximum available",
+                        chip::ErrorStr(error));
+        crmpRetryIntervalIdle = kMaxCRMPRetryInterval;
+    }
+    writtenCharactersNumber = snprintf(crmpRetryIntervalIdleBuf, sizeof(crmpRetryIntervalIdleBuf), "%u", crmpRetryIntervalIdle);
+    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
+                        CHIP_ERROR_INVALID_STRING_LENGTH);
+    crmpRetryIntervalEntries[textEntrySize++] = { "CRI", reinterpret_cast<const uint8_t *>(crmpRetryIntervalIdleBuf),
+                                                  strlen(crmpRetryIntervalIdleBuf) };
+
+    if (crmpRetryIntervalActive > kMaxCRMPRetryInterval)
+    {
+        ChipLogProgress(Discovery, "CRMP retry interval active value exceeds allowed range of 1 hour, using maximum available",
+                        chip::ErrorStr(error));
+        crmpRetryIntervalActive = kMaxCRMPRetryInterval;
+    }
+    writtenCharactersNumber =
+        snprintf(crmpRetryIntervalActiveBuf, sizeof(crmpRetryIntervalActiveBuf), "%u", crmpRetryIntervalActive);
+    VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
+                        CHIP_ERROR_INVALID_STRING_LENGTH);
+    crmpRetryIntervalEntries[textEntrySize++] = { "CRA", reinterpret_cast<const uint8_t *>(crmpRetryIntervalActiveBuf),
+                                                  strlen(crmpRetryIntervalActiveBuf) };
+
+    ReturnErrorOnFailure(SetupHostname(params.GetMac()));
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetFabricId(), params.GetNodeId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
-    service.mTextEntries   = nullptr;
-    service.mTextEntrySize = 0;
-    service.mInterface     = INET_NULL_INTERFACEID;
-    service.mAddressType   = Inet::kIPAddressType_Any;
-    error                  = ChipMdnsPublishService(&service);
+    service.mTextEntries   = crmpRetryIntervalEntries;
+    service.mTextEntrySize = textEntrySize;
+
+    service.mInterface   = INET_NULL_INTERFACEID;
+    service.mAddressType = Inet::kIPAddressType_Any;
+    error                = ChipMdnsPublishService(&service);
 
     return error;
 }
@@ -280,9 +350,11 @@ CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegat
 
 CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
+    ReturnErrorOnFailure(Init());
+
     MdnsService service;
 
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), fabricId, nodeId));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
@@ -321,9 +393,8 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
         if (result->mName[i] == '-')
         {
             deliminatorFound = true;
-            break;
         }
-        else
+        else if (deliminatorFound)
         {
             uint8_t val = HexToInt(result->mName[i]);
 
@@ -357,12 +428,6 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
 {
-    // TODO: Clean Mdns initialization order
-    // Previously sManager was a global object, but DiscoveryImplPlatform constructor calls
-    // platform-specific ChipMdnsInit() which for Linux initializes MdnsAvahi global object
-    // and that may lead to improper initialization, since the order in which global objects'
-    // constructors are called is undefined.
-    static DiscoveryImplPlatform sManager;
     return sManager;
 }
 

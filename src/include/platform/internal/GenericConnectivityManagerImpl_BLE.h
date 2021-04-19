@@ -52,15 +52,12 @@ public:
     // ===== Methods that implement the ConnectivityManager abstract interface.
 
     Ble::BleLayer * _GetBleLayer();
-    void _AddCHIPoBLEConnectionHandler(ConnectivityManager::BleConnectionReceivedFunct handler);
-    void _RemoveCHIPoBLEConnectionHandler();
     ConnectivityManager::CHIPoBLEServiceMode _GetCHIPoBLEServiceMode();
     CHIP_ERROR _SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val);
     bool _IsBLEAdvertisingEnabled();
     CHIP_ERROR _SetBLEAdvertisingEnabled(bool val);
-    bool _IsBLEFastAdvertisingEnabled();
-    CHIP_ERROR _SetBLEFastAdvertisingEnabled(bool val);
     bool _IsBLEAdvertising();
+    CHIP_ERROR _SetBLEAdvertisingMode(ConnectivityManager::BLEAdvertisingMode mode);
     CHIP_ERROR _GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetBLEDeviceName(const char * deviceName);
     uint16_t _NumBLEConnections();
@@ -77,21 +74,6 @@ template <class ImplClass>
 inline Ble::BleLayer * GenericConnectivityManagerImpl_BLE<ImplClass>::_GetBleLayer()
 {
     return BLEMgr().GetBleLayer();
-}
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_AddCHIPoBLEConnectionHandler(
-    ConnectivityManager::BleConnectionReceivedFunct handler)
-{
-    Ble::BleLayer * bleLayer           = BLEMgr().GetBleLayer();
-    bleLayer->OnChipBleConnectReceived = handler;
-}
-
-template <class ImplClass>
-inline void GenericConnectivityManagerImpl_BLE<ImplClass>::_RemoveCHIPoBLEConnectionHandler()
-{
-    Ble::BleLayer * bleLayer           = BLEMgr().GetBleLayer();
-    bleLayer->OnChipBleConnectReceived = nullptr;
 }
 
 template <class ImplClass>
@@ -120,21 +102,16 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEAdvertis
 }
 
 template <class ImplClass>
-inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEFastAdvertisingEnabled()
-{
-    return BLEMgr().IsFastAdvertisingEnabled();
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEFastAdvertisingEnabled(bool val)
-{
-    return BLEMgr().SetFastAdvertisingEnabled(val);
-}
-
-template <class ImplClass>
 inline bool GenericConnectivityManagerImpl_BLE<ImplClass>::_IsBLEAdvertising()
 {
     return BLEMgr().IsAdvertising();
+}
+
+template <class ImplClass>
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_BLE<ImplClass>::_SetBLEAdvertisingMode(ConnectivityManager::BLEAdvertisingMode mode)
+{
+    return BLEMgr().SetAdvertisingMode(mode);
 }
 
 template <class ImplClass>

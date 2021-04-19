@@ -21,7 +21,7 @@
 #include "Server.h"
 #include "support/ErrorStr.h"
 
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -36,11 +36,8 @@
 #include "TimersManager.h"
 #include "app_config.h"
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 6000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
-#define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
+constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
+constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -65,12 +62,11 @@ int AppTask::StartAppTask()
 {
     int err = CHIP_NO_ERROR;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreate(kAppEventQueueSize, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
-        err = CHIP_ERROR_MAX;
         K32W_LOG("Failed to allocate app event queue");
-        assert(err == CHIP_NO_ERROR);
+        assert(false);
     }
 
     return err;
@@ -84,7 +80,7 @@ int AppTask::Init()
     InitServer();
 
     // QR code will be used with CHIP Tool
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     TMR_Init();
 
@@ -220,7 +216,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -241,6 +237,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == JOIN_BUTTON)
     {
         button_event.Handler = JoinHandler;
+    }
+    else if (pin_no == BLE_BUTTON)
+    {
+        button_event.Handler = BleHandler;
     }
 
     sAppTask.PostEvent(&button_event);
@@ -278,6 +278,9 @@ void AppTask::HandleKeyboard(void)
             break;
         case gKBD_EventPB3_c:
             ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
+            break;
+        case gKBD_EventPB4_c:
+            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
         default:
             break;
@@ -329,7 +332,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        uint32_t resetTimeout = FACTORY_RESET_TRIGGER_TIMEOUT;
+        uint32_t resetTimeout = kFactoryResetTriggerTimeout;
 
         if (sAppTask.mFunction != kFunction_NoneSelected)
         {
@@ -347,7 +350,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         sStatusLED.Blink(500);
         sLockLED.Blink(500);
 
-        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+        sAppTask.StartTimer(kFactoryResetTriggerTimeout);
     }
 }
 
@@ -458,6 +461,37 @@ void AppTask::JoinHandler(AppEvent * aEvent)
      * In a future PR, these parameters will be sent via BLE.
      */
     ThreadStart();
+}
+
+void AppTask::BleHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
+        return;
+
+    if (sAppTask.mFunction != kFunction_NoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        K32W_LOG("Stopped BLE Advertising!");
+    }
+    else
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+
+        if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+        {
+            K32W_LOG("Started BLE Advertising!");
+        }
+        else
+        {
+            K32W_LOG("OpenDefaultPairingWindow() failed");
+        }
+    }
 }
 
 void AppTask::CancelTimer()

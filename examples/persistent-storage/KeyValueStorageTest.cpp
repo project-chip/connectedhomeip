@@ -23,7 +23,6 @@
 
 #include <platform/KeyValueStoreManager.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::DeviceLayer::PersistedStorage;

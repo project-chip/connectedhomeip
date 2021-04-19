@@ -167,7 +167,7 @@ CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input
     bbuf.Put(&input[consumed], length);
 
     consumed += bbuf.Needed();
-    bbuf.Put('\0');
+    bbuf.Put(static_cast<uint8_t>('\0'));
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -188,7 +188,7 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
 
-    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
+    err = mDelegate->SendSecureMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
                                        std::move(buffer));
     SuccessOrExit(err);
 
@@ -233,7 +233,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
         SuccessOrExit(EncodeString(passwd, bbuf));
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+        err = mDelegate->SendSecureMessage(Protocols::NetworkProvisioning::Id,
                                            NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, bbuf.Finalize());
         SuccessOrExit(err);
     }
@@ -276,8 +276,8 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
     bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kThreadAssociationRequest, bbuf.Finalize());
+    err = mDelegate->SendSecureMessage(Protocols::NetworkProvisioning::Id, NetworkProvisioning::MsgTypes::kThreadAssociationRequest,
+                                       bbuf.Finalize());
 
 exit:
     if (CHIP_NO_ERROR != err)

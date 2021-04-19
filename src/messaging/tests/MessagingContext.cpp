@@ -19,7 +19,6 @@
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace Test {
@@ -38,7 +37,7 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
 
     ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins));
 
-    ReturnErrorOnFailure(mExchangeManager.Init(GetSourceNodeId(), transport, &mSecureSessionMgr));
+    ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
 
     ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
                                                       SecureSessionMgr::PairingDirection::kInitiator, mSrcAdminId));

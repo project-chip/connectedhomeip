@@ -505,7 +505,8 @@ static CHIP_ERROR ConvertCertificate(ASN1Reader & reader, TLVWriter & writer)
     OID sigAlgoOID;
     TLVType containerType;
 
-    err = writer.StartContainer(ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate), kTLVType_Structure, containerType);
+    err = writer.StartContainer(ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate), kTLVType_Structure,
+                                containerType);
     SuccessOrExit(err);
 
     // Certificate ::= SEQUENCE

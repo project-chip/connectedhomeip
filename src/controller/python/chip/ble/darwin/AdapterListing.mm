@@ -1,5 +1,4 @@
 #include <support/CHIPMem.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>

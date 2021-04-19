@@ -28,7 +28,6 @@
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -194,7 +193,15 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = secureSessionMgr.SendMessage(localToRemoteSession, std::move(buffer));
+    PayloadHeader payloadHeader;
+
+    // Set the exchange ID for this header.
+    payloadHeader.SetExchangeID(0);
+
+    // Set the protocol ID and message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
+
+    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });

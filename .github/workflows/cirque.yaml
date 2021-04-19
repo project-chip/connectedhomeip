@@ -15,14 +15,17 @@
 name: Cirque
 
 on:
-    push:
-    pull_request:
+    workflow_dispatch:
 
 jobs:
-    build:
+    cirque:
         name: Cirque
 
+        env:
+            DOCKER_RUN_VERSION: 0.4.21
+
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
 # need to run with privilege, which isn't supported by job.XXX.contaner
 #  https://github.com/actions/container-action/issues/2

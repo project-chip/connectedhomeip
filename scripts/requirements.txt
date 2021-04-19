@@ -4,16 +4,20 @@
 #
 #    pip-compile requirements.in
 #
-appdirs==1.4.4 ; sys_platform == "darwin"
+appdirs==1.4.4
     # via
     #   -r requirements.in
     #   virtualenv
-appnope==0.1.2 ; sys_platform == "darwin"
-    # via
-    #   -r requirements.in
-    #   ipython
+appnope==0.1.2
+    # via -r requirements.in
 backcall==0.2.0
     # via ipython
+bidict==0.21.2
+    # via python-socketio
+bitstring==3.1.7
+    # via -r requirements.in
+brotli==1.0.9
+    # via flask-compress
 certifi==2020.12.5
     # via requests
 cffi==1.14.5
@@ -23,6 +27,7 @@ chardet==4.0.0
 click==7.1.2
     # via
     #   -r requirements.in
+    #   flask
     #   pip-tools
 colorama==0.4.4
     # via west
@@ -38,12 +43,29 @@ distlib==0.3.1
     # via virtualenv
 docopt==0.6.2
     # via pykwalify
+ecdsa==0.16.1
+    # via -r requirements.in
 filelock==3.0.12
     # via virtualenv
+flask-compress==1.9.0
+    # via gdbgui
+flask-socketio==2.9.6
+    # via gdbgui
+flask==0.12.5
+    # via
+    #   flask-compress
+    #   flask-socketio
+    #   gdbgui
 future==0.18.2
     # via
     #   -r requirements.in
     #   mobly
+gdbgui==0.13.2.0
+    # via -r requirements.in
+gevent==1.5.0
+    # via gdbgui
+greenlet==1.0.0
+    # via gevent
 humanfriendly==9.1
     # via coloredlogs
 idna==2.10
@@ -54,31 +76,39 @@ ipython-genutils==0.2.0
     # via traitlets
 ipython==7.21.0
     # via -r requirements.in
+itsdangerous==1.1.0
+    # via flask
 jedi==0.18.0
     # via ipython
+jinja2==2.11.3
+    # via flask
 lockfile==0.12.2
     # via -r requirements.in
+markupsafe==1.1.1
+    # via jinja2
 mobly==1.10.1
     # via -r requirements.in
 packaging==20.9
     # via west
 parso==0.8.1
     # via jedi
+pep517==0.10.0
+    # via pip-tools
 pexpect==4.8.0
     # via ipython
 pgi==0.0.11.2 ; sys_platform == "linux"
     # via -r requirements.in
 pickleshare==0.7.5
     # via ipython
-pip-tools==5.5.0
+pip-tools==6.0.1
     # via -r requirements.in
 portpicker==1.3.1
     # via
     #   -r requirements.in
     #   mobly
-prompt-toolkit==3.0.16
+prompt-toolkit==3.0.17
     # via ipython
-protobuf==3.15.5
+protobuf==3.15.6
     # via -r requirements.in
 psutil==5.8.0
     # via
@@ -90,8 +120,14 @@ pycparser==2.20
     # via cffi
 pyelftools==0.27
     # via -r requirements.in
-pygments==2.8.0
-    # via ipython
+pygdbmi==0.9.0.2
+    # via
+    #   -r requirements.in
+    #   gdbgui
+pygments==2.8.1
+    # via
+    #   gdbgui
+    #   ipython
 pykwalify==1.8.0
     # via west
 pyobjc-core==7.1 ; sys_platform == "darwin"
@@ -115,10 +151,16 @@ pyserial==3.5
     #   mobly
 python-dateutil==2.8.1
     # via pykwalify
+python-engineio==4.0.1
+    # via python-socketio
+python-socketio==5.1.0
+    # via flask-socketio
 pyyaml==5.4.1
     # via
     #   mobly
     #   west
+reedsolo==1.5.4
+    # via -r requirements.in
 requests==2.25.1
     # via -r requirements.in
 ruamel.yaml.clib==0.2.2
@@ -127,22 +169,27 @@ ruamel.yaml==0.16.13
     # via pykwalify
 six==1.15.0
     # via
+    #   ecdsa
     #   protobuf
     #   python-dateutil
     #   virtualenv
 timeout-decorator==0.5.0
     # via mobly
+toml==0.10.2
+    # via pep517
 traitlets==5.0.5
     # via ipython
-urllib3==1.26.3
+urllib3==1.26.4
     # via requests
-virtualenv==20.4.2
+virtualenv==20.4.3
     # via -r requirements.in
 watchdog==2.0.2
     # via -r requirements.in
 wcwidth==0.2.5
     # via prompt-toolkit
-west==0.9.0
+werkzeug==0.16.1
+    # via flask
+west==0.10.1
     # via -r requirements.in
 wheel==0.36.2
     # via -r requirements.in

@@ -57,6 +57,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
     wifi_init_config_t cfg;
+    uint8_t ap_mac[6];
+    wifi_mode_t mode;
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
@@ -81,6 +83,16 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     cfg = WIFI_INIT_CONFIG_DEFAULT();
     err = esp_wifi_init(&cfg);
     SuccessOrExit(err);
+
+    esp_wifi_get_mode(&mode);
+    if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+    {
+        esp_fill_random(ap_mac, sizeof(ap_mac));
+        /* Bit 0 of the first octet of MAC Address should always be 0 */
+        ap_mac[0] &= (uint8_t) ~0x01;
+        err = esp_wifi_set_mac(ESP_IF_WIFI_AP, ap_mac);
+        SuccessOrExit(err);
+    }
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.

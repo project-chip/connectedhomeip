@@ -15,13 +15,14 @@
  *    limitations under the License.
  */
 
+#include <inttypes.h>
+
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
-#include <app/server/SessionManager.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -34,7 +35,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -57,7 +57,7 @@ constexpr bool isRendezvousBypassed()
 #if defined(CHIP_BYPASS_RENDEZVOUS) && CHIP_BYPASS_RENDEZVOUS
     return true;
 #elif defined(CONFIG_RENDEZVOUS_MODE)
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
+    return static_cast<RendezvousInformationFlag>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlag::kNone;
 #else
     return false;
 #endif
@@ -67,40 +67,36 @@ constexpr bool useTestPairing()
 {
     // Use the test pairing whenever rendezvous is bypassed. Otherwise, there wouldn't be
     // any way to communicate with the device using CHIP protocol.
+    // This is used to bypass BLE in the cirque test.
+    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'.
     return isRendezvousBypassed();
 }
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void GetKeyValue(const char * key) override
+    void AsyncSetKeyValue(const char * key, const char * value) override
     {
         ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
         chipDie();
     }
 
-    void SetKeyValue(const char * key, const char * value) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
-    CHIP_ERROR GetKeyValue(const char * key, void * buffer, uint16_t & size) override
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
-    CHIP_ERROR SetKeyValue(const char * key, const void * value, uint16_t size) override
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void DeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -137,7 +133,8 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
         }
         else
         {
-            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID %llu", admin->GetAdminId(), admin->GetNodeId());
+            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
+                            static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
         }
     }
 
@@ -173,7 +170,9 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
         {
             connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from %llu", session->PeerConnection().GetPeerNodeId());
+            ChipLogProgress(AppServer, "Fetched the session information: from 0x%08" PRIx32 "%08" PRIx32,
+                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
+                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                   session->PeerConnection().GetPeerNodeId(), session,
                                   SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
@@ -243,7 +242,10 @@ class ServerRendezvousAdvertisementDelegate : public RendezvousAdvertisementDele
 public:
     CHIP_ERROR StartAdvertisement() const override
     {
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+        if (isBLE)
+        {
+            ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
+        }
         if (mDelegate != nullptr)
         {
             mDelegate->OnPairingWindowOpened();
@@ -254,7 +256,10 @@ public:
     {
         gDeviceDiscriminatorCache.RestoreDiscriminator();
 
-        ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
+        if (isBLE)
+        {
+            ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
+        }
         {
             if (mDelegate != nullptr)
                 mDelegate->OnPairingWindowClosed();
@@ -279,18 +284,18 @@ public:
     }
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
-
+    void SetBLE(bool ble) { isBLE = ble; }
     void SetAdminId(AdminId id) { mAdmin = id; }
 
 private:
     AppDelegate * mDelegate = nullptr;
     AdminId mAdmin;
+    bool isBLE = true;
 };
 
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
-
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
 static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
@@ -316,29 +321,27 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
 }
 
-class ServerCallback : public SecureSessionMgrDelegate
+class ServerCallback : public ExchangeDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+    void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle buffer) override
     {
-        auto state            = mgr->GetPeerConnectionState(session);
-        const size_t data_len = buffer->DataLength();
-        char src_addr[PeerAddress::kMaxToStringSize];
-
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(!buffer.IsNull(), ChipLogProgress(AppServer, "Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
+        VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));
+        VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), ChipLogError(AppServer, "Unknown source for received message"));
 
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
+        VerifyOrExit(mSessionMgr != nullptr, ChipLogError(AppServer, "SecureSessionMgr is not initilized yet"));
 
-        state->GetPeerAddress().ToString(src_addr);
+        VerifyOrExit(packetHeader.GetSourceNodeId().Value() != kUndefinedNodeId,
+                     ChipLogError(AppServer, "Unknown source for received message"));
 
-        ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
+        ChipLogProgress(AppServer, "Packet received from Node:%x: %u bytes", packetHeader.GetSourceNodeId().Value(),
+                        buffer->DataLength());
 
         // TODO: This code is temporary, and must be updated to use the Cluster API.
         // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
-        if (payloadHeader.GetProtocolID() == chip::Protocols::kProtocol_ServiceProvisioning)
+        if (payloadHeader.HasProtocol(chip::Protocols::ServiceProvisioning::Id))
         {
             CHIP_ERROR err = CHIP_NO_ERROR;
             uint32_t timeout;
@@ -348,7 +351,7 @@ public:
             ChipLogProgress(AppServer, "Received service provisioning message. Treating it as OpenPairingWindow request");
             chip::System::PacketBufferTLVReader reader;
             reader.Init(std::move(buffer));
-            reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+            reader.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
 
             SuccessOrExit(reader.Next(kTLVType_UnsignedInteger, TLV::ProfileTag(reader.ImplicitProfileId, 1)));
             SuccessOrExit(reader.Get(timeout));
@@ -381,35 +384,30 @@ public:
         }
         else
         {
-            HandleDataModelMessage(header.GetSourceNodeId().Value(), std::move(buffer));
+            HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
         }
 
     exit:;
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
+    void OnResponseTimeout(ExchangeContext * ec) override
     {
-        ChipLogProgress(AppServer, "Packet received error: %s", ErrorStr(error));
+        ChipLogProgress(AppServer, "Failed to receive response");
         if (mDelegate != nullptr)
         {
             mDelegate->OnReceiveError();
         }
     }
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
-    {
-        ChipLogProgress(AppServer, "Received a new connection.");
-    }
-
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
+    void SetSessionMgr(SecureSessionMgr * mgr) { mSessionMgr = mgr; }
 
 private:
-    AppDelegate * mDelegate = nullptr;
+    AppDelegate * mDelegate        = nullptr;
+    SecureSessionMgr * mSessionMgr = nullptr;
 };
 
-#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
 Messaging::ExchangeManager gExchangeMgr;
-#endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -420,8 +418,14 @@ SecureSessionMgr & chip::SessionManager()
     return gSessions;
 }
 
-CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
+Messaging::ExchangeManager & chip::ExchangeManager()
 {
+    return gExchangeMgr;
+}
+
+CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
+{
+    // TODO(cecille): If this is re-called when the window is already open, what should happen?
     gDeviceDiscriminatorCache.RestoreDiscriminator();
 
     uint32_t pinCode;
@@ -429,13 +433,14 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins)
 
     RendezvousParameters params;
 
-#if CONFIG_NETWORK_LAYER_BLE
-    params.SetSetupPINCode(pinCode)
-        .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
-        .SetPeerAddress(Transport::PeerAddress::BLE())
-        .SetAdvertisementDelegate(&gAdvDelegate);
-#else
     params.SetSetupPINCode(pinCode);
+#if CONFIG_NETWORK_LAYER_BLE
+    gAdvDelegate.SetBLE(advertisementMode == chip::PairingWindowAdvertisement::kBle);
+    params.SetAdvertisementDelegate(&gAdvDelegate);
+    if (advertisementMode == chip::PairingWindowAdvertisement::kBle)
+    {
+        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer()).SetPeerAddress(Transport::PeerAddress::BLE());
+    }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     if (resetAdmins == ResetAdmins::kYes)
@@ -483,15 +488,11 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
     SuccessOrExit(err);
 
-#if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
-#else
-    gSessions.SetDelegate(&gCallbacks);
-#endif
 
-#if defined(CHIP_APP_USE_INTERACTION_MODEL)
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr);
+#if CHIP_ENABLE_INTERACTION_MODEL
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
     SuccessOrExit(err);
 #endif
 
@@ -502,14 +503,8 @@ void InitServer(AppDelegate * delegate)
 
     if (useTestPairing())
     {
-        SuccessOrExit(err = AddTestPairing());
-    }
-
-    // This flag is used to bypass BLE in the cirque test
-    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-    if (isRendezvousBypassed())
-    {
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
+        SuccessOrExit(err = AddTestPairing());
     }
     else if (DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
@@ -530,6 +525,21 @@ void InitServer(AppDelegate * delegate)
         SuccessOrExit(err = OpenDefaultPairingWindow(ResetAdmins::kYes));
 #endif
     }
+
+// Starting mDNS server only for Thread devices due to problem reported in issue #5076.
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    app::Mdns::StartServer();
+#endif
+
+    gCallbacks.SetSessionMgr(&gSessions);
+
+    // Register to receive unsolicited legacy ZCL messages from the exchange manager.
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, &gCallbacks);
+    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
+
+    // Register to receive unsolicited Service Provisioning messages from the exchange manager.
+    err = gExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
+    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
 exit:
     if (err != CHIP_NO_ERROR)

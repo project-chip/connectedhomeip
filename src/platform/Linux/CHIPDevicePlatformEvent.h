@@ -45,6 +45,7 @@ enum InternalPlatformSpecificEventTypes
 {
     kPlatformLinuxEvent = kRange_InternalPlatformSpecific,
     kPlatformLinuxBLECentralConnected,
+    kPlatformLinuxBLECentralConnectFailed,
     kPlatformLinuxBLEWriteComplete,
     kPlatformLinuxBLESubscribeOpComplete,
     kPlatformLinuxBLEIndicationReceived,
@@ -69,6 +70,10 @@ struct ChipDevicePlatformEvent
         {
             BLE_CONNECTION_OBJECT mConnection;
         } BLECentralConnected;
+        struct
+        {
+            CHIP_ERROR mError;
+        } BLECentralConnectFailed;
         struct
         {
             BLE_CONNECTION_OBJECT mConnection;

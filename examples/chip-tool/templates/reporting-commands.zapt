@@ -13,6 +13,17 @@ public:
     Listen() : ReportingCommand("listen")
     {
     }
+
+    ~Listen()
+    {
+{{#chip_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if (isReportableAttribute)}}
+    delete onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback;
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_clusters}}
+    }
     
     void AddReportCallbacks(uint8_t endpointId) override
     {
@@ -20,7 +31,7 @@ public:
 {{#chip_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if (isReportableAttribute)}}
-        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, {{asHex parent.code 4}}, {{asHex attributeCode 4}}, onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback->Cancel());
+        callbacksMgr.AddReportCallback(chip::kTestDeviceNodeId, endpointId, {{asHex parent.code 4}}, {{asHex code 4}}, onReport{{asCamelCased parent.name false}}{{asCamelCased name false}}Callback->Cancel());
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_clusters}}

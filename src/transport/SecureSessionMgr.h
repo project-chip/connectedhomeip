@@ -196,6 +196,22 @@ public:
      */
     virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
+    /**
+     * @brief
+     *   Called when received message from a source node whose message counter is unknown.
+     *   Queue the message and start sync if the sync procedure is not started yet.
+     *
+     * @param state    A pointer to the state of peer connection
+     * @param msgBuf   The received message
+     *
+     * @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left to queue the message.
+     * @retval  #CHIP_NO_ERROR On success.
+     */
+    virtual CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf)
+    {
+        return CHIP_NO_ERROR;
+    }
+
     virtual ~SecureSessionMgrDelegate() {}
 };
 
@@ -223,7 +239,6 @@ public:
      *   returns success, the encrypted data that was sent, as well as various other information needed
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
-    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle && msgBuf);
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
     CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
@@ -272,11 +287,30 @@ public:
 
     /**
      * @brief
+     *  Shutdown the Secure Session Manager. This terminates this instance
+     *  of the object and reset it's state.
+     */
+    void Shutdown();
+
+    /**
+     * @brief
+     *   Called when a cached group message that was waiting for message counter
+     *   sync shold be reprocessed.
+     *
+     * @param packetHeader  The message header
+     * @param msgBuf        The received message
+     */
+    void HandleGroupMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf);
+
+    /**
+     * @brief
      *   Set local node ID
      *
      * @param nodeId    Node id for the current node
      */
-    void SetLocalNodeID(NodeId nodeId) { mLocalNodeId = nodeId; }
+    void SetLocalNodeId(NodeId nodeId) { mLocalNodeId = nodeId; }
+
+    NodeId GetLocalNodeId() { return mLocalNodeId; }
 
     /**
      * @brief
@@ -285,6 +319,8 @@ public:
      *   peer node does not exist.
      */
     Transport::Type GetTransportType(NodeId peerNodeId);
+
+    TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
 
 protected:
     /**

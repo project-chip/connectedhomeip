@@ -21,13 +21,17 @@
  *      CHIP specification.
  *
  *      The encoding of the binary data to a decimal string is split
- *      into 3 chunks <32 bit><16 bit><16 bit>:
- *      - <32 bit> Represents:
- *          - <1 bit> 1 if vid+pid present, 0 otherwise
- *          - <27 bit> setup pin code
- *          - <4 bit> discriminator
- *      - <16 bit> Vendor ID
- *      - <16 bit> Product ID
+ *      into 5 chunks <1-digit/3-bits><5 digits/16-bits><4-digits/13-bits><5-digits/16-bits><5-digits/16-bits>:
+ *      - <1 digit> Represents:
+ *          - <bits 1..0> Discriminator <bits 11.10>
+ *          - <bit 2> VID/PID present flag
+ *      - <5 digits> Represents:
+ *          - <bits 13..0> PIN Code <bits 13..0>
+ *          - <bits 15..14> Discriminator <bits 9..8>
+ *      - <4 digits> Represents:
+ *          - <bits 12..0> PIN Code <bits 26..14>
+ *      - <5 digits> Vendor ID
+ *      - <5 digits> Product ID
  *
  */
 

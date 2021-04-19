@@ -17,16 +17,20 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
 #include <inet/InetLayer.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Mdns {
 
 static constexpr uint16_t kMdnsPort = 5353;
+// Need 8 bytes to fit a thread mac.
+static constexpr size_t kMaxMacSize = 8;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -51,11 +55,20 @@ public:
         return *reinterpret_cast<Derived *>(this);
     }
     bool IsIPv4Enabled() const { return mEnableIPv4; }
+    Derived & SetMac(chip::ByteSpan mac)
+    {
+        mMac = chip::ByteSpan(mMacStorage, std::min(mac.size(), kMaxMacSize));
+        memcpy(mMacStorage, mac.data(), mMac.size());
+        return *reinterpret_cast<Derived *>(this);
+    }
+    const chip::ByteSpan GetMac() const { return mMac; }
 
 private:
-    uint16_t mPort   = CHIP_PORT;
-    bool mEnableIPv4 = true;
-};
+    uint16_t mPort                   = CHIP_PORT;
+    bool mEnableIPv4                 = true;
+    uint8_t mMacStorage[kMaxMacSize] = {};
+    chip::ByteSpan mMac              = chip::ByteSpan(mMacStorage, kMaxMacSize);
+}; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node
 /// over mDNS as an 'operationally ready' node.
@@ -76,9 +89,23 @@ public:
     }
     uint64_t GetNodeId() const { return mNodeId; }
 
+    OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
+    {
+        mCrmpRetryIntervalIdle   = intervalIdle;
+        mCrmpRetryIntervalActive = intervalActive;
+        return *this;
+    }
+    void GetCRMPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
+    {
+        intervalIdle   = mCrmpRetryIntervalIdle;
+        intervalActive = mCrmpRetryIntervalActive;
+    }
+
 private:
-    uint64_t mFabricId = 0;
-    uint64_t mNodeId   = 0;
+    uint64_t mFabricId                = 0;
+    uint64_t mNodeId                  = 0;
+    uint32_t mCrmpRetryIntervalIdle   = 0;
+    uint32_t mCrmpRetryIntervalActive = 0;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>

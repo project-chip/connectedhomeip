@@ -31,6 +31,7 @@
 
 #if CONFIG_BT_BLUEDROID_ENABLED
 
+#include "core/CHIPCallback.h"
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
@@ -60,13 +61,17 @@ namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
+ * Concrete implementation of the BLEManager singleton object for the ESP32 platform.
  */
 class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
                              private Ble::BlePlatformDelegate,
                              private Ble::BleApplicationDelegate
 {
+public:
+    BLEManagerImpl();
+
+private:
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
@@ -78,9 +83,8 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -191,6 +195,17 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
 
+    static constexpr uint32_t kAdvertiseTimeout     = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT;
+    static constexpr uint32_t kFastAdvertiseTimeout = CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME;
+    uint64_t mAdvertiseStartTime;
+    chip::Callback::Callback<> mAdvertiseTimerCallback;
+    chip::Callback::Callback<> mFastAdvertiseTimerCallback;
+
+    static void HandleFastAdvertisementTimer(void * context);
+    void HandleFastAdvertisementTimer();
+    static void HandleAdvertisementTimer(void * context);
+    void HandleAdvertisementTimer();
+
 #if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
@@ -267,11 +282,6 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)

@@ -19,9 +19,8 @@ on:
     pull_request:
 
 jobs:
-    build:
-        name: Build
-
+    android:
+        name: Build Android
         strategy:
             matrix:
                 type: [arm, arm64, x64]
@@ -32,6 +31,7 @@ jobs:
             JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build-android:latest

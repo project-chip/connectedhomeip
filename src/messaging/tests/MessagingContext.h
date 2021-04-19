@@ -63,6 +63,8 @@ public:
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
 
+    OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
+
 private:
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
@@ -73,6 +75,7 @@ private:
     Transport::AdminPairingTable mAdmins;
     Transport::AdminId mSrcAdminId  = 0;
     Transport::AdminId mDestAdminId = 1;
+    OperationalCredentialSet mOperationalCredentialSet;
 };
 
 } // namespace Test

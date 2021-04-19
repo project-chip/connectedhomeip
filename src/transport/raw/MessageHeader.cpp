@@ -32,7 +32,6 @@
 #include <core/CHIPError.h>
 #include <support/BufferReader.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 
 /**********************************************
  * Header format (little endian):
@@ -113,7 +112,7 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
 {
     size_t size = kEncryptedHeaderSizeBytes;
 
-    if (mVendorId.HasValue())
+    if (HaveVendorId())
     {
         size += kVendorIdSizeBytes;
     }
@@ -221,20 +220,24 @@ CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint
 
     mExchangeFlags.SetRaw(header);
 
-    if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_VendorIdPresent))
+    VendorId vendor_id;
+    if (HaveVendorId())
     {
-        uint16_t vendor_id;
-        err = reader.Read16(&vendor_id).StatusCode();
+        uint16_t vendor_id_raw;
+        err = reader.Read16(&vendor_id_raw).StatusCode();
         SuccessOrExit(err);
-        mVendorId.SetValue(vendor_id);
+        vendor_id = static_cast<VendorId>(vendor_id_raw);
     }
     else
     {
-        mVendorId.ClearValue();
+        vendor_id = VendorId::Common;
     }
 
-    err = reader.Read16(&mProtocolID).StatusCode();
+    uint16_t protocol_id;
+    err = reader.Read16(&protocol_id).StatusCode();
     SuccessOrExit(err);
+
+    mProtocolID = Protocols::Id(vendor_id, protocol_id);
 
     if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_AckMsg))
     {
@@ -328,11 +331,11 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
     Write8(p, header);
     Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
-    if (mVendorId.HasValue())
+    if (HaveVendorId())
     {
-        LittleEndian::Write16(p, mVendorId.Value());
+        LittleEndian::Write16(p, static_cast<std::underlying_type_t<VendorId>>(mProtocolID.GetVendorId()));
     }
-    LittleEndian::Write16(p, mProtocolID);
+    LittleEndian::Write16(p, mProtocolID.GetProtocolId());
     if (mAckId.HasValue())
     {
         LittleEndian::Write32(p, mAckId.Value());

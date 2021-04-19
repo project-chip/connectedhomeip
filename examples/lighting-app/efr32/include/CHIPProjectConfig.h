@@ -39,7 +39,9 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
 // Use a default pairing code if one hasn't been provisioned in flash.
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#endif
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 // For convenience, Chip Security Test Mode can be enabled and the
@@ -54,16 +56,16 @@
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
- * 0xE100: Google's Vendor Id.
+ * 0x235A: Chip's Vendor Id.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xE100
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x235A
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
- * 0xFE00: SDK Sample Light Resource
+ * 0x534C: EFR32 lighting-app
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xFD00
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x534C
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION

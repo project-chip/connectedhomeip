@@ -41,6 +41,7 @@
 
 #include <app/util/af.h>
 
+#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
@@ -49,10 +50,6 @@
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
-
-#ifdef EMBER_AF_PLUGIN_REPORTING
-#include <app/reporting/reporting.h>
-#endif
 
 using namespace chip;
 

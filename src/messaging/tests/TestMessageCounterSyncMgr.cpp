@@ -29,7 +29,6 @@
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -182,8 +181,7 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    err =
-        ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::kProtocol_SecureChannel, &mockAppDelegate);
+    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
@@ -224,7 +222,7 @@ void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     CHIP_ERROR err =
-        sm->AddToRetransmissionTable(Protocols::kProtocol_Echo, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
+        sm->AddToRetransmissionTable(Protocols::Echo::Id, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -241,10 +239,7 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    PacketHeader packetHeader;
-    PayloadHeader payloadHeader;
-
-    CHIP_ERROR err = sm->AddToReceiveTable(packetHeader, payloadHeader, { chip::kTestDeviceNodeId, 0, 0 }, std::move(buffer));
+    CHIP_ERROR err = sm->AddToReceiveTable(std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

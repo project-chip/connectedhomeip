@@ -742,7 +742,7 @@ limitations under the License.
     <attribute side="server" code="0x0021" define="PRICE_TRAILING_DIGIT" type="INT8U" writable="false" optional="false">price trailing digit</attribute>
     <attribute side="server" code="0x0022" define="PRICE" type="INT32U" writable="false" optional="false">price</attribute>
     <attribute side="server" code="0x0030" define="GOOD_ID" type="OCTET_STRING" length="64" writable="false" optional="false">good id</attribute>
-    <attribute side="server" code="0x0031" define="SERIAL_NUMBER" type="OCTET_STRING" length="64" writable="false" optional="false">serial number</attribute>
+    <attribute side="server" code="0x0031" define="PAYMENT_SERIAL_NUMBER" type="OCTET_STRING" length="64" writable="false" optional="false">serial number</attribute>
     <attribute side="server" code="0x0032" define="PAYMENT_TIMESTAMP" type="OCTET_STRING" length="64" writable="false" optional="false">timestamp</attribute>
     <attribute side="server" code="0x0033" define="TRANS_ID" type="INT16U" writable="true" optional="true">trans id</attribute>
     <attribute side="server" code="0x0034" define="TRANS_STATUS" type="ENUM8" writable="true" optional="true">trans status</attribute>

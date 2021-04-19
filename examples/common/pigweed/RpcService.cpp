@@ -30,7 +30,7 @@
 #include "pw_stream/sys_io_stream.h"
 #include "pw_sys_io/sys_io.h"
 
-#include "logging/CHIPLogging.h"
+#include "support/logging/CHIPLogging.h"
 
 #include <array>
 

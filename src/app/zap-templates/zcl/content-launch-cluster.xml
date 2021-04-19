@@ -19,7 +19,7 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Content Launch</name>
-    <code>0xF002</code>
+    <code>0x050a</code>
     <define>CONTENT_LAUNCH_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
@@ -80,12 +80,5 @@ limitations under the License.
     <item name="Sport" value="0x08"/>
     <item name="SportsTeam" value="0x009"/>
     <item name="Video" value="0x0A"/>
-  </enum>
-
-  <enum name="MediaPlaybackStatus" type="ENUM8">
-    <item name="Success" value="0x00"/>
-    <item name="InvalidStateForCommand" value="0x01"/>
-    <item name="NotAllowed" value="0x02"/>
-    <item name="NotActive" value="0x03"/>
   </enum>
 </configurator>

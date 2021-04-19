@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/common_flags.gni")
 
 static_library("controller") {
   output_name = "libChipController"
@@ -29,8 +28,6 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
-    "CHIPDeviceController_deprecated.cpp",
-    "CHIPDeviceController_deprecated.h",
     "DeviceAddressUpdater.cpp",
     "DeviceAddressUpdater.h",
   ]
@@ -49,8 +46,4 @@ static_library("controller") {
   ]
 
   defines = []
-
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
 }

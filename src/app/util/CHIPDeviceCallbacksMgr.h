@@ -68,6 +68,7 @@ private:
         if (CHIP_NO_ERROR == err)
         {
             ca->Cancel();
+            queue.Dequeue(ca);
         }
 
         return err;

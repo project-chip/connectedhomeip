@@ -119,19 +119,16 @@ CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
     CircularTLVReader reader;
     uint8_t * newHead;
     uint32_t newLen;
-    CHIP_ERROR err;
 
     // find the boundaries of an event to throw away
     reader.Init(*this);
     reader.ImplicitProfileId = mImplicitProfileId;
 
     // position the reader on the first element
-    err = reader.Next();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next());
 
     // skip to the next element
-    err = reader.Skip();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Skip());
 
     // record the state of the queue post-call
     newLen  = mQueueLength - (reader.GetLengthRead());
@@ -145,16 +142,14 @@ CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
         reader.Init(*this);
         reader.ImplicitProfileId = mImplicitProfileId;
 
-        err = mProcessEvictedElement(*this, mAppData, reader);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(mProcessEvictedElement(*this, mAppData, reader));
     }
 
     // update queue state
     mQueueLength = newLen;
     mQueueHead   = newHead;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -186,14 +181,12 @@ CHIP_ERROR CHIPCircularTLVBuffer::OnInit(TLVWriter & writer, uint8_t *& bufStart
 
 CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * tail = QueueTail();
 
     if (mQueueLength >= mQueueSize)
     {
         // Queue is out of space, need to evict an element
-        err = EvictHead();
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(EvictHead());
     }
 
     // set the output values, returned buffer must be contiguous
@@ -208,8 +201,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& 
         outBufLen = static_cast<uint32_t>(mQueueHead - tail);
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**

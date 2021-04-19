@@ -54,9 +54,11 @@
 #include <protocols/Protocols.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <support/BitFlags.h>
+#include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <cassert>
 #include <errno.h>
 #include <gio/gunixfdlist.h>
 #include <limits>
@@ -67,7 +69,6 @@
 
 #include <platform/Linux/BLEManagerImpl.h>
 #include <support/CodeUtils.h>
-#include <support/ReturnMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"
@@ -1163,7 +1164,7 @@ void EndpointCleanup(BluezEndpoint * apEndpoint)
             g_free(apEndpoint->mpPeerDevicePath);
             apEndpoint->mpPeerDevicePath = nullptr;
         }
-
+        g_free(apEndpoint->mpConnectCancellable);
         g_free(apEndpoint);
     }
 }
@@ -1554,7 +1555,8 @@ CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & a
     }
     else
     {
-        endpoint->mAdapterId = aBleAdvConfig.mAdapterId;
+        endpoint->mAdapterId           = aBleAdvConfig.mAdapterId;
+        endpoint->mpConnectCancellable = g_cancellable_new();
     }
 
     err = MainLoop::Instance().EnsureStarted();
@@ -1705,7 +1707,7 @@ static gboolean UnsubscribeCharacteristicImpl(BluezConnection * connection)
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "BluezConnection is NULL in %s", __func__));
     VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
 
-    bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, UnsubscribeCharacteristicDone, connection);
+    bluez_gatt_characteristic1_call_stop_notify(connection->mpC2, nullptr, UnsubscribeCharacteristicDone, connection);
 
 exit:
     return G_SOURCE_REMOVE;
@@ -1718,13 +1720,26 @@ bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
 
 // ConnectDevice callbacks
 
+struct ConnectParams
+{
+    ConnectParams(BluezDevice1 * device, BluezEndpoint * endpoint) : mDevice(device), mEndpoint(endpoint) {}
+    BluezDevice1 * mDevice;
+    BluezEndpoint * mEndpoint;
+};
+
 static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer)
 {
     BluezDevice1 * device = BLUEZ_DEVICE1(aObject);
     GError * error        = nullptr;
     gboolean success      = bluez_device1_call_connect_finish(device, aResult, &error);
 
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s", error->message));
+    if (!success)
+    {
+        ChipLogError(DeviceLayer, "FAIL: ConnectDevice : %s", error->message);
+        BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
+        ExitNow();
+    }
+
     ChipLogDetail(DeviceLayer, "ConnectDevice complete");
 
 exit:
@@ -1732,30 +1747,42 @@ exit:
         g_error_free(error);
 }
 
-static gboolean ConnectDeviceImpl(BluezDevice1 * device)
+static gboolean ConnectDeviceImpl(ConnectParams * apParams)
 {
-    VerifyOrExit(device != nullptr, ChipLogError(DeviceLayer, "device is NULL in %s", __func__));
+    BluezDevice1 * device    = apParams->mDevice;
+    BluezEndpoint * endpoint = apParams->mEndpoint;
 
-    bluez_device1_call_connect(device, nullptr, ConnectDeviceDone, nullptr);
+    assert(device != nullptr);
+    assert(endpoint != nullptr);
+
+    g_cancellable_reset(endpoint->mpConnectCancellable);
+    bluez_device1_call_connect(device, endpoint->mpConnectCancellable, ConnectDeviceDone, nullptr);
     g_object_unref(device);
+    chip::Platform::Delete(apParams);
 
-exit:
     return G_SOURCE_REMOVE;
 }
 
-CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice)
+CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice, BluezEndpoint * apEndpoint)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    auto params = chip::Platform::New<ConnectParams>(apDevice, apEndpoint);
     g_object_ref(apDevice);
 
-    if (!MainLoop::Instance().Schedule(ConnectDeviceImpl, apDevice))
+    if (!MainLoop::Instance().Schedule(ConnectDeviceImpl, params))
     {
         ChipLogError(Ble, "Failed to schedule ConnectDeviceImpl() on CHIPoBluez thread");
         g_object_unref(apDevice);
-        error = CHIP_ERROR_INCORRECT_STATE;
+        chip::Platform::Delete(params);
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return error;
+    return CHIP_NO_ERROR;
+}
+
+void CancelConnect(BluezEndpoint * apEndpoint)
+{
+    assert(apEndpoint->mpConnectCancellable != nullptr);
+    g_cancellable_cancel(apEndpoint->mpConnectCancellable);
 }
 
 } // namespace Internal

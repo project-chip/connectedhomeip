@@ -26,30 +26,6 @@
 #define ZCL_REPORTING_STATUS_CLIENT_ATTRIBUTE_ID (0xFFFE)
 #define ZCL_REPORTING_STATUS_SERVER_ATTRIBUTE_ID (0xFFFE)
 
-// Attribute ids for cluster: Basic
-
-// Client attributes
-
-// Server attributes
-#define ZCL_VERSION_ATTRIBUTE_ID (0x0000)
-#define ZCL_APPLICATION_VERSION_ATTRIBUTE_ID (0x0001)
-#define ZCL_STACK_VERSION_ATTRIBUTE_ID (0x0002)
-#define ZCL_HW_VERSION_ATTRIBUTE_ID (0x0003)
-#define ZCL_MANUFACTURER_NAME_ATTRIBUTE_ID (0x0004)
-#define ZCL_MODEL_IDENTIFIER_ATTRIBUTE_ID (0x0005)
-#define ZCL_DATE_CODE_ATTRIBUTE_ID (0x0006)
-#define ZCL_POWER_SOURCE_ATTRIBUTE_ID (0x0007)
-#define ZCL_GENERIC_DEVICE_CLASS_ATTRIBUTE_ID (0x0008)
-#define ZCL_GENERIC_DEVICE_TYPE_ATTRIBUTE_ID (0x0009)
-#define ZCL_PRODUCT_CODE_ATTRIBUTE_ID (0x000A)
-#define ZCL_PRODUCT_URL_ATTRIBUTE_ID (0x000B)
-#define ZCL_LOCATION_DESCRIPTION_ATTRIBUTE_ID (0x0010)
-#define ZCL_PHYSICAL_ENVIRONMENT_ATTRIBUTE_ID (0x0011)
-#define ZCL_DEVICE_ENABLED_ATTRIBUTE_ID (0x0012)
-#define ZCL_ALARM_MASK_ATTRIBUTE_ID (0x0013)
-#define ZCL_DISABLE_LOCAL_CONFIG_ATTRIBUTE_ID (0x0014)
-#define ZCL_SW_BUILD_ID_ATTRIBUTE_ID (0x4000)
-
 // Attribute ids for cluster: Power Configuration
 
 // Client attributes
@@ -335,6 +311,16 @@
 #define ZCL_FINISH_TIME_ATTRIBUTE_ID (0x0001)
 #define ZCL_REMAINING_TIME_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: Descriptor
+
+// Client attributes
+
+// Server attributes
+#define ZCL_DEVICE_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_SERVER_LIST_ATTRIBUTE_ID (0x0001)
+#define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
+#define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
+
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
@@ -384,6 +370,29 @@
 #define ZCL_KEEPALIVE_BASE_ATTRIBUTE_ID (0x0000)
 #define ZCL_KEEPALIVE_JITTER_ATTRIBUTE_ID (0x0001)
 
+// Attribute ids for cluster: Basic
+
+// Client attributes
+
+// Server attributes
+#define ZCL_INTERACTION_MODEL_VERSION_ATTRIBUTE_ID (0x0000)
+#define ZCL_VENDOR_NAME_ATTRIBUTE_ID (0x0001)
+#define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0002)
+#define ZCL_PRODUCT_NAME_ATTRIBUTE_ID (0x0003)
+#define ZCL_PRODUCT_ID_ATTRIBUTE_ID (0x0004)
+#define ZCL_USER_LABEL_ATTRIBUTE_ID (0x0005)
+#define ZCL_LOCATION_ATTRIBUTE_ID (0x0006)
+#define ZCL_HARDWARE_VERSION_ATTRIBUTE_ID (0x0007)
+#define ZCL_HARDWARE_VERSION_STRING_ATTRIBUTE_ID (0x0008)
+#define ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID (0x0009)
+#define ZCL_SOFTWARE_VERSION_STRING_ATTRIBUTE_ID (0x000A)
+#define ZCL_MANUFACTURING_DATE_ATTRIBUTE_ID (0x000B)
+#define ZCL_PART_NUMBER_ATTRIBUTE_ID (0x000C)
+#define ZCL_PRODUCT_URL_ATTRIBUTE_ID (0x000D)
+#define ZCL_PRODUCT_LABEL_ATTRIBUTE_ID (0x000E)
+#define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
+#define ZCL_LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID (0x0010)
+
 // Attribute ids for cluster: General Commissioning
 
 // Client attributes
@@ -391,6 +400,12 @@
 // Server attributes
 #define ZCL_FABRIC_ID_ATTRIBUTE_ID (0x0000)
 #define ZCL_BREADCRUMB_ATTRIBUTE_ID (0x0001)
+
+// Attribute ids for cluster: Network Commissioning
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Shade Configuration
 
@@ -1093,24 +1108,97 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Wake on LAN
+
+// Client attributes
+
+// Server attributes
+#define ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: TV Channel
+
+// Client attributes
+
+// Server attributes
+#define ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_TV_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
+#define ZCL_TV_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: Target Navigator
+
+// Client attributes
+
+// Server attributes
+#define ZCL_TARGET_NAVIGATOR_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_TARGET_NAVIGATOR_CURRENT_TARGET_ATTRIBUTE_ID (0x0001)
+
+// Attribute ids for cluster: Media Playback
+
+// Client attributes
+
+// Server attributes
+#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Media Input
+
+// Client attributes
+
+// Server attributes
+#define ZCL_MEDIA_INPUT_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_MEDIA_INPUT_CURRENT_INPUT_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Low Power
 
 // Client attributes
 
 // Server attributes
 
+// Attribute ids for cluster: Keypad Input
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Content Launch
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Audio Output
+
+// Client attributes
+
+// Server attributes
+#define ZCL_AUDIO_OUTPUT_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_AUDIO_OUTPUT_CURRENT_OUTPUT_ATTRIBUTE_ID (0x0001)
+
+// Attribute ids for cluster: Application Launcher
+
+// Client attributes
+
+// Server attributes
+#define ZCL_APPLICATION_LAUNCHER_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_APPLICATION_LAUNCHER_CURRENT_APP_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Application Basic
 
 // Client attributes
 
 // Server attributes
-#define ZCL_VENDOR_NAME_ATTRIBUTE_ID (0x0000)
-#define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0001)
+#define ZCL_APPLICATION_VENDOR_NAME_ATTRIBUTE_ID (0x0000)
+#define ZCL_APPLICATION_VENDOR_ID_ATTRIBUTE_ID (0x0001)
 #define ZCL_APPLICATION_NAME_ATTRIBUTE_ID (0x0002)
-#define ZCL_PRODUCT_ID_ATTRIBUTE_ID (0x0003)
+#define ZCL_APPLICATION_PRODUCT_ID_ATTRIBUTE_ID (0x0003)
 #define ZCL_APPLICATION_ID_ATTRIBUTE_ID (0x0005)
 #define ZCL_CATALOG_VENDOR_ID_ATTRIBUTE_ID (0x0006)
 #define ZCL_APPLICATION_STATUS_ATTRIBUTE_ID (0x0007)
+
+// Attribute ids for cluster: Account Login
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Generic Tunnel
 
@@ -3839,7 +3927,7 @@
 #define ZCL_PRICE_TRAILING_DIGIT_ATTRIBUTE_ID (0x0021)
 #define ZCL_PRICE_ATTRIBUTE_ID (0x0022)
 #define ZCL_GOOD_ID_ATTRIBUTE_ID (0x0030)
-#define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x0031)
+#define ZCL_PAYMENT_SERIAL_NUMBER_ATTRIBUTE_ID (0x0031)
 #define ZCL_PAYMENT_TIMESTAMP_ATTRIBUTE_ID (0x0032)
 #define ZCL_TRANS_ID_ATTRIBUTE_ID (0x0033)
 #define ZCL_TRANS_STATUS_ATTRIBUTE_ID (0x0034)
@@ -4085,30 +4173,19 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Network Commissioning
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Binding
 
 // Client attributes
 
 // Server attributes
 
-// Attribute ids for cluster: Media Playback
+// Attribute ids for cluster: Group Key Management
 
 // Client attributes
 
 // Server attributes
-#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
-
-// Attribute ids for cluster: Content Launch
-
-// Client attributes
-
-// Server attributes
+#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Sample Mfg Specific Cluster
 

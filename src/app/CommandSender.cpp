@@ -27,6 +27,10 @@
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
 
+#include <protocols/secure_channel/Constants.h>
+
+using GeneralStatusCode = chip::Protocols::SecureChannel::GeneralStatusCode;
+
 namespace chip {
 namespace app {
 
@@ -44,7 +48,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mpExchangeCtx->SetResponseTimeout(kImMesssageTimeout);
+    mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -81,10 +85,9 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
         goto exit;
     }
 
-    // Remove the EC from the app state now. OnMessageReceived can call
-    // SendCommandRequest and install a new one. We abort rather than close
-    // because we no longer care whether the echo request message has been
-    // acknowledged at the transport layer.
+    // Close the current exchange after receiving the response since the response message marks the
+    // end of conversation represented by the exchange. We should create an new exchange for a new
+    // conversation defined in Interaction Model protocol.
     ClearExistingExchangeContext();
 
     err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
@@ -92,7 +95,17 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
 
 exit:
     Reset();
-    return;
+    if (mpDelegate != nullptr)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            mpDelegate->CommandResponseError(this, err);
+        }
+        else
+        {
+            mpDelegate->CommandResponseProcessed(this);
+        }
+    }
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
@@ -100,6 +113,11 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
     Reset();
+
+    if (mpDelegate != nullptr)
+    {
+        mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
+    }
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
@@ -110,10 +128,22 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     chip::EndpointId endpointId;
-    uint16_t generalCode  = 0;
-    uint32_t protocolId   = 0;
-    uint16_t protocolCode = 0;
+    Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
+    uint32_t protocolId                                     = 0;
+    uint16_t protocolCode                                   = 0;
     StatusElement::Parser statusElementParser;
+
+    mCommandIndex++;
+    err = aCommandElement.GetCommandPath(&commandPath);
+    SuccessOrExit(err);
+
+    err = commandPath.GetClusterId(&clusterId);
+    SuccessOrExit(err);
+    err = commandPath.GetCommandId(&commandId);
+    SuccessOrExit(err);
+
+    err = commandPath.GetEndpointId(&endpointId);
+    SuccessOrExit(err);
 
     err = aCommandElement.GetStatusElement(&statusElementParser);
     if (CHIP_NO_ERROR == err)
@@ -121,37 +151,28 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         // Response has status element since either there is error in command response or it is empty response
         err = statusElementParser.CheckSchemaValidity();
         SuccessOrExit(err);
-
-        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &clusterId);
+        err = statusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
         SuccessOrExit(err);
+        if (mpDelegate != nullptr)
+        {
+            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
+                                              mCommandIndex);
+        }
     }
     else if (CHIP_END_OF_TLV == err)
     {
-        err = aCommandElement.GetCommandPath(&commandPath);
-        SuccessOrExit(err);
-
-        err = commandPath.GetClusterId(&clusterId);
-        SuccessOrExit(err);
-
-        err = commandPath.GetCommandId(&commandId);
-        SuccessOrExit(err);
-
-        err = commandPath.GetEndpointId(&endpointId);
-        SuccessOrExit(err);
-
         err = aCommandElement.GetData(&commandDataReader);
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-            ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-            // Todo: Define protocol code for StatusCode
-            AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
-        }
+        SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
 exit:
+    ChipLogFunctError(err);
+    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
+    {
+        mpDelegate->CommandResponseProtocolError(this, mCommandIndex);
+    }
     return err;
 }
 

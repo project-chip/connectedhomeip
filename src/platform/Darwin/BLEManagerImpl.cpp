@@ -80,13 +80,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
-    return false;
-}
-
-CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 {
     ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

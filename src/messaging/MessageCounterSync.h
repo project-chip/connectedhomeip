@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -72,23 +73,19 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToRetransmissionTable(uint16_t protocolId, uint8_t msgType, const SendFlags & sendFlags,
+    CHIP_ERROR AddToRetransmissionTable(Protocols::Id protocolId, uint8_t msgType, const SendFlags & sendFlags,
                                         System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
 
     /**
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
      * protocol for re-processing.
      *
-     *  @param[in]    packetHeader     The message header for the received message.
-     *  @param[in]    payloadHeader    The payload header for the received message.
-     *  @param[in]    session          The handle to the secure session.
      *  @param[in]    msgBuf           A handle to the packet buffer holding the received message.
      *
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AddToReceiveTable(System::PacketBufferHandle msgBuf);
 
 private:
     /**
@@ -103,11 +100,12 @@ private:
      */
     struct RetransTableEntry
     {
+        RetransTableEntry() : protocolId(Protocols::NotSpecified) {}
         ExchangeContext * exchangeContext; /**< The ExchangeContext for the stored CHIP message.
                                                 Non-null if and only if this entry is in use. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
         SendFlags sendFlags;               /**< Flags set by the application for the CHIP message being sent. */
-        uint16_t protocolId;               /**< The protocol identifier of the CHIP message to be sent. */
+        Protocols::Id protocolId;          /**< The protocol identifier of the CHIP message to be sent. */
         uint8_t msgType;                   /**< The message type of the CHIP message to be sent. */
     };
 
@@ -123,9 +121,6 @@ private:
      */
     struct ReceiveTableEntry
     {
-        PacketHeader packetHeader;         /**< The packet header for the message. */
-        PayloadHeader payloadHeader;       /**< The payload header for the message. */
-        SecureSessionHandle session;       /**< The secure session the message was received on. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding
                                                 the message data. This is non-null if and only
                                                 if this entry is in use. */

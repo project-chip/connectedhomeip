@@ -29,27 +29,40 @@
 #include <vector>
 
 #include <core/CHIPError.h>
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 
 // TODO this should point to the spec
-const int kVersionFieldLengthInBits                  = 3;
-const int kVendorIDFieldLengthInBits                 = 16;
-const int kProductIDFieldLengthInBits                = 16;
-const int kCustomFlowRequiredFieldLengthInBits       = 1;
-const int kRendezvousInfoFieldLengthInBits           = 8;
-const int kPayloadDiscriminatorFieldLengthInBits     = 12;
-const int kManualSetupDiscriminatorFieldLengthInBits = 4;
-const int kManualSetupDiscriminatorFieldBitMask      = (1 << kManualSetupDiscriminatorFieldLengthInBits) - 1;
-const int kSetupPINCodeFieldLengthInBits             = 27;
-const int kPaddingFieldLengthInBits                  = 5;
+const int kVersionFieldLengthInBits                   = 3;
+const int kVendorIDFieldLengthInBits                  = 16;
+const int kProductIDFieldLengthInBits                 = 16;
+const int kCustomFlowRequiredFieldLengthInBits        = 1;
+const int kRendezvousInfoFieldLengthInBits            = 8;
+const int kPayloadDiscriminatorFieldLengthInBits      = 12;
+const int kManualSetupDiscriminatorFieldLengthInBits  = 4;
+const int kManualSetupChunk1DiscriminatorMsbitsPos    = 0;
+const int kManualSetupChunk1DiscriminatorMsbitsLength = 2;
+const int kManualSetupChunk1VidPidPresentBitPos =
+    (kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength);
+const int kManualSetupChunk2PINCodeLsbitsPos       = 0;
+const int kManualSetupChunk2PINCodeLsbitsLength    = 14;
+const int kManualSetupChunk2DiscriminatorLsbitsPos = (kManualSetupChunk2PINCodeLsbitsPos + kManualSetupChunk2PINCodeLsbitsLength);
+const int kManualSetupChunk2DiscriminatorLsbitsLength = 2;
+const int kManualSetupChunk3PINCodeMsbitsPos          = 0;
+const int kManualSetupChunk3PINCodeMsbitsLength       = 13;
+const int kSetupPINCodeFieldLengthInBits              = 27;
+const int kPaddingFieldLengthInBits                   = 5;
 
 const int kRawVendorTagLengthInBits = 7;
 
-const int kManualSetupShortCodeCharLength = 10;
-const int kManualSetupLongCodeCharLength  = 20;
-const int kManualSetupVendorIdCharLength  = 5;
-const int kManualSetupProductIdCharLength = 5;
+const int kManualSetupShortCodeCharLength  = 10;
+const int kManualSetupLongCodeCharLength   = 20;
+const int kManualSetupCodeChunk1CharLength = 1;
+const int kManualSetupCodeChunk2CharLength = 5;
+const int kManualSetupCodeChunk3CharLength = 4;
+const int kManualSetupVendorIdCharLength   = 5;
+const int kManualSetupProductIdCharLength  = 5;
 
 const uint8_t kSerialNumberTag = 128;
 
@@ -73,16 +86,14 @@ const int kTotalPayloadDataSizeInBytes = kTotalPayloadDataSizeInBits / 8;
 const char * const kQRCodePrefix = "CH:";
 
 /// The rendezvous type this device supports.
-enum class RendezvousInformationFlags : uint16_t
+enum class RendezvousInformationFlag : uint16_t
 {
-    kNone     = 0,      ///< Device does not support any method for rendezvous
-    kWiFi     = 1 << 0, ///< Device supports Wi-Fi
-    kBLE      = 1 << 1, ///< Device supports BLE
-    kThread   = 1 << 2, ///< Device supports Thread
-    kEthernet = 1 << 3, ///< Device MAY be attached to a wired 802.3 connection
-
-    kAllMask = kWiFi | kBLE | kThread | kEthernet,
+    kNone      = 0,      ///< Device does not support any method for rendezvous
+    kSoftAP    = 1 << 0, ///< Device supports Wi-Fi softAP
+    kBLE       = 1 << 1, ///< Device supports BLE
+    kOnNetwork = 1 << 2, ///< Device supports Setup on network
 };
+using RendezvousInformationFlags = chip::BitFlags<RendezvousInformationFlag, uint16_t>;
 
 enum optionalQRCodeInfoType
 {
@@ -192,7 +203,7 @@ public:
 
     // Test that the Setup Payload is within expected value ranges
     SetupPayload() :
-        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlags::kNone),
+        version(0), vendorID(0), productID(0), requiresCustomFlow(0), rendezvousInformation(RendezvousInformationFlag::kNone),
         discriminator(0), setUpPINCode(0)
     {}
 

@@ -23,7 +23,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 
 #include "Server.h"
 #include "attribute-storage.h"
@@ -105,7 +105,7 @@ int AppTask::Init()
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     return err;
 }

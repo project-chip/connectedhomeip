@@ -35,7 +35,7 @@ template <class T>
 class Optional
 {
 public:
-    Optional() : mHasValue(false) {}
+    constexpr Optional() : mHasValue(false) {}
     explicit Optional(const T & value) : mValue(value), mHasValue(true) {}
 
     constexpr Optional(const Optional & other) = default;
@@ -47,7 +47,7 @@ public:
      * NOTE: Manually implemented instead of =default  since other::mValue may not be initialized
      * if it has no value.
      */
-    Optional & operator=(const Optional & other)
+    constexpr Optional & operator=(const Optional & other)
     {
         if (other.HasValue())
         {
@@ -61,14 +61,14 @@ public:
     }
 
     /** Make the optional contain a specific value */
-    void SetValue(const T & value)
+    constexpr void SetValue(const T & value)
     {
         mValue    = value;
         mHasValue = true;
     }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    void ClearValue() { mHasValue = false; }
+    constexpr void ClearValue() { mHasValue = false; }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
     const T & Value() const
@@ -89,7 +89,7 @@ public:
     }
 
     /** Checks if the optional contains a value or not */
-    bool HasValue() const { return mHasValue; }
+    constexpr bool HasValue() const { return mHasValue; }
 
     /** Comparison operator, handling missing values. */
     bool operator==(const Optional & other) const

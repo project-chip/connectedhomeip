@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines the classes corresponding to CHIP Exchange Context.
+ *      This file defines the classes corresponding to CHIP Exchange Context Delegate.
  *
  */
 

@@ -25,7 +25,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "FreeRTOS.h"
 #include "qvCHIP.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,7 +36,7 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Concrete implementation of the NetworkProvisioningServer singleton object for the platform.
+ * Concrete implementation of the BLEManager singleton object for the platform.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
@@ -50,9 +52,8 @@ private:
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsFastAdvertisingEnabled(void);
-    CHIP_ERROR _SetFastAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
+    CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
@@ -94,7 +95,9 @@ private:
         kFastAdvertisingEnabled   = 0x0004, /**< The application has enabled fast advertising. */
         kAdvertising              = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
-        kDeviceNameSet            = 0x0020,
+        kDeviceNameSet            = 0x0020, /**< The device name has been set. */
+        kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
+                                            flag is set*/
     };
 
     enum
@@ -136,6 +139,9 @@ private:
 
     /* Handlers for stack events */
     static void _handleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void CancelBleAdvTimeoutTimer(void);
+    static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
 };
 
 /**
@@ -173,11 +179,6 @@ inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(v
 inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return mFlags.Has(Flags::kAdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return mFlags.Has(Flags::kFastAdvertisingEnabled);
 }
 
 inline bool BLEManagerImpl::_IsAdvertising(void)

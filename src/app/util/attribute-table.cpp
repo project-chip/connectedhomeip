@@ -50,9 +50,7 @@
 #include "app/util/common.h"
 #include "gen/callback.h"
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
-#endif // EMBER_AF_PLUGIN_REPORTING
 
 using namespace chip;
 
@@ -359,7 +357,7 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
     status = emAfReadAttribute(endpoint, clusterId, attrId, mask, manufacturerCode, data, ATTRIBUTE_LARGEST, &dataType);
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
-        dataLen = emberAfAttributeValueSize(dataType, data);
+        dataLen = emberAfAttributeValueSize(clusterId, attrId, dataType, data);
         if ((readLength - 4) < dataLen)
         { // Not enough space for attribute.
             return;
@@ -430,7 +428,7 @@ EmberAfStatus emberAfAppendAttributeReportFields(EndpointId endpoint, ClusterId 
         goto kickout;
     }
 
-    size = emberAfAttributeValueSize(type, data);
+    size = emberAfAttributeValueSize(clusterId, attributeId, type, data);
     if (bufLen16 - *bufIndex < 3 || size > bufLen16 - (*bufIndex + 3))
     {
         status = EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
@@ -602,9 +600,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // Function itself will weed out tokens that are not tokenized.
         emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
 
-#ifdef EMBER_AF_PLUGIN_REPORTING
         emberAfReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
-#endif // EMBER_AF_PLUGIN_REPORTING
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.

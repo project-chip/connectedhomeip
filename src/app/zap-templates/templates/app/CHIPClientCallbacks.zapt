@@ -1,8 +1,11 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 #pragma once
 
 #include <inttypes.h>
+#include <gen/af-structs.h>
+#include <lib/support/Span.h>
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -16,12 +19,12 @@ typedef void (*Int32uAttributeCallback)(void * context, uint32_t value);
 typedef void (*Int32sAttributeCallback)(void * context, int32_t value);
 typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
+typedef void (*StringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*ReadReportingConfigurationReportedCallback)(void* context, uint16_t minInterval, uint16_t maxInterval);
 typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
-{{#all_user_clusters}}
-{{#if (isClient side) }}
+{{#chip_client_clusters}}
 {{#if (user_cluster_has_enabled_command name side)}}
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
@@ -31,5 +34,14 @@ typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name fals
 {{/if}}
 {{/all_user_cluster_commands}}
 {{/if}}
+{{/chip_client_clusters}}
 {{/if}}
-{{/all_user_clusters}}
+
+// List specific responses
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+typedef void (*{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback)(void * context, uint16_t count, {{chipType}} * entries);
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}

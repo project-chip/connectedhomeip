@@ -30,7 +30,7 @@ if (chip_enable_openthread) {
   }
 }
 
-if (chip_device_platform == "linux" && chip_enable_mdns) {
+if (chip_device_platform == "linux" && chip_mdns != "none") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
   }
@@ -75,7 +75,11 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
     }
 
-    if (chip_enable_mdns) {
+    if (chip_enable_nfc) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC=1" ]
+    }
+
+    if (chip_mdns != "none") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MDNS=1" ]
     }
 
@@ -160,6 +164,10 @@ if (chip_device_platform != "none") {
       "CHIP_DEVICE_LAYER_NONE=1",
       "CHIP_DEVICE_LAYER_TARGET=NONE",
     ]
+
+    if (current_os == "android") {
+      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
+    }
   }
 }
 
@@ -167,9 +175,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
   config("platform_config") {
     if (chip_device_platform == "darwin") {
       frameworks = [
+        "CoreData.framework",
         "CoreFoundation.framework",
         "CoreBluetooth.framework",
         "Foundation.framework",
+        "IOKit.framework",
       ]
     }
   }
@@ -206,13 +216,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/internal/GenericConnectivityManagerImpl_NoWiFi.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_Thread.h",
       "../include/platform/internal/GenericConnectivityManagerImpl_WiFi.h",
-      "../include/platform/internal/GenericNetworkProvisioningServerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl.h",
       "../include/platform/internal/GenericPlatformManagerImpl_FreeRTOS.h",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
-      "../include/platform/internal/NetworkProvisioningServer.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "GeneralUtils.cpp",
       "Globals.cpp",
@@ -241,7 +249,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src:includes",
     ]
 
-    if (chip_enable_mdns) {
+    if (chip_mdns != "none") {
       public_deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
     }
 
@@ -310,17 +318,18 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/ConnectivityManagerImpl.cpp",
         "Darwin/ConnectivityManagerImpl.h",
         "Darwin/InetPlatformConfig.h",
+        "Darwin/KeyValueStoreManagerImpl.h",
+        "Darwin/KeyValueStoreManagerImpl.mm",
         "Darwin/Logging.cpp",
+        "Darwin/MdnsError.cpp",
+        "Darwin/MdnsError.h",
+        "Darwin/MdnsImpl.cpp",
+        "Darwin/MdnsImpl.h",
         "Darwin/PlatformManagerImpl.cpp",
         "Darwin/PlatformManagerImpl.h",
         "Darwin/PosixConfig.cpp",
         "Darwin/PosixConfig.h",
         "Darwin/SystemPlatformConfig.h",
-      ]
-
-      sources += [
-        "Darwin/KeyValueStoreManagerImpl.cpp",
-        "Darwin/KeyValueStoreManagerImpl.h",
       ]
 
       if (chip_enable_ble) {
@@ -342,6 +351,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "EFR32/BlePlatformConfig.h",
         "EFR32/CHIPDevicePlatformConfig.h",
         "EFR32/CHIPDevicePlatformEvent.h",
+        "EFR32/CHIPMem-Platform.cpp",
         "EFR32/CHIPPlatformConfig.h",
         "EFR32/ConfigurationManagerImpl.cpp",
         "EFR32/ConfigurationManagerImpl.h",
@@ -406,7 +416,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "ESP32/Logging.cpp",
         "ESP32/LwIPCoreLock.cpp",
         "ESP32/MdnsImpl.cpp",
-        "ESP32/NetworkProvisioningServerImpl.h",
         "ESP32/PlatformManagerImpl.cpp",
         "ESP32/PlatformManagerImpl.h",
         "ESP32/ServiceProvisioning.cpp",
@@ -437,7 +446,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/KeyValueStoreManagerImpl.cpp",
         "K32W/KeyValueStoreManagerImpl.h",
         "K32W/Logging.cpp",
-        "K32W/NetworkProvisioningServerImpl.h",
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
         "K32W/SoftwareUpdateManagerImpl.h",
@@ -494,7 +502,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/bluez/Types.h",
       ]
 
-      if (chip_enable_mdns) {
+      if (chip_mdns != "none") {
         sources += [
           "Linux/MdnsImpl.cpp",
           "Linux/MdnsImpl.h",
@@ -553,6 +561,13 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "nrfconnect/ThreadStackManagerImpl.h",
         ]
       }
+
+      if (chip_enable_nfc) {
+        sources += [
+          "Zephyr/NFCManagerImpl.cpp",
+          "nrfconnect/NFCManagerImpl.h",
+        ]
+      }
     } else if (chip_device_platform == "qpg6100") {
       sources += [
         "FreeRTOS/SystemTimeSupport.cpp",
@@ -593,6 +608,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "qpg6100/ThreadStackManagerImpl.h",
         ]
       }
+    }
+
+    if (chip_enable_openthread && chip_mdns == "platform" &&
+        chip_device_platform != "linux") {
+      sources += [ "OpenThread/MdnsImpl.cpp" ]
     }
 
     allow_circular_includes_from = [ "${chip_root}/src/lib/support" ]

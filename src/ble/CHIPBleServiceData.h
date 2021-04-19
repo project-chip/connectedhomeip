@@ -47,13 +47,7 @@ struct ChipBLEDeviceIdentificationInfo
 {
     constexpr static uint16_t kDiscriminatorMask = 0xfff;
 
-    enum
-    {
-        kPairingStatus_Unpaired = 0,
-        kPairingStatus_Paired   = 1,
-    };
-
-    uint8_t PairingStatus;
+    uint8_t OpCode;
     uint8_t DeviceDiscriminator[2];
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];

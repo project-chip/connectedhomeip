@@ -43,27 +43,33 @@ namespace Messaging {
 #endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
  *
  *  @brief
- *    The default retransmission timeout in milliseconds.
+ *    Active retransmit interval, or time to wait before retransmission after
+ *    subsequent failures in milliseconds.
+ *
+ *  This is the default value, that might be adjusted by end device depending on its
+ *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
  *
  */
-#ifndef CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
-#define CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK (8)
-#endif // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
+#ifndef CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+#define CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL (300)
+#endif // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
+ *  @def CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
  *
  *  @brief
- *    The default long retransmission timeout in milliseconds
- *    to include sleepy destinaton nodes.
+ *    Initial retransmission interval, or time to wait before retransmission after first
+ *    failure in milliseconds.
  *
+ * This is the default value, that might be adjusted by end device depending on its
+ * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
-#ifndef CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
-#define CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK (8)
-#endif // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
+#ifndef CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+#define CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL (5000)
+#endif // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
 
 /**
  *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
@@ -89,7 +95,7 @@ namespace Messaging {
 #elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE)
 #else
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE 15
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 #endif // PBUF_POOL_SIZE
 #endif // CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 
@@ -116,8 +122,8 @@ struct ReliableMessageProtocolConfig
     uint8_t mMaxRetrans;                 /**< Configurable max value for retransmissions in the ExchangeContext. */
 };
 
-const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK,
-                                                                              CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK,
+const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL,
+                                                                              CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL,
                                                                               CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK,
                                                                               CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS };
 

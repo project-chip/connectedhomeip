@@ -79,9 +79,10 @@ static_library("support") {
     "PersistedCounter.h",
     "Pool.cpp",
     "Pool.h",
+    "PrivateHeap.cpp",
+    "PrivateHeap.h",
     "RandUtils.cpp",
     "RandUtils.h",
-    "ReturnMacros.h",
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
@@ -132,7 +133,7 @@ static_library("support") {
   ]
 
   if (chip_config_memory_management == "simple") {
-    sources += [ "CHIPMem-SimpleAlloc.cpp" ]
+    sources += [ "CHIPMem-Simple.cpp" ]
   }
   if (chip_config_memory_management == "malloc") {
     sources += [ "CHIPMem-Malloc.cpp" ]

@@ -24,13 +24,12 @@ jobs:
 
         strategy:
             matrix:
-                type: [gcc_debug, gcc_release, clang, mbedtls]
+                type: [gcc_debug, gcc_release, clang, mbedtls, clang_experimental]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_IMAGE: chip-build-openssl
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
             image: connectedhomeip/chip-build:latest
@@ -45,11 +44,10 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
 
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
@@ -60,6 +58,7 @@ jobs:
                      "gcc_release") GN_ARGS='is_debug=false';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
+                     "clang_experimental") GN_ARGS='is_clang=true chip_enable_interaction_model=true';;
                      *) ;;
                   esac
 
@@ -82,6 +81,6 @@ jobs:
               run: find out -type d -name "dbus" -exec rm -rf {} +
             # - name: Remove nrfxlib binaries for CodeQL Analysis
             #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

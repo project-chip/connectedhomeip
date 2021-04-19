@@ -32,6 +32,7 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeMgr.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
@@ -54,6 +55,14 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
                                         Transport::UDP /* IPv4 */
 #endif
                                         >;
+
+struct ControllerDeviceInitParams
+{
+    DeviceTransportMgr * transportMgr        = nullptr;
+    SecureSessionMgr * sessionMgr            = nullptr;
+    Messaging::ExchangeManager * exchangeMgr = nullptr;
+    Inet::InetLayer * inetLayer              = nullptr;
+};
 
 class DLL_EXPORT Device
 {
@@ -89,11 +98,13 @@ public:
      * @brief
      *   Send the provided message to the device
      *
-     * @param[in] message   The message to be sent.
+     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
+     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
+     * @param[in] message     The message payload to be sent.
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -112,7 +123,7 @@ public:
             mCommandSender->Shutdown();
             mCommandSender = nullptr;
         }
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#if CHIP_ENABLE_INTERACTION_MODEL
         chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
 #endif
     }
@@ -140,18 +151,16 @@ public:
      *   that of this device object. If these objects are freed, while the device object is
      *   still using them, it can lead to unknown behavior and crashes.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
+        mTransportMgr   = params.transportMgr;
+        mSessionManager = params.sessionMgr;
+        mExchangeMgr    = params.exchangeMgr;
+        mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
     }
@@ -167,18 +176,16 @@ public:
      *   uninitialzed/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, const Transport::PeerAddress & peerAddress, Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
+              Transport::AdminId admin)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
+        Init(params, mListenPort, admin);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
@@ -212,9 +219,8 @@ public:
      *   Called when a new pairing is being established
      *
      * @param session A handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr);
+    void OnNewConnection(SecureSessionHandle session);
 
     /**
      * @brief
@@ -223,9 +229,8 @@ public:
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr);
+    void OnConnectionExpired(SecureSessionHandle session);
 
     /**
      * @brief
@@ -235,12 +240,9 @@ public:
      *
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] session       A handle to the secure session
      * @param[in] msgBuf        The message buffer
-     * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
@@ -340,6 +342,8 @@ private:
 
     DeviceTransportMgr * mTransportMgr = nullptr;
 
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+
     app::CommandSender * mCommandSender = nullptr;
 
     SecureSessionHandle mSecureSession = {};
@@ -367,8 +371,6 @@ private:
      * @param[out] didLoad   Were the secure session params loaded by the call to this function.
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
 
     uint16_t mListenPort;
 

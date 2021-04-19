@@ -35,12 +35,11 @@ using namespace chip::Encoding;
 
 CHIP_ERROR TLVUpdater::Init(uint8_t * buf, uint32_t dataLen, uint32_t maxLen)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     uint32_t freeLen;
 
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(maxLen >= dataLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(maxLen >= dataLen, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // memmove the buffer data to end of the buffer
     freeLen = maxLen - dataLen;
@@ -54,30 +53,27 @@ CHIP_ERROR TLVUpdater::Init(uint8_t * buf, uint32_t dataLen, uint32_t maxLen)
     mUpdaterWriter.SetCloseContainerReserved(false);
     mElementStartAddr = buf + freeLen;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
     uint8_t * buf             = const_cast<uint8_t *>(aReader.GetReadPoint());
     uint32_t remainingDataLen = aReader.GetRemainingLength();
     uint32_t readDataLen      = aReader.GetLengthRead();
 
     // TLVUpdater does not support backing stores yet
-    VerifyOrExit(aReader.mBackingStore == 0, err = CHIP_ERROR_NOT_IMPLEMENTED);
+    VerifyOrReturnError(aReader.mBackingStore == 0, CHIP_ERROR_NOT_IMPLEMENTED);
 
     // TLVReader should point to a non-NULL buffer
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // If reader is already on an element, reset it to start of element
     if (aReader.ElementType() != TLVElementType::NotSpecified)
     {
         uint8_t elemHeadLen;
 
-        err = aReader.GetElementHeadLength(elemHeadLen);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(aReader.GetElementHeadLength(elemHeadLen));
 
         buf -= elemHeadLen;
         remainingDataLen += elemHeadLen;
@@ -122,8 +118,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     // use the original TLVReader object anymore.
     aReader.Init(static_cast<const uint8_t *>(nullptr), 0);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void TLVUpdater::SetImplicitProfileId(uint32_t profileId)
@@ -134,36 +129,29 @@ void TLVUpdater::SetImplicitProfileId(uint32_t profileId)
 
 CHIP_ERROR TLVUpdater::Next()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Skip current element if the reader is already positioned on an element
-    err = mUpdaterReader.Skip();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterReader.Skip());
 
     AdjustInternalWriterFreeSpace();
 
     // Move the reader to next element
-    err = mUpdaterReader.Next();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterReader.Next());
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVUpdater::Move()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     const uint8_t * elementEnd;
     uint32_t copyLen;
 
-    VerifyOrExit(static_cast<TLVElementType>((mUpdaterReader.mControlByte & kTLVTypeMask)) != TLVElementType::EndOfContainer,
-                 err = CHIP_END_OF_TLV);
+    VerifyOrReturnError(static_cast<TLVElementType>((mUpdaterReader.mControlByte & kTLVTypeMask)) != TLVElementType::EndOfContainer,
+                        CHIP_END_OF_TLV);
 
-    VerifyOrExit(mUpdaterReader.GetType() != kTLVType_NotSpecified, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+    VerifyOrReturnError(mUpdaterReader.GetType() != kTLVType_NotSpecified, CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Skip to the end of the element
-    err = mUpdaterReader.Skip();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterReader.Skip());
 
     elementEnd = mUpdaterReader.mReadPoint;
 
@@ -178,8 +166,7 @@ CHIP_ERROR TLVUpdater::Move()
     mUpdaterWriter.mLenWritten += copyLen;
     mUpdaterWriter.mMaxLen += copyLen;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void TLVUpdater::MoveUntilEnd()
@@ -210,42 +197,33 @@ void TLVUpdater::MoveUntilEnd()
 
 CHIP_ERROR TLVUpdater::EnterContainer(TLVType & outerContainerType)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVType containerType;
 
-    VerifyOrExit(TLVTypeIsContainer(static_cast<TLVType>(mUpdaterReader.mControlByte & kTLVTypeMask)),
-                 err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(TLVTypeIsContainer(static_cast<TLVType>(mUpdaterReader.mControlByte & kTLVTypeMask)),
+                        CHIP_ERROR_INCORRECT_STATE);
 
     // Change the updater state
     AdjustInternalWriterFreeSpace();
 
-    err = mUpdaterWriter.StartContainer(mUpdaterReader.GetTag(), mUpdaterReader.GetType(), containerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterWriter.StartContainer(mUpdaterReader.GetTag(), mUpdaterReader.GetType(), containerType));
 
-    err = mUpdaterReader.EnterContainer(containerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterReader.EnterContainer(containerType));
 
     outerContainerType = containerType;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVUpdater::ExitContainer(TLVType outerContainerType)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = mUpdaterReader.ExitContainer(outerContainerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterReader.ExitContainer(outerContainerType));
 
     // Change the updater's state
     AdjustInternalWriterFreeSpace();
 
-    err = mUpdaterWriter.EndContainer(outerContainerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(mUpdaterWriter.EndContainer(outerContainerType));
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 /**

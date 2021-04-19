@@ -26,7 +26,11 @@ extern "C" {
 
 void uartConsoleInit(void);
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength);
-int16_t uartConsoleRead(char * Buf, uint16_t BufLength);
+int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead);
+
+// Implemented by in openthread code
+extern void otPlatUartReceived(const uint8_t * aBuf, uint16_t aBufLength);
+extern void otPlatUartSendDone(void);
 
 #ifdef __cplusplus
 } // extern "C"
