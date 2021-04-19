@@ -827,7 +827,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
     const otExtAddress * extendedAddr = otLinkGetExtendedAddress(mOTInst);
     memcpy(buf, extendedAddr, sizeof(otExtAddress));
     return CHIP_NO_ERROR;
-};
+}
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetFactoryAssignedEUI64(uint8_t (&buf)[8])
@@ -836,7 +836,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetFactoryAssig
     otLinkGetFactoryAssignedIeeeEui64(mOTInst, &extendedAddr);
     memcpy(buf, extendedAddr.m8, sizeof(extendedAddr.m8));
     return CHIP_NO_ERROR;
-};
+}
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
@@ -873,7 +873,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
     buf = otLinkGetPollPeriod(mOTInst);
     Impl()->UnlockThreadStack();
     return CHIP_NO_ERROR;
-};
+}
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
@@ -1246,6 +1246,25 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     VerifyOrExit(srpService, error = MapOpenThreadError(OT_ERROR_NOT_FOUND));
 
     error = MapOpenThreadError(otSrpClientRemoveService(mOTInst, &(srpService->mService)));
+
+exit:
+    Impl()->UnlockThreadStack();
+
+    return error;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveAllSrpServices()
+{
+    CHIP_ERROR error;
+
+    Impl()->LockThreadStack();
+    const otSrpClientService * services = otSrpClientGetServices(mOTInst);
+
+    // In case of empty list just return with no error
+    VerifyOrExit(services != nullptr, error = CHIP_NO_ERROR);
+
+    error = MapOpenThreadError(otSrpClientRemoveHostAndServices(mOTInst, false));
 
 exit:
     Impl()->UnlockThreadStack();

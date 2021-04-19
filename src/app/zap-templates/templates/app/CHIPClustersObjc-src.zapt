@@ -8,6 +8,7 @@
 #import "CHIPError.h"
 #import "gen/CHIPClustersObjc.h"
 #import "gen/CHIPClientCallbacks.h"
+#import "app/util/af.h"
 
 #include <controller/CHIPClusters.h>
 #include <lib/support/Span.h>
@@ -398,6 +399,62 @@ private:
 {{/if}}
 {{/all_user_clusters}}
 
+{{#chip_client_clusters}}
+{{#chip_server_cluster_attributes}}
+{{#if isList}}
+class CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge : public Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>
+{
+public:
+    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue): Callback::Callback<{{asCamelCased parent.name false}}{{asCamelCased name false}}ListAttributeCallback>(CallbackFn, this), mHandler(handler), mQueue(queue) {}
+
+    ~CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, {{chipType}} * entries)
+    {
+        CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue)
+        {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++)
+            {
+                {{#if isStruct}}
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:
+                {{#chip_attribute_list_entryTypes}}
+                    {{#if (isString type)}}
+                    {{#if (isOctetString type)}}
+                    [NSData dataWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}})],
+                    {{else}}
+                    [[NSString alloc] initWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}}) encoding:NSUTF8StringEncoding],
+                    {{/if}}
+                    {{else}}
+                    [NSNumber numberWith{{asObjectiveCNumberType label type}}:entries[i].{{name}}],
+                    {{/if}}
+                    @"{{name}}",
+                {{/chip_attribute_list_entryTypes}}
+                nil];
+                {{else}}
+                values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type}}:entries[i]];
+                {{/if}}
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @{ @"value": array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_client_clusters}}
+
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 - (Controller::ClusterBase *)getCluster;
@@ -477,10 +534,13 @@ private:
 {{/chip_server_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
-{{#unless isList}}
 - (void)readAttribute{{asCamelCased name false}}:(ResponseHandler)completionHandler
 {
+{{#if isList}}
+    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallbackBridge(completionHandler, [self callbackQueue]);
+{{else}}
     CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge * onSuccess = new CHIP{{asCallbackAttributeType atomicTypeId}}AttributeCallbackBridge(completionHandler, [self callbackQueue]{{#if (isString type)}},{{#if (isOctetString type)}}true{{else}}false{{/if}}{{/if}});
+{{/if}}
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -574,7 +634,6 @@ private:
 }
 
 {{/if}}
-{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end

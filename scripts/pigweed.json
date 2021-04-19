@@ -39,22 +39,9 @@
         "tags": ["version:3.8.2.chromium.10"]
     },
     {
-        "path": "infra/go/${os}-${arch=amd64}",
-        "tags": ["version:1.13.5"]
-    },
-    {
-        "path": "pigweed/third_party/protoc-gen-go/${os}-${arch=amd64}",
-        "tags": ["version:1.3.2"]
-    },
-    {
         "_comment": "TODO(pwbug/66) Put openocd in cipd for Windows.",
         "path": "pigweed/third_party/openocd/${os=linux,mac}-${arch=amd64}",
         "tags": ["git_revision:e41c0f4906e46d1076ce62a0da5518aa1ca280b8"]
-    },
-    {
-        "_comment": "TODO(pwbug/69) Put rust in cipd for Windows.",
-        "path": "fuchsia/rust/${os=linux,mac}-${arch=amd64}",
-        "tags": ["git_revision:027149919e36ce5645ca5d02d55b97ef52eb55ba"]
     },
     {
         "path": "pigweed/third_party/mingw64-x86_64-win32-seh/${os=windows}-${arch=amd64}",

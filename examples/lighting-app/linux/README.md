@@ -9,6 +9,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   [CHIP Linux Lighting Example](#chip-linux-lighting-example)
     -   [Building](#building)
+    -   [Commandline Arguments](#command-line-args)
     -   [Running the Complete Example on Raspberry Pi 4](#running-complete-example)
 
 <hr>
@@ -33,6 +34,35 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
+
+-   Build the example with pigweed RCP
+
+          $ cd ~/connectedhomeip/examples/lighting-app/linux
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
+
+<a name="command-line-args"></a>
+
+## Commandline arguments
+
+-   `--wifi`
+
+    Enables WiFi management feature. Required for WiFi commissioning.
+
+-   `--thread`
+
+    Enables Thread management feature, requires ot-br-posix dbus daemon running.
+    Required for Thread commissioning.
+
+-   `--ble-device <interface id>`
+
+    Use specific bluetooth interface for BLE advertisement and connections.
+
+    `interface id`: the number after `hci` when listing BLE interfaces by
+    `hciconfig` command, for example, `--ble-device 1` means using `hci1`
+    interface. Default: `0`.
 
 <a name="running-complete-example"></a>
 
@@ -96,3 +126,19 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
         -   Test the device using ChipDeviceController on your laptop /
             workstation etc.
+
+## Running Pigweed RPC console
+
+-   As part of building the example with RPCs enabled the lighting_app python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/lighting_app_wheels. To install
+    the wheel files without rebuilding:
+    `pip3 install out/debug/lighting_app_wheels/*.whl`
+
+-   To use the lighting-app console after it has been installed run:
+    `python3 -m lighting_app.rpc_console -s localhost:33000 -o /<YourFolder>/pw_log.out`
+
+-   Then you can Get and Set the light using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True)`

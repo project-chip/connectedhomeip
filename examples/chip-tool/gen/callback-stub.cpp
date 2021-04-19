@@ -80,6 +80,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
         break;
+    case ZCL_THERMOSTAT_CLUSTER_ID:
+        emberAfThermostatClusterInitCallback(endpoint);
+        break;
     default:
         // Unrecognized cluster ID
         break;
@@ -167,6 +170,11 @@ void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

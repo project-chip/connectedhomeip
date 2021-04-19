@@ -29,7 +29,11 @@ examples_plat_dir = "${chip_root}/examples/platform/efr32"
 declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = false
+
+  # PIN code for PASE session establishment.
   setupPinCode = 73141520
+
+  # Monitor & log memory usage at runtime.
   enable_heap_monitoring = false
 }
 
@@ -41,16 +45,16 @@ if (efr32_board == "BRD4166A") {
 }
 
 efr32_sdk("sdk") {
+  sources = [
+    "${efr32_project_dir}/include/CHIPProjectConfig.h",
+    "${efr32_project_dir}/include/FreeRTOSConfig.h",
+  ]
+
   include_dirs = [
     "${chip_root}/src/platform/EFR32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
-
-  sources = [
-    "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${efr32_project_dir}/include/FreeRTOSConfig.h",
   ]
 
   defines = [
@@ -61,29 +65,8 @@ efr32_sdk("sdk") {
 }
 
 efr32_executable("window_app") {
-  include_dirs = []
-  defines = []
   output_name = "chip-efr32-window-example.out"
-
-  public_deps = [
-    ":sdk",
-    "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/window-app/common:window-common",
-    "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-  ]
-
-  include_dirs += [
-    "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-    "${examples_plat_dir}",
-    "${examples_plat_dir}/${efr32_family}/${efr32_board}",
-  ]
+  output_dir = root_out_dir
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
@@ -99,6 +82,22 @@ efr32_executable("window_app") {
     "src/main.cpp",
   ]
 
+  deps = [
+    ":sdk",
+    "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/window-app/common:window-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+  ]
+
+  include_dirs = [ "include" ]
+
+  defines = []
+
   if (show_qr_code) {
     sources += [
       "${examples_plat_dir}/display/lcd.c",
@@ -108,10 +107,9 @@ efr32_executable("window_app") {
     defines += [ "DISPLAY_ENABLED" ]
   }
 
-  output_dir = root_out_dir
-
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
+
     sources += [ "${examples_plat_dir}/MemMonitoring.cpp" ]
   }
 

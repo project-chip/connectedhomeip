@@ -27,6 +27,7 @@ enum class PairingMode
     Bypass,
     Ble,
     SoftAP,
+    Ethernet,
 };
 
 class PairingCommand : public Command, public chip::Controller::DevicePairingDelegate
@@ -50,6 +51,12 @@ public:
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
         case PairingMode::SoftAP:
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator);
+            AddArgument("device-remote-ip", &mRemoteAddr);
+            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
+            break;
+        case PairingMode::Ethernet:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("device-remote-ip", &mRemoteAddr);

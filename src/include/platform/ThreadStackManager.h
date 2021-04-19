@@ -90,6 +90,7 @@ public:
     CHIP_ERROR AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
                              size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR RemoveSrpService(const char * aInstanceName, const char * aName);
+    CHIP_ERROR RemoveAllSrpServices();
     CHIP_ERROR SetupSrpHost(const char * aHostName);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -238,6 +239,11 @@ inline CHIP_ERROR ThreadStackManager::AddSrpService(const char * aInstanceName, 
 inline CHIP_ERROR ThreadStackManager::RemoveSrpService(const char * aInstanceName, const char * aName)
 {
     return static_cast<ImplClass *>(this)->_RemoveSrpService(aInstanceName, aName);
+}
+
+inline CHIP_ERROR ThreadStackManager::RemoveAllSrpServices()
+{
+    return static_cast<ImplClass *>(this)->_RemoveAllSrpServices();
 }
 
 inline CHIP_ERROR ThreadStackManager::SetupSrpHost(const char * aHostName)

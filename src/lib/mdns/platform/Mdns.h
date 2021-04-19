@@ -136,13 +136,25 @@ CHIP_ERROR ChipMdnsSetHostname(const char * hostname);
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service);
 
 /**
- * This function stops publishing service via mDNS.
+ * This function stops publishing all services via mDNS.
  *
  * @retval CHIP_NO_ERROR                The publish stops successfully.
  * @retval Error code                   Stopping the publish fails.
  *
  */
 CHIP_ERROR ChipMdnsStopPublish();
+
+/**
+ * This function stops publishing a specific service via mDNS.
+ *
+ * @param[in] service   The service entry.
+ *
+ * @retval CHIP_NO_ERROR                The service stop succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The service is nullptr.
+ * @retval Error code                   The service stop fails.
+ *
+ */
+CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service);
 
 /**
  * This function browses the services published by mdns
