@@ -112,9 +112,9 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlGoToPercentCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlGoToPercentCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -142,9 +142,9 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlStopCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlStopCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -216,9 +216,9 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallbac
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMfgSpecificPingCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMfgSpecificPingCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -411,9 +411,9 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBindCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBindCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -448,9 +448,9 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnbindCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnbindCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -500,9 +500,9 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -538,9 +538,9 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSu
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorTemperatureCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorTemperatureCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -578,9 +578,9 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveHueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveHueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -614,9 +614,9 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveSaturationCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -651,9 +651,9 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCall
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -690,9 +690,9 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * on
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorTemperatureCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorTemperatureCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -727,9 +727,9 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -766,9 +766,9 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * on
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueAndSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueAndSaturationCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -805,9 +805,9 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSucces
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToSaturationCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -842,9 +842,9 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -882,9 +882,9 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSu
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorTemperatureCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorTemperatureCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -926,9 +926,9 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepHueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepHueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -965,9 +965,9 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepSaturationCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1003,9 +1003,9 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMoveStepCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMoveStepCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1686,9 +1686,9 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllPinsCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllPinsCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1711,9 +1711,9 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllRfidsCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllRfidsCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1737,9 +1737,9 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearHolidayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearHolidayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1766,9 +1766,9 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearPinCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearPinCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1795,9 +1795,9 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearRfidCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearRfidCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1824,9 +1824,9 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeekdayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeekdayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1856,9 +1856,9 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearYeardayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearYeardayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1888,9 +1888,9 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetHolidayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetHolidayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1917,9 +1917,9 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallbac
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLogRecordCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLogRecordCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1946,9 +1946,9 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Cal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetPinCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetPinCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -1975,9 +1975,9 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Ca
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRfidCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRfidCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2004,9 +2004,9 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetUserTypeCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetUserTypeCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2033,9 +2033,9 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeekdayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeekdayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2065,9 +2065,9 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetYeardayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetYeardayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2097,9 +2097,9 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLockDoorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLockDoorCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2127,9 +2127,9 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetHolidayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetHolidayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2163,9 +2163,9 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetPinCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetPinCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2199,9 +2199,9 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRfidCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRfidCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2235,9 +2235,9 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetUserTypeCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetUserTypeCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2267,9 +2267,9 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeekdayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeekdayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2309,9 +2309,9 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetYeardayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetYeardayScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2345,9 +2345,9 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockDoorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockDoorCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2374,9 +2374,9 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockWithTimeoutCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockWithTimeoutCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2462,9 +2462,9 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kArmFailSafeCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kArmFailSafeCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2496,9 +2496,9 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kCommissioningCompleteCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kCommissioningCompleteCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2523,9 +2523,9 @@ CHIP_ERROR GeneralCommissioningCluster::SetFabric(Callback::Cancelable * onSucce
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2633,9 +2633,9 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2664,9 +2664,9 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupIfIdentifyingCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupIfIdentifyingCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2696,9 +2696,9 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetGroupMembershipCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetGroupMembershipCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2727,9 +2727,9 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllGroupsCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllGroupsCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2753,9 +2753,9 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, 
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveGroupCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveGroupCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2782,9 +2782,9 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Ca
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewGroupCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewGroupCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2897,9 +2897,9 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2925,9 +2925,9 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyQueryCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyQueryCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -2983,9 +2983,9 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3019,9 +3019,9 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3056,9 +3056,9 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelWithOnOffCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3088,9 +3088,9 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveWithOnOffCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3120,9 +3120,9 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3158,9 +3158,9 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepWithOnOffCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3192,9 +3192,9 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3222,9 +3222,9 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopWithOnOffCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3287,9 +3287,9 @@ CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Call
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSleepCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSleepCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3330,9 +3330,9 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3365,9 +3365,9 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3402,9 +3402,9 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3437,9 +3437,9 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3472,9 +3472,9 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkCommissioningResultCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkCommissioningResultCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3503,9 +3503,9 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3538,9 +3538,9 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3574,9 +3574,9 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3609,9 +3609,9 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable *
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3661,9 +3661,9 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3686,9 +3686,9 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3711,9 +3711,9 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3774,9 +3774,9 @@ CHIP_ERROR OperationalCredentialsCluster::GetFabricId(Callback::Cancelable * onS
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetFabricIdCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetFabricIdCommandId,
+                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3801,9 +3801,9 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveFabricCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveFabricCommandId,
+                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3835,9 +3835,9 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateFabricLabelCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateFabricLabelCommandId,
+                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3891,9 +3891,9 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddSceneCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3933,9 +3933,9 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCal
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSceneMembershipCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSceneMembershipCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3962,9 +3962,9 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, 
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRecallSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRecallSceneCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -3996,9 +3996,9 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallba
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllScenesCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllScenesCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4025,9 +4025,9 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, 
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveSceneCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4056,9 +4056,9 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, C
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStoreSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStoreSceneCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4087,9 +4087,9 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Ca
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewSceneCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4231,9 +4231,9 @@ CHIP_ERROR ThermostatCluster::ClearWeeklySchedule(Callback::Cancelable * onSucce
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeeklyScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeeklyScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4256,9 +4256,9 @@ CHIP_ERROR ThermostatCluster::GetRelayStatusLog(Callback::Cancelable * onSuccess
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRelayStatusLogCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRelayStatusLogCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4282,9 +4282,9 @@ CHIP_ERROR ThermostatCluster::GetWeeklySchedule(Callback::Cancelable * onSuccess
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeeklyScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeeklyScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4315,9 +4315,9 @@ CHIP_ERROR ThermostatCluster::SetWeeklySchedule(Callback::Cancelable * onSuccess
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeeklyScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeeklyScheduleCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4351,9 +4351,9 @@ CHIP_ERROR ThermostatCluster::SetpointRaiseLower(Callback::Cancelable * onSucces
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetpointRaiseLowerCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetpointRaiseLowerCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4488,9 +4488,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable *
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringDownCloseCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringDownCloseCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4515,9 +4515,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftPercentageCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftPercentageCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4545,9 +4545,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelab
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftValueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftValueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4576,9 +4576,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltPercentageCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltPercentageCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4606,9 +4606,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelab
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltValueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltValueCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4636,9 +4636,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSu
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringStopCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringStopCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
@@ -4662,9 +4662,9 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * on
     (void) onSuccessCallback;
     (void) onFailureCallback;
 
-    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringUpOpenCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringUpOpenCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
