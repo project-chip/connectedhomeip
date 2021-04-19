@@ -41,7 +41,7 @@ public:
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     void SendNetworkCredentials(const char * ssid, const char * password);
-    void SendThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData);
+    void SendThreadCredentials(chip::ByteSpan threadData);
 
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
