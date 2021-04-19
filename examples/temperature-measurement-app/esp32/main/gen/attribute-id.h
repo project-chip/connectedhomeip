@@ -4233,6 +4233,13 @@
 #define ZCL_SAVED_RSSI_ATTRIBUTE_ID (0x0001)
 #define ZCL_SAVED_LQI_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: Operational Credentials
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: SL Works With All Hubs
 
 // Client attributes
@@ -4256,3 +4263,4 @@
 #define ZCL_SL_PENDING_NETWORK_UPDATE_CHANNEL_ATTRIBUTE_ID (0x0011)
 #define ZCL_SL_PENDING_NETWORK_UPDATE_PANID_ATTRIBUTE_ID (0x0012)
 #define ZCL_SL_OTA_MAX_OFFLINE_DURATION_ATTRIBUTE_ID (0x0013)
+
