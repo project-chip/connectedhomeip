@@ -88,15 +88,5 @@ void ThreadStackManagerImpl::_ProcessThreadActivity()
     // Intentionally empty.
 }
 
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart()
-{
-    // Intentionally empty.
-}
-
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop()
-{
-    // Intentionally empty.
-}
-
 } // namespace DeviceLayer
 } // namespace chip
