@@ -58,14 +58,14 @@ for device in chip.ble.DiscoverSync(2000):
 
 import chip.ble.commissioning
 
-device = chip.ble.commissioning.Connect(discriminator=3840, pin=12345678)
+device = chip.ble.commissioning.Connect(discriminator=3840, pin=20202021)
 if device.needsNetworkCredentials:
   device.ConnectToWifi("ssid", "password")
 
 ######## Thread provisioning ########
 
 import chip.ble.commissioning
-device = chip.ble.commissioning.Connect(discriminator=3840, pin=12345678)
+device = chip.ble.commissioning.Connect(discriminator=3840, pin=20202021)
 
 # Thread data is an opaque blob, but it can be build with internal constructs
 # starting from a memset(0) equivalent
