@@ -48,17 +48,6 @@ using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
 
-inline bool IsCertificateExtensionTag(uint64_t tag)
-{
-    if (IsContextTag(tag))
-    {
-        uint32_t tagNum = TagNumFromTag(tag);
-        return (tagNum >= kCertificateExtensionTagsStart && tagNum <= kCertificateExtensionTagsEnd);
-    }
-
-    return false;
-}
-
 static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipDN & dn)
 {
     CHIP_ERROR err;
@@ -609,7 +598,13 @@ exit:
 static CHIP_ERROR DecodeConvertExtensions(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
+    TLVType outerContainer;
+
+    err = reader.Next(kTLVType_List, ContextTag(kTag_Extensions));
+    SuccessOrExit(err);
+
+    err = reader.EnterContainer(outerContainer);
+    SuccessOrExit(err);
 
     // extensions [3] EXPLICIT Extensions OPTIONAL
     ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 3)
@@ -617,24 +612,22 @@ static CHIP_ERROR DecodeConvertExtensions(TLVReader & reader, ASN1Writer & write
         // Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension
         ASN1_START_SEQUENCE
         {
-            while (true)
+            // Read certificate extension in the List.
+            while ((err = reader.Next()) == CHIP_NO_ERROR)
             {
                 err = DecodeConvertExtension(reader, writer, certData);
                 SuccessOrExit(err);
-
-                // Break the loop if the next certificate element is NOT an extension.
-                err = reader.Next();
-                SuccessOrExit(err);
-                tag = reader.GetTag();
-                if (!IsCertificateExtensionTag(tag))
-                {
-                    break;
-                }
             }
         }
         ASN1_END_SEQUENCE;
     }
     ASN1_END_CONSTRUCTED;
+
+    err = reader.VerifyEndOfContainer();
+    SuccessOrExit(err);
+
+    err = reader.ExitContainer(outerContainer);
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -646,9 +639,8 @@ CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certDa
     TLVType containerType;
     uint32_t len;
 
-    // Verify the tag and type
-    VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrExit(reader.GetTag() == ContextTag(kTag_ECDSASignature), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    err = reader.Next(kTLVType_Structure, ContextTag(kTag_ECDSASignature));
+    SuccessOrExit(err);
 
     err = reader.EnterContainer(containerType);
     SuccessOrExit(err);
@@ -737,7 +729,6 @@ exit:
 CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
 
     // tbsCertificate TBSCertificate,
     // TBSCertificate ::= SEQUENCE
@@ -801,15 +792,9 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
         err = DecodeConvertSubjectPublicKeyInfo(reader, writer, certData);
         SuccessOrExit(err);
 
-        // If the next element is a certificate extension...
-        err = reader.Next();
+        // certificate extensions
+        err = DecodeConvertExtensions(reader, writer, certData);
         SuccessOrExit(err);
-        tag = reader.GetTag();
-        if (IsCertificateExtensionTag(tag))
-        {
-            err = DecodeConvertExtensions(reader, writer, certData);
-            SuccessOrExit(err);
-        }
     }
     ASN1_END_SEQUENCE;
 
