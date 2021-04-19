@@ -20,6 +20,7 @@
 #include "LightingManager.h"
 
 #include <iostream>
+#include <support/logging/CHIPLogging.h>
 
 LightingManager LightingManager::sLight;
 
@@ -49,13 +50,13 @@ bool LightingManager::InitiateAction(Action_t aAction)
     switch (aAction)
     {
     case ON_ACTION:
-        std::cout << "LightingManager::InitiateAction(ON_ACTION)" << std::endl;
+        ChipLogDetail(AppServer, "LightingManager::InitiateAction(ON_ACTION)");
         break;
     case OFF_ACTION:
-        std::cout << "LightingManager::InitiateAction(OFF_ACTION)" << std::endl;
+        ChipLogDetail(AppServer, "LightingManager::InitiateAction(OFF_ACTION)");
         break;
     default:
-        std::cout << "LightingManager::InitiateAction(unknown)" << std::endl;
+        ChipLogDetail(AppServer, "LightingManager::InitiateAction(unknown)");
         break;
     }
 

@@ -32,10 +32,7 @@ function build_chip_controller() {
     cd "$test_script_dir"
     gn gen --check --fail-on-unused-args out/debug >/dev/null
     run_ninja -C out/debug
-    mkdir -p "$test_script_dir/test/whl/"
-    cp -R "$test_script_dir/out/debug/controller/python/" "$test_script_dir/test/whl/"
-    cd "$test_script_dir/test"
-    docker build -t chip_mobile_device -f Dockerfile . 2>&1
+    docker build -t chip_mobile_device -f test/Dockerfile . 2>&1
 }
 
 function build_chip_lighting() {
