@@ -245,7 +245,9 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (res == INET_NO_ERROR)
+    {
         State = kState_Bound;
+    }
 
     return res;
 }
@@ -253,10 +255,6 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uin
 INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
 {
     INET_ERROR res = INET_NO_ERROR;
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    chip::System::Layer & lSystemLayer = SystemLayer();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     if (State != kState_Bound)
         return INET_ERROR_INCORRECT_STATE;
@@ -278,8 +276,11 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
     if (listen(mSocket, backlog) != 0)
         res = chip::System::MapErrorPOSIX(errno);
 
+    // Wait for ability to read on this endpoint.
+    mRequestIO.SetRead();
+
     // Wake the thread calling select so that it recognizes the new socket.
-    lSystemLayer.WakeSelect();
+    SystemLayer().WakeSelect();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -493,11 +494,17 @@ INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, Interface
     if (conRes == 0)
     {
         State = kState_Connected;
+        // Wait for ability to read on this endpoint.
+        mRequestIO.SetRead();
         if (OnConnectComplete != nullptr)
             OnConnectComplete(this, INET_NO_ERROR);
     }
     else
+    {
         State = kState_Connecting;
+        // Wait for ability to write on this endpoint.
+        mRequestIO.SetWrite();
+    }
 
     // Wake the thread calling select so that it recognizes the new socket.
     lSystemLayer.WakeSelect();
@@ -699,9 +706,17 @@ INET_ERROR TCPEndPoint::Send(System::PacketBufferHandle data, bool push)
     }
 
     if (mSendQueue.IsNull())
+    {
         mSendQueue = std::move(data);
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+        // Wait for ability to write on this endpoint.
+        mRequestIO.SetWrite();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    }
     else
+    {
         mSendQueue->AddToEnd(std::move(data));
+    }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -1318,9 +1333,18 @@ INET_ERROR TCPEndPoint::DriveSending()
         MarkActive();
 
         if (lenSent < bufLen)
+        {
             mSendQueue->ConsumeHead(lenSent);
+        }
         else
+        {
             mSendQueue.FreeHead();
+            if (mSendQueue.IsNull())
+            {
+                // Do not wait for ability to write on this endpoint.
+                mRequestIO.ClearWrite();
+            }
+        }
 
         if (OnDataSent != nullptr)
             OnDataSent(this, lenSent);
@@ -1418,6 +1442,13 @@ void TCPEndPoint::HandleConnectComplete(INET_ERROR err)
         MarkActive();
 
         State = kState_Connected;
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+        // Wait for ability to read or write on this endpoint.
+        mRequestIO.SetRead();
+        mRequestIO.SetWrite();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
         if (OnConnectComplete != nullptr)
             OnConnectComplete(this, INET_NO_ERROR);
     }
@@ -1547,6 +1578,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
             if (close(mSocket) != 0 && err == INET_NO_ERROR)
                 err = chip::System::MapErrorPOSIX(errno);
             mSocket = INET_INVALID_SOCKET_FD;
+            mRequestIO.Clear();
 
             // Wake the thread calling select so that it recognizes the socket is closed.
             lSystemLayer.WakeSelect();
@@ -2327,26 +2359,6 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
     return INET_NO_ERROR;
 }
 
-SocketEvents TCPEndPoint::PrepareIO()
-{
-    SocketEvents ioType;
-
-    // If initiating a new connection...
-    // OR if connected and there is data to be sent...
-    // THEN arrange for the kernel to alert us when the socket is ready to be written.
-    if (State == kState_Connecting || (IsConnected() && !mSendQueue.IsNull()))
-        ioType.SetWrite();
-
-    // If listening for incoming connections and the app is ready to receive a connection...
-    // OR if in a state where receiving is allowed, and the app is ready to receive data...
-    // THEN arrange for the kernel to alert us when the socket is ready to be read.
-    if ((State == kState_Listening && OnConnectionReceived != nullptr) ||
-        ((State == kState_Connected || State == kState_SendShutdown) && ReceiveEnabled && OnDataReceived != nullptr))
-        ioType.SetRead();
-
-    return ioType;
-}
-
 void TCPEndPoint::HandlePendingIO()
 {
     // Prevent the end point from being freed while in the middle of a callback.
@@ -2496,7 +2508,8 @@ void TCPEndPoint::ReceiveData()
                 State = kState_ReceiveShutdown;
             else
                 State = kState_Closing;
-
+            // Do not wait for ability to read on this endpoint.
+            mRequestIO.ClearRead();
             // Call the app's OnPeerClose.
             if (OnPeerClose != nullptr)
                 OnPeerClose(this);
@@ -2592,6 +2605,9 @@ void TCPEndPoint::HandleIncomingConnection()
         conEP->mAddrType = kIPAddressType_IPv6;
 #endif // !INET_CONFIG_ENABLE_IPV4
         conEP->Retain();
+
+        // Wait for ability to read on this endpoint.
+        conEP->mRequestIO.SetRead();
 
         // Call the app's callback function.
         OnConnectionReceived(this, conEP, peerAddr, peerPort);

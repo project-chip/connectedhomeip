@@ -166,10 +166,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 
         ReturnErrorOnFailure(info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
-        info->udp->AppState          = static_cast<void *>(this);
-        info->udp->OnMessageReceived = OnUdpPacketReceived;
-
-        ReturnErrorOnFailure(info->udp->Listen());
+        ReturnErrorOnFailure(info->udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 
         CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
         if (err != CHIP_NO_ERROR)

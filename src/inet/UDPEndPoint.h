@@ -56,7 +56,7 @@ public:
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
     uint16_t GetBoundPort();
-    INET_ERROR Listen();
+    INET_ERROR Listen(OnMessageReceivedFunct onMessageReceived, OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
     INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
                       uint16_t sendFlags = 0);
@@ -87,7 +87,6 @@ private:
     uint16_t mBoundPort;
 
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO();
     void HandlePendingIO();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };

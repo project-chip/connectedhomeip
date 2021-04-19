@@ -41,6 +41,7 @@ void EndPointBasis::InitEndPointBasis(InetLayer & aInetLayer, void * aAppState)
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     mSocket = INET_INVALID_SOCKET_FD;
     mPendingIO.Clear();
+    mRequestIO.Clear();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 }
 
