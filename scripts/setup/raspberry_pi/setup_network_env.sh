@@ -41,6 +41,8 @@ sudo nmcli con modify WiFiAp 802-11-wireless.mode ap 802-11-wireless.band bg ipv
 sudo nmcli con modify WiFiAp 802-11-wireless-security.proto rsn wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$AP_PASSWORD"
 sudo nmcli con up WiFiAp
 
+sudo nmcli -f GENERAL.STATE con show WiFiAp
+
 #Setting TCP and UDP echo server
 echo "Setting TCP and UDP echo server"
 
