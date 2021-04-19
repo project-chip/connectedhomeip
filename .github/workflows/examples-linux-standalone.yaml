@@ -59,6 +59,10 @@ jobs:
               run:
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
                   out/all_clusters_debug chip_bypass_rendezvous=true
+            - name: Build example lighting app with RPCs
+              run:
+                  scripts/examples/gn_build_example.sh examples/lighting-app/linux
+                  out/lighting_app_debug_rpc 'import("//with_pw_rpc.gni")'
             - name: Build example Standalone Bridge
               run:
                   scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge_debug
@@ -79,6 +83,7 @@ jobs:
                       out/all_clusters_debug/all-clusters-server
                       out/bridge_debug/bridge-app-server
                       out/chip_tool_debug/chip-tool
+                      out/lighting_app_debug_rpc/chip-lighting-app
                       out/shell_debug/chip-shell
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
