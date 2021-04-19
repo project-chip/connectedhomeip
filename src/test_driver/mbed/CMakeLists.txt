@@ -60,7 +60,7 @@ endif()
 set(CHIP_TESTS
 # TODO: Enable all the tests.
     # -lAppTests
-    # -lASN1Tests
+    -lASN1Tests
     # -lBleLayerTests
     -lChipCryptoTests
     # -lCoreTests

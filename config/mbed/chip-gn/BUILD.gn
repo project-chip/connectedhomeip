@@ -37,7 +37,7 @@ group("mbed") {
       # "${chip_root}/src/credentials/tests",
       "${chip_root}/src/crypto/tests",
       # "${chip_root}/src/inet/tests",
-      # "${chip_root}/src/lib/asn1/tests",
+      "${chip_root}/src/lib/asn1/tests",
       # "${chip_root}/src/lib/core/tests",
       # "${chip_root}/src/lib/mdns/minimal/core/tests",
       # "${chip_root}/src/lib/mdns/minimal/records/tests",
