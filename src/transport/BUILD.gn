@@ -40,6 +40,8 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
     "AdminPairingTable.cpp",
     "AdminPairingTable.h",
     "CASESession.cpp",
@@ -67,8 +69,6 @@ static_library("transport") {
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
   ]
 
   if (chip_config_network_layer_ble) {

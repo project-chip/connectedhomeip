@@ -58,5 +58,4 @@ static_library("server") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
-  
 }

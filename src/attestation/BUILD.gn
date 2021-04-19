@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
 import("//build_overrides/certifier.gni")
+import("//build_overrides/chip.gni")
 
 config("includes") {
   include_dirs = [
     ".",
-    "${root_out_dir}", 
+    "${root_out_dir}",
   ]
 }
 
 action("generate_dac_chain") {
   script = "${certifier_root}/generate_dac_chain.py"
-  sources = [ "${certifier_root}/repo/resources/device-attestation-certificate.p12" ]
+  sources =
+      [ "${certifier_root}/repo/resources/device-attestation-certificate.p12" ]
   outputs = [ "${root_out_dir}/dac_chain.h" ]
 
   args = rebase_path(sources, "") + rebase_path(outputs, root_out_dir)
@@ -34,15 +35,15 @@ static_library("attestation") {
   output_name = "libDeviceAttestation"
 
   sources = [
-    "DeviceAttestation.h",
     "DeviceAttestation.cpp",
+    "DeviceAttestation.h",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/messaging",
     ":generate_dac_chain",
+    "${chip_root}/src/messaging",
   ]
 
   data_deps = [ ":generate_dac_chain" ]
