@@ -805,6 +805,39 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDiscoveryResult(otActiveScanResult * aResult, void * aContext)
+{
+    if ((aResult == nullptr) || (aContext == nullptr))
+    {
+        return;
+    }
+
+    ImplClass * threadStackInstance = static_cast<GenericThreadStackManagerImpl_OpenThread *>(aContext)->Impl();
+
+    ConnectivityManager::ThreadDiscoveryResult discoveryResult;
+    discoveryResult.discoveryResponseVersion                = aResult->mVersion;
+    discoveryResult.discoveryResponseNativeCommissionerFlag = aResult->mIsNative;
+    memcpy(discoveryResult.extendedPanId, aResult->mExtendedPanId.m8, sizeof(discoveryResult.extendedPanId));
+    memcpy(discoveryResult.networkName, aResult->mNetworkName.m8, sizeof(discoveryResult.networkName));
+    discoveryResult.steeringDataLength = aResult->mSteeringData.mLength;
+    memcpy(discoveryResult.steeringData, aResult->mSteeringData.m8, sizeof(discoveryResult.steeringData));
+    discoveryResult.joinerUdpPort = aResult->mJoinerUdpPort;
+
+    threadStackInstance->mDiscoveryResultCallback(discoveryResult);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_DiscoverNetworks(
+    ConnectivityManager::ThreadDiscoveryResultCallback discoveryResultCallback)
+{
+    Impl()->LockThreadStack();
+    mDiscoveryResultCallback = discoveryResultCallback;
+    otThreadDiscover(mOTInst, 0, OT_PANID_BROADCAST, false, false, OnDiscoveryResult, this);
+    Impl()->UnlockThreadStack();
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

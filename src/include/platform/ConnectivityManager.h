@@ -24,6 +24,7 @@
 #pragma once
 
 #include <support/CodeUtils.h>
+#include <support/ThreadOperationalDataset.h>
 
 namespace chip {
 
@@ -122,6 +123,9 @@ public:
     };
 
     struct ThreadPollingConfig;
+
+    struct ThreadDiscoveryResult;
+    typedef void (*ThreadDiscoveryResultCallback)(ThreadDiscoveryResult & aResult);
 
     // WiFi station methods
     WiFiStationMode GetWiFiStationMode();
@@ -234,6 +238,18 @@ struct ConnectivityManager::ThreadPollingConfig
                                              when the device is acting as a sleepy end node. */
 
     void Clear() { memset(this, 0, sizeof(*this)); }
+};
+
+// TODO: Align structure with the spec issue #2427 discussion result.
+struct ConnectivityManager::ThreadDiscoveryResult
+{
+    unsigned int discoveryResponseVersion : 4;
+    bool discoveryResponseNativeCommissionerFlag : 1;
+    uint8_t extendedPanId[chip::Thread::kSizeExtendedPanId];
+    char networkName[chip::Thread::kSizeNetworkName];
+    uint8_t steeringDataLength;
+    uint8_t steeringData[chip::Thread::kSizeSteeringData];
+    uint16_t joinerUdpPort;
 };
 
 /**

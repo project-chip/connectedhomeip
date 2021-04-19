@@ -61,11 +61,12 @@ namespace app {
 namespace clusters {
 namespace NetworkCommissioning {
 
-constexpr uint8_t kMaxNetworkIDLen       = 32;
-constexpr uint8_t kMaxThreadDatasetLen   = 254; // As defined in Thread spec.
-constexpr uint8_t kMaxWiFiSSIDLen        = 32;
-constexpr uint8_t kMaxWiFiCredentialsLen = 64;
-constexpr uint8_t kMaxNetworks           = 4;
+constexpr uint8_t kMaxNetworkIDLen          = 32;
+constexpr uint8_t kMaxThreadDatasetLen      = 254; // As defined in Thread spec.
+constexpr uint8_t kMaxWiFiSSIDLen           = 32;
+constexpr uint8_t kMaxWiFiCredentialsLen    = 64;
+constexpr uint8_t kMaxNetworks              = 4;
+constexpr uint8_t kMaxScannedThreadNetworks = 4;
 
 enum class NetworkType : uint8_t
 {
@@ -105,6 +106,9 @@ struct NetworkInfo
 namespace {
 // The internal network info containing credentials. Need to find some better place to save these info.
 NetworkInfo sNetworks[kMaxNetworks];
+
+chip::DeviceLayer::ConnectivityManager::ThreadDiscoveryResult sThreadScanResults[kMaxScannedThreadNetworks];
+uint8_t sThreadNetworksScanned;
 } // namespace
 
 EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::Command *, EndpointId, ByteSpan operationalDataset,
@@ -270,6 +274,52 @@ EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::Com
     }
     // TODO: We should encode response command here.
 exit:
+    return err;
+}
+
+static void ThreadScanNetworksResultCallback(chip::DeviceLayer::ConnectivityManager::ThreadDiscoveryResult & result)
+{
+    ChipLogProgress(DeviceLayer, "ThreadDiscoveryResult for scanned network index = %d:", sThreadNetworksScanned);
+    ChipLogProgress(DeviceLayer, "- discoveryResponseVersion: %d", result.discoveryResponseVersion);
+    ChipLogProgress(DeviceLayer, "- discoveryResponseNativeCommissionerFlag: %d", result.discoveryResponseNativeCommissionerFlag);
+    ChipLogProgress(DeviceLayer, "- extendedPanId: %02X%02X%02X%02X%02X%02X%02X%02X", result.extendedPanId[0],
+                    result.extendedPanId[1], result.extendedPanId[2], result.extendedPanId[3], result.extendedPanId[4],
+                    result.extendedPanId[5], result.extendedPanId[6], result.extendedPanId[7]);
+    ChipLogProgress(DeviceLayer, "- networkName: %s", result.networkName);
+    ChipLogProgress(DeviceLayer, "- steeringDataLength: %s", result.steeringDataLength);
+    ChipLogProgress(DeviceLayer, "- steeringData: %02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
+                    result.steeringData[0], result.steeringData[1], result.steeringData[2], result.steeringData[3],
+                    result.steeringData[4], result.steeringData[5], result.steeringData[6], result.steeringData[7],
+                    result.steeringData[8], result.steeringData[9], result.steeringData[10], result.steeringData[11],
+                    result.steeringData[12], result.steeringData[13], result.steeringData[14], result.steeringData[15]);
+    ChipLogProgress(DeviceLayer, "- joinerUdpPort: %d", result.joinerUdpPort);
+
+    if (sThreadNetworksScanned >= kMaxScannedThreadNetworks)
+    {
+        ChipLogError(DeviceLayer, "Scanned network hasn't been added to the list due to lack of free space.");
+        return;
+    }
+    sThreadScanResults[sThreadNetworksScanned] = result;
+    sThreadNetworksScanned++;
+}
+
+EmberAfNetworkCommissioningError OnScanNetworksCommandCallbackInternal(app::Command *, EndpointId, ByteSpan ssid,
+                                                                       uint64_t breadcrumb, uint32_t timeoutMs)
+{
+    EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+
+    // TODO: Prevent from starting new scan before finishing the one started before.
+
+    sThreadNetworksScanned = 0;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    // TODO: Start timer to send Scan Networks Response in callback after given time.
+
+    DeviceLayer::ThreadStackMgr().DiscoverNetworks(&ThreadScanNetworksResultCallback);
+    err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS;
+#endif
+
     return err;
 }
 

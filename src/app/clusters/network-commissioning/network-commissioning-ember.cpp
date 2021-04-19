@@ -62,6 +62,19 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
     return true;
 }
 
+bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, ByteSpan ssid, uint64_t breadcrumb,
+                                                            uint32_t timeoutMs)
+{
+    EmberAfNetworkCommissioningError err = chip::app::clusters::NetworkCommissioning::OnScanNetworksCommandCallbackInternal(
+        nullptr, emberAfCurrentEndpoint(), ssid, breadcrumb, timeoutMs);
+
+    // TODO: Remove sending default response and replace it with sending Scan Networks Response.
+    emberAfSendImmediateDefaultResponse(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS ? EMBER_ZCL_STATUS_SUCCESS
+                                                                                             : EMBER_ZCL_STATUS_FAILURE);
+
+    return true;
+}
+
 // TODO: The following commands needed to be implemented.
 // These commands are not implemented thus not handled yet, return false so ember will return a error.
 
@@ -83,11 +96,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command 
     return false;
 }
 
-bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, ByteSpan ssid, uint64_t breadcrumb,
-                                                            uint32_t timeoutMs)
-{
-    return false;
-}
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj, ByteSpan operationalDataset,
                                                                    uint64_t breadcrumb, uint32_t timeoutMs)
 {

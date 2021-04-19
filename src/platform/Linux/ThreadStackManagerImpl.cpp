@@ -412,6 +412,11 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPollPeriod(uint32_t & buf)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::_DiscoverNetworks(ConnectivityManager::ThreadDiscoveryResultCallback discoveryResultCallback)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

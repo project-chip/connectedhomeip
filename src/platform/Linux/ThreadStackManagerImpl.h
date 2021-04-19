@@ -88,6 +88,8 @@ public:
 
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
+    CHIP_ERROR _DiscoverNetworks(ConnectivityManager::ThreadDiscoveryResultCallback discoveryResultCallback);
+
     CHIP_ERROR _JoinerStart();
 
     ~ThreadStackManagerImpl() = default;

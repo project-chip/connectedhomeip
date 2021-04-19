@@ -37,6 +37,7 @@ constexpr size_t kSizeOperationalDataset = 254;
 
 constexpr size_t kSizeNetworkName     = 16;
 constexpr size_t kSizeExtendedPanId   = 8;
+constexpr size_t kSizeSteeringData    = 16;
 constexpr size_t kSizeMasterKey       = 16;
 constexpr size_t kSizeMeshLocalPrefix = 8;
 constexpr size_t kSizePSKc            = 16;

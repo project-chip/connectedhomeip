@@ -26,6 +26,7 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/link.h>
 #include <openthread/netdata.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
@@ -89,6 +90,7 @@ protected:
     CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
+    CHIP_ERROR _DiscoverNetworks(ConnectivityManager::ThreadDiscoveryResultCallback discoveryResultCallback);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 
@@ -114,6 +116,7 @@ private:
 
     otInstance * mOTInst;
     ConnectivityManager::ThreadPollingConfig mPollingConfig;
+    ConnectivityManager::ThreadDiscoveryResultCallback mDiscoveryResultCallback;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -150,6 +153,8 @@ private:
     static void OnSrpClientStateChange(const otSockAddr * aServerSockAddr, void * aContext);
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    static void OnDiscoveryResult(otActiveScanResult * aResult, void * aContext);
 
     static void OnJoinerComplete(otError aError, void * aContext);
     void OnJoinerComplete(otError aError);
