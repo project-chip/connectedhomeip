@@ -554,8 +554,8 @@ void BLEManagerImpl::DriveBLEState(void)
                     ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
                     ExitNow();
                 }
-            } 
-            
+            }
+
             // mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
