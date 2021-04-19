@@ -611,14 +611,16 @@ class DeviceMgrCmd(Cmd):
     def emptyline(self):
         pass
 
-def echo_rpc(message):
+# Chip commands needed by the Harness Tool
+
+def echo_alive(message):
     print(message)
     lower_case_msg = message.casefold()
     return lower_case_msg
 
 def create_rpc_server():
-    with SimpleXMLRPCServer(("localhost", 5000)) as server:
-        server.register_function(echo_rpc)
+    with SimpleXMLRPCServer(("0.0.0.0", 5000)) as server:
+        server.register_function(echo_alive)
         server.register_multicall_functions()
         print('Serving XML-RPC on localhost port 5000')
         try:
