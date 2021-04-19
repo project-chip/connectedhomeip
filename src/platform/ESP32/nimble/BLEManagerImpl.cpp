@@ -546,7 +546,7 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            if(ble_gap_adv_active())
+            if (ble_gap_adv_active())
             {
                 err = MapBLEError(ble_gap_adv_stop());
                 if (err != CHIP_NO_ERROR)
