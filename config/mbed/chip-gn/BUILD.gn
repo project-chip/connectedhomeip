@@ -39,10 +39,10 @@ group("mbed") {
       # "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/asn1/tests",
       # "${chip_root}/src/lib/core/tests",
-      # "${chip_root}/src/lib/mdns/minimal/core/tests",
+      "${chip_root}/src/lib/mdns/minimal/core/tests",
       # "${chip_root}/src/lib/mdns/minimal/records/tests",
       # "${chip_root}/src/lib/mdns/minimal/responders/tests",
-      # "${chip_root}/src/lib/mdns/minimal/tests",
+      "${chip_root}/src/lib/mdns/minimal/tests",
       # "${chip_root}/src/lib/support/tests",
       # "${chip_root}/src/messaging/tests",
       # "${chip_root}/src/protocols/bdx/tests",
@@ -51,7 +51,7 @@ group("mbed") {
       # "${chip_root}/src/transport/raw/tests",
       "${chip_root}/src/transport/retransmit/tests",
       # "${chip_root}/src/transport/tests",
-      "${chip_root}/src/ble/tests"
+      "${chip_root}/src/ble/tests",
     ]
   }
 
