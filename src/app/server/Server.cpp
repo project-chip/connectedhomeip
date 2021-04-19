@@ -24,6 +24,7 @@
 #include <app/server/RendezvousServer.h>
 #include <app/util/DataModelHandler.h>
 
+#include <attestation/DeviceAttestation.h>
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -41,7 +42,6 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/AdminPairingTable.h>
-#include <attestation/DeviceAttestation.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
 

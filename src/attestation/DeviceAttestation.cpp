@@ -19,8 +19,8 @@
 #include <messaging/ExchangeMgr.h>
 #include <support/CHIPMem.h>
 
-#include "system/TLVPacketBufferBackingStore.h"
 #include "attestation/DeviceAttestation.h"
+#include "system/TLVPacketBufferBackingStore.h"
 #include "transport/SecureSessionMgr.h"
 
 #include "dac_chain.h"
