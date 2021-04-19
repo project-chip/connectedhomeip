@@ -69,7 +69,7 @@ void NetworkProvisioning::OnMessageReceived(Messaging::ExchangeContext * exchang
     // Currently, the only mechanism to get this callback is via unsolicited message handler.
     // That means that we now own the reference to exchange context. Let's free the reference since we no longer
     // need it.
-    exchangeContext->Release();
+    exchangeContext->Close();
 }
 
 CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf)
@@ -156,38 +156,32 @@ size_t NetworkProvisioning::EncodedStringSize(const char * str)
 
 CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, Encoding::LittleEndian::BufferWriter & bbuf)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    size_t length   = strlen(str);
-    uint16_t u16len = static_cast<uint16_t>(length);
-    VerifyOrExit(CanCastTo<uint16_t>(length), err = CHIP_ERROR_INVALID_ARGUMENT);
+    const size_t length = strlen(str);
+    VerifyOrReturnError(CanCastTo<uint16_t>(length), CHIP_ERROR_INVALID_ARGUMENT);
+    const uint16_t u16len = static_cast<uint16_t>(length);
 
     bbuf.Put16(u16len);
     bbuf.Put(str);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input_len, Encoding::LittleEndian::BufferWriter & bbuf,
                                              size_t & consumed)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    uint16_t length = 0;
+    VerifyOrReturnError(input_len >= sizeof(uint16_t), CHIP_ERROR_BUFFER_TOO_SMALL);
+    const uint16_t length = chip::Encoding::LittleEndian::Get16(input);
+    consumed              = sizeof(uint16_t);
 
-    VerifyOrExit(input_len >= sizeof(uint16_t), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    length   = chip::Encoding::LittleEndian::Get16(input);
-    consumed = sizeof(uint16_t);
-
-    VerifyOrExit(input_len - consumed >= length, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(input_len - consumed >= length, CHIP_ERROR_BUFFER_TOO_SMALL);
     bbuf.Put(&input[consumed], length);
 
     consumed += bbuf.Needed();
     bbuf.Put(static_cast<uint8_t>('\0'));
 
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR NetworkProvisioning::SendMessageUsingExchange(uint8_t msgType, System::PacketBufferHandle msgPayload)
@@ -196,7 +190,7 @@ CHIP_ERROR NetworkProvisioning::SendMessageUsingExchange(uint8_t msgType, System
     VerifyOrReturnError(exchangeContext != nullptr, CHIP_ERROR_INTERNAL);
     CHIP_ERROR err = exchangeContext->SendMessage(Protocols::NetworkProvisioning::Id, msgType, std::move(msgPayload),
                                                   Messaging::SendMessageFlags::kNoAutoRequestAck);
-    exchangeContext->Release();
+    exchangeContext->Close();
     return err;
 }
 
@@ -391,7 +385,7 @@ void NetworkProvisioning::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent
 {
     NetworkProvisioning * session = reinterpret_cast<NetworkProvisioning *>(arg);
 
-    VerifyOrExit(session != nullptr, /**/);
+    VerifyOrReturn(session != nullptr);
 
     if (event->Type == DeviceLayer::DeviceEventType::kInternetConnectivityChange &&
         event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established)
@@ -405,13 +399,10 @@ void NetworkProvisioning::ConnectivityHandler(const DeviceLayer::ChipDeviceEvent
     if (event->Type == DeviceLayer::DeviceEventType::kThreadStateChange && event->ThreadStateChange.AddressChanged)
     {
         Inet::IPAddress addr;
-        SuccessOrExit(DeviceLayer::ThreadStackMgr().GetExternalIPv6Address(addr));
+        ReturnOnFailure(DeviceLayer::ThreadStackMgr().GetExternalIPv6Address(addr));
         (void) session->SendIPAddress(addr);
     }
 #endif
-
-exit:
-    return;
 }
 #endif
 

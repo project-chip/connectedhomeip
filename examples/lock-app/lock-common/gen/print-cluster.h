@@ -156,6 +156,18 @@
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER
 #endif
 
+#if defined(ZCL_USING_OTA_SERVER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_SERVER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER { ZCL_OTA_SERVER_CLUSTER_ID, 41, "OTA Software Update Server" },
+#else
+#define CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OTA_CLIENT_CLUSTER_SERVER) || defined(ZCL_USING_OTA_CLIENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER { ZCL_OTA_CLIENT_CLUSTER_ID, 42, "OTA Software Update Client" },
+#else
+#define CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER { ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, 48, "General Commissioning" },
 #else
@@ -872,6 +884,8 @@
     CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
+    CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER                                                                                           \
+    CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \

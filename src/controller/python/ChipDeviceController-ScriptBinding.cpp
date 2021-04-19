@@ -147,16 +147,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId)
-{
-#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    ReturnErrorOnFailure(
-        DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true));
-#endif
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl)
 {
     if (devCtrl != NULL)

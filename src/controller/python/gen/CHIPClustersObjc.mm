@@ -22,6 +22,7 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
+#import "app/util/af.h"
 #import "gen/CHIPClientCallbacks.h"
 #import "gen/CHIPClustersObjc.h"
 

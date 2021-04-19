@@ -146,21 +146,16 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
     }
     else
     {
-        chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
-        chip::TLV::TLVWriter writer  = apCommand->CreateCommandDataElementTLVWriter();
-        err                          = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
+        err = apCommand->PrepareCommand(&commandParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        err = writer.PutBoolean(chip::TLV::ContextTag(1), true);
+        chip::TLV::TLVWriter * writer = apCommand->GetCommandDataElementTLVWriter();
+
+        err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        err = writer.EndContainer(dummyType);
+        err = apCommand->FinishCommand();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        err = writer.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        apCommand->AddCommand(commandParams);
     }
 }
 
@@ -198,9 +193,12 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     commandHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+
     TestExchangeDelegate delegate;
     commandHandler.mpExchangeCtx->SetDelegate(&delegate);
-    err = commandHandler.AddCommand(commandParams);
+    err = commandHandler.PrepareCommand(&commandParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = commandHandler.FinishCommand();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.SendCommandResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);

@@ -50,6 +50,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 @property (readonly) chip::NodeId localDeviceId;
+@property (readonly) uint16_t listenPort;
 
 @end
 
@@ -138,9 +139,18 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         [self _getControllerNodeId];
 
         _cppCommissioner = new chip::Controller::DeviceCommissioner();
-        if (_cppCommissioner != nullptr) {
-            errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
+        if ([self checkForInitError:(_cppCommissioner != nullptr) logMsg:kErrorMemoryInit]) {
+            return;
         }
+
+        if (_listenPort) {
+            errorCode = _cppCommissioner->SetUdpListenPort(_listenPort);
+            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+                return;
+            }
+        }
+
+        errorCode = _cppCommissioner->Init(_localDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }
@@ -200,6 +210,28 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return success;
 }
 
+- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
+                          address:(NSString *)address
+                             port:(uint16_t)port
+                            error:(NSError * __autoreleasing *)error
+{
+    __block BOOL success;
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+        chip::Controller::SerializedDevice serializedTestDevice;
+        chip::Inet::IPAddress addr;
+        chip::Inet::IPAddress::FromString([address UTF8String], addr);
+
+        if ([self _isRunning]) {
+            errorCode = _cppCommissioner->PairTestDeviceWithoutSecurity(
+                deviceID, chip::Transport::PeerAddress::UDP(addr, port), serializedTestDevice);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+
+    return success;
+}
+
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     __block BOOL success;
@@ -249,6 +281,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     });
 
     return chipDevice;
+}
+
+- (void)setListenPort:(uint16_t)port
+{
+    _listenPort = port;
 }
 
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue

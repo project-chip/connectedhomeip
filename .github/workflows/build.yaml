@@ -58,7 +58,6 @@ jobs:
                      "gcc_release") GN_ARGS='is_debug=false';;
                      "clang") GN_ARGS='is_clang=true';;
                      "mbedtls") GN_ARGS='chip_crypto="mbedtls"';;
-                     "clang_experimental") GN_ARGS='is_clang=true chip_enable_interaction_model=true';;
                      *) ;;
                   esac
 

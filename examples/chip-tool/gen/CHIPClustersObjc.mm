@@ -22,6 +22,7 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
+#import "app/util/af.h"
 #import "gen/CHIPClientCallbacks.h"
 #import "gen/CHIPClustersObjc.h"
 
@@ -1803,6 +1804,302 @@ public:
             });
         }
     };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPThermostatClusterCurrentWeeklyScheduleCallbackBridge
+    : public Callback::Callback<ThermostatClusterCurrentWeeklyScheduleCallback> {
+public:
+    CHIPThermostatClusterCurrentWeeklyScheduleCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ThermostatClusterCurrentWeeklyScheduleCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPThermostatClusterCurrentWeeklyScheduleCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+        uint8_t modeForSequence, /* TYPE WARNING: array array defaults to */ uint8_t * payload)
+    {
+        CHIPThermostatClusterCurrentWeeklyScheduleCallbackBridge * callback
+            = reinterpret_cast<CHIPThermostatClusterCurrentWeeklyScheduleCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"numberOfTransitionsForSequence" : [NSNumber numberWithUnsignedChar:numberOfTransitionsForSequence],
+                    @"dayOfWeekForSequence" : [NSNumber numberWithUnsignedChar:dayOfWeekForSequence],
+                    @"modeForSequence" : [NSNumber numberWithUnsignedChar:modeForSequence],
+                    // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
+                    // Conversion from this type to Objc is not properly implemented yet
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPThermostatClusterRelayStatusLogCallbackBridge : public Callback::Callback<ThermostatClusterRelayStatusLogCallback> {
+public:
+    CHIPThermostatClusterRelayStatusLogCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ThermostatClusterRelayStatusLogCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPThermostatClusterRelayStatusLogCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
+        uint8_t humidityInPercentage, int16_t setpoint, uint16_t unreadEntries)
+    {
+        CHIPThermostatClusterRelayStatusLogCallbackBridge * callback
+            = reinterpret_cast<CHIPThermostatClusterRelayStatusLogCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"timeOfDay" : [NSNumber numberWithUnsignedShort:timeOfDay],
+                    @"relayStatus" : [NSNumber numberWithUnsignedShort:relayStatus],
+                    @"localTemperature" : [NSNumber numberWithShort:localTemperature],
+                    @"humidityInPercentage" : [NSNumber numberWithUnsignedChar:humidityInPercentage],
+                    @"setpoint" : [NSNumber numberWithShort:setpoint],
+                    @"unreadEntries" : [NSNumber numberWithUnsignedShort:unreadEntries],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorDeviceListAttributeCallbackBridge : public Callback::Callback<DescriptorDeviceListListAttributeCallback> {
+public:
+    CHIPDescriptorDeviceListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorDeviceListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorDeviceListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _DeviceType * entries)
+    {
+        CHIPDescriptorDeviceListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorDeviceListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLong:entries[i].type], @"type",
+                                                  [NSNumber numberWithUnsignedShort:entries[i].revision], @"revision", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorServerListAttributeCallbackBridge : public Callback::Callback<DescriptorServerListListAttributeCallback> {
+public:
+    CHIPDescriptorServerListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorServerListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorServerListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
+    {
+        CHIPDescriptorServerListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorServerListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorClientListAttributeCallbackBridge : public Callback::Callback<DescriptorClientListListAttributeCallback> {
+public:
+    CHIPDescriptorClientListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorClientListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorClientListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::ClusterId * entries)
+    {
+        CHIPDescriptorClientListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorClientListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPDescriptorPartsListAttributeCallbackBridge : public Callback::Callback<DescriptorPartsListListAttributeCallback> {
+public:
+    CHIPDescriptorPartsListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<DescriptorPartsListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPDescriptorPartsListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::EndpointId * entries)
+    {
+        CHIPDescriptorPartsListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPDescriptorPartsListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGroupKeyManagementGroupsAttributeCallbackBridge
+    : public Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> {
+public:
+    CHIPGroupKeyManagementGroupsAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPGroupKeyManagementGroupsAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _GroupState * entries)
+    {
+        CHIPGroupKeyManagementGroupsAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId],
+                                                  @"VendorId", [NSNumber numberWithUnsignedShort:entries[i].VendorGroupId],
+                                                  @"VendorGroupId", [NSNumber numberWithUnsignedShort:entries[i].GroupKeySetIndex],
+                                                  @"GroupKeySetIndex", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge
+    : public Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> {
+public:
+    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _GroupKey * entries)
+    {
+        CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
+                    [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex], @"GroupKeyIndex",
+                    [NSData dataWithBytes:entries[i].GroupKeyRoot + 1u length:emberAfStringLength(entries[i].GroupKeyRoot)],
+                    @"GroupKeyRoot", [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime],
+                    @"GroupKeyEpochStartTime", [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy],
+                    @"GroupKeySecurityPolicy", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
 
 private:
     ResponseHandler mHandler;
@@ -4763,6 +5060,102 @@ private:
     return &_cppCluster;
 }
 
+- (void)readAttributeDeviceList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorDeviceListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorDeviceListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeDeviceList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeServerList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorServerListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorServerListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeServerList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClientList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorClientListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorClientListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClientList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributePartsList:(ResponseHandler)completionHandler
+{
+    CHIPDescriptorPartsListAttributeCallbackBridge * onSuccess
+        = new CHIPDescriptorPartsListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributePartsList(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
 {
     CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
@@ -5696,6 +6089,54 @@ private:
 - (Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
+}
+
+- (void)readAttributeGroups:(ResponseHandler)completionHandler
+{
+    CHIPGroupKeyManagementGroupsAttributeCallbackBridge * onSuccess
+        = new CHIPGroupKeyManagementGroupsAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeGroups(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeGroupKeys:(ResponseHandler)completionHandler
+{
+    CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge * onSuccess
+        = new CHIPGroupKeyManagementGroupKeysAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeGroupKeys(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
 }
 
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
@@ -7296,6 +7737,409 @@ private:
     }
 
     CHIP_ERROR err = self.cppCluster.ReadAttributeMaxMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
+@interface CHIPThermostat ()
+@property (readonly) Controller::ThermostatCluster cppCluster;
+@end
+
+@implementation CHIPThermostat
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)clearWeeklySchedule:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ClearWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)getRelayStatusLog:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetRelayStatusLog(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)getWeeklySchedule:(uint8_t)daysToReturn
+             modeToReturn:(uint8_t)modeToReturn
+        completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.GetWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel(), daysToReturn, modeToReturn);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)setWeeklySchedule:(uint8_t)numberOfTransitionsForSequence
+     dayOfWeekForSequence:(uint8_t)dayOfWeekForSequence
+          modeForSequence:(uint8_t)modeForSequence
+                  payload:(uint8_t)payload
+        completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetWeeklySchedule(
+        onSuccess->Cancel(), onFailure->Cancel(), numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)setpointRaiseLower:(uint8_t)mode amount:(int8_t)amount completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.SetpointRaiseLower(onSuccess->Cancel(), onFailure->Cancel(), mode, amount);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeLocalTemperature:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeLocalTemperature(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)configureAttributeLocalTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(int16_t)change
+                         completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ConfigureAttributeLocalTemperature(
+        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)reportAttributeLocalTemperature:(ResponseHandler)reportHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onReport = new CHIPInt16sAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
+    if (!onReport) {
+        reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReportAttributeLocalTemperature(onReport->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onReport;
+        reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeOccupiedCoolingSetpoint:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeOccupiedCoolingSetpoint(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeOccupiedCoolingSetpoint:(int16_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.WriteAttributeOccupiedCoolingSetpoint(onSuccess->Cancel(), onFailure->Cancel(), value);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeOccupiedHeatingSetpoint:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeOccupiedHeatingSetpoint(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeOccupiedHeatingSetpoint:(int16_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.WriteAttributeOccupiedHeatingSetpoint(onSuccess->Cancel(), onFailure->Cancel(), value);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeControlSequenceOfOperation:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeControlSequenceOfOperation(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeControlSequenceOfOperation:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.WriteAttributeControlSequenceOfOperation(onSuccess->Cancel(), onFailure->Cancel(), value);
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeSystemMode:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.ReadAttributeSystemMode(onSuccess->Cancel(), onFailure->Cancel());
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeSystemMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIP_ERROR err = self.cppCluster.WriteAttributeSystemMode(onSuccess->Cancel(), onFailure->Cancel(), value);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

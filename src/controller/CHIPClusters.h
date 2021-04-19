@@ -45,6 +45,7 @@ constexpr ClusterId kNetworkCommissioningClusterId   = 0x0031;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
 constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
+constexpr ClusterId kThermostatClusterId             = 0x0201;
 constexpr ClusterId kWindowCoveringClusterId         = 0x0102;
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
@@ -697,6 +698,55 @@ public:
     CHIP_ERROR ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval, int16_t change);
     CHIP_ERROR ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback);
+};
+
+class DLL_EXPORT ThermostatCluster : public ClusterBase
+{
+public:
+    ThermostatCluster() : ClusterBase(kThermostatClusterId) {}
+    ~ThermostatCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR GetRelayStatusLog(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR GetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint8_t daysToReturn, uint8_t modeToReturn);
+    CHIP_ERROR SetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                 uint8_t payload);
+    CHIP_ERROR SetpointRaiseLower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t mode,
+                                  int8_t amount);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, int16_t value);
+    CHIP_ERROR WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint8_t value);
+    CHIP_ERROR WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint8_t value);
+    CHIP_ERROR ConfigureAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval, int16_t change);
+    CHIP_ERROR ReportAttributeLocalTemperature(Callback::Cancelable * onReportCallback);
+
+private:
+    static constexpr CommandId kClearWeeklyScheduleCommandId = 0x03;
+    static constexpr CommandId kGetRelayStatusLogCommandId   = 0x04;
+    static constexpr CommandId kGetWeeklyScheduleCommandId   = 0x02;
+    static constexpr CommandId kSetWeeklyScheduleCommandId   = 0x01;
+    static constexpr CommandId kSetpointRaiseLowerCommandId  = 0x00;
 };
 
 class DLL_EXPORT WindowCoveringCluster : public ClusterBase

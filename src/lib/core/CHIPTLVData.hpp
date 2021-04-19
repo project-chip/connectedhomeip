@@ -179,10 +179,10 @@
 #define CHIP_TLV_ARRAY(TagSpec) chip::TLV::TLVElementType::Array | TagSpec
 
 /*
- *  @brief Specifies a Path TLV element, marking the beginning of a Path
+ *  @brief Specifies a List TLV element, marking the beginning of a List
  *  @param TagSpec      Should be filled with macros begin with CHIP_TLV_TAG_
  */
-#define CHIP_TLV_PATH(TagSpec) chip::TLV::TLVElementType::Path | TagSpec
+#define CHIP_TLV_LIST(TagSpec) chip::TLV::TLVElementType::List | TagSpec
 
 /*
  *  @brief Specifies a Boolean TLV element, which can be either true or false

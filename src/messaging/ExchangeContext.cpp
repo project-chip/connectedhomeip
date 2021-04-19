@@ -125,7 +125,14 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
-    VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
+    ApplicationExchangeDispatch defaultDispatch;
+
+    if (dispatch == nullptr)
+    {
+        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+        dispatch = &defaultDispatch;
+    }
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse))
@@ -143,8 +150,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         }
     }
 
-    err = GetMessageDispatch()->SendMessage(mSecureSession, mExchangeId, IsInitiator(), mReliableMessageContext,
-                                            reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), mReliableMessageContext, reliableTransmissionRequested,
+                                protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -200,7 +207,7 @@ void ExchangeContext::Close()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->ContextPool + 1), mExchangeId,
+    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId,
                     __func__);
 #endif
 
@@ -217,7 +224,7 @@ void ExchangeContext::Abort()
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->ContextPool + 1), mExchangeId,
+    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->mContextPool.begin()), mExchangeId,
                     __func__);
 #endif
 
@@ -257,8 +264,8 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
-                    this);
+    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
+                    em->GetContextsInUse(), this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 
@@ -286,7 +293,7 @@ void ExchangeContext::Free()
     }
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->ContextPool + 1),
+    ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
                     mExchangeId, em->GetContextsInUse(), this);
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
@@ -361,10 +368,16 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(GetMessageDispatch() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
+    ApplicationExchangeDispatch defaultDispatch;
 
-    err = GetMessageDispatch()->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
+    if (dispatch == nullptr)
+    {
+        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
+        dispatch = &defaultDispatch;
+    }
+
+    CHIP_ERROR err = dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.

@@ -6578,6 +6578,403 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace NetworkCommissioning
 
+namespace OtaSoftwareUpdateServer {
+
+void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+{
+    {
+        switch (aCommandId)
+        {
+        case ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            chip::ByteSpan updateToken;
+            bool updateTokenExists = false;
+            uint32_t newVersion;
+            bool newVersionExists       = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (updateTokenExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    {
+                        const uint8_t * data = nullptr;
+                        TLVUnpackError       = aDataTlv.GetDataPtr(data);
+                        updateToken          = chip::ByteSpan(data, aDataTlv.GetLength());
+                    }
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        updateTokenExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (newVersionExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(newVersion);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        newVersionExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(updateToken, newVersion);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    2, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            chip::ByteSpan updateToken;
+            bool updateTokenExists = false;
+            uint32_t currentVersion;
+            bool currentVersionExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (updateTokenExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    {
+                        const uint8_t * data = nullptr;
+                        TLVUnpackError       = aDataTlv.GetDataPtr(data);
+                        updateToken          = chip::ByteSpan(data, aDataTlv.GetLength());
+                    }
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        updateTokenExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (currentVersionExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(currentVersion);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        currentVersionExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(updateToken, currentVersion);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    2, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_QUERY_IMAGE_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint16_t vendorId;
+            bool vendorIdExists = false;
+            uint16_t productId;
+            bool productIdExists = false;
+            uint16_t imageType;
+            bool imageTypeExists = false;
+            uint16_t hardwareVersion;
+            bool hardwareVersionExists = false;
+            uint32_t currentVersion;
+            bool currentVersionExists = false;
+            /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported;
+            bool protocolsSupportedExists = false;
+            const uint8_t * location;
+            bool locationExists = false;
+            uint8_t clientCanConsent;
+            bool clientCanConsentExists = false;
+            chip::ByteSpan metadataForServer;
+            bool metadataForServerExists = false;
+            uint32_t validArgumentCount  = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (vendorIdExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(vendorId);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        vendorIdExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (productIdExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(productId);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        productIdExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 2:
+                    if (imageTypeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(imageType);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        imageTypeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 3:
+                    if (hardwareVersionExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(hardwareVersion);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        hardwareVersionExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 4:
+                    if (currentVersionExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(currentVersion);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        currentVersionExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 5:
+                    if (protocolsSupportedExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(protocolsSupported));
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        protocolsSupportedExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 6:
+                    if (locationExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
+                    TLVUnpackError = aDataTlv.GetDataPtr(location);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        locationExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 7:
+                    if (clientCanConsentExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(clientCanConsent);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        clientCanConsentExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 8:
+                    if (metadataForServerExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    {
+                        const uint8_t * data = nullptr;
+                        TLVUnpackError       = aDataTlv.GetDataPtr(data);
+                        metadataForServer    = chip::ByteSpan(data, aDataTlv.GetLength());
+                    }
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        metadataForServerExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 9 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
+                    vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
+                    const_cast<uint8_t *>(location), clientCanConsent, metadataForServer);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    9, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_OTA_SERVER_CLUSTER_ID);
+            break;
+        }
+        }
+    }
+}
+
+} // namespace OtaSoftwareUpdateServer
+
 namespace OnOff {
 
 void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
@@ -7297,6 +7694,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
+    case ZCL_OTA_SERVER_CLUSTER_ID:
+        clusters::OtaSoftwareUpdateServer::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         clusters::OnOff::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);

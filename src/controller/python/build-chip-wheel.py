@@ -137,6 +137,7 @@ try:
             'chip.logging',
             'chip.native',
             'chip.tlv',
+            'chip.setup_payload',
     ]
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing

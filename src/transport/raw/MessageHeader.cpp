@@ -270,22 +270,16 @@ CHIP_ERROR PayloadHeader::DecodeAndConsume(const System::PacketBufferHandle & bu
 
 CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    uint8_t * p     = data;
-    uint16_t header = kHeaderVersion << kVersionShift;
+    VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    Header::Flags encodeFlags = mFlags;
+    encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
+        .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
 
-    {
-        Header::Flags encodeFlags = mFlags;
-        encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
-            .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
-
-        header = header | encodeFlags.Raw();
-    }
-
+    uint16_t header = (kHeaderVersion << kVersionShift) | encodeFlags.Raw();
     header |= (static_cast<uint16_t>(static_cast<uint16_t>(mEncryptionType) << kEncryptionTypeShift) & kEncryptionTypeMask);
 
+    uint8_t * p = data;
     LittleEndian::Write16(p, header);
     LittleEndian::Write32(p, mMessageId);
     if (mSourceNodeId.HasValue())
@@ -300,11 +294,10 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     LittleEndian::Write16(p, mEncryptionKeyID);
 
     // Written data size provided to caller on success
-    VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
     *encode_size = static_cast<uint16_t>(p - data);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf) const
@@ -322,11 +315,10 @@ CHIP_ERROR PacketHeader::EncodeBeforeData(const System::PacketBufferHandle & buf
 
 CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    VerifyOrReturnError(size >= EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
+
     uint8_t * p          = data;
     const uint8_t header = mExchangeFlags.Raw();
-
-    VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     Write8(p, header);
     Write8(p, mMessageType);
@@ -342,11 +334,10 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
     }
 
     // Written data size provided to caller on success
-    VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(p - data == EncodeSizeBytes(), CHIP_ERROR_INTERNAL);
     *encode_size = static_cast<uint16_t>(p - data);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & buf) const
@@ -365,39 +356,33 @@ CHIP_ERROR PayloadHeader::EncodeBeforeData(const System::PacketBufferHandle & bu
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
                                              uint16_t * decode_len)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    const uint8_t * p     = data;
     const uint16_t taglen = TagLenForEncryptionType(packetHeader.GetEncryptionType());
 
-    VerifyOrExit(taglen != 0, err = CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
-    VerifyOrExit(size >= taglen, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE_FROM_PEER);
+    VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);
 
-    memcpy(&mTag[0], p, taglen);
+    memcpy(&mTag[0], data, taglen);
 
     *decode_len = taglen;
 
-exit:
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, uint8_t * data, uint16_t size,
                                              uint16_t * encode_size) const
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
     uint8_t * p           = data;
     const uint16_t taglen = TagLenForEncryptionType(packetHeader.GetEncryptionType());
 
-    VerifyOrExit(taglen != 0, err = CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
-    VerifyOrExit(size >= taglen, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(taglen != 0, CHIP_ERROR_WRONG_ENCRYPTION_TYPE);
+    VerifyOrReturnError(size >= taglen, CHIP_ERROR_INVALID_ARGUMENT);
 
     memcpy(p, &mTag[0], taglen);
 
     // Written data size provided to caller on success
     *encode_size = taglen;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

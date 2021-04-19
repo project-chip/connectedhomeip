@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell.h>
+#include <lib/shell/shell_core.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
