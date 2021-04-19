@@ -216,11 +216,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!isAdvertisingRerun)
     {
-// If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
         // Generate new private BLE address
         struct bt_le_oob bleOobInfo;
         err = bt_le_oob_get_local(advParams.id, &bleOobInfo);
@@ -290,11 +285,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         {

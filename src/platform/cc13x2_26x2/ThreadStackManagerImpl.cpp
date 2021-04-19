@@ -111,14 +111,6 @@ bool ThreadStackManagerImpl::IsInitialized()
     return sInstance.mThreadStackLock != NULL;
 }
 
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart(void)
-{
-}
-
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
-{
-}
-
 void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueMsg & procMsg)
 {
     xQueueSendFromISR(procQueue, &procMsg, NULL);

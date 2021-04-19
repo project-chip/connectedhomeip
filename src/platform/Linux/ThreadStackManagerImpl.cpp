@@ -406,10 +406,6 @@ void ThreadStackManagerImpl::_OnMessageLayerActivityChanged(bool messageLayerIsA
     (void) messageLayerIsActive;
 }
 
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart() {}
-
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop() {}
-
 CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadStatsCounters()
 {
     // TODO: implement after we decide on the profiling protocol

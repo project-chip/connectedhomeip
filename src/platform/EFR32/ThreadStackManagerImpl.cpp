@@ -67,14 +67,6 @@ bool ThreadStackManagerImpl::IsInitialized()
     return sInstance.mThreadStackLock != NULL;
 }
 
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart(void)
-{
-}
-
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
-{
-}
-
 } // namespace DeviceLayer
 } // namespace chip
 
