@@ -110,7 +110,8 @@ public:
     /**
      * Notification that a Command Send has received an Invoke Command Response and fails to process a command data element in that
      * command response
-     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly     w* @param[in]  aCommandIndex  Current processing command index which can identify failed command
+     * @param[in]  apCommandSender A current command sender which can identify the command sender to the consumer, particularly w*
+     * @param[in]  aCommandIndex  Current processing command index which can identify failed command
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR CommandResponseProtocolError(const CommandSender * apCommandSender, uint8_t aCommandIndex)

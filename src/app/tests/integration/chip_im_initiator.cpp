@@ -87,10 +87,10 @@ CHIP_ERROR SendCommandRequest(void)
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     chip::app::CommandPathParams commandPathParams = { kTestEndPointId, // Endpoint
-                                                        kTestGroupId,    // GroupId
-                                                        kTestClusterId,  // ClusterId
-                                                        kTestCommandId,  // CommandId
-                                                        chip::app::CommandPathFlags::kEndpointIdValid };
+                                                       kTestGroupId,    // GroupId
+                                                       kTestClusterId,  // ClusterId
+                                                       kTestCommandId,  // CommandId
+                                                       chip::app::CommandPathFlags::kEndpointIdValid };
 
     // Add command data here
 

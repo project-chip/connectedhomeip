@@ -33,71 +33,70 @@ enum class CommandPathFlags : uint8_t
 struct CommandPathParams
 {
     CommandPathParams(EndpointId aEndpointId, GroupId aGroupId, ClusterId aClusterId, CommandId aCommandId,
-                  const BitFlags<CommandPathFlags> & aFlags) :
+                      const BitFlags<CommandPathFlags> & aFlags) :
         mEndpointId(aEndpointId),
         mGroupId(aGroupId), mClusterId(aClusterId), mCommandId(aCommandId), mFlags(aFlags)
     {}
     bool operator==(const CommandPathParams & aCommandPathParams) const
     {
-        return ((aCommandPathParams.mClusterId == mClusterId) &&
-                (aCommandPathParams.mCommandId == mCommandId) &&
+        return ((aCommandPathParams.mClusterId == mClusterId) && (aCommandPathParams.mCommandId == mCommandId) &&
                 (mFlags.Has(aCommandPathParams.mFlags)) &&
                 (mFlags.Has(CommandPathFlags::kEndpointIdValid) ? aCommandPathParams.mEndpointId == mEndpointId : false) &&
                 (mFlags.Has(CommandPathFlags::kGroupIdValid) ? aCommandPathParams.mGroupId == mGroupId : false));
     }
-    EndpointId mEndpointId = 0;
-    GroupId mGroupId = 0;
-    ClusterId mClusterId = 0;
-    CommandId mCommandId = 0;
+    EndpointId mEndpointId            = 0;
+    GroupId mGroupId                  = 0;
+    ClusterId mClusterId              = 0;
+    CommandId mCommandId              = 0;
     BitFlags<CommandPathFlags> mFlags = CommandPathFlags::kEndpointIdValid;
 };
 
 enum class AttributePathFlags : uint8_t
 {
-    kFieldIdValid      = 0x01,
-    kListIndexValid    = 0x02,
+    kFieldIdValid   = 0x01,
+    kListIndexValid = 0x02,
 };
 
 struct AttributePathParams
 {
-    AttributePathParams(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, FieldId aFieldId, ListIndex aListIndex, const BitFlags<AttributePathFlags> & aFlags) :
-    mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId),  mListIndex(aListIndex), mFlags(aFlags)
+    AttributePathParams(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, FieldId aFieldId,
+                        ListIndex aListIndex, const BitFlags<AttributePathFlags> & aFlags) :
+        mNodeId(aNodeId),
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
 
     bool operator==(const AttributePathParams & aAttributePathParams) const
     {
-        return ((aAttributePathParams.mNodeId == mNodeId) &&
-                (aAttributePathParams.mEndpointId == mEndpointId) &&
-                (aAttributePathParams.mClusterId == mClusterId) &&
-                (mFlags.Has(aAttributePathParams.mFlags)) &&
+        return ((aAttributePathParams.mNodeId == mNodeId) && (aAttributePathParams.mEndpointId == mEndpointId) &&
+                (aAttributePathParams.mClusterId == mClusterId) && (mFlags.Has(aAttributePathParams.mFlags)) &&
                 (mFlags.Has(AttributePathFlags::kFieldIdValid) ? aAttributePathParams.mFieldId == mFieldId : false) &&
                 (mFlags.Has(AttributePathFlags::kListIndexValid) ? aAttributePathParams.mListIndex == mListIndex : false));
     }
-    chip::NodeId mNodeId = 0;
-    chip::EndpointId mEndpointId = 0;
-    chip::ClusterId mClusterId = 0;
-    chip::FieldId mFieldId = 0;
-    chip::ListIndex mListIndex = 0;
+    chip::NodeId mNodeId                = 0;
+    chip::EndpointId mEndpointId        = 0;
+    chip::ClusterId mClusterId          = 0;
+    chip::FieldId mFieldId              = 0;
+    chip::ListIndex mListIndex          = 0;
     BitFlags<AttributePathFlags> mFlags = AttributePathFlags::kFieldIdValid;
 };
 
 struct EventPathParams
 {
-    EventPathParams(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, chip::EventId aEventId, bool aIsUrgent) :
-        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
+    EventPathParams(chip::NodeId aNodeId, chip::EndpointId aEndpointId, chip::ClusterId aClusterId, chip::EventId aEventId,
+                    bool aIsUrgent) :
+        mNodeId(aNodeId),
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
     {}
     bool operator==(const EventPathParams & aEventPathParams) const
     {
-        return ((aEventPathParams.mNodeId == mNodeId) &&
-                (aEventPathParams.mEndpointId == mEndpointId) &&
-                (aEventPathParams.mClusterId == mClusterId) &&
-                (aEventPathParams.mEventId == mEventId));
+        return ((aEventPathParams.mNodeId == mNodeId) && (aEventPathParams.mEndpointId == mEndpointId) &&
+                (aEventPathParams.mClusterId == mClusterId) && (aEventPathParams.mEventId == mEventId));
     }
-    NodeId mNodeId = 0;
+    NodeId mNodeId         = 0;
     EndpointId mEndpointId = 0;
-    ClusterId mClusterId = 0;
-    EventId mEventId = 0;
-    bool mIsUrgent = false;
+    ClusterId mClusterId   = 0;
+    EventId mEventId       = 0;
+    bool mIsUrgent         = false;
 };
 
 struct ClusterInfo
@@ -110,7 +109,7 @@ struct ClusterInfo
         return ((aClusterInfo.mAttributePathParams == mAttributePathParams));
     }
     AttributePathParams mAttributePathParams;
-    bool mDirty                          = false;
+    bool mDirty = false;
 };
-}
-}
+} // namespace app
+} // namespace chip

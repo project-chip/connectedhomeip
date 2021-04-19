@@ -188,7 +188,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataElement::Builder aCommandDataElement)
+CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
+                                         CommandDataElement::Builder aCommandDataElement)
 {
     CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
     if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))

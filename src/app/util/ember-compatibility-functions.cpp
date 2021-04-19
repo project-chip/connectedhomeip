@@ -67,10 +67,10 @@ bool IMEmberAfSendDefaultResponseWithCallback(EmberAfStatus status)
     }
 
     chip::app::CommandPathParams returnStatusParam = { imCompatibilityEmberApsFrame.sourceEndpoint,
-                                                            0, // GroupId
-                                                            imCompatibilityEmberApsFrame.clusterId,
-                                                            imCompatibilityEmberAfCluster.commandId,
-                                                            (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                       0, // GroupId
+                                                       imCompatibilityEmberApsFrame.clusterId,
+                                                       imCompatibilityEmberAfCluster.commandId,
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     CHIP_ERROR err =
         currentCommandObject->AddStatusCode(&returnStatusParam, chip::Protocols::SecureChannel::GeneralStatusCode::kSuccess,

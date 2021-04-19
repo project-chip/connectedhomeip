@@ -124,12 +124,12 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
 void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand,
                                                    bool aNeedStatusCode, bool aIsEmptyResponse)
 {
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
     chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
-                                                        2, // GroupId
-                                                        3, // ClusterId
-                                                        4, // CommandId
-                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                       2, // GroupId
+                                                       3, // ClusterId
+                                                       4, // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     if (aNeedStatusCode)
     {
@@ -181,12 +181,12 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
 
 void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
     chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
-                                                        2, // GroupId
-                                                        3, // ClusterId
-                                                        4, // CommandId
-                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                       2, // GroupId
+                                                       3, // ClusterId
+                                                       4, // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
     app::CommandHandler commandHandler;
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                                       = commandHandler.Init(&chip::gExchangeManager, nullptr);

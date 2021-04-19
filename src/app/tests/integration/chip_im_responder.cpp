@@ -58,10 +58,10 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     }
 
     chip::app::CommandPathParams commandPathParams = { kTestEndPointId, // Endpoint
-                                                        kTestGroupId,    // GroupId
-                                                        kTestClusterId,  // ClusterId
-                                                        kTestCommandId,  // CommandId
-                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                                       kTestGroupId,    // GroupId
+                                                       kTestClusterId,  // ClusterId
+                                                       kTestCommandId,  // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
 
