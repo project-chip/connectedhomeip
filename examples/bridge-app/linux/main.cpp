@@ -131,7 +131,7 @@ CHIP_ERROR PrintQRCodeContent()
     // Wrap it so SuccessOrExit can work
     {
         chip::QRCodeSetupPayloadGenerator generator(payload);
-        err = generator.payloadBase41Representation(result);
+        err = generator.payloadBase38Representation(result);
         SuccessOrExit(err);
     }
 

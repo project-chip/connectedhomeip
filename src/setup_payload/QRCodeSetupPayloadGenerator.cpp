@@ -23,7 +23,7 @@
  */
 
 #include "QRCodeSetupPayloadGenerator.h"
-#include "Base41.h"
+#include "Base38.h"
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -186,13 +186,13 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     return err;
 }
 
-// TODO: issue #3663 - Unbounded stack in payloadBase41RepresentationWithTLV()
+// TODO: issue #3663 - Unbounded stack in payloadBase38RepresentationWithTLV()
 #if !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
 #endif
 
-static CHIP_ERROR payloadBase41RepresentationWithTLV(SetupPayload & setupPayload, std::string & base41Representation,
+static CHIP_ERROR payloadBase38RepresentationWithTLV(SetupPayload & setupPayload, std::string & base38Representation,
                                                      size_t bitsetSize, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
     uint8_t bits[bitsetSize];
@@ -201,21 +201,21 @@ static CHIP_ERROR payloadBase41RepresentationWithTLV(SetupPayload & setupPayload
     CHIP_ERROR err = generateBitSet(setupPayload, bits, tlvDataStart, tlvDataLengthInBytes);
     SuccessOrExit(err);
 
-    encodedPayload = base41Encode(bits, ArraySize(bits));
+    encodedPayload = base38Encode(bits, ArraySize(bits));
     encodedPayload.insert(0, kQRCodePrefix);
-    base41Representation = encodedPayload;
+    base38Representation = encodedPayload;
 exit:
     return err;
 }
 
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(std::string & base41Representation)
+CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string & base38Representation)
 {
     // 6.1.2.2. Table: Packed Binary Data Structure
     // The TLV Data should be 0 length if TLV is not included.
-    return payloadBase41Representation(base41Representation, nullptr, 0);
+    return payloadBase38Representation(base38Representation, nullptr, 0);
 }
 
-CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(std::string & base41Representation, uint8_t * tlvDataStart,
+CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase38Representation(std::string & base38Representation, uint8_t * tlvDataStart,
                                                                     uint32_t tlvDataStartSize)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -225,7 +225,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::payloadBase41Representation(std::string 
     err = generateTLVFromOptionalData(mPayload, tlvDataStart, tlvDataStartSize, tlvDataLengthInBytes);
     SuccessOrExit(err);
 
-    err = payloadBase41RepresentationWithTLV(mPayload, base41Representation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
+    err = payloadBase38RepresentationWithTLV(mPayload, base38Representation, kTotalPayloadDataSizeInBytes + tlvDataLengthInBytes,
                                              tlvDataStart, tlvDataLengthInBytes);
     SuccessOrExit(err);
 

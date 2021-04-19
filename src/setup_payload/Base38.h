@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Utility header to encode an input into a Base41 String
+ *      Utility header to encode an input into a Base38 String
  */
 
 #pragma once
@@ -30,7 +30,7 @@
 
 namespace chip {
 // returns CHIP_NO_ERROR on successful decode
-CHIP_ERROR base41Decode(std::string base41, std::vector<uint8_t> & out);
-std::string base41Encode(const uint8_t * buf, size_t buf_len);
+CHIP_ERROR base38Decode(std::string base38, std::vector<uint8_t> & out);
+std::string base38Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip

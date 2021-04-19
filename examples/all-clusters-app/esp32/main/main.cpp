@@ -487,12 +487,12 @@ std::string createSetupPayload()
 
         size_t tlvDataLen = sizeof(gw_ip);
         uint8_t tlvDataStart[tlvDataLen];
-        err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+        err = generator.payloadBase38Representation(result, tlvDataStart, tlvDataLen);
     }
     else
     {
         QRCodeSetupPayloadGenerator generator(payload);
-        err = generator.payloadBase41Representation(result);
+        err = generator.payloadBase38Representation(result);
     }
 
     {

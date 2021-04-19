@@ -67,7 +67,7 @@
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:B20800G.0G8G000"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"CH:J5L900CK70WWI0000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNil(payload);
@@ -78,7 +78,7 @@
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008000"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"CH:R5L90UV200A3L900000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -96,8 +96,8 @@
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G00800800583ND0UOGMHARTH7-40Y1CLJ/I7O"];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc]
+        initWithBase38Representation:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
