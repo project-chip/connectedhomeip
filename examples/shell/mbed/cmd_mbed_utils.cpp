@@ -761,11 +761,14 @@ public:
                            System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
     {
         char src_addr[PeerAddress::kMaxToStringSize];
+        streamer_t * sout     = streamer_get();
         auto state            = mgr->GetPeerConnectionState(session);
         const size_t data_len = buffer->DataLength();
 
         state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-        streamer_printf(streamer_get(), "INFO: received packet from: %zu bytes\r\n", src_addr, static_cast<size_t>(data_len));
+        streamer_printf(sout, "INFO: received %d bytes from: %s\r\n", data_len, src_addr);
+        streamer_printf(sout, "INFO: received message: \r\n%.*s\r\n\r\n",
+                        strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
     }
 
     void OnReceiveError(CHIP_ERROR error, const PeerAddress & source, SecureSessionMgr * mgr) override
