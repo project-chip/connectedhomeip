@@ -559,6 +559,15 @@
 					CoreBluetooth,
 					"-lnetwork",
 				);
+				"OTHER_LDFLAGS[sdk=macosx*]" = (
+					"-framework",
+					IOKit,
+					"-lnetwork",
+					"-framework",
+					CoreBluetooth,
+					"-framework",
+					CoreData,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				TARGETED_DEVICE_FAMILY = "1,2";
