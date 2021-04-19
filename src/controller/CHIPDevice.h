@@ -164,6 +164,7 @@ public:
         mAdminId        = admin;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
+#endif
 
 #if CHIP_ENABLE_INTERACTION_MODEL
         InitCommandSender();

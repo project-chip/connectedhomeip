@@ -54,7 +54,6 @@
 
 namespace chip {
 
-namespace chip {
 namespace Controller {
 
 constexpr uint16_t kNumMaxActiveDevices = 64;
