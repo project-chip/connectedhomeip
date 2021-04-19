@@ -26,13 +26,13 @@ namespace clusters {
 {{#if (user_cluster_has_enabled_command name side)}}
 namespace {{asCamelCased name false}} {
 
-void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
     {{else}}
     {{/if}}
     {
-        switch (commandId)
+        switch (aCommandId)
         {
         {{#all_user_cluster_commands}}
         {{#unless mfgCode}}
@@ -48,8 +48,9 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * command, CommandI
         {{/all_user_cluster_commands}}
         default: {
             // Unrecognized command ID, error status will apply.
-            // TODO: Encode response for command not found
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_{{asDelimitedMacro define}}_ID);
+            apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
+                            Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_{{asDelimitedMacro define}}_ID);
             break;
         }
         }
@@ -69,6 +70,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
                   aCommandId, aEndPointId);
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    TLV::TLVType dataTlvType;
+    SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
     {{#all_user_clusters}}
@@ -82,11 +85,14 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {{/all_user_clusters}}
     default:
         // Unrecognized cluster ID, error status will apply.
-        // TODO: Encode response for Cluster not found
+        apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
+                            Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
+exit:
     Compatibility::ResetEmberAfObjects();
+    aReader.ExitContainer(dataTlvType);
 }
 
 } // namespace app

@@ -86,7 +86,7 @@ menu "CHIP Core"
 
         config USE_MINIMAL_MDNS
             bool "Use the minimal mDNS implementation shipped in the CHIP library"
-            default n
+            default y
             help
                 The CHIP library is shipped with a minimal mDNS implementation,
                 enable this config to use it rather than the mDNS library in IDF.
@@ -676,7 +676,7 @@ menu "CHIP Device Layer"
         config USE_TEST_SETUP_PIN_CODE
             int "Use Test Setup Pin Code"
             range 0 99999999
-            default 12345678
+            default 20202021
             help
                 Specifies a hard-coded device setup pin code to be used if none is found in CHIP NV storage.
                 Setting the value to 0 disables the feature.

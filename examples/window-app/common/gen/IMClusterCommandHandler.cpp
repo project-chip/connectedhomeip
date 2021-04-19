@@ -41,10 +41,10 @@ namespace clusters {
 
 namespace WindowCovering {
 
-void DispatchServerCommand(app::Command * command, CommandId commandId, EndpointId endpointId, TLV::TLVReader & dataTlv)
+void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
 {
     {
-        switch (commandId)
+        switch (aCommandId)
         {
         case ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID: {
 
@@ -62,18 +62,18 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             bool percentageLiftValueExists = false;
             uint32_t validArgumentCount    = 0;
 
-            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
             {
-                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
                 {
                 case 0:
                     if (percentageLiftValueExists)
                     {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
                         TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
                         break;
                     }
-                    TLVUnpackError = dataTlv.Get(percentageLiftValue);
+                    TLVUnpackError = aDataTlv.Get(percentageLiftValue);
                     if (CHIP_NO_ERROR == TLVUnpackError)
                     {
                         percentageLiftValueExists = true;
@@ -88,7 +88,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
                     break;
                 }
             }
@@ -109,10 +109,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(percentageLiftValue);
             }
-            else if (1 != validArgumentCount)
+            else
             {
-                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
-                                validArgumentCount);
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    1, validArgumentCount, TLVError, TLVUnpackError);
             }
             break;
         }
@@ -126,18 +129,18 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             bool liftValueExists        = false;
             uint32_t validArgumentCount = 0;
 
-            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
             {
-                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
                 {
                 case 0:
                     if (liftValueExists)
                     {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
                         TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
                         break;
                     }
-                    TLVUnpackError = dataTlv.Get(liftValue);
+                    TLVUnpackError = aDataTlv.Get(liftValue);
                     if (CHIP_NO_ERROR == TLVUnpackError)
                     {
                         liftValueExists = true;
@@ -152,7 +155,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
                     break;
                 }
             }
@@ -173,10 +176,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(liftValue);
             }
-            else if (1 != validArgumentCount)
+            else
             {
-                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
-                                validArgumentCount);
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    1, validArgumentCount, TLVError, TLVUnpackError);
             }
             break;
         }
@@ -190,18 +196,18 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             bool percentageTiltValueExists = false;
             uint32_t validArgumentCount    = 0;
 
-            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
             {
-                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
                 {
                 case 0:
                     if (percentageTiltValueExists)
                     {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
                         TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
                         break;
                     }
-                    TLVUnpackError = dataTlv.Get(percentageTiltValue);
+                    TLVUnpackError = aDataTlv.Get(percentageTiltValue);
                     if (CHIP_NO_ERROR == TLVUnpackError)
                     {
                         percentageTiltValueExists = true;
@@ -216,7 +222,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
                     break;
                 }
             }
@@ -237,10 +243,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(percentageTiltValue);
             }
-            else if (1 != validArgumentCount)
+            else
             {
-                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
-                                validArgumentCount);
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    1, validArgumentCount, TLVError, TLVUnpackError);
             }
             break;
         }
@@ -254,18 +263,18 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
             bool tiltValueExists        = false;
             uint32_t validArgumentCount = 0;
 
-            while ((TLVError = dataTlv.Next()) == CHIP_NO_ERROR)
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
             {
-                switch (TLV::TagNumFromTag(dataTlv.GetTag()))
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
                 {
                 case 0:
                     if (tiltValueExists)
                     {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(dataTlv.GetTag()));
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
                         TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
                         break;
                     }
-                    TLVUnpackError = dataTlv.Get(tiltValue);
+                    TLVUnpackError = aDataTlv.Get(tiltValue);
                     if (CHIP_NO_ERROR == TLVUnpackError)
                     {
                         tiltValueExists = true;
@@ -280,7 +289,7 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 if (TLVUnpackError != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
-                                    TLV::TagNumFromTag(dataTlv.GetTag()), TLVUnpackError);
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
                     break;
                 }
             }
@@ -301,10 +310,13 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
                 emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(tiltValue);
             }
-            else if (1 != validArgumentCount)
+            else
             {
-                ChipLogProgress(Zcl, "Missing command arguments in TLV data, command requires %d, given %" PRIu32, 1,
-                                validArgumentCount);
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    1, validArgumentCount, TLVError, TLVUnpackError);
             }
             break;
         }
@@ -322,8 +334,9 @@ void DispatchServerCommand(app::Command * command, CommandId commandId, Endpoint
         }
         default: {
             // Unrecognized command ID, error status will apply.
-            // TODO: Encode response for command not found
-            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, commandId, ZCL_WINDOW_COVERING_CLUSTER_ID);
+            apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_WINDOW_COVERING_CLUSTER_ID);
             break;
         }
         }
@@ -340,6 +353,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId, aCommandId,
                   aEndPointId);
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    TLV::TLVType dataTlvType;
+    SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
     case ZCL_WINDOW_COVERING_CLUSTER_ID:
@@ -347,11 +362,14 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         break;
     default:
         // Unrecognized cluster ID, error status will apply.
-        // TODO: Encode response for Cluster not found
+        apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
+                                    Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
+exit:
     Compatibility::ResetEmberAfObjects();
+    aReader.ExitContainer(dataTlvType);
 }
 
 } // namespace app

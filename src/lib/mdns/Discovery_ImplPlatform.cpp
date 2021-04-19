@@ -32,24 +32,6 @@
 
 namespace {
 
-uint8_t HexToInt(char c)
-{
-    if ('0' <= c && c <= '9')
-    {
-        return static_cast<uint8_t>(c - '0');
-    }
-    else if ('a' <= c && c <= 'f')
-    {
-        return static_cast<uint8_t>(0x0a + c - 'a');
-    }
-    else if ('A' <= c && c <= 'F')
-    {
-        return static_cast<uint8_t>(0x0a + c - 'A');
-    }
-
-    return UINT8_MAX;
-}
-
 constexpr uint64_t kUndefinedNodeId = 0;
 
 } // namespace
@@ -261,7 +243,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     mOperationalAdvertisingParams = params;
-    // TODO: There may be multilple device/fabrid ids after multi-admin.
+    // TODO: There may be multilple device/fabric ids after multi-admin.
 
     // According to spec CRI and CRA intervals should not exceed 1 hour (3600000 ms).
     // TODO: That value should be defined in the ReliableMessageProtocolConfig.h,
@@ -320,16 +302,15 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
                                                   strlen(crmpRetryIntervalActiveBuf) };
 
     ReturnErrorOnFailure(SetupHostname(params.GetMac()));
-    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetFabricId(), params.GetNodeId()));
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
     service.mTextEntries   = crmpRetryIntervalEntries;
     service.mTextEntrySize = textEntrySize;
-
-    service.mInterface   = INET_NULL_INTERFACEID;
-    service.mAddressType = Inet::kIPAddressType_Any;
-    error                = ChipMdnsPublishService(&service);
+    service.mInterface     = INET_NULL_INTERFACEID;
+    service.mAddressType   = Inet::kIPAddressType_Any;
+    error                  = ChipMdnsPublishService(&service);
 
     return error;
 }
@@ -348,13 +329,13 @@ CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegat
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
     ReturnErrorOnFailure(Init());
 
     MdnsService service;
 
-    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), fabricId, nodeId));
+    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), peerId));
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
@@ -373,57 +354,33 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(kUndefinedNodeId, error);
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
         return;
     }
 
     if (result == nullptr)
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(kUndefinedNodeId, CHIP_ERROR_UNKNOWN_RESOURCE_ID);
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
         return;
     }
 
-    // Parse '%x-%x' from the name
-    uint64_t nodeId       = 0;
-    bool deliminatorFound = false;
+    ResolvedNodeData nodeData;
 
-    for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
+    error = ExtractIdFromInstanceName(result->mName, &nodeData.mPeerId);
+    if (error != CHIP_NO_ERROR)
     {
-        if (result->mName[i] == '-')
-        {
-            deliminatorFound = true;
-        }
-        else if (deliminatorFound)
-        {
-            uint8_t val = HexToInt(result->mName[i]);
-
-            if (val == UINT8_MAX)
-            {
-                break;
-            }
-            else
-            {
-                nodeId = nodeId * 16 + val;
-            }
-        }
+        ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
+        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
+        return;
     }
 
-    ResolvedNodeData nodeData;
     nodeData.mInterfaceId = result->mInterface;
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-    if (deliminatorFound)
-    {
-        ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-        mgr->mResolverDelegate->OnNodeIdResolved(nodeId, nodeData);
-    }
-    else
-    {
-        ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
-        mgr->mResolverDelegate->OnNodeIdResolved(kUndefinedNodeId, nodeData);
-    }
+    ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeData.mPeerId.GetNodeId());
+    mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 
 DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()

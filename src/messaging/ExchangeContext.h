@@ -36,12 +36,11 @@
 
 namespace chip {
 
-constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
-
 namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
+class ExchangeMessageDispatch;
 
 class ExchangeContextDeletor
 {
@@ -55,7 +54,8 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -129,6 +129,8 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
+     *  @param[in]    peerAddress   The address of the sender
+     *
      *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
@@ -137,15 +139,16 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
-    ExchangeDelegate * GetDelegate() const { return mDelegate; }
-    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
-    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
+    ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+    ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
+
+    ExchangeMessageDispatch * GetMessageDispatch();
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
@@ -165,9 +168,9 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
+    void SetAppState(void * state) { mAppState = state; }
 
-    const uint8_t * GetChallenge() const { return mChallenge; }
+    void * GetAppState() const { return mAppState; }
 
     SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
@@ -180,33 +183,21 @@ public:
     void Abort();
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegate * delegate);
+                            ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
 
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    enum class ExFlagValues : uint16_t
-    {
-        kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
-        kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
-    };
-
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ReliableMessageContext mReliableMessageContext;
-    ExchangeDelegate * mDelegate   = nullptr;
-    ExchangeManager * mExchangeMgr = nullptr;
-    ExchangeACL * mExchangeACL     = nullptr;
+    ExchangeDelegateBase * mDelegate = nullptr;
+    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeACL * mExchangeACL       = nullptr;
+    void * mAppState                 = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
-
-    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
-    // actions with a delegate pattern.
-    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
-
-    BitFlags<ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.

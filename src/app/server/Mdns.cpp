@@ -24,10 +24,10 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
 
 #include "Server.h"
 
@@ -97,15 +97,16 @@ CHIP_ERROR AdvertiseOperational()
 
     const auto advertiseParameters =
         chip::Mdns::OperationalAdvertisingParameters()
-            .SetFabricId(fabricId)
-            .SetNodeId(GetCurrentNodeId())
+            .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
-            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .SetPort(CHIP_PORT)
+            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
+    ChipLogProgress(Discovery, "Advertise operational node %" PRIX64 "-%" PRIX64, advertiseParameters.GetPeerId().GetFabricId(),
+                    advertiseParameters.GetPeerId().GetNodeId());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -146,12 +147,16 @@ CHIP_ERROR AdvertiseCommisioning()
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// (Re-)starts the minmdns server
 void StartServer()
 {
+    ChipLogProgress(Discovery, "Start dns-sd server");
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
     // TODO: advertise this only when really operational once we support both

@@ -28,5 +28,7 @@ source_set("freertos_mbedtls_utils") {
   #TODO: not sure this is required, maybe we should make this dependant on mbedtls
   public_deps = [ "${k32w_sdk_build_root}:k32w_sdk" ]
 
+  cflags = [ "-Wconversion" ]
+
   public_configs = [ ":support_config" ]
 }

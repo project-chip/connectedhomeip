@@ -38,24 +38,18 @@ namespace Messaging {
 
 CHIP_ERROR MessageCounterSyncMgr::Init(Messaging::ExchangeManager * exchangeMgr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrReturnError(exchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
-    // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
-
-    ReturnErrorOnFailure(err);
-
-    return err;
+    // Register to receive unsolicited Message Counter Synchronization Request messages from the exchange manager.
+    return mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, this);
 }
 
 void MessageCounterSyncMgr::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
         mExchangeMgr = nullptr;
     }
 }
@@ -89,7 +83,11 @@ void MessageCounterSyncMgr::OnResponseTimeout(Messaging::ExchangeContext * excha
 
     // Close the exchange if MsgCounterSyncRsp is not received before kMsgCounterSyncTimeout.
     if (exchangeContext != nullptr)
+    {
+        chip::Platform::MemoryFree(exchangeContext->GetAppState());
+        exchangeContext->SetAppState(nullptr);
         exchangeContext->Close();
+    }
 }
 
 CHIP_ERROR MessageCounterSyncMgr::AddToRetransmissionTable(Protocols::Id protocolId, uint8_t msgType, const SendFlags & sendFlags,
@@ -202,11 +200,14 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
 
             if (packetHeader.Decode((entry.msgBuf)->Start(), (entry.msgBuf)->DataLength(), &headerSize) != CHIP_NO_ERROR)
             {
+                ChipLogError(ExchangeManager, "ProcessPendingGroupMsgs::Failed to decode PacketHeader");
                 break;
             }
 
             if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
             {
+                (entry.msgBuf)->ConsumeHead(headerSize);
+
                 // Reprocess message.
                 mExchangeMgr->GetSessionMgr()->HandleGroupMessageReceived(packetHeader, std::move(entry.msgBuf));
 
@@ -244,7 +245,8 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle sess
     Transport::PeerConnectionState * state       = nullptr;
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
-    uint8_t challenge[kMsgCounterChallengeSize];
+    void * challenge = chip::Platform::MemoryAlloc(kMsgCounterChallengeSize);
+    VerifyOrExit(challenge != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(session);
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
@@ -258,14 +260,14 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle sess
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Generate a 64-bit random number to uniquely identify the request.
-    err = DRBG_get_bytes(challenge, kMsgCounterChallengeSize);
+    err = DRBG_get_bytes(static_cast<uint8_t *>(challenge), kMsgCounterChallengeSize);
     SuccessOrExit(err);
 
     // Store generated Challenge value to ExchangeContext to resolve synchronization response.
-    exchangeContext->SetChallenge(challenge);
-
+    exchangeContext->SetAppState(challenge);
     memcpy(msgBuf->Start(), challenge, kMsgCounterChallengeSize);
     msgBuf->SetDataLength(kMsgCounterChallengeSize);
+    challenge = nullptr;
 
     sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true).Set(Messaging::SendMessageFlags::kExpectResponse, true);
 
@@ -283,6 +285,7 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle sess
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        chip::Platform::MemoryFree(challenge);
         ChipLogError(ExchangeManager, "Failed to send message counter synchronization request with error:%s", ErrorStr(err));
     }
 
@@ -313,7 +316,7 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncResp(Messaging::ExchangeCont
         bbuf.Put32(state->GetSendMessageIndex());
 
         // Fill in the random value
-        bbuf.Put(exchangeContext->GetChallenge(), kMsgCounterChallengeSize);
+        bbuf.Put(exchangeContext->GetAppState(), kMsgCounterChallengeSize);
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
@@ -340,8 +343,9 @@ void MessageCounterSyncMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext *
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const uint8_t * req = msgBuf->Start();
-    size_t reqlen       = msgBuf->DataLength();
+    void * challenge = nullptr;
+    uint8_t * req    = msgBuf->Start();
+    size_t reqlen    = msgBuf->DataLength();
 
     ChipLogDetail(ExchangeManager, "Received MsgCounterSyncReq request");
 
@@ -350,8 +354,12 @@ void MessageCounterSyncMgr::HandleMsgCounterSyncReq(Messaging::ExchangeContext *
     VerifyOrExit(req != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(reqlen == kMsgCounterChallengeSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
+    challenge = chip::Platform::MemoryAlloc(kMsgCounterChallengeSize);
+    VerifyOrExit(challenge != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    memcpy(challenge, req, kMsgCounterChallengeSize);
+
     // Store the 64-bit value sent in the Challenge filed of the MsgCounterSyncReq.
-    exchangeContext->SetChallenge(req);
+    exchangeContext->SetAppState(challenge);
 
     // Respond with MsgCounterSyncResp
     err = SendMsgCounterSyncResp(exchangeContext, { packetHeader.GetSourceNodeId().Value(), packetHeader.GetEncryptionKeyID(), 0 });
@@ -363,7 +371,11 @@ exit:
     }
 
     if (exchangeContext != nullptr)
+    {
+        chip::Platform::MemoryFree(exchangeContext->GetAppState());
+        exchangeContext->SetAppState(nullptr);
         exchangeContext->Close();
+    }
 
     return;
 }
@@ -402,7 +414,7 @@ void MessageCounterSyncMgr::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     memcpy(challenge, resp, kMsgCounterChallengeSize);
 
     // Verify that the response field matches the expected Challenge field for the exchange.
-    VerifyOrExit(memcmp(exchangeContext->GetChallenge(), challenge, kMsgCounterChallengeSize) == 0,
+    VerifyOrExit(memcmp(exchangeContext->GetAppState(), challenge, kMsgCounterChallengeSize) == 0,
                  err = CHIP_ERROR_INVALID_SIGNATURE);
 
     VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -419,7 +431,11 @@ exit:
     }
 
     if (exchangeContext != nullptr)
+    {
+        chip::Platform::MemoryFree(exchangeContext->GetAppState());
+        exchangeContext->SetAppState(nullptr);
         exchangeContext->Close();
+    }
 
     return;
 }

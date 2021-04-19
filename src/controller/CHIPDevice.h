@@ -33,10 +33,10 @@
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -112,21 +112,6 @@ public:
      */
     CHIP_ERROR SendCommands();
 
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     */
-    void InitCommandSender()
-    {
-        if (mCommandSender != nullptr)
-        {
-            mCommandSender->Shutdown();
-            mCommandSender = nullptr;
-        }
-#if CHIP_ENABLE_INTERACTION_MODEL
-        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
-#endif
-    }
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
@@ -163,6 +148,10 @@ public:
         mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
+
+#if CHIP_ENABLE_INTERACTION_MODEL
+        InitCommandSender();
+#endif
     }
 
     /**
@@ -371,6 +360,13 @@ private:
      * @param[out] didLoad   Were the secure session params loaded by the call to this function.
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
+
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     *   It's safe to call InitCommandSender multiple times, but only one will be available.
+     */
+    void InitCommandSender();
 
     uint16_t mListenPort;
 

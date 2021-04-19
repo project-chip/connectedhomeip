@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_PATH_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_PATH_H
-
 #include "Builder.h"
 #include "Parser.h"
 #include <core/CHIPCore.h>
@@ -58,6 +55,7 @@ public:
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -72,7 +70,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
-
+#endif
     /**
      *  @brief Get a TLVReader for the NodeId. Next() must be called before accessing them.
      *
@@ -115,7 +113,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetFieldId(uint8_t * const apFieldId) const;
+    CHIP_ERROR GetFieldId(chip::FieldId * const apFieldId) const;
 
     /**
      *  @brief Get a TLVReader for the ListIndex. Next() must be called before accessing them.
@@ -126,7 +124,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetListIndex(uint16_t * const apListIndex) const;
+    CHIP_ERROR GetListIndex(chip::ListIndex * const apListIndex) const;
 };
 
 class Builder : public chip::app::Builder
@@ -186,7 +184,7 @@ public:
      *
      *  @return A reference to *this
      */
-    AttributePath::Builder & FieldId(const uint8_t aFieldId);
+    AttributePath::Builder & FieldId(const chip::FieldId aFieldId);
 
     /**
      *  @brief Inject NodeId into the TLV stream.
@@ -195,7 +193,7 @@ public:
      *
      *  @return A reference to *this
      */
-    AttributePath::Builder & ListIndex(const uint16_t aListIndex);
+    AttributePath::Builder & ListIndex(const chip::ListIndex aListIndex);
 
     /**
      *  @brief Mark the end of this AttributePath
@@ -212,5 +210,3 @@ private:
 
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_PATH_H

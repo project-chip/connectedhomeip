@@ -117,10 +117,9 @@ public:
      */
     CHIP_ERROR FinalizeCommandsMessage();
 
-    chip::TLV::TLVWriter & CreateCommandDataElementTLVWriter();
-    CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
-                          chip::CommandId aCommandId, BitFlags<CommandPathFlags> Flags);
-    CHIP_ERROR AddCommand(CommandParams & aCommandParams);
+    CHIP_ERROR PrepareCommand(const CommandParams * const apCommandParams);
+    TLV::TLVWriter * GetCommandDataElementTLVWriter();
+    CHIP_ERROR FinishCommand();
     virtual CHIP_ERROR AddStatusCode(const CommandParams * apCommandParams,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                      const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
@@ -141,14 +140,14 @@ public:
 
     virtual ~Command() = default;
 
-    bool IsFree() const { return (nullptr == mpExchangeCtx); };
+    bool IsFree() const { return mState == CommandState::Uninitialized; };
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
     CHIP_ERROR ClearExistingExchangeContext();
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
-    CHIP_ERROR ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder & aCommandDataElement);
+    CHIP_ERROR ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder aCommandDataElement);
     void ClearState();
     const char * GetStateStr() const;
 
@@ -161,12 +160,9 @@ protected:
 
 private:
     friend class TestCommandInteraction;
-    chip::System::PacketBufferHandle mpBufHandle;
-    CommandState mState;
-
-    chip::System::PacketBufferHandle mCommandDataBuf;
+    CommandState mState                    = CommandState::Uninitialized;
+    TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    chip::System::PacketBufferTLVWriter mCommandDataWriter;
 };
 } // namespace app
 } // namespace chip

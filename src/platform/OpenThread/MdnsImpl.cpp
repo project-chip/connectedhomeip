@@ -42,6 +42,9 @@ const char * GetProtocolString(MdnsServiceProtocol protocol)
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
+    if (service == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
     char serviceType[kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
@@ -51,7 +54,18 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 
 CHIP_ERROR ChipMdnsStopPublish()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return ThreadStackMgr().RemoveAllSrpServices();
+}
+
+CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+{
+    if (service == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    char serviceType[kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1];
+    snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
+
+    return ThreadStackMgr().RemoveSrpService(service->mName, serviceType);
 }
 
 CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, Inet::IPAddressType addressType,

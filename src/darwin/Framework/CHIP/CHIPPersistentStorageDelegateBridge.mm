@@ -26,7 +26,8 @@ CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
 
-void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue)
+void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(
+    _Nullable id<CHIPPersistentStorageDelegate> delegate, _Nullable dispatch_queue_t queue)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate && queue) {

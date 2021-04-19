@@ -15,6 +15,7 @@
 declare_args() {
   # Crypto implementation: mbedtls, openssl.
   chip_crypto = ""
+  chip_with_se05x = 0
 }
 
 if (chip_crypto == "") {
