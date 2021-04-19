@@ -236,27 +236,27 @@ static const nlTest sTests[] =
 int CASE_TestSecurePairing_Setup(void * inContext)
 {
     CHIP_ERROR error;
-    CertificateKeyId trustedRootId = { .mId = sTestCert_Root_SubjectKeyId, .mLen = sTestCert_Root_SubjectKeyId_Len };
+    CertificateKeyId trustedRootId = { .mId = sTestCert_Root01_SubjectKeyId, .mLen = sTestCert_Root01_SubjectKeyId_Len };
 
     error = chip::Platform::MemoryInit();
     SuccessOrExit(error);
 
-    error = commissionerOpKeysSerialized.SetLength(sTestCert_Node01_PublicKey_Len + sTestCert_Node01_PrivateKey_Len);
+    error = commissionerOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len);
     SuccessOrExit(error);
 
-    memcpy((uint8_t *) (commissionerOpKeysSerialized), sTestCert_Node01_PublicKey, sTestCert_Node01_PublicKey_Len);
-    memcpy((uint8_t *) (commissionerOpKeysSerialized) + sTestCert_Node01_PublicKey_Len, sTestCert_Node01_PrivateKey,
-           sTestCert_Node01_PrivateKey_Len);
+    memcpy((uint8_t *) (commissionerOpKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+    memcpy((uint8_t *) (commissionerOpKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+           sTestCert_Node01_01_PrivateKey_Len);
 
     error = commissionerOpKeys.Deserialize(commissionerOpKeysSerialized);
     SuccessOrExit(error);
 
-    error = accessoryOpKeysSerialized.SetLength(sTestCert_Node01_PublicKey_Len + sTestCert_Node01_PrivateKey_Len);
+    error = accessoryOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len);
     SuccessOrExit(error);
 
-    memcpy((uint8_t *) (accessoryOpKeysSerialized), sTestCert_Node01_PublicKey, sTestCert_Node01_PublicKey_Len);
-    memcpy((uint8_t *) (accessoryOpKeysSerialized) + sTestCert_Node01_PublicKey_Len, sTestCert_Node01_PrivateKey,
-           sTestCert_Node01_PrivateKey_Len);
+    memcpy((uint8_t *) (accessoryOpKeysSerialized), sTestCert_Node01_01_PublicKey, sTestCert_Node01_01_PublicKey_Len);
+    memcpy((uint8_t *) (accessoryOpKeysSerialized) + sTestCert_Node01_01_PublicKey_Len, sTestCert_Node01_01_PrivateKey,
+           sTestCert_Node01_01_PrivateKey_Len);
 
     error = accessoryOpKeys.Deserialize(accessoryOpKeysSerialized);
     SuccessOrExit(error);
@@ -268,27 +268,27 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     SuccessOrExit(error);
 
     // Add the trusted root certificate to the certificate set.
-    error = commissionerCertificateSet.LoadCert(sTestCert_Root_Chip, sTestCert_Root_Chip_Len,
+    error = commissionerCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
                                                 BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
-    error = accessoryCertificateSet.LoadCert(sTestCert_Root_Chip, sTestCert_Root_Chip_Len,
+    error = accessoryCertificateSet.LoadCert(sTestCert_Root01_Chip, sTestCert_Root01_Chip_Len,
                                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
-    error = commissionerCertificateSet.LoadCert(sTestCert_NodeCA_Chip, sTestCert_NodeCA_Chip_Len,
+    error = commissionerCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
                                                 BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
-    error = accessoryCertificateSet.LoadCert(sTestCert_NodeCA_Chip, sTestCert_NodeCA_Chip_Len,
+    error = accessoryCertificateSet.LoadCert(sTestCert_ICA01_Chip, sTestCert_ICA01_Chip_Len,
                                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
     SuccessOrExit(error);
 
     error = commissionerDevOpCred.Init(&commissionerCertificateSet, 1);
     SuccessOrExit(error);
 
-    error =
-        commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_Chip, static_cast<uint16_t>(sTestCert_Node01_Chip_Len));
+    error = commissionerDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
+                                               static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len));
     SuccessOrExit(error);
 
     error = commissionerDevOpCred.SetDevOpCredKeypair(trustedRootId, &commissionerOpKeys);
@@ -297,7 +297,8 @@ int CASE_TestSecurePairing_Setup(void * inContext)
     error = accessoryDevOpCred.Init(&accessoryCertificateSet, 1);
     SuccessOrExit(error);
 
-    error = accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_Chip, static_cast<uint16_t>(sTestCert_Node01_Chip_Len));
+    error = accessoryDevOpCred.SetDevOpCred(trustedRootId, sTestCert_Node01_01_Chip,
+                                            static_cast<uint16_t>(sTestCert_Node01_01_Chip_Len));
     SuccessOrExit(error);
 
     error = accessoryDevOpCred.SetDevOpCredKeypair(trustedRootId, &accessoryOpKeys);

@@ -63,7 +63,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 17
+#define GENERATED_ATTRIBUTE_COUNT 18
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                                 \
@@ -89,6 +89,8 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(0x0001) }, /* Barrier Control (client): cluster revision */                                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
+              ZAP_SIMPLE_DEFAULT(3) }, /* Thermostat (client): cluster revision */                                                 \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(3) }, /* Color Control (client): cluster revision */                                              \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
               ZAP_SIMPLE_DEFAULT(3) }, /* Temperature Measurement (client): cluster revision */                                    \
@@ -109,7 +111,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 17
+#define GENERATED_CLUSTER_COUNT 18
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
@@ -136,22 +138,25 @@
                 0x0103, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Barrier Control (client) */                                                                \
             {                                                                                                                      \
-                0x0300, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0201, ZAP_ATTRIBUTE_INDEX(11), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Thermostat (client) */                                                                     \
+            {                                                                                                                      \
+                0x0300, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Color Control (client) */                                                                  \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(12), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0402, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x0508, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x0508, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Low Power (client) */                                                                      \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x050D, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Application Basic (client) */                                                              \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(15), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF000, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
             {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(16), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF004, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Group Key Management (client) */                                                           \
     }
 
@@ -160,7 +165,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 17, 34 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 18, 36 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -170,7 +175,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (2)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (34)
+#define ATTRIBUTE_MAX_SIZE (36)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -214,7 +219,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (131)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (138)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (client): Identify */                                 \
@@ -399,6 +404,13 @@
             },                                                   /* Door Lock (client): ClearAllRfidsResponse */                   \
             { 0x0103, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (client): BarrierControlGoToPercent */         \
             { 0x0103, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Barrier Control (client): BarrierControlStop */                \
+            { 0x0201, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Thermostat (client): CurrentWeeklySchedule */                  \
+            { 0x0201, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Thermostat (client): SetpointRaiseLower */                     \
+            { 0x0201, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Thermostat (client): RelayStatusLog */                         \
+            { 0x0201, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Thermostat (client): SetWeeklySchedule */                      \
+            { 0x0201, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Thermostat (client): GetWeeklySchedule */                      \
+            { 0x0201, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Thermostat (client): ClearWeeklySchedule */                    \
+            { 0x0201, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Thermostat (client): GetRelayStatusLog */                      \
             { 0x0300, 0x00,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Color Control (client): MoveToHue */     \
             { 0x0300, 0x01,                                                                                                        \

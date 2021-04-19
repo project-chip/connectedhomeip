@@ -228,6 +228,16 @@
 #define ZCL_SHUT_DOWN_COMMAND_ID (0x01)
 #define ZCL_LEAVE_COMMAND_ID (0x02)
 
+// Commands for cluster: OTA Software Update Server
+#define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
+#define ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID (0x02)
+#define ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID (0x03)
+#define ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID (0x04)
+
+// Commands for cluster: OTA Software Update Client
+#define ZCL_ANNOUNCE_OTA_SERVER_COMMAND_ID (0x00)
+
 // Commands for cluster: General Commissioning
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 #define ZCL_SET_FABRIC_RESPONSE_COMMAND_ID (0x01)

@@ -46,6 +46,7 @@
 | OnOff                                                               | 0x0006 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
+| Thermostat                                                          | 0x0201 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
@@ -2145,6 +2146,152 @@ encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
  */
 chip::System::PacketBufferHandle
 encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Thermostat                                                  | 0x0201 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ClearWeeklySchedule                                               |   0x03 |
+| * GetRelayStatusLog                                                 |   0x04 |
+| * GetWeeklySchedule                                                 |   0x02 |
+| * SetWeeklySchedule                                                 |   0x01 |
+| * SetpointRaiseLower                                                |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * LocalTemperature                                                  | 0x0000 |
+| * OccupiedCoolingSetpoint                                           | 0x0011 |
+| * OccupiedHeatingSetpoint                                           | 0x0012 |
+| * ControlSequenceOfOperation                                        | 0x001B |
+| * SystemMode                                                        | 0x001C |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ClearWeeklySchedule command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterClearWeeklyScheduleCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an GetRelayStatusLog command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterGetRelayStatusLogCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an GetWeeklySchedule command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterGetWeeklyScheduleCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint,
+                                                                                 uint8_t daysToReturn, uint8_t modeToReturn);
+
+/**
+ * @brief
+ *    Encode an SetWeeklySchedule command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterSetWeeklyScheduleCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint,
+                                                                                 uint8_t numberOfTransitionsForSequence,
+                                                                                 uint8_t dayOfWeekForSequence,
+                                                                                 uint8_t modeForSequence, uint8_t payload);
+
+/**
+ * @brief
+ *    Encode an SetpointRaiseLower command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterSetpointRaiseLowerCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t mode, int8_t amount);
+
+/**
+ * @brief
+ *    Encode a Thermostat server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the local temperature attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadLocalTemperatureAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server configure report command for the local temperature attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterConfigureLocalTemperatureAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           uint16_t minInterval,
+                                                                                           uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the occupied cooling setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadOccupiedCoolingSetpointAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the occupied cooling setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterWriteOccupiedCoolingSetpointAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint,
+                                                                                              int16_t occupiedCoolingSetpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the occupied heating setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadOccupiedHeatingSetpointAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the occupied heating setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterWriteOccupiedHeatingSetpointAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint,
+                                                                                              int16_t occupiedHeatingSetpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the control sequence of operation attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterReadControlSequenceOfOperationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the control sequence of operation attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterWriteControlSequenceOfOperationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                uint8_t controlSequenceOfOperation);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the system mode attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadSystemModeAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the system mode attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t systemMode);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster WindowCovering                                              | 0x0102 |

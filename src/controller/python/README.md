@@ -208,6 +208,36 @@ chip-device-ctrl > connect -ip <Device IP Address> 12345678
 **`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
 For testing
 
+### `setup-payload parse-manual <manual-pairing-code>`
+
+Print the commissioning information encoded in the Manual Pairing Code.
+
+```
+chip-device-ctrl > setup-payload parse-manual 35767807533
+Version: 0
+VendorID: 0
+ProductID: 0
+RequiresCustomFlow: 0
+RendezvousInformation: 0
+Discriminator: 3840
+SetUpPINCode: 12345678
+```
+
+### `setup-payload parse-qr <qr-code>`
+
+Print the commissioning information encoded in the QR Code payload.
+
+```
+chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%CH:H34.GHY00 0C9SS0"
+Version: 0
+VendorID: 9050
+ProductID: 20043
+RequiresCustomFlow: 0
+RendezvousInformation: 2 [BLE]
+Discriminator: 3840
+SetUpPINCode: 12345678
+```
+
 ### **`[L]`** `ble-adapter-print`
 
 Print the available Bluetooth adapters on device. Takes no arguments.

@@ -23,9 +23,6 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_DATA_LIST_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_DATA_LIST_H
-
 #include "AttributeDataElement.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
@@ -41,6 +38,7 @@ namespace AttributeDataList {
 class Parser : public ListParser
 {
 public:
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -55,6 +53,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
+#endif
 };
 
 class Builder : public ListBuilder
@@ -81,5 +80,3 @@ private:
 
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_ATTRIBUTE_DATA_LIST_H

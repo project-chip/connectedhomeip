@@ -2228,23 +2228,18 @@ void TCPEndPoint::LwIPHandleError(void * arg, err_t lwipErr)
 
 INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId)
 {
-    INET_ERROR err = INET_NO_ERROR;
-
     // If we are trying to make a TCP connection over a 'specified target interface',
     // then we bind the TCPEndPoint to an IP address on that target interface
     // and use that address as the source address for that connection. This is
     // done in the event that directly binding the connection to the target
     // interface is not allowed due to insufficient privileges.
-    IPAddress curAddr     = IPAddress::Any;
-    InterfaceId curIntfId = INET_NULL_INTERFACEID;
-    bool ipAddrFound      = false;
+    VerifyOrReturnError(State != kState_Bound, INET_ERROR_NOT_SUPPORTED);
 
-    VerifyOrExit(State != kState_Bound, err = INET_ERROR_NOT_SUPPORTED);
-
+    bool ipAddrFound = false;
     for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
     {
-        curAddr   = addrIter.GetAddress();
-        curIntfId = addrIter.GetInterface();
+        const IPAddress curAddr     = addrIter.GetAddress();
+        const InterfaceId curIntfId = addrIter.GetInterface();
 
         if (curIntfId == intfId)
         {
@@ -2257,8 +2252,7 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
                 {
                     // Bind to the IPv4 address of the TargetInterface
                     ipAddrFound = true;
-                    err         = Bind(kIPAddressType_IPv4, curAddr, 0, true);
-                    SuccessOrExit(err);
+                    ReturnErrorOnFailure(Bind(kIPAddressType_IPv4, curAddr, 0, true));
 
                     break;
                 }
@@ -2273,8 +2267,7 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
                 {
                     // Bind to the IPv6 address of the TargetInterface
                     ipAddrFound = true;
-                    err         = Bind(kIPAddressType_IPv6, curAddr, 0, true);
-                    SuccessOrExit(err);
+                    ReturnErrorOnFailure(Bind(kIPAddressType_IPv6, curAddr, 0, true));
 
                     break;
                 }
@@ -2282,10 +2275,9 @@ INET_ERROR TCPEndPoint::BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId 
         }
     }
 
-    VerifyOrExit(ipAddrFound, err = INET_ERROR_NOT_SUPPORTED);
+    VerifyOrReturnError(ipAddrFound, INET_ERROR_NOT_SUPPORTED);
 
-exit:
-    return err;
+    return INET_NO_ERROR;
 }
 
 INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
@@ -2628,7 +2620,6 @@ void TCPEndPoint::HandleIncomingConnection()
  */
 INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 {
-    INET_ERROR err          = INET_NO_ERROR;
     int currPendingBytesRaw = 0;
     uint32_t currPendingBytes; // Will be initialized once we know it's safe.
 
@@ -2636,12 +2627,12 @@ INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 
     if (ioctl(mSocket, TIOCOUTQ, &currPendingBytesRaw) < 0)
     {
-        ExitNow(err = chip::System::MapErrorPOSIX(errno));
+        return chip::System::MapErrorPOSIX(errno);
     }
 
     if (!CanCastTo<uint32_t>(currPendingBytesRaw))
     {
-        ExitNow(err = INET_ERROR_INCORRECT_STATE);
+        return INET_ERROR_INCORRECT_STATE;
     }
 
     currPendingBytes = static_cast<uint32_t>(currPendingBytesRaw);
@@ -2666,8 +2657,7 @@ INET_ERROR TCPEndPoint::CheckConnectionProgress(bool & isProgressing)
 
     mLastTCPKernelSendQueueLen = currPendingBytes;
 
-exit:
-    return err;
+    return INET_NO_ERROR;
 }
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 

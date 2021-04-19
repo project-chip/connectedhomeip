@@ -57,12 +57,12 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     {
         if (write)
         {
-            // src is a pointer to native-endian uint16_t, dst is pointer to buffer that should hold little-endian value
+            // src is a pointer to native-endian uint16_t, dest is pointer to buffer that should hold little-endian value
             emberAfCopyInt16u(dest, 0, *reinterpret_cast<uint16_t *>(src));
         }
         else
         {
-            // src is pointer to buffer holding little-endian value, dst is a pointer to native-endian uint16_t
+            // src is pointer to buffer holding little-endian value, dest is a pointer to native-endian uint16_t
             *reinterpret_cast<uint16_t *>(dest) = emberAfGetInt16u(src, 0, kSizeLengthInBytes);
         }
         return kSizeLengthInBytes;
@@ -77,6 +77,58 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0xF004: // Group Key Management Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // groups
+        {
+            entryLength = 6;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _GroupState
+            _GroupState * entry = reinterpret_cast<_GroupState *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorGroupId, write ? (uint8_t *) &entry->VendorGroupId : src, write,
+                           &entryOffset, sizeof(entry->VendorGroupId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeySetIndex, write ? (uint8_t *) &entry->GroupKeySetIndex : src,
+                           write, &entryOffset, sizeof(entry->GroupKeySetIndex)); // INT16U
+            break;
+        }
+        case 0x0001: // group keys
+        {
+            entryLength = 29;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _GroupKey
+            _GroupKey * entry = reinterpret_cast<_GroupKey *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyIndex, write ? (uint8_t *) &entry->GroupKeyIndex : src, write,
+                           &entryOffset, sizeof(entry->GroupKeyIndex)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyRoot, write ? (uint8_t *) &entry->GroupKeyRoot : src, write,
+                           &entryOffset, 16); // OCTET_STRING
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyEpochStartTime,
+                           write ? (uint8_t *) &entry->GroupKeyEpochStartTime : src, write, &entryOffset,
+                           sizeof(entry->GroupKeyEpochStartTime)); // INT64U
+            copyListMember(write ? dest : (uint8_t *) &entry->GroupKeySecurityPolicy,
+                           write ? (uint8_t *) &entry->GroupKeySecurityPolicy : src, write, &entryOffset,
+                           sizeof(entry->GroupKeySecurityPolicy)); // GroupKeySecurityPolicy
+            break;
+        }
+        }
+        break;
+    }
     }
 
     return entryLength;
@@ -96,6 +148,19 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0xF004: // Group Key Management Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // groups
+            // Struct _GroupState
+            entryLength = 6;
+            break;
+        case 0x0001: // group keys
+            // Struct _GroupKey
+            entryLength = 29;
+            break;
+        }
+        break;
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);

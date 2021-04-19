@@ -38,24 +38,18 @@ namespace Messaging {
 
 CHIP_ERROR MessageCounterSyncMgr::Init(Messaging::ExchangeManager * exchangeMgr)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrReturnError(exchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
-    // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
-    err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, this);
-
-    ReturnErrorOnFailure(err);
-
-    return err;
+    // Register to receive unsolicited Message Counter Synchronization Request messages from the exchange manager.
+    return mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, this);
 }
 
 void MessageCounterSyncMgr::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq);
         mExchangeMgr = nullptr;
     }
 }
@@ -202,11 +196,14 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
 
             if (packetHeader.Decode((entry.msgBuf)->Start(), (entry.msgBuf)->DataLength(), &headerSize) != CHIP_NO_ERROR)
             {
+                ChipLogError(ExchangeManager, "ProcessPendingGroupMsgs::Failed to decode PacketHeader");
                 break;
             }
 
             if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
             {
+                (entry.msgBuf)->ConsumeHead(headerSize);
+
                 // Reprocess message.
                 mExchangeMgr->GetSessionMgr()->HandleGroupMessageReceived(packetHeader, std::move(entry.msgBuf));
 

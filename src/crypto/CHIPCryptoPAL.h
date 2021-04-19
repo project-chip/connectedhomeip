@@ -468,7 +468,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(const uint8_t * context, size_t context_len);
+    virtual CHIP_ERROR Init(const uint8_t * context, size_t context_len);
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -484,8 +484,9 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin, size_t Lin_len);
+    virtual CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+                                     size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
+                                     size_t Lin_len);
 
     /**
      * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
@@ -501,18 +502,21 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len);
+    virtual CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+                                   size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
+                                   size_t w1in_len);
 
     /**
      * @brief Compute the first round of the protocol.
      *
+     * @param pab      X value from commissioner.
+     * @param pab_len  X length.
      * @param out     The output first round Spake2+ contribution.
      * @param out_len The output first round Spake2+ contribution length.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundOne(uint8_t * out, size_t * out_len);
+    virtual CHIP_ERROR ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Compute the second round of the protocol.
@@ -524,7 +528,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
+    virtual CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Confirm that each party computed the same keys.
@@ -534,7 +538,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
+    virtual CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
 
     /**
      * @brief Return the shared secret.

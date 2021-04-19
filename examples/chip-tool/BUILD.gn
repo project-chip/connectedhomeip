@@ -20,12 +20,11 @@ import("${chip_root}/src/app/chip_data_model.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [ "." ]
-}
-
 chip_data_model("data_model") {
-  cluster_sources = [ "media-playback-client" ]
+  cluster_sources = [
+    "media-playback-client",
+    "thermostat-client",
+  ]
 
   zap_pregenerated_dir = "gen"
 
@@ -37,6 +36,7 @@ executable("chip-tool") {
     "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
+    "commands/discover/DiscoverCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
@@ -45,9 +45,7 @@ executable("chip-tool") {
     "main.cpp",
   ]
 
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
     ":data_model",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
@@ -55,7 +53,7 @@ executable("chip-tool") {
     "${chip_root}/third_party/inipp",
   ]
 
-  public_configs = [ ":includes" ]
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }

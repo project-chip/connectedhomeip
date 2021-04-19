@@ -27,6 +27,8 @@
 #include <app/MessageDef/InvokeCommand.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <app/MessageDef/ReportData.h>
+#include <app/MessageDef/WriteRequest.h>
+#include <app/MessageDef/WriteResponse.h>
 #include <core/CHIPTLVDebug.hpp>
 #include <support/CHIPMem.h>
 #include <support/UnitTestRegistration.h>
@@ -80,15 +82,15 @@ void ParseAttributePath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     chip::NodeId nodeId         = 1;
     chip::EndpointId endpointId = 2;
     chip::ClusterId clusterId   = 3;
-    uint8_t fieldId             = 4;
-    uint16_t listIndex          = 5;
+    chip::FieldId fieldId       = 4;
+    chip::ListIndex listIndex   = 5;
 
     err = attributePathParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = attributePathParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = attributePathParser.GetNodeId(&nodeId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && nodeId == 1);
 
@@ -124,8 +126,10 @@ void ParseAttributePathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     err = attributePathListParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = attributePathListParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildEventPath(nlTestSuite * apSuite, EventPath::Builder & aEventPathBuilder)
@@ -144,9 +148,10 @@ void ParseEventPath(nlTestSuite * apSuite, EventPath::Parser & aEventPathParser)
     chip::ClusterId clusterId   = 3;
     chip::EventId eventId       = 4;
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aEventPathParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = aEventPathParser.GetNodeId(&nodeId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && nodeId == 1);
 
@@ -177,9 +182,10 @@ void ParseEventPathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
     err = eventPathListParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = eventPathListParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildCommandPath(nlTestSuite * apSuite, CommandPath::Builder & aCommandPathBuilder)
@@ -199,9 +205,10 @@ void ParseCommandPath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     err = commandPathParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = commandPathParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = commandPathParser.GetEndpointId(&endpointId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && endpointId == 1);
 
@@ -256,9 +263,10 @@ void ParseEventDataElement(nlTestSuite * apSuite, EventDataElement::Parser & aEv
     uint64_t deltaUTCTimestamp    = 0;
     uint64_t deltaSystemTimestamp = 0;
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aEventDataElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     {
         {
             EventPath::Parser eventPath;
@@ -315,9 +323,10 @@ void ParseEventList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
     err = eventListParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = eventListParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildStatusElement(nlTestSuite * apSuite, StatusElement::Builder & aStatusElementBuilder)
@@ -339,9 +348,10 @@ void ParseStatusElement(nlTestSuite * apSuite, StatusElement::Parser & aStatusEl
     uint32_t protocolId                                           = 0;
     uint16_t protocolCode                                         = 0;
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aStatusElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = aStatusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode);
     NL_TEST_ASSERT(apSuite,
                    err == CHIP_NO_ERROR &&
@@ -370,9 +380,10 @@ void ParseAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::
     AttributePath::Parser attributePathParser;
     StatusElement::Parser statusElementParser;
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aAttributeStatusElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = aAttributeStatusElementParser.GetAttributePath(&attributePathParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -398,8 +409,10 @@ void ParseAttributeStatusList(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
     err = attributeStatusParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = attributeStatusParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Builder & aAttributeDataElementBuilder)
@@ -444,10 +457,10 @@ void ParseAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Pars
     StatusElement::Parser statusElementParser;
     chip::DataVersion version = 0;
     bool moreClusterDataFlag  = false;
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aAttributeDataElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = aAttributeDataElementParser.GetAttributePath(&attributePathParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -493,9 +506,10 @@ void ParseAttributeDataList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
 
     err = attributeDataListParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = attributeDataListParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildAttributeDataVersionList(nlTestSuite * apSuite, AttributeDataVersionList::Builder & aAttributeDataVersionListBuilder)
@@ -515,9 +529,10 @@ void ParseAttributeDataVersionList(nlTestSuite * apSuite, chip::TLV::TLVReader &
     err = attributeDataVersionListParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = attributeDataVersionListParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     attributeDataVersionListParser.GetVersion(&version);
 }
 
@@ -552,10 +567,10 @@ void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser &
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aCommandDataElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = aCommandDataElementParser.GetCommandPath(&commandPathParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -597,9 +612,10 @@ void ParseCommandDataElementWithStatusCode(nlTestSuite * apSuite, CommandDataEle
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
     StatusElement::Parser statusElementParser;
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = aCommandDataElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = aCommandDataElementParser.GetCommandPath(&commandPathParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -621,9 +637,13 @@ void ParseCommandList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Parser commandListParser;
-    commandListParser.Init(aReader);
+    err = commandListParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = commandListParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void BuildReportData(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
@@ -636,10 +656,6 @@ void BuildReportData(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
 
     reportDataBuilder.SuppressResponse(true).SubscriptionId(2);
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
-
-    AttributeStatusList::Builder attributeStatusList = reportDataBuilder.CreateAttributeStatusListBuilder();
-    NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributeStatusList(apSuite, attributeStatusList);
 
     AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
@@ -663,23 +679,20 @@ void ParseReportData(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
     bool suppressResponse   = false;
     uint64_t subscriptionId = 0;
-    AttributeStatusList::Parser attributeStatusListParser;
     AttributeDataList::Parser attributeDataListParser;
     EventList::Parser eventListParser;
     bool moreChunkedMessages = false;
     reportDataParser.Init(aReader);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = reportDataParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = reportDataParser.GetSuppressResponse(&suppressResponse);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && suppressResponse);
 
     err = reportDataParser.GetSubscriptionId(&subscriptionId);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && subscriptionId == 2);
-
-    err = reportDataParser.GetAttributeStatusList(&attributeStatusListParser);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = reportDataParser.GetAttributeDataList(&attributeDataListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -717,9 +730,10 @@ void ParseInvokeCommand(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     err = invokeCommandParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = invokeCommandParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = invokeCommandParser.GetCommandList(&commandListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
@@ -763,10 +777,10 @@ void ParseReadRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
     err = readRequestParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = readRequestParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
+#endif
     err = readRequestParser.GetAttributePathList(&attributePathListParser);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -778,6 +792,93 @@ void ParseReadRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
     err = readRequestParser.GetEventNumber(&eventNumber);
     NL_TEST_ASSERT(apSuite, eventNumber == 1 && err == CHIP_NO_ERROR);
+}
+
+void BuildWriteRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    WriteRequest::Builder writeRequestBuilder;
+
+    err = writeRequestBuilder.Init(&aWriter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    writeRequestBuilder.SuppressResponse(true);
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    AttributeDataList::Builder attributeDataList = writeRequestBuilder.CreateAttributeDataListBuilder();
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributeDataList(apSuite, attributeDataList);
+
+    AttributeDataVersionList::Builder attributeDataVersionList = writeRequestBuilder.CreateAttributeDataVersionListBuilder();
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributeDataVersionList(apSuite, attributeDataVersionList);
+
+    writeRequestBuilder.MoreChunkedMessages(true);
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    writeRequestBuilder.EndOfWriteRequest();
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseWriteRequest(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    WriteRequest::Parser writeRequestParser;
+    bool suppressResponse = false;
+    AttributeDataList::Parser attributeDataList;
+    AttributeDataVersionList::Parser attributeDataVersionList;
+    bool moreChunkedMessages = false;
+
+    err = writeRequestParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = writeRequestParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = writeRequestParser.GetSuppressResponse(&suppressResponse);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && suppressResponse);
+
+    err = writeRequestParser.GetAttributeDataList(&attributeDataList);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = writeRequestParser.GetAttributeDataVersionList(&attributeDataVersionList);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = writeRequestParser.GetMoreChunkedMessages(&moreChunkedMessages);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && moreChunkedMessages);
+}
+
+void BuildWriteResponse(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    WriteResponse::Builder writeResponseBuilder;
+
+    err = writeResponseBuilder.Init(&aWriter);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    AttributeStatusList::Builder attributeStatusList = writeResponseBuilder.CreateAttributeStatusListBuilder();
+    NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributeStatusList(apSuite, attributeStatusList);
+
+    writeResponseBuilder.EndOfWriteResponse();
+    NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
+}
+
+void ParseWriteResponse(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    WriteResponse::Parser writeResponseParser;
+    AttributeStatusList::Parser attributeStatusListParser;
+    err = writeResponseParser.Init(aReader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = writeResponseParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
+    err = writeResponseParser.GetAttributeStatusList(&attributeStatusListParser);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
 void AttributePathTest(nlTestSuite * apSuite, void * apContext)
@@ -1208,6 +1309,44 @@ void ReadRequestTest(nlTestSuite * apSuite, void * apContext)
     ParseReadRequest(apSuite, reader);
 }
 
+void WriteRequestTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    BuildWriteRequest(apSuite, writer);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseWriteRequest(apSuite, reader);
+}
+
+void WriteResponseTest(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferTLVWriter writer;
+    chip::System::PacketBufferTLVReader reader;
+    writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
+    BuildWriteResponse(apSuite, writer);
+    chip::System::PacketBufferHandle buf;
+    err = writer.Finalize(&buf);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    DebugPrettyPrint(buf);
+
+    reader.Init(std::move(buf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    ParseWriteResponse(apSuite, reader);
+}
+
 void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -1248,8 +1387,11 @@ void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
 
     err = attributeDataListParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    attributeDataListParser.CheckSchemaValidity();
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    err = attributeDataListParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
     while (CHIP_NO_ERROR == (err = attributeDataListParser.Next()))
     {
         ++NumDataElement;
@@ -1284,6 +1426,8 @@ const nlTest sTests[] =
                 NL_TEST_DEF("ReportDataTest", ReportDataTest),
                 NL_TEST_DEF("InvokeCommandTest", InvokeCommandTest),
                 NL_TEST_DEF("ReadRequestTest", ReadRequestTest),
+                NL_TEST_DEF("WriteRequestTest", WriteRequestTest),
+                NL_TEST_DEF("WriteResponseTest", WriteResponseTest),
                 NL_TEST_DEF("CheckPointRollbackTest", CheckPointRollbackTest),
                 NL_TEST_SENTINEL()
         };

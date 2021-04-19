@@ -33,10 +33,9 @@
 #include <core/CHIPCore.h>
 #include <mutex>
 #include <platform/CHIPDeviceLayer.h>
-
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -87,7 +86,7 @@ CHIP_ERROR SendCommandRequest(void)
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::Command::CommandParams CommandParams = { kTestEndPointId, // Endpoint
+    chip::app::Command::CommandParams commandParams = { kTestEndPointId, // Endpoint
                                                         kTestGroupId,    // GroupId
                                                         kTestClusterId,  // ClusterId
                                                         kTestCommandId,  // CommandId
@@ -97,27 +96,19 @@ CHIP_ERROR SendCommandRequest(void)
 
     uint8_t effectIdentifier = 1; // Dying light
     uint8_t effectVariant    = 1;
+    chip::TLV::TLVWriter * writer;
 
-    chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
-
-    chip::TLV::TLVWriter writer = gpCommandSender->CreateCommandDataElementTLVWriter();
-
-    err = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
+    err = gpCommandSender->PrepareCommand(&commandParams);
     SuccessOrExit(err);
 
-    err = writer.Put(chip::TLV::ContextTag(1), effectIdentifier);
+    writer = gpCommandSender->GetCommandDataElementTLVWriter();
+    err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
     SuccessOrExit(err);
 
-    err = writer.Put(chip::TLV::ContextTag(2), effectVariant);
+    err = writer->Put(chip::TLV::ContextTag(2), effectVariant);
     SuccessOrExit(err);
 
-    err = writer.EndContainer(dummyType);
-    SuccessOrExit(err);
-
-    err = writer.Finalize();
-    SuccessOrExit(err);
-
-    err = gpCommandSender->AddCommand(CommandParams);
+    err = gpCommandSender->FinishCommand();
     SuccessOrExit(err);
 
     err = gpCommandSender->SendCommandRequest(chip::kTestDeviceNodeId, gAdminId);

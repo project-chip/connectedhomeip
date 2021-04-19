@@ -44,6 +44,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/media-playback-server             \
   ../third_party/connectedhomeip/src/app/clusters/media-input-server                \
   ../third_party/connectedhomeip/src/app/clusters/network-commissioning             \
+  ../third_party/connectedhomeip/src/app/clusters/ota-server                        \
   ../third_party/connectedhomeip/src/app/clusters/target-navigator-server           \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
   ../third_party/connectedhomeip/src/app/clusters/tv-channel-server                 \

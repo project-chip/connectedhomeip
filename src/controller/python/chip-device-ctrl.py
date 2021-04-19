@@ -39,6 +39,7 @@ import string
 import re
 from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
+from chip.setup_payload import SetupPayload
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -167,6 +168,8 @@ class DeviceMgrCmd(Cmd):
             pass
 
     command_names = [
+        "setup-payload",
+
         "ble-scan",
         "ble-adapter-select",
         "ble-adapter-print",
@@ -295,6 +298,27 @@ class DeviceMgrCmd(Cmd):
             return
 
         print("Done.")
+
+    def do_setuppayload(self, line):
+        """
+        setup-payload parse-manual <manual-pairing-code>
+        setup-payload parse-qr <qr-code-payload>
+        """
+        try:
+            args = shlex.split(line)
+            if (len(args) != 2) or (args[0] not in ("parse-manual", "parse-qr")):
+                self.do_help("setup-payload")
+                return
+
+            if args[0] == "parse-manual":
+                SetupPayload().ParseManualPairingCode(args[1]).Print()
+
+            if args[0] == "parse-qr":
+                SetupPayload().ParseQrCode(args[1]).Print()
+
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
 
     def do_bleadapterselect(self, line):
         """

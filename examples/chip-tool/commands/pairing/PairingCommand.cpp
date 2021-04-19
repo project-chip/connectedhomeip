@@ -60,6 +60,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
+    case PairingMode::Ethernet:
+        err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
+        break;
     }
     WaitForResponse(kWaitDurationInSeconds);
 

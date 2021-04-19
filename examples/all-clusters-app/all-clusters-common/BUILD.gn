@@ -39,6 +39,7 @@ chip_data_model("all-clusters-common") {
     "media-playback-server",
     "network-commissioning",
     "on-off-server",
+    "ota-server",
     "scenes",
     "target-navigator-server",
     "temperature-measurement-server",
