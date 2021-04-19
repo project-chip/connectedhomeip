@@ -159,11 +159,14 @@ void ConnectivityManagerImpl::OnInterfaceEvent(nsapi_event_t event, intptr_t dat
         {
         case NSAPI_STATUS_LOCAL_UP:
             ChipLogDetail(DeviceLayer, "Status - LOCAL_UP");
-            break;
-        case NSAPI_STATUS_GLOBAL_UP:
             OnStationConnected();
             break;
+        case NSAPI_STATUS_GLOBAL_UP:
+            ChipLogDetail(DeviceLayer, "Status - GLOBAL_UP");
+            // OnStationConnected();
+            break;
         case NSAPI_STATUS_DISCONNECTED:
+            ChipLogDetail(DeviceLayer, "Status - DISCONNECTED");
             OnStationDisconnected();
             break;
         case NSAPI_STATUS_CONNECTING:
@@ -278,12 +281,74 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
     // Assign an IPv6 link local address to the station interface.
 
     // Alert other components of the new state.
+    mWiFiStationState = kWiFiStationState_Connected;
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     PlatformMgr().PostEvent(&event);
-    mWiFiStationState = kWiFiStationState_Connected;
     ChipLogDetail(DeviceLayer, "Event - StationConnected");
+
+    // Get IP address
+    SocketAddress a;
+    _interface->get_ip_address(&a);
+    IPAddress addr;
+    IPAddress::FromString(a.get_ip_address(), addr);
+
+    // Post that IP address is available:
+    event.Type                            = DeviceEventType::kInternetConnectivityChange;
+    event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+    event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+    addr.ToString(event.InternetConnectivityChange.address);
+
+    PlatformMgr().PostEvent(&event);
+    ChipLogDetail(DeviceLayer, "Event - ip address change: %s", a.get_ip_address());
+
+    a = SocketAddress();
+    _interface->get_ipv6_link_local_address(&a);
+    ChipLogDetail(DeviceLayer, "IPv6 address: %s", a.get_ip_address());
+
+    // FIXME: Update state depending on the previous state
+
+    // Post that IP V4 address is available:
+    // SocketAddress a;
+    // if (_interface->get_ip_address(&a))
+    // {
+    //     IPAddress addr;
+    //     IPAddress::FromString(a.get_ip_address(), addr);
+
+    //     // Post that IP address is available:
+    //     event.Type                            = DeviceEventType::kInternetConnectivityChange;
+    //     event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+    //     event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+    //     addr.ToString(event.InternetConnectivityChange.address);
+
+    //     ChipLogError(DeviceLayer, "Sending connectivity change: IPv4 address acquired");
+    //     PlatformMgr().PostEvent(&event);
+    // }
+    // else
+    // {
+    //     ChipLogError(DeviceLayer, "Failed to get the IPv4 address");
+    // }
+
+    // Post that IP V6 address is available:
+    // if (_interface->get_ipv6_link_local_address(&a))
+    // {
+    //     IPAddress addr;
+    //     IPAddress::FromString(a.get_ip_address(), addr);
+
+    //     // Post that IP address is available:
+    //     event.Type                            = DeviceEventType::kInternetConnectivityChange;
+    //     event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+    //     event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+    //     addr.ToString(event.InternetConnectivityChange.address);
+
+    //     ChipLogError("Sending connectivity change: IPv6 address acquired");
+    //     PlatformMgr().PostEvent(&event);
+    // }
+    // else
+    // {
+    //     ChipLogError("Failed to get the IPv6 address");
+    // }
     return CHIP_NO_ERROR;
 }
 
