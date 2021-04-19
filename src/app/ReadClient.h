@@ -25,6 +25,7 @@
 #pragma once
 
 #include <app/InteractionModelDelegate.h>
+#include <app/InteractionModelUtilities.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
