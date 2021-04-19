@@ -58,17 +58,17 @@ static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & 
 
 bool ExchangeContext::IsInitiator() const
 {
-    return mFlags.Has(ExFlagValues::kFlagInitiator);
+    return mFlags.Has(Flags::kFlagInitiator);
 }
 
 bool ExchangeContext::IsResponseExpected() const
 {
-    return mFlags.Has(ExFlagValues::kFlagResponseExpected);
+    return mFlags.Has(Flags::kFlagResponseExpected);
 }
 
 void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 {
-    mFlags.Set(ExFlagValues::kFlagResponseExpected, inResponseExpected);
+    mFlags.Set(Flags::kFlagResponseExpected, inResponseExpected);
 }
 
 void ExchangeContext::SetResponseTimeout(Timeout timeout)
@@ -150,8 +150,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
         }
     }
 
-    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), mReliableMessageContext, reliableTransmissionRequested,
-                                protocolId, msgType, std::move(msgBuf));
+    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
+                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -183,13 +183,13 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // it is done with the exchange context and the message layer sets all callbacks to NULL and does not send anything
     // received on the exchange context up to higher layers.  At this point, the message layer needs to handle the
     // remaining work to be done on that exchange, (e.g. send all pending acks) before truly cleaning it up.
-    mReliableMessageContext.FlushAcks();
+    FlushAcks();
 
     // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange
     // needs to clear the CRMP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(&mReliableMessageContext);
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
     }
 
     // Cancel the response timer.
@@ -258,10 +258,14 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     em->IncrementContextsInUse();
     mExchangeId    = ExchangeId;
     mSecureSession = session;
-    mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
+    mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
-    mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
+    SetDropAckDebug(false);
+    SetAckPending(false);
+    SetPeerRequestedAck(false);
+    SetMsgRcvdFromPeer(false);
+    SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
@@ -283,6 +287,7 @@ void ExchangeContext::Free()
 
     DoClose(false);
     mExchangeMgr = nullptr;
+    mAppState    = nullptr;
 
     em->DecrementContextsInUse();
 
@@ -385,7 +390,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         dispatch = &defaultDispatch;
     }
 
-    CHIP_ERROR err = dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, mReliableMessageContext);
+    CHIP_ERROR err =
+        dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
     SuccessOrExit(err);
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
