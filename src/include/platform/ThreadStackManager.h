@@ -130,8 +130,6 @@ private:
     CHIP_ERROR SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
     bool HaveMeshConnectivity();
     void OnMessageLayerActivityChanged(bool messageLayerIsActive);
-    void OnCHIPoBLEAdvertisingStart();
-    void OnCHIPoBLEAdvertisingStop();
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -307,16 +305,6 @@ inline bool ThreadStackManager::HaveMeshConnectivity()
 inline void ThreadStackManager::OnMessageLayerActivityChanged(bool messageLayerIsActive)
 {
     return static_cast<ImplClass *>(this)->_OnMessageLayerActivityChanged(messageLayerIsActive);
-}
-
-inline void ThreadStackManager::OnCHIPoBLEAdvertisingStart()
-{
-    static_cast<ImplClass *>(this)->_OnCHIPoBLEAdvertisingStart();
-}
-
-inline void ThreadStackManager::OnCHIPoBLEAdvertisingStop()
-{
-    static_cast<ImplClass *>(this)->_OnCHIPoBLEAdvertisingStop();
 }
 
 inline CHIP_ERROR ThreadStackManager::GetAndLogThreadStatsCounters()

@@ -74,10 +74,6 @@ public:
 
     void _OnMessageLayerActivityChanged(bool messageLayerIsActive);
 
-    void _OnCHIPoBLEAdvertisingStart();
-
-    void _OnCHIPoBLEAdvertisingStop();
-
     CHIP_ERROR _GetAndLogThreadStatsCounters();
 
     CHIP_ERROR _GetAndLogThreadTopologyMinimal();
