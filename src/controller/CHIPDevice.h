@@ -36,7 +36,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/DeviceAttestation.h>
+#include <attestation/DeviceAttestation.h>
 #include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>

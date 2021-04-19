@@ -109,7 +109,7 @@ public:
                            System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override
     {}
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
     {
         if (NewConnectionHandlerCallCount == 0)
         {

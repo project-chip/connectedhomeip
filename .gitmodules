@@ -77,3 +77,7 @@
 [submodule "third_party/certifier/repo"]
 	path = third_party/certifier/repo
 	url = https://github.com/jpk233/libcertifier.git
+[submodule "third_party/simw-top-mini/repo"]
+	path = third_party/simw-top-mini/repo
+	url = https://github.com/NXP/plug-and-trust.git
+	branch = int/CHIPSE_Release

@@ -44,15 +44,19 @@ public:
     PairSoftAP() : PairingCommand("softap", PairingMode::SoftAP) {}
 };
 
+class PairSoftAPCase : public PairingCommand
+{
+public:
+    PairSoftAPCase() : PairingCommand("softap-case", PairingMode::SoftAPCase) {}
+};
+
 void registerCommandsPairing(Commands & commands)
 {
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Unpair>(),
-        make_unique<PairBypass>(),
-        make_unique<PairBle>(),
-        make_unique<PairSoftAP>(),
+        make_unique<Unpair>(),     make_unique<PairBypass>(),     make_unique<PairBle>(),
+        make_unique<PairSoftAP>(), make_unique<PairSoftAPCase>(),
     };
 
     commands.Register(clusterName, clusterCommands);

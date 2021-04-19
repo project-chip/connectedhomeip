@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/certifier.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 import("${chip_root}/src/ble/ble.gni")
 
+if (chip_enable_libcertifier) {
+  import("//build_overrides/certifier.gni")
+}
+
 config("includes") {
   include_dirs = [
     ".",
-    "$root_out_dir", 
+    "${root_out_dir}",
   ]
 
   if (chip_enable_libcertifier) {
@@ -33,26 +36,14 @@ config("includes") {
   }
 }
 
-action("generate_dac_chain") {
-  script = "${certifier_root}/generate_dac_chain.py"
-  sources = [ "${certifier_root}/repo/resources/device-attestation-certificate.p12" ]
-  outputs = [ "$root_out_dir/dac_chain.h" ]
-
-  args = rebase_path(sources, "") + rebase_path(outputs, root_out_dir)
-}
-
 static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
     "AdminPairingTable.cpp",
     "AdminPairingTable.h",
     "CASESession.cpp",
     "CASESession.h",
-    "DeviceAttestation.cpp",
-    "DeviceAttestation.h",
     "NetworkProvisioning.cpp",
     "NetworkProvisioning.h",
     "PASESession.cpp",
@@ -76,6 +67,8 @@ static_library("transport") {
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -103,8 +96,6 @@ static_library("transport") {
   if (chip_enable_libcertifier) {
     public_deps += [ "${certifier_root}:certifier" ]
   }
-
-  data_deps = [ ":generate_dac_chain" ]
 
   public_configs = [ ":includes" ]
 }

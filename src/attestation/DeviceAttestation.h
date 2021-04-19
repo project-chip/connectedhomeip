@@ -18,7 +18,7 @@
 
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 
 #include "transport/SecureSessionMgr.h"
 
@@ -128,7 +128,8 @@ private:
     Messaging::ExchangeContext * mExchangeContext;
     uint8_t mNonce[kNonceSize + 1] = { 'b', 'g', 'v', 'y', 'a', 'K', 'B', 'h', 'y', 'T', 'F', '4', 'G', '6', '7', 'x',
                                        'B', 'p', 'W', 'U', 't', 'g', 'd', 'd', 'T', 'v', 'y', 'x', 'x', 'U', 'y', '1' };
-    char mTimestamp[21]            = "";
+#ifdef CONFIG_COMMISSIONER_ENABLED
+    char mTimestamp[21] = "";
 
     uint32_t mDerCertificateLength      = 0;
     uint32_t mDerCsrLength              = 0;
@@ -138,6 +139,7 @@ private:
     char * mOperationalID               = nullptr;
     char * mJsonCrt                     = nullptr;
     uint8_t * mJsonCsr                  = nullptr;
+#endif // CONFIG_COMMISSIONER_ENABLED
     Hash_SHA256_stream hash_sha256;
 #ifdef CONFIG_COMMISSIONER_ENABLED
     CERTIFIER * mCertifier = nullptr;
@@ -152,16 +154,20 @@ private:
     ValidationContext mValidContext;
     uint8_t mChipDeviceCredentials[1024];
     uint32_t mChipDeviceCredentialsLength;
-    uint8_t mChipCommissionerCredentials[1024];
-    uint32_t mChipCommissionerCredentialsLength;
     uint8_t mChipCACertificate[1024];
     uint32_t mChipCACertificateLength;
-    uint8_t mChipCommissionerCACertificate[1024];
-    uint32_t mChipCommissionerCACertificateLength;
     uint8_t mChipRootCertificate[1024];
     uint32_t mChipRootCertificateLength;
+#ifdef CONFIG_COMMISSIONER_ENABLED
+    uint8_t mChipCommissionerCredentials[1024];
+    uint32_t mChipCommissionerCredentialsLength;
+    uint8_t mChipCommissionerCACertificate[1024];
+    uint32_t mChipCommissionerCACertificateLength;
     uint8_t mChipCommissionerRootCertificate[1024];
     uint32_t mChipCommissionerRootCertificateLength;
+    char mAuthCertificate[1024] = "libcertifier-cert.crt";
+    char mCertifierCfg[1024]    = "libcertifier.cfg";
+#endif // CONFIG_COMMISSIONER_ENABLED
 
     bool mDeviceAttested = false;
 

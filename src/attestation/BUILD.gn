@@ -13,38 +13,39 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/certifier.gni")
 
-static_library("controller") {
-  output_name = "libChipController"
+config("includes") {
+  include_dirs = [
+    ".",
+    "${root_out_dir}", 
+  ]
+}
+
+action("generate_dac_chain") {
+  script = "${certifier_root}/generate_dac_chain.py"
+  sources = [ "${certifier_root}/repo/resources/device-attestation-certificate.p12" ]
+  outputs = [ "${root_out_dir}/dac_chain.h" ]
+
+  args = rebase_path(sources, "") + rebase_path(outputs, root_out_dir)
+}
+
+static_library("attestation") {
+  output_name = "libDeviceAttestation"
 
   sources = [
-    "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
-    "CHIPCluster.cpp",
-    "CHIPCluster.h",
-    "CHIPClusters.cpp",
-    "CHIPClusters.h",
-    "CHIPDevice.cpp",
-    "CHIPDevice.h",
-    "CHIPDeviceController.cpp",
-    "CHIPDeviceController.h",
-    "DeviceAddressUpdater.cpp",
-    "DeviceAddressUpdater.h",
-    "EmptyDataModelHandler.cpp",
+    "DeviceAttestation.h",
+    "DeviceAttestation.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/mdns",
-    "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
-    "${chip_root}/src/platform",
-    "${chip_root}/src/setup_payload",
-    "${chip_root}/src/transport",
-    "${chip_root}/src/attestation",
+    ":generate_dac_chain",
   ]
 
-  defines = []
+  data_deps = [ ":generate_dac_chain" ]
+
+  public_configs = [ ":includes" ]
 }

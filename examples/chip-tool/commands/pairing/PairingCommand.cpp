@@ -61,6 +61,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId localId, NodeId remoteId)
         err = Pair(remoteId, PeerAddress::BLE(), mPairingType, localId);
         break;
     case PairingMode::SoftAP:
+    case PairingMode::SoftAPCase:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort), mPairingType, localId);
         break;
     }
@@ -73,11 +74,11 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address, char * pai
 {
     RendezvousParameters params;
 
-    if (!strcmp("PASE", pairingType))
+    if (mPairingMode == PairingMode::SoftAP)
     {
         params.SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
     }
-    else if (!strcmp("CASE", pairingType))
+    else if (mPairingMode == PairingMode::SoftAPCase)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         // 1. Get Device
@@ -91,6 +92,10 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address, char * pai
         params.SetOpCredSet(mDevice->GetOperationalCredentialSet()).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
     exit:
         VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        return CHIP_ERROR_INTERNAL;
     }
 
     return mCommissioner.PairDevice(remoteId, params);

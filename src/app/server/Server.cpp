@@ -41,7 +41,7 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/DeviceAttestation.h>
+#include <attestation/DeviceAttestation.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
 
