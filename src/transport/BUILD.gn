@@ -12,26 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/certifier.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
-import("//build_overrides/certifier.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 config("includes") {
   include_dirs = [
     ".",
-    "${chip_root}/third_party/certifier/repo/include",
-    "${chip_root}/third_party/certifier/repo/internal_headers",
     "$root_out_dir", 
   ]
-  libs = [
-    "curl",
-  ]
+
+  if (chip_enable_libcertifier) {
+    include_dirs += [
+      "${certifier_root}/repo/include",
+      "${certifier_root}/repo/internal_headers",
+    ]
+
+    defines = [ "CONFIG_COMMISSIONER_ENABLED=${chip_enable_libcertifier}" ]
+  }
 }
 
 action("generate_dac_chain") {
-  script = "${chip_root}/third_party/certifier/generate_dac_chain.py"
-  sources = [ "${chip_root}/third_party/certifier/repo/resources/device-attestation-certificate.p12" ]
+  script = "${certifier_root}/generate_dac_chain.py"
+  sources = [ "${certifier_root}/repo/resources/device-attestation-certificate.p12" ]
   outputs = [ "$root_out_dir/dac_chain.h" ]
 
   args = rebase_path(sources, "") + rebase_path(outputs, root_out_dir)
@@ -41,6 +45,8 @@ static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
+    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
     "AdminPairingTable.cpp",
     "AdminPairingTable.h",
     "CASESession.cpp",
@@ -70,8 +76,6 @@ static_library("transport") {
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.cpp",
-    "${chip_root}/src/credentials/tests/CHIPCert_test_vectors.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -94,8 +98,11 @@ static_library("transport") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
     "${nlio_root}:nlio",
-    "${certifier_root}:certifier",
   ]
+
+  if (chip_enable_libcertifier) {
+    public_deps += [ "${certifier_root}:certifier" ]
+  }
 
   data_deps = [ ":generate_dac_chain" ]
 

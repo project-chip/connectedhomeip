@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/certifier.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
@@ -29,21 +30,13 @@ chip_data_model("data_model") {
 }
 
 copy("libcertifier_cfg_copy") {
-  sources = [
-    "${chip_root}/third_party/certifier/libcertifier.cfg",
-  ]
-  outputs = [
-    "$root_out_dir/libcertifier.cfg"
-  ]
+  sources = [ "${certifier_root}/libcertifier.cfg" ]
+  outputs = [ "$root_out_dir/libcertifier.cfg" ]
 }
 
 copy("libcertifier_cert_copy") {
-  sources = [
-    "${chip_root}/third_party/certifier/libcertifier-cert.crt",
-  ]
-  outputs = [
-    "$root_out_dir/libcertifier-cert.crt"
-  ]
+  sources = [ "${certifier_root}/libcertifier-cert.crt" ]
+  outputs = [ "$root_out_dir/libcertifier-cert.crt" ]
 }
 
 executable("chip-tool") {

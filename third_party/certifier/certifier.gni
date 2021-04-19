@@ -24,14 +24,14 @@ template("certifier_target") {
       "-Wno-maybe-uninitialized",
       "-Wno-string-concatenation",
       "-Wno-shadow",
-      "-Wno-sign-compare"
+      "-Wno-sign-compare",
     ]
   }
 
   config("${certifier_target_name}_config") {
-    include_dirs = [ 
-        "${_certifier_root}/include",
-        "${_certifier_root}/internal_headers"  
+    include_dirs = [
+      "${_certifier_root}/include",
+      "${_certifier_root}/internal_headers",
     ]
   }
 
@@ -45,8 +45,8 @@ template("certifier_target") {
     sources += [
       "${_certifier_root}/src/base58.c",
       "${_certifier_root}/src/base64.c",
-      "${_certifier_root}/src/certifier_api_easy.c",
       "${_certifier_root}/src/certifier.c",
+      "${_certifier_root}/src/certifier_api_easy.c",
       "${_certifier_root}/src/certifierclient.c",
       "${_certifier_root}/src/error.c",
       "${_certifier_root}/src/http.c",
@@ -74,6 +74,8 @@ template("certifier_target") {
     }
 
     public_configs += [ ":certifier_config" ]
+
+    libs = [ "curl" ]
 
     output_name = "libcertifier"
     output_dir = "${root_out_dir}/lib"

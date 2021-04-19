@@ -25,12 +25,24 @@
 
 #include "dac_chain.h"
 
+#ifdef CONFIG_COMMISSIONER_ENABLED
+extern "C" {
+#include <certifier/base64.h>
+#include <certifier/certifier_api_easy.h>
+#include <certifier/certifier_internal.h>
+#include <certifier/http.h>
+#include <certifier/parson.h>
+#include <certifier/util.h>
+}
+} // the include seems to consume one openning brace
+#endif // CONFIG_COMMISSIONER_ENABLED
+
 /**
  * autonumber
 participant "Commissioner" as cr
 participant "Commissionee" as ce #33FCFF
 
-+ Establish a PACE session
++ Establish a PASE session
 + cr --> ce : nonce, begin attestation flow
 + ce -> ce: Create signature of nonce using\n private key associated with DAC
 + ce -> cr : DAC, signed nonce (from previous step)
@@ -125,6 +137,7 @@ void DeviceAttestation::Close()
     mDeviceAttested = false;
 }
 
+#ifdef CONFIG_COMMISSIONER_ENABLED
 CHIP_ERROR DeviceAttestation::StartAttestation()
 {
     CHIP_ERROR err = CommissionerSendNonce();
@@ -132,12 +145,19 @@ CHIP_ERROR DeviceAttestation::StartAttestation()
         mState = DeviceAttestationState::kCommissionerNonceSent;
     return err;
 }
+#else  // CONFIG_COMMISSIONER_ENABLED
+CHIP_ERROR DeviceAttestation::StartAttestation()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif // CONFIG_COMMISSIONER_ENABLED
 
 CHIP_ERROR DeviceAttestation::OnMessageReceived(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     switch (mState)
     {
+#ifdef CONFIG_COMMISSIONER_ENABLED
     case DeviceAttestationState::kCommissionerNonceSent:
         err = CommissionerValidateNonceResponse(std::move(msgBuf), exchangeContext);
         if (err == CHIP_NO_ERROR)
@@ -201,7 +221,7 @@ CHIP_ERROR DeviceAttestation::OnMessageReceived(System::PacketBufferHandle msgBu
             mState = DeviceAttestationState::kDeviceWaiting;
         }
         break;
-
+#else  // CONFIG_COMMISSIONER_ENABLED
     case DeviceAttestationState::kDeviceWaiting:
         err = DeviceProcessNonce(std::move(msgBuf), exchangeContext);
         if (err == CHIP_NO_ERROR)
@@ -248,13 +268,14 @@ CHIP_ERROR DeviceAttestation::OnMessageReceived(System::PacketBufferHandle msgBu
             mState = DeviceAttestationState::kFinished;
         }
         break;
-
+#endif // CONFIG_COMMISSIONER_ENABLED
     default:
         break;
     }
     return err;
 }
 
+#ifdef CONFIG_COMMISSIONER_ENABLED
 CHIP_ERROR DeviceAttestation::CommissionerSendNonce()
 {
     CHIP_ERROR err = CHIP_CONFIG_NO_ERROR;
@@ -690,7 +711,7 @@ CHIP_ERROR DeviceAttestation::CommissionerSendACL(Messaging::ExchangeContext * e
 
     return err;
 }
-
+#else  // CONFIG_COMMISSIONER_ENABLED
 CHIP_ERROR DeviceAttestation::DeviceProcessNonce(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1203,11 +1224,13 @@ exit:
 
     return err;
 }
+#endif // CONFIG_COMMISSIONER_ENABLED
 
+#ifdef CONFIG_COMMISSIONER_ENABLED
 void DeviceAttestation::GetTimestampForCertifying()
 {
     int64_t ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-    sprintf(mTimestamp, "%zd", ms);
+    sprintf(mTimestamp, "%" PRId64, ms);
 }
 
 http_response * DeviceAttestation::DoHttpExchange(uint8_t * buffer, CERTIFIER * certifier)
@@ -1272,7 +1295,7 @@ DeviceAttestation::ObtainOpCert(uint8_t * derCertificate, uint32_t derCertificat
     pkcs7OpCert = nullptr;
     memset(operationalID, 0, sizeof(operationalID));
     ReturnErrorOnFailure(DRBG_get_bytes(reinterpret_cast<uint8_t *>(&temporaryRandomValue), sizeof(temporaryRandomValue)));
-    snprintf(operationalID, sizeof(operationalID), "%016zX", temporaryRandomValue);
+    snprintf(operationalID, sizeof(operationalID), "%016" PRIX64, temporaryRandomValue);
 
     json_object_set_string(root_object, "tokenType", "X509");
     base64_encode(base64Certificate.get(), derCertificate, static_cast<int>(derCertificateLength));
@@ -1487,6 +1510,7 @@ DeviceAttestation::ObtainCommissionerOpCert()
 exit:
     return err;
 }
+#endif // CONFIG_COMMISSIONER_ENABLED
 
 // PLACEHOLDER - TODO: IMPLEMENT THIS
 CHIP_ERROR DeviceAttestation::SetEffectiveTime(void)

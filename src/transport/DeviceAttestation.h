@@ -25,15 +25,8 @@
 #include <chrono>
 #include <memory>
 
-extern "C" {
-#include <certifier/base64.h>
-#include <certifier/certifier_api_easy.h>
-#include <certifier/certifier_internal.h>
-#include <certifier/http.h>
-#include <certifier/parson.h>
-#include <certifier/util.h>
-}
-} // the include seems to consume one openning brace
+struct CERTIFIER;
+struct http_response;
 
 namespace chip {
 namespace Transport {
@@ -133,19 +126,22 @@ private:
     static constexpr size_t kNonceSize = 32;
     DeviceAttestationState mState;
     Messaging::ExchangeContext * mExchangeContext;
-    uint8_t mNonce[kNonceSize + 1] = "bgvyaKBhyTF4G67xBpWUtgddTvyxxUy1";
+    uint8_t mNonce[kNonceSize + 1] = { 'b', 'g', 'v', 'y', 'a', 'K', 'B', 'h', 'y', 'T', 'F', '4', 'G', '6', '7', 'x',
+                                       'B', 'p', 'W', 'U', 't', 'g', 'd', 'd', 'T', 'v', 'y', 'x', 'x', 'U', 'y', '1' };
     char mTimestamp[21]            = "";
 
     uint32_t mDerCertificateLength      = 0;
     uint32_t mDerCsrLength              = 0;
     uint32_t mOperationalIDLength       = 0;
-    uint8_t mDerDeviceCertificate[1024] = "";
+    uint8_t mDerDeviceCertificate[1024] = {};
     uint8_t * mDeviceCSR                = nullptr;
     char * mOperationalID               = nullptr;
     char * mJsonCrt                     = nullptr;
     uint8_t * mJsonCsr                  = nullptr;
     Hash_SHA256_stream hash_sha256;
+#ifdef CONFIG_COMMISSIONER_ENABLED
     CERTIFIER * mCertifier = nullptr;
+#endif // CONFIG_COMMISSIONER_ENABLED
     P256Keypair mKeypair;
     P256Keypair mKeypairOperational;
     uint8_t mCSRBuffer[512];
@@ -169,6 +165,7 @@ private:
 
     bool mDeviceAttested = false;
 
+#ifdef CONFIG_COMMISSIONER_ENABLED
     CHIP_ERROR CommissionerSendNonce();
     CHIP_ERROR CommissionerValidateNonceResponse(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR CommissionerSendCSRRequest(Messaging::ExchangeContext * exchangeContext);
@@ -177,7 +174,7 @@ private:
     CHIP_ERROR CommissionerSendCACert(Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR CommissionerSendOpCert(Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR CommissionerSendACL(Messaging::ExchangeContext * exchangeContext);
-
+#else  // CONFIG_COMMISSIONER_ENABLED
     CHIP_ERROR DeviceProcessNonce(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR DeviceSendDAC(const uint8_t * nonce, size_t nonce_size, Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR DeviceProcessCSRRequest(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
@@ -185,13 +182,15 @@ private:
     CHIP_ERROR DeviceProcessCACert(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR DeviceProcessOpCert(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
     CHIP_ERROR DeviceProcessACL(System::PacketBufferHandle msgBuf, Messaging::ExchangeContext * exchangeContext);
-
+#endif // CONFIG_COMMISSIONER_ENABLED
+#ifdef CONFIG_COMMISSIONER_ENABLED
     void GetTimestampForCertifying();
     http_response * DoHttpExchange(uint8_t * buffer, CERTIFIER * certifier);
     CHIP_ERROR ObtainDeviceOpCert();
     CHIP_ERROR ObtainCommissionerOpCert();
     CHIP_ERROR ObtainOpCert(uint8_t * derCertificate, uint32_t derCertificateLength, uint8_t * derCsr, uint32_t derCsrLength,
                             char *& pkcs7OpCert);
+#endif // CONFIG_COMMISSIONER_ENABLED
 
     // TODO
     CHIP_ERROR SetEffectiveTime(void);

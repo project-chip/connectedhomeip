@@ -18,12 +18,12 @@ declare_args() {
 }
 
 if (certifier_target != "") {
-    group("certifier") {
-        public_deps = [ certifier_target ]
-    }
+  group("certifier") {
+    public_deps = [ certifier_target ]
+  }
 } else {
-    import("certifier.gni")
+  import("certifier.gni")
 
-    certifier_target("certifier") {
-    }
+  certifier_target("certifier") {
+  }
 }

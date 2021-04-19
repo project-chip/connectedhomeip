@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/certifier.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
-import("//build_overrides/certifier.gni")
 
 config("server_config") {
   defines = []
@@ -57,4 +57,5 @@ static_library("server") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+  
 }
