@@ -25,6 +25,7 @@
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_CPP
 #define GENERIC_PLATFORM_MANAGER_IMPL_CPP
 
+#include <inttypes.h>
 #include <new>
 #include <platform/PlatformManager.h>
 #include <platform/internal/BLEManager.h>

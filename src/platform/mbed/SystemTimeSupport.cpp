@@ -23,6 +23,7 @@
  *          time/clock functions that are suitable for use on the Mbed-OS platform.
  */
 /* this file behaves like a config.h, comes first */
+#include <inttypes.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <support/TimeUtils.h>

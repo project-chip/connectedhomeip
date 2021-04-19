@@ -21,6 +21,9 @@
  *          for mbed platforms.
  */
 
+#include <inttypes.h>
+#include <stdint.h>
+
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
