@@ -126,7 +126,8 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
+            wasHandled =
+                emberAfNetworkCommissioningClusterAddThreadNetworkCallback(nullptr, operationalDataset, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_ADD_WI_FI_NETWORK_COMMAND_ID: {
@@ -166,7 +167,8 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
+            wasHandled =
+                emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(nullptr, ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_DISABLE_NETWORK_COMMAND_ID: {
@@ -196,7 +198,7 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(networkID, breadcrumb, timeoutMs);
+            wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(nullptr, networkID, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_ENABLE_NETWORK_COMMAND_ID: {
@@ -226,7 +228,7 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(networkID, breadcrumb, timeoutMs);
+            wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(nullptr, networkID, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID: {
@@ -239,7 +241,7 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(timeoutMs);
+            wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(nullptr, timeoutMs);
             break;
         }
         case ZCL_REMOVE_NETWORK_COMMAND_ID: {
@@ -269,7 +271,7 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             TimeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(NetworkID, Breadcrumb, TimeoutMs);
+            wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(nullptr, NetworkID, Breadcrumb, TimeoutMs);
             break;
         }
         case ZCL_SCAN_NETWORKS_COMMAND_ID: {
@@ -299,7 +301,7 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(ssid, breadcrumb, timeoutMs);
+            wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(nullptr, ssid, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID: {
@@ -329,7 +331,8 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
+            wasHandled =
+                emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(nullptr, operationalDataset, breadcrumb, timeoutMs);
             break;
         }
         case ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID: {
@@ -369,7 +372,8 @@ EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfCluste
             }
             timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
+            wasHandled =
+                emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(nullptr, ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
         default: {
@@ -389,15 +393,15 @@ EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->commandId)
         {
         case ZCL_OFF_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterOffCallback();
+            wasHandled = emberAfOnOffClusterOffCallback(nullptr);
             break;
         }
         case ZCL_ON_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterOnCallback();
+            wasHandled = emberAfOnOffClusterOnCallback(nullptr);
             break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
-            wasHandled = emberAfOnOffClusterToggleCallback();
+            wasHandled = emberAfOnOffClusterToggleCallback(nullptr);
             break;
         }
         default: {

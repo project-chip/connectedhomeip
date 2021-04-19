@@ -101,7 +101,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearAllPinsResponseCallback(status);
+                emberAfDoorLockClusterClearAllPinsResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -168,7 +168,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearAllRfidsResponseCallback(status);
+                emberAfDoorLockClusterClearAllRfidsResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -235,7 +235,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearHolidayScheduleResponseCallback(status);
+                emberAfDoorLockClusterClearHolidayScheduleResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -302,7 +302,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearPinResponseCallback(status);
+                emberAfDoorLockClusterClearPinResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -369,7 +369,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearRfidResponseCallback(status);
+                emberAfDoorLockClusterClearRfidResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -436,7 +436,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(status);
+                emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -503,7 +503,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterClearYeardayScheduleResponseCallback(status);
+                emberAfDoorLockClusterClearYeardayScheduleResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -634,8 +634,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetHolidayScheduleResponseCallback(scheduleId, status, localStartTime, localEndTime,
-                                                                         operatingModeDuringHoliday);
+                emberAfDoorLockClusterGetHolidayScheduleResponseCallback(apCommandObj, scheduleId, status, localStartTime,
+                                                                         localEndTime, operatingModeDuringHoliday);
             }
             else
             {
@@ -799,8 +799,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetLogRecordResponseCallback(logEntryId, timestamp, eventType, source, eventIdOrAlarmCode,
-                                                                   userId, const_cast<uint8_t *>(pin));
+                emberAfDoorLockClusterGetLogRecordResponseCallback(apCommandObj, logEntryId, timestamp, eventType, source,
+                                                                   eventIdOrAlarmCode, userId, const_cast<uint8_t *>(pin));
             }
             else
             {
@@ -916,7 +916,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetPinResponseCallback(userId, userStatus, userType, const_cast<uint8_t *>(pin));
+                emberAfDoorLockClusterGetPinResponseCallback(apCommandObj, userId, userStatus, userType,
+                                                             const_cast<uint8_t *>(pin));
             }
             else
             {
@@ -1032,7 +1033,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetRfidResponseCallback(userId, userStatus, userType, const_cast<uint8_t *>(rfid));
+                emberAfDoorLockClusterGetRfidResponseCallback(apCommandObj, userId, userStatus, userType,
+                                                              const_cast<uint8_t *>(rfid));
             }
             else
             {
@@ -1115,7 +1117,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetUserTypeResponseCallback(userId, userType);
+                emberAfDoorLockClusterGetUserTypeResponseCallback(apCommandObj, userId, userType);
             }
             else
             {
@@ -1294,8 +1296,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(scheduleId, userId, status, daysMask, startHour,
-                                                                         startMinute, endHour, endMinute);
+                emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(apCommandObj, scheduleId, userId, status, daysMask,
+                                                                         startHour, startMinute, endHour, endMinute);
             }
             else
             {
@@ -1426,7 +1428,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterGetYeardayScheduleResponseCallback(scheduleId, userId, status, localStartTime, localEndTime);
+                emberAfDoorLockClusterGetYeardayScheduleResponseCallback(apCommandObj, scheduleId, userId, status, localStartTime,
+                                                                         localEndTime);
             }
             else
             {
@@ -1493,7 +1496,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterLockDoorResponseCallback(status);
+                emberAfDoorLockClusterLockDoorResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1560,7 +1563,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterSetHolidayScheduleResponseCallback(status);
+                emberAfDoorLockClusterSetHolidayScheduleResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1627,7 +1630,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterSetPinResponseCallback(status);
+                emberAfDoorLockClusterSetPinResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1694,7 +1697,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterSetRfidResponseCallback(status);
+                emberAfDoorLockClusterSetRfidResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1761,7 +1764,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterSetUserTypeResponseCallback(status);
+                emberAfDoorLockClusterSetUserTypeResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1828,7 +1831,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(status);
+                emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1895,7 +1898,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterSetYeardayScheduleResponseCallback(status);
+                emberAfDoorLockClusterSetYeardayScheduleResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -1962,7 +1965,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterUnlockDoorResponseCallback(status);
+                emberAfDoorLockClusterUnlockDoorResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -2029,7 +2032,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(status);
+                emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(apCommandObj, status);
             }
             else
             {
@@ -2133,7 +2136,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(errorCode, const_cast<uint8_t *>(debugText));
+                emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(apCommandObj, errorCode,
+                                                                              const_cast<uint8_t *>(debugText));
             }
             else
             {
@@ -2217,7 +2221,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(errorCode,
+                emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(apCommandObj, errorCode,
                                                                                         const_cast<uint8_t *>(debugText));
             }
             else
@@ -2302,7 +2306,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGeneralCommissioningClusterSetFabricResponseCallback(errorCode, const_cast<uint8_t *>(debugText));
+                emberAfGeneralCommissioningClusterSetFabricResponseCallback(apCommandObj, errorCode,
+                                                                            const_cast<uint8_t *>(debugText));
             }
             else
             {
@@ -2405,7 +2410,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterAddGroupResponseCallback(status, groupId);
+                emberAfGroupsClusterAddGroupResponseCallback(apCommandObj, status, groupId);
             }
             else
             {
@@ -2505,7 +2510,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterGetGroupMembershipResponseCallback(capacity, groupCount, groupList);
+                emberAfGroupsClusterGetGroupMembershipResponseCallback(apCommandObj, capacity, groupCount, groupList);
             }
             else
             {
@@ -2588,7 +2593,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterRemoveGroupResponseCallback(status, groupId);
+                emberAfGroupsClusterRemoveGroupResponseCallback(apCommandObj, status, groupId);
             }
             else
             {
@@ -2688,7 +2693,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterViewGroupResponseCallback(status, groupId, const_cast<uint8_t *>(groupName));
+                emberAfGroupsClusterViewGroupResponseCallback(apCommandObj, status, groupId, const_cast<uint8_t *>(groupName));
             }
             else
             {
@@ -2775,7 +2780,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+                emberAfIdentifyClusterIdentifyQueryResponseCallback(apCommandObj, timeout);
             }
             else
             {
@@ -2894,7 +2899,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterAddSceneResponseCallback(status, groupId, sceneId);
+                emberAfScenesClusterAddSceneResponseCallback(apCommandObj, status, groupId, sceneId);
             }
             else
             {
@@ -3026,7 +3031,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterGetSceneMembershipResponseCallback(status, capacity, groupId, sceneCount, sceneList);
+                emberAfScenesClusterGetSceneMembershipResponseCallback(apCommandObj, status, capacity, groupId, sceneCount,
+                                                                       sceneList);
             }
             else
             {
@@ -3109,7 +3115,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterRemoveAllScenesResponseCallback(status, groupId);
+                emberAfScenesClusterRemoveAllScenesResponseCallback(apCommandObj, status, groupId);
             }
             else
             {
@@ -3208,7 +3214,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterRemoveSceneResponseCallback(status, groupId, sceneId);
+                emberAfScenesClusterRemoveSceneResponseCallback(apCommandObj, status, groupId, sceneId);
             }
             else
             {
@@ -3307,7 +3313,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterStoreSceneResponseCallback(status, groupId, sceneId);
+                emberAfScenesClusterStoreSceneResponseCallback(apCommandObj, status, groupId, sceneId);
             }
             else
             {
@@ -3456,7 +3462,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterViewSceneResponseCallback(status, groupId, sceneId, transitionTime,
+                emberAfScenesClusterViewSceneResponseCallback(apCommandObj, status, groupId, sceneId, transitionTime,
                                                               const_cast<uint8_t *>(sceneName), extensionFieldSets);
             }
             else

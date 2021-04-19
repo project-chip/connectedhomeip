@@ -91,7 +91,7 @@ EmberAfStatus emberAfWindowCoveringClusterServerCommandParse(EmberAfClusterComma
         switch (cmd->commandId)
         {
         case ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID: {
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringDownCloseCallback();
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(nullptr);
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID: {
@@ -104,7 +104,7 @@ EmberAfStatus emberAfWindowCoveringClusterServerCommandParse(EmberAfClusterComma
             }
             percentageLiftValue = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(percentageLiftValue);
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(nullptr, percentageLiftValue);
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_LIFT_VALUE_COMMAND_ID: {
@@ -117,7 +117,7 @@ EmberAfStatus emberAfWindowCoveringClusterServerCommandParse(EmberAfClusterComma
             }
             liftValue = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(liftValue);
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(nullptr, liftValue);
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_TILT_PERCENTAGE_COMMAND_ID: {
@@ -130,7 +130,7 @@ EmberAfStatus emberAfWindowCoveringClusterServerCommandParse(EmberAfClusterComma
             }
             percentageTiltValue = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(percentageTiltValue);
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(nullptr, percentageTiltValue);
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_TILT_VALUE_COMMAND_ID: {
@@ -143,15 +143,15 @@ EmberAfStatus emberAfWindowCoveringClusterServerCommandParse(EmberAfClusterComma
             }
             tiltValue = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(tiltValue);
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(nullptr, tiltValue);
             break;
         }
         case ZCL_WINDOW_COVERING_STOP_COMMAND_ID: {
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringStopCallback();
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringStopCallback(nullptr);
             break;
         }
         case ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID: {
-            wasHandled = emberAfWindowCoveringClusterWindowCoveringUpOpenCallback();
+            wasHandled = emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(nullptr);
             break;
         }
         default: {

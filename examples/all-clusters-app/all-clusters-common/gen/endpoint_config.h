@@ -682,8 +682,8 @@
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                 /* Application Basic (server): vendor id */   \
             { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
               ZAP_LONG_DEFAULTS_INDEX(3094) },                              /* Application Basic (server): application name */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
               ZAP_LONG_DEFAULTS_INDEX(3126) },                             /* Application Basic (server): application id */        \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },       /* Application Basic (server): catalog vendor id */     \
