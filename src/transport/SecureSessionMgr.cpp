@@ -207,6 +207,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (bufferRetainSlot != nullptr)
     {
         encryptedMsg = msgBuf.Retain();
+        // Rewind the start and len of the buffer back to pre-send state for following possible retransmition.
+        encryptedMsg->SetStart(msgStart);
+        encryptedMsg->SetDataLength(msgLen);
+
+        (*bufferRetainSlot) = std::move(encryptedMsg);
     }
 
     ChipLogProgress(Inet,
@@ -227,15 +232,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     }
     ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     SuccessOrExit(err);
-
-    if (bufferRetainSlot != nullptr)
-    {
-        // Rewind the start and len of the buffer back to pre-send state for following possible retransmition.
-        encryptedMsg->SetStart(msgStart);
-        encryptedMsg->SetDataLength(msgLen);
-
-        (*bufferRetainSlot) = std::move(encryptedMsg);
-    }
 
 exit:
     if (!msgBuf.IsNull())
