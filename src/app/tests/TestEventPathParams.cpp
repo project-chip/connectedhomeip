@@ -22,9 +22,9 @@
  *
  */
 
-#include <support/UnitTestRegistration.h>
 #include <app/EventPathParams.h>
 #include <nlunit-test.h>
+#include <support/UnitTestRegistration.h>
 
 namespace chip {
 namespace app {
@@ -63,31 +63,22 @@ void TestDifferentEventId(nlTestSuite * apSuite, void * apContext)
     EventPathParams eventPathParams2(1, 2, 3, 6, false);
     NL_TEST_ASSERT(apSuite, !eventPathParams1.IsSamePath(eventPathParams2));
 }
-}
-}
-}
+} // namespace TestEventPathParams
+} // namespace app
+} // namespace chip
 
 namespace {
-const nlTest sTests[] =
-{
-        NL_TEST_DEF("TestSamePath", chip::app::TestEventPathParams::TestSamePath),
-        NL_TEST_DEF("TestDifferentNodeId", chip::app::TestEventPathParams::TestDifferentNodeId),
-        NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestEventPathParams::TestDifferentEndpointId),
-        NL_TEST_DEF("TestDifferentClusterId", chip::app::TestEventPathParams::TestDifferentClusterId),
-        NL_TEST_DEF("TestDifferentEventId", chip::app::TestEventPathParams::TestDifferentEventId),
-        NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestEventPathParams::TestSamePath),
+                          NL_TEST_DEF("TestDifferentNodeId", chip::app::TestEventPathParams::TestDifferentNodeId),
+                          NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestEventPathParams::TestDifferentEndpointId),
+                          NL_TEST_DEF("TestDifferentClusterId", chip::app::TestEventPathParams::TestDifferentClusterId),
+                          NL_TEST_DEF("TestDifferentEventId", chip::app::TestEventPathParams::TestDifferentEventId),
+                          NL_TEST_SENTINEL() };
 }
 
 int TestEventPathParams()
 {
-    nlTestSuite theSuite =
-            {
-                    "EventPathParams",
-                    &sTests[0],
-                    nullptr,
-                    nullptr
-            };
+    nlTestSuite theSuite = { "EventPathParams", &sTests[0], nullptr, nullptr };
 
     nlTestRunner(&theSuite, nullptr);
 

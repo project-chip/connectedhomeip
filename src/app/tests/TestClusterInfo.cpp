@@ -22,9 +22,9 @@
  *
  */
 
-#include <support/UnitTestRegistration.h>
 #include <app/ClusterInfo.h>
 #include <nlunit-test.h>
+#include <support/UnitTestRegistration.h>
 
 namespace chip {
 namespace app {
@@ -56,29 +56,19 @@ void TestDirty(nlTestSuite * apSuite, void * apContext)
     clusterInfo1.ClearDirty();
     NL_TEST_ASSERT(apSuite, !clusterInfo1.IsDirty());
 }
-}
-}
-}
+} // namespace TestClusterInfo
+} // namespace app
+} // namespace chip
 
 namespace {
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestSamePath", chip::app::TestClusterInfo::TestSamePath),
-    NL_TEST_DEF("TestDifferentPath", chip::app::TestClusterInfo::TestDifferentPath),
-    NL_TEST_DEF("TestDirtiness", chip::app::TestClusterInfo::TestDirty),
-    NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestClusterInfo::TestSamePath),
+                          NL_TEST_DEF("TestDifferentPath", chip::app::TestClusterInfo::TestDifferentPath),
+                          NL_TEST_DEF("TestDirtiness", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
 }
 
 int TestClusterInfo()
 {
-    nlTestSuite theSuite =
-	{
-        "ClusterInfo",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
+    nlTestSuite theSuite = { "ClusterInfo", &sTests[0], nullptr, nullptr };
 
     nlTestRunner(&theSuite, nullptr);
 

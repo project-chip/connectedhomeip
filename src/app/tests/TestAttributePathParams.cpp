@@ -22,9 +22,9 @@
  *
  */
 
-#include <support/UnitTestRegistration.h>
 #include <app/AttributePathParams.h>
 #include <nlunit-test.h>
+#include <support/UnitTestRegistration.h>
 
 namespace chip {
 namespace app {
@@ -77,33 +77,24 @@ void TestDifferentPathFlag(nlTestSuite * apSuite, void * apContext)
     AttributePathParams attributePathParams2(1, 2, 3, 4, 5, AttributePathFlags::kListIndexValid);
     NL_TEST_ASSERT(apSuite, !attributePathParams1.IsSamePath(attributePathParams2));
 }
-}
-}
-}
+} // namespace TestAttributePathParams
+} // namespace app
+} // namespace chip
 
 namespace {
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestSamePath", chip::app::TestAttributePathParams::TestSamePath),
-    NL_TEST_DEF("TestDifferentNodeId", chip::app::TestAttributePathParams::TestDifferentNodeId),
-    NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestAttributePathParams::TestDifferentEndpointId),
-    NL_TEST_DEF("TestDifferentClusterId", chip::app::TestAttributePathParams::TestDifferentClusterId),
-    NL_TEST_DEF("TestDifferentFieldId", chip::app::TestAttributePathParams::TestDifferentFieldId),
-    NL_TEST_DEF("TestDifferentListIndex", chip::app::TestAttributePathParams::TestDifferentListIndex),
-    NL_TEST_DEF("TestDifferentPathFlag", chip::app::TestAttributePathParams::TestDifferentPathFlag),
-    NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestAttributePathParams::TestSamePath),
+                          NL_TEST_DEF("TestDifferentNodeId", chip::app::TestAttributePathParams::TestDifferentNodeId),
+                          NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestAttributePathParams::TestDifferentEndpointId),
+                          NL_TEST_DEF("TestDifferentClusterId", chip::app::TestAttributePathParams::TestDifferentClusterId),
+                          NL_TEST_DEF("TestDifferentFieldId", chip::app::TestAttributePathParams::TestDifferentFieldId),
+                          NL_TEST_DEF("TestDifferentListIndex", chip::app::TestAttributePathParams::TestDifferentListIndex),
+                          NL_TEST_DEF("TestDifferentPathFlag", chip::app::TestAttributePathParams::TestDifferentPathFlag),
+                          NL_TEST_SENTINEL() };
 }
 
 int TestAttributePathParams()
 {
-    nlTestSuite theSuite =
-	{
-        "AttributePathParams",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
+    nlTestSuite theSuite = { "AttributePathParams", &sTests[0], nullptr, nullptr };
 
     nlTestRunner(&theSuite, nullptr);
 

@@ -22,9 +22,9 @@
  *
  */
 
-#include <support/UnitTestRegistration.h>
 #include <app/CommandPathParams.h>
 #include <nlunit-test.h>
+#include <support/UnitTestRegistration.h>
 
 namespace chip {
 namespace app {
@@ -70,32 +70,23 @@ void TestDifferentPathFlag(nlTestSuite * apSuite, void * apContext)
     CommandPathParams commandPathParams2(1, 2, 3, 4, CommandPathFlags::kGroupIdValid);
     NL_TEST_ASSERT(apSuite, !commandPathParams1.IsSamePath(commandPathParams2));
 }
-}
-}
-}
+} // namespace TestCommandPathParams
+} // namespace app
+} // namespace chip
 
 namespace {
-const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestSamePath", chip::app::TestCommandPathParams::TestSamePath),
-    NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestCommandPathParams::TestDifferentEndpointId),
-    NL_TEST_DEF("TestDifferentGroupId", chip::app::TestCommandPathParams::TestDifferentGroupId),
-    NL_TEST_DEF("TestDifferentClusterId", chip::app::TestCommandPathParams::TestDifferentClusterId),
-    NL_TEST_DEF("TestDifferentCommandId", chip::app::TestCommandPathParams::TestDifferentCommandId),
-    NL_TEST_DEF("TestDifferentPathFlag", chip::app::TestCommandPathParams::TestDifferentPathFlag),
-    NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestCommandPathParams::TestSamePath),
+                          NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestCommandPathParams::TestDifferentEndpointId),
+                          NL_TEST_DEF("TestDifferentGroupId", chip::app::TestCommandPathParams::TestDifferentGroupId),
+                          NL_TEST_DEF("TestDifferentClusterId", chip::app::TestCommandPathParams::TestDifferentClusterId),
+                          NL_TEST_DEF("TestDifferentCommandId", chip::app::TestCommandPathParams::TestDifferentCommandId),
+                          NL_TEST_DEF("TestDifferentPathFlag", chip::app::TestCommandPathParams::TestDifferentPathFlag),
+                          NL_TEST_SENTINEL() };
 }
 
 int TestCommandPathParams()
 {
-    nlTestSuite theSuite =
-	{
-        "CommandPathParams",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
+    nlTestSuite theSuite = { "CommandPathParams", &sTests[0], nullptr, nullptr };
 
     nlTestRunner(&theSuite, nullptr);
 

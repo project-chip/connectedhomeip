@@ -24,15 +24,13 @@ namespace chip {
 namespace app {
 struct EventPathParams
 {
-    EventPathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId,
-                    bool aIsUrgent) :
-        mNodeId(aNodeId),
-        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
+    EventPathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aIsUrgent) :
+        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
     {}
     bool IsSamePath(const EventPathParams & aEventPathParams) const
     {
         return aEventPathParams.mNodeId == mNodeId && aEventPathParams.mEndpointId == mEndpointId &&
-                aEventPathParams.mClusterId == mClusterId && aEventPathParams.mEventId == mEventId;
+            aEventPathParams.mClusterId == mClusterId && aEventPathParams.mEventId == mEventId;
     }
     NodeId mNodeId         = 0;
     EndpointId mEndpointId = 0;

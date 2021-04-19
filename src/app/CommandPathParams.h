@@ -40,9 +40,9 @@ struct CommandPathParams
     bool IsSamePath(const CommandPathParams & aCommandPathParams) const
     {
         return aCommandPathParams.mClusterId == mClusterId && aCommandPathParams.mCommandId == mCommandId &&
-                mFlags.Has(aCommandPathParams.mFlags) &&
-                mFlags.Has(CommandPathFlags::kEndpointIdValid) ? aCommandPathParams.mEndpointId == mEndpointId : false ||
-                mFlags.Has(CommandPathFlags::kGroupIdValid) ? aCommandPathParams.mGroupId == mGroupId : false;
+                mFlags.Has(aCommandPathParams.mFlags) && mFlags.Has(CommandPathFlags::kEndpointIdValid)
+            ? aCommandPathParams.mEndpointId == mEndpointId
+            : false || mFlags.Has(CommandPathFlags::kGroupIdValid) ? aCommandPathParams.mGroupId == mGroupId : false;
     }
     EndpointId mEndpointId            = 0;
     GroupId mGroupId                  = 0;

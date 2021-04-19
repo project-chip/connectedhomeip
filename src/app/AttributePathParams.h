@@ -31,26 +31,27 @@ enum class AttributePathFlags : uint8_t
 
 struct AttributePathParams
 {
-    AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, FieldId aFieldId,
-                        ListIndex aListIndex, const BitFlags<AttributePathFlags> & aFlags) :
+    AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, FieldId aFieldId, ListIndex aListIndex,
+                        const BitFlags<AttributePathFlags> & aFlags) :
         mNodeId(aNodeId),
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
     AttributePathParams(const AttributePathParams & aAttributePathParams)
     {
-        mNodeId = aAttributePathParams.mNodeId;
+        mNodeId     = aAttributePathParams.mNodeId;
         mEndpointId = aAttributePathParams.mEndpointId;
-        mClusterId = aAttributePathParams.mClusterId;
-        mFieldId = aAttributePathParams.mFieldId;
-        mListIndex = aAttributePathParams.mListIndex;
-        mFlags = aAttributePathParams.mFlags;
+        mClusterId  = aAttributePathParams.mClusterId;
+        mFieldId    = aAttributePathParams.mFieldId;
+        mListIndex  = aAttributePathParams.mListIndex;
+        mFlags      = aAttributePathParams.mFlags;
     }
     bool IsSamePath(const AttributePathParams & aAttributePathParams) const
     {
         return aAttributePathParams.mNodeId == mNodeId && aAttributePathParams.mEndpointId == mEndpointId &&
                 aAttributePathParams.mClusterId == mClusterId && mFlags.Has(aAttributePathParams.mFlags) &&
-                mFlags.Has(AttributePathFlags::kFieldIdValid) ? aAttributePathParams.mFieldId == mFieldId : false ||
-                mFlags.Has(AttributePathFlags::kListIndexValid) ? aAttributePathParams.mListIndex == mListIndex : false;
+                mFlags.Has(AttributePathFlags::kFieldIdValid)
+            ? aAttributePathParams.mFieldId == mFieldId
+            : false || mFlags.Has(AttributePathFlags::kListIndexValid) ? aAttributePathParams.mListIndex == mListIndex : false;
     }
     chip::NodeId mNodeId                = 0;
     chip::EndpointId mEndpointId        = 0;

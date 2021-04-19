@@ -26,9 +26,8 @@ namespace app {
 struct ClusterInfo
 {
     ClusterInfo(AttributePathParams & aAttributePathParams, bool aDirty) :
-    mAttributePathParams(aAttributePathParams), mDirty(aDirty)
-    {
-    }
+        mAttributePathParams(aAttributePathParams), mDirty(aDirty)
+    {}
     bool IsDirty() { return mDirty; }
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
