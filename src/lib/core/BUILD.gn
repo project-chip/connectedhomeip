@@ -102,6 +102,7 @@ static_library("core") {
     "CHIPTLVUpdater.cpp",
     "CHIPTLVUtilities.cpp",
     "CHIPTLVWriter.cpp",
+    "PeerId.h",
   ]
 
   cflags = [ "-Wconversion" ]

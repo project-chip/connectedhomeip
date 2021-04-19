@@ -49,7 +49,7 @@ public:
 
     CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                  const Transport::PeerAddress & peerAddress,
-                                 Messaging::ReliableMessageContext & reliableMessageContext) override;
+                                 Messaging::ReliableMessageContext * reliableMessageContext) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 

@@ -1108,7 +1108,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     {
         RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
         if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
+            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
@@ -1117,7 +1117,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     {
         TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
         if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
+            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -1126,7 +1126,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     {
         UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
         if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
+            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 }

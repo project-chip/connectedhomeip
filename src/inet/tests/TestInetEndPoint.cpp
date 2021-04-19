@@ -373,14 +373,14 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 
     // Listen after bind should succeed if the prior bind succeeded.
 
-    err = testRaw6EP->Listen();
+    err = testRaw6EP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     NL_TEST_ASSERT(inSuite, (didBind && (err == INET_NO_ERROR)) || (!didBind && (err == INET_ERROR_INCORRECT_STATE)));
 
     didListen = (err == INET_NO_ERROR);
 
     // If the first listen succeeded, then the second listen should be successful.
 
-    err = testRaw6EP->Listen();
+    err = testRaw6EP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     NL_TEST_ASSERT(inSuite, (didBind && didListen && (err == INET_NO_ERROR)) || (!didBind && (err == INET_ERROR_INCORRECT_STATE)));
 
     didListen = (err == INET_NO_ERROR);
@@ -412,7 +412,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     // UdpEndPoint special cases to cover the error branch
-    err = testUDPEP->Listen();
+    err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     err = testUDPEP->Bind(kIPAddressType_Unknown, addr_any, 3000);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
@@ -428,8 +428,8 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     InterfaceId id = testUDPEP->GetBoundInterface();
     NL_TEST_ASSERT(inSuite, id == intId);
 
-    err = testUDPEP->Listen();
-    err = testUDPEP->Listen();
+    err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
+    err = testUDPEP->Listen(nullptr /*OnMessageReceived*/, nullptr /*OnReceiveError*/);
     err = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     err = testUDPEP->BindInterface(kIPAddressType_IPv6, intId);

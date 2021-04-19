@@ -41,8 +41,6 @@ class ThreadStackManagerImpl;
 
 namespace Internal {
 
-class DeviceNetworkInfo;
-
 /**
  * Provides a generic implementation of ThreadStackManager features that works in conjunction
  * with OpenThread.
@@ -75,9 +73,8 @@ protected:
 
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
