@@ -75,8 +75,8 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
         packaged with the TI SDK. Check the following section for a list of
         changes needed.
 
--   Download and install [SysConfig][sysconfig]
-    ([recommended version][sysconfig_recommended])
+-   Download and install [SysConfig][sysconfig] ([recommended
+    version][sysconfig_recommended])
 
     -   This may have already been installed with your SimpleLink SDK install.
 
