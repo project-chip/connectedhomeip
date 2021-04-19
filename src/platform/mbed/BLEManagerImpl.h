@@ -167,7 +167,10 @@ inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 inline bool BLEManagerImpl::_IsAdvertising(void)
 {
     return mFlags.Has(Flags::kFlag_Advertising);
+}
+
 } // namespace Internal
-} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
