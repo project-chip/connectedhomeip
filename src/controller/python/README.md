@@ -160,7 +160,7 @@ chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 4.  Connect to device using setup pin code
 
 ```
-chip-device-ctrl > connect -ble 1383 12345678
+chip-device-ctrl > connect -ble 1383 20202021
 ```
 
 ## Thread provisioning
