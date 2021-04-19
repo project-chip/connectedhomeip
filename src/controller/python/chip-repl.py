@@ -81,6 +81,15 @@ data.Channel = 15
 
 if device.needsNetworkCredentials:
   device.ConnectToThread(ThreadNetworkInfo.build(data))
+
+######## Node discovery ########
+
+import chip.discovery
+
+chip.discovery.FindAddressAsync(123, 456, lambda x: print("%r", x))
+
+print(chip.discovery.FindAddress(123, 456)
+
     '''.strip())
 
 if __name__ == "__main__":

@@ -274,7 +274,7 @@ void pychip_ScriptDeviceAddressUpdateDelegate_SetOnAddressUpdateComplete(
 
 CHIP_ERROR pychip_Resolver_ResolveNode(uint64_t fabricid, chip::NodeId nodeid)
 {
-    return Mdns::Resolver::Instance().ResolveNodeId(nodeid, fabricid, Inet::kIPAddressType_Any);
+    return Mdns::Resolver::Instance().ResolveNodeId(PeerId().SetNodeId(nodeid).SetFabricId(fabricid), Inet::kIPAddressType_Any);
 }
 
 CHIP_ERROR pychip_Stack_Init()

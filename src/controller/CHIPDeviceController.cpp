@@ -350,7 +350,8 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    return Mdns::Resolver::Instance().ResolveNodeId(device->GetDeviceId(), fabricId, chip::Inet::kIPAddressType_Any);
+    return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
+                                                    chip::Inet::kIPAddressType_Any);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -580,12 +581,12 @@ exit:
 void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-void DeviceController::OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData)
+void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 
-    err = GetDevice(nodeId, &device);
+    err = GetDevice(nodeData.mPeerId.GetNodeId(), &device);
     SuccessOrExit(err);
 
     err = device->UpdateAddress(Transport::PeerAddress::UDP(nodeData.mAddress, nodeData.mPort, nodeData.mInterfaceId));
@@ -596,18 +597,18 @@ void DeviceController::OnNodeIdResolved(NodeId nodeId, const chip::Mdns::Resolve
 exit:
     if (mDeviceAddressUpdateDelegate != nullptr)
     {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeId, err);
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeData.mPeerId.GetNodeId(), err);
     }
     return;
 };
 
-void DeviceController::OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error)
+void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_ERROR error)
 {
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 
     if (mDeviceAddressUpdateDelegate != nullptr)
     {
-        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(nodeId, error);
+        mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
