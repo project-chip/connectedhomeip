@@ -38,6 +38,7 @@
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
+#include <protocols/secure_channel/PASESession.h>
 #include <rtos/EventFlags.h>
 
 #include "netdb.h"
@@ -85,7 +86,7 @@ void OnTcpMessageSent(Inet::TCPEndPoint * endPoint, uint16_t Length)
     streamer_printf(streamer_get(), "INFO: TCP socket message sent\r\n");
 }
 
-void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
+INET_ERROR OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
 {
     streamer_t * sout = streamer_get();
 
@@ -94,6 +95,7 @@ void OnTcpMessageReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHand
                     strstr((char *) buffer->Start(), "\n") - (char *) buffer->Start(), (char *) buffer->Start());
     buffer.FreeHead();
     socketEvent.set(socketMsgReceiveFlag);
+    return INET_NO_ERROR;
 }
 
 void OnConnectionCompleted(Inet::TCPEndPoint * endPoint, INET_ERROR error)
@@ -758,7 +760,8 @@ class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
+                           const Transport::PeerAddress & source, System::PacketBufferHandle buffer,
+                           SecureSessionMgr * mgr) override
     {
         char src_addr[PeerAddress::kMaxToStringSize];
         streamer_t * sout     = streamer_get();
@@ -783,8 +786,7 @@ public:
 };
 
 static ServerCallback gCallbacks;
-static SecurePairingUsingTestSecret gTestPairing(Optional<NodeId>::Value(kUndefinedNodeId), static_cast<uint16_t>(0),
-                                                 static_cast<uint16_t>(0));
+static SecurePairingUsingTestSecret gTestPairing;
 static AdminPairingTable gAdmin;
 
 int cmd_server_on(int argc, char ** argv)
@@ -885,7 +887,8 @@ int cmd_server_on(int argc, char ** argv)
 
     gChipServer.sessionManager->SetDelegate(&gCallbacks);
 
-    err = gChipServer.sessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, gAdminId);
+    err = gChipServer.sessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                                 chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     if (err != INET_NO_ERROR)
     {
         streamer_printf(sout, "ERROR: set new pairing failed\r\n");
