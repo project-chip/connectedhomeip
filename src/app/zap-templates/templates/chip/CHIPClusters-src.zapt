@@ -22,30 +22,26 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onSuccessCallback;
-(void) onFailureCallback;
+    (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
                                          (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
 {{#chip_server_cluster_command_arguments}}
 {{#first}}
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
 {{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
 {{else}}
     // Command takes no arguments.
 {{/chip_server_cluster_command_arguments}}
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
