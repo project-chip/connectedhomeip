@@ -1121,7 +1121,7 @@ public:
                 callback->mHandler(nil, @{
                   @"capacity": [NSNumber numberWithUnsignedChar:capacity],
                                     @"groupCount": [NSNumber numberWithUnsignedChar:groupCount],
-                                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                                    // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
                   // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
@@ -1373,9 +1373,9 @@ public:
                 callback->mHandler(nil, @{
                   @"errorCode": [NSNumber numberWithUnsignedChar:errorCode],
                                     @"debugText": [NSString stringWithFormat:@"%s", debugText],
-                  // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                   // Conversion from this type to Objc is not properly implemented yet
-                  // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                   // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
@@ -1517,7 +1517,7 @@ public:
                   @"capacity": [NSNumber numberWithUnsignedChar:capacity],
                                     @"groupId": [NSNumber numberWithUnsignedShort:groupId],
                                     @"sceneCount": [NSNumber numberWithUnsignedChar:sceneCount],
-                                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                                    // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
                   // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
@@ -1632,7 +1632,7 @@ public:
                                     @"sceneId": [NSNumber numberWithUnsignedChar:sceneId],
                                     @"transitionTime": [NSNumber numberWithUnsignedShort:transitionTime],
                                     @"sceneName": [NSString stringWithFormat:@"%s", sceneName],
-                  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
                   // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
@@ -1663,7 +1663,7 @@ public:
                   @"numberOfTransitionsForSequence": [NSNumber numberWithUnsignedChar:numberOfTransitionsForSequence],
                                     @"dayOfWeekForSequence": [NSNumber numberWithUnsignedChar:dayOfWeekForSequence],
                                     @"modeForSequence": [NSNumber numberWithUnsignedChar:modeForSequence],
-                                    // payload: /* TYPE WARNING: array array defaults to */ uint8_t * 
+                                    // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
                   // Conversion from this type to Objc is not properly implemented yet
                 });
                 callback->Cancel();
@@ -7831,4 +7831,3 @@ private:
 
 
 @end
-

@@ -535,4 +535,3 @@
 
 // Definitions for cluster: SL Works With All Hubs
 #define ZCL_SL_WWAH_CLUSTER_ID (0xFC57)
-

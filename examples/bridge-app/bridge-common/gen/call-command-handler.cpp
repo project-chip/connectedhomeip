@@ -135,7 +135,7 @@ uint8_t optionOverride;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterMoveCallback(moveMode, rate, optionMask, optionOverride);
             break;
         }
@@ -169,7 +169,7 @@ uint8_t optionOverride;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterMoveToLevelCallback(level, transitionTime, optionMask, optionOverride);
             break;
         }
@@ -189,7 +189,7 @@ uint16_t transitionTime;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(level, transitionTime);
             break;
         }
@@ -209,7 +209,7 @@ uint8_t rate;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   rate = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(moveMode, rate);
             break;
         }
@@ -250,7 +250,7 @@ uint8_t optionOverride;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterStepCallback(stepMode, stepSize, transitionTime, optionMask, optionOverride);
             break;
         }
@@ -277,7 +277,7 @@ uint16_t transitionTime;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(stepMode, stepSize, transitionTime);
             break;
         }
@@ -297,7 +297,7 @@ uint8_t optionOverride;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfLevelControlClusterStopCallback(optionMask, optionOverride);
             break;
         }
@@ -347,7 +347,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
             break;
         }
@@ -387,7 +387,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
@@ -417,7 +417,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(networkID, breadcrumb, timeoutMs);
             break;
         }
@@ -447,7 +447,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(networkID, breadcrumb, timeoutMs);
             break;
         }
@@ -460,7 +460,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(timeoutMs);
             break;
         }
@@ -490,7 +490,7 @@ uint32_t TimeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   TimeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkCallback(NetworkID, Breadcrumb, TimeoutMs);
             break;
         }
@@ -520,7 +520,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(ssid, breadcrumb, timeoutMs);
             break;
         }
@@ -550,7 +550,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(operationalDataset, breadcrumb, timeoutMs);
             break;
         }
@@ -590,7 +590,7 @@ uint32_t timeoutMs;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeoutMs = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(ssid, credentials, breadcrumb, timeoutMs);
             break;
         }
