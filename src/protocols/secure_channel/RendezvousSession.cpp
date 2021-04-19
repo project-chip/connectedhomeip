@@ -81,7 +81,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
     // TODO: We should assume mTransportMgr not null for IP rendezvous.
     if (mTransportMgr != nullptr)
     {
-        ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(nullptr, mTransportMgr));
+        ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mTransportMgr));
         mPairingSession.MessageDispatch().SetPeerAddress(mParams.GetPeerAddress());
     }
 
