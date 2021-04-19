@@ -38,7 +38,7 @@ void CheckStringToUUID_ChipUUID(nlTestSuite * inSuite, void * inContext)
 {
     // Test positive scenario - CHIP Service UUID
     ChipBleUUID uuid;
-    NL_TEST_ASSERT(inSuite, StringToUUID("0000FEAF-0000-1000-8000-00805F9B34FB", uuid));
+    NL_TEST_ASSERT(inSuite, StringToUUID("0000FFF6-0000-1000-8000-00805F9B34FB", uuid));
     NL_TEST_ASSERT(inSuite, UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
 }
 
@@ -46,7 +46,7 @@ void CheckStringToUUID_ChipUUID_RandomCase(nlTestSuite * inSuite, void * inConte
 {
     // Test that letter case doesn't matter
     ChipBleUUID uuid;
-    NL_TEST_ASSERT(inSuite, StringToUUID("0000FeAf-0000-1000-8000-00805f9B34Fb", uuid));
+    NL_TEST_ASSERT(inSuite, StringToUUID("0000FfF6-0000-1000-8000-00805f9B34Fb", uuid));
     NL_TEST_ASSERT(inSuite, UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
 }
 
@@ -54,7 +54,7 @@ void CheckStringToUUID_ChipUUID_NoSeparators(nlTestSuite * inSuite, void * inCon
 {
     // Test that separators don't matter
     ChipBleUUID uuid;
-    NL_TEST_ASSERT(inSuite, StringToUUID("0000FEAF00001000800000805F9B34FB", uuid));
+    NL_TEST_ASSERT(inSuite, StringToUUID("0000FFF600001000800000805F9B34FB", uuid));
     NL_TEST_ASSERT(inSuite, UUIDsMatch(&uuid, &CHIP_BLE_SVC_ID));
 }
 
@@ -62,21 +62,21 @@ void CheckStringToUUID_TooLong(nlTestSuite * inSuite, void * inContext)
 {
     // Test that even one more digit is too much
     ChipBleUUID uuid;
-    NL_TEST_ASSERT(inSuite, !StringToUUID("0000FEAF00001000800000805F9B34FB0", uuid));
+    NL_TEST_ASSERT(inSuite, !StringToUUID("0000FFF600001000800000805F9B34FB0", uuid));
 }
 
 void CheckStringToUUID_TooShort(nlTestSuite * inSuite, void * inContext)
 {
     // Test that even one less digit is too little
     ChipBleUUID uuid;
-    NL_TEST_ASSERT(inSuite, !StringToUUID("0000FEAF00001000800000805F9B34F", uuid));
+    NL_TEST_ASSERT(inSuite, !StringToUUID("0000FFF600001000800000805F9B34F", uuid));
 }
 
 void CheckStringToUUID_InvalidChar(nlTestSuite * inSuite, void * inContext)
 {
     // Test that non-hex digits don't pass
     ChipBleUUID uuid;
-    NL_TEST_ASSERT(inSuite, !StringToUUID("0000GEAF-0000-1000-8000-00805F9B34FB0", uuid));
+    NL_TEST_ASSERT(inSuite, !StringToUUID("0000GFF6-0000-1000-8000-00805F9B34FB0", uuid));
 }
 
 // clang-format off

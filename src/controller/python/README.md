@@ -141,7 +141,7 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
 2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
 2021-01-19 02:27:27,257 ChipBLEMgr   INFO
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
@@ -273,7 +273,7 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
 2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
 2021-01-19 02:27:27,257 ChipBLEMgr   INFO
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
