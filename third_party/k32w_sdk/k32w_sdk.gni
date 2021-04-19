@@ -169,6 +169,7 @@ template("k32w_sdk") {
       "-Wno-conversion",
       "-Wno-sign-compare",
       "-Wno-clobbered",
+      "-Wno-implicit-fallthrough",
     ]
 
     # Now add our "system-header" include dirs
