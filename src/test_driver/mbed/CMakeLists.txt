@@ -61,7 +61,7 @@ set(CHIP_TESTS
 # TODO: Enable all the tests.
     # -lAppTests
     -lASN1Tests
-    # -lBleLayerTests
+    -lBleLayerTests
     -lChipCryptoTests
     # -lCoreTests
     # -lInetLayerTests
