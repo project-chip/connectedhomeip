@@ -27,41 +27,68 @@
 namespace chip {
 namespace Transport {
 
-CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate & kvs)
+PersistentStorageDelegate * gStorage = nullptr;
+AdminPairingTableDelegate * gDelegate = nullptr;
+
+CHIP_ERROR AdminPairingInfo::StoreIntoKVS()
 {
+    if (gStorage == nullptr)
+    {
+        ChipLogError(Discovery, "Server storage delegate is nill, cannot store admin in KVS");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
 
     StorableAdminPairingInfo info;
     info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
     info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
+    info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
+    info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
-    return kvs.SyncSetKeyValue(key, &info, sizeof(info));
+    gDelegate->OnAdminPersistedToStorage(mAdmin, mFabricId, mNodeId);
+    return gStorage->SyncSetKeyValue(key, &info, sizeof(info));
 }
 
-CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
+CHIP_ERROR AdminPairingInfo::FetchFromKVS()
 {
+    if (gStorage == nullptr)
+    {
+        ChipLogError(Discovery, "Server storage delegate is nill, cannot fetch from KVS");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
 
     StorableAdminPairingInfo info;
 
     uint16_t size = sizeof(info);
-    ReturnErrorOnFailure(kvs.SyncGetKeyValue(key, &info, size));
+    ReturnErrorOnFailure(gStorage->SyncGetKeyValue(key, &info, size));
 
     mNodeId    = Encoding::LittleEndian::HostSwap64(info.mNodeId);
     AdminId id = Encoding::LittleEndian::HostSwap16(info.mAdmin);
+    mFabricId  = Encoding::LittleEndian::HostSwap64(info.mFabricId);
+    mVendorId  = Encoding::LittleEndian::HostSwap16(info.mVendorId);
     ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
 
+    gDelegate->OnAdminPersistedToStorage(id, mFabricId, mNodeId);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id)
+CHIP_ERROR AdminPairingInfo::DeleteFromKVS(AdminId id)
 {
+    if (gStorage == nullptr)
+    {
+        ChipLogError(Discovery, "Server storage delegate is nill, cannot delete from KVS");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
-    kvs.AsyncDeleteKeyValue(key);
+    gStorage->AsyncDeleteKeyValue(key);
+    gDelegate->OnAdminDeletedFromStorage(id);
     return CHIP_NO_ERROR;
 }
 
@@ -128,12 +155,46 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(AdminId adminId)
     return nullptr;
 }
 
+AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId)
+{
+    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    {
+        if (mStates[i].IsInitialized())
+        {
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu.", i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), fabricId);
+        }
+        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId)
+        {
+            ChipLogProgress(Discovery, "Found a match!");
+            return &mStates[i];
+        }
+    }
+
+    return nullptr;
+}
+
 void AdminPairingTable::Reset()
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
         mStates[i].Reset();
     }
+}
+
+CHIP_ERROR AdminPairingTable::Init(PersistentStorageDelegate * storage)
+{
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    gStorage  = storage;
+    ChipLogProgress(Discovery, "Init admin pairing table with server storage.");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AdminPairingTable::SetAdminPairingDelegate(AdminPairingTableDelegate * delegate)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    gDelegate  = delegate;
+    ChipLogProgress(Discovery, "Set the admin pairing table delegate");
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Transport

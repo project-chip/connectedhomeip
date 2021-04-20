@@ -29,8 +29,11 @@ namespace chip {
 namespace Transport {
 
 typedef uint16_t AdminId;
-static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
+typedef uint64_t FabricId;
 
+static constexpr AdminId kUndefinedAdminId   = UINT16_MAX;
+// static constexpr FabricId kUndefinedFabricId = UINT64_MAX;
+static constexpr uint16_t kUndefinedVendorId = UINT16_MAX;
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
@@ -46,6 +49,16 @@ struct AccessControlList
     uint32_t placeholder;
 };
 
+class DLL_EXPORT AdminPairingTableDelegate
+{
+public:
+    virtual ~AdminPairingTableDelegate() {}
+
+    virtual void OnAdminDeletedFromStorage(AdminId adminId);
+    virtual void OnAdminRetrievedFromStorage(AdminId adminId, FabricId fabricId, NodeId nodeId);
+    virtual void OnAdminPersistedToStorage(AdminId adminId, FabricId fabricId, NodeId nodeId);
+};
+
 /**
  * Defines state of a pairing established by an admin.
  * ACL data can be mutated throughout the lifetime of the admin pairing.
@@ -54,6 +67,8 @@ struct AccessControlList
  * Information contained within the state:
  *   - Admin identification
  *   - Node Id assigned by the admin to the device
+ *   - Vendor Id
+ *   - Fabric Id
  *   - Device operational credentials
  *   - Access control list
  */
@@ -65,8 +80,14 @@ public:
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
 
+    FabricId GetFabricId() const { return mFabricId; }
+    void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
+
     AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(AdminId adminId) { mAdmin = adminId; }
+
+    uint16_t GetVendorId() const { return mVendorId; }
+    void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
     OperationalCredentials & GetOperationalCreds() { return mOpCred; }
@@ -83,19 +104,23 @@ public:
      */
     void Reset()
     {
-        mNodeId = kUndefinedNodeId;
-        mAdmin  = kUndefinedAdminId;
+        mNodeId   = kUndefinedNodeId;
+        mAdmin    = kUndefinedAdminId;
+        mFabricId = kUndefinedFabricId;
+        mVendorId = kUndefinedVendorId;
     }
 
-    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
+    CHIP_ERROR StoreIntoKVS();
 
-    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs);
+    CHIP_ERROR FetchFromKVS();
 
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id);
+    static CHIP_ERROR DeleteFromKVS(AdminId id);
 
 private:
-    AdminId mAdmin = kUndefinedAdminId;
-    NodeId mNodeId = kUndefinedNodeId;
+    AdminId mAdmin     = kUndefinedAdminId;
+    NodeId mNodeId     = kUndefinedNodeId;
+    FabricId mFabricId = kUndefinedFabricId;
+    uint16_t mVendorId = kUndefinedVendorId;
 
     OperationalCredentials mOpCred;
     AccessControlList mACL;
@@ -106,8 +131,10 @@ private:
 
     struct StorableAdminPairingInfo
     {
-        uint16_t mAdmin;  /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mAdmin;    /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
+        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
     };
 };
 
@@ -190,7 +217,12 @@ public:
 
     AdminPairingInfo * FindAdmin(AdminId adminId);
 
+    AdminPairingInfo * FindAdmin(FabricId fabricId, NodeId nodeId);
+
     void Reset();
+
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR SetAdminPairingDelegate(AdminPairingTableDelegate * delegate);
 
     ConstAdminIterator cbegin() const { return ConstAdminIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
     ConstAdminIterator cend() const

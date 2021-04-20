@@ -90,15 +90,22 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
+        ChipLogProgress(AppServer, "Retrieved value from server storage.");
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
-        return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+        ChipLogProgress(AppServer, "Stored value in server storage");
+        CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
+        return err;
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    void AsyncDeleteKeyValue(const char * key) override 
+    { 
+        ChipLogProgress(AppServer, "Delete value in server storage.");
+        PersistedStorage::KeyValueStoreMgr().Delete(key); 
+    }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -108,7 +115,7 @@ CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvaila
     ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
 
-    ReturnErrorOnFailure(admin->StoreIntoKVS(gServerStorage));
+    ReturnErrorOnFailure(admin->StoreIntoKVS());
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
 
     ChipLogProgress(AppServer, "Persisting admin ID successfully");
@@ -129,7 +136,7 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
     {
         AdminPairingInfo * admin = adminPairings.AssignAdminId(id);
         // Recreate the binding if one exists in persistent storage. Else skip to the next ID
-        if (admin->FetchFromKVS(gServerStorage) != CHIP_NO_ERROR)
+        if (admin->FetchFromKVS() != CHIP_NO_ERROR)
         {
             adminPairings.ReleaseAdminId(id);
         }
@@ -139,6 +146,7 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
                             static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
         }
     }
+    ChipLogProgress(AppServer, "Restored all admin pairings from KVS.");
 
     return CHIP_NO_ERROR;
 }
@@ -149,7 +157,7 @@ void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
 
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
-        AdminPairingInfo::DeleteFromKVS(gServerStorage, id);
+        AdminPairingInfo::DeleteFromKVS(id);
     }
 }
 
@@ -501,6 +509,9 @@ void InitServer(AppDelegate * delegate)
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
+
+    err = gAdminPairings.Init(&gServerStorage);
+    SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
     err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6)
