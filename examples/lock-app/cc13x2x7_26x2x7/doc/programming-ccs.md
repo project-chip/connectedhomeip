@@ -40,25 +40,25 @@
     ![CCS step 2](images/ccs-2.jpg)
 
 -   Name the new ccxml file a useful name. Here I use the XDS110 serial number
-    from before. Leave the Location as the shared location and click `Finish`
-    to create the file.
+    from before. Leave the Location as the shared location and click `Finish` to
+    create the file.
 
     ![CCS step 3](images/ccs-3.jpg)
 
 -   In the new ccxml, select the `Connection` and the `Board or Device`. This
-    may be different for your setup, but all LaunchPads will use the `Texas
-    Instruments XDS110 USB Debug Probe` for the target connection. And the and
-    a `CC1352R1F3` is mounted on the `CC1352R1_LAUNCHXL` LaunchPads. Builds for
-    other LaunchPads should use the corresponding SoC name.
+    may be different for your setup, but all LaunchPads will use the
+    `Texas Instruments XDS110 USB Debug Probe` for the target connection. And
+    the and a `CC1352R1F3` is mounted on the `CC1352R1_LAUNCHXL` LaunchPads.
+    Builds for other LaunchPads should use the corresponding SoC name.
 
     ![CCS step 4](images/ccs-4.jpg)
 
 -   Now set the XDS110 serial number in the advanced tab of the ccxml. First
-    select the `Advanced` tab at the bottom of the window. Then select the
-    Debug Probe in the connection tree. Then select `Select by serial number`
-    in the `Debug Probe Selection`. Then enter the serial number from `xdsdfu`
-    earlier in the `Enter the serial number` text field. Finally click `Save`
-    to save your ccxml.
+    select the `Advanced` tab at the bottom of the window. Then select the Debug
+    Probe in the connection tree. Then select `Select by serial number` in the
+    `Debug Probe Selection`. Then enter the serial number from `xdsdfu` earlier
+    in the `Enter the serial number` text field. Finally click `Save` to save
+    your ccxml.
 
     ![CCS step 5](images/ccs-5.jpg)
 
@@ -68,15 +68,14 @@
 
     ![CCS step 6](images/ccs-6.jpg)
 
--   Now open the Debug Configurations dialog to setup a new debug
-    configuration.  Select `Run` >> `Debug Configurations...`.
+-   Now open the Debug Configurations dialog to setup a new debug configuration.
+    Select `Run` >> `Debug Configurations...`.
 
     ![CCS step 7](images/ccs-7.jpg)
 
--   Create a new launch configuration from the default CCS launch
-    configuration.  Select `Code Composer Studio - Device Debugging` and then
-    create a new launch configuration with the `New launch configuration`
-    button.
+-   Create a new launch configuration from the default CCS launch configuration.
+    Select `Code Composer Studio - Device Debugging` and then create a new
+    launch configuration with the `New launch configuration` button.
 
     ![CCS step 8](images/ccs-8.jpg)
 
