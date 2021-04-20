@@ -519,7 +519,7 @@
 - (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
 {
     self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
-                                                           endpoint:1
+                                                           endpoint:0
                                                               queue:dispatch_get_main_queue()];
     NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
@@ -539,7 +539,7 @@
 - (void)addThreadNetwork:(NSData *)threadDataSet
 {
     self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
-                                                           endpoint:1
+                                                           endpoint:0
                                                               queue:dispatch_get_main_queue()];
     uint64_t breadcrumb = 0;
     uint32_t timeoutMs = 3000;
