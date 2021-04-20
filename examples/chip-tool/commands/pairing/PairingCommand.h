@@ -74,9 +74,6 @@ public:
             AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
-            AddArgument("thread-channel", 11, 25, &mThreadInfo.ThreadChannel);
-            AddArgument("thread-panId", 0, 0xFFFE, &mThreadInfo.ThreadPANId);            
-            AddArgument("thread-masterKey", (char**)&mThrdKey);
             break;
         case PairingMode::SoftAP:
             AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
@@ -139,9 +136,6 @@ private:
     char * mOperationalDataset;
     char * mSSID;
     char * mPassword;
-    char * mThrdKey;
-    // Thread Provisioning Data
-    chip::DeviceLayer::Internal::DeviceNetworkInfo mThreadInfo = {};
 
     chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * mOnAddThreadNetworkCallback;
     chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * mOnAddWiFiNetworkCallback;
