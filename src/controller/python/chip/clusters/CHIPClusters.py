@@ -672,6 +672,13 @@ class ChipClusters:
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
         funcCaller(lambda: func(device, endpoint, groupid))
 
+    def ConfigureAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, minInterval: int, maxInterval: int, change: int, imEnabled):
+        func = getattr(self, "Cluster{}_ConfigureAttribute{}".format(cluster, attribute), None)
+        if not func:
+            raise UnknownAttribute(cluster, attribute)
+        funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
+        funcCaller(lambda: func(device, endpoint, minInterval, maxInterval, change))
+
     # Cluster commands
 
     def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
@@ -1123,20 +1130,30 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentHue(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeCurrentSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeRemainingTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCurrentX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentX(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentX(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeCurrentY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentY(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentY(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeDriftCompensation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCompensationText(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_CompensationText(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_ColorTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeColorMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorControlOptions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1227,6 +1244,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeLockState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState(device, ZCLendpoint, ZCLgroupid)
+    def ClusterDoorLock_ConfigureAttributeLockState(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_DoorLock_LockState(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterDoorLock_ReadAttributeLockType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeActuatorEnabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1263,6 +1282,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterLevelControl_ReadAttributeCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterLevelControl_ConfigureAttributeCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_LevelControl_CurrentLevel(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterLevelControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterLowPower_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1271,6 +1292,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_ConfigureAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterOnOff_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeSceneCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1287,6 +1310,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTemperatureMeasurement_ConfigureAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterTemperatureMeasurement_ReadAttributeMinMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1295,6 +1320,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ConfigureAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterThermostat_ReadAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1307,12 +1334,20 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterWindowCovering_ReadAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterWindowCovering_ReadAttributeCurrentPositionTilt(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeCurrentPositionTilt(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterWindowCovering_ReadAttributeConfigStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_ConfigStatus(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeConfigStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterWindowCovering_ReadAttributeInstalledOpenLimitLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift(device, ZCLendpoint, ZCLgroupid)
     def ClusterWindowCovering_ReadAttributeInstalledClosedLimitLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1496,18 +1531,30 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute CurrentHue
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentHue
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentHue.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentSaturation
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentSaturation
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute RemainingTime
         self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentX
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentX
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentX.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentY
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentY
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentY.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute DriftCompensation
         self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation.restype = ctypes.c_uint32
@@ -1517,6 +1564,9 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ColorTemperature
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute ColorTemperature
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_ColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_ColorTemperature.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorMode
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode.restype = ctypes.c_uint32
@@ -1723,6 +1773,9 @@ class ChipClusters:
         # Cluster DoorLock ReadAttribute LockState
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState.restype = ctypes.c_uint32
+        # Cluster DoorLock ConfigureAttribute LockState
+        self._chipLib.chip_ime_ConfigureAttribute_DoorLock_LockState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_DoorLock_LockState.restype = ctypes.c_uint32
         # Cluster DoorLock ReadAttribute LockType
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType.restype = ctypes.c_uint32
@@ -1840,6 +1893,9 @@ class ChipClusters:
         # Cluster LevelControl ReadAttribute CurrentLevel
         self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl ConfigureAttribute CurrentLevel
+        self._chipLib.chip_ime_ConfigureAttribute_LevelControl_CurrentLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_LevelControl_CurrentLevel.restype = ctypes.c_uint32
         # Cluster LevelControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision.restype = ctypes.c_uint32
@@ -1894,6 +1950,9 @@ class ChipClusters:
         # Cluster OnOff ReadAttribute OnOff
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff.restype = ctypes.c_uint32
+        # Cluster OnOff ConfigureAttribute OnOff
+        self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
@@ -1941,6 +2000,9 @@ class ChipClusters:
         # Cluster TemperatureMeasurement ReadAttribute MeasuredValue
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement ConfigureAttribute MeasuredValue
+        self._chipLib.chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement ReadAttribute MinMeasuredValue
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue.restype = ctypes.c_uint32
@@ -1969,6 +2031,9 @@ class ChipClusters:
         # Cluster Thermostat ReadAttribute LocalTemperature
         self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
+        # Cluster Thermostat ConfigureAttribute LocalTemperature
+        self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute OccupiedCoolingSetpoint
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
@@ -2009,15 +2074,27 @@ class ChipClusters:
         # Cluster WindowCovering ReadAttribute WindowCoveringType
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute WindowCoveringType
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute CurrentPositionLift
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute CurrentPositionLift
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute CurrentPositionTilt
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute CurrentPositionTilt
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute ConfigStatus
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_ConfigStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_ConfigStatus.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute ConfigStatus
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute InstalledOpenLimitLift
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift.restype = ctypes.c_uint32

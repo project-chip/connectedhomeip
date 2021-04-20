@@ -97,6 +97,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
 - (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
 - (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeManufacturingDate:(ResponseHandler)completionHandler;
+- (void)readAttributePartNumber:(ResponseHandler)completionHandler;
+- (void)readAttributeProductURL:(ResponseHandler)completionHandler;
+- (void)readAttributeProductLabel:(ResponseHandler)completionHandler;
+- (void)readAttributeSerialNumber:(ResponseHandler)completionHandler;
+- (void)readAttributeLocalConfigDisabled:(ResponseHandler)completionHandler;
+- (void)writeAttributeLocalConfigDisabled:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
