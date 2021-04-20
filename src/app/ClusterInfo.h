@@ -31,10 +31,7 @@ struct ClusterInfo
     bool IsDirty() { return mDirty; }
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
-    bool IsSamePath(const ClusterInfo & other) const
-    {
-        return other.mAttributePathParams.IsSamePath(mAttributePathParams);
-    }
+    bool IsSamePath(const ClusterInfo & other) const { return other.mAttributePathParams.IsSamePath(mAttributePathParams); }
     AttributePathParams mAttributePathParams;
     bool mDirty = false;
 };

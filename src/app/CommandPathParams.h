@@ -43,7 +43,8 @@ struct CommandPathParams
         {
             return false;
         }
-        if (mFlags != other.mFlags) {
+        if (mFlags != other.mFlags)
+        {
             return false;
         }
         if (mFlags == CommandPathFlags::kEndpointIdValid && other.mEndpointId != mEndpointId)
@@ -56,10 +57,10 @@ struct CommandPathParams
         }
         return true;
     }
-    EndpointId mEndpointId            = 0;
-    GroupId mGroupId                  = 0;
-    ClusterId mClusterId              = 0;
-    CommandId mCommandId              = 0;
+    EndpointId mEndpointId = 0;
+    GroupId mGroupId       = 0;
+    ClusterId mClusterId   = 0;
+    CommandId mCommandId   = 0;
     BitFlags<CommandPathFlags> mFlags;
 };
 } // namespace app

@@ -65,11 +65,11 @@ struct AttributePathParams
         }
         return true;
     }
-    chip::NodeId mNodeId                = 0;
-    chip::EndpointId mEndpointId        = 0;
-    chip::ClusterId mClusterId          = 0;
-    chip::FieldId mFieldId              = 0;
-    chip::ListIndex mListIndex          = 0;
+    chip::NodeId mNodeId         = 0;
+    chip::EndpointId mEndpointId = 0;
+    chip::ClusterId mClusterId   = 0;
+    chip::FieldId mFieldId       = 0;
+    chip::ListIndex mListIndex   = 0;
     BitFlags<AttributePathFlags> mFlags;
 };
 } // namespace app

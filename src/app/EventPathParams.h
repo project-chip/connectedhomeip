@@ -29,8 +29,8 @@ struct EventPathParams
     {}
     bool IsSamePath(const EventPathParams & other) const
     {
-        return other.mNodeId == mNodeId && other.mEndpointId == mEndpointId &&
-            other.mClusterId == mClusterId && other.mEventId == mEventId;
+        return other.mNodeId == mNodeId && other.mEndpointId == mEndpointId && other.mClusterId == mClusterId &&
+            other.mEventId == mEventId;
     }
     NodeId mNodeId         = 0;
     EndpointId mEndpointId = 0;
