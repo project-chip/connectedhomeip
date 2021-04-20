@@ -150,7 +150,7 @@ def main():
     test = MobileDeviceTests(112233)
 
     FailIfNot(test.TestKeyExchange(options.deviceAddress,
-                                   12345678, 1), "Failed to finish key exchange")
+                                   20202021, 1), "Failed to finish key exchange")
     FailIfNot(test.TestNetworkCommissioning(1), "Failed to finish network commissioning")
     FailIfNot(test.TestOnOffCluster(1), "Failed to test on off cluster")
 
