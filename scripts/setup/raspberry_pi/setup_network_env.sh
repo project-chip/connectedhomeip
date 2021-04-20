@@ -21,8 +21,10 @@
 #
 # See docs/BUILDING.md for more details
 
-AP_NAME=CHIPnet
+AP_NAME=WIFI_AP
+AP_SSID=CHIPnet
 AP_PASSWORD="CHIPnet123"
+AP_DHCP_SERVER=192.168.4.1/24
 
 set -ex
 
@@ -37,12 +39,14 @@ sudo apt-get install -fy \
 # Run access point
 echo "Run access point"
 
-sudo nmcli con add type wifi ifname wlan0 con-name WiFiAp autoconnect true ssid "$AP_NAME"
-sudo nmcli con modify WiFiAp 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared
-sudo nmcli con modify WiFiAp 802-11-wireless-security.proto rsn wifi-sec.key-mgmt wpa-psk wifi-sec.psk "$AP_PASSWORD"
-sudo nmcli con up WiFiAp
+sudo nmcli con add type wifi ifname wlan0 mode ap con-name "$AP_NAME" autoconnect true ssid "$AP_SSID"
+sudo nmcli con modify "$AP_NAME" 802-11-wireless.band bg 802-11-wireless.channel 7
+sudo nmcli con modify "$AP_NAME" 802-11-wireless-security.proto rsn 802-11-wireless-security.group ccmp 802-11-wireless-security.pairwise ccmp 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk "$AP_PASSWORD"
+sudo nmcli con modify "$AP_NAME" ipv4.method shared
+sudo nmcli con modify "$AP_NAME" ipv4.addr "$AP_DHCP_SERVER"
+sudo nmcli con up "$AP_NAME"
 
-sudo nmcli -f GENERAL.STATE con show WiFiAp
+sudo nmcli -f GENERAL.STATE con show "$AP_NAME"
 
 #Setting TCP and UDP echo server
 echo "Setting TCP and UDP echo server"
