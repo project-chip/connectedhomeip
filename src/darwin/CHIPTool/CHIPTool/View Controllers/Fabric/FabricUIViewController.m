@@ -36,7 +36,7 @@
 {
     [super viewDidLoad];
     self.cluster = [[CHIPOperationalCredentials alloc] initWithDevice:CHIPGetPairedDevice() endpoint:0 queue:dispatch_get_main_queue()];
-    
+
     [self setupUIElements];
     [self fetchFabricId];
 
@@ -44,7 +44,7 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-   
+
 }
 
 - (void)dismissKeyboard
@@ -88,7 +88,7 @@
     stackViewButtons.alignment = UIStackViewAlignmentLeading;
     stackViewButtons.spacing = 10;
     [_stackView addArrangedSubview:stackViewButtons];
-    
+
     // Update Fabric Label
     UIButton *updateFabricLabelButton = [UIButton new];
     [updateFabricLabelButton setTitle:@"Go" forState:UIControlStateNormal];
@@ -100,7 +100,7 @@
 
     updateFabricLabelView.translatesAutoresizingMaskIntoConstraints = false;
     [updateFabricLabelView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
-    
+
     // Remove Fabric
     UIButton *removeFabricButton = [UIButton new];
     [removeFabricButton setTitle:@"Go" forState:UIControlStateNormal];
@@ -113,9 +113,9 @@
 
     removeFabricView.translatesAutoresizingMaskIntoConstraints = false;
     [removeFabricView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
-    
+
     // Get Fabrics List
-    
+
     UIButton *getFabricsListButton = [UIButton new];
     getFabricsListButton.titleLabel.font = [UIFont systemFontOfSize:17];
     getFabricsListButton.titleLabel.textColor = [UIColor blackColor];
@@ -125,11 +125,11 @@
     [getFabricsListButton setTitle:@"Get Fabrics List" forState:UIControlStateNormal];
     [getFabricsListButton addTarget:self action:@selector(getFabricsListButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_stackView addArrangedSubview:getFabricsListButton];
-    
+
     getFabricsListButton.translatesAutoresizingMaskIntoConstraints = false;
     [getFabricsListButton.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
     [getFabricsListButton.leadingAnchor constraintEqualToAnchor:_stackView.leadingAnchor].active = YES;
-    
+
     // Result message
     _resultLabel = [UILabel new];
     _resultLabel.font = [UIFont systemFontOfSize:14];
@@ -141,7 +141,7 @@
     _resultLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_resultLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
     _resultLabel.adjustsFontSizeToFitWidth = YES;
-    
+
     // Fabrics text view
     _fabricsListTextView = [UITextView new];
     _fabricsListTextView.font = [UIFont systemFontOfSize:14];
@@ -150,14 +150,14 @@
     _fabricsListTextView.userInteractionEnabled = NO;
     _fabricsListTextView.text = @"";
     [self.view addSubview:_fabricsListTextView];
-    
+
     _fabricsListTextView.translatesAutoresizingMaskIntoConstraints = false;
     [_fabricsListTextView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
     [_fabricsListTextView.leadingAnchor constraintEqualToAnchor:_stackView.leadingAnchor].active = YES;
     [_fabricsListTextView.topAnchor constraintEqualToAnchor:_stackView.bottomAnchor constant:20].active = YES;
     [_fabricsListTextView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
-    
-    
+
+
 }
 
 - (void)updateResult:(NSString *)result isError:(BOOL)isError
@@ -182,7 +182,7 @@
             NSNumber *nodeID = [fabricDict objectForKey:@"NodeId"];
             NSNumber *vendorID = [fabricDict objectForKey:@"VendorId"];
             NSData *labelData = [fabricDict objectForKey:@"Label"];
-            
+
             NSString* label = [[NSString alloc] initWithData:labelData encoding:NSUTF8StringEncoding];
             [fabricsText appendString:[NSString stringWithFormat:@"Fabric #%@\n", @(fabricIndex)]];
             [fabricsText appendString:[NSString stringWithFormat:@"FabricId: %@\n", fabricId]];
@@ -315,9 +315,9 @@
             self->_removeFabricTextField.text = @"";
             [self updateResult:[NSString stringWithFormat:@"Cannot removeFabric, no fabric found at index %@", @(fabricIndex)] isError:YES];
         });
-        
+
     }
-   
+
 }
 
 - (IBAction)getFabricsListButtonPressed:(id)sender
