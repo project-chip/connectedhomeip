@@ -695,7 +695,7 @@ int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool si
  */
 void emberAfGetEui64(EmberEUI64 returnEui64);
 
-#ifdef EZSP_HOST
+#if (BIGENDIAN_CPU) || defined(EZSP_HOST)
 // Normally this is provided by the stack code, but on the host
 // it is provided by the application code.
 void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
