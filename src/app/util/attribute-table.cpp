@@ -536,8 +536,8 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         if (dataLen <= 2)
         {
             int8_t minR, maxR;
-            uint8_t * minI = (uint8_t *) &(minv.defaultValue);
-            uint8_t * maxI = (uint8_t *) &(maxv.defaultValue);
+            uint8_t * minI = (uint8_t *) &(minv.defaultValue.value);
+            uint8_t * maxI = (uint8_t *) &(maxv.defaultValue.value);
 // On big endian cpu with length 1 only the second byte counts
 #if (BIGENDIAN_CPU)
             if (dataLen == 1)

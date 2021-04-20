@@ -1088,7 +1088,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
                     {
                         if (emberAfAttributeSize(am) <= 2)
                         {
-                            ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                            ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue.value);
                         }
                         else
                         {
@@ -1099,7 +1099,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
                     {
                         if (emberAfAttributeSize(am) <= 2)
                         {
-                            ptr = (uint8_t *) &(am->defaultValue.defaultValue);
+                            ptr = (uint8_t *) &(am->defaultValue.defaultValue.value);
                         }
                         else
                         {

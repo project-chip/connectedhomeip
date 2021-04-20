@@ -89,6 +89,37 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 #define EMBER_AF_NULL_MANUFACTURER_CODE 0x0000
 
 /**
+ * @brief Type for align a 16 bits value.
+ *
+ * This structure has the same size as a pointer and is used to align
+ * a 16 bit value to the 16 least significant bits of a pointer.
+ * Note that this structure is aware of the endianess and the pointer size.
+ */
+typedef struct
+{
+#if (BIGENDIAN_CPU)
+#if (UINTPTR_MAX == UINT32_MAX)
+    uint32_t align : 16;
+#elif (UINTPTR_MAX == UINT64_MAX)
+    uint64_t align : 48;
+#endif
+#endif
+
+    /**
+     * Actual value.
+     */
+    uint16_t value;
+
+#if (!BIGENDIAN_CPU)
+#if (UINTPTR_MAX == UINT32_MAX)
+    uint32_t align : 16;
+#elif (UINTPTR_MAX == UINT64_MAX)
+    uint64_t align : 48;
+#endif
+#endif
+} EmberAfAlignValue;
+
+/**
  * @brief Type for default values.
  *
  * Default value is either a value itself, if it is 2 bytes or less,
@@ -106,7 +137,7 @@ typedef union
     /**
      * Actual default value if the attribute size is 2 bytes or less.
      */
-    uint16_t defaultValue;
+    EmberAfAlignValue defaultValue;
 } EmberAfDefaultAttributeValue;
 
 /**
@@ -143,9 +174,9 @@ typedef union
      */
     uint8_t * ptrToDefaultValue;
     /**
-     * Actual default value if the attribute size is 2 bytes or less.
+     * Default value of the attribute.
      */
-    uint16_t defaultValue;
+    EmberAfAlignValue defaultValue;
     /**
      * Points to the min max attribute value structure, if min/max is
      * supported for this attribute.
