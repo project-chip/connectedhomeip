@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +99,6 @@ CHIP_ERROR BLEBase::SendMessage(const PacketHeader & header, const Transport::Pe
 {
     ReturnErrorCodeIf(address.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-    // ReturnErrorCodeIf(mBleEndPoint == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
@@ -117,17 +116,13 @@ CHIP_ERROR BLEBase::SendMessage(const PacketHeader & header, const Transport::Pe
 
 CHIP_ERROR BLEBase::SendAfterConnect(System::PacketBufferHandle msg)
 {
-    // This will initiate a connection to the specified peer
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
-    // Iterate through the ENTIRE array. If a pending packet for
-    // the address already exists, this means a connection is pending and
-    // does NOT need to be re-established.
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
         if (mPendingPackets[i].IsNull())
         {
-            ChipLogDetail(Inet, "Message appended to send queue");
+            ChipLogDetail(Inet, "Message appended to BLE send queue");
             mPendingPackets[i] = std::move(msg);
             err                = CHIP_NO_ERROR;
             break;
@@ -137,12 +132,12 @@ CHIP_ERROR BLEBase::SendAfterConnect(System::PacketBufferHandle msg)
     return err;
 }
 
-void BLEBase::OnBleConnectionComplete(Ble::BLEEndPoint * endpoint)
+void BLEBase::OnBleConnectionComplete(Ble::BLEEndPoint * endPoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipLogDetail(Inet, "BleConnectionComplete");
+    ChipLogDetail(Inet, "BleConnectionComplete: endPoint %p", endPoint);
 
-    mBleEndPoint = endpoint;
+    mBleEndPoint = endPoint;
 
     // Initiate CHIP over BLE protocol connection.
     err = mBleEndPoint->StartConnect();
@@ -151,17 +146,18 @@ void BLEBase::OnBleConnectionComplete(Ble::BLEEndPoint * endpoint)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (mBleEndPoint)
+        if (mBleEndPoint != nullptr)
         {
             mBleEndPoint->Close();
             mBleEndPoint = nullptr;
         }
-        ChipLogError(Ble, "Failed to setup ble endpoint: %s", ErrorStr(err));
+        ChipLogError(Inet, "Failed to setup BLE endPoint: %s", ErrorStr(err));
     }
 }
 
 void BLEBase::OnBleConnectionError(BLE_ERROR err)
 {
+    ClearPendingPackets();
     ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
 }
 
@@ -186,24 +182,34 @@ void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)
     if (err != BLE_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to establish BLE connection: %s", ErrorStr(err));
+        ClearPendingPackets();
+        return;
     }
-    else
+
+    for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
-        for (size_t i = 0; i < mPendingPacketsSize; i++)
+        if (!mPendingPackets[i].IsNull())
         {
-            if (!mPendingPackets[i].IsNull())
-            {
-                endPoint->Send(std::move(mPendingPackets[i]));
-            }
+            endPoint->Send(std::move(mPendingPackets[i]));
         }
-        ChipLogDetail(Inet, "BLE EndPoint Connection Complete");
     }
+    ChipLogDetail(Inet, "BLE EndPoint %p Connection Complete", endPoint);
 }
 
 void BLEBase::OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)
 {
     mState       = State::kInitialized;
     mBleEndPoint = nullptr;
+    ClearPendingPackets();
+}
+
+void BLEBase::ClearPendingPackets()
+{
+    ChipLogDetail(Inet, "Clearing BLE pending packets.");
+    for (size_t i = 0; i < mPendingPacketsSize; i++)
+    {
+        mPendingPackets[i] = nullptr;
+    }
 }
 
 } // namespace Transport

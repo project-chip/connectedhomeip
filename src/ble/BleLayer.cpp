@@ -345,7 +345,7 @@ BLE_ERROR BleLayer::CloseAllBleConnections()
 
 BLE_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
 {
-    // Close and free all BLE end points.
+    // Close and free all BLE endpoints.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {
         BLEEndPoint * elem = sBLEEndPointPool.Get(i);
@@ -771,13 +771,13 @@ void BleLayer::OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connO
 {
     BleLayer * layer       = reinterpret_cast<BleLayer *>(appState);
     BLEEndPoint * endPoint = nullptr;
-    BLE_ERROR err          = layer->NewBleEndPoint(&endPoint, connObj, kBleRole_Central, true);
+    BLE_ERROR err          = BLE_NO_ERROR;
 
-    SuccessOrExit(err);
+    SuccessOrExit(err = layer->NewBleEndPoint(&endPoint, connObj, kBleRole_Central, true));
     layer->mBleTransport->OnBleConnectionComplete(endPoint);
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if (err != BLE_NO_ERROR)
     {
         OnConnectionError(layer, err);
     }

@@ -38,7 +38,7 @@
 namespace chip {
 namespace Transport {
 
-/** Defines listening parameters for setting up a TCP transport */
+/** Defines listening parameters for setting up a BLE transport */
 class BleListenParameters
 {
 public:
@@ -54,9 +54,7 @@ private:
 
 /** Implements a transport using BLE.
  *
- *  TODO: BLE transport currently does NOT receive messages as defined
- *        in the Transport::Base (i.e. no header is parsed and processed) and
- *        instead received packets are sent raw via BLE Handler callbacks.
+ *  TODO: BLE transport currently only allow one BLE connection, neet to clearify if we should support multiple BLE connections.
  */
 class DLL_EXPORT BLEBase : public Base, public Ble::BleLayerDelegate
 {
@@ -111,6 +109,8 @@ private:
     // parameters used a name instead of a BLE_CONNECTION_OBJECT.
     void OnBleConnectionComplete(Ble::BLEEndPoint * endPoint) override;
     void OnBleConnectionError(BLE_ERROR err) override;
+
+    void ClearPendingPackets();
 
     // Those functions are BLEEndPoint callbacks
     void OnEndPointMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle buffer) override;

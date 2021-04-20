@@ -32,7 +32,7 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
                                                                  System::PacketBufferHandle && message,
                                                                  EncryptedPacketBufferHandle * retainedMessage)
 {
-    ChipLogProgress(Ble, "SessionEstablishmentExchangeDispatch::SendMessageImpl  mTransportMgr %p", mTransportMgr);
+    ChipLogProgress(ExchangeManager, "SessionEstablishmentExchangeDispatch::SendMessageImpl  mTransportMgr %p", mTransportMgr);
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
     if (mTransportMgr != nullptr)
     {

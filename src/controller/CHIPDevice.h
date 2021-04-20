@@ -436,7 +436,7 @@ typedef struct SerializableDevice
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
     uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
-    Transport::Type mDeviceTransport;
+    uint8_t mDeviceTransport;
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

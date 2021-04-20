@@ -171,11 +171,15 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    serializable.mOpsCreds        = mPairing;
-    serializable.mDeviceId        = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort      = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
-    serializable.mAdminId         = Encoding::LittleEndian::HostSwap16(mAdminId);
-    serializable.mDeviceTransport = mDeviceAddress.GetTransportType();
+    serializable.mOpsCreds   = mPairing;
+    serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
+
+    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
+                  "The underlying type of Transport::Type is not uint8_t.");
+    serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
+
     SuccessOrExit(error = Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
                                                  sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
@@ -240,7 +244,9 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
     }
 
-    switch (serializable.mDeviceTransport)
+    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
+                  "The underlying type of Transport::Type is not uint8_t.");
+    switch (static_cast<Transport::Type>(serializable.mDeviceTransport))
     {
     case Transport::Type::kUdp:
         mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
