@@ -27,7 +27,7 @@
 #define GATT_HEADER(F) F
 #define GATT_DATA(F) F
 GATT_DATA(const uint16_t bg_gattdb_data_uuidtable_16_map[]) = {
-    0x2800, 0x2801, 0x2803, 0x1800, 0x2a00, 0x2a01, 0x180a, 0x2a29, 0x2a24, 0x2a23, 0xfeaf, 0x1801, 0x2a05, 0x2b2a, 0x2b29, 0x2902,
+    0x2800, 0x2801, 0x2803, 0x1800, 0x2a00, 0x2a01, 0x180a, 0x2a29, 0x2a24, 0x2a23, 0xfff6, 0x1801, 0x2a05, 0x2b2a, 0x2b29, 0x2902,
 };
 
 GATT_DATA(const uint8_t bg_gattdb_data_uuidtable_128_map[]) = {
@@ -113,8 +113,8 @@ GATT_DATA(const struct bg_gattdb_buffer_with_len bg_gattdb_data_attribute_field_
                                                                                         } };
 GATT_DATA(const struct bg_gattdb_buffer_with_len bg_gattdb_data_attribute_field_23)    = { .len  = 2,
                                                                                         .data = {
-                                                                                            0xaf,
-                                                                                            0xfe,
+                                                                                            0xf6,
+                                                                                            0xff,
                                                                                         } };
 GATT_DATA(const struct bg_gattdb_attribute_chrvalue bg_gattdb_data_attribute_field_22) = {
     .properties = 0x08,
