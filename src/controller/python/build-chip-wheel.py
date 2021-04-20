@@ -130,6 +130,7 @@ try:
             'chip.ble.commissioning',
             'chip.configuration',
             'chip.clusters',
+            'chip.discovery',
             'chip.exceptions',
             'chip.internal',
             'chip.interaction_model',

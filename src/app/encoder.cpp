@@ -512,6 +512,12 @@ PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8
 | * HardwareVersionString                                             | 0x0008 |
 | * SoftwareVersion                                                   | 0x0009 |
 | * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * LocalConfigDisabled                                               | 0x0010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -680,6 +686,79 @@ PacketBufferHandle encodeBasicClusterReadSoftwareVersionStringAttribute(uint8_t 
 {
     COMMAND_HEADER("ReadBasicSoftwareVersionString", BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000A);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ManufacturingDate
+ */
+PacketBufferHandle encodeBasicClusterReadManufacturingDateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicManufacturingDate", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PartNumber
+ */
+PacketBufferHandle encodeBasicClusterReadPartNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicPartNumber", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000C);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ProductURL
+ */
+PacketBufferHandle encodeBasicClusterReadProductURLAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicProductURL", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000D);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ProductLabel
+ */
+PacketBufferHandle encodeBasicClusterReadProductLabelAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicProductLabel", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000E);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute SerialNumber
+ */
+PacketBufferHandle encodeBasicClusterReadSerialNumberAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicSerialNumber", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x000F);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute LocalConfigDisabled
+ */
+PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBasicLocalConfigDisabled", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                       uint8_t localConfigDisabled)
+{
+    COMMAND_HEADER("WriteBasicLocalConfigDisabled", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0010)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(localConfigDisabled));
     COMMAND_FOOTER();
 }
 

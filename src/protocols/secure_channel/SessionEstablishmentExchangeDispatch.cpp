@@ -44,7 +44,7 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
-                                                                   ReliableMessageContext & reliableMessageContext)
+                                                                   ReliableMessageContext * reliableMessageContext)
 {
     ReturnErrorOnFailure(ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext));
     mPeerAddress = peerAddress;

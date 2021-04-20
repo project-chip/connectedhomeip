@@ -278,8 +278,8 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
-    void OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData) override;
-    void OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error) override;
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();

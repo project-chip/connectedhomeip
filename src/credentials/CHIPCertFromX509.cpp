@@ -476,6 +476,10 @@ exit:
 static CHIP_ERROR ConvertExtensions(ASN1Reader & reader, TLVWriter & writer)
 {
     CHIP_ERROR err;
+    TLVType containerType;
+
+    err = writer.StartContainer(ContextTag(kTag_Extensions), kTLVType_List, containerType);
+    SuccessOrExit(err);
 
     // Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension
     ASN1_PARSE_ENTER_SEQUENCE
@@ -492,6 +496,9 @@ static CHIP_ERROR ConvertExtensions(ASN1Reader & reader, TLVWriter & writer)
         }
     }
     ASN1_EXIT_SEQUENCE;
+
+    err = writer.EndContainer(containerType);
+    SuccessOrExit(err);
 
 exit:
     return err;

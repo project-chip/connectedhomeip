@@ -28,6 +28,7 @@
 namespace chip {
 namespace Messaging {
 
+constexpr uint16_t kMsgCounterChallengeSize   = 8;   // The size of the message counter synchronization request message.
 constexpr uint16_t kMsgCounterSyncRespMsgSize = 12;  // The size of the message counter synchronization response message.
 constexpr uint32_t kMsgCounterSyncTimeout     = 500; // The amount of time(in milliseconds) which a peer is given to respond
                                                      // to a message counter synchronization request.

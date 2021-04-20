@@ -234,11 +234,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!isAdvertisingRerun)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
 #if CONFIG_BT_PRIVACY
         static_assert((CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT / 1000) <= CONFIG_BT_RPA_TIMEOUT,
                       "BLE advertising timeout is too long relative to RPA timeout");
@@ -311,11 +306,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         {

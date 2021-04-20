@@ -546,13 +546,15 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = MapBLEError(ble_gap_adv_stop());
-            if (err != CHIP_NO_ERROR)
+            if (ble_gap_adv_active())
             {
-                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
-                ExitNow();
+                err = MapBLEError(ble_gap_adv_stop());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+                    ExitNow();
+                }
             }
-
             // mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
@@ -562,11 +564,6 @@ void BLEManagerImpl::DriveBLEState(void)
                 mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-                // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
                 // Post a CHIPoBLEAdvertisingChange(Stopped) event.
                 {
@@ -1084,13 +1081,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-
-    // Inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    {
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 

@@ -52,6 +52,11 @@ jobs:
               run:
                   scripts/examples/gn_efr32_example.sh
                   examples/lighting-app/efr32/ out/lighting_app_debug BRD4161A
+            - name: Build example EFR32 Lighting App for BRD4161A with RPCs
+              run:
+                  scripts/examples/gn_efr32_example.sh
+                  examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A
+                  -args='import("//with_pw_rpc.gni")'
             - name: Build example EFR32 Window Covering for BRD4161A
               run:
                   scripts/examples/gn_efr32_example.sh examples/window-app/efr32/
@@ -72,6 +77,7 @@ jobs:
                   path: |
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
                       out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
+                      out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove SiliconLabs binaries for CodeQL Analysis

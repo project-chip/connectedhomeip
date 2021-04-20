@@ -306,7 +306,7 @@ void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * p
     mNetworkProvision.SendNetworkCredentials(ssid, passwd);
 }
 
-void RendezvousSession::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+void RendezvousSession::SendThreadCredentials(ByteSpan threadData)
 {
     mNetworkProvision.SendThreadCredentials(threadData);
 }

@@ -97,17 +97,16 @@ CHIP_ERROR AdvertiseOperational()
 
     const auto advertiseParameters =
         chip::Mdns::OperationalAdvertisingParameters()
-            .SetFabricId(fabricId)
-            .SetNodeId(GetCurrentNodeId())
+            .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
-            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .SetPort(CHIP_PORT)
+            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise operational node %" PRIX64 "-%" PRIX64, advertiseParameters.GetFabricId(),
-                    advertiseParameters.GetNodeId());
+    ChipLogProgress(Discovery, "Advertise operational node %" PRIX64 "-%" PRIX64, advertiseParameters.GetPeerId().GetFabricId(),
+                    advertiseParameters.GetPeerId().GetNodeId());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 

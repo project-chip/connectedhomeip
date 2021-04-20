@@ -352,6 +352,10 @@ ret:
 /**
  * @brief   Prepare the endpoint to receive ICMP messages.
  *
+ * @param[in]  onMessageReceived   The endpoint's message reception event handling function delegate.
+ * @param[in]  onReceiveError      The endpoint's receive error event handling function delegate.
+ * @param[in]  appState            Application state pointer.
+ *
  * @retval  INET_NO_ERROR   always returned.
  *
  * @details
@@ -363,7 +367,8 @@ ret:
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired
  */
-INET_ERROR RawEndPoint::Listen()
+INET_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessageReceived,
+                               IPEndPointBasis::OnReceiveErrorFunct onReceiveError, void * appState)
 {
     if (mState == kState_Listening)
     {
@@ -374,6 +379,10 @@ INET_ERROR RawEndPoint::Listen()
     {
         return INET_ERROR_INCORRECT_STATE;
     }
+
+    OnMessageReceived = onMessageReceived;
+    OnReceiveError    = onReceiveError;
+    AppState          = appState;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -400,6 +409,11 @@ INET_ERROR RawEndPoint::Listen()
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     mState = kState_Listening;
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    // Wait for ability to read on this endpoint.
+    mRequestIO.SetRead();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return INET_NO_ERROR;
 }
@@ -452,6 +466,9 @@ void RawEndPoint::Close()
 
         // Clear any results from select() that indicate pending I/O for the socket.
         mPendingIO.Clear();
+
+        // Do not wait for I/O on this endpoint.
+        mRequestIO.Clear();
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -993,11 +1010,6 @@ INET_ERROR RawEndPoint::GetSocket(IPAddressType aAddressType)
     }
 
     return IPEndPointBasis::GetSocket(aAddressType, lType, lProtocol);
-}
-
-SocketEvents RawEndPoint::PrepareIO()
-{
-    return (IPEndPointBasis::PrepareIO());
 }
 
 void RawEndPoint::HandlePendingIO()

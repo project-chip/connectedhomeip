@@ -64,6 +64,13 @@ typedef NS_ENUM(NSUInteger, CHIPNetworkCredentialType) {
  *
  */
 - (void)onPairingDeleted:(NSError *)error;
+
+/**
+ * Notify the delegate when address is updated
+ *
+ */
+- (void)onAddressUpdated:(NSError *)error;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -219,6 +219,12 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | * HardwareVersionString                                             | 0x0008 |
 | * SoftwareVersion                                                   | 0x0009 |
 | * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * LocalConfigDisabled                                               | 0x0010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -318,6 +324,52 @@ chip::System::PacketBufferHandle encodeBasicClusterReadSoftwareVersionAttribute(
  */
 chip::System::PacketBufferHandle encodeBasicClusterReadSoftwareVersionStringAttribute(uint8_t seqNum,
                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ManufacturingDate attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadManufacturingDateAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the PartNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadPartNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ProductURL attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadProductURLAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ProductLabel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadProductLabelAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the SerialNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadSerialNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the LocalConfigDisabled attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server write command for the LocalConfigDisabled attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint8_t localConfigDisabled);
 
 /**
  * @brief

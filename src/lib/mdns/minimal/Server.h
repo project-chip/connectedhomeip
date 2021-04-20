@@ -130,6 +130,13 @@ public:
     /// Entries with non-null UDP are considered usable.
     const EndpointInfo * GetEndpoints() const { return mEndpoints; }
 
+    /// A server is considered listening if any UDP endpoint is active.
+    ///
+    /// This is expected to return false after any Shutdown() and will
+    /// return true IFF lListen was called and the listen iterator successfully
+    /// found a valid listening interface.
+    bool IsListening() const;
+
 private:
     static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                     const chip::Inet::IPPacketInfo * info);
