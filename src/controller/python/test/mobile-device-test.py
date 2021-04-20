@@ -30,7 +30,7 @@ TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
                 "0102d252" + \
                 "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
 # Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
-TEST_THREAD_NETWORK_ID = "0123456789abcdef"
+TEST_THREAD_NETWORK_ID = "fedcba9876543210"
 
 
 def TestFail(message):
