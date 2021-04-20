@@ -318,6 +318,7 @@ const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t stat
 CHIP_ERROR pychip_GetDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                     chip::Controller::Device ** device)
 {
+    VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     return devCtrl->GetDevice(nodeId, device);
 }
 

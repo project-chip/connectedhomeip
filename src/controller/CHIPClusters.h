@@ -43,6 +43,7 @@ constexpr ClusterId kLevelControlClusterId           = 0x0008;
 constexpr ClusterId kLowPowerClusterId               = 0x0508;
 constexpr ClusterId kNetworkCommissioningClusterId   = 0x0031;
 constexpr ClusterId kOnOffClusterId                  = 0x0006;
+constexpr ClusterId kOperationalCredentialsClusterId = 0x003E;
 constexpr ClusterId kScenesClusterId                 = 0x0005;
 constexpr ClusterId kTemperatureMeasurementClusterId = 0x0402;
 constexpr ClusterId kThermostatClusterId             = 0x0201;
@@ -115,11 +116,19 @@ public:
     CHIP_ERROR ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        chip::ByteSpan value);
     CHIP_ERROR WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                       chip::ByteSpan value);
+    CHIP_ERROR WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t value);
 
 private:
     static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
@@ -639,6 +648,30 @@ private:
     static constexpr CommandId kOffCommandId    = 0x00;
     static constexpr CommandId kOnCommandId     = 0x01;
     static constexpr CommandId kToggleCommandId = 0x02;
+};
+
+class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
+{
+public:
+    OperationalCredentialsCluster() : ClusterBase(kOperationalCredentialsClusterId) {}
+    ~OperationalCredentialsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR GetFabricId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId);
+    CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                 chip::ByteSpan label);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kGetFabricIdCommandId       = 0x00;
+    static constexpr CommandId kRemoveFabricCommandId      = 0x0A;
+    static constexpr CommandId kUpdateFabricLabelCommandId = 0x09;
 };
 
 class DLL_EXPORT ScenesCluster : public ClusterBase

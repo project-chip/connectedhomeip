@@ -50,7 +50,7 @@ namespace {
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
 #define CHIP_ADV_SHORT_UUID_LEN 2
-#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFEAF
+#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFFF6
 
 // FreeeRTOS sw timer
 TimerHandle_t sbleAdvTimeoutTimer;

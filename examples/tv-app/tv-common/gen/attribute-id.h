@@ -421,6 +421,13 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Operational Credentials
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes

@@ -144,7 +144,8 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
+        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
+            controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
@@ -179,6 +180,7 @@ class DeviceMgrCmd(Cmd):
         "resolve",
         "zcl",
         "zclread",
+        "zclconfigure",
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
@@ -410,14 +412,16 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]), nodeid)
+                self.devCtrl.ConnectIP(args[1].encode(
+                    "utf-8"), int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-            print("Device temporary node id (**this does not match spec**): {}".format(nodeid))
+            print(
+                "Device temporary node id (**this does not match spec**): {}".format(nodeid))
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
@@ -435,7 +439,8 @@ class DeviceMgrCmd(Cmd):
                 err = self.devCtrl.ResolveNode(int(args[0]), int(args[1]))
                 if err == 0:
                     address = self.devCtrl.GetAddressAndPort(int(args[1]))
-                    address = "{}:{}".format(*address) if address else "unknown"
+                    address = "{}:{}".format(
+                        *address) if address else "unknown"
                     print("Current address: " + address)
             else:
                 self.do_help("resolve")
@@ -514,11 +519,40 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(args[2]), int(args[3]), int(args[4]))
+                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]))
             else:
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during reading ZCL attribute:")
+            print(str(ex))
+        except Exception as ex:
+            print("An exception occurred during processing input:")
+            print(str(ex))
+
+    def do_zclconfigure(self, line):
+        """
+        To configure ZCL attribute reporting:
+        zclconfigure <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval> <change>
+        """
+        try:
+            args = shlex.split(line)
+            all_attrs = self.devCtrl.ZCLAttributeList()
+            if len(args) == 1 and args[0] == '?':
+                print('\n'.join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == '?':
+                if args[1] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[1])
+                print('\n'.join(all_attrs.get(args[1])))
+            elif len(args) == 7:
+                if args[0] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[0])
+                self.devCtrl.ZCLConfigureAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), int(args[5]), int(args[6]))
+            else:
+                self.do_help("zclconfigure")
+        except exceptions.ChipStackException as ex:
+            print("An exception occurred during configuring reporting of ZCL attribute:")
             print(str(ex))
         except Exception as ex:
             print("An exception occurred during processing input:")
@@ -550,7 +584,8 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             if len(args) == 3:
-                self.devCtrl.SetThreadCredential(int(args[0]), int(args[1], 16), args[2])
+                self.devCtrl.SetThreadCredential(
+                    int(args[0]), int(args[1], 16), args[2])
                 print("Thread credential set")
             else:
                 self.do_help("set-pairing-thread-credential")
@@ -635,16 +670,19 @@ def main():
     adapterId = None
     if sys.platform.startswith("linux"):
         if not options.bluetoothAdapter.startswith("hci"):
-            print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+            print(
+                "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
             sys.exit(-1)
         else:
             try:
                 adapterId = int(options.bluetoothAdapter[3:])
             except:
-                print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+                print(
+                    "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)
 
-    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr, controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
+    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
+                             controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
     print("Chip Device Controller Shell")
     if options.rendezvousAddr:
         print("Rendezvous address set to %s" % options.rendezvousAddr)

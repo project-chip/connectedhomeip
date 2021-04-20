@@ -563,6 +563,8 @@ CHIP_ERROR AddTestPairing()
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
     AdminPairingInfo * adminInfo = nullptr;
+    PASESession * testSession    = nullptr;
+    PASESessionSerializable serializedTestSession;
 
     for (const AdminPairingInfo & admin : gAdminPairings)
         if (admin.IsInitialized() && admin.GetNodeId() == chip::kTestDeviceNodeId)
@@ -572,11 +574,21 @@ CHIP_ERROR AddTestPairing()
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     adminInfo->SetNodeId(chip::kTestDeviceNodeId);
+    gTestPairing.ToSerializable(serializedTestSession);
+
+    testSession = chip::Platform::New<PASESession>();
+    testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             &gTestPairing, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+                                             testSession, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:
+    if (testSession)
+    {
+        testSession->Clear();
+        chip::Platform::Delete(testSession);
+    }
+
     if (err != CHIP_NO_ERROR && adminInfo != nullptr)
         gAdminPairings.ReleaseAdminId(gNextAvailableAdminId);
 

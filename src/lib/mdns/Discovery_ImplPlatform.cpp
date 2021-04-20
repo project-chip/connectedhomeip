@@ -30,12 +30,6 @@
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
 
-namespace {
-
-constexpr uint64_t kUndefinedNodeId = 0;
-
-} // namespace
-
 namespace chip {
 namespace Mdns {
 

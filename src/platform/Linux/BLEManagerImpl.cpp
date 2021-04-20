@@ -197,7 +197,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     mBLEAdvConfig.mDuration         = 2;
     mBLEAdvConfig.mPairingStatus    = 0;
     mBLEAdvConfig.mType             = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
-    mBLEAdvConfig.mpAdvertisingUUID = "0xFEAF";
+    mBLEAdvConfig.mpAdvertisingUUID = "0xFFF6";
 
     mIsCentral = aIsCentral;
 

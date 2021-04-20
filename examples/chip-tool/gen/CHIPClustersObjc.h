@@ -97,6 +97,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
 - (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
 - (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeManufacturingDate:(ResponseHandler)completionHandler;
+- (void)readAttributePartNumber:(ResponseHandler)completionHandler;
+- (void)readAttributeProductURL:(ResponseHandler)completionHandler;
+- (void)readAttributeProductLabel:(ResponseHandler)completionHandler;
+- (void)readAttributeSerialNumber:(ResponseHandler)completionHandler;
+- (void)readAttributeLocalConfigDisabled:(ResponseHandler)completionHandler;
+- (void)writeAttributeLocalConfigDisabled:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -565,6 +572,24 @@ NS_ASSUME_NONNULL_BEGIN
                     maxInterval:(uint16_t)maxInterval
               completionHandler:(ResponseHandler)completionHandler;
 - (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Operational Credentials
+ *
+ */
+@interface CHIPOperationalCredentials : CHIPCluster
+
+- (void)getFabricId:(ResponseHandler)completionHandler;
+- (void)removeFabric:(uint64_t)fabricId
+               nodeId:(uint64_t)nodeId
+             vendorId:(uint16_t)vendorId
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)updateFabricLabel:(NSString *)label completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeFabricsList:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

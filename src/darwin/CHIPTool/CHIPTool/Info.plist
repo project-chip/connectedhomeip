@@ -20,6 +20,10 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Network usage is required for discovering accessories</string>
+	<key>NSBonjourServices</key>
+	<array><string>_chip._tcp</string></array>
 	<key>NFCReaderUsageDescription</key>
 	<string>To read a setup payload code via NFC code</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>

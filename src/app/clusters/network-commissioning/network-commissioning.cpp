@@ -214,7 +214,11 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     {
     case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+// TODO: On linux, we are using Reset() instead of Detach() to disable thread network, which is not expected.
+// Upstream issue: https://github.com/openthread/ot-br-posix/issues/755
+#if !CHIP_DEVICE_LAYER_TARGET_LINUX
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+#endif
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.AsByteSpan()));
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
 #else

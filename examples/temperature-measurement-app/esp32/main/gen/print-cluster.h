@@ -180,6 +180,12 @@
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER { ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, 62, "Operational Credentials" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER { ZCL_SHADE_CONFIG_CLUSTER_ID, 256, "Shade Configuration" },
 #else
@@ -888,6 +894,7 @@
     CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
