@@ -334,44 +334,44 @@
 #define GENERATED_ATTRIBUTE_COUNT 149
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                /* On/off (server): cluster revision */          \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* On/off (server): on/off */                    \
-            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },              /* Media Playback (server): current state */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },       /* Media Playback (server): cluster revision */  \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },       /* Low Power (server): cluster revision */       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },       /* Content Launch (server): cluster revision */  \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },            /* On/off (server): cluster revision */          \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* On/off (server): on/off */                    \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },            /* Level Control (server): cluster revision */   \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },          /* Level Control (server): current level */      \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },       /* Content Launch (server): cluster revision */  \
+        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },          /* On/off (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Media Playback (server): cluster revision */        \
+            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Media Playback (server): current state */           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Low Power (server): cluster revision */             \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* On/off (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Level Control (server): cluster revision */         \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Level Control (server): current level */            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* Application Basic (server): vendor name */    \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },              /* Application Basic (server): vendor id */      \
             { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(32) },                                /* Application Basic (server): application name */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+              ZAP_LONG_DEFAULTS_INDEX(32) },                         /* Application Basic (server): application name */            \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Application Basic (server): product id */                  \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(64) },                             /* Application Basic (server): application id */          \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* Application Basic (server): catalog vendor id */       \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) }, /* Application Basic (server): application satus */       \
+              ZAP_LONG_DEFAULTS_INDEX(64) },                                /* Application Basic (server): application id */       \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(96) }, /* Application Basic (server): vendor name */   \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },               /* Application Basic (server): vendor id */     \
             { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(128) },                               /* Application Basic (server): application name */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+              ZAP_LONG_DEFAULTS_INDEX(128) },                        /* Application Basic (server): application name */            \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Application Basic (server): product id */                  \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
               ZAP_LONG_DEFAULTS_INDEX(160) },                               /* Application Basic (server): application id */       \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
             { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Content Launch (server): cluster revision */        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(192) }, /* Application Basic (server): vendor name */  \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
             { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(224) },                               /* Application Basic (server): application name */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+              ZAP_LONG_DEFAULTS_INDEX(224) },                        /* Application Basic (server): application name */            \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Application Basic (server): product id */                  \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
               ZAP_LONG_DEFAULTS_INDEX(256) },                            /* Application Basic (server): application id */          \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },     /* Application Basic (server): catalog vendor id */       \
@@ -412,11 +412,11 @@
             { 0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
               ZAP_LONG_DEFAULTS_INDEX(464) }, /* Basic (server): SoftwareVersion */                                                \
             { 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(468) },                                       /* Basic (server): SoftwareVersionString */    \
+              ZAP_LONG_DEFAULTS_INDEX(468) },                               /* Basic (server): SoftwareVersionString */            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (server): cluster revision */ \
             { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(532) }, /* General Commissioning (server): FabricId */ \
             { 0x0001, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
               ZAP_LONG_DEFAULTS_INDEX(540) },                               /* General Commissioning (server): Breadcrumb */       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (server): cluster revision */ \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Network Commissioning (server): cluster revision */ \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Door Lock (server): cluster revision */             \
             { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* Door Lock (server): lock state */                   \
@@ -504,23 +504,23 @@
             { 0x0001, ZAP_TYPE(ENUM16), 2, 0, ZAP_EMPTY_DEFAULT() },          /* IAS Zone (server): zone type */                   \
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* IAS Zone (server): zone status */                 \
             { 0x0010, ZAP_TYPE(IEEE_ADDRESS), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
-              ZAP_LONG_DEFAULTS_INDEX(802) },                                       /* IAS Zone (server): IAS CIE address */       \
-            { 0x0011, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xff) },            /* IAS Zone (server): Zone ID */               \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* Low Power (server): cluster revision */     \
+              ZAP_LONG_DEFAULTS_INDEX(802) },                               /* IAS Zone (server): IAS CIE address */               \
+            { 0x0011, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xff) },    /* IAS Zone (server): Zone ID */                       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Low Power (server): cluster revision */             \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
             { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(810) }, /* Application Basic (server): vendor name */  \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* Application Basic (server): vendor id */    \
             { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(842) },                               /* Application Basic (server): application name */     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Application Basic (server): cluster revision */     \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): product id */           \
+              ZAP_LONG_DEFAULTS_INDEX(842) },                        /* Application Basic (server): application name */            \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* Application Basic (server): product id */                  \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0,                                                                                \
-              ZAP_LONG_DEFAULTS_INDEX(874) },                                  /* Application Basic (server): application id */    \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* Application Basic (server): catalog vendor id */ \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },       /* Application Basic (server): application satus */ \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* Binding (server): cluster revision */            \
-            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(906) }, /* Group Key Management (server): groups */         \
-            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1160) }, /* Group Key Management (server): group keys */    \
+              ZAP_LONG_DEFAULTS_INDEX(874) },                               /* Application Basic (server): application id */       \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },        /* Application Basic (server): catalog vendor id */    \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },    /* Application Basic (server): application satus */    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Binding (server): cluster revision */               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Group Key Management (server): cluster revision */  \
+            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(906) },  /* Group Key Management (server): groups */        \
+            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1160) }, /* Group Key Management (server): group keys */    \
     }
 
 // This is an array of EmberAfCluster structures.
