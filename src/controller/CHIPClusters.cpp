@@ -3775,7 +3775,7 @@ CHIP_ERROR OperationalCredentialsCluster::GetFabricId(Callback::Cancelable * onS
     (void) onFailureCallback;
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetFabricIdCommandId,
-                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
@@ -3802,7 +3802,7 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveFabricCommandId,
-                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
@@ -3836,7 +3836,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
     (void) onFailureCallback;
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateFabricLabelCommandId,
-                                     (chip::app::CommandPathFlags::kEndpointIdValid) };
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
     app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
     ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
