@@ -52,6 +52,7 @@ group("mbed") {
       "${chip_root}/src/transport/retransmit/tests",
       # "${chip_root}/src/transport/tests",
       "${chip_root}/src/ble/tests",
+      "${chip_root}/src/platform/tests",
     ]
   }
 
