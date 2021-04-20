@@ -546,13 +546,15 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = MapBLEError(ble_gap_adv_stop());
-            if (err != CHIP_NO_ERROR)
+            if (ble_gap_adv_active())
             {
-                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
-                ExitNow();
+                err = MapBLEError(ble_gap_adv_stop());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+                    ExitNow();
+                }
             }
-
             // mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
