@@ -971,19 +971,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_OFF_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterOffCallback();
                     break;
         }
         case ZCL_ON_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterOnCallback();
                     break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
-        
+
         // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
         emberAfOnOffClusterToggleCallback();
                     break;

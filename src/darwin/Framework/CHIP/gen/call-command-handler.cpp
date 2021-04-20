@@ -180,7 +180,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(status);
             break;
         }
@@ -193,7 +193,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(status);
             break;
         }
@@ -206,7 +206,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(status);
             break;
         }
@@ -219,7 +219,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearPinResponseCallback(status);
             break;
         }
@@ -232,7 +232,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(status);
             break;
         }
@@ -245,7 +245,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(status);
             break;
         }
@@ -258,7 +258,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(status);
             break;
         }
@@ -299,7 +299,7 @@ uint8_t operatingModeDuringHoliday;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   operatingModeDuringHoliday = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(scheduleId, status, localStartTime, localEndTime, operatingModeDuringHoliday);
             break;
         }
@@ -354,7 +354,7 @@ uint8_t * pin;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin);
             break;
         }
@@ -388,7 +388,7 @@ uint8_t * pin;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetPinResponseCallback(userId, userStatus, userType, pin);
             break;
         }
@@ -422,7 +422,7 @@ uint8_t * rfid;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   rfid = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(userId, userStatus, userType, rfid);
             break;
         }
@@ -442,7 +442,7 @@ uint8_t userType;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   userType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(userId, userType);
             break;
         }
@@ -504,7 +504,7 @@ uint8_t endMinute;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   endMinute = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(scheduleId, userId, status, daysMask, startHour, startMinute, endHour, endMinute);
             break;
         }
@@ -545,7 +545,7 @@ uint32_t localEndTime;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   localEndTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterGetYeardayScheduleResponseCallback(scheduleId, userId, status, localStartTime, localEndTime);
             break;
         }
@@ -558,7 +558,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(status);
             break;
         }
@@ -571,7 +571,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(status);
             break;
         }
@@ -584,7 +584,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterSetPinResponseCallback(status);
             break;
         }
@@ -597,7 +597,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(status);
             break;
         }
@@ -610,7 +610,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(status);
             break;
         }
@@ -623,7 +623,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(status);
             break;
         }
@@ -636,7 +636,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(status);
             break;
         }
@@ -649,7 +649,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(status);
             break;
         }
@@ -662,7 +662,7 @@ uint8_t status;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(status);
             break;
         }
@@ -698,7 +698,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(errorCode, debugText);
             break;
         }
@@ -718,7 +718,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(errorCode, debugText);
             break;
         }
@@ -738,7 +738,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfGeneralCommissioningClusterSetFabricResponseCallback(errorCode, debugText);
             break;
         }
@@ -774,7 +774,7 @@ uint16_t groupId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfGroupsClusterAddGroupResponseCallback(status, groupId);
             break;
         }
@@ -817,7 +817,7 @@ uint16_t groupId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(status, groupId);
             break;
         }
@@ -844,7 +844,7 @@ uint8_t * groupName;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   groupName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfGroupsClusterViewGroupResponseCallback(status, groupId, groupName);
             break;
         }
@@ -873,7 +873,7 @@ uint16_t timeout;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
             break;
         }
@@ -909,7 +909,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -929,7 +929,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -949,7 +949,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -969,7 +969,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -989,7 +989,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -1034,7 +1034,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -1054,7 +1054,7 @@ uint8_t * debugText;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(errorCode, debugText);
             break;
         }
@@ -1083,7 +1083,7 @@ chip::FabricId FabricId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   FabricId = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(FabricId);
             break;
         }
@@ -1126,7 +1126,7 @@ uint8_t sceneId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfScenesClusterAddSceneResponseCallback(status, groupId, sceneId);
             break;
         }
@@ -1197,7 +1197,7 @@ uint16_t groupId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(status, groupId);
             break;
         }
@@ -1224,7 +1224,7 @@ uint8_t sceneId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(status, groupId, sceneId);
             break;
         }
@@ -1251,7 +1251,7 @@ uint8_t sceneId;
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
   sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-  
+
 wasHandled = emberAfScenesClusterStoreSceneResponseCallback(status, groupId, sceneId);
             break;
         }

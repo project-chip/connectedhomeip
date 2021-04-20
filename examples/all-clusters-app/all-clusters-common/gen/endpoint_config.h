@@ -635,5 +635,3 @@ const EmberAfGenericClusterFunction chipFuncArrayIasZoneServer[] = {\
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0402, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* Reporting for cluster: "Temperature Measurement", attribute: "measured value". side: server */ \
   { ZAP_REPORT_DIRECTION(REPORTED), 0x0002, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, {{ 0, 65344, 0 }} }, /* Reporting for cluster: "On/off", attribute: "on/off". side: server */ \
 }
-
-
