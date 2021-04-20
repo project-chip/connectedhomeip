@@ -198,6 +198,17 @@ class CHIPVirtualHome:
     def get_device_log(self, device_id):
         return self.query_api('device_log', [self.home_id, device_id], binary=True)
 
+    def wait_for_device_output(self, device_id, pattern, timeout = 1):
+        due = time.time() + timeout
+        while True:
+            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern, ]):
+                return True
+            if time.time() < due:
+                time.sleep(1)
+            else:
+                break
+        return False
+
     def assertTrue(self, exp, note=None):
         '''
         assert{True|False}

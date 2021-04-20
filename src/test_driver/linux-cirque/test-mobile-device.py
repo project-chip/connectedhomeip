@@ -72,8 +72,10 @@ class TestPythonController(CHIPVirtualHome):
         req_ids = [device['id'] for device in self.non_ap_devices
                    if device['type'] == 'MobileDevice']
 
-        time.sleep(5)
         for device_id in server_ids:
+            # Wait for otbr-agent and CHIP server start
+            self.assertTrue(self.wait_for_device_output(device_id, "Border router agent started.", 5))
+            self.assertTrue(self.wait_for_device_output(device_id, "CHIP:SVR: Server Listening...", 5))
             # Clear default Thread network commissioning data
             self.logger.info("Resetting thread network on {}".format(
                 self.get_device_pretty_id(device_id)))
