@@ -21,6 +21,7 @@
         "descriptor-cluster.xml",
         "types.xml",
         "general.xml",
+        "operational-credentials-cluster.xml",
         "general-commissioning-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "ha.xml",

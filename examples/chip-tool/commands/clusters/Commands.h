@@ -423,6 +423,14 @@ static void OnNetworkCommissioningClusterUpdateWiFiNetworkResponse(void * contex
     command->SetCommandExitStatus(true);
 }
 
+static void OnOperationalCredentialsClusterGetFabricIdResponse(void * context, chip::FabricId FabricId)
+{
+    ChipLogProgress(chipTool, "OperationalCredentialsClusterGetFabricIdResponse");
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 static void OnScenesClusterAddSceneResponse(void * context, uint16_t groupId, uint8_t sceneId)
 {
     ChipLogProgress(chipTool, "ScenesClusterAddSceneResponse");
@@ -562,6 +570,23 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
     command->SetCommandExitStatus(true);
 }
 
+static void OnOperationalCredentialsFabricsListListAttributeResponse(void * context, uint16_t count, _FabricDescriptor * entries)
+{
+    ChipLogProgress(chipTool, "OnOperationalCredentialsFabricsListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "FabricDescriptor[%lu]:", i);
+        ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entries[i].FabricId);
+        ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
+        ChipLogProgress(chipTool, "  Label: %s", entries[i].Label);
+        ChipLogProgress(chipTool, "  NodeId: %" PRIu64 "", entries[i].NodeId);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
@@ -580,6 +605,7 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
 | LowPower                                                            | 0x0508 |
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
+| OperationalCredentials                                              | 0x003E |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
@@ -600,6 +626,7 @@ constexpr chip::ClusterId kLevelControlClusterId           = 0x0008;
 constexpr chip::ClusterId kLowPowerClusterId               = 0x0508;
 constexpr chip::ClusterId kNetworkCommissioningClusterId   = 0x0031;
 constexpr chip::ClusterId kOnOffClusterId                  = 0x0006;
+constexpr chip::ClusterId kOperationalCredentialsClusterId = 0x003E;
 constexpr chip::ClusterId kScenesClusterId                 = 0x0005;
 constexpr chip::ClusterId kTemperatureMeasurementClusterId = 0x0402;
 constexpr chip::ClusterId kThermostatClusterId             = 0x0201;
@@ -8777,6 +8804,221 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster OperationalCredentials                                      | 0x003E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetFabricId                                                       |   0x00 |
+| * RemoveFabric                                                      |   0x0A |
+| * UpdateFabricLabel                                                 |   0x09 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricsList                                                       | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command GetFabricId
+ */
+class OperationalCredentialsGetFabricId : public ModelCommand
+{
+public:
+    OperationalCredentialsGetFabricId() : ModelCommand("get-fabric-id") { ModelCommand::AddArguments(); }
+    ~OperationalCredentialsGetFabricId()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.GetFabricId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>(
+            OnOperationalCredentialsClusterGetFabricIdResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Command RemoveFabric
+ */
+class OperationalCredentialsRemoveFabric : public ModelCommand
+{
+public:
+    OperationalCredentialsRemoveFabric() : ModelCommand("remove-fabric")
+    {
+        AddArgument("fabricId", 0, UINT64_MAX, &mFabricId);
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("vendorId", 0, UINT16_MAX, &mVendorId);
+        ModelCommand::AddArguments();
+    }
+    ~OperationalCredentialsRemoveFabric()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x0A) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RemoveFabric(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mFabricId, mNodeId, mVendorId);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::FabricId mFabricId;
+    chip::NodeId mNodeId;
+    uint16_t mVendorId;
+};
+
+/*
+ * Command UpdateFabricLabel
+ */
+class OperationalCredentialsUpdateFabricLabel : public ModelCommand
+{
+public:
+    OperationalCredentialsUpdateFabricLabel() : ModelCommand("update-fabric-label")
+    {
+        AddArgument("label", &mLabel);
+        ModelCommand::AddArguments();
+    }
+    ~OperationalCredentialsUpdateFabricLabel()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x09) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.UpdateFabricLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                         chip::ByteSpan(chip::Uint8::from_char(mLabel), strlen(mLabel)));
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    char * mLabel;
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverOperationalCredentialsAttributes : public ModelCommand
+{
+public:
+    DiscoverOperationalCredentialsAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverOperationalCredentialsAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FabricsList
+ */
+class ReadOperationalCredentialsFabricsList : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsFabricsList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "fabrics-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsFabricsList()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFabricsList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>(
+            OnOperationalCredentialsFabricsListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadOperationalCredentialsClusterRevision : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -10467,6 +10709,18 @@ void registerClusterOnOff(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterOperationalCredentials(Commands & commands)
+{
+    const char * clusterName = "OperationalCredentials";
+
+    commands_list clusterCommands = {
+        make_unique<OperationalCredentialsGetFabricId>(),       make_unique<OperationalCredentialsRemoveFabric>(),
+        make_unique<OperationalCredentialsUpdateFabricLabel>(), make_unique<DiscoverOperationalCredentialsAttributes>(),
+        make_unique<ReadOperationalCredentialsFabricsList>(),   make_unique<ReadOperationalCredentialsClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterScenes(Commands & commands)
 {
     const char * clusterName = "Scenes";
@@ -10537,6 +10791,7 @@ void registerClusters(Commands & commands)
     registerClusterLowPower(commands);
     registerClusterNetworkCommissioning(commands);
     registerClusterOnOff(commands);
+    registerClusterOperationalCredentials(commands);
     registerClusterScenes(commands);
     registerClusterTemperatureMeasurement(commands);
     registerClusterThermostat(commands);

@@ -185,6 +185,15 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
     uint8_t attributeAccessControl;
 } EmberAfExtendedDiscoverAttributesInfoRecord;
 
+// Struct for FabricDescriptor
+typedef struct _FabricDescriptor
+{
+    chip::FabricId FabricId;
+    uint16_t VendorId;
+    uint8_t * Label;
+    chip::NodeId NodeId;
+} EmberAfFabricDescriptor;
+
 // Struct for GpPairingConfigurationGroupList
 typedef struct _GpPairingConfigurationGroupList
 {

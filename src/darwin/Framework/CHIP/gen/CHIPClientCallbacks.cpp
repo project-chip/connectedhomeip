@@ -475,6 +475,36 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x003E:
+                    switch (attributeId)
+                    {
+                    case 0x0001: // FabricDescriptor
+                    {
+                        _FabricDescriptor data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].FabricId = emberAfGetInt64u(message, 0, messageLen);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Label = emberAfGetString(message, 0, messageLen);
+                            message += 32;
+                            CHECK_MESSAGE_LENGTH(32);
+                            data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(8);
+                        }
+
+                        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
+                            Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 }
                 break;
             }
@@ -1573,6 +1603,19 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(uint8_t
     Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::FabricId FabricId)
+{
+    ChipLogProgress(Zcl, "GetFabricIdResponse:");
+    ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
+
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterGetFabricIdResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, FabricId);
     return true;
 }
 

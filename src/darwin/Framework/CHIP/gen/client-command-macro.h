@@ -2223,6 +2223,49 @@
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
+/** @brief Command description for GetFabricId
+ *
+ * Command: GetFabricId
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterGetFabricId() emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_GET_FABRIC_ID_COMMAND_ID, "", );
+
+/** @brief Command description for GetFabricIdResponse
+ *
+ * Command: GetFabricIdResponse
+ * @param FabricId FABRIC_ID
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterGetFabricIdResponse(FabricId)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID, "u", FabricId);
+
+/** @brief Command description for UpdateFabricLabel
+ *
+ * Command: UpdateFabricLabel
+ * @param Label CHAR_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterUpdateFabricLabel(Label) emberAfFillExternalBuffer(mask,                                                     \
+                                                                                                                                   \
+                                                                         ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID, "u", Label);
+
+/** @brief Command description for RemoveFabric
+ *
+ * Command: RemoveFabric
+ * @param FabricId FABRIC_ID
+ * @param NodeId NODE_ID
+ * @param VendorId INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveFabric(FabricId, NodeId, VendorId)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_FABRIC_COMMAND_ID, "uuu", FabricId, NodeId, VendorId);
+
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor

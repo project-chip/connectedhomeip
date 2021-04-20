@@ -44,6 +44,7 @@
 | LowPower                                                            | 0x0508 |
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
+| OperationalCredentials                                              | 0x003E |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
@@ -2027,6 +2028,64 @@ chip::System::PacketBufferHandle encodeOnOffClusterConfigureOnOffAttribute(uint8
  */
 chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                 chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster OperationalCredentials                                      | 0x003E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetFabricId                                                       |   0x00 |
+| * RemoveFabric                                                      |   0x0A |
+| * UpdateFabricLabel                                                 |   0x09 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricsList                                                       | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an GetFabricId command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterGetFabricIdCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an RemoveFabric command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterRemoveFabricCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        chip::FabricId fabricId,
+                                                                                        chip::NodeId nodeId, uint16_t vendorId);
+
+/**
+ * @brief
+ *    Encode an UpdateFabricLabel command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterUpdateFabricLabelCommand(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             chip::ByteSpan label);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the fabrics list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |

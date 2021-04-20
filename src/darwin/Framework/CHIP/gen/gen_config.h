@@ -44,6 +44,7 @@
 #define EMBER_AF_LOW_POWER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
@@ -108,6 +109,10 @@
 // Use this macro to check if the client side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ON_OFF_CLIENT
+
+// Use this macro to check if the client side of the Operational Credentials cluster is included
+#define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_CLIENT
 
 // Use this macro to check if the client side of the Scenes cluster is included
 #define ZCL_USING_SCENES_CLUSTER_CLIENT
