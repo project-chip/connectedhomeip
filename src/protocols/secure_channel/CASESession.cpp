@@ -23,7 +23,7 @@
  *      operational credentials.
  *
  */
-#include <transport/CASESession.h>
+#include <protocols/secure_channel/CASESession.h>
 
 #include <inttypes.h>
 #include <string.h>
@@ -59,6 +59,12 @@ constexpr size_t kTAGSize = 16;
 
 using namespace Crypto;
 using namespace Credentials;
+using namespace Messaging;
+
+// Wait at most 30 seconds for the response from the peer.
+// This timeout value assumes the underlying transport is reliable.
+// The session establishment fails if the response is not received with in timeout window.
+static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = 30000;
 
 CASESession::CASESession()
 {
@@ -90,6 +96,12 @@ void CASESession::Clear()
     {
         chip::Platform::MemoryFree(const_cast<uint8_t *>(mTrustedRootId.mId));
         mTrustedRootId.mId = nullptr;
+    }
+
+    if (mExchangeCtxt != nullptr)
+    {
+        mExchangeCtxt->Close();
+        mExchangeCtxt = nullptr;
     }
 }
 
@@ -211,32 +223,23 @@ CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalC
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
-{
-    PayloadHeader payloadHeader;
-
-    payloadHeader.SetMessageType(msgType);
-
-    ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
-
-    ReturnErrorOnFailure(mDelegate->SendSessionEstablishmentMessage(PacketHeader()
-                                                                        .SetSourceNodeId(mLocalNodeId)
-                                                                        .SetDestinationNodeId(mConnectionState.GetPeerNodeId())
-                                                                        .SetEncryptionKeyID(mConnectionState.GetLocalKeyID()),
-                                                                    mConnectionState.GetPeerAddress(), std::move(msgBuf)));
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress,
                                          OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                         NodeId peerNodeId, uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+                                         NodeId peerNodeId, uint16_t myKeyId, ExchangeContext * exchangeCtxt,
+                                         SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
+
+    // We are setting the exchange context specifically before checking for error.
+    // This is to make sure the exchange will get closed if Init() returned an error.
+    mExchangeCtxt = exchangeCtxt;
     SuccessOrExit(err);
 
+    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
     mConnectionState.SetPeerAddress(peerAddress);
     mConnectionState.SetPeerNodeId(peerNodeId);
 
@@ -249,6 +252,16 @@ exit:
         Clear();
     }
     return err;
+}
+
+void CASESession::OnResponseTimeout(ExchangeContext * ec)
+{
+    VerifyOrReturn(ec != nullptr, ChipLogError(Inet, "CASESession::OnResponseTimeout was called by null exchange"));
+    VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
+                   ChipLogError(Inet, "CASESession::OnResponseTimeout exchange doesn't match"));
+    ChipLogError(Inet, "CASESession timed out while waiting for a response from the peer. Expected message type was %d",
+                 mNextExpectedMsg);
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
@@ -325,7 +338,8 @@ CHIP_ERROR CASESession::SendSigmaR1()
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR2;
 
     // Call delegate to send the msg to peer
-    ReturnErrorOnFailure(AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR1, std::move(msg_R1)));
+    ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaR1, std::move(msg_R1),
+                                                    SendFlags(SendMessageFlags::kExpectResponse)));
 
     ChipLogDetail(Inet, "Sent SigmaR1 msg");
 
@@ -524,7 +538,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR3;
 
     // Call delegate to send the msg to peer
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR2, std::move(msg_R2));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaR2, std::move(msg_R2),
+                                     SendFlags(SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
 
     ChipLogDetail(Inet, "Sent SigmaR2 msg");
@@ -768,7 +783,8 @@ CHIP_ERROR CASESession::SendSigmaR3()
     SuccessOrExit(err);
 
     // Call delegate to send the Msg3 to peer
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaR3, std::move(msg_R3));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaR3, std::move(msg_R3),
+                                     SendFlags(SendMessageFlags::kNone));
     SuccessOrExit(err);
 
     ChipLogDetail(Inet, "Sent SigmaR3 msg");
@@ -903,7 +919,8 @@ void CASESession::SendErrorMsg(SigmaErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg),
+                                     SendFlags(SendMessageFlags::kNone));
     SuccessOrExit(err);
 
 exit:
@@ -1068,25 +1085,25 @@ exit:
     Clear();
 }
 
-CHIP_ERROR CASESession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBufferHandle msg)
+void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                    System::PacketBufferHandle msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PayloadHeader payloadHeader;
 
-    Protocols::SecureChannel::MsgType msgType;
-
+    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mExchangeCtxt == nullptr || mExchangeCtxt == ec, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(payloadHeader.HasMessageType(mNextExpectedMsg) ||
+                     payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_SigmaErr),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    err = payloadHeader.DecodeAndConsume(msg);
-    SuccessOrExit(err);
+    if (mExchangeCtxt == nullptr)
+    {
+        mExchangeCtxt = ec;
+        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
+    }
 
-    VerifyOrExit(payloadHeader.HasProtocol(Protocols::SecureChannel::Id), err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
-    VerifyOrExit(msgType == mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    mConnectionState.SetPeerAddress(peerAddress);
+    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
     if (mLocalNodeId == kUndefinedNodeId)
     {
@@ -1097,7 +1114,7 @@ CHIP_ERROR CASESession::HandlePeerMessage(const PacketHeader & packetHeader, con
         VerifyOrExit(mLocalNodeId == packetHeader.GetDestinationNodeId().Value(), err = CHIP_ERROR_WRONG_NODE_ID);
     }
 
-    switch (msgType)
+    switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
     case Protocols::SecureChannel::MsgType::CASE_SigmaR1:
         err = HandleSigmaR1_and_SendSigmaR2(packetHeader, msg);
@@ -1128,8 +1145,6 @@ exit:
     {
         mDelegate->OnSessionEstablishmentError(err);
     }
-
-    return err;
 }
 
 } // namespace chip

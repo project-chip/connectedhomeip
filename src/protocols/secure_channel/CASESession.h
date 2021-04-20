@@ -28,9 +28,13 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeDelegate.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/SessionEstablishmentDelegate.h>
@@ -65,7 +69,7 @@ struct CASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
-class DLL_EXPORT CASESession
+class DLL_EXPORT CASESession : public Messaging::ExchangeDelegateBase, public PairingSession
 {
 public:
     CASESession();
@@ -101,13 +105,14 @@ public:
      * @param myNodeId                      Node id of local node
      * @param peerNodeId                    Node id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
+     * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, OperationalCredentialSet * operationalCredentialSet,
                                 Optional<NodeId> myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                SessionEstablishmentDelegate * delegate);
+                                Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -120,19 +125,7 @@ public:
      *                    initialized once session establishment is complete
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
-
-    /**
-     * @brief
-     *   Handler for peer's messages, exchanged during pairing handshake.
-     *
-     * @param packetHeader Message header for the received message
-     * @param peerAddress  Source of the message
-     * @param msg          Message sent by the peer
-     * @return CHIP_ERROR The result of message processing
-     */
-    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                         System::PacketBufferHandle msg);
+    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
 
     /**
      * @brief
@@ -148,7 +141,7 @@ public:
      *
      * @return uint16_t The associated peer key id
      */
-    uint16_t GetPeerKeyId() { return mConnectionState.GetPeerKeyID(); }
+    uint16_t GetPeerKeyId() override { return mConnectionState.GetPeerKeyID(); }
 
     /**
      * @brief
@@ -156,7 +149,11 @@ public:
      *
      * @return uint16_t The assocated local key id
      */
-    uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
+    uint16_t GetLocalKeyId() override { return mConnectionState.GetLocalKeyID(); }
+
+    const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
+
+    const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
 
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
@@ -179,6 +176,18 @@ public:
      * @brief Reconstruct secure pairing class from the serializable data structure.
      **/
     CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
+
+    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
+
+    //// ExchangeDelegate Implementation ////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle payload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
+                                                            SecureSessionMgr * sessionMgr) override
+    {
+        return &mMessageDispatch;
+    }
 
 private:
     enum SigmaErrorType : uint8_t
@@ -241,6 +250,9 @@ private:
     uint8_t mMessageDigest[kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
     uint8_t mRemoteIPK[kIPKSize];
+
+    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct SigmaErrorMsg
     {
