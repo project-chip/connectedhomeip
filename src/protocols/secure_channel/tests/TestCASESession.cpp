@@ -28,11 +28,11 @@
 #include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <protocols/secure_channel/CASESession.h>
 #include <stdarg.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
-#include <transport/CASESession.h>
 
 #include "credentials/tests/CHIPCert_test_vectors.h"
 

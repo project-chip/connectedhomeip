@@ -261,8 +261,6 @@ CHIP_ERROR ChannelContext::SendSessionEstablishmentMessage(const PacketHeader & 
 CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle && msg)
 {
-    if (IsCasePairing())
-        return mStateVars.mPreparing.mCasePairingSession->HandlePeerMessage(packetHeader, peerAddress, std::move(msg));
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
@@ -270,13 +268,17 @@ void ChannelContext::EnterCasePairingState()
 {
     mStateVars.mPreparing.mState              = PrepareState::kCasePairing;
     mStateVars.mPreparing.mCasePairingSession = Platform::New<CASESession>();
+
+    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), mStateVars.mPreparing.mCasePairingSession);
+    VerifyOrReturn(ctxt != nullptr);
+
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(mStateVars.mPreparing.mAddress);
     CHIP_ERROR err = mStateVars.mPreparing.mCasePairingSession->EstablishSession(
         addr, &mStateVars.mPreparing.mBuilder.GetOperationalCredentialSet(),
         Optional<NodeId>::Value(mExchangeManager->GetSessionMgr()->GetLocalNodeId()),
-        mStateVars.mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), this);
+        mStateVars.mPreparing.mBuilder.GetPeerNodeId(), mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
         ExitCasePairingState();
