@@ -18,13 +18,13 @@
 #import "RootViewController.h"
 #import "BindingsViewController.h"
 #import "EchoViewController.h"
+#import "FabricUIViewController.h"
 #import "MultiAdminViewController.h"
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
 #import "TemperatureSensorViewController.h"
 #import "UnpairDevicesViewController.h"
 #import "WifiViewController.h"
-#import "FabricUIViewController.h"
 
 @implementation RootViewController
 

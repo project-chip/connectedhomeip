@@ -6,8 +6,8 @@
 //  Copyright © 2021 CHIP. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import <CHIP/CHIP.h>
+#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
