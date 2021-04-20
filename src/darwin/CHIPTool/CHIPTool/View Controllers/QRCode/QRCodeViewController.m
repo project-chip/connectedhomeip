@@ -541,12 +541,11 @@
     self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
                                                            endpoint:1
                                                               queue:dispatch_get_main_queue()];
-    NSData * credentials = [threadDataSet dataUsingEncoding:NSUTF8StringEncoding];
     uint64_t breadcrumb = 0;
     uint32_t timeoutMs = 3000;
 
     __weak typeof(self) weakSelf = self;
-    [_cluster addThreadNetwork:credentials
+    [_cluster addThreadNetwork:threadDataSet
                     breadcrumb:breadcrumb
                      timeoutMs:timeoutMs
              completionHandler:^(NSError * error, NSDictionary * values) {
@@ -566,7 +565,8 @@
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     } else {
-        networkId = [NSData dataWithBytes:TEMP_THREAD_NETWORK_ID length:sizeof(TEMP_THREAD_NETWORK_ID)];
+        uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+        networkId = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
     }
     uint64_t breadcrumb = 0;
     uint32_t timeoutMs = 3000;
