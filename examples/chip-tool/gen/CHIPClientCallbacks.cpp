@@ -214,7 +214,7 @@ void LogStringAttribute(const uint8_t * string, const uint16_t length, const boo
 
     for (uint16_t i = 0; i < length && bufferPos + kByteInHexLength < bufferEnd; i++, bufferPos += kByteInHexLength)
     {
-        snprintf(bufferPos, bufferEnd - bufferPos, "%02X ", string[i]);
+        snprintf(bufferPos, static_cast<size_t>(bufferEnd - bufferPos), "%02X ", string[i]);
     }
 
     ChipLogProgress(Zcl, "%s", buffer);
