@@ -28,6 +28,7 @@
 namespace chip {
 namespace Messaging {
 
+constexpr uint16_t kMsgCounterChallengeSize   = 8;   // The size of the message counter synchronization request message.
 constexpr uint16_t kMsgCounterSyncRespMsgSize = 12;  // The size of the message counter synchronization response message.
 constexpr uint32_t kMsgCounterSyncTimeout     = 500; // The amount of time(in milliseconds) which a peer is given to respond
                                                      // to a message counter synchronization request.
@@ -57,7 +58,7 @@ public:
     CHIP_ERROR SendMsgCounterSyncReq(SecureSessionHandle session);
 
     /**
-     *  Add a CHIP message into the cache table to queue the outging messages that trigger message counter synchronization protocol
+     *  Add a CHIP message into the cache table to queue the outgoing messages that trigger message counter synchronization protocol
      *  for retransmission.
      *
      *  @param[in]    protocolId       The protocol identifier of the CHIP message to be sent.
@@ -128,11 +129,15 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
 
-    // MessageCounterSyncProtocol cache table to queue the outging messages that trigger message counter synchronization protocol.
-    RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+    // MessageCounterSyncProtocol cache table to queue the outgoing messages that trigger message counter
+    // synchronization protocol. Reserve two extra exchanges, one for MCSP messages and another one for
+    // temporary exchange for ack.
+    RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS - 2];
 
-    // MessageCounterSyncProtocol cache table to queue the incoming messages that trigger message counter synchronization protocol.
-    ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+    // MessageCounterSyncProtocol cache table to queue the incoming messages that trigger message counter
+    // synchronization protocol. Reserve two extra exchanges, one for MCSP messages and another one for
+    // temporary exchange for ack.
+    ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS - 2];
 
     void RetransPendingGroupMsgs(NodeId peerNodeId);
 

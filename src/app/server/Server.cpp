@@ -22,6 +22,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
+#include <app/server/StorablePeerConnection.h>
 #include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
@@ -40,9 +41,10 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/StorablePeerConnection.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include "Mdns.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -274,6 +276,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     void RendezvousComplete() const override
     {
         // Once rendezvous completed, assume we are operational
@@ -282,6 +285,7 @@ public:
             ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
         }
     }
+#endif
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
     void SetBLE(bool ble) { isBLE = ble; }
@@ -296,6 +300,7 @@ private:
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 RendezvousServer gRendezvousServer;
+Messaging::ExchangeManager gExchangeMgr;
 ServerRendezvousAdvertisementDelegate gAdvDelegate;
 
 static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVerifier & verifier)
@@ -318,7 +323,7 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
 class ServerCallback : public ExchangeDelegate
@@ -387,7 +392,8 @@ public:
             HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
         }
 
-    exit:;
+    exit:
+        exchangeContext->Close();
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override
@@ -407,7 +413,6 @@ private:
     SecureSessionMgr * mSessionMgr = nullptr;
 };
 
-Messaging::ExchangeManager gExchangeMgr;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -457,7 +462,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gTransports, &gSessions, adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
 // The function will initialize datamodel handler and then start the server
@@ -528,7 +533,9 @@ void InitServer(AppDelegate * delegate)
 
 // Starting mDNS server only for Thread devices due to problem reported in issue #5076.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     app::Mdns::StartServer();
+#endif
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);

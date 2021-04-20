@@ -199,6 +199,27 @@ void LogStatus(uint8_t status)
     }
 }
 
+void LogStringAttribute(const uint8_t * string, const uint16_t length, const bool isAscii)
+{
+    if (isAscii)
+    {
+        ChipLogProgress(Zcl, "  value: %.*s", length, string);
+        return;
+    }
+
+    constexpr size_t kByteInHexLength             = 3; // 2 hex digits + space
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = "  value: ";
+    char * bufferPos                              = buffer + strlen(buffer);
+    char * const bufferEnd                        = buffer + CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
+
+    for (uint16_t i = 0; i < length && bufferPos + kByteInHexLength < bufferEnd; i++, bufferPos += kByteInHexLength)
+    {
+        snprintf(bufferPos, static_cast<size_t>(bufferEnd - bufferPos), "%02X ", string[i]);
+    }
+
+    ChipLogProgress(Zcl, "%s", buffer);
+}
+
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
@@ -290,7 +311,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 // Short Strings must contains at least one byte for the length
                 CHECK_MESSAGE_LENGTH(1);
                 uint8_t length = chip::Encoding::Read8(message);
-                ChipLogProgress(Zcl, "  length: 0x%02x", length);
 
                 // When the length is set to 0xFF, it represents a non-value. In this case the data field is zero length.
                 if (length == 0xFF)
@@ -299,6 +319,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 }
 
                 CHECK_MESSAGE_LENGTH(length);
+                LogStringAttribute(message, length, attributeType == 0x42);
                 Callback::Callback<StringAttributeCallback> * cb =
                     Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
                 cb->mCall(cb->mContext, chip::ByteSpan(message, length));
@@ -311,7 +332,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 // Long Strings must contains at least two bytes for the length
                 CHECK_MESSAGE_LENGTH(2);
                 uint16_t length = chip::Encoding::LittleEndian::Read16(message);
-                ChipLogProgress(Zcl, "  length: 0x%02x", length);
 
                 // When the length is set to 0xFFFF, it represents a non-value. In this case the data field is zero length.
                 if (length == 0xFFFF)
@@ -320,6 +340,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                 }
 
                 CHECK_MESSAGE_LENGTH(length);
+                LogStringAttribute(message, length, attributeType == 0x44);
                 Callback::Callback<StringAttributeCallback> * cb =
                     Callback::Callback<StringAttributeCallback>::FromCancelable(onSuccessCallback);
                 cb->mCall(cb->mContext, chip::ByteSpan(message, length));

@@ -132,6 +132,18 @@ void ServerBase::Shutdown()
     }
 }
 
+bool ServerBase::IsListening() const
+{
+    for (size_t i = 0; i < mEndpointCount; i++)
+    {
+        if (mEndpoints[i].udp != nullptr)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
@@ -154,10 +166,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 
         ReturnErrorOnFailure(info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
-        info->udp->AppState          = static_cast<void *>(this);
-        info->udp->OnMessageReceived = OnUdpPacketReceived;
-
-        ReturnErrorOnFailure(info->udp->Listen());
+        ReturnErrorOnFailure(info->udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 
         CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
         if (err != CHIP_NO_ERROR)

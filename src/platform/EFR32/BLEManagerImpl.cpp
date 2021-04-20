@@ -714,10 +714,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     else
     {
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
-        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     }
 
     err = ConfigureAdvertisingData();
@@ -776,10 +772,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         SuccessOrExit(err);
 
         CancelBleAdvTimeoutTimer();
-        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising has stopped
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     }
 
 exit:

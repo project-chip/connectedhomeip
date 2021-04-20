@@ -19,7 +19,7 @@
 #pragma once
 
 #include "DiscoverCommand.h"
-#include <controller/DeviceAddressUpdater.h>
+#include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
 
 class Resolve : public DiscoverCommand, public chip::Mdns::ResolverDelegate
@@ -31,23 +31,24 @@ public:
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
         ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(this));
-        return chip::Mdns::Resolver::Instance().ResolveNodeId(remoteId, fabricId, chip::Inet::kIPAddressType_Any);
+        return chip::Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetFabricId(fabricId),
+                                                              chip::Inet::kIPAddressType_Any);
     }
 
-    /////////// ResolverDelegate Interface /////////
-    void OnNodeIdResolved(NodeId nodeId, const chip::Mdns::ResolvedNodeData & nodeData) override
+    void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override
     {
         char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
         nodeData.mAddress.ToString(addrBuffer);
-        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeId, addrBuffer, nodeData.mPort);
+        ChipLogProgress(chipTool, "NodeId Resolution: %" PRIu64 " Address: %s, Port: %" PRIu16, nodeData.mPeerId.GetNodeId(),
+                        addrBuffer, nodeData.mPort);
         SetCommandExitStatus(true);
-    };
+    }
 
-    void OnNodeIdResolutionFailed(NodeId nodeId, CHIP_ERROR error) override
+    void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override
     {
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(false);
-    };
+    }
 };
 
 class Update : public DiscoverCommand

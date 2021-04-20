@@ -30,82 +30,74 @@ namespace Controller {
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
 
+
 // ApplicationBasic Cluster Commands
 // ApplicationBasic Cluster Attributes
-CHIP_ERROR ApplicationBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadVendorNameAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadVendorIdAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationName(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadApplicationNameAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeProductId(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeProductId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadProductIdAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadApplicationIdAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadCatalogVendorIdAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationSatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadApplicationSatusAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ApplicationBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeApplicationBasicClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // BarrierControl Cluster Commands
-CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint8_t percentOpen)
+CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t percentOpen)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -113,33 +105,27 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlGoToPercentCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // percentOpen: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), percentOpen));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), percentOpen));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeBarrierControlClusterBarrierControlGoToPercentCommand(seqNum, mEndpoint, percentOpen);
+    System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterBarrierControlGoToPercentCommand(seqNum, mEndpoint, percentOpen);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -147,75 +133,65 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlStopCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterBarrierControlStopCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // BarrierControl Cluster Attributes
-CHIP_ERROR BarrierControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterReadBarrierMovingStateAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierSafetyStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterReadBarrierSafetyStatusAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierCapabilities(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierCapabilities(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterReadBarrierCapabilitiesAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierPosition(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierPosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterReadBarrierPositionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BarrierControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BarrierControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBarrierControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // Basic Cluster Commands
 CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -226,23 +202,18 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallbac
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMfgSpecificPingCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterMfgSpecificPingCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -251,120 +222,160 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallbac
 // Basic Cluster Attributes
 CHIP_ERROR BasicCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR BasicCluster::ReadAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadInteractionModelVersionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadVendorNameAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadVendorIDAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeProductName(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadProductNameAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeProductID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadProductIDAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadUserLabelAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan value)
+CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterWriteUserLabelAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR BasicCluster::ReadAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadLocationAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                chip::ByteSpan value)
+CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterWriteLocationAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadHardwareVersionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadHardwareVersionStringAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadSoftwareVersionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadSoftwareVersionStringAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadManufacturingDateAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadPartNumberAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadProductURLAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadProductLabelAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadSerialNumberAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterReadLocalConfigDisabledAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeBasicClusterWriteLocalConfigDisabledAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBasicClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // Binding Cluster Commands
-CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
+CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -372,40 +383,33 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBindCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // nodeId: nodeId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), nodeId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
     // groupId: groupId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // endpointId: endpointId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endpointId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), endpointId));
     // clusterId: clusterId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), clusterId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeBindingClusterBindCommand(seqNum, mEndpoint, nodeId, groupId, endpointId, clusterId);
+    System::PacketBufferHandle encodedCommand = encodeBindingClusterBindCommand(seqNum, mEndpoint, nodeId, groupId, endpointId, clusterId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
-                                  chip::ClusterId clusterId)
+CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -413,33 +417,28 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnbindCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // nodeId: nodeId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), nodeId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
     // groupId: groupId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // endpointId: endpointId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endpointId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), endpointId));
     // clusterId: clusterId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), clusterId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeBindingClusterUnbindCommand(seqNum, mEndpoint, nodeId, groupId, endpointId, clusterId);
+    System::PacketBufferHandle encodedCommand = encodeBindingClusterUnbindCommand(seqNum, mEndpoint, nodeId, groupId, endpointId, clusterId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
@@ -447,21 +446,20 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
 // Binding Cluster Attributes
 CHIP_ERROR BindingCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBindingClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeBindingClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // ColorControl Cluster Commands
-CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -469,41 +467,33 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // rateX: int16s
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rateX));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rateX));
     // rateY: int16s
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rateY));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rateY));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterMoveColorCommand(seqNum, mEndpoint, rateX, rateY, optionsMask, optionsOverride);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveColorCommand(seqNum, mEndpoint, rateX, rateY, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint16_t rate,
-                                                     uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
-                                                     uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint16_t rate, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -511,43 +501,37 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorTemperatureCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // moveMode: hueMoveMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rate));
     // colorTemperatureMinimum: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMinimum));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMinimum));
     // colorTemperatureMaximum: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMaximum));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMaximum));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveColorTemperatureCommand(
-        seqNum, mEndpoint, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveColorTemperatureCommand(seqNum, mEndpoint, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -555,39 +539,33 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveHueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // moveMode: hueMoveMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rate));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterMoveHueCommand(seqNum, mEndpoint, moveMode, rate, optionsMask, optionsOverride);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveHueCommand(seqNum, mEndpoint, moveMode, rate, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -595,40 +573,33 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // moveMode: saturationMoveMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rate));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterMoveSaturationCommand(seqNum, mEndpoint, moveMode, rate, optionsMask, optionsOverride);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveSaturationCommand(seqNum, mEndpoint, moveMode, rate, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask,
-                                            uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -636,42 +607,35 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCall
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // colorX: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorX));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorX));
     // colorY: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorY));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorY));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToColorCommand(
-        seqNum, mEndpoint, colorX, colorY, transitionTime, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToColorCommand(seqNum, mEndpoint, colorX, colorY, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t colorTemperature,
-                                                       uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -679,40 +643,33 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorTemperatureCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // colorTemperature: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperature));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorTemperature));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToColorTemperatureCommand(
-        seqNum, mEndpoint, colorTemperature, transitionTime, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToColorTemperatureCommand(seqNum, mEndpoint, colorTemperature, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask,
-                                          uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t hue, uint8_t direction, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -720,42 +677,35 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // hue: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), hue));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), hue));
     // direction: hueDirection
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), direction));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), direction));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterMoveToHueCommand(seqNum, mEndpoint, hue, direction, transitionTime, optionsMask, optionsOverride);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToHueCommand(seqNum, mEndpoint, hue, direction, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint8_t hue, uint8_t saturation,
-                                                       uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t hue, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -763,42 +713,35 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueAndSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // hue: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), hue));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), hue));
     // saturation: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), saturation));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), saturation));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToHueAndSaturationCommand(
-        seqNum, mEndpoint, hue, saturation, transitionTime, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToHueAndSaturationCommand(seqNum, mEndpoint, hue, saturation, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
-                                                 uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -806,40 +749,33 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // saturation: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), saturation));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), saturation));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToSaturationCommand(
-        seqNum, mEndpoint, saturation, transitionTime, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterMoveToSaturationCommand(seqNum, mEndpoint, saturation, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
-                                          uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -847,43 +783,35 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // stepX: int16s
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepX));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepX));
     // stepY: int16s
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepY));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepY));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterStepColorCommand(seqNum, mEndpoint, stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepColorCommand(seqNum, mEndpoint, stepX, stepY, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint16_t stepSize,
-                                                     uint16_t transitionTime, uint16_t colorTemperatureMinimum,
-                                                     uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -891,47 +819,39 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorTemperatureCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // stepMode: hueStepMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // colorTemperatureMinimum: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMinimum));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMinimum));
     // colorTemperatureMaximum: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMaximum));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), colorTemperatureMaximum));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepColorTemperatureCommand(
-        seqNum, mEndpoint, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask,
-        optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepColorTemperatureCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
-                                        uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -939,42 +859,35 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepHueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // stepMode: hueStepMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepHueCommand(
-        seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepHueCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
-                                               uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -982,41 +895,35 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepSaturationCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // stepMode: saturationStepMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepSaturationCommand(
-        seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStepSaturationCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t optionsMask, uint8_t optionsOverride)
+CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t optionsMask, uint8_t optionsOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1024,56 +931,46 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMoveStepCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // optionsMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterStopMoveStepCommand(seqNum, mEndpoint, optionsMask, optionsOverride);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterStopMoveStepCommand(seqNum, mEndpoint, optionsMask, optionsOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // ColorControl Cluster Attributes
-CHIP_ERROR ColorControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadCurrentHueAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval, uint8_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterConfigureCurrentHueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterConfigureCurrentHueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -1082,21 +979,17 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable *
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadCurrentSaturationAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval, uint8_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterConfigureCurrentSaturationAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterConfigureCurrentSaturationAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -1105,29 +998,24 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cance
     return RequestAttributeReporting(0x0001, onReportCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeRemainingTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadRemainingTimeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeCurrentX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadCurrentXAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval, uint16_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterConfigureCurrentXAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterConfigureCurrentXAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -1136,21 +1024,17 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * o
     return RequestAttributeReporting(0x0003, onReportCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadCurrentYAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval, uint16_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeCurrentY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterConfigureCurrentYAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterConfigureCurrentYAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -1159,37 +1043,31 @@ CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * o
     return RequestAttributeReporting(0x0004, onReportCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadDriftCompensationAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeCompensationText(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeCompensationText(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadCompensationTextAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorTemperatureAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ConfigureAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval, uint16_t change)
+CHIP_ERROR ColorControlCluster::ConfigureAttributeColorTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterConfigureColorTemperatureAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterConfigureColorTemperatureAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -1198,509 +1076,442 @@ CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancel
     return RequestAttributeReporting(0x0007, onReportCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorMode(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorModeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorControlOptionsAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterWriteColorControlOptionsAttribute(seqNum, mEndpoint, value);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorControlOptionsAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadNumberOfPrimariesAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary1X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary1X(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary1XAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Y(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary1YAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Intensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary1IntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary2X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary2X(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary2XAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Y(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary2YAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Intensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary2IntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary3X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary3X(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary3XAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Y(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary3YAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Intensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary3IntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary4X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary4X(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary4XAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Y(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary4YAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Intensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary4IntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary5X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary5X(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary5XAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Y(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary5YAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Intensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary5IntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary6X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary6X(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary6XAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Y(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary6YAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Intensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadPrimary6IntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadWhitePointXAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteWhitePointXAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadWhitePointYAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteWhitePointYAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointRXAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointRXAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointRYAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointRYAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointRIntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterWriteColorPointRIntensityAttribute(seqNum, mEndpoint, value);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointRIntensityAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointGXAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointGXAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointGYAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointGYAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointGIntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterWriteColorPointGIntensityAttribute(seqNum, mEndpoint, value);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointGIntensityAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointBXAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointBXAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointBYAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointBYAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorPointBIntensityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterWriteColorPointBIntensityAttribute(seqNum, mEndpoint, value);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteColorPointBIntensityAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadEnhancedCurrentHueAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedColorMode(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedColorMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadEnhancedColorModeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorLoopActiveAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorLoopDirectionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorLoopTimeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorCapabilitiesAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorTempPhysicalMinAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMax(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMax(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadColorTempPhysicalMaxAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t value)
+CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(seqNum, mEndpoint, value);
+    System::PacketBufferHandle encodedCommand = encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeColorControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // Descriptor Cluster Commands
 // Descriptor Cluster Attributes
 CHIP_ERROR DescriptorCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDescriptorClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR DescriptorCluster::ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DescriptorCluster::ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDescriptorClusterReadDeviceListAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DescriptorCluster::ReadAttributeServerList(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DescriptorCluster::ReadAttributeServerList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDescriptorClusterReadServerListAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DescriptorCluster::ReadAttributeClientList(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DescriptorCluster::ReadAttributeClientList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDescriptorClusterReadClientListAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DescriptorCluster::ReadAttributePartsList(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DescriptorCluster::ReadAttributePartsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDescriptorClusterReadPartsListAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DescriptorCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DescriptorCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDescriptorClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -1711,23 +1522,18 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllPinsCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearAllPinsCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -1741,30 +1547,24 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllRfidsCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearAllRfidsCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId)
+CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1772,32 +1572,27 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearHolidayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearHolidayScheduleCommand(seqNum, mEndpoint, scheduleId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1805,32 +1600,27 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearPinCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearPinCommand(seqNum, mEndpoint, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1838,32 +1628,27 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearRfidCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearRfidCommand(seqNum, mEndpoint, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1871,35 +1656,29 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeekdayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterClearWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1907,35 +1686,29 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearYeardayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterClearYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterClearYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId)
+CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1943,32 +1716,27 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetHolidayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetHolidayScheduleCommand(seqNum, mEndpoint, scheduleId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint16_t logIndex)
+CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t logIndex)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1976,32 +1744,27 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallbac
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLogRecordCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // logIndex: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), logIndex));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), logIndex));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetLogRecordCommand(seqNum, mEndpoint, logIndex);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2009,32 +1772,27 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetPinCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetPinCommand(seqNum, mEndpoint, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2042,32 +1800,27 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRfidCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetRfidCommand(seqNum, mEndpoint, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2075,32 +1828,27 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetUserTypeCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetUserTypeCommand(seqNum, mEndpoint, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2108,35 +1856,29 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeekdayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterGetWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint16_t userId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2144,35 +1886,29 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetYeardayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterGetYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterGetYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     chip::ByteSpan pin)
+CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pin)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2180,33 +1916,27 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLockDoorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // pin: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), pin));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterLockDoorCommand(seqNum, mEndpoint, pin);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
-                                               uint8_t operatingModeDuringHoliday)
+CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2214,39 +1944,33 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetHolidayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // localStartTime: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localStartTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), localStartTime));
     // localEndTime: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localEndTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), localEndTime));
     // operatingModeDuringHoliday: enum8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), operatingModeDuringHoliday));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), operatingModeDuringHoliday));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetHolidayScheduleCommand(
-        seqNum, mEndpoint, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetHolidayScheduleCommand(seqNum, mEndpoint, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
+CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2254,39 +1978,33 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetPinCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
     // userStatus: doorLockUserStatus
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userStatus));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
     // userType: doorLockUserType
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userType));
     // pin: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), pin));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterSetPinCommand(seqNum, mEndpoint, userId, userStatus, userType, pin);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetPinCommand(seqNum, mEndpoint, userId, userStatus, userType, pin);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan id)
+CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan id)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2294,39 +2012,33 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRfidCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
     // userStatus: doorLockUserStatus
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userStatus));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
     // userType: doorLockUserType
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userType));
     // id: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), id));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), id));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterSetRfidCommand(seqNum, mEndpoint, userId, userStatus, userType, id);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetRfidCommand(seqNum, mEndpoint, userId, userStatus, userType, id);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint16_t userId, uint8_t userType)
+CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId, uint8_t userType)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2334,35 +2046,29 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetUserTypeCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
     // userType: doorLockUserType
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userType));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetUserTypeCommand(seqNum, mEndpoint, userId, userType);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
-                                               uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
+CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2370,45 +2076,39 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeekdayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
     // daysMask: doorLockDayOfWeek
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), daysMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), daysMask));
     // startHour: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), startHour));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), startHour));
     // startMinute: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), startMinute));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), startMinute));
     // endHour: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endHour));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), endHour));
     // endMinute: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endMinute));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), endMinute));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetWeekdayScheduleCommand(
-        seqNum, mEndpoint, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetWeekdayScheduleCommand(seqNum, mEndpoint, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
+CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2416,39 +2116,33 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetYeardayScheduleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // scheduleId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), userId));
     // localStartTime: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localStartTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), localStartTime));
     // localEndTime: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localEndTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), localEndTime));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterSetYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId, localStartTime, localEndTime);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterSetYeardayScheduleCommand(seqNum, mEndpoint, scheduleId, userId, localStartTime, localEndTime);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       chip::ByteSpan pin)
+CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pin)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2456,32 +2150,27 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockDoorCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // pin: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), pin));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterUnlockDoorCommand(seqNum, mEndpoint, pin);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t timeoutInSeconds, chip::ByteSpan pin)
+CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t timeoutInSeconds, chip::ByteSpan pin)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2489,29 +2178,24 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockWithTimeoutCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // timeoutInSeconds: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
     // pin: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), pin));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterUnlockWithTimeoutCommand(seqNum, mEndpoint, timeoutInSeconds, pin);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterUnlockWithTimeoutCommand(seqNum, mEndpoint, timeoutInSeconds, pin);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
@@ -2519,25 +2203,21 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
 // DoorLock Cluster Attributes
 CHIP_ERROR DoorLockCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterReadLockStateAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DoorLockCluster::ConfigureAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
+CHIP_ERROR DoorLockCluster::ConfigureAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeDoorLockClusterConfigureLockStateAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    System::PacketBufferHandle encodedCommand = encodeDoorLockClusterConfigureLockStateAttribute(seqNum, mEndpoint, minInterval, maxInterval);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -2546,34 +2226,30 @@ CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onRe
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR DoorLockCluster::ReadAttributeLockType(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ReadAttributeLockType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterReadLockTypeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DoorLockCluster::ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterReadActuatorEnabledAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeDoorLockClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // GeneralCommissioning Cluster Commands
-CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t expiryLengthSeconds,
-                                                    uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2581,37 +2257,31 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kArmFailSafeCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // expiryLengthSeconds: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), expiryLengthSeconds));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), expiryLengthSeconds));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeGeneralCommissioningClusterArmFailSafeCommand(seqNum, mEndpoint, expiryLengthSeconds, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterArmFailSafeCommand(seqNum, mEndpoint, expiryLengthSeconds, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2619,31 +2289,24 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kCommissioningCompleteCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterCommissioningCompleteCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR GeneralCommissioningCluster::SetFabric(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, chip::ByteSpan fabricId,
-                                                  chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR GeneralCommissioningCluster::SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan fabricId, chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2651,113 +2314,100 @@ CHIP_ERROR GeneralCommissioningCluster::SetFabric(Callback::Cancelable * onSucce
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // fabricId: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), fabricId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), fabricId));
     // fabricSecret: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), fabricSecret));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), fabricSecret));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeGeneralCommissioningClusterSetFabricCommand(seqNum, mEndpoint, fabricId, fabricSecret, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterSetFabricCommand(seqNum, mEndpoint, fabricId, fabricSecret, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GeneralCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeFabricId(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GeneralCommissioningCluster::ReadAttributeFabricId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterReadFabricIdAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterReadBreadcrumbAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint64_t value)
+CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGeneralCommissioningClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // GroupKeyManagement Cluster Commands
 // GroupKeyManagement Cluster Attributes
-CHIP_ERROR GroupKeyManagementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupKeyManagementClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroups(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupKeyManagementClusterReadGroupsAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroupKeys(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroupKeys(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupKeyManagementClusterReadGroupKeysAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupKeyManagementClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // Groups Cluster Commands
-CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, chip::ByteSpan groupName)
+CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, chip::ByteSpan groupName)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2765,34 +2415,29 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupName));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupName));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterAddGroupCommand(seqNum, mEndpoint, groupId, groupName);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                uint16_t groupId, chip::ByteSpan groupName)
+CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, chip::ByteSpan groupName)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2800,35 +2445,29 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupIfIdentifyingCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupName));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupName));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeGroupsClusterAddGroupIfIdentifyingCommand(seqNum, mEndpoint, groupId, groupName);
+    System::PacketBufferHandle encodedCommand = encodeGroupsClusterAddGroupIfIdentifyingCommand(seqNum, mEndpoint, groupId, groupName);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t groupCount, uint16_t groupList)
+CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t groupCount, uint16_t groupList)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2836,29 +2475,24 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetGroupMembershipCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupCount: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupCount));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupCount));
     // groupList: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupList));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupList));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeGroupsClusterGetGroupMembershipCommand(seqNum, mEndpoint, groupCount, groupList);
+    System::PacketBufferHandle encodedCommand = encodeGroupsClusterGetGroupMembershipCommand(seqNum, mEndpoint, groupCount, groupList);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
@@ -2871,30 +2505,24 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllGroupsCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterRemoveAllGroupsCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t groupId)
+CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2902,32 +2530,27 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveGroupCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterRemoveGroupCommand(seqNum, mEndpoint, groupId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t groupId)
+CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -2935,25 +2558,21 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewGroupCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterViewGroupCommand(seqNum, mEndpoint, groupId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -2962,91 +2581,85 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Ca
 // Groups Cluster Attributes
 CHIP_ERROR GroupsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR GroupsCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupsCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterReadNameSupportAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR GroupsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeGroupsClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // IasZone Cluster Commands
 // IasZone Cluster Attributes
 CHIP_ERROR IasZoneCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR IasZoneCluster::ReadAttributeZoneState(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR IasZoneCluster::ReadAttributeZoneState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterReadZoneStateAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeZoneType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterReadZoneTypeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR IasZoneCluster::ReadAttributeZoneStatus(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR IasZoneCluster::ReadAttributeZoneStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterReadZoneStatusAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR IasZoneCluster::ReadAttributeIasCieAddress(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR IasZoneCluster::ReadAttributeIasCieAddress(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterReadIasCieAddressAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR IasZoneCluster::WriteAttributeIasCieAddress(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint64_t value)
+CHIP_ERROR IasZoneCluster::WriteAttributeIasCieAddress(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterWriteIasCieAddressAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR IasZoneCluster::ReadAttributeZoneId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterReadZoneIdAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR IasZoneCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR IasZoneCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIasZoneClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // Identify Cluster Commands
-CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t identifyTime)
+CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t identifyTime)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3054,25 +2667,21 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // identifyTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), identifyTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), identifyTime));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIdentifyClusterIdentifyCommand(seqNum, mEndpoint, identifyTime);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3086,23 +2695,18 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyQueryCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIdentifyClusterIdentifyQueryCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3111,37 +2715,34 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Cancelable * onSuccessCallba
 // Identify Cluster Attributes
 CHIP_ERROR IdentifyCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIdentifyClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIdentifyClusterReadIdentifyTimeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
+CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIdentifyClusterWriteIdentifyTimeAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR IdentifyCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR IdentifyCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeIdentifyClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // LevelControl Cluster Commands
-CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3149,39 +2750,33 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // moveMode: moveMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rate));
     // optionMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeLevelControlClusterMoveCommand(seqNum, mEndpoint, moveMode, rate, optionMask, optionOverride);
+    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterMoveCommand(seqNum, mEndpoint, moveMode, rate, optionMask, optionOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t level, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3189,40 +2784,33 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // level: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), level));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), level));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeLevelControlClusterMoveToLevelCommand(seqNum, mEndpoint, level, transitionTime, optionMask, optionOverride);
+    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterMoveToLevelCommand(seqNum, mEndpoint, level, transitionTime, optionMask, optionOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t level,
-                                                     uint16_t transitionTime)
+CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t level, uint16_t transitionTime)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3230,35 +2818,29 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // level: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), level));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), level));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeLevelControlClusterMoveToLevelWithOnOffCommand(seqNum, mEndpoint, level, transitionTime);
+    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterMoveToLevelWithOnOffCommand(seqNum, mEndpoint, level, transitionTime);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint8_t moveMode, uint8_t rate)
+CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t moveMode, uint8_t rate)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3266,35 +2848,29 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // moveMode: moveMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rate));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterMoveWithOnOffCommand(seqNum, mEndpoint, moveMode, rate);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask,
-                                     uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3302,41 +2878,35 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // stepMode: stepMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // optionMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeLevelControlClusterStepCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterStepCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
+CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3344,37 +2914,31 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // stepMode: stepMode
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeLevelControlClusterStepWithOnOffCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime);
+    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterStepWithOnOffCommand(seqNum, mEndpoint, stepMode, stepSize, transitionTime);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t optionMask, uint8_t optionOverride)
+CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t optionMask, uint8_t optionOverride)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3382,27 +2946,23 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // optionMask: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), optionOverride));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterStopCommand(seqNum, mEndpoint, optionMask, optionOverride);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3416,51 +2976,41 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopWithOnOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterStopWithOnOffCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // LevelControl Cluster Attributes
-CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LevelControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterReadCurrentLevelAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval, uint8_t change)
+CHIP_ERROR LevelControlCluster::ConfigureAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint8_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeLevelControlClusterConfigureCurrentLevelAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeLevelControlClusterConfigureCurrentLevelAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -3469,13 +3019,13 @@ CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLevelControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // LowPower Cluster Commands
 CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -3486,23 +3036,18 @@ CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Call
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSleepCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLowPowerClusterSleepCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3511,22 +3056,20 @@ CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Call
 // LowPower Cluster Attributes
 CHIP_ERROR LowPowerCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLowPowerClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR LowPowerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
+CHIP_ERROR LowPowerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeLowPowerClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // NetworkCommissioning Cluster Commands
-CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback,
-                                                         chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3534,38 +3077,31 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // operationalDataset: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterAddThreadNetworkCommand(seqNum, mEndpoint, operationalDataset, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterAddThreadNetworkCommand(seqNum, mEndpoint, operationalDataset, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                       chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3573,40 +3109,33 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // ssid: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), ssid));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
     // credentials: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), credentials));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), credentials));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterAddWiFiNetworkCommand(seqNum, mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterAddWiFiNetworkCommand(seqNum, mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                       uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3614,38 +3143,31 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // networkID: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), networkID));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterDisableNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterDisableNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                      uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3653,38 +3175,31 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // networkID: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), networkID));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterEnableNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterEnableNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3692,34 +3207,27 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkCommissioningResultCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterGetLastNetworkCommissioningResultCommand(seqNum, mEndpoint, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterGetLastNetworkCommissioningResultCommand(seqNum, mEndpoint, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                      uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3727,38 +3235,31 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // networkID: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), networkID));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterRemoveNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterRemoveNetworkCommand(seqNum, mEndpoint, networkID, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                     uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3766,39 +3267,31 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // ssid: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), ssid));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterScanNetworksCommand(seqNum, mEndpoint, ssid, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterScanNetworksCommand(seqNum, mEndpoint, ssid, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback,
-                                                            chip::ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                            uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3806,38 +3299,31 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // operationalDataset: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(seqNum, mEndpoint, operationalDataset, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterUpdateThreadNetworkCommand(seqNum, mEndpoint, operationalDataset, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                          chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -3845,52 +3331,46 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable *
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // ssid: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), ssid));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
     // credentials: octetString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), credentials));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), credentials));
     // breadcrumb: int64u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(seqNum, mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
+    System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterUpdateWiFiNetworkCommand(seqNum, mEndpoint, ssid, credentials, breadcrumb, timeoutMs);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+CHIP_ERROR NetworkCommissioningCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeNetworkCommissioningClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -3901,23 +3381,18 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOnOffClusterOffCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3931,23 +3406,18 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOnOffClusterOnCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3961,23 +3431,18 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOnOffClusterToggleCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -3986,23 +3451,21 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
 // OnOff Cluster Attributes
 CHIP_ERROR OnOffCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOnOffClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOnOffClusterReadOnOffAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR OnOffCluster::ConfigureAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeOnOffClusterConfigureOnOffAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    System::PacketBufferHandle encodedCommand = encodeOnOffClusterConfigureOnOffAttribute(seqNum, mEndpoint, minInterval, maxInterval);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4011,81 +3474,68 @@ CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCal
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeOnOffClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // PumpConfigurationAndControl Cluster Commands
 // PumpConfigurationAndControl Cluster Attributes
-CHIP_ERROR PumpConfigurationAndControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadMaxPressureAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadMaxFlowAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadCapacityAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval,
-                                                                          int16_t change)
+CHIP_ERROR PumpConfigurationAndControlCluster::ConfigureAttributeCapacity(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4094,37 +3544,30 @@ CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeCapacity(Callback:
     return RequestAttributeReporting(0x0013, onReportCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadOperationModeAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadOperationModeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(seqNum, mEndpoint, value);
+    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    System::PacketBufferHandle encodedCommand = encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 // Scenes Cluster Commands
-CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
-                                   chip::ClusterId clusterId, uint8_t length, uint8_t value)
+CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName, chip::ClusterId clusterId, uint8_t length, uint8_t value)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4132,45 +3575,39 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // sceneName: charString
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneName));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), sceneName));
     // clusterId: clusterId
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), clusterId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
     // length: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), length));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), length));
     // value: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), value));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), value));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeScenesClusterAddSceneCommand(
-        seqNum, mEndpoint, groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeScenesClusterAddSceneCommand(seqNum, mEndpoint, groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint16_t groupId)
+CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4178,32 +3615,27 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCal
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSceneMembershipCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterGetSceneMembershipCommand(seqNum, mEndpoint, groupId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
+CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4211,37 +3643,31 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRecallSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
     // transitionTime: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeScenesClusterRecallSceneCommand(seqNum, mEndpoint, groupId, sceneId, transitionTime);
+    System::PacketBufferHandle encodedCommand = encodeScenesClusterRecallSceneCommand(seqNum, mEndpoint, groupId, sceneId, transitionTime);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint16_t groupId)
+CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4249,32 +3675,27 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallba
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllScenesCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterRemoveAllScenesCommand(seqNum, mEndpoint, groupId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t groupId, uint8_t sceneId)
+CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, uint8_t sceneId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4282,34 +3703,29 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, 
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterRemoveSceneCommand(seqNum, mEndpoint, groupId, sceneId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t groupId, uint8_t sceneId)
+CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, uint8_t sceneId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4317,34 +3733,29 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, C
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStoreSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterStoreSceneCommand(seqNum, mEndpoint, groupId, sceneId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t groupId, uint8_t sceneId)
+CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t groupId, uint8_t sceneId)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4352,27 +3763,23 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Ca
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewSceneCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // groupId: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), sceneId));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterViewSceneCommand(seqNum, mEndpoint, groupId, sceneId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
@@ -4381,83 +3788,72 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Ca
 // Scenes Cluster Attributes
 CHIP_ERROR ScenesCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR ScenesCluster::ReadAttributeSceneCount(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ScenesCluster::ReadAttributeSceneCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterReadSceneCountAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ScenesCluster::ReadAttributeCurrentScene(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ScenesCluster::ReadAttributeCurrentScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterReadCurrentSceneAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ScenesCluster::ReadAttributeCurrentGroup(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ScenesCluster::ReadAttributeCurrentGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterReadCurrentGroupAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ScenesCluster::ReadAttributeSceneValid(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ScenesCluster::ReadAttributeSceneValid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterReadSceneValidAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ScenesCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ScenesCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterReadNameSupportAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeScenesClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
 // TemperatureMeasurement Cluster Commands
 // TemperatureMeasurement Cluster Attributes
-CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval,
-                                                                          int16_t change)
+CHIP_ERROR TemperatureMeasurementCluster::ConfigureAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterConfigureMeasuredValueAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4466,33 +3862,265 @@ CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback:
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+
+// Thermostat Cluster Commands
+CHIP_ERROR ThermostatCluster::ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeeklyScheduleCommandId,
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterClearWeeklyScheduleCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR ThermostatCluster::GetRelayStatusLog(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRelayStatusLogCommandId,
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterGetRelayStatusLogCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR ThermostatCluster::GetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t daysToReturn, uint8_t modeToReturn)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeeklyScheduleCommandId,
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber = 0;
+    // daysToReturn: dayOfWeek
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), daysToReturn));
+    // modeToReturn: modeForSequence
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), modeToReturn));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterGetWeeklyScheduleCommand(seqNum, mEndpoint, daysToReturn, modeToReturn);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR ThermostatCluster::SetWeeklySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence, uint8_t modeForSequence, uint8_t payload)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeeklyScheduleCommandId,
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber = 0;
+    // numberOfTransitionsForSequence: enum8
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), numberOfTransitionsForSequence));
+    // dayOfWeekForSequence: dayOfWeek
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), dayOfWeekForSequence));
+    // modeForSequence: modeForSequence
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), modeForSequence));
+    // payload: int8u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), payload));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterSetWeeklyScheduleCommand(seqNum, mEndpoint, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR ThermostatCluster::SetpointRaiseLower(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t mode, int8_t amount)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetpointRaiseLowerCommandId,
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber = 0;
+    // mode: setpointAdjustMode
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), mode));
+    // amount: int8s
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), amount));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterSetpointRaiseLowerCommand(seqNum, mEndpoint, mode, amount);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+// Thermostat Cluster Attributes
+CHIP_ERROR ThermostatCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR ThermostatCluster::ReadAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadLocalTemperatureAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ConfigureAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, int16_t change)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterConfigureLocalTemperatureAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ReportAttributeLocalTemperature(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0000, onReportCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadOccupiedCoolingSetpointAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t value)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterWriteOccupiedCoolingSetpointAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadOccupiedHeatingSetpointAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t value)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterWriteOccupiedHeatingSetpointAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadControlSequenceOfOperationAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterWriteControlSequenceOfOperationAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadSystemModeAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterWriteSystemModeAttribute(seqNum, mEndpoint, value);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+
 // WindowCovering Cluster Commands
-CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4500,31 +4128,24 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable *
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringDownCloseCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringDownCloseCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback,
-                                                                   uint8_t percentageLiftValue)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t percentageLiftValue)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4532,33 +4153,27 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftPercentageCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // percentageLiftValue: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), percentageLiftValue));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), percentageLiftValue));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterWindowCoveringGoToLiftPercentageCommand(seqNum, mEndpoint, percentageLiftValue);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringGoToLiftPercentageCommand(seqNum, mEndpoint, percentageLiftValue);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t liftValue)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t liftValue)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4566,34 +4181,27 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelab
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftValueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // liftValue: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), liftValue));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), liftValue));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterWindowCoveringGoToLiftValueCommand(seqNum, mEndpoint, liftValue);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringGoToLiftValueCommand(seqNum, mEndpoint, liftValue);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback,
-                                                                   uint8_t percentageTiltValue)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t percentageTiltValue)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4601,33 +4209,27 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltPercentageCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // percentageTiltValue: int8u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), percentageTiltValue));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), percentageTiltValue));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterWindowCoveringGoToTiltPercentageCommand(seqNum, mEndpoint, percentageTiltValue);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringGoToTiltPercentageCommand(seqNum, mEndpoint, percentageTiltValue);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t tiltValue)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t tiltValue)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4635,33 +4237,27 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelab
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltValueCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
-
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
     // tiltValue: int16u
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), tiltValue));
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), tiltValue));
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterWindowCoveringGoToTiltValueCommand(seqNum, mEndpoint, tiltValue);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringGoToTiltValueCommand(seqNum, mEndpoint, tiltValue);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4669,30 +4265,24 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSu
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringStopCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringStopCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
-CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
 #if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -4700,51 +4290,41 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * on
     (void) onFailureCallback;
 
     app::Command::CommandParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringUpOpenCommandId,
-                                              (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand             = mDevice->GetCommandSender();
+                                         (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand = mDevice->GetCommandSender();
 
-    TLV::TLVWriter writer = ZCLcommand->CreateCommandDataElementTLVWriter();
-
-    TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(writer.EndContainer(dummyType));
-    ReturnErrorOnFailure(writer.Finalize());
-    ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
     return mDevice->SendCommands();
 #else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWindowCoveringUpOpenCommand(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
 
 // WindowCovering Cluster Attributes
-CHIP_ERROR WindowCoveringCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterDiscoverAttributes(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR WindowCoveringCluster::ReadAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeWindowCoveringType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(seqNum, mEndpoint, minInterval, maxInterval);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4753,21 +4333,17 @@ CHIP_ERROR WindowCoveringCluster::ReportAttributeWindowCoveringType(Callback::Ca
     return RequestAttributeReporting(0x0000, onReportCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadCurrentPositionLiftAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4776,21 +4352,17 @@ CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLift(Callback::C
     return RequestAttributeReporting(0x0003, onReportCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadCurrentPositionTiltAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval, uint16_t change)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval, uint16_t change)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4799,21 +4371,17 @@ CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTilt(Callback::C
     return RequestAttributeReporting(0x0004, onReportCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadConfigStatusAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ConfigureAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
+CHIP_ERROR WindowCoveringCluster::ConfigureAttributeConfigStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeWindowCoveringClusterConfigureConfigStatusAttribute(seqNum, mEndpoint, minInterval, maxInterval);
+    System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterConfigureConfigStatusAttribute(seqNum, mEndpoint, minInterval, maxInterval);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
@@ -4822,61 +4390,55 @@ CHIP_ERROR WindowCoveringCluster::ReportAttributeConfigStatus(Callback::Cancelab
     return RequestAttributeReporting(0x0007, onReportCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeMode(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadModeAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
+CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterWriteModeAttribute(seqNum, mEndpoint, value);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR WindowCoveringCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR WindowCoveringCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeWindowCoveringClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
+
 
 } // namespace Controller
 } // namespace chip

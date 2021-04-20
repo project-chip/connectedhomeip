@@ -27,8 +27,7 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
-    "DeviceAddressUpdater.cpp",
-    "DeviceAddressUpdater.h",
+    "DeviceAddressUpdateDelegate.h",
     "EmptyDataModelHandler.cpp",
   ]
 
@@ -41,6 +40,7 @@ static_library("controller") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]

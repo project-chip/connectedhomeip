@@ -71,8 +71,6 @@ public:
 
     using ThreadStackManager::InitThreadStack;
     CHIP_ERROR InitThreadStack(otInstance * otInst);
-    void _OnCHIPoBLEAdvertisingStart(void);
-    void _OnCHIPoBLEAdvertisingStop(void);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.

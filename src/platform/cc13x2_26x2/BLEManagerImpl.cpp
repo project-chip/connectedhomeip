@@ -766,12 +766,6 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 
                 if (mFlags.Has(Flags::kAdvertisingEnabled))
                 {
-
-// Send notification to thread manager that CHIPoBLE advertising is starting
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                    ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
                     // Enable legacy advertising for set #1
                     status = (bStatus_t) GapAdv_enable(sInstance.advHandleLegacy, GAP_ADV_ENABLE_OPTIONS_USE_MAX, 0);
 

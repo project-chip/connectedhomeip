@@ -130,12 +130,14 @@ try:
             'chip.ble.commissioning',
             'chip.configuration',
             'chip.clusters',
+            'chip.discovery',
             'chip.exceptions',
             'chip.internal',
             'chip.interaction_model',
             'chip.logging',
             'chip.native',
             'chip.tlv',
+            'chip.setup_payload',
     ]
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing

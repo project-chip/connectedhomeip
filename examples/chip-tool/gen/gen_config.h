@@ -47,6 +47,7 @@
 #define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -121,3 +122,7 @@
 // Use this macro to check if the client side of the Temperature Measurement cluster is included
 #define ZCL_USING_TEMP_MEASUREMENT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Thermostat cluster is included
+#define ZCL_USING_THERMOSTAT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_THERMOSTAT_CLIENT

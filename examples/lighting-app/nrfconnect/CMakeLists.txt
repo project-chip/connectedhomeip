@@ -23,6 +23,11 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 
 # Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+# TODO: temporary fix to remove after solving static addressing problem on nrf5340
+if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
+endif()
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
@@ -87,9 +92,37 @@ add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 
-pw_proto_library(pigweed_lighting_protolib
+pw_proto_library(button_service
   SOURCES
-    main/pigweed_lighting.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
+  PREFIX
+    button_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(device_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.options
+  PREFIX
+    device_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(lighting_service
+  SOURCES
+    ${CHIP_ROOT}/examples/lighting-app/lighting-common/lighting_service/lighting_service.proto
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/lighting-app/lighting-common/
+  DEPS
+    pw_protobuf.common_protos
 )
 
 target_sources(app PRIVATE
@@ -108,7 +141,9 @@ target_include_directories(app PRIVATE
   ../../common/pigweed/nrfconnect)
 
 target_link_libraries(app PRIVATE
-  pigweed_lighting_protolib.nanopb_rpc
+  button_service.nanopb_rpc
+  device_service.nanopb_rpc
+  lighting_service.nanopb_rpc
   pw_checksum
   pw_hdlc
   pw_log

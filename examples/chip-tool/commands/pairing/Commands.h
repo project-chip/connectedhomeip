@@ -23,25 +23,37 @@
 class Unpair : public PairingCommand
 {
 public:
-    Unpair() : PairingCommand("unpair", PairingMode::None) {}
+    Unpair() : PairingCommand("unpair", PairingMode::None, PairingNetworkType::None) {}
 };
 
 class PairBypass : public PairingCommand
 {
 public:
-    PairBypass() : PairingCommand("bypass", PairingMode::Bypass) {}
+    PairBypass() : PairingCommand("bypass", PairingMode::Bypass, PairingNetworkType::None) {}
 };
 
-class PairBle : public PairingCommand
+class PairBleWiFi : public PairingCommand
 {
 public:
-    PairBle() : PairingCommand("ble", PairingMode::Ble) {}
+    PairBleWiFi() : PairingCommand("ble-wifi", PairingMode::Ble, PairingNetworkType::WiFi) {}
+};
+
+class PairBleThread : public PairingCommand
+{
+public:
+    PairBleThread() : PairingCommand("ble-thread", PairingMode::Ble, PairingNetworkType::Thread) {}
 };
 
 class PairSoftAP : public PairingCommand
 {
 public:
-    PairSoftAP() : PairingCommand("softap", PairingMode::SoftAP) {}
+    PairSoftAP() : PairingCommand("softap", PairingMode::SoftAP, PairingNetworkType::WiFi) {}
+};
+
+class Ethernet : public PairingCommand
+{
+public:
+    Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
 };
 
 void registerCommandsPairing(Commands & commands)
@@ -49,10 +61,8 @@ void registerCommandsPairing(Commands & commands)
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Unpair>(),
-        make_unique<PairBypass>(),
-        make_unique<PairBle>(),
-        make_unique<PairSoftAP>(),
+        make_unique<Unpair>(),        make_unique<PairBypass>(), make_unique<PairBleWiFi>(),
+        make_unique<PairBleThread>(), make_unique<PairSoftAP>(), make_unique<Ethernet>(),
     };
 
     commands.Register(clusterName, clusterCommands);

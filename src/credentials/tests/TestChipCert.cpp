@@ -44,7 +44,7 @@ using namespace chip::TestCerts;
 enum
 {
     kStandardCertsCount = 3,
-    kTestCertBufSize    = 1024, // Size of buffer needed to hold any of the test certificates
+    kTestCertBufSize    = 2048, // Size of buffer needed to hold any of the test certificates
                                 // (in either CHIP or DER form), or to decode the certificates.
 };
 
@@ -61,7 +61,6 @@ static const BitFlags<TestCertLoadFlags> sSupIsCAFlag(TestCertLoadFlags::kSuppre
 static const BitFlags<TestCertLoadFlags> sSupKeyUsageFlag(TestCertLoadFlags::kSuppressKeyUsage);
 static const BitFlags<TestCertLoadFlags> sSupKeyCertSignFlag(TestCertLoadFlags::kSuppressKeyCertSign);
 static const BitFlags<TestCertLoadFlags> sPathLenZeroFlag(TestCertLoadFlags::kSetPathLenConstZero);
-static const BitFlags<TestCertLoadFlags> sAppDefCertTypeFlag(TestCertLoadFlags::kSetAppDefinedCertType);
 
 static const BitFlags<KeyPurposeFlags> sNullKPFlag;
 static const BitFlags<KeyPurposeFlags> sSA(KeyPurposeFlags::kServerAuth);
@@ -102,17 +101,17 @@ static const BitFlags<KeyUsageFlags> sKCandCR(sKC, sCR);
 static const BitFlags<KeyUsageFlags> sKCandEO(sKC, sEO);
 static const BitFlags<KeyUsageFlags> sKCandDO(sKC, sDO);
 
-static CHIP_ERROR LoadStandardCerts(ChipCertificateSet & certSet)
+static CHIP_ERROR LoadTestCertSet01(ChipCertificateSet & certSet)
 {
     CHIP_ERROR err;
 
-    err = LoadTestCert(certSet, TestCertTypes::kRoot, sNullLoadFlag, sTrustAnchorFlag);
+    err = LoadTestCert(certSet, TestCert::kRoot01, sNullLoadFlag, sTrustAnchorFlag);
     SuccessOrExit(err);
 
-    err = LoadTestCert(certSet, TestCertTypes::kNodeCA, sNullLoadFlag, sGenTBSHashFlag);
+    err = LoadTestCert(certSet, TestCert::kICA01, sNullLoadFlag, sGenTBSHashFlag);
     SuccessOrExit(err);
 
-    err = LoadTestCert(certSet, TestCertTypes::kNode01, sNullLoadFlag, sGenTBSHashFlag);
+    err = LoadTestCert(certSet, TestCert::kNode01_01, sNullLoadFlag, sGenTBSHashFlag);
     SuccessOrExit(err);
 
 exit:
@@ -216,10 +215,9 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
     enum
     {
         CTNS   = kCertType_NotSpecified,
-        CTCA   = kCertType_CA,
+        CTCA   = kCertType_ICA,
         CTNode = kCertType_Node,
         CTFS   = kCertType_FirmwareSigning,
-        CTAD   = kCertType_AppDefinedBase,
     };
 
     // clang-format off
@@ -229,108 +227,113 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         // Ind  Flags Type    Expected Result                 Index Index  Type                     Flags            Flags
         // ==================================================================================================================================
 
-        // Basic validation of leaf certificate with different load orders.
-        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-        {  1,   0,    CTNS,   CHIP_NO_ERROR,                  1,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        // Basic validation of node certificate with different load orders.
+        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_NO_ERROR,                  1,    0, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       } } },
 
-        // Validation of leaf certificate with root key only.
-        {  1,   0,    CTNS,   CHIP_NO_ERROR,                  1,    0, { { TestCertTypes::kRootKey, sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        // Basic validation of certificate, which is signed by Root.
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    1, { { TestCert::kNode01_02, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode01_02, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    3, { { TestCert::kNode01_02, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       } } },
+
+        // Basic validation of node certificates chaining up to another root.
+        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode02_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_NO_ERROR,                  1,    0, { { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode02_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_02, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_03, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_04, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
 
         // Validation with two copies of root certificate, one trusted, one untrusted.
-        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    1, { { TestCertTypes::kRoot,    sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    1, { { TestCert::kRoot01,    sNullDecodeFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       } } },
 
-        // Validation with trusted root key and trusted root certificate.
-        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    0, { { TestCertTypes::kRootKey, sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-
-        // Validation with trusted root key and untrusted root certificate.
-        {  3,   0,    CTNS,   CHIP_NO_ERROR,                  3,    1, { { TestCertTypes::kRoot,    sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kRootKey, sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        // Validation with two trusted certificates.
+        {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    1, { { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to missing CA certificate.
-        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to missing root certificate.
-        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to lack of TBS hash.
-        {  1,   0,    CTNS,   CHIP_ERROR_INVALID_ARGUMENT,   -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_ERROR_INVALID_ARGUMENT,   -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sNullDecodeFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to untrusted root.
-        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sNullDecodeFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  1,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sNullDecodeFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to intermediate cert with isCA flag = false
-        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sSupIsCAFlag        },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sSupIsCAFlag        },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to CA cert with no key usage.
-        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sSupKeyUsageFlag    },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sSupKeyUsageFlag    },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to CA cert with no cert sign key usage.
-        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sSupKeyCertSignFlag },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sSupKeyCertSignFlag },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to 3-level deep cert chain and root cert with path constraint == 0
-        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sPathLenZeroFlag    },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTNS,   CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sPathLenZeroFlag    },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Require a specific certificate type.
-        {  2,   0,    CTNode, CHIP_NO_ERROR,                  2,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-
-        // Require a certificate with an application-defined type.
-        {  2,   0,    CTAD,   CHIP_NO_ERROR,                  2,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sAppDefCertTypeFlag } } },
-
-        // Select between two identical certificates with different types.
-        {  2,   0,    CTAD,   CHIP_NO_ERROR,                  3,    0, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sAppDefCertTypeFlag } } },
+        {  2,   0,    CTNode, CHIP_NO_ERROR,                  2,    0, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
 
         // Failure due to required certificate type not found.
-        {  2,   0,    CTCA,   CHIP_ERROR_WRONG_CERT_TYPE,    -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-
-        // Failure due to CA certificate having wrong type.
-        {  2,   0,    CTNode, CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sNullLoadFlag       },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sAppDefCertTypeFlag },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
-
-        // Failure due to root certificate having wrong type.
-        {  2,   0,    CTNode, CHIP_ERROR_CA_CERT_NOT_FOUND,  -1,   -1, { { TestCertTypes::kRoot,    sTrustAnchorFlag, sAppDefCertTypeFlag },
-                                                                         { TestCertTypes::kNodeCA,  sGenTBSHashFlag,  sNullLoadFlag       },
-                                                                         { TestCertTypes::kNode01,  sGenTBSHashFlag,  sNullLoadFlag       } } },
+        {  2,   0,    CTCA,   CHIP_ERROR_WRONG_CERT_TYPE,    -1,   -1, { { TestCert::kRoot01,    sTrustAnchorFlag, sNullLoadFlag       },
+                                                                         { TestCert::kICA01,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kNode01_01, sGenTBSHashFlag,  sNullLoadFlag       } } },
     };
     // clang-format on
     static const size_t sNumValidationTestCases = sizeof(sValidationTestCases) / sizeof(sValidationTestCases[0]);
@@ -344,7 +347,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         certSet.Init(kMaxCertsPerTestCase, kTestCertBufSize);
         for (size_t i2 = 0; i2 < kMaxCertsPerTestCase; i2++)
         {
-            if (testCase.InputCerts[i2].Type != TestCertTypes::kNone)
+            if (testCase.InputCerts[i2].Type != TestCert::kNone)
             {
                 err = LoadTestCert(certSet, testCase.InputCerts[i2].Type, testCase.InputCerts[i2].LoadFlags,
                                    testCase.InputCerts[i2].DecodeFlags);
@@ -400,7 +403,7 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
 
     certSet.Init(kStandardCertsCount, kTestCertBufSize);
 
-    err = LoadStandardCerts(certSet);
+    err = LoadTestCertSet01(certSet);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     validContext.Reset();
@@ -556,7 +559,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
 
     certSet.Init(kStandardCertsCount, kTestCertBufSize);
 
-    err = LoadStandardCerts(certSet);
+    err = LoadTestCertSet01(certSet);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     for (size_t i = 0; i < sNumUsageTestCases; i++)
@@ -588,13 +591,18 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
 
     // clang-format off
     static TestCase sTestCases[] = {
-        // Cert                             ExpectedCertType
+        // Cert                        ExpectedCertType
         // =============================================================
-        {  TestCertTypes::kRoot,            kCertType_CA              },
-        {  TestCertTypes::kRootKey,         kCertType_CA              },
-        {  TestCertTypes::kNodeCA,          kCertType_CA              },
-        {  TestCertTypes::kNode01,          kCertType_Node            },
-        {  TestCertTypes::kFirmwareSigning, kCertType_FirmwareSigning },
+        {  TestCert::kRoot01,          kCertType_Root            },
+        {  TestCert::kRoot02,          kCertType_Root            },
+        {  TestCert::kICA01,           kCertType_ICA             },
+        {  TestCert::kICA02,           kCertType_ICA             },
+        {  TestCert::kICA01_1,         kCertType_ICA             },
+        {  TestCert::kFWSign01,        kCertType_FirmwareSigning },
+        {  TestCert::kNode01_01,       kCertType_Node            },
+        {  TestCert::kNode01_02,       kCertType_Node            },
+        {  TestCert::kNode02_01,       kCertType_Node            },
+        {  TestCert::kNode02_02,       kCertType_Node            },
     };
     // clang-format on
     static const size_t sNumTestCases = sizeof(sTestCases) / sizeof(sTestCases[0]);
@@ -602,12 +610,17 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
     for (unsigned i = 0; i < sNumTestCases; i++)
     {
         const TestCase & testCase = sTestCases[i];
+        uint8_t certType;
 
         // Initialize the certificate set and load the test certificate.
         certSet.Init(1, kTestCertBufSize);
         err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, certSet.GetCertSet()->mCertType == testCase.ExpectedCertType);
+
+        err = certSet.GetCertSet()->mSubjectDN.GetCertType(certType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, certType == testCase.ExpectedCertType);
     }
 }
 
