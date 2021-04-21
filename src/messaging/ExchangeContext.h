@@ -182,11 +182,6 @@ public:
     void Close();
     void Abort();
 
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegateBase * delegate);
-    void Free();
-    void Reset();
-
     void SetResponseTimeout(Timeout timeout);
 
 private:
@@ -198,6 +193,11 @@ private:
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
+
+    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                            ExchangeDelegateBase * delegate);
+    void Free();
+    void Reset();
 
     /**
      *  Search for an existing exchange that the message applies to.
