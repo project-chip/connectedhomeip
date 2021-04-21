@@ -24,6 +24,8 @@
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
 
+#if ENABLE_HSM_GENERATE_EC_KEY
+
 #define MAX_SHA_ONE_SHOT_DATA_LEN 900
 #define NIST256_HEADER_OFFSET 26
 
@@ -315,3 +317,5 @@ exit:
 
 } // namespace Crypto
 } // namespace chip
+
+#endif //#if ENABLE_HSM_GENERATE_EC_KEY
