@@ -70,7 +70,9 @@ has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console.
+the UART console and shared using an NFC tag. For security reasons, you must
+start NFC tag emulation manually after powering up the device by pressing
+Button 4.
 
 ### Thread Provisioning
 
@@ -124,7 +126,9 @@ being used if this button is pressed.
 The remaining two LEDs (D1/D2) and button (SW1) are unused.
 
 Directly on the development board, **Button USERINTERFACE** can be used for
-enabling Bluetooth LE advertising for a predefined period of time.
+enabling Bluetooth LE advertising for a predefined period of time. Also, pushing
+this button starts the NFC emulation by writing the onboarding information in
+the NTAG.
 
 <a name="building"></a>
 
@@ -152,8 +156,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lightin-app/k32w$ ninja -C ou
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061
-SDK 2.6.3.
+Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
+2.6.3.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 install the recommanded packages (python version > 3, pip3, pycrypto,
