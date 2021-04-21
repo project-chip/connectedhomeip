@@ -161,7 +161,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearAllPinsResponseCallback(nullptr, status);
             break;
         }
         case ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID: {
@@ -174,7 +174,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearAllRfidsResponseCallback(nullptr, status);
             break;
         }
         case ZCL_CLEAR_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -187,7 +187,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearHolidayScheduleResponseCallback(nullptr, status);
             break;
         }
         case ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID: {
@@ -200,7 +200,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearPinResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearPinResponseCallback(nullptr, status);
             break;
         }
         case ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID: {
@@ -213,7 +213,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearRfidResponseCallback(nullptr, status);
             break;
         }
         case ZCL_CLEAR_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -226,7 +226,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(nullptr, status);
             break;
         }
         case ZCL_CLEAR_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -239,7 +239,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterClearYeardayScheduleResponseCallback(nullptr, status);
             break;
         }
         case ZCL_GET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -280,8 +280,8 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             operatingModeDuringHoliday = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(scheduleId, status, localStartTime, localEndTime,
-                                                                                  operatingModeDuringHoliday);
+            wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(nullptr, scheduleId, status, localStartTime,
+                                                                                  localEndTime, operatingModeDuringHoliday);
             break;
         }
         case ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID: {
@@ -336,7 +336,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(logEntryId, timestamp, eventType, source,
+            wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(nullptr, logEntryId, timestamp, eventType, source,
                                                                             eventIdOrAlarmCode, userId, pin);
             break;
         }
@@ -371,7 +371,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             pin = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterGetPinResponseCallback(userId, userStatus, userType, pin);
+            wasHandled = emberAfDoorLockClusterGetPinResponseCallback(nullptr, userId, userStatus, userType, pin);
             break;
         }
         case ZCL_GET_RFID_RESPONSE_COMMAND_ID: {
@@ -405,7 +405,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             rfid = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(userId, userStatus, userType, rfid);
+            wasHandled = emberAfDoorLockClusterGetRfidResponseCallback(nullptr, userId, userStatus, userType, rfid);
             break;
         }
         case ZCL_GET_USER_TYPE_RESPONSE_COMMAND_ID: {
@@ -425,7 +425,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             userType = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(userId, userType);
+            wasHandled = emberAfDoorLockClusterGetUserTypeResponseCallback(nullptr, userId, userType);
             break;
         }
         case ZCL_GET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -487,8 +487,8 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             endMinute = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(scheduleId, userId, status, daysMask, startHour,
-                                                                                  startMinute, endHour, endMinute);
+            wasHandled = emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(nullptr, scheduleId, userId, status, daysMask,
+                                                                                  startHour, startMinute, endHour, endMinute);
             break;
         }
         case ZCL_GET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -529,8 +529,8 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             localEndTime = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled =
-                emberAfDoorLockClusterGetYeardayScheduleResponseCallback(scheduleId, userId, status, localStartTime, localEndTime);
+            wasHandled = emberAfDoorLockClusterGetYeardayScheduleResponseCallback(nullptr, scheduleId, userId, status,
+                                                                                  localStartTime, localEndTime);
             break;
         }
         case ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID: {
@@ -543,7 +543,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterLockDoorResponseCallback(nullptr, status);
             break;
         }
         case ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -556,7 +556,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetHolidayScheduleResponseCallback(nullptr, status);
             break;
         }
         case ZCL_SET_PIN_RESPONSE_COMMAND_ID: {
@@ -569,7 +569,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterSetPinResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetPinResponseCallback(nullptr, status);
             break;
         }
         case ZCL_SET_RFID_RESPONSE_COMMAND_ID: {
@@ -582,7 +582,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetRfidResponseCallback(nullptr, status);
             break;
         }
         case ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID: {
@@ -595,7 +595,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetUserTypeResponseCallback(nullptr, status);
             break;
         }
         case ZCL_SET_WEEKDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -608,7 +608,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(nullptr, status);
             break;
         }
         case ZCL_SET_YEARDAY_SCHEDULE_RESPONSE_COMMAND_ID: {
@@ -621,7 +621,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterSetYeardayScheduleResponseCallback(nullptr, status);
             break;
         }
         case ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID: {
@@ -634,7 +634,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterUnlockDoorResponseCallback(nullptr, status);
             break;
         }
         case ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID: {
@@ -647,7 +647,7 @@ EmberAfStatus emberAfDoorLockClusterClientCommandParse(EmberAfClusterCommand * c
             }
             status = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(status);
+            wasHandled = emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(nullptr, status);
             break;
         }
         default: {
@@ -683,7 +683,7 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(nullptr, errorCode, debugText);
             break;
         }
         case ZCL_COMMISSIONING_COMPLETE_RESPONSE_COMMAND_ID: {
@@ -703,7 +703,7 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(nullptr, errorCode, debugText);
             break;
         }
         case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
@@ -723,7 +723,7 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGeneralCommissioningClusterSetFabricResponseCallback(errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterSetFabricResponseCallback(nullptr, errorCode, debugText);
             break;
         }
         default: {
@@ -759,7 +759,7 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGroupsClusterAddGroupResponseCallback(status, groupId);
+            wasHandled = emberAfGroupsClusterAddGroupResponseCallback(nullptr, status, groupId);
             break;
         }
         case ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID: {
@@ -782,7 +782,7 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
             payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
             groupList     = cmd->buffer + payloadOffset;
 
-            wasHandled = emberAfGroupsClusterGetGroupMembershipResponseCallback(capacity, groupCount, groupList);
+            wasHandled = emberAfGroupsClusterGetGroupMembershipResponseCallback(nullptr, capacity, groupCount, groupList);
             break;
         }
         case ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID: {
@@ -802,7 +802,7 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(status, groupId);
+            wasHandled = emberAfGroupsClusterRemoveGroupResponseCallback(nullptr, status, groupId);
             break;
         }
         case ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID: {
@@ -829,7 +829,7 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             groupName = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGroupsClusterViewGroupResponseCallback(status, groupId, groupName);
+            wasHandled = emberAfGroupsClusterViewGroupResponseCallback(nullptr, status, groupId, groupName);
             break;
         }
         default: {
@@ -858,7 +858,7 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
             }
             timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+            wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(nullptr, timeout);
             break;
         }
         default: {
@@ -901,7 +901,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfScenesClusterAddSceneResponseCallback(status, groupId, sceneId);
+            wasHandled = emberAfScenesClusterAddSceneResponseCallback(nullptr, status, groupId, sceneId);
             break;
         }
         case ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID: {
@@ -952,7 +952,8 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
                 sceneList = NULL;
             }
 
-            wasHandled = emberAfScenesClusterGetSceneMembershipResponseCallback(status, capacity, groupId, sceneCount, sceneList);
+            wasHandled =
+                emberAfScenesClusterGetSceneMembershipResponseCallback(nullptr, status, capacity, groupId, sceneCount, sceneList);
             break;
         }
         case ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID: {
@@ -972,7 +973,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             groupId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(status, groupId);
+            wasHandled = emberAfScenesClusterRemoveAllScenesResponseCallback(nullptr, status, groupId);
             break;
         }
         case ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID: {
@@ -999,7 +1000,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(status, groupId, sceneId);
+            wasHandled = emberAfScenesClusterRemoveSceneResponseCallback(nullptr, status, groupId, sceneId);
             break;
         }
         case ZCL_STORE_SCENE_RESPONSE_COMMAND_ID: {
@@ -1026,7 +1027,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
             }
             sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfScenesClusterStoreSceneResponseCallback(status, groupId, sceneId);
+            wasHandled = emberAfScenesClusterStoreSceneResponseCallback(nullptr, status, groupId, sceneId);
             break;
         }
         case ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID: {
@@ -1091,7 +1092,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
                 extensionFieldSets = NULL;
             }
 
-            wasHandled = emberAfScenesClusterViewSceneResponseCallback(status, groupId, sceneId, transitionTime, sceneName,
+            wasHandled = emberAfScenesClusterViewSceneResponseCallback(nullptr, status, groupId, sceneId, transitionTime, sceneName,
                                                                        extensionFieldSets);
             break;
         }
