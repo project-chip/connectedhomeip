@@ -102,6 +102,12 @@ CHIP_ERROR ExchangeManager::Shutdown()
     mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
+    for (auto & ec : mContextPool)
+    {
+        // ExchangeContext leaked
+        assert(ec.GetReferenceCount() == 0);
+    }
+
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->SetDelegate(nullptr);
