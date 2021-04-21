@@ -33,7 +33,6 @@ namespace chip {
 namespace app {
 class ReadClient;
 class CommandSender;
-struct EventPathParams;
 
 /**
  * @brief
