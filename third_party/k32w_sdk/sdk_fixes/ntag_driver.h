@@ -2,7 +2,7 @@
  * Copyright 2016-2020 NXP
  * All rights reserved.
  *
- * 
+ *
  * SPDX-License-Identifier: BSD-3-Clause
  *
  */
@@ -155,7 +155,7 @@ BOOL NTAG_ReadBytes(NTAG_HANDLE_T ntag, uint16_t address, uint8_t *bytes, uint16
  *
  *	This functions writes the specified number of bytes to the given address of
  *	the selected NTAG device. Writing to an invalid address
- *	is undefined. 
+ *	is undefined.
  *
  * \param	ntag	handle to identify the NTAG device instance
  * \param	bytes	array of bytes to be written
