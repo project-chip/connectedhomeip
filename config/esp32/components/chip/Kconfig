@@ -328,7 +328,7 @@ menu "CHIP Device Layer"
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
             range 0 65535
-            default 5120
+            default 6144
             help
                 The size (in bytes) of the CHIP task stack.
 

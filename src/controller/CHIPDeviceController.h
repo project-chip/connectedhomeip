@@ -44,6 +44,9 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
@@ -61,6 +64,10 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * bleLayer = nullptr;
+#endif
 #if CHIP_ENABLE_INTERACTION_MODEL
     app::InteractionModelDelegate * imDelegate = nullptr;
 #endif
@@ -238,6 +245,9 @@ protected:
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     Inet::InetLayer * mInetLayer;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
     System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
@@ -370,6 +380,17 @@ public:
     void RendezvousCleanup(CHIP_ERROR status);
 
     void ReleaseDevice(Device * device) override;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    /**
+     * @brief
+     *   Once we have finished all commissioning work, the Controller should close the BLE
+     *   connection to the device and establish CASE session / another PASE session to the device
+     *   if needed.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR CloseBleConnection();
+#endif
 
 private:
     DevicePairingDelegate * mPairingDelegate;

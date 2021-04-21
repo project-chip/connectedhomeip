@@ -60,7 +60,9 @@
 #include <ble/BleApplicationDelegate.h>
 #include <ble/BleConnectionDelegate.h>
 #include <ble/BleError.h>
+#include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
+#include <ble/BleRole.h>
 #include <ble/BleUUID.h>
 
 namespace chip {
@@ -81,13 +83,6 @@ namespace Ble {
 /// Forward declarations.
 class BleLayer;
 class BLEEndPoint;
-
-/// Role of end points' associated BLE connections. Determines means used by end points to send and receive data.
-typedef enum
-{
-    kBleRole_Central    = 0,
-    kBleRole_Peripheral = 1
-} BleRole;
 
 /// Enum defining versions of CHIP over BLE transport protocol.
 typedef enum
@@ -112,22 +107,6 @@ constexpr size_t kCapabilitiesResponseWindowSizeLength              = 1;
 constexpr size_t kCapabilitiesResponseLength(kCapabilitiesResponseMagicnumLength + kCapabilitiesResponseL2capMtuLength +
                                              kCapabilitiesResponseSelectedProtocolVersionLength +
                                              kCapabilitiesResponseWindowSizeLength);
-
-class BleLayerObject
-{
-    friend class BleLayer;
-
-public:
-    // Public data members:
-    BleLayer * mBle;  ///< [READ-ONLY] Pointer to the BleLayer object that owns this object.
-    void * mAppState; ///< Generic pointer to app-specific data associated with the object.
-
-protected:
-    uint32_t mRefCount;
-
-    void AddRef() { mRefCount++; }
-    void Release();
-};
 
 class BleTransportCapabilitiesRequestMessage
 {
@@ -251,7 +230,9 @@ public:
         kState_Initialized    = 1
     } mState; ///< [READ-ONLY] Current state
 
-    void * mAppState;
+    // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
+    void * mAppState                 = nullptr;
+    BleLayerDelegate * mBleTransport = nullptr;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
@@ -264,11 +245,13 @@ public:
                    BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
     BLE_ERROR Shutdown();
 
-    BLE_ERROR NewBleConnection(void * appState, uint16_t connDiscriminator,
-                               BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
-                               BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR CancelBleIncompleteConnection();
+    BLE_ERROR NewBleConnectionByDiscriminator(uint16_t connDiscriminator);
+    BLE_ERROR NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
+
+    BLE_ERROR CloseAllBleConnections();
+    BLE_ERROR CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
 
     chip::System::Error ScheduleWork(chip::System::Layer::TimerCompleteFunct aComplete, void * aAppState)
     {
@@ -362,6 +345,9 @@ private:
     BLE_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);
+
+    static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnConnectionError(void * appState, BLE_ERROR err);
 };
 
 } /* namespace Ble */

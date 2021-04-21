@@ -47,7 +47,7 @@ namespace Internal {
 namespace {
 
 static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
-static constexpr unsigned kConnectTimeoutMs           = 5000;
+static constexpr unsigned kConnectTimeoutMs           = 10000;
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -81,7 +81,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    mAppState = nullptr;
 
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
@@ -279,14 +278,15 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            OnConnectionComplete(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnected.mConnection);
+            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
+                                                        apEvent->Platform.BLECentralConnected.mConnection);
             CleanScanConfig();
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
+            BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
             CleanScanConfig();
         }
         break;
@@ -672,21 +672,21 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     if (scanType == BleScanState::kNotScanning)
     {
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "Invalid scan type requested");
         return;
     }
 
     if (mpEndpoint == nullptr)
     {
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "BLE Layer is not yet initialized");
         return;
     }
 
     if (mpEndpoint->mpAdapter == nullptr)
     {
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "No adapter available for new connection establishment");
         return;
     }
@@ -697,7 +697,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     if (!mDeviceScanner)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-        OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
         ChipLogError(Ble, "Failed to create a BLE device scanner");
         return;
     }
@@ -707,7 +707,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         ChipLogError(Ble, "Failed to start a BLE can: %s", chip::ErrorStr(err));
-        OnConnectionError(mBLEScanConfig.mAppState, err);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
         return;
     }
 }
@@ -818,7 +818,7 @@ void BLEManagerImpl::OnScanComplete()
         return;
     }
 
-    OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 

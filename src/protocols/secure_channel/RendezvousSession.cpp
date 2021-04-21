@@ -23,10 +23,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <transport/BLE.h>
-#endif // CONFIG_NETWORK_LAYER_BLE
-
 static constexpr uint32_t kSpake2p_Iteration_Count = 100;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 
@@ -55,18 +51,11 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
     mAdmin            = admin;
     mExchangeManager  = exchangeManager;
 
-    // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
+    // Note: Since BLE is only used for initial setup, enable BLE advertisement in rendezvous session can be expected.
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
 #if CONFIG_NETWORK_LAYER_BLE
     {
         ReturnErrorOnFailure(mParams.GetAdvertisementDelegate()->StartAdvertisement());
-        Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
-        mTransport                 = transport;
-
-        ReturnErrorOnFailure(
-            transport->Init(this, sessionMgr, mParams.GetBleLayer(), mParams.GetDiscriminator(), mParams.GetConnectionObject()));
-        ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transport, mTransportMgr));
-        mPairingSession.MessageDispatch().SetPeerAddress(mParams.GetPeerAddress());
     }
 #else
     {
@@ -90,9 +79,9 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Messagin
     }
 
     // TODO: We should assume mTransportMgr not null for IP rendezvous.
-    if (mTransportMgr != nullptr && params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
+    if (mTransportMgr != nullptr)
     {
-        ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(nullptr, mTransportMgr));
+        ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(mTransportMgr));
         mPairingSession.MessageDispatch().SetPeerAddress(mParams.GetPeerAddress());
     }
 
@@ -142,22 +131,10 @@ void RendezvousSession::OnSessionEstablished()
 
     InitPairingSessionHandle();
 
-    mNetworkProvision.Init(mExchangeManager, *mPairingSessionHandle, this);
-
-    // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
-    // a transport.
-    if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle ||                        // For rendezvous initializer
-        mPairingSession.PeerConnection().GetPeerAddress().GetTransportType() != Transport::Type::kBle) // For rendezvous target
+    UpdateState(State::kRendezvousComplete);
+    if (!mParams.IsController())
     {
-        UpdateState(State::kRendezvousComplete);
-        if (!mParams.IsController())
-        {
-            OnRendezvousConnectionClosed();
-        }
-    }
-    else
-    {
-        UpdateState(State::kNetworkProvisioning);
+        OnRendezvousConnectionClosed();
     }
 }
 
@@ -210,17 +187,6 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
             else
             {
                 mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingFailed, err);
-            }
-            break;
-
-        case State::kNetworkProvisioning:
-            if (CHIP_NO_ERROR == err)
-            {
-                mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess, err);
-            }
-            else
-            {
-                mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed, err);
             }
             break;
 

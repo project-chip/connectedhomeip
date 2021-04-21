@@ -28,9 +28,6 @@
 #include <transport/TransportMgr.h>
 
 namespace chip {
-namespace Transport {
-class BLE;
-}
 
 class SessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
@@ -39,10 +36,9 @@ public:
 
     virtual ~SessionEstablishmentExchangeDispatch() {}
 
-    CHIP_ERROR Init(Transport::BLE * transport, TransportMgrBase * transportMgr)
+    CHIP_ERROR Init(TransportMgrBase * transportMgr)
     {
-        ReturnErrorCodeIf(transport == nullptr && transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mBLETransport = transport;
+        ReturnErrorCodeIf(transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mTransportMgr = transportMgr;
         return CHIP_NO_ERROR;
     }
@@ -69,7 +65,6 @@ protected:
     }
 
 private:
-    Transport::BLE * mBLETransport   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
     Transport::PeerAddress mPeerAddress;
 };

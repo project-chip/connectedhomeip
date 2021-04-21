@@ -153,6 +153,11 @@ class ChipDeviceController(object):
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         )
 
+    def CloseBLEConnection(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceCommissioner_CloseBleConnection(self.devCtrl)
+        )
+
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
@@ -301,5 +306,9 @@ class ChipDeviceController(object):
                 c_void_p, c_uint64, POINTER(c_void_p)]
             self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
 
+            self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.restype = c_uint32
+
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
+

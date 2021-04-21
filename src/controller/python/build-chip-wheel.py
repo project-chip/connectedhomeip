@@ -136,6 +136,7 @@ try:
             'chip.interaction_model',
             'chip.logging',
             'chip.native',
+            'chip.clusters',
             'chip.tlv',
             'chip.setup_payload',
     ]

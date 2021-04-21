@@ -23,13 +23,21 @@
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
+constexpr size_t kMaxBlePendingPackets = 1;
+
+using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP, chip::Transport::UDP>;
-#else
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
+                                            ,
+                                            chip::Transport::UDP
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                            ,
+                                            chip::Transport::BLE<kMaxBlePendingPackets>
+#endif
+                                            >;
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server

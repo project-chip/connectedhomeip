@@ -77,7 +77,6 @@ public:
     {
         kInit = 0,
         kSecurePairing,
-        kNetworkProvisioning,
         kRendezvousComplete,
     };
 
