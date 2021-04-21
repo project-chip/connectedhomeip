@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <gen/af-structs.h>
 #include <inttypes.h>
 #include <lib/support/Span.h>
 
@@ -40,3 +41,5 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint1
 
 // Cluster Specific Response Callbacks
 typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
+
+// List specific responses

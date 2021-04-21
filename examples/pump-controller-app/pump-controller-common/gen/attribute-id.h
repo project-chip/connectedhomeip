@@ -393,6 +393,20 @@
 #define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
 #define ZCL_LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID (0x0010)
 
+// Attribute ids for cluster: OTA Software Update Server
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: OTA Software Update Client
+
+// Client attributes
+#define ZCL_DEFAULT_OTA_SERVER_ATTRIBUTE_ID (0x0000)
+#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0001)
+
+// Server attributes
+
 // Attribute ids for cluster: General Commissioning
 
 // Client attributes
@@ -406,6 +420,13 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Operational Credentials
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Shade Configuration
 
@@ -1108,6 +1129,30 @@
 // Server attributes
 #define ZCL_MAX_DURATION_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Wake on LAN
+
+// Client attributes
+
+// Server attributes
+#define ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: TV Channel
+
+// Client attributes
+
+// Server attributes
+#define ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_TV_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
+#define ZCL_TV_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: Target Navigator
+
+// Client attributes
+
+// Server attributes
+#define ZCL_TARGET_NAVIGATOR_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_TARGET_NAVIGATOR_CURRENT_TARGET_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Media Playback
 
 // Client attributes
@@ -1115,7 +1160,21 @@
 // Server attributes
 #define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: Media Input
+
+// Client attributes
+
+// Server attributes
+#define ZCL_MEDIA_INPUT_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_MEDIA_INPUT_CURRENT_INPUT_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Low Power
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Keypad Input
 
 // Client attributes
 
@@ -1126,6 +1185,22 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Audio Output
+
+// Client attributes
+
+// Server attributes
+#define ZCL_AUDIO_OUTPUT_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_AUDIO_OUTPUT_CURRENT_OUTPUT_ATTRIBUTE_ID (0x0001)
+
+// Attribute ids for cluster: Application Launcher
+
+// Client attributes
+
+// Server attributes
+#define ZCL_APPLICATION_LAUNCHER_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_APPLICATION_LAUNCHER_CURRENT_APP_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Application Basic
 
@@ -1139,6 +1214,12 @@
 #define ZCL_APPLICATION_ID_ATTRIBUTE_ID (0x0005)
 #define ZCL_CATALOG_VENDOR_ID_ATTRIBUTE_ID (0x0006)
 #define ZCL_APPLICATION_STATUS_ATTRIBUTE_ID (0x0007)
+
+// Attribute ids for cluster: Account Login
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Generic Tunnel
 

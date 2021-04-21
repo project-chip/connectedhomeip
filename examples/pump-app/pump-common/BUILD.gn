@@ -14,39 +14,15 @@
 
 import("//build_overrides/chip.gni")
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-    "${chip_root}/src",
-  ]
-}
+import("${chip_root}/src/app/chip_data_model.gni")
 
-source_set("pump-common") {
-  sources = [
-    "${chip_root}/src/app/clusters/bindings/bindings.cpp",
-    "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
-    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
-    "${chip_root}/src/app/reporting/reporting.cpp",
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
-    "${chip_root}/src/app/util/af-event.cpp",
-    "${chip_root}/src/app/util/af-main-common.cpp",
-    "${chip_root}/src/app/util/attribute-size.cpp",
-    "${chip_root}/src/app/util/attribute-storage.cpp",
-    "${chip_root}/src/app/util/attribute-table.cpp",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/chip-message-send.cpp",
-    "${chip_root}/src/app/util/client-api.cpp",
-    "${chip_root}/src/app/util/ember-print.cpp",
-    "${chip_root}/src/app/util/message.cpp",
-    "${chip_root}/src/app/util/process-cluster-message.cpp",
-    "${chip_root}/src/app/util/process-global-message.cpp",
-    "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.cpp",
-    "gen/callback-stub.cpp",
+chip_data_model("pump-common") {
+  cluster_sources = [
+    "basic",
+    "bindings",
+    "network-commissioning",
+    "on-off-server",
   ]
 
-  deps = [ "${chip_root}/src/lib" ]
-
-  public_configs = [ ":includes" ]
+  zap_pregenerated_dir = "gen"
 }
