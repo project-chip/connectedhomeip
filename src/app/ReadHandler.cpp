@@ -39,6 +39,7 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     mpDelegate        = apDelegate;
     mSuppressResponse = true;
     mGetToAllEvents   = true;
+    mpClusterInfoList = nullptr;
     MoveToState(HandlerState::Initialized);
 
 exit:
@@ -48,6 +49,8 @@ exit:
 
 void ReadHandler::Shutdown()
 {
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpClusterInfoList);
+    mpClusterInfoList = nullptr;
     ClearExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
     mpDelegate = nullptr;
@@ -92,6 +95,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 exit:
+    ChipLogFunctError(err);
+    Shutdown();
     return err;
 }
 
@@ -102,6 +107,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
 
     ReadRequest::Parser readRequestParser;
     EventPathList::Parser eventPathListParser;
+    AttributePathList::Parser attributePathListParser;
     TLV::TLVReader eventPathListReader;
 
     reader.Init(std::move(aPayload));
@@ -116,6 +122,18 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     err = readRequestParser.CheckSchemaValidity();
     SuccessOrExit(err);
 #endif
+
+    err = readRequestParser.GetAttributePathList(&attributePathListParser);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else
+    {
+        SuccessOrExit(err);
+        ProcessAttributePathList(attributePathListParser);
+    }
+
     err = readRequestParser.GetEventPathList(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -147,6 +165,55 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     MoveToState(HandlerState::Reportable);
 
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    ClusterInfo * LastClusterInfo = nullptr;
+    TLV::TLVReader reader;
+    aAttributePathListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        ClusterInfo * clusterInfo = nullptr;
+        AttributePathParams attributePathParams;
+        AttributePath::Parser path;
+        err = path.Init(reader);
+        SuccessOrExit(err);
+        err = path.GetNodeId(&(attributePathParams.mNodeId));
+        SuccessOrExit(err);
+        err = path.GetEndpointId(&(attributePathParams.mEndpointId));
+        SuccessOrExit(err);
+        err = path.GetClusterId(&(attributePathParams.mClusterId));
+        SuccessOrExit(err);
+        err = path.GetFieldId(&(attributePathParams.mFieldId));
+        SuccessOrExit(err);
+        err = InteractionModelEngine::GetInstance()->PushFront(clusterInfo, attributePathParams);
+        SuccessOrExit(err);
+        clusterInfo->SetDirty();
+        if (mpClusterInfoList == nullptr)
+        {
+            mpClusterInfoList = clusterInfo;
+        }
+        else
+        {
+            VerifyOrExit(LastClusterInfo != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+            LastClusterInfo->mpNext = clusterInfo;
+        }
+        LastClusterInfo = clusterInfo;
+    }
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
 
 exit:
     ChipLogFunctError(err);
