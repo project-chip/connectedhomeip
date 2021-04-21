@@ -151,11 +151,13 @@
 #endif /* CHIP_SYSTEM_CONFIG_ERROR_TYPE */
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+#ifdef TARGET_MCU_STM32L4
 // [ MBED HACK ] 
 // We have to undefine |SUCCESS| here to prevent compilation error due to 
 // conflict with |ErrorStatus| enum type values defined in CMSIS/stm32l4xx.h.
 // This problem is only related for when tests are build and nlunit-test.h is used. 
 #undef SUCCESS
+#endif
 #include <lwip/opt.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
