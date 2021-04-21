@@ -104,13 +104,13 @@ public:
     ClusterInfo * GetClusterInfoList() { return mpClusterInfoList; };
     size_t GetNumClusterInfos() { return mNumClusterInfos; }
     size_t GetProcessingClusterIndex() { return mCurProcessingClusterInfoIdx; };
-    void BumpProcessingClusterIndex() { mCurProcessingClusterInfoIdx ++; };
+    void BumpProcessingClusterIndex() { mCurProcessingClusterInfoIdx++; };
     void ShrinkClusterInfo(size_t numClusterInfos) { mpClusterInfoList -= numClusterInfos; }
     void ClearClusterInfo()
     {
-        mpClusterInfoList = nullptr;
+        mpClusterInfoList            = nullptr;
         mCurProcessingClusterInfoIdx = 0;
-        mNumClusterInfos = 0;
+        mNumClusterInfos             = 0;
     }
 
 private:

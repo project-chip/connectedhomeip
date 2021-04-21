@@ -100,9 +100,9 @@ exit:
 }
 
 CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
-                           TLV::TLVWriter & aWriter)
+                                 TLV::TLVWriter & aWriter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint8_t effectIdentifier = 1; // Dying light
     uint8_t effectVariant    = 1;
 

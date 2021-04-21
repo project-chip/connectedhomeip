@@ -129,7 +129,8 @@ exit:
 CHIP_ERROR SendReadRequest(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndPointId, kTestClusterId, 1, 0, chip::app::AttributePathFlags::kFieldIdValid);
+    chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndPointId, kTestClusterId, 1, 0,
+                                                       chip::app::AttributePathFlags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -265,7 +266,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 }
 
 CHIP_ERROR WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
-                            TLV::TLVReader & aReader)
+                                  TLV::TLVReader & aReader)
 {
     if (aClusterId != kTestClusterId || aEndPointId != kTestEndPointId)
     {

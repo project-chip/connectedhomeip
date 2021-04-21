@@ -48,14 +48,14 @@ static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
 static const Transport::AdminId gAdminId = 0;
-constexpr ClusterId kTestClusterId   = 6;
-constexpr EndpointId kTestEndPointId = 1;
+constexpr ClusterId kTestClusterId       = 6;
+constexpr EndpointId kTestEndPointId     = 1;
 
 namespace app {
 CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
                                  TLV::TLVWriter & aWriter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint8_t effectIdentifier = 1;
     uint8_t effectVariant    = 1;
 
@@ -117,7 +117,8 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder = attributePathBuilder.NodeId(1).EndpointId(kTestEndPointId).ClusterId(kTestClusterId).FieldId(0).EndOfAttributePath();
+    attributePathBuilder =
+        attributePathBuilder.NodeId(1).EndpointId(kTestEndPointId).ClusterId(kTestClusterId).FieldId(0).EndOfAttributePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathListBuilder.EndOfAttributePathList();
     readRequestBuilder.EventNumber(1);

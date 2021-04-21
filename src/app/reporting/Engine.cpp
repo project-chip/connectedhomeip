@@ -40,43 +40,50 @@ CHIP_ERROR Engine::Init()
 CHIP_ERROR
 Engine::RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType type = TLV::kTLVType_NotSpecified;
+    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    TLV::TLVType type                           = TLV::kTLVType_NotSpecified;
     AttributePath::Builder attributePathBuilder = aAttributeDataElementBuilder.CreateAttributePathBuilder();
-    attributePathBuilder.NodeId(aClusterInfo.mAttributePathParams.mNodeId).EndpointId(aClusterInfo.mAttributePathParams.mEndpointId).ClusterId(aClusterInfo.mAttributePathParams.mClusterId).FieldId(aClusterInfo.mAttributePathParams.mFieldId).EndOfAttributePath();
+    attributePathBuilder.NodeId(aClusterInfo.mAttributePathParams.mNodeId)
+        .EndpointId(aClusterInfo.mAttributePathParams.mEndpointId)
+        .ClusterId(aClusterInfo.mAttributePathParams.mClusterId)
+        .FieldId(aClusterInfo.mAttributePathParams.mFieldId)
+        .EndOfAttributePath();
     err = attributePathBuilder.GetError();
     SuccessOrExit(err);
 
-    aAttributeDataElementBuilder.GetWriter()->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data), TLV::kTLVType_Structure, type);
-    err = ReadSingleClusterData(aClusterInfo.mAttributePathParams.mNodeId, aClusterInfo.mAttributePathParams.mClusterId, aClusterInfo.mAttributePathParams.mEndpointId, aClusterInfo.mAttributePathParams.mFieldId, *(aAttributeDataElementBuilder.GetWriter()));
+    aAttributeDataElementBuilder.GetWriter()->StartContainer(TLV::ContextTag(AttributeDataElement::kCsTag_Data),
+                                                             TLV::kTLVType_Structure, type);
+    err = ReadSingleClusterData(aClusterInfo.mAttributePathParams.mNodeId, aClusterInfo.mAttributePathParams.mClusterId,
+                                aClusterInfo.mAttributePathParams.mEndpointId, aClusterInfo.mAttributePathParams.mFieldId,
+                                *(aAttributeDataElementBuilder.GetWriter()));
     SuccessOrExit(err);
     aAttributeDataElementBuilder.GetWriter()->EndContainer(type);
     aAttributeDataElementBuilder.DataVersion(0).MoreClusterData(false).EndOfAttributeDataElement();
     err = aAttributeDataElementBuilder.GetError();
-    //TODO:; Add DataVersion support
+    // TODO:; Add DataVersion support
 
 exit:
     aClusterInfo.ClearDirty();
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %d", aClusterInfo.mAttributePathParams.mClusterId, err);
+        ChipLogError(DataManagement, "Error retrieving data from clusterId: %08x, err = %d",
+                     aClusterInfo.mAttributePathParams.mClusterId, err);
     }
 
     return err;
 }
 
-CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder,
-                                                                   ReadHandler * apReadHandler)
+CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler)
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
     AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
     SuccessOrExit(reportDataBuilder.GetError());
-    //TODO: Need to handle multiple chunk of message
+    // TODO: Need to handle multiple chunk of message
     while (apReadHandler->GetProcessingClusterIndex() < apReadHandler->GetNumClusterInfos())
     {
         ClusterInfo * clusterInfo = nullptr;
-        err = apReadHandler->GetProcessingClusterInfo(clusterInfo);
+        err                       = apReadHandler->GetProcessingClusterInfo(clusterInfo);
         SuccessOrExit(err);
         if (clusterInfo->IsDirty())
         {

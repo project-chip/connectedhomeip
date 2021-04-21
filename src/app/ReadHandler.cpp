@@ -184,10 +184,10 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         {
             AttributePathParams attributePathParams;
             AttributePath::Parser path;
-            NodeId nodeId = 0;
-            EndpointId endpointId = 0;
-            ClusterId clusterId = 0;
-            FieldId fieldId = 0;
+            NodeId nodeId             = 0;
+            EndpointId endpointId     = 0;
+            ClusterId clusterId       = 0;
+            FieldId fieldId           = 0;
             ClusterInfo * clusterInfo = nullptr;
             err                       = path.Init(reader);
             SuccessOrExit(err);
@@ -199,10 +199,10 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
             SuccessOrExit(err);
             err = path.GetFieldId(&fieldId);
             SuccessOrExit(err);
-            attributePathParams.mNodeId = nodeId;
+            attributePathParams.mNodeId     = nodeId;
             attributePathParams.mEndpointId = endpointId;
-            attributePathParams.mClusterId = clusterId;
-            attributePathParams.mFieldId = fieldId;
+            attributePathParams.mClusterId  = clusterId;
+            attributePathParams.mFieldId    = fieldId;
 
             for (size_t i = 0; i < mNumClusterInfos; ++i)
             {

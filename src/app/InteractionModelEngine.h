@@ -37,6 +37,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
+#include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
@@ -44,7 +45,6 @@
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
-#include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
 
 #define CHIP_MAX_NUM_COMMAND_HANDLER 1
@@ -133,6 +133,7 @@ public:
     void ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler);
 
     CHIP_ERROR GetFirstAvailableClusterInfo(ClusterInfo *& apClusterInfo);
+
 private:
     friend class reporting::Engine;
     void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -157,7 +158,7 @@ private:
     ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
     reporting::Engine mReportingEngine;
-    size_t mNumClusterInfos                         = 0;
+    size_t mNumClusterInfos = 0;
     ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
 };
 

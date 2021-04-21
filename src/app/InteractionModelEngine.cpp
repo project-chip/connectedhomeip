@@ -227,7 +227,6 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-
 void InteractionModelEngine::ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler)
 {
     ClusterInfo * const clusterInfoList = apReadHandler->GetClusterInfoList();
@@ -295,26 +294,24 @@ DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aComman
 }
 
 CHIP_ERROR __attribute__((weak))
-ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
-                           TLV::TLVWriter & aWriter)
+ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId, TLV::TLVWriter & aWriter)
 {
-    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8" FieldId=%" PRIx8, aClusterId,
-            aNodeId, aEndPointId, aFieldId);
-    ChipLogError(
-            DataManagement,
-            "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8,
+                  aClusterId, aNodeId, aEndPointId, aFieldId);
+    ChipLogError(DataManagement,
+                 "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR __attribute__((weak))
-WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
-                           TLV::TLVReader & aReader)
+WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId, TLV::TLVReader & aReader)
 {
-    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8" FieldId=%" PRIx8, aClusterId,
-            aNodeId, aEndPointId, aFieldId);
-    ChipLogError(
-            DataManagement,
-            "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8,
+                  aClusterId, aNodeId, aEndPointId, aFieldId);
+    ChipLogError(DataManagement,
+                 "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;
 }
 
@@ -330,7 +327,7 @@ CHIP_ERROR InteractionModelEngine::GetFirstAvailableClusterInfo(ClusterInfo *& a
         return CHIP_ERROR_NO_MEMORY;
     }
     apClusterInfo = &mClusterInfoPool[mNumClusterInfos];
-    mNumClusterInfos ++;
+    mNumClusterInfos++;
     apClusterInfo->ClearDirty();
     return CHIP_NO_ERROR;
 }

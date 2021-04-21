@@ -78,7 +78,8 @@ void ReadClient::MoveToState(const ClientState aTargetState)
 }
 
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                                       size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize)
+                                       size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                                       size_t aAttributePathParamsListSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
@@ -112,7 +113,9 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
             for (size_t index = 0; index < aAttributePathParamsListSize; index++)
             {
                 AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
-                attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId).EndpointId(apAttributePathParamsList[index].mEndpointId).ClusterId(apAttributePathParamsList[index].mClusterId);
+                attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
+                    .EndpointId(apAttributePathParamsList[index].mEndpointId)
+                    .ClusterId(apAttributePathParamsList[index].mClusterId);
                 if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdValid)
                 {
                     attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
@@ -196,10 +199,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportData::Parser report;
 
-    bool isEventListPresent  = false;
-    bool isAttributeDataListPresent  = false;
-    bool suppressResponse    = false;
-    bool moreChunkedMessages = false;
+    bool isEventListPresent         = false;
+    bool isAttributeDataListPresent = false;
+    bool suppressResponse           = false;
+    bool moreChunkedMessages        = false;
 
     System::PacketBufferTLVReader reader;
 
@@ -306,15 +309,15 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
     CHIP_ERROR err = CHIP_NO_ERROR;
     while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))
     {
-        NodeId nodeId = 0;
+        NodeId nodeId         = 0;
         EndpointId endpointId = 0;
-        ClusterId clusterId = 0;
-        FieldId fieldId = 0;
+        ClusterId clusterId   = 0;
+        FieldId fieldId       = 0;
         chip::TLV::TLVReader dataReader;
         AttributeDataElement::Parser element;
         AttributePath::Parser attributePathParser;
-        TLV::TLVReader reader      = aAttributeDataListReader;
-        err = element.Init(reader);
+        TLV::TLVReader reader = aAttributeDataListReader;
+        err                   = element.Init(reader);
         SuccessOrExit(err);
 
         err = element.GetAttributePath(&attributePathParser);
