@@ -23,7 +23,7 @@ chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
   test_sources = [
-#    "TestCASESession.cpp",
+    #    "TestCASESession.cpp",
     "TestPeerConnections.cpp",
     "TestSecureSession.cpp",
     "TestSecureSessionMgr.cpp",

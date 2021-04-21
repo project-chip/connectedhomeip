@@ -66,6 +66,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   group("default") {
     deps = [
       "${chip_root}/src/app",
+      "${chip_root}/src/attestation",
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
@@ -81,7 +82,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/setup_payload",
       "${chip_root}/src/system",
       "${chip_root}/src/transport",
-      "${chip_root}/src/attestation",
       "${mbedtls_root}:mbedtls",
       "${nlassert_root}:nlassert",
       "${nlio_root}:nlio",

@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import("//build_overrides/build.gni")
-import("//build_overrides/chip.gni")
 import("//build_overrides/certifier.gni")
+import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
@@ -59,12 +59,12 @@ executable("chip-tool") {
 
   deps = [
     ":data_model",
+    ":libcertifier_cert_copy",
+    ":libcertifier_cfg_copy",
     "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
-    ":libcertifier_cfg_copy",
-    ":libcertifier_cert_copy",
   ]
 
   cflags = [ "-Wconversion" ]

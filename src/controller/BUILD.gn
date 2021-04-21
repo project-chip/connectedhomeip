@@ -35,6 +35,7 @@ static_library("controller") {
 
   public_deps = [
     "${chip_root}/src/app",
+    "${chip_root}/src/attestation",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
@@ -43,7 +44,6 @@ static_library("controller") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
-    "${chip_root}/src/attestation",
   ]
 
   defines = []
