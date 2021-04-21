@@ -53,6 +53,13 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     mReportingEngine.Init();
     SuccessOrExit(err);
 
+    for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
+    {
+        mClusterInfoPool[index].mpNext = &mClusterInfoPool[index + 1];
+    }
+    mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
+    mpNextAvailableClusterInfo                                  = mClusterInfoPool;
+
 exit:
     return err;
 }
@@ -78,6 +85,13 @@ void InteractionModelEngine::Shutdown()
     {
         readHandler.Shutdown();
     }
+
+    for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
+    {
+        mClusterInfoPool[index].mpNext = nullptr;
+        mClusterInfoPool[index].ClearDirty();
+    }
+    mpNextAvailableClusterInfo = nullptr;
 }
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCommandSender)
@@ -240,9 +254,65 @@ DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aComman
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
+CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
+{
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8
+                  " ListIndex=%" PRIx8,
+                  aAttributePathParams.mClusterId, aAttributePathParams.mNodeId, aAttributePathParams.mEndpointId,
+                  aAttributePathParams.mFieldId, aAttributePathParams.mListIndex);
+    ChipLogError(DataManagement,
+                 "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR __attribute__((weak)) WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader)
+{
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8,
+                  " ListIndex=%" PRIx8, aAttributePathParams.mClusterId, aAttributePathParams.mNodeId,
+                  aAttributePathParams.mEndpointId, aAttributePathParams.mFieldId, aAttributePathParams.mListIndex);
+    ChipLogError(DataManagement,
+                 "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    return CHIP_NO_ERROR;
+}
+
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
 {
     return static_cast<uint16_t>(apReadClient - mReadClients);
 }
+
+void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo * apClusterInfo)
+{
+    ClusterInfo * lastClusterInfo = apClusterInfo;
+    if (lastClusterInfo == nullptr)
+    {
+        return;
+    }
+
+    while (lastClusterInfo != nullptr && lastClusterInfo->mpNext != nullptr)
+    {
+        lastClusterInfo->ClearDirty();
+        lastClusterInfo = lastClusterInfo->mpNext;
+    }
+    lastClusterInfo->ClearDirty();
+    lastClusterInfo->mpNext   = mpNextAvailableClusterInfo;
+    mpNextAvailableClusterInfo = apClusterInfo;
+}
+
+CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfo, AttributePathParams & aAttributePathParams)
+{
+    ClusterInfo * last = aClusterInfo;
+    if (mpNextAvailableClusterInfo == nullptr)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    aClusterInfo                       = mpNextAvailableClusterInfo;
+    mpNextAvailableClusterInfo          = mpNextAvailableClusterInfo->mpNext;
+    aClusterInfo->mpNext               = last;
+    aClusterInfo->mAttributePathParams = aAttributePathParams;
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip
