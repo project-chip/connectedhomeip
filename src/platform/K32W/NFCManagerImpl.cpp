@@ -19,10 +19,10 @@
 
 #include <platform/NFCManager.h>
 
+#include <support/CHIPPlatformMemory.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-#include <support/CHIPPlatformMemory.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,37 +36,37 @@ CHIP_ERROR NFCManagerImpl::_Init()
 
 CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t payloadLength)
 {
-	ntagDriverHandleInstance = NTAG_InitDevice((NTAG_ID_T)0, I2C2);
-	assert(ntagDriverHandleInstance);
+    ntagDriverHandleInstance = NTAG_InitDevice((NTAG_ID_T) 0, I2C2);
+    assert(ntagDriverHandleInstance);
 
-    CLOCK_EnableClock(kCLOCK_I2c0) ;
+    CLOCK_EnableClock(kCLOCK_I2c0);
     CLOCK_AttachClk(kOSC32M_to_I2C_CLK);
     HAL_I2C_InitDevice(HAL_I2C_INIT_DEFAULT, kCLOCK_Fro32M, I2C2);
 
-	/* populate the NDEF structure */
-	sInstance.ndefUriRecord.recordType    = NDEF_RECORD_TYPE;
-	sInstance.ndefUriRecord.recordTypeLen = NDEF_RECORD_TYPE_LEN;
-	sInstance.ndefUriRecord.payloadLen    = payloadLength + sizeof(sInstance.ndefUriRecord.uriIdCode);
-	sInstance.ndefUriRecord.recordName    = NFC_NDEF_RECORD_NAME;
-	sInstance.ndefUriRecord.uriIdCode     = NDEF_URI_ID_CODE;
+    /* populate the NDEF structure */
+    sInstance.ndefUriRecord.recordType    = NDEF_RECORD_TYPE;
+    sInstance.ndefUriRecord.recordTypeLen = NDEF_RECORD_TYPE_LEN;
+    sInstance.ndefUriRecord.payloadLen    = payloadLength + sizeof(sInstance.ndefUriRecord.uriIdCode);
+    sInstance.ndefUriRecord.recordName    = NFC_NDEF_RECORD_NAME;
+    sInstance.ndefUriRecord.uriIdCode     = NDEF_URI_ID_CODE;
 
-	if (payloadLength > NDEF_URI_ID_MAX_LENGTH)
-	{
-		return CHIP_ERROR_BUFFER_TOO_SMALL;
-	}
-	else
-	{
-		memcpy(sInstance.ndefUriRecord.uriIdData, payload, payloadLength);
-	}
-
-	/* write the NDEF structure to the NTAG EEPROM */
-    if (AppNtagInitEepromSmartPoster() != E_APP_NTAG_NO_ERROR)
+    if (payloadLength > NDEF_URI_ID_MAX_LENGTH)
     {
-	    return CHIP_ERROR_INTERNAL;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
     else
     {
-	    sInstance.mIsStarted = TRUE;
+        memcpy(sInstance.ndefUriRecord.uriIdData, payload, payloadLength);
+    }
+
+    /* write the NDEF structure to the NTAG EEPROM */
+    if (AppNtagInitEepromSmartPoster() != E_APP_NTAG_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+    else
+    {
+        sInstance.mIsStarted = TRUE;
     }
 
     return CHIP_NO_ERROR;
@@ -74,30 +74,30 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
 
 CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
 {
-	uint8_t ndefUriRecordSize = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
+    uint8_t ndefUriRecordSize = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
 
-	memset(&sInstance.ndefUriRecord, 0, ndefUriRecordSize);
+    memset(&sInstance.ndefUriRecord, 0, ndefUriRecordSize);
 
-	if (AppNtagEepromUnlockThenWrite(ndefUriRecordSize) != E_APP_NTAG_NO_ERROR)
-	{
-		return CHIP_ERROR_INTERNAL;
-	}
+    if (AppNtagEepromUnlockThenWrite(ndefUriRecordSize) != E_APP_NTAG_NO_ERROR)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
     /* Stop I2C */
     HAL_I2C_CloseDevice(I2C2);
-	NTAG_CloseDevice(sInstance.ntagDriverHandleInstance);
-	sInstance.ntagDriverHandleInstance = NULL;
+    NTAG_CloseDevice(sInstance.ntagDriverHandleInstance);
+    sInstance.ntagDriverHandleInstance = NULL;
 
-	sInstance.mIsStarted = FALSE;
-	return CHIP_NO_ERROR;
+    sInstance.mIsStarted = FALSE;
+    return CHIP_NO_ERROR;
 }
 
 NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagInitEepromSmartPoster(void)
 {
     eAppNtagError ntagErr = E_APP_NTAG_NO_ERROR;
-    uint8_t byte0 = 0;
-    uint8_t i = 0;
-    bool_t i2cAddrFound = FALSE;
+    uint8_t byte0         = 0;
+    uint8_t i             = 0;
+    bool_t i2cAddrFound   = FALSE;
 
     do
     {
@@ -145,51 +145,48 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagInitEepromSmartPoster(void)
 
 bool NFCManagerImpl::AppNtagEepromWrite(uint8_t originalSize)
 {
-	 bool wasWritten = FALSE;
-	 uint32_t ndefSize = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
-	 uint32_t addrToWrite = NTAG_I2C_BLOCK_SIZE;
-	 uint8_t buf[4];
-	 uint8_t terminatorTLV = 0xFE;
+    bool wasWritten      = FALSE;
+    uint32_t ndefSize    = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
+    uint32_t addrToWrite = NTAG_I2C_BLOCK_SIZE;
+    uint8_t buf[4];
+    uint8_t terminatorTLV = 0xFE;
 
-	 do
-	 {
-		 if (!sInstance.ndefUriRecord.payloadLen)
-		 {
-			 if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite,
-					             (uint8_t *)&(sInstance.ndefUriRecord),
-					             originalSize + sizeof(terminatorTLV)))
-             {
-				 break;
-			 }
-		 }
-		 else
-		 {
-			 buf[0] = 0x3;
-			 buf[1] = ndefSize;
-			 if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite, buf, 2))
-			 {
-				 break;
-			 }
+    do
+    {
+        if (!sInstance.ndefUriRecord.payloadLen)
+        {
+            if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite, (uint8_t *) &(sInstance.ndefUriRecord),
+                                originalSize + sizeof(terminatorTLV)))
+            {
+                break;
+            }
+        }
+        else
+        {
+            buf[0] = 0x3;
+            buf[1] = ndefSize;
+            if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite, buf, 2))
+            {
+                break;
+            }
 
-			 addrToWrite += 2;
+            addrToWrite += 2;
 
-			 if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite,
-					            (uint8_t *)&(sInstance.ndefUriRecord), ndefSize))
-			 {
-				 break;
-			 }
+            if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite, (uint8_t *) &(sInstance.ndefUriRecord), ndefSize))
+            {
+                break;
+            }
 
-			 addrToWrite += ndefSize;
+            addrToWrite += ndefSize;
 
-			 if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite,
-					             &terminatorTLV, 1))
-			 {
-				 break;
-			 }
-	     }
+            if (NTAG_WriteBytes(sInstance.ntagDriverHandleInstance, addrToWrite, &terminatorTLV, 1))
+            {
+                break;
+            }
+        }
 
-		wasWritten = TRUE;
-	} while (0);
+        wasWritten = TRUE;
+    } while (0);
 
     return wasWritten;
 }
@@ -216,18 +213,16 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagEepromUnlockThenWrite(uint8
 
         /* Lock write access */
         ntagErr = AppNtagLockWriteAccess();
-    } while(0);
+    } while (0);
 
     return ntagErr;
 }
 
 uint8_t NFCManagerImpl::AppNdefUriRecordGetSize(NdefUriRecord_t ndefUriRecord)
 {
-    return sizeof(sInstance.ndefUriRecord.recordType) +
-    	   sizeof(sInstance.ndefUriRecord.recordTypeLen) +
-		   sizeof(sInstance.ndefUriRecord.payloadLen) +
-    	   sInstance.ndefUriRecord.payloadLen +
-		   sizeof(sInstance.ndefUriRecord.recordName);
+    return sizeof(sInstance.ndefUriRecord.recordType) + sizeof(sInstance.ndefUriRecord.recordTypeLen) +
+        sizeof(sInstance.ndefUriRecord.payloadLen) + sInstance.ndefUriRecord.payloadLen +
+        sizeof(sInstance.ndefUriRecord.recordName);
 }
 
 NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagLockWriteAccess(void)

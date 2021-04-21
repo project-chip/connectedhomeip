@@ -520,7 +520,8 @@ void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
             K32W_LOG("Stopped NFC Tag Emulation!");
         }
     }
-    else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+    else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange &&
+             event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
     {
         if (NFCMgr().IsTagEmulationStarted())
         {

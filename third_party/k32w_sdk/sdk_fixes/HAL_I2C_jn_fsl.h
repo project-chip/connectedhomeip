@@ -29,11 +29,11 @@
 extern "C" {
 #endif
 
-int16_t I2C_InitDevice(uint32_t bitrate, clock_name_t input_clock, I2C_Type *instance);
-int16_t I2C_CloseDevice(I2C_Type *instance);
+int16_t I2C_InitDevice(uint32_t bitrate, clock_name_t input_clock, I2C_Type * instance);
+int16_t I2C_CloseDevice(I2C_Type * instance);
 
-int16_t ReceivePoll(I2C_Type *instance, uint8_t address, uint8_t *bytes, size_t len);
-int16_t TransmitPoll(I2C_Type *instance, uint8_t address, uint8_t *bytes, size_t len);
+int16_t ReceivePoll(I2C_Type * instance, uint8_t address, uint8_t * bytes, size_t len);
+int16_t TransmitPoll(I2C_Type * instance, uint8_t address, uint8_t * bytes, size_t len);
 
 #ifdef __cplusplus
 }

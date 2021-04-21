@@ -15,9 +15,9 @@
 /***********************************************************************/
 /* INCLUDES                                                            */
 /***********************************************************************/
+#include "HAL_I2C_driver.h"
 #include "global_types.h"
 #include "ntag_defines.h"
-#include "HAL_I2C_driver.h"
 
 /***********************************************************************/
 /* DEFINES                                                             */
@@ -33,13 +33,13 @@
 #define NTAG_INVALID_HANDLE NULL
 
 #ifndef API_DESCRIPTION
-#define NTAG_DEVICE_LIST_BEGIN \
-    typedef enum               \
+#define NTAG_DEVICE_LIST_BEGIN                                                                                                     \
+    typedef enum                                                                                                                   \
     {
 #define NTAG_DEVICE_ENTRY(label, i2c_address, isr) label
-#define NTAG_DEVICE_LIST_END \
-    , NTAG_ID_MAX_DEVICES    \
-    }                        \
+#define NTAG_DEVICE_LIST_END                                                                                                       \
+    , NTAG_ID_MAX_DEVICES                                                                                                          \
+    }                                                                                                                              \
     NTAG_ID_T;
 #endif /* hide from doxygen */
 
@@ -52,7 +52,7 @@ NTAG_DEVICE_LIST_BEGIN
 NTAG_DEVICE_LIST_END
 #endif /* hide from doxygen */
 
-typedef struct NTAG_DEVICE *NTAG_HANDLE_T;
+typedef struct NTAG_DEVICE * NTAG_HANDLE_T;
 
 typedef enum
 {
@@ -148,7 +148,7 @@ void NTAG_CloseDevice(NTAG_HANDLE_T ntag);
  *
  * \return			TRUE on failure
  */
-BOOL NTAG_ReadBytes(NTAG_HANDLE_T ntag, uint16_t address, uint8_t *bytes, uint16_t len);
+BOOL NTAG_ReadBytes(NTAG_HANDLE_T ntag, uint16_t address, uint8_t * bytes, uint16_t len);
 
 /**
  * \brief write len number of bytes to the selected NTAG device
@@ -164,7 +164,7 @@ BOOL NTAG_ReadBytes(NTAG_HANDLE_T ntag, uint16_t address, uint8_t *bytes, uint16
  *
  * \return			TRUE on failure
  */
-BOOL NTAG_WriteBytes(NTAG_HANDLE_T ntag, uint16_t address, const uint8_t *bytes, uint16_t len);
+BOOL NTAG_WriteBytes(NTAG_HANDLE_T ntag, uint16_t address, const uint8_t * bytes, uint16_t len);
 
 /**
  * \brief read a register from the selected NTAG device
@@ -178,7 +178,7 @@ BOOL NTAG_WriteBytes(NTAG_HANDLE_T ntag, uint16_t address, const uint8_t *bytes,
  *
  * \return			TRUE on failure
  */
-BOOL NTAG_ReadRegister(NTAG_HANDLE_T ntag, uint8_t reg, uint8_t *val);
+BOOL NTAG_ReadRegister(NTAG_HANDLE_T ntag, uint8_t reg, uint8_t * val);
 
 /**
  * \brief write a register of the selected NTAG device
@@ -207,7 +207,7 @@ BOOL NTAG_WriteRegister(NTAG_HANDLE_T ntag, uint8_t reg, uint8_t mask, uint8_t v
  *
  * \return			TRUE on failure
  */
-BOOL NTAG_ReadConfiguration(NTAG_HANDLE_T ntag, uint8_t reg, uint8_t *val);
+BOOL NTAG_ReadConfiguration(NTAG_HANDLE_T ntag, uint8_t reg, uint8_t * val);
 
 /**
  * \brief write the configuration of the selected NTAG device

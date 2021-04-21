@@ -31,13 +31,13 @@ namespace chip {
 namespace DeviceLayer {
 
 namespace {
-        #define NDEF_RECORD_TYPE              0xD1 /* MB=1, ME=1, TNF=1 */
-        #define NDEF_RECORD_TYPE_LEN          0x01
-        #define NFC_NDEF_RECORD_NAME          'U'
-        #define NDEF_URI_ID_CODE              0x00 /* No URI abbreviation */
-	    #define NDEF_URI_ID_MAX_LENGTH        40
-        #define TERMINATOR_TLV_LEN			  1
-}
+#define NDEF_RECORD_TYPE 0xD1 /* MB=1, ME=1, TNF=1 */
+#define NDEF_RECORD_TYPE_LEN 0x01
+#define NFC_NDEF_RECORD_NAME 'U'
+#define NDEF_URI_ID_CODE 0x00 /* No URI abbreviation */
+#define NDEF_URI_ID_MAX_LENGTH 40
+#define TERMINATOR_TLV_LEN 1
+} // namespace
 
 class NFCManagerImpl final : public NFCManager
 {
@@ -79,14 +79,15 @@ private:
         uint8_t recordName;
         uint8_t uriIdCode;
         uint8_t uriIdData[NDEF_URI_ID_MAX_LENGTH + TERMINATOR_TLV_LEN];
-    } NdefUriRecord_t;
+    }
+    NdefUriRecord_t;
 
     static eAppNtagError AppNtagInitEepromSmartPoster(void);
-    static bool          AppNtagEepromWrite(uint8_t originalSize);
+    static bool AppNtagEepromWrite(uint8_t originalSize);
     static eAppNtagError AppNtagEepromUnlockThenWrite(uint8_t originalSize);
     static eAppNtagError AppNtagLockWriteAccess(void);
     static eAppNtagError AppNtagUnlockWriteAccess(void);
-    static uint8_t       AppNdefUriRecordGetSize(NdefUriRecord_t ndefUriRecord);
+    static uint8_t AppNdefUriRecordGetSize(NdefUriRecord_t ndefUriRecord);
 
     NdefUriRecord_t ndefUriRecord;
     static NFCManagerImpl sInstance;

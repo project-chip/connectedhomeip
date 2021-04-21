@@ -866,7 +866,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-	CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint32_t bleAdvTimeoutMs = 0;
 
     mFlags.Set(Flags::kAdvertising);
@@ -882,18 +882,18 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     StartBleAdvTimeoutTimer(bleAdvTimeoutMs);
 
-   err = ConfigureAdvertisingData();
+    err = ConfigureAdvertisingData();
 
-   if (err == CHIP_NO_ERROR)
-   /* schedule NFC emulation stop */
-   {
-	   ChipDeviceEvent advChange;
-       advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-       advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-       PlatformMgr().PostEvent(&advChange);
-   }
+    if (err == CHIP_NO_ERROR)
+    /* schedule NFC emulation stop */
+    {
+        ChipDeviceEvent advChange;
+        advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+        PlatformMgr().PostEvent(&advChange);
+    }
 
-   return err;
+    return err;
 }
 
 CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
@@ -915,10 +915,10 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         {
             /* schedule NFC emulation stop */
             {
-        	    ChipDeviceEvent advChange;
-        	    advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-        	    advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-        	    PlatformMgr().PostEvent(&advChange);
+                ChipDeviceEvent advChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+                PlatformMgr().PostEvent(&advChange);
             }
         }
     }
