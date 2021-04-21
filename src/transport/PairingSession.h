@@ -26,15 +26,45 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <messaging/ExchangeDelegate.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
+#include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
+#include <transport/SessionEstablishmentDelegate.h>
 
 namespace chip {
 
-class DLL_EXPORT PairingSession
+class DLL_EXPORT PairingSession : public Messaging::ExchangeDelegateBase
 {
 public:
     PairingSession() {}
     virtual ~PairingSession() {}
+
+    enum SecureSessionType : uint8_t
+    {
+        kPASESession = 0x00,
+        kCASESession = 0x01,
+        kUnexpected  = 0xff
+    };
+
+    enum SessionParameter : uint8_t
+    {
+        kSetupPinCode             = 0x00,
+        kPASEVerifier             = 0x01,
+        kCertificateCredentialSet = 0x02,
+        kParameterUnexpected      = 0xff,
+    };
+
+    virtual CHIP_ERROR WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                      SessionEstablishmentDelegate * delegate)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    virtual CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                            Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * @brief
@@ -68,6 +98,24 @@ public:
     virtual const char * GetI2RSessionInfo() const = 0;
 
     virtual const char * GetR2ISessionInfo() const = 0;
+
+    virtual Transport::PeerConnectionState & PeerConnection() = 0;
+
+    virtual CHIP_ERROR ToSerializable(void * output) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    virtual CHIP_ERROR FromSerializable(const void * output) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    virtual void Clear() {}
+
+    virtual SecureSessionType GetSecureSessionType() { return SecureSessionType::kUnexpected; }
+
+    virtual SessionEstablishmentExchangeDispatch & MessageDispatch() = 0;
+
+    //// ExchangeDelegate Implementation ////
+    virtual void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle payload) = 0;
+    virtual void OnResponseTimeout(Messaging::ExchangeContext * ec)                                         = 0;
+    virtual Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
+                                                                    SecureSessionMgr * sessionMgr)          = 0;
 };
 
 } // namespace chip

@@ -24,8 +24,6 @@
 
 #pragma once
 
-#include <app/AttributePathParams.h>
-#include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/ReadRequest.h>
 #include <core/CHIPCore.h>

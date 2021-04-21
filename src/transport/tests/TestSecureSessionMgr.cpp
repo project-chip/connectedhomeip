@@ -55,8 +55,6 @@ const char PAYLOAD[]                = "Hello!";
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 
-const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
-
 class LoopbackTransport : public Transport::Base
 {
 public:
@@ -104,21 +102,13 @@ public:
 
         size_t data_len = msgBuf->DataLength();
 
-        if (LargeMessageSent)
-        {
-            int compare = memcmp(msgBuf->Start(), LARGE_PAYLOAD, data_len);
-            NL_TEST_ASSERT(mSuite, compare == 0);
-        }
-        else
-        {
-            int compare = memcmp(msgBuf->Start(), PAYLOAD, data_len);
-            NL_TEST_ASSERT(mSuite, compare == 0);
-        }
+        int compare = memcmp(msgBuf->Start(), PAYLOAD, data_len);
+        NL_TEST_ASSERT(mSuite, compare == 0);
 
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr, uint8_t secureSessionType) override
     {
         if (NewConnectionHandlerCallCount == 0)
             mRemoteToLocalSession = session;
@@ -133,8 +123,6 @@ public:
     SecureSessionHandle mLocalToRemoteSession;
     int ReceiveHandlerCallCount       = 0;
     int NewConnectionHandlerCallCount = 0;
-
-    bool LargeMessageSent = false;
 };
 
 TestSessMgrCallback callback;
@@ -162,8 +150,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     uint16_t payload_len = sizeof(PAYLOAD);
-
-    callback.LargeMessageSent = false;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
@@ -223,30 +209,6 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
-
-    // Let's send the max sized message and make sure it is received
-    chip::System::PacketBufferHandle large_buffer = chip::MessagePacketBuffer::NewWithData(LARGE_PAYLOAD, kMaxAppMessageLen);
-    NL_TEST_ASSERT(inSuite, !large_buffer.IsNull());
-
-    callback.LargeMessageSent = true;
-
-    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(large_buffer));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
-
-    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
-
-    uint16_t large_payload_len = sizeof(LARGE_PAYLOAD);
-
-    // Let's send bigger message than supported and make sure it fails to send
-    chip::System::PacketBufferHandle extra_large_buffer = chip::MessagePacketBuffer::NewWithData(LARGE_PAYLOAD, large_payload_len);
-    NL_TEST_ASSERT(inSuite, !extra_large_buffer.IsNull());
-
-    callback.LargeMessageSent = true;
-
-    err = secureSessionMgr.SendMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer));
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
 }
 
 void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
@@ -254,8 +216,6 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     uint16_t payload_len = sizeof(PAYLOAD);
-
-    callback.LargeMessageSent = false;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
@@ -330,8 +290,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     uint16_t payload_len = sizeof(PAYLOAD);
-
-    callback.LargeMessageSent = false;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 

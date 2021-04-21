@@ -125,6 +125,7 @@ install-chip : $(OUTPUT_DIR)
 	echo esp32_cc = \"$(CC)\"                >> $(OUTPUT_DIR)/args.gn
 	echo esp32_cxx = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
 	echo esp32_cpu = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
+	echo chip_enable_libcertifier = false               >> $(OUTPUT_DIR)/args.gn
 ifeq ($(is_debug),false)
 	@echo "is_debug = false" >> $(OUTPUT_DIR)/args.gn
 endif

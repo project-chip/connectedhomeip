@@ -86,11 +86,11 @@ CHIP_ERROR SendCommandRequest(void)
 
     printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::CommandPathParams commandPathParams = { kTestEndPointId, // Endpoint
-                                                       kTestGroupId,    // GroupId
-                                                       kTestClusterId,  // ClusterId
-                                                       kTestCommandId,  // CommandId
-                                                       chip::app::CommandPathFlags::kEndpointIdValid };
+    chip::app::Command::CommandParams commandParams = { kTestEndPointId, // Endpoint
+                                                        kTestGroupId,    // GroupId
+                                                        kTestClusterId,  // ClusterId
+                                                        kTestCommandId,  // CommandId
+                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
 
@@ -98,7 +98,7 @@ CHIP_ERROR SendCommandRequest(void)
     uint8_t effectVariant    = 1;
     chip::TLV::TLVWriter * writer;
 
-    err = gpCommandSender->PrepareCommand(&commandPathParams);
+    err = gpCommandSender->PrepareCommand(&commandParams);
     SuccessOrExit(err);
 
     writer = gpCommandSender->GetCommandDataElementTLVWriter();
@@ -264,7 +264,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 }
-
 } // namespace app
 } // namespace chip
 

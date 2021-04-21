@@ -22,7 +22,7 @@
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds     = 120;
+constexpr uint16_t kWaitDurationInSeconds     = 240;
 constexpr uint64_t kBreadcrumb                = 0;
 constexpr uint32_t kTimeoutMs                 = 6000;
 constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
@@ -35,6 +35,9 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
         .storageDelegate              = &storage,
         .mDeviceAddressUpdateDelegate = this,
     };
+
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
     err = mCommissioner.Init(localId, params, this);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
@@ -71,6 +74,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         err = Pair(remoteId, PeerAddress::BLE());
         break;
     case PairingMode::SoftAP:
+    case PairingMode::SoftAPCase:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
     case PairingMode::Ethernet:
@@ -85,8 +89,30 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    RendezvousParameters params =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    RendezvousParameters params;
+
+    if (mPairingMode == PairingMode::SoftAP)
+    {
+        params.SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+    }
+    else if (mPairingMode == PairingMode::SoftAPCase)
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        // 1. Get Device
+        err = mCommissioner.GetDevice(remoteId, &mDevice);
+        ReturnErrorOnFailure(err);
+        // 2. Unpair
+        err = mCommissioner.UnpairDevice(remoteId);
+        ReturnErrorOnFailure(err);
+        // 3. Get Op Cred Set (add pub get method)
+        mDevice->DeserializeOperationalCredentials();
+        // 4. run pair device
+        params.SetOpCredSet(mDevice->GetOperationalCredentialSet()).SetDiscriminator(0).SetPeerAddress(address);
+    }
+    else
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return mCommissioner.PairDevice(remoteId, params);
 }
@@ -140,7 +166,8 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
-        SetupNetwork();
+        // SetupNetwork();
+        SetCommandExitStatus(err == CHIP_NO_ERROR);
     }
     else
     {

@@ -658,6 +658,170 @@ exit:
     return err;
 }
 
+static CHIP_ERROR ExtractPubkey(ASN1Reader & reader, Crypto::P256PublicKey & pubkey)
+{
+    CHIP_ERROR err;
+    int64_t version;
+    OID sigAlgoOID;
+    OID attrOID;
+    ASN1UniversalTime asn1Time;
+    OID pubKeyAlgoOID, pubKeyCurveOID;
+
+    // Certificate ::= SEQUENCE
+    ASN1_PARSE_ENTER_SEQUENCE
+    {
+        // tbsCertificate TBSCertificate,
+        // TBSCertificate ::= SEQUENCE
+        ASN1_PARSE_ENTER_SEQUENCE
+        {
+            // version [0] EXPLICIT Version DEFAULT v1
+            ASN1_PARSE_ENTER_CONSTRUCTED(kASN1TagClass_ContextSpecific, 0)
+            {
+                // Version ::= INTEGER { v1(0), v2(1), v3(2) }
+                ASN1_PARSE_INTEGER(version);
+            }
+            ASN1_EXIT_CONSTRUCTED;
+
+            // serialNumber CertificateSerialNumber
+            // CertificateSerialNumber ::= INTEGER
+            ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_Integer);
+
+            // signature AlgorithmIdentifier
+            // AlgorithmIdentifier ::= SEQUENCE
+            ASN1_PARSE_ENTER_SEQUENCE
+            {
+                // algorithm OBJECT IDENTIFIER,
+                ASN1_PARSE_OBJECT_ID(sigAlgoOID);
+            }
+            ASN1_EXIT_SEQUENCE;
+
+            // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+            ASN1_PARSE_ENTER_SEQUENCE
+            {
+                while ((err = reader.Next()) == ASN1_NO_ERROR)
+                {
+                    // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
+                    ASN1_ENTER_SET
+                    {
+                        // AttributeTypeAndValue ::= SEQUENCE
+                        ASN1_PARSE_ENTER_SEQUENCE
+                        {
+                            // type AttributeType
+                            // AttributeType ::= OBJECT IDENTIFIER
+                            ASN1_PARSE_OBJECT_ID(attrOID);
+
+                            // AttributeValue ::= ANY -- DEFINED BY AttributeType
+                            ASN1_PARSE_ANY;
+                        }
+                        ASN1_EXIT_SEQUENCE;
+
+                        // Only one AttributeTypeAndValue allowed per RDN.
+                        err = reader.Next();
+                        if (err == ASN1_NO_ERROR)
+                        {
+                            ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
+                        }
+                        if (err != ASN1_END)
+                        {
+                            ExitNow();
+                        }
+                    }
+                    ASN1_EXIT_SET;
+                }
+            }
+            ASN1_EXIT_SEQUENCE;
+
+            // Validity validity
+            ASN1_PARSE_ENTER_SEQUENCE
+            {
+                ASN1_PARSE_TIME(asn1Time);
+                ASN1_PARSE_TIME(asn1Time);
+            }
+            ASN1_EXIT_SEQUENCE;
+
+            // RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+            ASN1_PARSE_ENTER_SEQUENCE
+            {
+                while ((err = reader.Next()) == ASN1_NO_ERROR)
+                {
+                    // RelativeDistinguishedName ::= SET SIZE (1..MAX) OF AttributeTypeAndValue
+                    ASN1_ENTER_SET
+                    {
+                        // AttributeTypeAndValue ::= SEQUENCE
+                        ASN1_PARSE_ENTER_SEQUENCE
+                        {
+                            // type AttributeType
+                            // AttributeType ::= OBJECT IDENTIFIER
+                            ASN1_PARSE_OBJECT_ID(attrOID);
+
+                            // AttributeValue ::= ANY -- DEFINED BY AttributeType
+                            ASN1_PARSE_ANY;
+                        }
+                        ASN1_EXIT_SEQUENCE;
+
+                        // Only one AttributeTypeAndValue allowed per RDN.
+                        err = reader.Next();
+                        if (err == ASN1_NO_ERROR)
+                        {
+                            ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
+                        }
+                        if (err != ASN1_END)
+                        {
+                            ExitNow();
+                        }
+                    }
+                    ASN1_EXIT_SET;
+                }
+            }
+            ASN1_EXIT_SEQUENCE;
+
+            // subjectPublicKeyInfo SubjectPublicKeyInfo,
+            ASN1_PARSE_ENTER_SEQUENCE
+            {
+                // algorithm AlgorithmIdentifier,
+                // AlgorithmIdentifier ::= SEQUENCE
+                ASN1_PARSE_ENTER_SEQUENCE
+                {
+                    // algorithm OBJECT IDENTIFIER,
+                    ASN1_PARSE_OBJECT_ID(pubKeyAlgoOID);
+
+                    // EcpkParameters ::= CHOICE {
+                    //     ecParameters  ECParameters,
+                    //     namedCurve    OBJECT IDENTIFIER,
+                    //     implicitlyCA  NULL }
+                    ASN1_PARSE_ANY;
+
+                    ASN1_GET_OBJECT_ID(pubKeyCurveOID);
+                }
+                ASN1_EXIT_SEQUENCE;
+
+                // subjectPublicKey BIT STRING
+                ASN1_PARSE_ELEMENT(kASN1TagClass_Universal, kASN1UniversalTag_BitString);
+
+                // Verify public key length.
+                VerifyOrExit(reader.GetValueLen() > 0, err = ASN1_ERROR_INVALID_ENCODING);
+                VerifyOrExit(reader.GetValueLen() - 1 <= pubkey.Length(), err = ASN1_ERROR_INVALID_ENCODING);
+
+                // The first byte is Unused Bit Count value, which should be zero.
+                VerifyOrExit(reader.GetValue()[0] == 0, err = ASN1_ERROR_INVALID_ENCODING);
+
+                // Copy the X9.62 encoded EC point into the CHIP certificate as a byte string.
+                // Skip the first Unused Bit Count byte.
+                memcpy(pubkey, reader.GetValue() + 1, reader.GetValueLen() - 1);
+
+                // Pubkey retrieved... exit now
+                ExitNow();
+            }
+            ASN1_EXIT_SEQUENCE;
+        }
+        ASN1_EXIT_SEQUENCE;
+    }
+    ASN1_EXIT_SEQUENCE;
+
+exit:
+    return err;
+}
+
 DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509CertLen, uint8_t * chipCertBuf,
                                                 uint32_t chipCertBufSize, uint32_t & chipCertLen)
 {
@@ -676,6 +840,20 @@ DLL_EXPORT CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32
     SuccessOrExit(err);
 
     chipCertLen = writer.GetLengthWritten();
+
+exit:
+    return err;
+}
+
+DLL_EXPORT CHIP_ERROR ExtractPubkeyFromX509Cert(const uint8_t * x509Cert, uint32_t x509CertLen, Crypto::P256PublicKey & pubkey)
+{
+    CHIP_ERROR err;
+    ASN1Reader reader;
+
+    reader.Init(x509Cert, x509CertLen);
+
+    err = ExtractPubkey(reader, pubkey);
+    SuccessOrExit(err);
 
 exit:
     return err;

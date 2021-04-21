@@ -144,7 +144,7 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams)
+CHIP_ERROR Command::PrepareCommand(const CommandParams * const apCommandParams)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -153,9 +153,9 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
     err = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    if (apCommandPathParams != nullptr)
+    if (apCommandParams != nullptr)
     {
-        err = ConstructCommandPath(*apCommandPathParams, commandDataElement);
+        err = ConstructCommandPath(*apCommandParams, commandDataElement);
         SuccessOrExit(err);
     }
 
@@ -188,21 +188,20 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
-                                         CommandDataElement::Builder aCommandDataElement)
+CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder aCommandDataElement)
 {
     CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
-    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
+    if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
     {
-        commandPath.EndpointId(aCommandPathParams.mEndpointId);
+        commandPath.EndpointId(aCommandParams.EndpointId);
     }
 
-    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kGroupIdValid))
+    if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
     {
-        commandPath.GroupId(aCommandPathParams.mGroupId);
+        commandPath.GroupId(aCommandParams.GroupId);
     }
 
-    commandPath.ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPath();
+    commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
 
     return commandPath.GetError();
 }

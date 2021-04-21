@@ -44,6 +44,8 @@ chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
+chip_gn_arg_append("chip_enable_libcertifier"             "false")
+chip_gn_arg_append("chip_config_network_layer_ble"        "true")
 
 if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")

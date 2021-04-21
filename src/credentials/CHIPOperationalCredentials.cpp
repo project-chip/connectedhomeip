@@ -266,6 +266,86 @@ CHIP_ERROR OperationalCredentialSet::SetDevOpCredKeypair(const CertificateKeyId 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR OperationalCredentialSet::ToSerializable(const CertificateKeyId & trustedRootId,
+                                                    OperationalCredentialSerializable & serializable)
+{
+    const NodeCredential * nodeCredential = GetNodeCredentialAt(trustedRootId);
+    P256Keypair * keypair                 = GetNodeKeypairAt(trustedRootId);
+    P256SerializedKeypair serializedKeypair;
+    ChipCertificateSet * certificateSet  = FindCertSet(trustedRootId);
+    const ChipCertificateData * dataSet  = nullptr;
+    uint8_t * ptrSerializableCerts[]     = { serializable.mRootCertificate, serializable.mCACertificate,
+                                         serializable.mLeafCertificate };
+    uint16_t * ptrSerializableCertsLen[] = { &serializable.mRootCertificateLen, &serializable.mCACertificateLen,
+                                             &serializable.mLeafCertificateLen };
+
+    VerifyOrReturnError(certificateSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(keypair->Serialize(serializedKeypair));
+    VerifyOrReturnError(serializedKeypair.Length() <= sizeof(serializable.mNodeKeypair), CHIP_ERROR_INVALID_ARGUMENT);
+
+    dataSet = certificateSet->GetCertSet();
+    VerifyOrReturnError(dataSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memset(&serializable, 0, sizeof(serializable));
+    serializable.mNodeCredentialLen = nodeCredential->mLen;
+
+    memcpy(serializable.mNodeCredential, nodeCredential->mCredential, nodeCredential->mLen);
+    memcpy(serializable.mNodeKeypair, serializedKeypair, serializedKeypair.Length());
+    serializable.mNodeKeypairLen = static_cast<uint16_t>(serializedKeypair.Length());
+
+    for (uint8_t i = 0; i < certificateSet->GetCertCount(); ++i)
+    {
+        memcpy(ptrSerializableCerts[i], dataSet[i].mCertificateBegin, dataSet[i].mCertificateLen);
+        *ptrSerializableCertsLen[i] = dataSet[i].mCertificateLen;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentialSerializable & serializable)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    P256Keypair keypair;
+    P256SerializedKeypair serializedKeypair;
+    ChipCertificateSet certificateSet;
+    CertificateKeyId trustedRootId;
+
+    // TODO change constants
+    SuccessOrExit(err = certificateSet.Init(3, 1024));
+
+    err = certificateSet.LoadCert(serializable.mRootCertificate, serializable.mRootCertificateLen,
+                                  BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
+    SuccessOrExit(err);
+
+    trustedRootId.mId  = certificateSet.GetLastCert()->mAuthKeyId.mId;
+    trustedRootId.mLen = certificateSet.GetLastCert()->mAuthKeyId.mLen;
+
+    err = certificateSet.LoadCert(serializable.mCACertificate, serializable.mCACertificateLen,
+                                  BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
+    SuccessOrExit(err);
+
+    //    err = certificateSet.LoadCert(serializable.mLeafCertificate, serializable.mLeafCertificateLen,
+    //                                  BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash));
+    //    SuccessOrExit(err);
+
+    LoadCertSet(&certificateSet);
+
+    memcpy(serializedKeypair, serializable.mNodeKeypair, serializable.mNodeKeypairLen);
+    SuccessOrExit(err = serializedKeypair.SetLength(serializable.mNodeKeypairLen));
+
+    SuccessOrExit(err = keypair.Deserialize(serializedKeypair));
+
+    SuccessOrExit(err = SetDevOpCredKeypair(trustedRootId, &keypair));
+
+    SuccessOrExit(err = SetDevOpCred(trustedRootId, serializable.mNodeCredential, serializable.mNodeCredentialLen));
+
+exit:
+    certificateSet.Release();
+
+    return err;
+}
+
 const NodeCredential * OperationalCredentialSet::GetNodeCredentialAt(const CertificateKeyId & trustedRootId) const
 {
     for (size_t i = 0; i < kOperationalCredentialsMax && mChipDeviceCredentials[i].nodeCredential.mCredential != nullptr; ++i)

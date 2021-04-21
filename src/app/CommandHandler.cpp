@@ -114,14 +114,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                          const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandPathParams);
+    err = PrepareCommand(apCommandParams);
     SuccessOrExit(err);
 
     statusElementBuilder =

@@ -270,7 +270,7 @@ private:
                            const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
                            SecureSessionMgr * msgLayer) override;
 
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr, uint8_t secureSessionType) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     // TransportMgrDelegate interface for rendezvous sessions

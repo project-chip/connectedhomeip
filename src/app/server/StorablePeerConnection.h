@@ -19,6 +19,7 @@
 
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <transport/CASESession.h>
 
 namespace chip {
 
@@ -32,7 +33,7 @@ class DLL_EXPORT StorablePeerConnection
 public:
     StorablePeerConnection() {}
 
-    StorablePeerConnection(PASESession & session, Transport::AdminId admin);
+    StorablePeerConnection(PairingSession * session, Transport::AdminId admin);
 
     virtual ~StorablePeerConnection() {}
 
@@ -42,7 +43,7 @@ public:
 
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, uint16_t keyId);
 
-    void GetPASESession(PASESession * session) { session->FromSerializable(mSession.mOpCreds); }
+    void GetPairingSession(PairingSession * session) { session->FromSerializable(&mSession.mOpCreds); }
 
     Transport::AdminId GetAdminId() { return mSession.mAdmin; }
 
@@ -53,7 +54,11 @@ private:
 
     struct StorableSession
     {
-        PASESessionSerializable mOpCreds;
+        union
+        {
+            PASESessionSerializable mPASE;
+            CASESessionSerializable mCASE;
+        } mOpCreds;
         Transport::AdminId mAdmin; /* This field is serialized in LittleEndian byte order */
     };
 

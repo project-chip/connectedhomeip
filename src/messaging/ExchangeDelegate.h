@@ -59,6 +59,10 @@ public:
     virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    System::PacketBufferHandle payload) = 0;
 
+    virtual void OnReceiveCredentials(ExchangeContext * ec, OperationalCredentialSet * opCredSet,
+                                      const CertificateKeyId & trustedRootId)
+    {}
+
     /**
      * @brief
      *   This function is the protocol callback to invoke when the timeout for the receipt

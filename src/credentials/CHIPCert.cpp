@@ -156,13 +156,14 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
     err = reader.Next(kTLVType_Structure, ProfileTag(Protocols::OpCredentials::Id.ToTLVProfileId(), kTag_ChipCertificate));
     SuccessOrExit(err);
 
-    err = LoadCert(reader, decodeFlags);
+    err = LoadCert(reader, decodeFlags, chipCert, chipCertLen);
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, const uint8_t * chipCert,
+                                        uint32_t chipCertLen)
 {
     CHIP_ERROR err;
     ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
@@ -176,6 +177,9 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
 
     cert = new (&mCerts[mCertCount]) ChipCertificateData();
+
+    cert->mCertificateBegin = chipCert;
+    cert->mCertificateLen   = static_cast<uint16_t>(chipCertLen);
 
     {
         TLVType containerType;
@@ -592,6 +596,9 @@ ChipCertificateData::~ChipCertificateData() {}
 
 void ChipCertificateData::Clear()
 {
+    mCertificateBegin = nullptr;
+    mCertificateLen   = 0;
+
     mSubjectDN.Clear();
     mIssuerDN.Clear();
     mSubjectKeyId.Clear();
@@ -760,6 +767,31 @@ CHIP_ERROR ChipDN::GetCertType(uint8_t & certType) const
 
 exit:
     return err;
+}
+
+CHIP_ERROR ChipDN::GetCertChipVal(uint64_t & chipVal) const
+{
+    uint8_t rdnCount = RDNCount();
+
+    chipVal = 0;
+
+    for (uint8_t i = 0; i < rdnCount; i++)
+    {
+        switch (rdn[i].mAttrOID)
+        {
+        case kOID_AttributeType_ChipRootId:
+        case kOID_AttributeType_ChipICAId:
+        case kOID_AttributeType_ChipNodeId:
+        case kOID_AttributeType_ChipFirmwareSigningId:
+            VerifyOrReturnError(chipVal == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+
+            chipVal = rdn[i].mAttrValue.mChipVal;
+        default:
+            break;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 bool ChipDN::IsEqual(const ChipDN & other) const

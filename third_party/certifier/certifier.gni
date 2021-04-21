@@ -1,0 +1,83 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/certifier.gni")
+
+template("certifier_target") {
+  certifier_target_name = target_name
+
+  _certifier_root = "${certifier_root}/repo"
+
+  config("${certifier_target_name}_warnings") {
+    cflags = [
+      "-Wno-maybe-uninitialized",
+      "-Wno-string-concatenation",
+      "-Wno-shadow",
+      "-Wno-sign-compare"
+    ]
+  }
+
+  config("${certifier_target_name}_config") {
+    include_dirs = [ 
+        "${_certifier_root}/include",
+        "${_certifier_root}/internal_headers"  
+    ]
+  }
+
+  static_library(certifier_target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${_certifier_root}/src/base58.c",
+      "${_certifier_root}/src/base64.c",
+      "${_certifier_root}/src/certifier_api_easy.c",
+      "${_certifier_root}/src/certifier.c",
+      "${_certifier_root}/src/certifierclient.c",
+      "${_certifier_root}/src/error.c",
+      "${_certifier_root}/src/http.c",
+      "${_certifier_root}/src/httpdebug.c",
+      "${_certifier_root}/src/log.c",
+      "${_certifier_root}/src/mbedtls.c",
+      "${_certifier_root}/src/openssl.c",
+      "${_certifier_root}/src/parson.c",
+      "${_certifier_root}/src/property.c",
+      "${_certifier_root}/src/security.c",
+      "${_certifier_root}/src/system.c",
+      "${_certifier_root}/src/timer.c",
+      "${_certifier_root}/src/util.c",
+    ]
+
+    if (!defined(configs)) {
+      configs = []
+    }
+
+    # Relax warnings for third_party code.
+    configs += [ ":${certifier_target_name}_warnings" ]
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    public_configs += [ ":certifier_config" ]
+
+    libs = [ "curl" ]
+
+    output_name = "libcertifier"
+    output_dir = "${root_out_dir}/lib"
+  }
+}

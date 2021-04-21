@@ -53,11 +53,6 @@
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
-#include <transport/raw/BLE.h>
-#endif
-
 #include <errno.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -141,16 +136,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrExit(mInetLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorageDelegate = params.storageDelegate;
-#if CONFIG_NETWORK_LAYER_BLE
-#if CONFIG_DEVICE_LAYER
-    if (params.bleLayer == nullptr)
-    {
-        params.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
-    }
-#endif // CONFIG_DEVICE_LAYER
-    mBleLayer = params.bleLayer;
-    VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-#endif
 
     if (mStorageDelegate != nullptr)
     {
@@ -166,10 +151,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 #if INET_CONFIG_ENABLE_IPV4
             ,
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mListenPort)
-#endif
-#if CONFIG_NETWORK_LAYER_BLE
-            ,
-        Transport::BleListenParameters(mBleLayer)
 #endif
     );
     SuccessOrExit(err);
@@ -429,10 +410,11 @@ void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
-    mActiveDevices[index].OnMessageReceived(packetHeader, payloadHeader, std::move(msgBuf));
+    mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
 
 exit:
-    ec->Close();
+    return;
+    // ec->Close();
 }
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
@@ -440,7 +422,7 @@ void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Controller, "Time out! failed to receive response from Exchange: %p", ec);
 }
 
-void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
+void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr, uint8_t secureSessionType)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
 
@@ -448,7 +430,7 @@ void DeviceController::OnNewConnection(SecureSessionHandle session, Messaging::E
     VerifyOrReturn(index < kNumMaxActiveDevices,
                    ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
 
-    mActiveDevices[index].OnNewConnection(session);
+    mActiveDevices[index].OnNewConnection(this, session, secureSessionType);
 }
 
 void DeviceController::OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr)
@@ -699,9 +681,9 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
 CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    Device * device                    = nullptr;
-    Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    Device * device                       = nullptr;
+    Transport::PeerAddress udpPeerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
 
@@ -722,16 +704,16 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
         if (!params.HasBleLayer())
         {
+            params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
             params.SetPeerAddress(Transport::PeerAddress::BLE());
         }
-        peerAddress = Transport::PeerAddress::BLE();
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     }
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp ||
              params.GetPeerAddress().GetTransportType() == Transport::Type::kUdp)
     {
-        peerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
-                                                  params.GetPeerAddress().GetInterface());
+        udpPeerAddress = Transport::PeerAddress::UDP(params.GetPeerAddress().GetIPAddress(), params.GetPeerAddress().GetPort(),
+                                                     params.GetPeerAddress().GetInterface());
     }
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
@@ -746,31 +728,17 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                    mTransportMgr, mSessionMgr, admin);
     SuccessOrExit(err);
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, admin->GetAdminId());
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, udpPeerAddress, admin->GetAdminId(),
+                 mOpenPairingWindow);
 
     mSystemLayer->StartTimer(kSessionEstablishmentTimeout, OnSessionEstablishmentTimeoutCallback, this);
+
+    // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
+    // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        device->SetAddress(params.GetPeerAddress().GetIPAddress());
+        mRendezvousSession->OnRendezvousConnectionOpened();
     }
-#if CONFIG_NETWORK_LAYER_BLE
-    else
-    {
-        if (params.HasConnectionObject())
-        {
-            SuccessOrExit(err = mBleLayer->NewBleConnectionByObject(params.GetConnectionObject()));
-        }
-        else if (params.HasDiscriminator())
-        {
-            SuccessOrExit(err = mBleLayer->NewBleConnectionByDiscriminator(params.GetDiscriminator()));
-        }
-        else
-        {
-            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
-        }
-    }
-#endif
-    mRendezvousSession->OnRendezvousConnectionOpened();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -812,9 +780,9 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    testSecurePairingSecret->ToSerializable(device->GetPairing());
+    testSecurePairingSecret->ToSerializable(*device->GetPairing());
 
-    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mAdminId);
+    device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, mAdminId, mOpenPairingWindow);
 
     device->Serialize(serialized);
 
@@ -902,7 +870,10 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         // already persisted. The application will use GetDevice()
         // method to get access to the device, which will fetch
         // the device information from the persistent storage.
-        DeviceController::ReleaseDevice(mDeviceBeingPaired);
+
+        // This is wrong to release the device because releasing
+        // causes resetting fo the internal connection state
+        // DeviceController::ReleaseDevice(mDeviceBeingPaired);
     }
 
     mDeviceBeingPaired = kNumMaxActiveDevices;
@@ -943,14 +914,38 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
+        ChipLogDetail(Controller, "Remote device completed Secure Session handshake\n");
+        switch (mRendezvousSession->GetSecureSessionType())
+        {
+        case PairingSession::SecureSessionType::kPASESession:
+            mRendezvousSession->GetPairingSession()->ToSerializable(device->GetPairing());
+            break;
+        case PairingSession::SecureSessionType::kCASESession:
+            mRendezvousSession->GetPairingSession()->ToSerializable(device->GetCASEPairing());
+            break;
+        default:
+            break;
+        }
+
+        if (!mIsIPRendezvous && mPairingDelegate != nullptr)
+        {
+            mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
+        }
         mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
         break;
 
     case RendezvousSessionDelegate::SecurePairingFailed:
-        ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
+        ChipLogDetail(Controller, "Remote device failed in Secure Session/SPAKE2+ handshake\n");
         mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+        break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
+        ChipLogDetail(Controller, "Remote device was assigned an ip address\n");
+        device->SetAddress(mRendezvousSession->GetIPAddress());
+        break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningFailed:
+        ChipLogDetail(Controller, "Remote device failed in network provisioning\n");
         break;
 
     default:
@@ -995,15 +990,27 @@ void DeviceCommissioner::ReleaseDevice(Device * device)
     DeviceController::ReleaseDevice(device);
 }
 
-#if CONFIG_NETWORK_LAYER_BLE
-CHIP_ERROR DeviceCommissioner::CloseBleConnection()
+void DeviceCommissioner::OnReceiveCredentials(Messaging::ExchangeContext * ec, OperationalCredentialSet * opCredSet,
+                                              const CertificateKeyId & trustedRootId)
 {
-    // It is fine since we can only commission one device at the same time.
-    // We should be able to distinguish different BLE connections if we want
-    // to commission multiple devices at the same time over BLE.
-    return mBleLayer->CloseAllBleConnections();
+    VerifyOrReturn(ec != nullptr);
+    SecureSessionHandle session = ec->GetSecureSession();
+    SecureSessionMgr * mgr      = ec->GetExchangeMgr()->GetSessionMgr();
+
+    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnReceiveCredentials was called in incorrect state"));
+
+    uint16_t index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
+    VerifyOrReturn(index < kNumMaxActiveDevices,
+                   ChipLogDetail(Controller, "OnReceiveCredentials was called for unknown device, ignoring it."));
+
+    mActiveDevices[index].OnReceiveCredentials(session, mgr);
+
+    mActiveDevices[index].GetOperationalCredentialSet()->ToSerializable(trustedRootId, *mActiveDevices[index].GetOpCredPairing());
+
+    mDeviceBeingPaired = index;
+
+    OnRendezvousComplete();
 }
-#endif
 
 void DeviceCommissioner::OnSessionEstablishmentTimeout()
 {

@@ -28,12 +28,12 @@
 #include <utility>
 
 #include <core/CHIPCore.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
@@ -43,7 +43,11 @@
 
 namespace chip {
 
+using namespace Credentials;
+
 class SecureSessionMgr;
+
+class PairingSession;
 
 class SecureSessionHandle
 {
@@ -175,7 +179,13 @@ public:
      * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr,
+                                 uint8_t /*PairingSession::SecureSessionType*/ secureSessionType)
+    {}
+
+    virtual void OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr, OperationalCredentialSet * opCredSet,
+                                      const CertificateKeyId & trustedRootId)
+    {}
 
     /**
      * @brief
@@ -256,6 +266,9 @@ public:
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           PairingDirection direction, Transport::AdminId admin, Transport::Base * transport = nullptr);
+
+    CHIP_ERROR OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                const CertificateKeyId & trustedRootId);
 
     /**
      * @brief

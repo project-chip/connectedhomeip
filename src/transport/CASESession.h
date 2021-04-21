@@ -29,8 +29,10 @@
 #include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/PairingSession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSession.h>
 #include <transport/SessionEstablishmentDelegate.h>
@@ -65,7 +67,7 @@ struct CASESessionSerializable
     uint16_t mPeerKeyId;
 };
 
-class DLL_EXPORT CASESession
+class DLL_EXPORT CASESession : public PairingSession
 {
 public:
     CASESession();
@@ -88,8 +90,11 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                           uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                           SessionEstablishmentDelegate * delegate);
+
+    virtual CHIP_ERROR WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                      SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -106,8 +111,24 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, OperationalCredentialSet * operationalCredentialSet,
-                                Optional<NodeId> myNodeId, NodeId peerNodeId, uint16_t myKeyId,
+                                uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
                                 SessionEstablishmentDelegate * delegate);
+
+    /**
+     * @brief
+     *   Create a pairing request using peer's setup PIN code.
+     *
+     * @param peerAddress      Address of peer to pair
+     * @param arg              TBD
+     * @param myNodeId         Optional node id of local node
+     * @param peerNodeId       Node id assigned to the peer node by commissioner
+     * @param myKeyId          Key ID to be assigned to the secure session on the peer node
+     * @param delegate         Callback object
+     *
+     * @return CHIP_ERROR      The result of initialization
+     */
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate) override;
 
     /**
      * @brief
@@ -121,18 +142,6 @@ public:
      * @return CHIP_ERROR The result of session derivation
      */
     virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session);
-
-    /**
-     * @brief
-     *   Handler for peer's messages, exchanged during pairing handshake.
-     *
-     * @param packetHeader Message header for the received message
-     * @param peerAddress  Source of the message
-     * @param msg          Message sent by the peer
-     * @return CHIP_ERROR The result of message processing
-     */
-    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                         System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -158,6 +167,10 @@ public:
      */
     uint16_t GetLocalKeyId() { return mConnectionState.GetLocalKeyID(); }
 
+    const char * GetI2RSessionInfo() const override { return "i2r"; }
+
+    const char * GetR2ISessionInfo() const override { return "r2i"; }
+
     Transport::PeerConnectionState & PeerConnection() { return mConnectionState; }
 
     /**
@@ -175,10 +188,31 @@ public:
      **/
     CHIP_ERROR ToSerializable(CASESessionSerializable & output);
 
+    CHIP_ERROR ToSerializable(void * output) { return ToSerializable(*static_cast<CASESessionSerializable *>(output)); }
+
     /**
      * @brief Reconstruct secure pairing class from the serializable data structure.
      **/
     CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
+
+    CHIP_ERROR FromSerializable(const void * output)
+    {
+        return FromSerializable(*static_cast<const CASESessionSerializable *>(output));
+    }
+
+    SecureSessionType GetSecureSessionType() { return SecureSessionType::kCASESession; }
+
+    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
+
+    //// ExchangeDelegate Implementation ////
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle payload) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
+                                                            SecureSessionMgr * sessionMgr) override
+    {
+        return &mMessageDispatch;
+    }
 
 private:
     enum SigmaErrorType : uint8_t
@@ -190,8 +224,7 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
@@ -222,8 +255,6 @@ private:
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
 
-    CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
-
     void Clear();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
@@ -241,6 +272,10 @@ private:
     uint8_t mMessageDigest[kSHA256_Hash_Length];
     uint8_t mIPK[kIPKSize];
     uint8_t mRemoteIPK[kIPKSize];
+
+    Messaging::ExchangeContext * mExchangeCtxt = nullptr;
+
+    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct SigmaErrorMsg
     {

@@ -235,6 +235,37 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * s
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR PASESession::WaitForPairing(const void * mySessionParameters, SessionParameter sessionParameter, uint16_t myKeyId,
+                                       SessionEstablishmentDelegate * delegate)
+{
+    CHIP_ERROR err                                      = CHIP_NO_ERROR;
+    const PASESessionParameters * paseSessionParameters = reinterpret_cast<const PASESessionParameters *>(mySessionParameters);
+    const PASEVerifier * paseVerifier                   = reinterpret_cast<const PASEVerifier *>(mySessionParameters);
+
+    VerifyOrExit(mySessionParameters != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    switch (sessionParameter)
+    {
+    case SessionParameter::kSetupPinCode:
+        err = WaitForPairing(paseSessionParameters->mSetUpPinCode, paseSessionParameters->mPbkdf2IterCount,
+                             paseSessionParameters->mSalt, paseSessionParameters->mSaltLen, myKeyId, delegate);
+        break;
+    case SessionParameter::kPASEVerifier:
+        err = WaitForPairing(*paseVerifier, myKeyId, delegate);
+        break;
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+    }
+    return err;
+}
+
 CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                        uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
 {
@@ -289,6 +320,20 @@ exit:
     {
         Clear();
     }
+    return err;
+}
+
+CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, const void * arg, uint16_t myKeyId,
+                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(arg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = Pair(peerAddress, *reinterpret_cast<const uint32_t *>(arg), myKeyId, exchangeCtxt, delegate);
+    SuccessOrExit(err);
+
+exit:
     return err;
 }
 
@@ -653,6 +698,8 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
 
+    mExchangeCtxt->Close();
+
 exit:
 
     if (err != CHIP_NO_ERROR)
@@ -691,6 +738,9 @@ CHIP_ERROR PASESession::HandleMsg3(const System::PacketBufferHandle & msg)
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
+
+    mExchangeCtxt->Close();
+    mExchangeCtxt->Close();
 
 exit:
 

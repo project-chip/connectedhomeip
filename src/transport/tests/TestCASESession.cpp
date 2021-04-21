@@ -28,6 +28,7 @@
 #include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <messaging/ExchangeContext.h>
 #include <stdarg.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -62,23 +63,37 @@ enum
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
-    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                               System::PacketBufferHandle msgBuf) override
-    {
-        mNumMessageSend++;
-        return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, std::move(msgBuf)) : mMessageSendError;
-    }
-
     void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
 
     void OnSessionEstablished() override { mNumPairingComplete++; }
 
-    uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
+};
+
+class TestCASESecurePairingExchangeContext : public Messaging::ExchangeContext
+{
+public:
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                           const Messaging::SendFlags & sendFlags) override
+    {
+        mNumMessageSend++;
+        ReturnErrorOnFailure(mMessageSendError);
+        if (peer != nullptr)
+        {
+            PayloadHeader payloadHeader;
+            payloadHeader.SetMessageType(protocolId, msgType);
+            peer->OnMessageReceived(peerContext, PacketHeader(), payloadHeader, std::move(msgPayload));
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    uint32_t mNumMessageSend     = 0;
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
 
-    CASESession * peer = nullptr;
+    CASESession * peer                       = nullptr;
+    Messaging::ExchangeContext * peerContext = nullptr;
 };
 
 void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
@@ -87,36 +102,35 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0, nullptr) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0, &delegate) ==
-                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForSessionEstablishment(&accessoryDevOpCred, 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
+    NL_TEST_ASSERT(inSuite, pairing.WaitForSessionEstablishment(&accessoryDevOpCred, 0, &delegate) == CHIP_NO_ERROR);
 }
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
+
+    TestCASESecurePairingExchangeContext * context = chip::Platform::New<TestCASESecurePairingExchangeContext>();
     CASESession pairing;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            Optional<NodeId>::Value(1), 2, 0, nullptr) != CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0, nullptr,
+                                            nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_NO_ERROR);
+                   pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0, context,
+                                            &delegate) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
-
-    delegate.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    NL_TEST_ASSERT(inSuite, context->mNumMessageSend == 1);
 
     CASESession pairing1;
+    TestCASESecurePairingExchangeContext * context1 = chip::Platform::New<TestCASESecurePairingExchangeContext>();
+
+    context1->mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                             Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0, context1,
+                                             &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
 void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
@@ -124,24 +138,28 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
 {
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
+    TestCASESecurePairingExchangeContext * contextAccessory    = chip::Platform::New<TestCASESecurePairingExchangeContext>();
+    TestCASESecurePairingExchangeContext * contextCommissioner = chip::Platform::New<TestCASESecurePairingExchangeContext>();
     CASESession pairingAccessory;
     CASESessionSerializable serializableCommissioner;
     CASESessionSerializable serializableAccessory;
 
-    delegateCommissioner.peer = &pairingAccessory;
-    delegateAccessory.peer    = &pairingCommissioner;
+    contextAccessory->peerContext    = contextCommissioner;
+    contextCommissioner->peerContext = contextAccessory;
+
+    contextCommissioner->peer = &pairingAccessory;
+    contextAccessory->peer    = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
-                   pairingAccessory.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0,
-                                                                &delegateAccessory) == CHIP_NO_ERROR);
+                   pairingAccessory.WaitForSessionEstablishment(&accessoryDevOpCred, 0, &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        Optional<NodeId>::Value(2), 1, 0, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred, 0,
+                                                        contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, contextAccessory->mNumMessageSend == 1);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
 
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumMessageSend == 2);
+    NL_TEST_ASSERT(inSuite, contextCommissioner->mNumMessageSend == 2);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     NL_TEST_ASSERT(inSuite, pairingCommissioner.ToSerializable(serializableCommissioner) == CHIP_NO_ERROR);

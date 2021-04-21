@@ -39,8 +39,6 @@ namespace chip {
 
 static constexpr size_t kMaxTagLen = 16;
 
-static constexpr size_t kMaxAppMessageLen = 1200;
-
 typedef int PacketHeaderFlags;
 
 namespace Header {

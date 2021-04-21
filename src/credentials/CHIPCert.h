@@ -249,6 +249,8 @@ public:
      **/
     CHIP_ERROR GetCertType(uint8_t & certType) const;
 
+    CHIP_ERROR GetCertChipVal(uint64_t & chipVal) const;
+
     bool IsEqual(const ChipDN & other) const;
 
     /**
@@ -298,6 +300,9 @@ struct ChipCertificateData
     ~ChipCertificateData();
 
     void Clear();
+
+    const uint8_t * mCertificateBegin;
+    uint16_t mCertificateLen;
 
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
@@ -434,7 +439,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags);
+    CHIP_ERROR LoadCert(chip::TLV::TLVReader & reader, BitFlags<CertDecodeFlags> decodeFlags, const uint8_t * chipCert = nullptr,
+                        uint32_t chipCertLen = 0);
 
     /**
      * @brief Load CHIP certificates into set.
@@ -624,6 +630,8 @@ CHIP_ERROR DecodeChipDN(chip::TLV::TLVReader & reader, ChipDN & dn);
  **/
 CHIP_ERROR ConvertX509CertToChipCert(const uint8_t * x509Cert, uint32_t x509CertLen, uint8_t * chipCertBuf,
                                      uint32_t chipCertBufSize, uint32_t & chipCertLen);
+
+CHIP_ERROR ExtractPubkeyFromX509Cert(const uint8_t * x509Cert, uint32_t x509CertLen, Crypto::P256PublicKey & pubkey);
 
 /**
  * @brief Convert CHIP certificate to the standard X.509 DER encoded certificate.

@@ -27,6 +27,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>
+#include <platform/KeyValueStoreManager.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -184,6 +185,8 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
     LightingMgr().Init();
+
+    PersistedStorage::KeyValueStoreMgrImpl().Init("text.txt");
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();

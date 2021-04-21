@@ -44,9 +44,6 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
-#if CONFIG_NETWORK_LAYER_BLE
-#include <ble/BleLayer.h>
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
@@ -64,10 +61,6 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
-
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * bleLayer = nullptr;
-#endif
 #if CHIP_ENABLE_INTERACTION_MODEL
     app::InteractionModelDelegate * imDelegate = nullptr;
 #endif
@@ -245,9 +238,6 @@ protected:
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     Inet::InetLayer * mInetLayer;
-#if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * mBleLayer = nullptr;
-#endif
     System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
@@ -270,7 +260,7 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////
-    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
+    void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr, uint8_t secureSessionType) override;
     void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
@@ -380,17 +370,11 @@ public:
     void RendezvousCleanup(CHIP_ERROR status);
 
     void ReleaseDevice(Device * device) override;
+    void OnReceiveCredentials(Messaging::ExchangeContext * ec, OperationalCredentialSet * opCredSet,
+                              const CertificateKeyId & trustedRootId) override;
 
-#if CONFIG_NETWORK_LAYER_BLE
-    /**
-     * @brief
-     *   Once we have finished all commissioning work, the Controller should close the BLE
-     *   connection to the device and establish CASE session / another PASE session to the device
-     *   if needed.
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR CloseBleConnection();
-#endif
+    void SetOpenPairingWindow(bool openPairingWindow) { mOpenPairingWindow = openPairingWindow; }
+    bool WillOpenPairingWindow() const { return mOpenPairingWindow; }
 
 private:
     DevicePairingDelegate * mPairingDelegate;
@@ -411,6 +395,8 @@ private:
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
+
+    bool mOpenPairingWindow = false;
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 

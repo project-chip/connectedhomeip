@@ -56,13 +56,19 @@ public:
     Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
 };
 
+class PairSoftAPCase : public PairingCommand
+{
+public:
+    PairSoftAPCase() : PairingCommand("case", PairingMode::SoftAPCase, PairingNetworkType::None) {}
+};
+
 void registerCommandsPairing(Commands & commands)
 {
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Unpair>(),        make_unique<PairBypass>(), make_unique<PairBleWiFi>(),
-        make_unique<PairBleThread>(), make_unique<PairSoftAP>(), make_unique<Ethernet>(),
+        make_unique<Unpair>(),     make_unique<PairBypass>(), make_unique<PairBleWiFi>(),    make_unique<PairBleThread>(),
+        make_unique<PairSoftAP>(), make_unique<Ethernet>(),   make_unique<PairSoftAPCase>(),
     };
 
     commands.Register(clusterName, clusterCommands);

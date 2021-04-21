@@ -36,6 +36,7 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
+#include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
 
@@ -46,6 +47,13 @@ namespace chip {
 using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
+
+// Maximum length of application data that can be encrypted as one block.
+// The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
+// This limit would need additional reviews once we have formalized Secure Transport header.
+//
+// TODO: this should be checked within the transport message sending instead of the session management layer.
+static const size_t kMax_SecureSDU_Length = 1024;
 
 uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 {
@@ -129,12 +137,11 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
     PacketHeader packetHeader;
     ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
-
-    VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen + packetHeader.EncodeSizeBytes(), CHIP_ERROR_MESSAGE_TOO_LONG);
 
     PayloadHeader payloadHeader;
     return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
@@ -163,6 +170,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msgBuf->HasChainedBuffer(), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Find an active connection to the specified peer node
     state = GetPeerConnectionState(session);
@@ -248,12 +256,21 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
+    PeerConnectionState * state_duplicate =
+        mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), Transport::kAnyKeyId, nullptr);
 
     // Find any existing connection with the same node and key ID
     if (state && (state->GetAdminId() == Transport::kUndefinedAdminId || state->GetAdminId() == admin))
     {
         mPeerConnections.MarkConnectionExpired(
             state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
+    }
+
+    // Find any existing connection with the same node and old key ID
+    if (state_duplicate)
+    {
+        mPeerConnections.MarkConnectionExpired(
+            state_duplicate, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New pairing for device 0x%08" PRIx32 "%08" PRIx32 ", key %d!!", static_cast<uint32_t>(peerNodeId >> 32),
@@ -310,8 +327,19 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 
         if (mCB != nullptr)
         {
-            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
+            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this, pairing->GetSecureSessionType());
         }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SecureSessionMgr::OnAttestedDevice(SecureSessionHandle session, OperationalCredentialSet * opCredSet,
+                                              const CertificateKeyId & trustedRootId)
+{
+    if (mCB != nullptr)
+    {
+        mCB->OnReceiveCredentials(session, this, opCredSet, trustedRootId);
     }
 
     return CHIP_NO_ERROR;

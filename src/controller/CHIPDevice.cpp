@@ -40,6 +40,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <messaging/ExchangeDelegate.h>
 #include <protocols/Protocols.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
@@ -47,7 +48,6 @@
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -105,7 +105,8 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try session resumption if needed
-    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
+    if (err != CHIP_NO_ERROR && !resend.IsNull() &&
+        (mState == ConnectionState::SecureConnected || mState == ConnectionState::PinConnected))
     {
         mState = ConnectionState::NotConnected;
 
@@ -129,7 +130,7 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     didLoad = false;
 
     // If there is no secure connection to the device, try establishing it
-    if (mState != ConnectionState::SecureConnected)
+    if (mState != ConnectionState::SecureConnected && mState != ConnectionState::PinConnected)
     {
         ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
         didLoad = true;
@@ -171,19 +172,29 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    serializable.mOpsCreds   = mPairing;
+    serializable.mState = static_cast<uint8_t>(mState);
+    switch (mState)
+    {
+    case ConnectionState::PinConnected:
+        serializable.mOpsCreds.mPASE = mPASEPairing;
+        break;
+    case ConnectionState::DeviceAttested:
+        serializable.mOpsCreds.mOpCred = mOpCredPairing;
+        break;
+    case ConnectionState::SecureConnected:
+        serializable.mOpsCreds.mCASE = mCASEPairing;
+        break;
+    default:
+        error = CHIP_ERROR_INTERNAL;
+        SuccessOrExit(error);
+    }
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceUdpAddress.GetPort());
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
-
-    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
-                  "The underlying type of Transport::Type is not uint8_t.");
-    serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
-
-    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
+    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceUdpAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
                                                  sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
-    mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
+    mDeviceUdpAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
@@ -202,6 +213,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
     size_t len               = strnlen(Uint8::to_const_char(&input.inner[0]), maxlen);
     uint16_t deserializedLen = 0;
+    ConnectionState state;
 
     VerifyOrExit(len < sizeof(SerializedDevice), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -224,7 +236,23 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
-    mPairing  = serializable.mOpsCreds;
+    state = static_cast<ConnectionState>(serializable.mState);
+    switch (state)
+    {
+    case ConnectionState::PinConnected:
+        mPASEPairing = serializable.mOpsCreds.mPASE;
+        break;
+    case ConnectionState::DeviceAttested:
+        mOpCredPairing = serializable.mOpsCreds.mOpCred;
+        break;
+    case ConnectionState::SecureConnected:
+        mCASEReady   = true;
+        mCASEPairing = serializable.mOpsCreds.mCASE;
+        break;
+    default:
+        error = CHIP_ERROR_INTERNAL;
+        SuccessOrExit(error);
+    }
     mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     port      = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
     mAdminId  = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
@@ -244,30 +272,38 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
         VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
     }
 
-    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
-                  "The underlying type of Transport::Type is not uint8_t.");
-    switch (static_cast<Transport::Type>(serializable.mDeviceTransport))
-    {
-    case Transport::Type::kUdp:
-        mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
-        break;
-    case Transport::Type::kBle:
-        mDeviceAddress = Transport::PeerAddress::BLE();
-        break;
-    case Transport::Type::kTcp:
-    case Transport::Type::kUndefined:
-    default:
-        ExitNow(error = CHIP_ERROR_INTERNAL);
-    }
+    mDeviceUdpAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
 
 exit:
     return error;
 }
 
-void Device::OnNewConnection(SecureSessionHandle session)
+void Device::OnNewConnection(Messaging::ExchangeDelegate * exchangeDelegate, SecureSessionHandle session, uint8_t secureSessionType)
 {
-    mState         = ConnectionState::SecureConnected;
+    mState         = secureSessionType == PairingSession::SecureSessionType::kCASESession ? ConnectionState::SecureConnected
+                                                                                          : ConnectionState::PinConnected;
     mSecureSession = session;
+
+    if (!mDeviceAttestation.IsDeviceAttested())
+    {
+        mCommissioningExchangeContext = mExchangeMgr->NewContext(mSecureSession, nullptr);
+        VerifyOrReturn(mCommissioningExchangeContext != nullptr);
+
+        mCommissioningExchangeContext->SetDelegate(dynamic_cast<Messaging::ExchangeDelegate *>(exchangeDelegate));
+
+        mDeviceAttestation.Init(mCommissioningExchangeContext, &mOperationalCredentialSet);
+    }
+}
+
+void Device::OnReceiveCredentials(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    mState         = ConnectionState::DeviceAttested;
+    mSecureSession = session;
+
+    if (mCommissioningExchangeContext != nullptr)
+    {
+        mCommissioningExchangeContext->Close();
+    }
 }
 
 void Device::OnConnectionExpired(SecureSessionHandle session)
@@ -276,13 +312,18 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+void Device::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & header, const PayloadHeader & payloadHeader,
+                               System::PacketBufferHandle msgBuf)
 {
-    if (mState == ConnectionState::SecureConnected)
+    if (mState == ConnectionState::SecureConnected || mState == ConnectionState::PinConnected)
     {
         if (mStatusDelegate != nullptr)
         {
             mStatusDelegate->OnMessage(std::move(msgBuf));
+        }
+        else if (payloadHeader.HasProtocol(chip::Protocols::OpCredentials::Id))
+        {
+            mDeviceAttestation.OnMessageReceived(std::move(msgBuf), ec);
         }
         else
         {
@@ -316,6 +357,8 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
                                              reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
     }
 
+    ChipLogDetail(Controller, "OpenPairingWindow Request with PIN: %d", setupPayload.setUpPINCode);
+
     System::PacketBufferHandle outBuffer;
     ReturnErrorOnFailure(writer.Finalize(&outBuffer));
 
@@ -327,16 +370,29 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR Device::Attest()
+{
+    ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+
+    if (!mDeviceAttestation.IsDeviceAttested())
+    {
+        ReturnErrorOnFailure(mDeviceAttestation.StartAttestation());
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 {
     bool didLoad;
 
+    VerifyOrReturnError(addr.GetTransportType() == Transport::Type::kUdp, CHIP_ERROR_INVALID_ADDRESS);
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
     Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
     VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mDeviceAddress = addr;
+    mDeviceUdpAddress = addr;
     connectionState->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
@@ -344,15 +400,19 @@ CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
 
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PASESession pairingSession;
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    PairingSession * pairingSession = nullptr;
 
-    if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
+    if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected || mState == ConnectionState::PinConnected)
     {
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
-    err = pairingSession.FromSerializable(mPairing);
+    pairingSession = mCASEReady ? dynamic_cast<PairingSession *>(chip::Platform::New<CASESession>())
+                                : dynamic_cast<PairingSession *>(chip::Platform::New<PASESession>());
+    VerifyOrExit(pairingSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = mCASEReady ? pairingSession->FromSerializable(&mCASEPairing) : pairingSession->FromSerializable(&mPASEPairing);
     SuccessOrExit(err);
 
     if (resetNeeded == ResetTransport::kYes)
@@ -363,20 +423,20 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                 ,
             Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
 #endif
-#if CONFIG_NETWORK_LAYER_BLE
-                ,
-            Transport::BleListenParameters(mBleLayer)
-#endif
         );
         SuccessOrExit(err);
     }
 
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceUdpAddress), mDeviceId, pairingSession,
                                       SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
     SuccessOrExit(err);
 
 exit:
 
+    if (pairingSession != nullptr)
+    {
+        chip::Platform::Delete(pairingSession);
+    }
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "LoadSecureSessionParameters returning error %d\n", err);
@@ -389,8 +449,8 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
     if (mState == ConnectionState::NotConnected)
         return false;
 
-    addr = mDeviceAddress.GetIPAddress();
-    port = mDeviceAddress.GetPort();
+    addr = mDeviceUdpAddress.GetIPAddress();
+    port = mDeviceUdpAddress.GetPort();
     return true;
 }
 
@@ -403,6 +463,11 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
                               Callback::Cancelable * onReportCallback)
 {
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+}
+
+CHIP_ERROR Device::DeserializeOperationalCredentials()
+{
+    return mOperationalCredentialSet.FromSerializable(mOpCredPairing);
 }
 
 void Device::InitCommandSender()

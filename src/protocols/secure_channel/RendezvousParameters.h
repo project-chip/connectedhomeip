@@ -102,6 +102,46 @@ public:
         return *this;
     }
 
+    bool HasOpCredSet() const { return mHasOpCredSet; }
+    const OperationalCredentialSet * GetOpCredSet() const { return mOpCredSet; }
+    RendezvousParameters & SetOpCredSet(OperationalCredentialSet * opCredSet)
+    {
+        mOpCredSet    = opCredSet;
+        mHasOpCredSet = true;
+        return *this;
+    }
+
+    PairingSession::SecureSessionType GetSecureSessionType() const
+    {
+        PairingSession::SecureSessionType secureSessionType = PairingSession::SecureSessionType::kUnexpected;
+
+        if (mHasOpCredSet ^ (mHasPASEVerifier || (mSetupPINCode != 0)))
+        {
+            if (mHasOpCredSet)
+            {
+                secureSessionType = PairingSession::SecureSessionType::kCASESession;
+            }
+            else
+            {
+                secureSessionType = PairingSession::SecureSessionType::kPASESession;
+            }
+        }
+        return secureSessionType;
+    }
+
+    const void * GetSecureSessionArg() const
+    {
+        switch (GetSecureSessionType())
+        {
+        case PairingSession::SecureSessionType::kPASESession:
+            return &mSetupPINCode;
+        case PairingSession::SecureSessionType::kCASESession:
+            return mOpCredSet;
+        default:
+            return nullptr;
+        }
+    }
+
     bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
 
     const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
@@ -141,6 +181,9 @@ private:
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
+
+    OperationalCredentialSet * mOpCredSet;
+    bool mHasOpCredSet = false;
 
     RendezvousAdvertisementDelegate * mAdvDelegate = nullptr;
 

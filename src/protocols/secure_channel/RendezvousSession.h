@@ -26,11 +26,11 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/NetworkProvisioning.h>
-#include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/BufferWriter.h>
 #include <transport/AdminPairingTable.h>
+#include <transport/PairingSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -77,6 +77,7 @@ public:
     {
         kInit = 0,
         kSecurePairing,
+        kNetworkProvisioning,
         kRendezvousComplete,
     };
 
@@ -103,10 +104,11 @@ public:
      *
      * @return PASESession The associated pairing session
      */
-    PASESession & GetPairingSession() { return mPairingSession; }
+    PairingSession * GetPairingSession() { return mPairingSession; }
 
     Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
+    PairingSession::SecureSessionType GetSecureSessionType() const { return mParams.GetSecureSessionType(); }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished() override;
@@ -144,15 +146,14 @@ public:
     void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
 
 private:
-    CHIP_ERROR Pair(uint32_t setupPINCode);
-    CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
-    CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
+    CHIP_ERROR Pair(const void * secureSessionArg);
+    CHIP_ERROR WaitForPairing(const void * secureSessionArg, PairingSession::SessionParameter sessionParameter);
 
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
-    PASESession mPairingSession;
+    PairingSession * mPairingSession = nullptr;
     NetworkProvisioning mNetworkProvision;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
     TransportMgrBase * mTransportMgr;
