@@ -19,7 +19,8 @@
 
 #include "LightingManager.h"
 
-#include <cstdio>
+#include <iostream>
+#include <support/logging/CHIPLogging.h>
 
 LightingManager LightingManager::sLight;
 
@@ -49,13 +50,13 @@ bool LightingManager::InitiateAction(Action_t aAction)
     switch (aAction)
     {
     case ON_ACTION:
-        printf("LightingManager::InitiateAction(ON_ACTION)");
+        ChipLogDetail(AppServer, "LightingManager::InitiateAction(ON_ACTION)");
         break;
     case OFF_ACTION:
-        printf("LightingManager::InitiateAction(OFF_ACTION)");
+        ChipLogDetail(AppServer, "LightingManager::InitiateAction(OFF_ACTION)");
         break;
     default:
-        printf("LightingManager::InitiateAction(unknown)");
+        ChipLogDetail(AppServer, "LightingManager::InitiateAction(unknown)");
         break;
     }
 

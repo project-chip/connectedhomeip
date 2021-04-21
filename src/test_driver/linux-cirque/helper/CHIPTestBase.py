@@ -130,34 +130,33 @@ class CHIPVirtualHome:
 
     def connect_to_thread_network(self):
         self.logger.info("Running commands to form Thread network")
-        time.sleep(3)  # Avoid sending commands at very beginning.
+        for device in self.non_ap_devices:
+            self.wait_for_device_output(device['id'], "Border router agent started.", 5)
         otInitCommands = [
             "ot-ctl thread stop",
             "ot-ctl ifconfig down",
-            "ot-ctl dataset init new",
-            "ot-ctl dataset panid 0x1234",
-            "ot-ctl dataset networkname OpenThread",
-            "ot-ctl dataset channel 13",
-            "ot-ctl dataset extpanid dead00beef00cafe",
-            "ot-ctl dataset meshlocalprefix \"fd01:2345:6789:0abc::\"",
-            "ot-ctl dataset masterkey 00112233445566778899aabbccddeeff",
-            "ot-ctl dataset commit active",
-            "ot-ctl dataset active",  # This will emit an output of dataset in flask.log
+            "ot-ctl dataset set active 0e080000000000010000000300000d35060004001fffe00208dead00beef00cafe0708fd01234567890abc051000112233445566778899aabbccddeeff030a4f70656e546872656164010212340410ad463152f9622c7297ec6c6c543a63e70c0302a0ff",
             "ot-ctl ifconfig up",
             "ot-ctl thread start",
+            "ot-ctl dataset active", # Emit
         ]
         for device in self.non_ap_devices:
             # Set default openthread provisioning
             for cmd in otInitCommands:
                 self.execute_device_cmd(device['id'], cmd)
         self.logger.info("Waiting for Thread network to be formed...")
-        time.sleep(15)
-        roles = set()
-        for device in self.non_ap_devices:
-            reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
-            roles.add(reply['output'].split()[0])
-        self.assertTrue('leader' in roles)
-        self.assertTrue('router' in roles or 'child' in roles)
+        threadNetworkFormed = False
+        for i in range(30):
+            roles = set()
+            for device in self.non_ap_devices:
+                # We can only check the status of ot-agent by query its state.
+                reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
+                roles.add(reply['output'].split()[0])
+            if ('leader' in roles) and ('router' in roles or 'child' in roles):
+                threadNetworkFormed = True
+                break
+            time.sleep(1)
+        self.assertTrue(threadNetworkFormed)
         self.logger.info("Thread network formed")
 
     def enable_wifi_on_device(self):
@@ -197,6 +196,17 @@ class CHIPVirtualHome:
 
     def get_device_log(self, device_id):
         return self.query_api('device_log', [self.home_id, device_id], binary=True)
+
+    def wait_for_device_output(self, device_id, pattern, timeout = 1):
+        due = time.time() + timeout
+        while True:
+            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern, ]):
+                return True
+            if time.time() < due:
+                time.sleep(1)
+            else:
+                break
+        return False
 
     def assertTrue(self, exp, note=None):
         '''

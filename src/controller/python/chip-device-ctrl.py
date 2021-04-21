@@ -39,6 +39,7 @@ import string
 import re
 from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
+from chip.setup_payload import SetupPayload
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -143,7 +144,8 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
+        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
+            controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
@@ -167,15 +169,19 @@ class DeviceMgrCmd(Cmd):
             pass
 
     command_names = [
+        "setup-payload",
+
         "ble-scan",
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
 
         "connect",
+        "close-ble",
         "resolve",
         "zcl",
         "zclread",
+        "zclconfigure",
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
@@ -238,11 +244,11 @@ class DeviceMgrCmd(Cmd):
                 80,
             )
 
-    def do_close(self, line):
+    def do_closeble(self, line):
         """
-        close
+        close-ble
 
-        Close the connection to the device.
+        Close the ble connection to the device.
         """
 
         args = shlex.split(line)
@@ -253,7 +259,7 @@ class DeviceMgrCmd(Cmd):
             return
 
         try:
-            self.devCtrl.Close()
+            self.devCtrl.CloseBLEConnection()
         except exceptions.ChipStackException as ex:
             print(str(ex))
 
@@ -294,6 +300,27 @@ class DeviceMgrCmd(Cmd):
             return
 
         print("Done.")
+
+    def do_setuppayload(self, line):
+        """
+        setup-payload parse-manual <manual-pairing-code>
+        setup-payload parse-qr <qr-code-payload>
+        """
+        try:
+            args = shlex.split(line)
+            if (len(args) != 2) or (args[0] not in ("parse-manual", "parse-qr")):
+                self.do_help("setup-payload")
+                return
+
+            if args[0] == "parse-manual":
+                SetupPayload().ParseManualPairingCode(args[1]).Print()
+
+            if args[0] == "parse-qr":
+                SetupPayload().ParseQrCode(args[1]).Print()
+
+        except exceptions.ChipStackException as ex:
+            print(str(ex))
+            return
 
     def do_bleadapterselect(self, line):
         """
@@ -386,14 +413,16 @@ class DeviceMgrCmd(Cmd):
             print("Device is assigned with nodeid = {}".format(nodeid))
 
             if args[0] == "-ip" and len(args) >= 3:
-                self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]), nodeid)
+                self.devCtrl.ConnectIP(args[1].encode(
+                    "utf-8"), int(args[2]), nodeid)
             elif args[0] == "-ble" and len(args) >= 3:
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-            print("Device temporary node id (**this does not match spec**): {}".format(nodeid))
+            print(
+                "Device temporary node id (**this does not match spec**): {}".format(nodeid))
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
@@ -411,7 +440,8 @@ class DeviceMgrCmd(Cmd):
                 err = self.devCtrl.ResolveNode(int(args[0]), int(args[1]))
                 if err == 0:
                     address = self.devCtrl.GetAddressAndPort(int(args[1]))
-                    address = "{}:{}".format(*address) if address else "unknown"
+                    address = "{}:{}".format(
+                        *address) if address else "unknown"
                     print("Current address: " + address)
             else:
                 self.do_help("resolve")
@@ -453,15 +483,24 @@ class DeviceMgrCmd(Cmd):
                 # When command takes no arguments, (not command) is True
                 if command == None:
                     raise exceptions.UnknownCommand(args[0], args[1])
-                self.devCtrl.ZCLSend(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
+                err, res = self.devCtrl.ZCLSend(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command), blocking=True)
+                if err != 0:
+                    print("Failed to receive command response: {}".format(res))
+                elif res != None:
+                    print("Received command status response:")
+                    print(res)
+                else:
+                    print("Success, no status code is attached with response.")
             else:
                 self.do_help("zcl")
         except exceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
         except Exception as ex:
+            import traceback
             print("An exception occurred during processing input:")
+            traceback.print_exc()
             print(str(ex))
 
     def do_zclread(self, line):
@@ -481,7 +520,8 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 5:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(args[2]), int(args[3]), int(args[4]))
+                self.devCtrl.ZCLReadAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]))
             else:
                 self.do_help("zclread")
         except exceptions.ChipStackException as ex:
@@ -491,39 +531,49 @@ class DeviceMgrCmd(Cmd):
             print("An exception occurred during processing input:")
             print(str(ex))
 
-    def do_setpairingwificredential(self, line):
+    def do_zclconfigure(self, line):
         """
-        set-pairing-wifi-credential <ssid> <password>
-
-        Set WiFi credential to be used while pairing a Wi-Fi device
+        To configure ZCL attribute reporting:
+        zclconfigure <cluster> <attribute> <nodeid> <endpoint> <minInterval> <maxInterval> <change>
         """
         try:
             args = shlex.split(line)
-            if len(args) == 2:
-                self.devCtrl.SetWifiCredential(args[0], args[1])
-                print("WiFi credential set")
+            all_attrs = self.devCtrl.ZCLAttributeList()
+            if len(args) == 1 and args[0] == '?':
+                print('\n'.join(all_attrs.keys()))
+            elif len(args) == 2 and args[0] == '?':
+                if args[1] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[1])
+                print('\n'.join(all_attrs.get(args[1])))
+            elif len(args) == 7:
+                if args[0] not in all_attrs:
+                    raise exceptions.UnknownCluster(args[0])
+                self.devCtrl.ZCLConfigureAttribute(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), int(args[5]), int(args[6]))
             else:
-                self.do_help("set-pairing-wifi-credential")
+                self.do_help("zclconfigure")
         except exceptions.ChipStackException as ex:
+            print("An exception occurred during configuring reporting of ZCL attribute:")
             print(str(ex))
-            return
+        except Exception as ex:
+            print("An exception occurred during processing input:")
+            print(str(ex))
+
+    def do_setpairingwificredential(self, line):
+        """
+        set-pairing-wifi-credential
+
+        Removed, use network commissioning cluster instead.
+        """
+        print("Pairing WiFi Credential is nolonger available, use NetworkCommissioning cluster instead.")
 
     def do_setpairingthreadcredential(self, line):
         """
-        set-pairing-thread-credential <channel> <panid> <masterkey>
+        set-pairing-thread-credential
 
-        Set Thread credential to be used while pairing a Thread device
+        Removed, use network commissioning cluster instead.
         """
-        try:
-            args = shlex.split(line)
-            if len(args) == 3:
-                self.devCtrl.SetThreadCredential(int(args[0]), int(args[1], 16), args[2])
-                print("Thread credential set")
-            else:
-                self.do_help("set-pairing-thread-credential")
-        except exceptions.ChipStackException as ex:
-            print(str(ex))
-            return
+        print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
 
     def do_history(self, line):
         """
@@ -602,16 +652,19 @@ def main():
     adapterId = None
     if sys.platform.startswith("linux"):
         if not options.bluetoothAdapter.startswith("hci"):
-            print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+            print(
+                "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
             sys.exit(-1)
         else:
             try:
                 adapterId = int(options.bluetoothAdapter[3:])
             except:
-                print("Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
+                print(
+                    "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)
 
-    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr, controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
+    devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
+                             controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
     print("Chip Device Controller Shell")
     if options.rendezvousAddr:
         print("Rendezvous address set to %s" % options.rendezvousAddr)

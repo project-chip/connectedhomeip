@@ -2,6 +2,7 @@
     "name": "CHIP Application templates",
     "version": "chip-v1",
     "helpers": [
+        "common/ListHelper.js",
         "common/StringHelper.js",
         "templates/app/helper.js",
         "templates/chip/helper.js"
@@ -49,6 +50,11 @@
             "path": "templates/app/attribute-type.zapt",
             "name": "ZCL attribute-type header",
             "output": "attribute-type.h"
+        },
+        {
+            "path": "templates/app/attribute-size-src.zapt",
+            "name": "ZCL attribute-size",
+            "output": "attribute-size.cpp"
         },
         {
             "path": "templates/app/attribute-size.zapt",

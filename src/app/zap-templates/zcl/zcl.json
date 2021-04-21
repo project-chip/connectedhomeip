@@ -21,6 +21,7 @@
         "descriptor-cluster.xml",
         "types.xml",
         "general.xml",
+        "operational-credentials-cluster.xml",
         "general-commissioning-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "ha.xml",
@@ -34,6 +35,7 @@
         "zll-devices.xml",
         "ta.xml",
         "ta-devices.xml",
+        "tv-device-types.xml",
         "hc.xml",
         "hc-devices.xml",
         "green-power.xml",
@@ -43,7 +45,8 @@
         "wwah-silabs.xml",
         "wwah-silabs-devices.xml",
         "sample-extensions.xml",
-        "commissioning.xml"
+        "commissioning.xml",
+        "chip-ota.xml"
     ],
     "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {

@@ -173,10 +173,10 @@ BLE_ERROR BLEEndPoint::HandleConnectComplete()
     StopConnectTimer();
 
     // We've successfully completed the BLE transport protocol handshake, so let the application know we're open for business.
-    if (OnConnectComplete != nullptr)
+    if (mBleTransport != nullptr)
     {
         // Indicate connect complete to next-higher layer.
-        OnConnectComplete(this, BLE_NO_ERROR);
+        mBleTransport->OnEndPointConnectComplete(this, BLE_NO_ERROR);
     }
     else
     {
@@ -197,11 +197,11 @@ BLE_ERROR BLEEndPoint::HandleReceiveConnectionComplete()
     // Cancel receive connection timer.
     StopReceiveConnectionTimer();
 
-    // We've successfully completed the BLE transport protocol handshake, so let the application know we're open for business.
-    if (mBle->OnChipBleConnectReceived != nullptr)
+    // We've successfully completed the BLE transport protocol handshake, so let the transport know we're open for business.
+    if (mBleTransport != nullptr)
     {
         // Indicate BLE transport protocol connection received to next-higher layer.
-        mBle->OnChipBleConnectReceived(this);
+        err = mBleTransport->SetEndPoint(this);
     }
     else
     {
@@ -365,6 +365,11 @@ void BLEEndPoint::DoClose(uint8_t flags, BLE_ERROR err)
             {
                 DoCloseCallback(oldState, flags, err);
             }
+
+            if ((flags & kBleCloseFlag_SuppressCallback) != 0)
+            {
+                mBleTransport->OnEndPointConnectionClosed(this, err);
+            }
         }
     }
 }
@@ -382,6 +387,11 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
     if (oldState != kState_Closing && (flags & kBleCloseFlag_SuppressCallback) == 0)
     {
         DoCloseCallback(oldState, flags, err);
+    }
+
+    if ((flags & kBleCloseFlag_SuppressCallback) != 0)
+    {
+        mBleTransport->OnEndPointConnectionClosed(this, err);
     }
 
     // If underlying BLE connection has closed, connection object is invalid, so just free the end point and return.
@@ -434,16 +444,16 @@ void BLEEndPoint::DoCloseCallback(uint8_t state, uint8_t flags, BLE_ERROR err)
 {
     if (state == kState_Connecting)
     {
-        if (OnConnectComplete != nullptr)
+        if (mBleTransport != nullptr)
         {
-            OnConnectComplete(this, err);
+            mBleTransport->OnEndPointConnectComplete(this, err);
         }
     }
     else
     {
-        if (OnConnectionClosed != nullptr)
+        if (mBleTransport != nullptr)
         {
-            OnConnectionClosed(this, err);
+            mBleTransport->OnEndPointConnectionClosed(this, err);
         }
     }
 
@@ -557,7 +567,6 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     }
 #endif
 
-    // BleLayerObject initialization:
     mBle      = bleLayer;
     mRefCount = 1;
 
@@ -579,6 +588,17 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
 
 exit:
     return err;
+}
+
+void BLEEndPoint::Release()
+{
+    // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
+    // object. This effectively declared the object free and ready for re-allocation.
+    mRefCount--;
+    if (mRefCount == 0)
+    {
+        mBle = nullptr;
+    }
 }
 
 BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
@@ -1427,10 +1447,10 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
         else
 #endif
             // If we have a message received callback, and end point is not closing...
-            if (OnMessageReceived && mState != kState_Closing)
+            if (mBleTransport != nullptr && mState != kState_Closing)
         {
             // Pass received message up the stack.
-            OnMessageReceived(this, std::move(full_packet));
+            mBleTransport->OnEndPointMessageReceived(this, std::move(full_packet));
         }
     }
 

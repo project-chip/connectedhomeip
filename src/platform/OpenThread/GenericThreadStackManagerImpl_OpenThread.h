@@ -41,8 +41,6 @@ class ThreadStackManagerImpl;
 
 namespace Internal {
 
-class DeviceNetworkInfo;
-
 /**
  * Provides a generic implementation of ThreadStackManager features that works in conjunction
  * with OpenThread.
@@ -75,9 +73,8 @@ protected:
 
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
@@ -91,6 +88,7 @@ protected:
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 
@@ -98,6 +96,7 @@ protected:
     CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
                               size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
     CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
+    CHIP_ERROR _RemoveAllSrpServices();
     CHIP_ERROR _SetupSrpHost(const char * aHostName);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 

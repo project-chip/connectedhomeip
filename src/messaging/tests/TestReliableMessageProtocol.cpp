@@ -105,18 +105,6 @@ void test_os_sleep_ms(uint64_t millisecs)
     nanosleep(&sleep_time, nullptr);
 }
 
-class ReliableMessageDelegateObject : public ReliableMessageDelegate
-{
-public:
-    ~ReliableMessageDelegateObject() override {}
-
-    /* Application callbacks */
-    void OnSendError(CHIP_ERROR err) override { SendErrorCalled = true; }
-    void OnAckRcvd() override {}
-
-    bool SendErrorCalled = false;
-};
-
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -154,14 +142,10 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     ReliableMessageMgr::RetransTableEntry * entry;
-    ReliableMessageDelegateObject delegate;
-    rc->SetDelegate(&delegate);
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    NL_TEST_ASSERT(inSuite, !delegate.SendErrorCalled);
     rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-    NL_TEST_ASSERT(inSuite, delegate.SendErrorCalled);
 }
 
 void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
@@ -189,10 +173,8 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
-        3, // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
     gSendMessageCount = 0;
@@ -226,9 +208,6 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     ReliableMessageContext * rc = exchange->GetReliableMessageContext();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
-
-    ReliableMessageDelegateObject delegate;
-    rc->SetDelegate(&delegate);
 
     NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
 }

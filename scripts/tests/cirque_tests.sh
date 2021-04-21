@@ -24,17 +24,34 @@ TEST_DIR=$REPO_DIR/src/test_driver/linux-cirque
 LOG_DIR=${LOG_DIR:-$(mktemp -d)}
 GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
 
+# The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
+# Using the same ot-br-posix version as chip
+OPENTHREAD=$REPO_DIR/third_party/openthread/repo
+OPENTHREAD_CHECKOUT=$(cd "$REPO_DIR" && git rev-parse :third_party/openthread/repo)
+
+CIRQUE_CACHE_PATH=${GITHUB_CACHE_PATH:-"/tmp/cirque-cache/"}
+OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation.tgz"
+
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
     "EchoTest"
     "InteractionModelTest"
     "OnOffClusterTest"
+    "MobileDeviceTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"
 BOLD_YELLOW_TEXT="\033[1;33m"
 BOLD_RED_TEXT="\033[1;31m"
 RESET_COLOR="\033[0m"
+
+function __screen() {
+    if [[ "x$GITHUB_ACTION_RUN" != "x1" ]]; then
+        screen -dm "$@"
+    else
+        "$@"
+    fi
+}
 
 function __kill_grep() {
     ps aux | grep "$1" | awk '{print $2}' | sort -k2 -rn |
@@ -58,9 +75,14 @@ function __virtual_thread_clean() {
 function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
-    FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/simulation/bin/ \
-        python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
+    # screen is a wrapper function, it run the program directly on github actions and wrap
+    # the command using screen when running locally.
+    # When running the ManualTests, if Ctrl-C is send to the shell, it will stop flask as well.
+    # This is not expected, so we append a screen to make it run totally background.
+    # We don't have this issue on GitHub actions, so we don't need screen.
+    __screen bash -c 'FLASK_APP=cirque/restservice/service.py \
+        PATH="'"$PATH"'":"'"$REPO_DIR"'"/third_party/openthread/repo/output/simulation/bin/ \
+        python3 -m flask run >"'"$LOG_DIR"'"/"'"$CURRENT_TEST"'"/flask.log 2>&1'
 }
 
 function __cirquetest_clean_flask() {
@@ -71,27 +93,44 @@ function __cirquetest_clean_flask() {
 }
 
 function __cirquetest_build_ot() {
-    pushd .
-    cd "$REPO_DIR"/third_party/openthread/repo
+    echo -e "[$BOLD_YELLOW_TEXT""INFO""$RESET_COLOR] Cache miss, build openthread simulation."
     ./bootstrap
     make -f examples/Makefile-simulation
+    tar czf "$OT_SIMULATION_CACHE" output
+}
+
+function __cirquetest_build_ot_lazy() {
+    pushd .
+    cd "$REPO_DIR"/third_party/openthread/repo
+    ([[ -f "$OT_SIMULATION_CACHE" ]] && tar zxf "$OT_SIMULATION_CACHE") || __cirquetest_build_ot
     popd
 }
 
+function __cirquetest_self_hash() {
+    shasum "$SOURCE" | awk '{ print $1 }'
+}
+
+function cirquetest_cachekey() {
+    echo "$("$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/cachekey.sh).openthread.$OPENTHREAD_CHECKOUT.cirque_test.$(__cirquetest_self_hash)"
+}
+
+function cirquetest_cachekeyhash() {
+    cirquetest_cachekey | shasum | awk '{ print $1 }'
+}
+
 function cirquetest_bootstrap() {
-    set -e
+    set -ex
+
     cd "$REPO_DIR"/third_party/cirque/repo
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
 
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
-        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download --latest
-    else
-        "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh --try-download
-    fi
+    "$REPO_DIR"/integrations/docker/ci-only-images/chip-cirque-device-base/build.sh
 
-    __cirquetest_build_ot
+    __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
+
+    set +x
 
     # Call activate here so the later tests can be faster
     # set -e will cause error if activate.sh is sourced twice

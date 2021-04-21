@@ -24,6 +24,7 @@
 #include <inttypes.h>
 
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageContext.h>
 
 #include <core/CHIPEncoding.h>
@@ -38,31 +39,17 @@ namespace chip {
 namespace Messaging {
 
 ReliableMessageContext::ReliableMessageContext() :
-    mManager(nullptr), mExchange(nullptr), mDelegate(nullptr), mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0),
-    mPendingPeerAckId(0)
+    mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mPendingPeerAckId(0)
 {}
 
-void ReliableMessageContext::Init(ReliableMessageMgr * manager, ExchangeContext * exchange)
+void ReliableMessageContext::RetainContext()
 {
-    mManager  = manager;
-    mExchange = exchange;
-    mDelegate = nullptr;
-
-    SetDropAckDebug(false);
-    SetAckPending(false);
-    SetPeerRequestedAck(false);
-    SetMsgRcvdFromPeer(false);
-    SetAutoRequestAck(true);
+    GetExchangeContext()->Retain();
 }
 
-void ReliableMessageContext::Retain()
+void ReliableMessageContext::ReleaseContext()
 {
-    mExchange->Retain();
-}
-
-void ReliableMessageContext::Release()
-{
-    mExchange->Release();
+    GetExchangeContext()->Release();
 }
 
 bool ReliableMessageContext::AutoRequestAck() const
@@ -110,9 +97,29 @@ void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
     mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
 }
 
+bool ReliableMessageContext::IsOccupied() const
+{
+    return mFlags.Has(Flags::kFlagOccupied);
+}
+
+void ReliableMessageContext::SetOccupied(bool inOccupied)
+{
+    mFlags.Set(Flags::kFlagOccupied, inOccupied);
+}
+
 bool ReliableMessageContext::ShouldDropAckDebug() const
 {
     return mFlags.Has(Flags::kFlagDropAckDebug);
+}
+
+ExchangeContext * ReliableMessageContext::GetExchangeContext()
+{
+    return static_cast<ExchangeContext *>(this);
+}
+
+ReliableMessageMgr * ReliableMessageContext::GetReliableMessageMgr()
+{
+    return static_cast<ExchangeContext *>(this)->GetExchangeMgr()->GetReliableMessageMgr();
 }
 
 CHIP_ERROR ReliableMessageContext::FlushAcks()
@@ -135,9 +142,14 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
-uint64_t ReliableMessageContext::GetCurrentRetransmitTimeoutTick()
+uint64_t ReliableMessageContext::GetInitialRetransmitTimeoutTick()
 {
-    return (HasRcvdMsgFromPeer() ? mConfig.mActiveRetransTimeoutTick : mConfig.mInitialRetransTimeoutTick);
+    return mConfig.mInitialRetransTimeoutTick;
+}
+
+uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
+{
+    return mConfig.mActiveRetransTimeoutTick;
 }
 
 /**
@@ -158,7 +170,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Msg is an Ack; Check Retrans Table and remove message context
-    if (!mManager->CheckAndRemRetransTable(this, AckMsgId))
+    if (!GetReliableMessageMgr()->CheckAndRemRetransTable(this, AckMsgId))
     {
 #if !defined(NDEBUG)
         ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", AckMsgId);
@@ -168,11 +180,6 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     }
     else
     {
-        if (mDelegate)
-        {
-            mDelegate->OnAckRcvd();
-        }
-
 #if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable", AckMsgId);
 #endif
@@ -191,7 +198,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
         return err;
 
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    mManager->ExpireTicks();
+    GetReliableMessageMgr()->ExpireTicks();
 
     // If the message IS a duplicate.
     if (MsgFlags.Has(MessageFlagValues::kDuplicateMessage))
@@ -237,14 +244,15 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<M
 
         // Replace the Pending ack id.
         mPendingPeerAckId = MessageId;
-        mNextAckTimeTick  = static_cast<uint16_t>(mConfig.mAckPiggybackTimeoutTick +
-                                                 mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+        mNextAckTimeTick =
+            static_cast<uint16_t>(CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
+                                  GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
         SetAckPending(true);
     }
 
 exit:
     // Schedule next physical wakeup
-    mManager->StartTimer();
+    GetReliableMessageMgr()->StartTimer();
     return err;
 }
 
@@ -257,20 +265,12 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    if (mExchange != nullptr)
-    {
 #if !defined(NDEBUG)
-        ChipLogProgress(ExchangeManager, "Sending Standalone Ack for MsgId:%08" PRIX32, mPendingPeerAckId);
+    ChipLogProgress(ExchangeManager, "Sending Standalone Ack for MsgId:%08" PRIX32, mPendingPeerAckId);
 #endif
 
-        err = mExchange->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
-                                     BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
-    }
-    else
-    {
-        ChipLogError(ExchangeManager, "ExchangeContext is not initilized in ReliableMessageContext");
-        err = CHIP_ERROR_NOT_CONNECTED;
-    }
+    err = GetExchangeContext()->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
+                                            BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
 
 exit:
     if (IsSendErrorNonCritical(err))

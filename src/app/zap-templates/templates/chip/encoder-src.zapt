@@ -180,7 +180,7 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterRead{{asCamelC
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
        .Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID)
-       .Put16({{asHex attributeCode 4}});
+       .Put16({{asHex code 4}});
     COMMAND_FOOTER();
 }
 
@@ -200,7 +200,7 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterWrite{{asCamel
     buf.Put8(kFrameControlGlobalCommand)
        .Put8(seqNum)
        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-       .Put16({{asHex attributeCode 4}})
+       .Put16({{asHex code 4}})
        .Put8({{atomicTypeId}})
     {{#if (isString type)}}
        .Put(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased name}}StrLen))
@@ -221,7 +221,7 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asC
        .Put8(seqNum)
        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-       .Put16({{asHex attributeCode 4}})
+       .Put16({{asHex code 4}})
        .Put8({{atomicTypeId}})
        .Put16(minInterval)
        .Put16(maxInterval);

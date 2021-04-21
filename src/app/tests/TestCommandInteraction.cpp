@@ -31,11 +31,11 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -66,6 +66,15 @@ private:
                                       bool aIsEmptyResponse);
     static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode,
                                                       bool aIsEmptyResponse);
+};
+
+class TestExchangeDelegate : public Messaging::ExchangeDelegate
+{
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle payload) override
+    {}
+
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
 void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
@@ -115,12 +124,12 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
 void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand,
                                                    bool aNeedStatusCode, bool aIsEmptyResponse)
 {
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
-    chip::app::Command::CommandParams commandParams = { 1, // Endpoint
-                                                        2, // GroupId
-                                                        3, // ClusterId
-                                                        4, // CommandId
-                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
+                                                       2, // GroupId
+                                                       3, // ClusterId
+                                                       4, // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     if (aNeedStatusCode)
     {
@@ -131,27 +140,22 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
         }
         else
         {
-            apCommand->AddStatusCode(&commandParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+            apCommand->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
                                      Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
         }
     }
     else
     {
-        chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
-        chip::TLV::TLVWriter writer  = apCommand->CreateCommandDataElementTLVWriter();
-        err                          = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
+        err = apCommand->PrepareCommand(&commandPathParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        err = writer.PutBoolean(chip::TLV::ContextTag(1), true);
+        chip::TLV::TLVWriter * writer = apCommand->GetCommandDataElementTLVWriter();
+
+        err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        err = writer.EndContainer(dummyType);
+        err = apCommand->FinishCommand();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        err = writer.Finalize();
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-        apCommand->AddCommand(commandParams);
     }
 }
 
@@ -177,19 +181,24 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
 
 void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err                                  = CHIP_NO_ERROR;
-    chip::app::Command::CommandParams commandParams = { 1, // Endpoint
-                                                        2, // GroupId
-                                                        3, // ClusterId
-                                                        4, // CommandId
-                                                        (chip::app::Command::CommandPathFlags::kEndpointIdValid) };
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
+                                                       2, // GroupId
+                                                       3, // ClusterId
+                                                       4, // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
     app::CommandHandler commandHandler;
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                                       = commandHandler.Init(&chip::gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     commandHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
-    err                          = commandHandler.AddCommand(commandParams);
+
+    TestExchangeDelegate delegate;
+    commandHandler.mpExchangeCtx->SetDelegate(&delegate);
+    err = commandHandler.PrepareCommand(&commandPathParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = commandHandler.FinishCommand();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.SendCommandResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
@@ -221,7 +230,9 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     commandHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
-    ;
+    TestExchangeDelegate delegate;
+    commandHandler.mpExchangeCtx->SetDelegate(&delegate);
+
     AddCommandDataElement(apSuite, apContext, &commandHandler, aNeedStatusCode, aIsEmptyResponse);
     err = commandHandler.SendCommandResponse();
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);

@@ -37,6 +37,9 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
 #include "nvs_flash.h"
 
 #include <cmath>
@@ -46,11 +49,13 @@
 #include <vector>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <server/Mdns.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 
+#include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
 using namespace ::chip;
@@ -181,8 +186,19 @@ public:
         }
         else
         {
+            auto & name    = std::get<0>(attribute);
+            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
+
             ESP_LOGI(TAG, "editing attribute as string: '%s' (%s)", value.c_str(), i == 0 ? "+" : "-");
             value = (value == "Closed") ? "Open" : "Closed";
+            ESP_LOGI(TAG, "name and cluster: '%s' (%s)", name.c_str(), cluster.c_str());
+            if (name == "State" && cluster == "Lock")
+            {
+                // update the doorlock attribute here
+                uint8_t attributeValue = value == "Closed" ? EMBER_ZCL_DOOR_LOCK_STATE_LOCKED : EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
+                emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID,
+                                            (uint8_t *) &attributeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
         }
     }
 };
@@ -271,10 +287,12 @@ class SetupListModel : public ListScreen::Model
 public:
     SetupListModel()
     {
-        std::string resetWiFi      = "Reset WiFi";
-        std::string resetToFactory = "Reset to factory";
+        std::string resetWiFi              = "Reset WiFi";
+        std::string resetToFactory         = "Reset to factory";
+        std::string forceWifiCommissioning = "Force WiFi commissioning";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
+        options.emplace_back(forceWifiCommissioning);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }
@@ -290,6 +308,11 @@ public:
         else if (i == 1)
         {
             ConfigurationMgr().InitiateFactoryReset();
+        }
+        else if (i == 2)
+        {
+            app::Mdns::AdvertiseCommisioning();
+            OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }
 
@@ -332,6 +355,14 @@ void SetupPretendDevices()
     // write the temp attribute
     emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(21 * 100));
 
+    AddDevice("Door Lock");
+    AddEndpoint("Default");
+    AddCluster("Lock");
+    AddAttribute("State", "Open");
+    // write the door lock state
+    uint8_t attributeValue = EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
+    emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, &attributeValue,
+                                ZCL_INT8U_ATTRIBUTE_TYPE);
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
     AddCluster("Door");
@@ -362,7 +393,8 @@ void GetGatewayIP(char * ip_buf, size_t ip_len)
 
 bool isRendezvousBLE()
 {
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
+    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
+    return flags.Has(RendezvousInformationFlag::kBLE);
 }
 
 std::string createSetupPayload()
@@ -406,7 +438,7 @@ std::string createSetupPayload()
     payload.version               = 0;
     payload.discriminator         = discriminator;
     payload.setUpPINCode          = setupPINCode;
-    payload.rendezvousInformation = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+    payload.rendezvousInformation = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
     payload.vendorID              = vendorId;
     payload.productID             = productId;
 

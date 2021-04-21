@@ -27,6 +27,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
   ../third_party/connectedhomeip/src/app/server                                     \
   ../third_party/connectedhomeip/src/app/util                                       \
+  ../third_party/connectedhomeip/src/app/clusters/descriptor                        \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
   ../third_party/connectedhomeip/src/app/clusters/identify                          \
@@ -41,8 +42,10 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/low-power-server                  \
   ../third_party/connectedhomeip/src/app/clusters/keypad-input-server               \
   ../third_party/connectedhomeip/src/app/clusters/media-playback-server             \
+  ../third_party/connectedhomeip/src/app/clusters/operational-credentials           \
   ../third_party/connectedhomeip/src/app/clusters/media-input-server                \
   ../third_party/connectedhomeip/src/app/clusters/network-commissioning             \
+  ../third_party/connectedhomeip/src/app/clusters/ota-server                        \
   ../third_party/connectedhomeip/src/app/clusters/target-navigator-server           \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
   ../third_party/connectedhomeip/src/app/clusters/tv-channel-server                 \

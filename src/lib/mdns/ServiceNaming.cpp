@@ -24,15 +24,85 @@
 
 namespace chip {
 namespace Mdns {
+namespace {
 
-CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, uint64_t fabricId, uint64_t nodeId)
+uint8_t HexToInt(char c)
+{
+    if ('0' <= c && c <= '9')
+    {
+        return static_cast<uint8_t>(c - '0');
+    }
+    else if ('a' <= c && c <= 'f')
+    {
+        return static_cast<uint8_t>(0x0a + c - 'a');
+    }
+    else if ('A' <= c && c <= 'F')
+    {
+        return static_cast<uint8_t>(0x0a + c - 'A');
+    }
+
+    return UINT8_MAX;
+}
+
+} // namespace
+
+CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId)
 {
     constexpr size_t kServiceNameLen = 16 + 1 + 16; // 2 * 64-bit value in HEX + hyphen
 
     ReturnErrorCodeIf(bufferLen <= kServiceNameLen, CHIP_ERROR_BUFFER_TOO_SMALL);
 
+    NodeId nodeId     = peerId.GetNodeId();
+    FabricId fabricId = peerId.GetFabricId();
+
     snprintf(buffer, bufferLen, "%08" PRIX32 "%08" PRIX32 "-%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(fabricId >> 32),
              static_cast<uint32_t>(fabricId), static_cast<uint32_t>(nodeId >> 32), static_cast<uint32_t>(nodeId));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId)
+{
+    ReturnErrorCodeIf(name == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(peerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    peerId->SetNodeId(0);
+    peerId->SetFabricId(0);
+
+    bool deliminatorFound = false;
+    bool hasFabricPart    = false;
+    bool hasNodePart      = false;
+
+    for (; *name != '\0'; name++)
+    {
+        if (*name == '.')
+        {
+            break;
+        }
+        else if (*name == '-')
+        {
+            deliminatorFound = true;
+            continue;
+        }
+
+        uint8_t val = HexToInt(*name);
+        ReturnErrorCodeIf(val == UINT8_MAX, CHIP_ERROR_WRONG_NODE_ID);
+
+        if (deliminatorFound)
+        {
+            hasNodePart = true;
+            peerId->SetNodeId(peerId->GetNodeId() * 16 + val);
+        }
+        else
+        {
+            hasFabricPart = true;
+            peerId->SetFabricId(peerId->GetFabricId() * 16 + val);
+        }
+    }
+
+    ReturnErrorCodeIf(!deliminatorFound, CHIP_ERROR_WRONG_NODE_ID);
+    ReturnErrorCodeIf(!hasNodePart, CHIP_ERROR_WRONG_NODE_ID);
+    ReturnErrorCodeIf(!hasFabricPart, CHIP_ERROR_WRONG_NODE_ID);
 
     return CHIP_NO_ERROR;
 }

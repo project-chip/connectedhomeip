@@ -164,6 +164,10 @@ if (chip_device_platform != "none") {
       "CHIP_DEVICE_LAYER_NONE=1",
       "CHIP_DEVICE_LAYER_TARGET=NONE",
     ]
+
+    if (current_os == "android") {
+      defines += [ "EXTERNAL_KEYVALUESTOREMANAGERIMPL_HEADER=\"controller/java/AndroidKeyValueStoreManagerImpl.h\"" ]
+    }
   }
 }
 
@@ -175,6 +179,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CoreFoundation.framework",
         "CoreBluetooth.framework",
         "Foundation.framework",
+        "IOKit.framework",
       ]
     }
   }

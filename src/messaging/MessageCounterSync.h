@@ -28,6 +28,7 @@
 namespace chip {
 namespace Messaging {
 
+constexpr uint16_t kMsgCounterChallengeSize   = 8;   // The size of the message counter synchronization request message.
 constexpr uint16_t kMsgCounterSyncRespMsgSize = 12;  // The size of the message counter synchronization response message.
 constexpr uint32_t kMsgCounterSyncTimeout     = 500; // The amount of time(in milliseconds) which a peer is given to respond
                                                      // to a message counter synchronization request.
@@ -57,7 +58,7 @@ public:
     CHIP_ERROR SendMsgCounterSyncReq(SecureSessionHandle session);
 
     /**
-     *  Add a CHIP message into the cache table to queue the outging messages that trigger message counter synchronization protocol
+     *  Add a CHIP message into the cache table to queue the outgoing messages that trigger message counter synchronization protocol
      *  for retransmission.
      *
      *  @param[in]    protocolId       The protocol identifier of the CHIP message to be sent.
@@ -80,16 +81,12 @@ public:
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
      * protocol for re-processing.
      *
-     *  @param[in]    packetHeader     The message header for the received message.
-     *  @param[in]    payloadHeader    The payload header for the received message.
-     *  @param[in]    session          The handle to the secure session.
      *  @param[in]    msgBuf           A handle to the packet buffer holding the received message.
      *
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                 const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AddToReceiveTable(System::PacketBufferHandle msgBuf);
 
 private:
     /**
@@ -125,9 +122,6 @@ private:
      */
     struct ReceiveTableEntry
     {
-        PacketHeader packetHeader;         /**< The packet header for the message. */
-        PayloadHeader payloadHeader;       /**< The payload header for the message. */
-        SecureSessionHandle session;       /**< The secure session the message was received on. */
         System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding
                                                 the message data. This is non-null if and only
                                                 if this entry is in use. */
@@ -135,11 +129,15 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
 
-    // MessageCounterSyncProtocol cache table to queue the outging messages that trigger message counter synchronization protocol.
-    RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+    // MessageCounterSyncProtocol cache table to queue the outgoing messages that trigger message counter
+    // synchronization protocol. Reserve two extra exchanges, one for MCSP messages and another one for
+    // temporary exchange for ack.
+    RetransTableEntry mRetransTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS - 2];
 
-    // MessageCounterSyncProtocol cache table to queue the incoming messages that trigger message counter synchronization protocol.
-    ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+    // MessageCounterSyncProtocol cache table to queue the incoming messages that trigger message counter
+    // synchronization protocol. Reserve two extra exchanges, one for MCSP messages and another one for
+    // temporary exchange for ack.
+    ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS - 2];
 
     void RetransPendingGroupMsgs(NodeId peerNodeId);
 

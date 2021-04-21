@@ -1813,6 +1813,99 @@
                                                                                                                                    \
                               ZCL_LEAVE_COMMAND_ID, "", );
 
+/** @brief Command description for QueryImage
+ *
+ * Command: QueryImage
+ * @param vendorId INT16U
+ * @param productId INT16U
+ * @param imageType INT16U
+ * @param hardwareVersion INT16U
+ * @param currentVersion INT32U
+ * @param protocolsSupported OTADownloadProtocol []
+ * @param protocolsSupportedLen int
+ * @param location CHAR_STRING
+ * @param clientCanConsent BOOLEAN
+ * @param metadataForServer OCTET_STRING
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,   \
+                                            protocolsSupportedLen, location, clientCanConsent, metadataForServer)                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_QUERY_IMAGE_COMMAND_ID, "uuuuubuuu", vendorId, productId, imageType, hardwareVersion,        \
+                                  currentVersion, protocolsSupported, protocolsSupportedLen, location, clientCanConsent,           \
+                                  metadataForServer);
+
+/** @brief Command description for ApplyUpdateRequest
+ *
+ * Command: ApplyUpdateRequest
+ * @param updateToken OCTET_STRING
+ * @param newVersion INT32U
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterApplyUpdateRequest(updateToken, newVersion)                                                       \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID, "uu", updateToken, newVersion);
+
+/** @brief Command description for NotifyUpdateApplied
+ *
+ * Command: NotifyUpdateApplied
+ * @param updateToken OCTET_STRING
+ * @param currentVersion INT32U
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterNotifyUpdateApplied(updateToken, currentVersion)                                                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID, "uu", updateToken, currentVersion);
+
+/** @brief Command description for QueryImageResponse
+ *
+ * Command: QueryImageResponse
+ * @param status OTAQueryStatus
+ * @param delayedActionTime INT32U
+ * @param imageURI CHAR_STRING
+ * @param softwareVersion INT32U
+ * @param updateToken OCTET_STRING
+ * @param userConsentNeeded BOOLEAN
+ * @param metadataForClient OCTET_STRING
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterQueryImageResponse(status, delayedActionTime, imageURI, softwareVersion, updateToken,             \
+                                                    userConsentNeeded, metadataForClient)                                          \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, "uuuuuuu", status, delayedActionTime, imageURI,             \
+                                  softwareVersion, updateToken, userConsentNeeded, metadataForClient);
+
+/** @brief Command description for ApplyUpdateRequestResponse
+ *
+ * Command: ApplyUpdateRequestResponse
+ * @param action OTAApplyUpdateAction
+ * @param delayedActionTime INT32U
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ServerClusterApplyUpdateRequestResponse(action, delayedActionTime)                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID, "uu", action, delayedActionTime);
+
+/** @brief Command description for AnnounceOtaServer
+ *
+ * Command: AnnounceOtaServer
+ * @param serverLocation OCTET_STRING
+ * @param vendorId INT16U
+ * @param announcementReason OTAAnnouncementReason
+ * @param metadataForNode OCTET_STRING
+ */
+#define emberAfFillCommandOTA                                                                                                      \
+    Software Update ClientClusterAnnounceOtaServer(serverLocation, vendorId, announcementReason, metadataForNode)                  \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ANNOUNCE_OTA_SERVER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,        \
+                                  metadataForNode);
+
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric
@@ -2129,6 +2222,49 @@
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
+
+/** @brief Command description for GetFabricId
+ *
+ * Command: GetFabricId
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterGetFabricId() emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_GET_FABRIC_ID_COMMAND_ID, "", );
+
+/** @brief Command description for GetFabricIdResponse
+ *
+ * Command: GetFabricIdResponse
+ * @param FabricId FABRIC_ID
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterGetFabricIdResponse(FabricId)                                                                                \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID, "u", FabricId);
+
+/** @brief Command description for UpdateFabricLabel
+ *
+ * Command: UpdateFabricLabel
+ * @param Label CHAR_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterUpdateFabricLabel(Label) emberAfFillExternalBuffer(mask,                                                     \
+                                                                                                                                   \
+                                                                         ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID, "u", Label);
+
+/** @brief Command description for RemoveFabric
+ *
+ * Command: RemoveFabric
+ * @param FabricId FABRIC_ID
+ * @param NodeId NODE_ID
+ * @param VendorId INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveFabric(FabricId, NodeId, VendorId)                                                                     \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_FABRIC_COMMAND_ID, "uuu", FabricId, NodeId, VendorId);
 
 /** @brief Command description for LockDoor
  *

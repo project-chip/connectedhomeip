@@ -27,17 +27,22 @@
 #include "AndroidBlePlatformDelegate.h"
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
+#include "JniReferences.h"
+#include "JniTypeWrappers.h"
 
 #include <app/chip-zcl-zpro-codec.h>
 #include <atomic>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
+#include <platform/KeyValueStoreManager.h>
+#include <protocols/Protocols.h>
 #include <pthread.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
@@ -69,7 +74,6 @@ static void HandleNewConnection(void * appState, const uint16_t discriminator);
 static void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow);
 static void ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * cbName);
 static void * IOThreadMain(void * arg);
-static CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
 static CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray);
 static CHIP_ERROR N2J_Error(JNIEnv * env, CHIP_ERROR inErr, jthrowable & outEx);
 
@@ -112,38 +116,6 @@ struct StackUnlockGuard
     ~StackUnlockGuard() { pthread_mutex_lock(&sStackLock); }
 };
 
-class JniUtfString
-{
-public:
-    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string) { mChars = env->GetStringUTFChars(string, 0); }
-    ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
-
-    const char * c_str() const { return mChars; }
-
-private:
-    JNIEnv * mEnv;
-    jstring mString;
-    const char * mChars;
-};
-
-class JniByteArray
-{
-public:
-    JniByteArray(JNIEnv * env, jbyteArray array) :
-        mEnv(env), mArray(array), mData(env->GetByteArrayElements(array, nullptr)), mDataLength(env->GetArrayLength(array))
-    {}
-    ~JniByteArray() { mEnv->ReleaseByteArrayElements(mArray, mData, 0); }
-
-    const jbyte * data() const { return mData; }
-    jsize size() const { return mDataLength; }
-
-private:
-    JNIEnv * mEnv;
-    jbyteArray mArray;
-    jbyte * mData;
-    jsize mDataLength;
-};
-
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -167,6 +139,8 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 
     // Get a JNI environment object.
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(env);
 
     ChipLogProgress(Controller, "Loading Java class references.");
 
@@ -361,20 +335,41 @@ JNI_METHOD(void, sendThreadCredentials)
 
     VerifyOrReturn(CanCastTo<uint8_t>(channel), ChipLogError(Controller, "sendThreadCredentials() called with invalid Channel"));
     VerifyOrReturn(CanCastTo<uint16_t>(panId), ChipLogError(Controller, "sendThreadCredentials() called with invalid PAN ID"));
-    VerifyOrReturn(xpanIdBytes.size() <= static_cast<jsize>(kThreadExtendedPANIdLength),
+    VerifyOrReturn(xpanIdBytes.size() == static_cast<jsize>(Thread::kSizeExtendedPanId),
                    ChipLogError(Controller, "sendThreadCredentials() called with invalid XPAN ID"));
-    VerifyOrReturn(masterKeyBytes.size() <= static_cast<jsize>(kThreadMasterKeyLength),
+    VerifyOrReturn(masterKeyBytes.size() == static_cast<jsize>(Thread::kSizeMasterKey),
                    ChipLogError(Controller, "sendThreadCredentials() called with invalid Master Key"));
 
-    DeviceNetworkInfo threadData                = {};
-    threadData.ThreadChannel                    = channel;
-    threadData.ThreadPANId                      = panId;
-    threadData.FieldPresent.ThreadExtendedPANId = 1;
-    memcpy(threadData.ThreadExtendedPANId, xpanIdBytes.data(), xpanIdBytes.size());
-    memcpy(threadData.ThreadMasterKey, masterKeyBytes.data(), masterKeyBytes.size());
+    Thread::OperationalDataset dataset{};
+
+    dataset.SetChannel(channel);
+    dataset.SetPanId(panId);
+
+    // TODO network name is required, need to add UI
+    {
+        char networkName[Thread::kSizeNetworkName + 1];
+
+        snprintf(networkName, sizeof(networkName), "CHIP-%04X", panId);
+        dataset.SetNetworkName(networkName);
+    }
+
+    {
+        uint8_t value[Thread::kSizeMasterKey];
+
+        memcpy(value, masterKeyBytes.data(), sizeof(value));
+
+        dataset.SetMasterKey(value);
+    }
+    {
+        uint8_t value[Thread::kSizeExtendedPanId];
+
+        memcpy(value, xpanIdBytes.data(), sizeof(value));
+
+        dataset.SetExtendedPanId(value);
+    }
 
     ScopedPthreadLock lock(&sStackLock);
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(threadData);
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(dataset.AsByteSpan());
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -494,7 +489,7 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
         }
     }
 
@@ -552,7 +547,7 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
         }
     }
 
@@ -1072,22 +1067,6 @@ void ThrowError(JNIEnv * env, CHIP_ERROR errToThrow)
     {
         env->Throw(ex);
     }
-}
-
-CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    jclass cls     = NULL;
-
-    cls = env->FindClass(clsType);
-    VerifyOrExit(cls != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-
-    outCls = (jclass) env->NewGlobalRef((jobject) cls);
-    VerifyOrExit(outCls != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-
-exit:
-    env->DeleteLocalRef(cls);
-    return err;
 }
 
 CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)

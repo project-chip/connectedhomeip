@@ -44,7 +44,7 @@ extern "C" {
 // Simple Keys Profile Services bit fields
 #define CHIPOBLEPROFILE_SERVICE 0x00000001
 
-#define CHIPOBLE_SERV_UUID 0xFEAF           // Servuce UUID
+#define CHIPOBLE_SERV_UUID 0xFFF6           // Service UUID
 #define CHIPOBLEPROFILE_TX_CHAR_UUID 0x129D // GATT indications/read
 #define CHIPOBLEPROFILE_RX_CHAR_UUID 0x119D // GATT Writes
 

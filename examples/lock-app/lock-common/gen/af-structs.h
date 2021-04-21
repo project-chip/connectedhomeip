@@ -185,6 +185,15 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
     uint8_t attributeAccessControl;
 } EmberAfExtendedDiscoverAttributesInfoRecord;
 
+// Struct for FabricDescriptor
+typedef struct _FabricDescriptor
+{
+    chip::FabricId FabricId;
+    uint16_t VendorId;
+    uint8_t * Label;
+    chip::NodeId NodeId;
+} EmberAfFabricDescriptor;
+
 // Struct for GpPairingConfigurationGroupList
 typedef struct _GpPairingConfigurationGroupList
 {
@@ -212,15 +221,15 @@ typedef struct _GroupInformationRecord
     uint8_t groupType;
 } EmberAfGroupInformationRecord;
 
-// Struct for GroupKeys
-typedef struct _GroupKeys
+// Struct for GroupKey
+typedef struct _GroupKey
 {
     uint16_t VendorId;
     uint16_t GroupKeyIndex;
-    /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeyRoot;
+    uint8_t * GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
-} EmberAfGroupKeys;
+} EmberAfGroupKey;
 
 // Struct for GroupState
 typedef struct _GroupState

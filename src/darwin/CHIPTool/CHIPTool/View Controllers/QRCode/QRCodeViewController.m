@@ -69,6 +69,7 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
+@property (nonatomic, strong) CHIPNetworkCommissioning * cluster;
 
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
 @property (strong, nonatomic) CHIPSetupPayload * setupPayload;
@@ -365,22 +366,11 @@
 }
 
 // MARK: CHIPDevicePairingDelegate
-- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
-{
-    NSLog(@"Network credential requested for pairing for type %lu", (unsigned long) type);
-    if (type == kNetworkCredentialTypeWiFi) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-            [self retrieveAndSendWifiCredentials];
-        });
-    } else {
-        NSLog(@"Unsupported credentials requested");
-    }
-}
-
 - (void)onPairingComplete:(NSError *)error
 {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
         [self->_deviceList refreshDeviceList];
+        [self retrieveAndSendWifiCredentials];
     });
 }
 
@@ -520,11 +510,97 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 [strongSelf.chipController sendWiFiCredentials:networkSSID.text
-                                                                                       password:networkPassword.text];
+                                                 [strongSelf addWiFiNetwork:networkSSID.text password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
+{
+    self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
+                                                           endpoint:1
+                                                              queue:dispatch_get_main_queue()];
+    NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+    NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+    uint64_t breadcrumb = 0;
+    uint32_t timeoutMs = 3000;
+
+    __weak typeof(self) weakSelf = self;
+    [_cluster addWiFiNetwork:networkId
+                 credentials:credentials
+                  breadcrumb:breadcrumb
+                   timeoutMs:timeoutMs
+           completionHandler:^(NSError * error, NSDictionary * values) {
+               [weakSelf onAddNetworkResponse:error isWiFi:YES];
+           }];
+}
+
+- (void)addThreadNetwork:(NSData *)threadDataSet
+{
+    self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
+                                                           endpoint:1
+                                                              queue:dispatch_get_main_queue()];
+    uint64_t breadcrumb = 0;
+    uint32_t timeoutMs = 3000;
+
+    __weak typeof(self) weakSelf = self;
+    [_cluster addThreadNetwork:threadDataSet
+                    breadcrumb:breadcrumb
+                     timeoutMs:timeoutMs
+             completionHandler:^(NSError * error, NSDictionary * values) {
+                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
+             }];
+}
+
+- (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi
+{
+    if (error != nil) {
+        NSLog(@"Error adding network: %@", error);
+        return;
+    }
+
+    NSData * networkId;
+    if (isWiFi) {
+        NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+        networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+    } else {
+        uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+        networkId = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
+    }
+    uint64_t breadcrumb = 0;
+    uint32_t timeoutMs = 3000;
+
+    __weak typeof(self) weakSelf = self;
+    [_cluster enableNetwork:networkId
+                 breadcrumb:breadcrumb
+                  timeoutMs:timeoutMs
+          completionHandler:^(NSError * err, NSDictionary * values) {
+              [weakSelf onEnableNetworkResponse:err];
+          }];
+}
+
+- (void)onEnableNetworkResponse:(NSError *)error
+{
+    if (error != nil) {
+        NSLog(@"Error enabling network: %@", error);
+    }
+
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    [controller updateDevice:deviceId fabricId:0];
+}
+
+- (void)onAddressUpdated:(NSError *)error
+{
+    if (error.code != CHIPSuccess) {
+        NSLog(@"Error retrieving device informations over Mdns: %@", error);
+        return;
+    }
+}
+
+- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
+{
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
@@ -589,12 +665,11 @@
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationThread:
-    case kRendezvousInformationEthernet:
+    case kRendezvousInformationOnNetwork:
     case kRendezvousInformationAllMask:
         NSLog(@"Rendezvous Unknown");
         break;
-    case kRendezvousInformationWiFi:
+    case kRendezvousInformationSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;

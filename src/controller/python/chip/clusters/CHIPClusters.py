@@ -30,6 +30,9 @@ TODO(#4511): This file only sends cluster commands, should add more functions.
 __all__ = ["ChipClusters"]
 
 class ChipClusters:
+    SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
+    FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
+
     def __init__(self, chipstack):
         self._ChipStack = chipstack
 
@@ -156,6 +159,8 @@ class ChipClusters:
                     "optionsMask": "int",
                     "optionsOverride": "int",
                 },
+            },
+            "Descriptor": {
             },
             "DoorLock": {
                 "ClearAllPins": {
@@ -397,6 +402,18 @@ class ChipClusters:
                 "Toggle": {
                 },
             },
+            "OperationalCredentials": {
+                "GetFabricId": {
+                },
+                "RemoveFabric": {
+                    "fabricId": "int",
+                    "nodeId": "int",
+                    "vendorId": "int",
+                },
+                "UpdateFabricLabel": {
+                    "label": "bytes",
+                },
+            },
             "Scenes": {
                 "AddScene": {
                     "groupId": "int",
@@ -433,6 +450,46 @@ class ChipClusters:
             },
             "TemperatureMeasurement": {
             },
+            "Thermostat": {
+                "ClearWeeklySchedule": {
+                },
+                "GetRelayStatusLog": {
+                },
+                "GetWeeklySchedule": {
+                    "daysToReturn": "int",
+                    "modeToReturn": "int",
+                },
+                "SetWeeklySchedule": {
+                    "numberOfTransitionsForSequence": "int",
+                    "dayOfWeekForSequence": "int",
+                    "modeForSequence": "int",
+                    "payload": "int",
+                },
+                "SetpointRaiseLower": {
+                    "mode": "int",
+                    "amount": "int",
+                },
+            },
+            "WindowCovering": {
+                "WindowCoveringDownClose": {
+                },
+                "WindowCoveringGoToLiftPercentage": {
+                    "percentageLiftValue": "int",
+                },
+                "WindowCoveringGoToLiftValue": {
+                    "liftValue": "int",
+                },
+                "WindowCoveringGoToTiltPercentage": {
+                    "percentageTiltValue": "int",
+                },
+                "WindowCoveringGoToTiltValue": {
+                    "tiltValue": "int",
+                },
+                "WindowCoveringStop": {
+                },
+                "WindowCoveringUpOpen": {
+                },
+            },
         }
 
     def ListClusterAttributes(self):
@@ -466,6 +523,12 @@ class ChipClusters:
                 "HardwareVersionString",
                 "SoftwareVersion",
                 "SoftwareVersionString",
+                "ManufacturingDate",
+                "PartNumber",
+                "ProductURL",
+                "ProductLabel",
+                "SerialNumber",
+                "LocalConfigDisabled",
                 "ClusterRevision",
             ],
             "Binding": [
@@ -524,6 +587,9 @@ class ChipClusters:
                 "StartUpColorTemperatureMireds",
                 "ClusterRevision",
             ],
+            "Descriptor": [
+                "ClusterRevision",
+            ],
             "DoorLock": [
                 "LockState",
                 "LockType",
@@ -536,8 +602,6 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "GroupKeyManagement": [
-                "Groups",
-                "GroupKeys",
                 "ClusterRevision",
             ],
             "Groups": [
@@ -570,6 +634,9 @@ class ChipClusters:
                 "OnOff",
                 "ClusterRevision",
             ],
+            "OperationalCredentials": [
+                "ClusterRevision",
+            ],
             "Scenes": [
                 "SceneCount",
                 "CurrentScene",
@@ -584,976 +651,755 @@ class ChipClusters:
                 "MaxMeasuredValue",
                 "ClusterRevision",
             ],
+            "Thermostat": [
+                "LocalTemperature",
+                "OccupiedCoolingSetpoint",
+                "OccupiedHeatingSetpoint",
+                "ControlSequenceOfOperation",
+                "SystemMode",
+                "ClusterRevision",
+            ],
+            "WindowCovering": [
+                "WindowCoveringType",
+                "CurrentPositionLift",
+                "CurrentPositionTilt",
+                "ConfigStatus",
+                "InstalledOpenLimitLift",
+                "InstalledClosedLimitLift",
+                "InstalledOpenLimitTilt",
+                "InstalledClosedLimitTilt",
+                "Mode",
+                "ClusterRevision",
+            ],
         }
 
-    def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args):
+    def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
-        func(device, endpoint, groupid, **args)
+        funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
+        funcCaller(lambda: func(device, endpoint, groupid, **args))
 
-    def ReadAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int):
+    def ReadAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int, imEnabled):
         func = getattr(self, "Cluster{}_ReadAttribute{}".format(cluster, attribute), None)
         if not func:
             raise UnknownAttribute(cluster, attribute)
-        func(device, endpoint, groupid)
+        funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
+        funcCaller(lambda: func(device, endpoint, groupid))
+
+    def ConfigureAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, minInterval: int, maxInterval: int, change: int, imEnabled):
+        func = getattr(self, "Cluster{}_ConfigureAttribute{}".format(cluster, attribute), None)
+        if not func:
+            raise UnknownAttribute(cluster, attribute)
+        funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
+        funcCaller(lambda: func(device, endpoint, minInterval, maxInterval, change))
 
     # Cluster commands
 
     def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(
+        return self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(
                 device, ZCLendpoint, ZCLgroupid, percentOpen
-            )
         )
     def ClusterBarrierControl_CommandBarrierControlStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop(
+        return self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterBasic_CommandMfgSpecificPing(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing(
+        return self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterBinding_CommandBind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Binding_Bind(
+        return self._chipLib.chip_ime_AppendCommand_Binding_Bind(
                 device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
-            )
         )
     def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
+        return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
                 device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
-            )
         )
     def ClusterColorControl_CommandMoveColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor(
                 device, ZCLendpoint, ZCLgroupid, rateX, rateY, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature(
                 device, ZCLendpoint, ZCLgroupid, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue(
                 device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation(
                 device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveToColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, colorX: int, colorY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor(
                 device, ZCLendpoint, ZCLgroupid, colorX, colorY, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveToColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, colorTemperature: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature(
                 device, ZCLendpoint, ZCLgroupid, colorTemperature, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveToHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, hue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue(
                 device, ZCLendpoint, ZCLgroupid, hue, direction, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveToHueAndSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, hue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation(
                 device, ZCLendpoint, ZCLgroupid, hue, saturation, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandMoveToSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation(
                 device, ZCLendpoint, ZCLgroupid, saturation, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandStepColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepX: int, stepY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor(
                 device, ZCLendpoint, ZCLgroupid, stepX, stepY, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandStepColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature(
                 device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandStepHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue(
                 device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandStepSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation(
                 device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
-            )
         )
     def ClusterColorControl_CommandStopMoveStep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, optionsMask: int, optionsOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep(
+        return self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep(
                 device, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
-            )
         )
     def ClusterDoorLock_CommandClearAllPins(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterDoorLock_CommandClearAllRfids(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterDoorLock_CommandClearHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId
-            )
         )
     def ClusterDoorLock_CommandClearPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin(
                 device, ZCLendpoint, ZCLgroupid, userId
-            )
         )
     def ClusterDoorLock_CommandClearRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid(
                 device, ZCLendpoint, ZCLgroupid, userId
-            )
         )
     def ClusterDoorLock_CommandClearWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId
-            )
         )
     def ClusterDoorLock_CommandClearYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId
-            )
         )
     def ClusterDoorLock_CommandGetHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId
-            )
         )
     def ClusterDoorLock_CommandGetLogRecord(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, logIndex: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord(
                 device, ZCLendpoint, ZCLgroupid, logIndex
-            )
         )
     def ClusterDoorLock_CommandGetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin(
                 device, ZCLendpoint, ZCLgroupid, userId
-            )
         )
     def ClusterDoorLock_CommandGetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid(
                 device, ZCLendpoint, ZCLgroupid, userId
-            )
         )
     def ClusterDoorLock_CommandGetUserType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType(
                 device, ZCLendpoint, ZCLgroupid, userId
-            )
         )
     def ClusterDoorLock_CommandGetWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId
-            )
         )
     def ClusterDoorLock_CommandGetYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId
-            )
         )
     def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
                 device, ZCLendpoint, ZCLgroupid, pin, len(pin)
-            )
         )
     def ClusterDoorLock_CommandSetHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, localStartTime: int, localEndTime: int, operatingModeDuringHoliday: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
-            )
         )
     def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
                 device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin, len(pin)
-            )
         )
     def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: bytes):
         id = id.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
                 device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id, len(id)
-            )
         )
     def ClusterDoorLock_CommandSetUserType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userType: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType(
                 device, ZCLendpoint, ZCLgroupid, userId, userType
-            )
         )
     def ClusterDoorLock_CommandSetWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, daysMask: int, startHour: int, startMinute: int, endHour: int, endMinute: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute
-            )
         )
     def ClusterDoorLock_CommandSetYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, localStartTime: int, localEndTime: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(
                 device, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
-            )
         )
     def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
                 device, ZCLendpoint, ZCLgroupid, pin, len(pin)
-            )
         )
     def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
+        return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
                 device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin, len(pin)
-            )
         )
     def ClusterGeneralCommissioning_CommandArmFailSafe(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, expiryLengthSeconds: int, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(
+        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(
                 device, ZCLendpoint, ZCLgroupid, expiryLengthSeconds, breadcrumb, timeoutMs
-            )
         )
     def ClusterGeneralCommissioning_CommandCommissioningComplete(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(
+        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterGeneralCommissioning_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: bytes, fabricSecret: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric(
+        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric(
                 device, ZCLendpoint, ZCLgroupid, fabricId, len(fabricId), fabricSecret, len(fabricSecret), breadcrumb, timeoutMs
-            )
         )
     def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Groups_AddGroup(
+        return self._chipLib.chip_ime_AppendCommand_Groups_AddGroup(
                 device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
-            )
         )
     def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(
+        return self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(
                 device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
-            )
         )
     def ClusterGroups_CommandGetGroupMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupCount: int, groupList: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership(
+        return self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership(
                 device, ZCLendpoint, ZCLgroupid, groupCount, groupList
-            )
         )
     def ClusterGroups_CommandRemoveAllGroups(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups(
+        return self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterGroups_CommandRemoveGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup(
+        return self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup(
                 device, ZCLendpoint, ZCLgroupid, groupId
-            )
         )
     def ClusterGroups_CommandViewGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup(
+        return self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup(
                 device, ZCLendpoint, ZCLgroupid, groupId
-            )
         )
     def ClusterIdentify_CommandIdentify(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, identifyTime: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Identify_Identify(
+        return self._chipLib.chip_ime_AppendCommand_Identify_Identify(
                 device, ZCLendpoint, ZCLgroupid, identifyTime
-            )
         )
     def ClusterIdentify_CommandIdentifyQuery(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery(
+        return self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterLevelControl_CommandMove(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionMask: int, optionOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Move(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_Move(
                 device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionMask, optionOverride
-            )
         )
     def ClusterLevelControl_CommandMoveToLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int, optionMask: int, optionOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel(
                 device, ZCLendpoint, ZCLgroupid, level, transitionTime, optionMask, optionOverride
-            )
         )
     def ClusterLevelControl_CommandMoveToLevelWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff(
                 device, ZCLendpoint, ZCLgroupid, level, transitionTime
-            )
         )
     def ClusterLevelControl_CommandMoveWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff(
                 device, ZCLendpoint, ZCLgroupid, moveMode, rate
-            )
         )
     def ClusterLevelControl_CommandStep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Step(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_Step(
                 device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionMask, optionOverride
-            )
         )
     def ClusterLevelControl_CommandStepWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff(
                 device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime
-            )
         )
     def ClusterLevelControl_CommandStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, optionMask: int, optionOverride: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Stop(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_Stop(
                 device, ZCLendpoint, ZCLgroupid, optionMask, optionOverride
-            )
         )
     def ClusterLevelControl_CommandStopWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff(
+        return self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterLowPower_CommandSleep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_LowPower_Sleep(
+        return self._chipLib.chip_ime_AppendCommand_LowPower_Sleep(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterNetworkCommissioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(
                 device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandAddWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandDisableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork(
                 device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandEnableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork(
                 device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandGetLastNetworkCommissioningResult(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
                 device, ZCLendpoint, ZCLgroupid, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(
                 device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandScanNetworks(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandUpdateThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork(
                 device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
-            )
         )
     def ClusterNetworkCommissioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork(
+        return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork(
                 device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
-            )
         )
     def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_OnOff_Off(
+        return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterOnOff_CommandOn(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_OnOff_On(
+        return self._chipLib.chip_ime_AppendCommand_OnOff_On(
                 device, ZCLendpoint, ZCLgroupid
-            )
         )
     def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
+        return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
                 device, ZCLendpoint, ZCLgroupid
-            )
+        )
+    def ClusterOperationalCredentials_CommandGetFabricId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_GetFabricId(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: int, nodeId: int, vendorId: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(
+                device, ZCLendpoint, ZCLgroupid, fabricId, nodeId, vendorId
+        )
+    def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, label: bytes):
+        label = label.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(
+                device, ZCLendpoint, ZCLgroupid, label, len(label)
         )
     def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_AddScene(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_AddScene(
                 device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, len(sceneName), clusterId, length, value
-            )
         )
     def ClusterScenes_CommandGetSceneMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership(
                 device, ZCLendpoint, ZCLgroupid, groupId
-            )
         )
     def ClusterScenes_CommandRecallScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene(
                 device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime
-            )
         )
     def ClusterScenes_CommandRemoveAllScenes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes(
                 device, ZCLendpoint, ZCLgroupid, groupId
-            )
         )
     def ClusterScenes_CommandRemoveScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene(
                 device, ZCLendpoint, ZCLgroupid, groupId, sceneId
-            )
         )
     def ClusterScenes_CommandStoreScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene(
                 device, ZCLendpoint, ZCLgroupid, groupId, sceneId
-            )
         )
     def ClusterScenes_CommandViewScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene(
+        return self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene(
                 device, ZCLendpoint, ZCLgroupid, groupId, sceneId
-            )
+        )
+    def ClusterThermostat_CommandClearWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterThermostat_CommandGetRelayStatusLog(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterThermostat_CommandGetWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, daysToReturn: int, modeToReturn: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule(
+                device, ZCLendpoint, ZCLgroupid, daysToReturn, modeToReturn
+        )
+    def ClusterThermostat_CommandSetWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, numberOfTransitionsForSequence: int, dayOfWeekForSequence: int, modeForSequence: int, payload: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule(
+                device, ZCLendpoint, ZCLgroupid, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload
+        )
+    def ClusterThermostat_CommandSetpointRaiseLower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, mode: int, amount: int):
+        return self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower(
+                device, ZCLendpoint, ZCLgroupid, mode, amount
+        )
+    def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterWindowCovering_CommandWindowCoveringGoToLiftPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentageLiftValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage(
+                device, ZCLendpoint, ZCLgroupid, percentageLiftValue
+        )
+    def ClusterWindowCovering_CommandWindowCoveringGoToLiftValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, liftValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue(
+                device, ZCLendpoint, ZCLgroupid, liftValue
+        )
+    def ClusterWindowCovering_CommandWindowCoveringGoToTiltPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentageTiltValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage(
+                device, ZCLendpoint, ZCLgroupid, percentageTiltValue
+        )
+    def ClusterWindowCovering_CommandWindowCoveringGoToTiltValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tiltValue: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue(
+                device, ZCLendpoint, ZCLgroupid, tiltValue
+        )
+    def ClusterWindowCovering_CommandWindowCoveringStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterWindowCovering_CommandWindowCoveringUpOpen(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen(
+                device, ZCLendpoint, ZCLgroupid
         )
 
     # Cluster attributes
 
     def ClusterApplicationBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorId(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorId(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeApplicationName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationName(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationName(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeProductId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ProductId(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ProductId(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeApplicationId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationId(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationId(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeCatalogVendorId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_CatalogVendorId(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_CatalogVendorId(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeApplicationSatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeBarrierMovingState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierMovingState(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierMovingState(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeBarrierSafetyStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierSafetyStatus(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierSafetyStatus(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeBarrierCapabilities(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierCapabilities(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierCapabilities(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeBarrierPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierPosition(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierPosition(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_BarrierControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_BarrierControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeInteractionModelVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_InteractionModelVersion(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_InteractionModelVersion(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeVendorName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_VendorName(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_VendorName(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeVendorID(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_VendorID(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_VendorID(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeProductName(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_ProductName(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_ProductName(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeProductID(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_ProductID(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_ProductID(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeUserLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_UserLabel(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeLocation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_Location(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeHardwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersion(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeHardwareVersionString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersionString(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_HardwareVersionString(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeSoftwareVersion(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_SoftwareVersion(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_SoftwareVersion(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeSoftwareVersionString(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_SoftwareVersionString(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_SoftwareVersionString(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributeManufacturingDate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_ManufacturingDate(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributePartNumber(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_PartNumber(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributeProductURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_ProductURL(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributeProductLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_ProductLabel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributeSerialNumber(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_SerialNumber(device, ZCLendpoint, ZCLgroupid)
+    def ClusterBasic_ReadAttributeLocalConfigDisabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled(device, ZCLendpoint, ZCLgroupid)
     def ClusterBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBinding_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentHue(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeCurrentSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeRemainingTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCurrentX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentX(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentX(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeCurrentY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeCurrentY(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentY(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeDriftCompensation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCompensationText(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_CompensationText(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_CompensationText(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature(device, ZCLendpoint, ZCLgroupid)
+    def ClusterColorControl_ConfigureAttributeColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_ColorControl_ColorTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterColorControl_ReadAttributeColorMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorControlOptions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorControlOptions(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorControlOptions(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeNumberOfPrimaries(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_NumberOfPrimaries(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_NumberOfPrimaries(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary1X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary1X(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary1X(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary1Y(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary1Y(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary1Y(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary1Intensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary1Intensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary1Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary2X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary2X(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary2X(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary2Y(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary2Y(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary2Y(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary2Intensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary2Intensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary2Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary3X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary3X(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary3X(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary3Y(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary3Y(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary3Y(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary3Intensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary3Intensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary3Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary4X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary4X(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary4X(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary4Y(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary4Y(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary4Y(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary4Intensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary4Intensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary4Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary5X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary5X(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary5X(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary5Y(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary5Y(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary5Y(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary5Intensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary5Intensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary5Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary6X(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6X(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6X(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary6Y(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6Y(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6Y(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributePrimary6Intensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6Intensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_Primary6Intensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeWhitePointX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointX(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointX(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeWhitePointY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointY(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_WhitePointY(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointRX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRX(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRX(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointRY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRY(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRY(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointRIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRIntensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointRIntensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointGX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGX(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGX(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointGY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGY(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGY(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointGIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGIntensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointGIntensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointBX(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBX(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBX(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointBY(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBY(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBY(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorPointBIntensity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBIntensity(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorPointBIntensity(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeEnhancedCurrentHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedCurrentHue(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeEnhancedColorMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedColorMode(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_EnhancedColorMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorLoopActive(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopActive(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopActive(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorLoopDirection(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopDirection(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorLoopTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorLoopTime(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorCapabilities(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorCapabilities(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorTempPhysicalMin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMin(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMin(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeColorTempPhysicalMax(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMax(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTempPhysicalMax(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeCoupleColorTempToLevelMinMireds(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_CoupleColorTempToLevelMinMireds(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_CoupleColorTempToLevelMinMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeStartUpColorTemperatureMireds(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterDescriptor_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeLockState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState(device, ZCLendpoint, ZCLgroupid)
+    def ClusterDoorLock_ConfigureAttributeLockState(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_DoorLock_LockState(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterDoorLock_ReadAttributeLockType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeActuatorEnabled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_DoorLock_ActuatorEnabled(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_DoorLock_ActuatorEnabled(device, ZCLendpoint, ZCLgroupid)
     def ClusterDoorLock_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeFabricId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeBreadcrumb(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_Breadcrumb(device, ZCLendpoint, ZCLgroupid)
     def ClusterGeneralCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
-    def ClusterGroupKeyManagement_ReadAttributeGroups(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_Groups(device, ZCLendpoint, ZCLgroupid)
-        )
-    def ClusterGroupKeyManagement_ReadAttributeGroupKeys(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_GroupKeys(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGroupKeyManagement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterGroups_ReadAttributeNameSupport(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Groups_NameSupport(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Groups_NameSupport(device, ZCLendpoint, ZCLgroupid)
     def ClusterGroups_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterIasZone_ReadAttributeZoneState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneState(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneState(device, ZCLendpoint, ZCLgroupid)
     def ClusterIasZone_ReadAttributeZoneType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneType(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneType(device, ZCLendpoint, ZCLgroupid)
     def ClusterIasZone_ReadAttributeZoneStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneStatus(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneStatus(device, ZCLendpoint, ZCLgroupid)
     def ClusterIasZone_ReadAttributeIasCieAddress(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_IasZone_IasCieAddress(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_IasZone_IasCieAddress(device, ZCLendpoint, ZCLgroupid)
     def ClusterIasZone_ReadAttributeZoneId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneId(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneId(device, ZCLendpoint, ZCLgroupid)
     def ClusterIasZone_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_IasZone_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_IasZone_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_ReadAttributeIdentifyTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterLevelControl_ReadAttributeCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel(device, ZCLendpoint, ZCLgroupid)
+    def ClusterLevelControl_ConfigureAttributeCurrentLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_LevelControl_CurrentLevel(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterLevelControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterLowPower_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_LowPower_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_LowPower_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterNetworkCommissioning_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOnOff_ReadAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOnOff_ConfigureAttributeOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterOnOff_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeSceneCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Scenes_SceneCount(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Scenes_SceneCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeCurrentScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Scenes_CurrentScene(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Scenes_CurrentScene(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeCurrentGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Scenes_CurrentGroup(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Scenes_CurrentGroup(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeSceneValid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Scenes_SceneValid(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Scenes_SceneValid(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeNameSupport(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Scenes_NameSupport(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Scenes_NameSupport(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTemperatureMeasurement_ConfigureAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterTemperatureMeasurement_ReadAttributeMinMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMaxMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MaxMeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-        )
+        return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ConfigureAttributeLocalTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterThermostat_ReadAttributeOccupiedCoolingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeOccupiedHeatingSetpoint(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeControlSequenceOfOperation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeSystemMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ReadAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeWindowCoveringType(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterWindowCovering_ReadAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeCurrentPositionLift(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterWindowCovering_ReadAttributeCurrentPositionTilt(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeCurrentPositionTilt(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterWindowCovering_ReadAttributeConfigStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_ConfigStatus(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ConfigureAttributeConfigStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterWindowCovering_ReadAttributeInstalledOpenLimitLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ReadAttributeInstalledClosedLimitLift(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitLift(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ReadAttributeInstalledOpenLimitTilt(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitTilt(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ReadAttributeInstalledClosedLimitTilt(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitTilt(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ReadAttributeMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_Mode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterWindowCovering_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
 
     # Init native functions
 
     def InitLib(self, chipLib):
         self._chipLib = chipLib
+        # Response delegate setters
+        self._chipLib.chip_ime_SetSuccessResponseDelegate.argtypes = [ChipClusters.SUCCESS_DELEGATE]
+        self._chipLib.chip_ime_SetSuccessResponseDelegate.restype = None
+        self._chipLib.chip_ime_SetFailureResponseDelegate.argtypes = [ChipClusters.FAILURE_DELEGATE]
+        self._chipLib.chip_ime_SetFailureResponseDelegate.res = None
         # Cluster ApplicationBasic
         # Cluster ApplicationBasic ReadAttribute VendorName
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_VendorName.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1638,6 +1484,24 @@ class ChipClusters:
         # Cluster Basic ReadAttribute SoftwareVersionString
         self._chipLib.chip_ime_ReadAttribute_Basic_SoftwareVersionString.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_SoftwareVersionString.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute ManufacturingDate
+        self._chipLib.chip_ime_ReadAttribute_Basic_ManufacturingDate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_ManufacturingDate.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute PartNumber
+        self._chipLib.chip_ime_ReadAttribute_Basic_PartNumber.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_PartNumber.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute ProductURL
+        self._chipLib.chip_ime_ReadAttribute_Basic_ProductURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_ProductURL.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute ProductLabel
+        self._chipLib.chip_ime_ReadAttribute_Basic_ProductLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_ProductLabel.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute SerialNumber
+        self._chipLib.chip_ime_ReadAttribute_Basic_SerialNumber.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_SerialNumber.restype = ctypes.c_uint32
+        # Cluster Basic ReadAttribute LocalConfigDisabled
+        self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Basic_LocalConfigDisabled.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.restype = ctypes.c_uint32
@@ -1697,18 +1561,30 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute CurrentHue
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentHue
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentHue.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentSaturation
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentSaturation.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentSaturation
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute RemainingTime
         self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_RemainingTime.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentX
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentX.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentX
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentX.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentX.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentY
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentY.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute CurrentY
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentY.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_CurrentY.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute DriftCompensation
         self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_DriftCompensation.restype = ctypes.c_uint32
@@ -1718,6 +1594,9 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ColorTemperature
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorTemperature.restype = ctypes.c_uint32
+        # Cluster ColorControl ConfigureAttribute ColorTemperature
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_ColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_ColorControl_ColorTemperature.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute ColorMode
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ColorMode.restype = ctypes.c_uint32
@@ -1847,6 +1726,10 @@ class ChipClusters:
         # Cluster ColorControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster Descriptor
+        # Cluster Descriptor ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.restype = ctypes.c_uint32
         # Cluster DoorLock
         # Cluster DoorLock Command ClearAllPins
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1920,6 +1803,9 @@ class ChipClusters:
         # Cluster DoorLock ReadAttribute LockState
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState.restype = ctypes.c_uint32
+        # Cluster DoorLock ConfigureAttribute LockState
+        self._chipLib.chip_ime_ConfigureAttribute_DoorLock_LockState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_DoorLock_LockState.restype = ctypes.c_uint32
         # Cluster DoorLock ReadAttribute LockType
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockType.restype = ctypes.c_uint32
@@ -1949,12 +1835,6 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision.restype = ctypes.c_uint32
         # Cluster GroupKeyManagement
-        # Cluster GroupKeyManagement ReadAttribute Groups
-        self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_Groups.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_Groups.restype = ctypes.c_uint32
-        # Cluster GroupKeyManagement ReadAttribute GroupKeys
-        self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_GroupKeys.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_GroupKeys.restype = ctypes.c_uint32
         # Cluster GroupKeyManagement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision.restype = ctypes.c_uint32
@@ -2043,6 +1923,9 @@ class ChipClusters:
         # Cluster LevelControl ReadAttribute CurrentLevel
         self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel.restype = ctypes.c_uint32
+        # Cluster LevelControl ConfigureAttribute CurrentLevel
+        self._chipLib.chip_ime_ConfigureAttribute_LevelControl_CurrentLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_LevelControl_CurrentLevel.restype = ctypes.c_uint32
         # Cluster LevelControl ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision.restype = ctypes.c_uint32
@@ -2097,9 +1980,25 @@ class ChipClusters:
         # Cluster OnOff ReadAttribute OnOff
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff.restype = ctypes.c_uint32
+        # Cluster OnOff ConfigureAttribute OnOff
+        self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_OnOff_OnOff.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials
+        # Cluster OperationalCredentials Command GetFabricId
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_GetFabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_GetFabricId.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command RemoveFabric
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command UpdateFabricLabel
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Scenes
         # Cluster Scenes Command AddScene
         self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
@@ -2144,6 +2043,9 @@ class ChipClusters:
         # Cluster TemperatureMeasurement ReadAttribute MeasuredValue
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue.restype = ctypes.c_uint32
+        # Cluster TemperatureMeasurement ConfigureAttribute MeasuredValue
+        self._chipLib.chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_ConfigureAttribute_TemperatureMeasurement_MeasuredValue.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement ReadAttribute MinMeasuredValue
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MinMeasuredValue.restype = ctypes.c_uint32
@@ -2153,3 +2055,113 @@ class ChipClusters:
         # Cluster TemperatureMeasurement ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster Thermostat
+        # Cluster Thermostat Command ClearWeeklySchedule
+        self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.restype = ctypes.c_uint32
+        # Cluster Thermostat Command GetRelayStatusLog
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.restype = ctypes.c_uint32
+        # Cluster Thermostat Command GetWeeklySchedule
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.restype = ctypes.c_uint32
+        # Cluster Thermostat Command SetWeeklySchedule
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.restype = ctypes.c_uint32
+        # Cluster Thermostat Command SetpointRaiseLower
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_int8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute LocalTemperature
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
+        # Cluster Thermostat ConfigureAttribute LocalTemperature
+        self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_ConfigureAttribute_Thermostat_LocalTemperature.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute OccupiedCoolingSetpoint
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedCoolingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute OccupiedHeatingSetpoint
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_OccupiedHeatingSetpoint.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute ControlSequenceOfOperation
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ControlSequenceOfOperation.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute SystemMode
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode.restype = ctypes.c_uint32
+        # Cluster Thermostat ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster WindowCovering
+        # Cluster WindowCovering Command WindowCoveringDownClose
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command WindowCoveringGoToLiftPercentage
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command WindowCoveringGoToLiftValue
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command WindowCoveringGoToTiltPercentage
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command WindowCoveringGoToTiltValue
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command WindowCoveringStop
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.restype = ctypes.c_uint32
+        # Cluster WindowCovering Command WindowCoveringUpOpen
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute WindowCoveringType
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute WindowCoveringType
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_WindowCoveringType.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute CurrentPositionLift
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionLift.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute CurrentPositionLift
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionLift.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute CurrentPositionTilt
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_CurrentPositionTilt.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute CurrentPositionTilt
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_CurrentPositionTilt.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute ConfigStatus
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_ConfigStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_ConfigStatus.restype = ctypes.c_uint32
+        # Cluster WindowCovering ConfigureAttribute ConfigStatus
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_ConfigureAttribute_WindowCovering_ConfigStatus.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute InstalledOpenLimitLift
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitLift.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute InstalledClosedLimitLift
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitLift.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitLift.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute InstalledOpenLimitTilt
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitTilt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledOpenLimitTilt.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute InstalledClosedLimitTilt
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitTilt.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_InstalledClosedLimitTilt.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute Mode
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_Mode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_Mode.restype = ctypes.c_uint32
+        # Cluster WindowCovering ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_WindowCovering_ClusterRevision.restype = ctypes.c_uint32
+        # Init response delegates
+        def HandleSuccess():
+            self._ChipStack.callbackRes = 0
+            self._ChipStack.completeEvent.set()
+        def HandleFailure(status):
+            self._ChipStack.callbackRes = status
+            self._ChipStack.completeEvent.set()
+        self._chipLib.chip_ime_SetSuccessResponseDelegate(ChipClusters.SUCCESS_DELEGATE(HandleSuccess))
+        self._chipLib.chip_ime_SetFailureResponseDelegate(ChipClusters.FAILURE_DELEGATE(HandleFailure))

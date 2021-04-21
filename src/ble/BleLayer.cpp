@@ -145,17 +145,6 @@ const ChipBleUUID BleLayer::CHIP_BLE_CHAR_3_ID = { { // 64630238-8772-45F2-B87D-
                                                      0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83,
                                                      0x21, 0x8F, 0x04 } };
 
-void BleLayerObject::Release()
-{
-    // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
-    // object. This effectively declared the object free and ready for re-allocation.
-    mRefCount--;
-    if (mRefCount == 0)
-    {
-        mBle = nullptr;
-    }
-}
-
 // BleTransportCapabilitiesRequestMessage implementation:
 
 void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t index, uint8_t version)
@@ -323,7 +312,11 @@ BLE_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleApplicationD
 BLE_ERROR BleLayer::Shutdown()
 {
     mState = kState_NotInitialized;
+    return CloseAllBleConnections();
+}
 
+BLE_ERROR BleLayer::CloseAllBleConnections()
+{
     // Close and free all BLE end points.
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {
@@ -347,25 +340,35 @@ BLE_ERROR BleLayer::Shutdown()
             }
         }
     }
-
     return BLE_NO_ERROR;
 }
 
-BLE_ERROR BleLayer::NewBleConnection(void * appState, const uint16_t connDiscriminator,
-                                     BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
-                                     BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
+BLE_ERROR BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
 {
-    BLE_ERROR err = BLE_NO_ERROR;
+    // Close and free all BLE endpoints.
+    for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+    {
+        BLEEndPoint * elem = sBLEEndPointPool.Get(i);
 
-    VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
+        // If end point was initialized, and has not since been freed...
+        if (elem->mBle != nullptr && elem->ConnectionObjectIs(connObj))
+        {
+            // If end point hasn't already been closed...
+            if (elem->mState != BLEEndPoint::kState_Closed)
+            {
+                // Close end point such that callbacks are suppressed and pending transmissions aborted.
+                elem->Abort();
+            }
 
-    mConnectionDelegate->OnConnectionComplete = onConnectionComplete;
-    mConnectionDelegate->OnConnectionError    = onConnectionError;
-    mConnectionDelegate->NewConnection(this, appState, connDiscriminator);
-
-exit:
-    return err;
+            // If end point was closed, but is still waiting for GATT unsubscribe to complete, free it anyway.
+            // This cancels the unsubscribe timer (plus all the end point's other timers).
+            if (elem->IsUnsubscribePending())
+            {
+                elem->Free();
+            }
+        }
+    }
+    return BLE_NO_ERROR;
 }
 
 BLE_ERROR BleLayer::CancelBleIncompleteConnection()
@@ -383,6 +386,31 @@ BLE_ERROR BleLayer::CancelBleIncompleteConnection()
 
 exit:
     return err;
+}
+
+BLE_ERROR BleLayer::NewBleConnectionByDiscriminator(uint16_t connDiscriminator)
+{
+
+    VerifyOrReturnError(mState == kState_Initialized, BLE_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConnectionDelegate != nullptr, BLE_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, BLE_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = OnConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = OnConnectionError;
+    // TODO: We are passing the same parameter two times, should take a look at it to see if we can remove one of them.
+    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
+
+    return BLE_NO_ERROR;
+}
+
+BLE_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj)
+{
+    VerifyOrReturnError(mState == kState_Initialized, BLE_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, BLE_ERROR_INCORRECT_STATE);
+
+    OnConnectionComplete(this, connObj);
+
+    return BLE_NO_ERROR;
 }
 
 BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
@@ -407,6 +435,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
     }
 
     (*retEndPoint)->Init(this, connObj, role, autoClose);
+    (*retEndPoint)->mBleTransport = mBleTransport;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = *retEndPoint;
@@ -426,7 +455,7 @@ BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT 
     err = NewBleEndPoint(&newEndPoint, connObj, kBleRole_Peripheral, false);
     SuccessOrExit(err);
 
-    newEndPoint->mAppState = mAppState;
+    newEndPoint->mBleTransport = mBleTransport;
 
     err = newEndPoint->Receive(std::move(pBuf));
     SuccessOrExit(err); // If we fail here, end point will have already released connection and freed itself.
@@ -736,6 +765,28 @@ BleTransportProtocolVersion BleLayer::GetHighestSupportedProtocolVersion(const B
     }
 
     return retVersion;
+}
+
+void BleLayer::OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    BleLayer * layer       = reinterpret_cast<BleLayer *>(appState);
+    BLEEndPoint * endPoint = nullptr;
+    BLE_ERROR err          = BLE_NO_ERROR;
+
+    SuccessOrExit(err = layer->NewBleEndPoint(&endPoint, connObj, kBleRole_Central, true));
+    layer->mBleTransport->OnBleConnectionComplete(endPoint);
+
+exit:
+    if (err != BLE_NO_ERROR)
+    {
+        OnConnectionError(layer, err);
+    }
+}
+
+void BleLayer::OnConnectionError(void * appState, BLE_ERROR err)
+{
+    BleLayer * layer = reinterpret_cast<BleLayer *>(appState);
+    layer->mBleTransport->OnBleConnectionError(err);
 }
 
 } /* namespace Ble */

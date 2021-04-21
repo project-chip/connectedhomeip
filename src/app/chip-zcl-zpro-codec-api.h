@@ -33,6 +33,7 @@
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
+| Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -43,8 +44,11 @@
 | LowPower                                                            | 0x0508 |
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
+| OperationalCredentials                                              | 0x003E |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
+| Thermostat                                                          | 0x0201 |
+| WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
@@ -216,6 +220,12 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | * HardwareVersionString                                             | 0x0008 |
 | * SoftwareVersion                                                   | 0x0009 |
 | * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * LocalConfigDisabled                                               | 0x0010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -315,6 +325,52 @@ chip::System::PacketBufferHandle encodeBasicClusterReadSoftwareVersionAttribute(
  */
 chip::System::PacketBufferHandle encodeBasicClusterReadSoftwareVersionStringAttribute(uint8_t seqNum,
                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ManufacturingDate attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadManufacturingDateAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the PartNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadPartNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ProductURL attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadProductURLAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ProductLabel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadProductLabelAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the SerialNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadSerialNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the LocalConfigDisabled attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server write command for the LocalConfigDisabled attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint8_t localConfigDisabled);
 
 /**
  * @brief
@@ -1061,6 +1117,60 @@ encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t seq
  */
 chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                        chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Descriptor                                                  | 0x001D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * DeviceList                                                        | 0x0000 |
+| * ServerList                                                        | 0x0001 |
+| * ClientList                                                        | 0x0002 |
+| * PartsList                                                         | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Descriptor server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the device list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadDeviceListAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the server list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadServerListAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the client list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadClientListAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the parts list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadPartsListAttribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Descriptor server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeDescriptorClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -1920,6 +2030,64 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
                                                                                 chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster OperationalCredentials                                      | 0x003E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetFabricId                                                       |   0x00 |
+| * RemoveFabric                                                      |   0x0A |
+| * UpdateFabricLabel                                                 |   0x09 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricsList                                                       | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an GetFabricId command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterGetFabricIdCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an RemoveFabric command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterRemoveFabricCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        chip::FabricId fabricId,
+                                                                                        chip::NodeId nodeId, uint16_t vendorId);
+
+/**
+ * @brief
+ *    Encode an UpdateFabricLabel command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterUpdateFabricLabelCommand(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             chip::ByteSpan label);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the fabrics list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2089,3 +2257,348 @@ encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
  */
 chip::System::PacketBufferHandle
 encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Thermostat                                                  | 0x0201 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ClearWeeklySchedule                                               |   0x03 |
+| * GetRelayStatusLog                                                 |   0x04 |
+| * GetWeeklySchedule                                                 |   0x02 |
+| * SetWeeklySchedule                                                 |   0x01 |
+| * SetpointRaiseLower                                                |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * LocalTemperature                                                  | 0x0000 |
+| * OccupiedCoolingSetpoint                                           | 0x0011 |
+| * OccupiedHeatingSetpoint                                           | 0x0012 |
+| * ControlSequenceOfOperation                                        | 0x001B |
+| * SystemMode                                                        | 0x001C |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ClearWeeklySchedule command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterClearWeeklyScheduleCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an GetRelayStatusLog command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterGetRelayStatusLogCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an GetWeeklySchedule command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterGetWeeklyScheduleCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint,
+                                                                                 uint8_t daysToReturn, uint8_t modeToReturn);
+
+/**
+ * @brief
+ *    Encode an SetWeeklySchedule command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterSetWeeklyScheduleCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint,
+                                                                                 uint8_t numberOfTransitionsForSequence,
+                                                                                 uint8_t dayOfWeekForSequence,
+                                                                                 uint8_t modeForSequence, uint8_t payload);
+
+/**
+ * @brief
+ *    Encode an SetpointRaiseLower command for Thermostat server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterSetpointRaiseLowerCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t mode, int8_t amount);
+
+/**
+ * @brief
+ *    Encode a Thermostat server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the local temperature attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadLocalTemperatureAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server configure report command for the local temperature attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterConfigureLocalTemperatureAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           uint16_t minInterval,
+                                                                                           uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the occupied cooling setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadOccupiedCoolingSetpointAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the occupied cooling setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterWriteOccupiedCoolingSetpointAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint,
+                                                                                              int16_t occupiedCoolingSetpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the occupied heating setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadOccupiedHeatingSetpointAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the occupied heating setpoint attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterWriteOccupiedHeatingSetpointAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint,
+                                                                                              int16_t occupiedHeatingSetpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the control sequence of operation attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterReadControlSequenceOfOperationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the control sequence of operation attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterWriteControlSequenceOfOperationAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                uint8_t controlSequenceOfOperation);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the system mode attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadSystemModeAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Thermostat server write command for the system mode attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t systemMode);
+
+/**
+ * @brief
+ *    Encode a Thermostat server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster WindowCovering                                              | 0x0102 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * WindowCoveringDownClose                                           |   0x01 |
+| * WindowCoveringGoToLiftPercentage                                  |   0x05 |
+| * WindowCoveringGoToLiftValue                                       |   0x04 |
+| * WindowCoveringGoToTiltPercentage                                  |   0x08 |
+| * WindowCoveringGoToTiltValue                                       |   0x07 |
+| * WindowCoveringStop                                                |   0x02 |
+| * WindowCoveringUpOpen                                              |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * WindowCoveringType                                                | 0x0000 |
+| * CurrentPositionLift                                               | 0x0003 |
+| * CurrentPositionTilt                                               | 0x0004 |
+| * ConfigStatus                                                      | 0x0007 |
+| * InstalledOpenLimitLift                                            | 0x0010 |
+| * InstalledClosedLimitLift                                          | 0x0011 |
+| * InstalledOpenLimitTilt                                            | 0x0012 |
+| * InstalledClosedLimitTilt                                          | 0x0013 |
+| * Mode                                                              | 0x0017 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an WindowCoveringDownClose command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterWindowCoveringDownCloseCommand(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an WindowCoveringGoToLiftPercentage command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterWindowCoveringGoToLiftPercentageCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint8_t percentageLiftValue);
+
+/**
+ * @brief
+ *    Encode an WindowCoveringGoToLiftValue command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterWindowCoveringGoToLiftValueCommand(uint8_t seqNum,
+                                                                                               chip::EndpointId destinationEndpoint,
+                                                                                               uint16_t liftValue);
+
+/**
+ * @brief
+ *    Encode an WindowCoveringGoToTiltPercentage command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterWindowCoveringGoToTiltPercentageCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint8_t percentageTiltValue);
+
+/**
+ * @brief
+ *    Encode an WindowCoveringGoToTiltValue command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterWindowCoveringGoToTiltValueCommand(uint8_t seqNum,
+                                                                                               chip::EndpointId destinationEndpoint,
+                                                                                               uint16_t tiltValue);
+
+/**
+ * @brief
+ *    Encode an WindowCoveringStop command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterWindowCoveringStopCommand(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an WindowCoveringUpOpen command for Window Covering server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterWindowCoveringUpOpenCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterDiscoverAttributes(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the window covering type attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterReadWindowCoveringTypeAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server configure report command for the window covering type attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterConfigureWindowCoveringTypeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                uint16_t minInterval, uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the current position - lift attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionLiftAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server configure report command for the current position - lift attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterConfigureCurrentPositionLiftAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                 uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the current position - tilt attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterReadCurrentPositionTiltAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server configure report command for the current position - tilt attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterConfigureCurrentPositionTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                 uint16_t minInterval, uint16_t maxInterval, uint16_t change);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the config status attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterReadConfigStatusAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server configure report command for the config status attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterConfigureConfigStatusAttribute(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint,
+                                                                                           uint16_t minInterval,
+                                                                                           uint16_t maxInterval);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the installed open limit - lift attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterReadInstalledOpenLimitLiftAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the installed closed limit - lift attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterReadInstalledClosedLimitLiftAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the installed open limit - tilt attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterReadInstalledOpenLimitTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the installed closed limit - tilt attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeWindowCoveringClusterReadInstalledClosedLimitTiltAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the mode attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterReadModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Window Covering server write command for the mode attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterWriteModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                               uint8_t mode);
+
+/**
+ * @brief
+ *    Encode a Window Covering server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWindowCoveringClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                         chip::EndpointId destinationEndpoint);

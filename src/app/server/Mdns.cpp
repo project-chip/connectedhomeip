@@ -21,12 +21,13 @@
 
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
 
 #include "Server.h"
 
@@ -39,13 +40,6 @@ namespace {
 NodeId GetCurrentNodeId()
 {
     // TODO: once operational credentials are implemented, node ID should be read from them
-    if (!DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogError(Discovery, "Device not fully provisioned. Node ID unknown.");
-        return chip::kTestDeviceNodeId;
-    }
-
-    // Admin pairings should have been persisted and should be loadable
 
     // TODO: once multi-admin is decided, figure out if a single node id
     // is sufficient or if we need multi-node-id advertisement. Existing
@@ -55,7 +49,7 @@ NodeId GetCurrentNodeId()
     auto pairing = GetGlobalAdminPairingTable().cbegin();
     if (pairing != GetGlobalAdminPairingTable().cend())
     {
-        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
+        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX16 ", node %" PRIX64, pairing->GetAdminId(),
                         pairing->GetNodeId());
         return pairing->GetNodeId();
     }
@@ -101,18 +95,19 @@ CHIP_ERROR AdvertiseOperational()
 
     uint8_t mac[8];
 
-    const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
-                                         .SetFabricId(fabricId)
-                                         .SetNodeId(GetCurrentNodeId())
-                                         .SetMac(FillMAC(mac))
-                                         .SetPort(CHIP_PORT)
-                                         .EnableIpV4(true);
+    const auto advertiseParameters =
+        chip::Mdns::OperationalAdvertisingParameters()
+            .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
+            .SetMac(FillMAC(mac))
+            .SetPort(CHIP_PORT)
+            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+            .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
-    ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-
-    return mdnsAdvertiser.Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    ChipLogProgress(Discovery, "Advertise operational node %" PRIX64 "-%" PRIX64, advertiseParameters.GetPeerId().GetFabricId(),
+                    advertiseParameters.GetPeerId().GetNodeId());
+    return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// Set MDNS commisioning advertisement
@@ -152,14 +147,16 @@ CHIP_ERROR AdvertiseCommisioning()
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
-    ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-
-    return mdnsAdvertiser.Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
+    return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// (Re-)starts the minmdns server
 void StartServer()
 {
+    ChipLogProgress(Discovery, "Start dns-sd server");
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
     // TODO: advertise this only when really operational once we support both

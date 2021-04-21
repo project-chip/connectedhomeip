@@ -955,9 +955,6 @@ static void StartTest()
         lStatus = gInet.NewRawEndPoint(lIPVersion, lIPProtocol, &sRawIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewRawEndPoint failed");
 
-        sRawIPEndPoint->OnMessageReceived = HandleRawMessageReceived;
-        sRawIPEndPoint->OnReceiveError    = HandleRawReceiveError;
-
         if (IsInterfaceIdPresent(gInterfaceId))
         {
             lStatus = sRawIPEndPoint->BindInterface(lIPAddressType, gInterfaceId);
@@ -968,9 +965,6 @@ static void StartTest()
     {
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
-
-        sUDPIPEndPoint->OnMessageReceived = HandleUDPMessageReceived;
-        sUDPIPEndPoint->OnReceiveError    = HandleUDPReceiveError;
 
         if (IsInterfaceIdPresent(gInterfaceId))
         {
@@ -992,7 +986,7 @@ static void StartTest()
                 INET_FAIL_ERROR(lStatus, "RawEndPoint::SetICMPFilter failed");
             }
 
-            lStatus = sRawIPEndPoint->Listen();
+            lStatus = sRawIPEndPoint->Listen(HandleRawMessageReceived, HandleRawReceiveError);
             INET_FAIL_ERROR(lStatus, "RawEndPoint::Listen failed");
         }
         else if (gOptFlags & kOptFlagUseUDPIP)
@@ -1000,7 +994,7 @@ static void StartTest()
             lStatus = sUDPIPEndPoint->Bind(lIPAddressType, IPAddress::Any, kUDPPort);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");
 
-            lStatus = sUDPIPEndPoint->Listen();
+            lStatus = sUDPIPEndPoint->Listen(HandleUDPMessageReceived, HandleUDPReceiveError);
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::Listen failed");
         }
         else if (gOptFlags & kOptFlagUseTCPIP)

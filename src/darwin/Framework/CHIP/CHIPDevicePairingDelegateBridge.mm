@@ -74,25 +74,9 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDele
 void CHIPDevicePairingDelegateBridge::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
 {
     NSLog(@"DevicePairingDelegate Requesting network credentials");
-
-    mCallback = callback;
-
-    id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        dispatch_async(mQueue, ^{
-            [strongDelegate onNetworkCredentialsRequested:kNetworkCredentialTypeWiFi];
-        });
-    }
 }
 
-void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password)
-{
-    if (mCallback) {
-        mCallback->SendNetworkCredentials([ssid UTF8String], [password UTF8String]);
-    } else {
-        NSLog(@"Couldn't Send WiFi Credentials, are you sure pairing is in progress?");
-    }
-}
+void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password) {}
 
 void CHIPDevicePairingDelegateBridge::SendThreadCredentials(NSData * threadDataSet)
 {
@@ -130,6 +114,21 @@ void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
             dispatch_async(mQueue, ^{
                 NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
                 [strongDelegate onPairingDeleted:nsError];
+            });
+        }
+    }
+}
+
+void CHIPDevicePairingDelegateBridge::OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error)
+{
+    NSLog(@"OnAddressUpdateComplete. Status %d", error);
+
+    id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
+    if ([strongDelegate respondsToSelector:@selector(onAddressUpdated:)]) {
+        if (strongDelegate && mQueue) {
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
+                [strongDelegate onAddressUpdated:nsError];
             });
         }
     }

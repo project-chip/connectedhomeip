@@ -26,6 +26,8 @@
 #include "dbus/client/thread_api_dbus.hpp"
 #include "platform/internal/DeviceNetworkInfo.h"
 
+#include <support/ThreadOperationalDataset.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -46,11 +48,9 @@ public:
 
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetThreadProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials);
+    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
 
-    CHIP_ERROR _SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
-
-    CHIP_ERROR _SetThreadProvision(const uint8_t * operationalDataset, size_t operationalDatasetLen);
+    CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
 
     void _ErasePersistentInfo();
 
@@ -74,10 +74,6 @@ public:
 
     void _OnMessageLayerActivityChanged(bool messageLayerIsActive);
 
-    void _OnCHIPoBLEAdvertisingStart();
-
-    void _OnCHIPoBLEAdvertisingStop();
-
     CHIP_ERROR _GetAndLogThreadStatsCounters();
 
     CHIP_ERROR _GetAndLogThreadTopologyMinimal();
@@ -89,6 +85,8 @@ public:
     CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
 
     CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR _JoinerStart();
 
@@ -110,10 +108,10 @@ private:
 
     void _ThreadDevcieRoleChangedHandler(otbr::DBus::DeviceRole role);
 
+    Thread::OperationalDataset mDataset = {};
+
     std::unique_ptr<otbr::DBus::ThreadApiDBus> mThreadApi;
     UniqueDBusConnection mConnection;
-    std::vector<uint8_t> mOperationalDatasetTlv;
-    Internal::DeviceNetworkInfo mNetworkInfo;
     bool mAttached;
     std::thread mDBusEventLoop;
 };

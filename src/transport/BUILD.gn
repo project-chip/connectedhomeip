@@ -24,15 +24,8 @@ static_library("transport") {
     "AdminPairingTable.h",
     "CASESession.cpp",
     "CASESession.h",
-    "NetworkProvisioning.cpp",
-    "NetworkProvisioning.h",
-    "PASESession.cpp",
-    "PASESession.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
-    "RendezvousParameters.h",
-    "RendezvousSession.cpp",
-    "RendezvousSession.h",
     "RendezvousSessionDelegate.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
@@ -41,23 +34,15 @@ static_library("transport") {
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
     "SessionEstablishmentDelegate.h",
-    "StorablePeerConnection.cpp",
-    "StorablePeerConnection.h",
     "TransportMgr.h",
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
   ]
 
-  if (chip_config_network_layer_ble) {
-    sources += [
-      "BLE.cpp",
-      "BLE.h",
-    ]
-  }
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",

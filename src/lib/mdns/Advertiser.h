@@ -22,6 +22,7 @@
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <core/PeerId.h>
 #include <inet/InetLayer.h>
 #include <lib/support/Span.h>
 
@@ -75,23 +76,29 @@ private:
 class OperationalAdvertisingParameters : public BaseAdvertisingParams<OperationalAdvertisingParameters>
 {
 public:
-    OperationalAdvertisingParameters & SetFabricId(uint64_t fabricId)
+    OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
-        mFabricId = fabricId;
+        mPeerId = peerId;
         return *this;
     }
-    uint64_t GetFabricId() const { return mFabricId; }
+    PeerId GetPeerId() const { return mPeerId; }
 
-    OperationalAdvertisingParameters & SetNodeId(uint64_t nodeId)
+    OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
     {
-        mNodeId = nodeId;
+        mCrmpRetryIntervalIdle   = intervalIdle;
+        mCrmpRetryIntervalActive = intervalActive;
         return *this;
     }
-    uint64_t GetNodeId() const { return mNodeId; }
+    void GetCRMPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
+    {
+        intervalIdle   = mCrmpRetryIntervalIdle;
+        intervalActive = mCrmpRetryIntervalActive;
+    }
 
 private:
-    uint64_t mFabricId = 0;
-    uint64_t mNodeId   = 0;
+    PeerId mPeerId;
+    uint32_t mCrmpRetryIntervalIdle   = 0;
+    uint32_t mCrmpRetryIntervalActive = 0;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>

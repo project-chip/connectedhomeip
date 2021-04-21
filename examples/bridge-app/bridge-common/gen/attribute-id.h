@@ -393,6 +393,20 @@
 #define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
 #define ZCL_LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID (0x0010)
 
+// Attribute ids for cluster: OTA Software Update Server
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: OTA Software Update Client
+
+// Client attributes
+#define ZCL_DEFAULT_OTA_SERVER_ATTRIBUTE_ID (0x0000)
+#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0001)
+
+// Server attributes
+
 // Attribute ids for cluster: General Commissioning
 
 // Client attributes
@@ -406,6 +420,13 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Operational Credentials
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Shade Configuration
 
