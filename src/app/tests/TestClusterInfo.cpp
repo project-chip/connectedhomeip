@@ -63,7 +63,7 @@ void TestDirty(nlTestSuite * apSuite, void * apContext)
 namespace {
 const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestClusterInfo::TestSamePath),
                           NL_TEST_DEF("TestDifferentPath", chip::app::TestClusterInfo::TestDifferentPath),
-                          NL_TEST_DEF("TestDirtiness", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
+                          NL_TEST_DEF("TestDirty", chip::app::TestClusterInfo::TestDirty), NL_TEST_SENTINEL() };
 }
 
 int TestClusterInfo()
