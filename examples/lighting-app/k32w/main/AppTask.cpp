@@ -132,6 +132,10 @@ int AppTask::Init()
 
     K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+    PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
+#endif
+
     return err;
 }
 
@@ -473,6 +477,18 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         K32W_LOG("Stopped BLE Advertising!");
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (!NFCMgr().IsTagEmulationStarted())
+        {
+            K32W_LOG("NFC Tag emulation is already stopped");
+        }
+        else
+        {
+            NFCMgr().StopTagEmulation();
+            K32W_LOG("Stopped NFC Tag Emulation!");
+        }
+#endif
     }
     else
     {
@@ -488,6 +504,36 @@ void AppTask::BleHandler(AppEvent * aEvent)
         }
     }
 }
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t)
+{
+    if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+    {
+        if (!NFCMgr().IsTagEmulationStarted())
+        {
+            K32W_LOG("NFC Tag emulation is already stopped!");
+        }
+        else
+        {
+            NFCMgr().StopTagEmulation();
+            K32W_LOG("Stopped NFC Tag Emulation!");
+        }
+    }
+    else if (event->Type == DeviceEventType::kCHIPoBLEAdvertisingChange && event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+    {
+        if (NFCMgr().IsTagEmulationStarted())
+        {
+            K32W_LOG("NFC Tag emulation is already started!");
+        }
+        else
+        {
+            ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            K32W_LOG("Started NFC Tag Emulation!");
+        }
+    }
+}
+#endif
 
 void AppTask::CancelTimer()
 {
