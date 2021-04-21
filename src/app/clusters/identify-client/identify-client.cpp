@@ -22,11 +22,12 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app/Command.h>
 #include <app/util/af.h>
 
 using namespace chip;
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * commandObj, uint16_t timeout)
 {
     emberAfIdentifyClusterPrintln("RX: IdentifyQueryResponse 0x%4x", timeout);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

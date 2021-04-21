@@ -50,4 +50,4 @@ else
 {{/zcl_command_arguments}}
 
 {{/if}}
-wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(nullptr{{#zcl_command_arguments}}, {{asSymbol label}}{{/zcl_command_arguments}});

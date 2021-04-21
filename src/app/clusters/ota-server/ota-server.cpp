@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <app/Command.h>
 #include <gen/att-storage.h>
 #include <gen/attribute-id.h>
 #include <gen/attribute-type.h>
@@ -38,7 +39,8 @@ using namespace chip;
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
  */
 
-bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(chip::ByteSpan updateToken, uint32_t newVersion)
+bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Command * commandObj, chip::ByteSpan updateToken,
+                                                                     uint32_t newVersion)
 {
     return false;
 }
@@ -51,7 +53,8 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(chip::ByteS
  *                       OTA Client's Basic Information Cluster.
  */
 
-bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::ByteSpan updateToken, uint32_t currentVersion)
+bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Command * commandObj, chip::ByteSpan updateToken,
+                                                                      uint32_t currentVersion)
 {
     return false;
 }
@@ -74,7 +77,8 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::Byte
  */
 
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
-    uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion, uint32_t currentVersion,
+    app::Command * commandObj, uint16_t vendorId, uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+    uint32_t currentVersion,
     /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
     chip::ByteSpan metadataForServer)
 {

@@ -45,6 +45,7 @@
 #include "../../util/common.h"
 
 #include "app/framework/plugin/esi-management/esi-management.h"
+#include <app/Command.h>
 
 static EmberAfPluginMessagingClientMessage messageTable[EMBER_AF_MESSAGING_CLUSTER_CLIENT_ENDPOINT_COUNT];
 
@@ -120,8 +121,8 @@ void emberAfMessagingClusterClientTickCallback(EndpointId endpoint)
     }
 }
 
-bool emberAfMessagingClusterDisplayMessageCallback(uint32_t messageId, uint8_t messageControl, uint32_t startTime,
-                                                   uint16_t durationInMinutes, uint8_t * msg,
+bool emberAfMessagingClusterDisplayMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl,
+                                                   uint32_t startTime, uint16_t durationInMinutes, uint8_t * msg,
                                                    uint8_t optionalExtendedMessageControl)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
@@ -241,7 +242,7 @@ kickout:
     return true;
 }
 
-bool emberAfMessagingClusterCancelMessageCallback(uint32_t messageId, uint8_t messageControl)
+bool emberAfMessagingClusterCancelMessageCallback(chip::app::Command * commandObj, uint32_t messageId, uint8_t messageControl)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
     uint8_t ep          = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);

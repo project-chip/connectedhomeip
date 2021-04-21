@@ -38,9 +38,10 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfMediaPlaybackClusterPlaybackCallback()
+bool emberAfMediaPlaybackClusterPlaybackCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

@@ -21,27 +21,29 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app/Command.h>
 #include <app/util/af.h>
 #include <lib/support/Span.h>
 
 using namespace chip;
 
-bool emberAfGeneralCommissioningClusterArmFailSafeCallback(uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
+                                                           uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback()
+bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetFabricCallback(ByteSpan fabricId, ByteSpan fabricSecret, uint64_t breadcrumb,
-                                                         uint32_t timeoutMs)
+bool emberAfGeneralCommissioningClusterSetFabricCallback(chip::app::Command * commandObj, ByteSpan fabricId, ByteSpan fabricSecret,
+                                                         uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

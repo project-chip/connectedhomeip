@@ -48,6 +48,7 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
+#include <app/Command.h>
 #include <app/reporting/reporting.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -165,7 +166,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t c
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool emberAfOnOffClusterOffCallback(void)
+bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_OFF_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -178,7 +179,7 @@ bool emberAfOnOffClusterOffCallback(void)
     return true;
 }
 
-bool emberAfOnOffClusterOnCallback(void)
+bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_ON_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
@@ -191,7 +192,7 @@ bool emberAfOnOffClusterOnCallback(void)
     return true;
 }
 
-bool emberAfOnOffClusterToggleCallback(void)
+bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = emberAfOnOffClusterSetValueCallback(emberAfCurrentEndpoint(), ZCL_TOGGLE_COMMAND_ID, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER

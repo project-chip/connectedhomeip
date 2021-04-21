@@ -54,6 +54,7 @@
 
 #include "zll-on-off-server.h"
 #include "../../include/af.h"
+#include <app/Command.h>
 
 #define ZLL_ON_OFF_CLUSTER_ON_OFF_CONTROL_ACCEPT_ONLY_WHEN_ON_MASK EMBER_BIT(0)
 
@@ -166,7 +167,7 @@ void emberAfOnOffClusterServerTickCallback(uint8_t endpoint)
     emberAfScheduleServerTick(endpoint, ZCL_ON_OFF_CLUSTER_ID, MILLISECOND_TICKS_PER_SECOND / 10);
 }
 
-bool emberAfOnOffClusterOffWithEffectCallback(uint8_t effectId, uint8_t effectVariant)
+bool emberAfOnOffClusterOffWithEffectCallback(chip::app::Command * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_VALUE;
     bool globalSceneControl;
@@ -227,7 +228,7 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(void)
+bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status;
     bool globalSceneControl;
@@ -278,7 +279,8 @@ kickout:
     return true;
 }
 
-bool emberAfOnOffClusterOnWithTimedOffCallback(uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime)
+bool emberAfOnOffClusterOnWithTimedOffCallback(chip::app::Command * commandObj, uint8_t onOffControl, uint16_t onTime,
+                                               uint16_t offWaitTime)
 {
     EmberAfStatus status;
     uint16_t onTimeAttribute, offWaitTimeAttribute;

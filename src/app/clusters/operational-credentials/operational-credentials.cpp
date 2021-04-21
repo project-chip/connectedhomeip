@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "af.h"
+#include <app/Command.h>
 #include <app/util/attribute-storage.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -33,7 +34,8 @@
 
 using namespace chip;
 
-bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId)
+bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command * commandObj, chip::FabricId fabricId,
+                                                              chip::NodeId nodeId, uint16_t vendorId)
 {
     // Go through admin pairing table and remove the element
     // Then fetch the attribute list and find the right element (or maybe just use the admin pairing table index)
@@ -44,7 +46,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::FabricId fab
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterGetFabricIdCallback()
+bool emberAfOperationalCredentialsClusterGetFabricIdCallback(chip::app::Command * commandObj)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: GetFabricId");
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
@@ -52,7 +54,7 @@ bool emberAfOperationalCredentialsClusterGetFabricIdCallback()
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(uint8_t * Label)
+bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
     // Go look at admin table using fabricId + update the label
