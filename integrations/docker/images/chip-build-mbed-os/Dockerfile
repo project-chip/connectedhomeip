@@ -50,8 +50,16 @@ RUN set -x \
     && : # last line
 
 # ------------------------------------------------------------------------------
+# Install openocd
+RUN set -x \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    openocd \
+    && : # last line
+
+# ------------------------------------------------------------------------------
 # Configure environment variables
 ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/
 ENV MBED_OS_PATH=/opt/mbed-os/
+ENV OPENOCD_PATH=/usr/share/openocd/
 
 ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
