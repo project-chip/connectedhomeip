@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/InteractionModelDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -99,6 +100,19 @@ public:
 
     virtual ~ReadHandler() = default;
 
+    CHIP_ERROR GetProcessingClusterInfo(ClusterInfo *& apClusterInfo);
+    ClusterInfo * GetClusterInfoList() { return mpClusterInfoList; };
+    size_t GetNumClusterInfos() { return mNumClusterInfos; }
+    size_t GetProcessingClusterIndex() { return mCurProcessingClusterInfoIdx; };
+    void BumpProcessingClusterIndex() { mCurProcessingClusterInfoIdx ++; };
+    void ShrinkClusterInfo(size_t numClusterInfos) { mpClusterInfoList -= numClusterInfos; }
+    void ClearClusterInfo()
+    {
+        mpClusterInfoList = nullptr;
+        mCurProcessingClusterInfoIdx = 0;
+        mNumClusterInfos = 0;
+    }
+
 private:
     enum class HandlerState
     {
@@ -108,7 +122,7 @@ private:
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle aPayload);
-
+    CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
@@ -125,6 +139,9 @@ private:
 
     // Current Handler state
     HandlerState mState;
+    ClusterInfo * mpClusterInfoList     = nullptr;
+    size_t mCurProcessingClusterInfoIdx = 0;
+    size_t mNumClusterInfos             = 0;
 };
 } // namespace app
 } // namespace chip

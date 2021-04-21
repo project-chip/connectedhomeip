@@ -99,6 +99,30 @@ exit:
     return;
 }
 
+CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                           TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t effectIdentifier = 1; // Dying light
+    uint8_t effectVariant    = 1;
+
+    VerifyOrExit(aClusterId == kTestClusterId && aEndPointId == kTestEndPointId, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (aFieldId == 0 || aFieldId == 1)
+    {
+        err = aWriter.Put(TLV::ContextTag(1), effectIdentifier);
+        SuccessOrExit(err);
+    }
+    if (aFieldId == 0 || aFieldId == 2)
+    {
+        err = aWriter.Put(TLV::ContextTag(2), effectVariant);
+        SuccessOrExit(err);
+    }
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
 } // namespace app
 } // namespace chip
 

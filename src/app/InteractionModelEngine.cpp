@@ -227,6 +227,60 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
+
+void InteractionModelEngine::ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler)
+{
+    ClusterInfo * const clusterInfoList = apReadHandler->GetClusterInfoList();
+    size_t numClusterInfos              = apReadHandler->GetNumClusterInfos();
+    size_t numClusterInfosToBeAffected;
+
+    apReadHandler->ClearClusterInfo();
+
+    if (numClusterInfos == 0)
+    {
+        ChipLogDetail(DataManagement, "No cluster instances allocated");
+        ExitNow();
+    }
+
+    // make sure everything is still sane
+    ChipLogIfFalse(clusterInfoList >= mClusterInfoPool);
+    ChipLogIfFalse(numClusterInfos <= mNumClusterInfos);
+
+    // mPathGroupPool + IM_PUBLISHER_MAX_NUM_PATH_GROUPS is a pointer which points to the last+1byte of this array
+    // clusterInfoList is a pointer to the first cluster instance to be released
+    // the result of subtraction is the number of cluster instances from clusterInfoList to the end of this array
+    numClusterInfosToBeAffected = ((size_t) mClusterInfoPool + mNumClusterInfos) - (size_t) clusterInfoList;
+
+    // Shrink the clusterInfosInPool by the number of cluster instances.
+    mNumClusterInfos -= numClusterInfos;
+
+    ChipLogDetail(DataManagement, "numClusterInfos is %d, and numClusterInfosToBeAffected is %d", numClusterInfos,
+                  numClusterInfosToBeAffected);
+    if (numClusterInfos == numClusterInfosToBeAffected)
+    {
+        ChipLogDetail(DataManagement, "Releasing the last block of cluster instances");
+        ExitNow();
+    }
+
+    ChipLogDetail(DataManagement, "Moving %d cluster infos forward", numClusterInfosToBeAffected - numClusterInfos);
+
+    memmove(clusterInfoList, clusterInfoList + numClusterInfos,
+            sizeof(ClusterInfo) * (numClusterInfosToBeAffected - numClusterInfos));
+
+    for (size_t i = 0; i < CHIP_MAX_NUM_READ_HANDLER; ++i)
+    {
+        ReadHandler * const handler = mReadHandlers + i;
+
+        if ((apReadHandler != handler) && (handler->GetClusterInfoList() > clusterInfoList))
+        {
+            handler->ShrinkClusterInfo(numClusterInfos);
+        }
+    }
+
+exit:
+    ChipLogDetail(DataManagement, "Number of allocated cluster instances: %u", mNumClusterInfos);
+}
+
 // The default implementation to make compiler happy before codegen for this is ready.
 // TODO: Remove this after codegen is ready.
 void __attribute__((weak))
@@ -240,9 +294,45 @@ DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aComman
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
+CHIP_ERROR __attribute__((weak))
+ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                           TLV::TLVWriter & aWriter)
+{
+    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8" FieldId=%" PRIx8, aClusterId,
+            aNodeId, aEndPointId, aFieldId);
+    ChipLogError(
+            DataManagement,
+            "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR __attribute__((weak))
+WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                           TLV::TLVReader & aReader)
+{
+    ChipLogDetail(DataManagement, "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8" FieldId=%" PRIx8, aClusterId,
+            aNodeId, aEndPointId, aFieldId);
+    ChipLogError(
+            DataManagement,
+            "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    return CHIP_NO_ERROR;
+}
+
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
 {
     return static_cast<uint16_t>(apReadClient - mReadClients);
+}
+
+CHIP_ERROR InteractionModelEngine::GetFirstAvailableClusterInfo(ClusterInfo *& apClusterInfo)
+{
+    if (mNumClusterInfos >= IM_SERVER_MAX_NUM_PATH_GROUPS)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    apClusterInfo = &mClusterInfoPool[mNumClusterInfos];
+    mNumClusterInfos ++;
+    apClusterInfo->ClearDirty();
+    return CHIP_NO_ERROR;
 }
 } // namespace app
 } // namespace chip

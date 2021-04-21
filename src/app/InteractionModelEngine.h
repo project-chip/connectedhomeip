@@ -44,12 +44,15 @@
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/reporting/Engine.h>
+#include <app/ClusterInfo.h>
+#include <app/util/basic-types.h>
 
 #define CHIP_MAX_NUM_COMMAND_HANDLER 1
 #define CHIP_MAX_NUM_COMMAND_SENDER 1
 #define CHIP_MAX_NUM_READ_CLIENT 1
 #define CHIP_MAX_NUM_READ_HANDLER 1
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
+#define IM_SERVER_MAX_NUM_PATH_GROUPS 256
 
 namespace chip {
 namespace app {
@@ -127,6 +130,9 @@ public:
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
+    void ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler);
+
+    CHIP_ERROR GetFirstAvailableClusterInfo(ClusterInfo *& apClusterInfo);
 private:
     friend class reporting::Engine;
     void OnUnknownMsgType(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
@@ -151,10 +157,15 @@ private:
     ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
     reporting::Engine mReportingEngine;
+    size_t mNumClusterInfos                         = 0;
+    ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
 };
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj);
-
+CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                                 TLV::TLVWriter & aWriter);
+CHIP_ERROR WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                                  TLV::TLVReader & aReader);
 } // namespace app
 } // namespace chip

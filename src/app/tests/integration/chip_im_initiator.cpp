@@ -129,12 +129,11 @@ exit:
 CHIP_ERROR SendReadRequest(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    gLastMessageTime = chip::System::Timer::GetCurrentEpoch();
+    chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndPointId, kTestClusterId, 1, 0, chip::app::AttributePathFlags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr, 0);
+    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr, 0, &attributePathParams, 1);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -265,6 +264,20 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     }
 }
 
+CHIP_ERROR WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                            TLV::TLVReader & aReader)
+{
+    if (aClusterId != kTestClusterId || aEndPointId != kTestEndPointId)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    if (aReader.GetLength() != 0)
+    {
+        chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
+    }
+    return CHIP_NO_ERROR;
+}
 } // namespace app
 } // namespace chip
 

@@ -48,8 +48,35 @@ static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
 static const Transport::AdminId gAdminId = 0;
+constexpr ClusterId kTestClusterId   = 6;
+constexpr EndpointId kTestEndPointId = 1;
 
 namespace app {
+CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                                 TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t effectIdentifier = 1;
+    uint8_t effectVariant    = 1;
+
+    VerifyOrExit(aClusterId == kTestClusterId && aEndPointId == kTestEndPointId, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (aFieldId == 0 || aFieldId == 1)
+    {
+        err = aWriter.Put(TLV::ContextTag(1), effectIdentifier);
+        SuccessOrExit(err);
+    }
+    if (aFieldId == 0 || aFieldId == 2)
+    {
+        err = aWriter.Put(TLV::ContextTag(2), effectVariant);
+        SuccessOrExit(err);
+    }
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
 namespace reporting {
 class TestReportingEngine
 {
@@ -74,6 +101,8 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
+    AttributePathList::Builder attributePathListBuilder;
+    AttributePath::Builder attributePathBuilder;
 
     err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -84,6 +113,13 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     writer.Init(std::move(readRequestbuf));
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    attributePathListBuilder = readRequestBuilder.CreateAttributePathListBuilder();
+    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+    attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+    attributePathBuilder = attributePathBuilder.NodeId(1).EndpointId(kTestEndPointId).ClusterId(kTestClusterId).FieldId(0).EndOfAttributePath();
+    NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
+    attributePathListBuilder.EndOfAttributePathList();
     readRequestBuilder.EventNumber(1);
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     readRequestBuilder.EndOfReadRequest();
