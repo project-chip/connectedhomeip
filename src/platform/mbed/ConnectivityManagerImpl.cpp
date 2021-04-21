@@ -92,9 +92,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mWiFiAPMode    = val;
-    return err;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 void ConnectivityManagerImpl::GetWifiStatus(::chip::DeviceLayer::Internal::NetworkStatus * WifiStatus)
@@ -126,6 +124,8 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationState               = kWiFiStationState_NotConnected;
     mIsProvisioned                  = false;
+    mIp4Address                     = IPAddress::Any;
+    mIp6Address                     = IPAddress::Any;
     mWiFiAPMode                     = kWiFiAPMode_NotSupported;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
     mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
@@ -135,7 +135,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     _security  = NSAPI_SECURITY_WPA_WPA2;
     if (_interface)
     {
-        _interface->attach([this](nsapi_event_t event, intptr_t data) {
+        // TODO: Add to user documentation that add_event_listener must be used
+        // To add more listener to the interface
+        _interface->add_event_listener([this](nsapi_event_t event, intptr_t data) {
             PlatformMgrImpl().mQueue.call([this, event, data] {
                 PlatformMgr().LockChipStack();
                 OnInterfaceEvent(event, data);
@@ -151,32 +153,37 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     // This is for internal use, state change is handled by platform middleware
 }
 
+void ConnectivityManagerImpl::_ProcessInterfaceChange(nsapi_connection_status_t new_status)
+{
+    switch (new_status)
+    {
+    case NSAPI_STATUS_LOCAL_UP:
+        ChipLogDetail(DeviceLayer, "Status - LOCAL_UP");
+        OnStationConnected();
+        break;
+    case NSAPI_STATUS_GLOBAL_UP:
+        ChipLogDetail(DeviceLayer, "Status - GLOBAL_UP");
+        OnStationConnected();
+        break;
+    case NSAPI_STATUS_DISCONNECTED:
+        ChipLogDetail(DeviceLayer, "Status - DISCONNECTED");
+        OnStationDisconnected();
+        break;
+    case NSAPI_STATUS_CONNECTING:
+        ChipLogDetail(DeviceLayer, "Status - CONNECTING");
+        OnStationConnecting();
+        break;
+    default:
+        ChipLogDetail(DeviceLayer, "Unprocessed WiFi status: 0x%08X", new_status);
+        break;
+    }
+}
+
 void ConnectivityManagerImpl::OnInterfaceEvent(nsapi_event_t event, intptr_t data)
 {
     if (event == NSAPI_EVENT_CONNECTION_STATUS_CHANGE)
     {
-        switch (data)
-        {
-        case NSAPI_STATUS_LOCAL_UP:
-            ChipLogDetail(DeviceLayer, "Status - LOCAL_UP");
-            OnStationConnected();
-            break;
-        case NSAPI_STATUS_GLOBAL_UP:
-            ChipLogDetail(DeviceLayer, "Status - GLOBAL_UP");
-            // OnStationConnected();
-            break;
-        case NSAPI_STATUS_DISCONNECTED:
-            ChipLogDetail(DeviceLayer, "Status - DISCONNECTED");
-            OnStationDisconnected();
-            break;
-        case NSAPI_STATUS_CONNECTING:
-            ChipLogDetail(DeviceLayer, "Status - CONNECTING");
-
-            break;
-        default:
-
-            break;
-        }
+        _ProcessInterfaceChange((nsapi_connection_status_t) data);
     }
 }
 
@@ -185,42 +192,61 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
 #if defined(CHIP_DEVICE_CONFIG_WIFI_SECURITY_SCAN)
 #error Wifi security scan Not implemented yet
 #else
+    // Validate the interface is available
     if (!_interface)
     {
         ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
-        return -1;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
-    auto result = _interface->connect(ssid, key, _security);
-    auto status = _interface->get_connection_status();
-    ChipLogDetail(DeviceLayer, "Connection result %d status: %s", result, status2str(status));
-    mWiFiStationMode = kWiFiStationMode_Enabled;
-    if (status == NSAPI_STATUS_GLOBAL_UP)
+
+    // Connect the interface with the credentials provided
+    auto error = _interface->connect(ssid, key, _security);
+    if (error)
     {
-        mWiFiStationState = kWiFiStationState_Connected;
-        mIsProvisioned    = true;
+        ChipLogError(DeviceLayer, "Connection result %d", error);
+        return CHIP_ERROR_INTERNAL;
     }
-    else
-    {
-        mWiFiStationState = kWiFiStationState_NotConnected;
-    }
+
+    mIsProvisioned = true;
+    auto status    = _interface->get_connection_status();
+    ChipLogError(DeviceLayer, "Connection result %d status: %s", error, status2str(status));
+    _ProcessInterfaceChange(status);
     return CHIP_NO_ERROR;
 #endif
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
-    mWiFiStationMode  = kWiFiStationMode_Disabled;
-    mWiFiStationState = kWiFiStationState_NotConnected;
-    mIsProvisioned    = false;
-    _security         = NSAPI_SECURITY_WPA_WPA2;
-
     if (!_interface)
     {
         ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
         return;
     }
-    _interface->set_credentials(NULL, NULL, _security);
-    _interface->disconnect();
+
+    // Reset credentials
+    _security = NSAPI_SECURITY_WPA_WPA2;
+    auto err  = _interface->set_credentials(NULL, NULL, _security);
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "Failed to reset WiFi credentials: error = %d", err);
+    }
+    else
+    {
+        mIsProvisioned = false;
+    }
+
+    // Disconnect from the WiFi station
+    err = _interface->disconnect();
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "Failed to disconnect WiFi interface: error = %d", err);
+    }
+    else
+    {
+        mWiFiStationMode = kWiFiStationMode_Disabled;
+    }
+
+    _ProcessInterfaceChange(_interface->get_connection_status());
 }
 int ConnectivityManagerImpl::ScanWiFi(int APlimit, ::chip::DeviceLayer::Internal::NetworkInfo * wifiInfo)
 {
@@ -276,93 +302,163 @@ int ConnectivityManagerImpl::ScanWiFi(int APlimit, ::chip::DeviceLayer::Internal
 
 CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Update WiFi station state and propagate it if necessary
+    if (mWiFiStationState != kWiFiStationState_Connected)
+    {
+        mWiFiStationState = kWiFiStationState_Connected;
+        ChipDeviceEvent event;
+        event.Type                          = DeviceEventType::kWiFiConnectivityChange;
+        event.WiFiConnectivityChange.Result = kConnectivity_Established;
+        PlatformMgr().PostEvent(&event);
+        ChipLogProgress(DeviceLayer, "Event - StationConnected");
+    }
 
-    // Assign an IPv6 link local address to the station interface.
+    // Update IPv4 address
+    SocketAddress address;
+    auto error = _interface->get_ip_address(&address);
+    if (error)
+    {
+        if (mIp4Address != IPAddress::Any)
+        {
+            // Unnexpected change, forward to the application
+            mIp4Address = IPAddress::Any;
+            ChipDeviceEvent event;
+            event.Type                            = DeviceEventType::kInternetConnectivityChange;
+            event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
+            event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+            PlatformMgr().PostEvent(&event);
+            ChipLogError(DeviceLayer, "Unnexpected loss of Ip4 address");
+        }
+    }
+    else
+    {
+        IPAddress addr;
+        if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp4Address)
+        {
+            mIp4Address = addr;
+            ChipDeviceEvent event;
+            event.Type                            = DeviceEventType::kInternetConnectivityChange;
+            event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+            event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+            PlatformMgr().PostEvent(&event);
+            ChipLogProgress(DeviceLayer, "New Ip4 address set");
+        }
+    }
 
-    // Alert other components of the new state.
-    mWiFiStationState = kWiFiStationState_Connected;
-    ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
-    event.WiFiConnectivityChange.Result = kConnectivity_Established;
-    PlatformMgr().PostEvent(&event);
-    ChipLogDetail(DeviceLayer, "Event - StationConnected");
-
-    // Get IP address
-    SocketAddress a;
-    _interface->get_ip_address(&a);
-    IPAddress addr;
-    IPAddress::FromString(a.get_ip_address(), addr);
-
-    // Post that IP address is available:
-    event.Type                            = DeviceEventType::kInternetConnectivityChange;
-    event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-    event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-    addr.ToString(event.InternetConnectivityChange.address);
-
-    PlatformMgr().PostEvent(&event);
-    ChipLogDetail(DeviceLayer, "Event - ip address change: %s", a.get_ip_address());
-
-    a = SocketAddress();
-    _interface->get_ipv6_link_local_address(&a);
-    ChipLogDetail(DeviceLayer, "IPv6 address: %s", a.get_ip_address());
-
-    // FIXME: Update state depending on the previous state
-
-    // Post that IP V4 address is available:
-    // SocketAddress a;
-    // if (_interface->get_ip_address(&a))
-    // {
-    //     IPAddress addr;
-    //     IPAddress::FromString(a.get_ip_address(), addr);
-
-    //     // Post that IP address is available:
-    //     event.Type                            = DeviceEventType::kInternetConnectivityChange;
-    //     event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
-    //     event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-    //     addr.ToString(event.InternetConnectivityChange.address);
-
-    //     ChipLogError(DeviceLayer, "Sending connectivity change: IPv4 address acquired");
-    //     PlatformMgr().PostEvent(&event);
-    // }
-    // else
-    // {
-    //     ChipLogError(DeviceLayer, "Failed to get the IPv4 address");
-    // }
-
-    // Post that IP V6 address is available:
-    // if (_interface->get_ipv6_link_local_address(&a))
-    // {
-    //     IPAddress addr;
-    //     IPAddress::FromString(a.get_ip_address(), addr);
-
-    //     // Post that IP address is available:
-    //     event.Type                            = DeviceEventType::kInternetConnectivityChange;
-    //     event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-    //     event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
-    //     addr.ToString(event.InternetConnectivityChange.address);
-
-    //     ChipLogError("Sending connectivity change: IPv6 address acquired");
-    //     PlatformMgr().PostEvent(&event);
-    // }
-    // else
-    // {
-    //     ChipLogError("Failed to get the IPv6 address");
-    // }
+    // Update IPv6 address
+    error = _interface->get_ipv6_link_local_address(&address);
+    if (error)
+    {
+        if (mIp6Address != IPAddress::Any)
+        {
+            // Unnexpected change, forward to the application
+            mIp6Address = IPAddress::Any;
+            ChipDeviceEvent event;
+            event.Type                            = DeviceEventType::kInternetConnectivityChange;
+            event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+            event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+            PlatformMgr().PostEvent(&event);
+            ChipLogError(DeviceLayer, "Unnexpected loss of Ip6 address");
+        }
+    }
+    else
+    {
+        IPAddress addr;
+        if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp6Address)
+        {
+            mIp6Address = addr;
+            ChipDeviceEvent event;
+            event.Type                            = DeviceEventType::kInternetConnectivityChange;
+            event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+            event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+            PlatformMgr().PostEvent(&event);
+            ChipLogProgress(DeviceLayer, "New Ip6 address set");
+        }
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
 {
-    // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
+    // Update WiFi station state and propagate it if necessary
+    if (mWiFiStationState != kWiFiStationState_NotConnected)
+    {
+        mWiFiStationState = kWiFiStationState_NotConnected;
+        ChipDeviceEvent event;
+        event.Type                          = DeviceEventType::kWiFiConnectivityChange;
+        event.WiFiConnectivityChange.Result = kConnectivity_Lost;
+        PlatformMgr().PostEvent(&event);
+        ChipLogProgress(DeviceLayer, "Event - StationDisconnected");
+    }
 
-    // Alert other components of the new state.
-    ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kWiFiConnectivityChange;
-    event.WiFiConnectivityChange.Result = kConnectivity_Lost;
-    PlatformMgr().PostEvent(&event);
-    mWiFiStationState = kWiFiStationState_NotConnected;
-    ChipLogDetail(DeviceLayer, "Event - StationDisconnected");
+    // Update IPv4 address
+    if (mIp4Address != IPAddress::Any)
+    {
+        // Unnexpected change, forward to the application
+        mIp4Address = IPAddress::Any;
+        ChipDeviceEvent event;
+        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
+        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+        PlatformMgr().PostEvent(&event);
+        ChipLogError(DeviceLayer, "Loss of Ip4 address");
+    }
+
+    if (mIp6Address != IPAddress::Any)
+    {
+        // Unnexpected change, forward to the application
+        mIp6Address = IPAddress::Any;
+        ChipDeviceEvent event;
+        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+        event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+        PlatformMgr().PostEvent(&event);
+        ChipLogError(DeviceLayer, "Loss of Ip6 address");
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::OnStationConnecting()
+{
+    ChipLogProgress(DeviceLayer, "Event - StationConnecting");
+
+    // Update WiFi station state and propagate it if necessary
+    if (mWiFiStationState == kWiFiStationState_Connected)
+    {
+        ChipDeviceEvent event;
+        event.Type                          = DeviceEventType::kWiFiConnectivityChange;
+        event.WiFiConnectivityChange.Result = kConnectivity_Lost;
+        PlatformMgr().PostEvent(&event);
+    }
+
+    mWiFiStationState = kWiFiStationState_Connecting;
+
+    // Update IPv4 address
+    if (mIp4Address != IPAddress::Any)
+    {
+        // Unnexpected change, forward to the application
+        mIp4Address = IPAddress::Any;
+        ChipDeviceEvent event;
+        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
+        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+        PlatformMgr().PostEvent(&event);
+        ChipLogError(DeviceLayer, "Loss of Ip4 address");
+    }
+
+    if (mIp6Address != IPAddress::Any)
+    {
+        // Unnexpected change, forward to the application
+        mIp6Address = IPAddress::Any;
+        ChipDeviceEvent event;
+        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+        event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+        PlatformMgr().PostEvent(&event);
+        ChipLogError(DeviceLayer, "Loss of Ip6 address");
+    }
+
     return CHIP_NO_ERROR;
 }
 
