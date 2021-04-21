@@ -329,8 +329,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             // Enable BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                PLAT_LOG("Enabled BLE Advertisements");
+                if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+                {
+                    PLAT_LOG("Enabled BLE Advertisement");
+                }
+                else
+                {
+                    PLAT_LOG("OpenDefaultPairingWindow() failed");
+                }
             }
         }
         break;
