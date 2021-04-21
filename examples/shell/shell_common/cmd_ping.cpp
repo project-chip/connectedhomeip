@@ -426,7 +426,7 @@ int cmd_ping(int argc, char ** argv)
         case 'p':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
-                streamer_printf(sout, "Invalid argument specified for -c\n");
+                streamer_printf(sout, "Invalid argument specified for -p\n");
                 return -1;
             }
             else

@@ -38,6 +38,7 @@ static_library("shell_common") {
     "cmd_misc.cpp",
     "cmd_otcli.cpp",
     "cmd_ping.cpp",
+    "cmd_send.cpp",
   ]
 
   public_deps = [
