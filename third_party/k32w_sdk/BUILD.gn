@@ -32,7 +32,7 @@ group("k32w_sdk") {
 config("mbedtls_k32w_config") {
   defines = [
     "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
-    "MBEDTLS_USER_CONFIG_FILE=<third_party/openthread/repo/examples/platforms/k32w/k32w061/k32w061-mbedtls-config.h>",
+    "MBEDTLS_USER_CONFIG_FILE=<src/platform/K32W/k32w-chip-mbedtls-config.h>",
 
     # These options should really be in the config.h...
     "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",

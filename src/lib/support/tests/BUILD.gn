@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
@@ -21,18 +22,23 @@ chip_test_suite("tests") {
   output_name = "libSupportTests"
 
   test_sources = [
-    "TestBufBound.cpp",
     "TestBufferReader.cpp",
     "TestBufferWriter.cpp",
+    "TestBytesToHex.cpp",
     "TestCHIPArgParser.cpp",
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestErrorStr.cpp",
+    "TestOwnerOf.cpp",
     "TestPool.cpp",
+    "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
+    "TestSafeString.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
+    "TestSpan.cpp",
     "TestStringBuilder.cpp",
+    "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
   ]
   sources = []

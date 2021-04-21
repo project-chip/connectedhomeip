@@ -19,26 +19,25 @@ on:
     pull_request:
 
 jobs:
-    build:
+    unit_tests:
         name: Unit / Interation Tests
+        if: github.actor != 'restyled-io[bot]'
 
         strategy:
             matrix:
                 type: [main, clang, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_VERSION: 0.2.18
-            BUILD_IMAGE: chip-build-openssl
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-          image: connectedhomeip/chip-build:0.4.18
-          volumes:
-              - "/tmp/log_output:/tmp/test_logs"
-              - "/tmp/happy_test_logs:/tmp/happy_test_logs"
-          options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+            image: connectedhomeip/chip-build:latest
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+                - "/tmp/happy_test_logs:/tmp/happy_test_logs"
+            options:
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
             - name: Checkout
@@ -78,8 +77,7 @@ jobs:
               if: ${{ always() }}
               with:
                   name:
-                      happy_log-${{
-                        steps.outsuffix.outputs.value }}-${{ matrix.type }}
+                      happy_log-${{ steps.outsuffix.outputs.value }}-${{ matrix.type }}
                   path: /tmp/happy_test_logs/
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

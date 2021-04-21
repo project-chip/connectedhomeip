@@ -6,7 +6,7 @@ digraph RendezvousSession
   subgraph cluster_controller {
     label=<<b>Controller</b>>
 
-    ChipDeviceController [shape=record label=<{ChipDeviceController|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::DeviceController::ChipDeviceController"]
+    DeviceCommissioner [shape=record label=<{DeviceCommissioner|<font point-size="11">RendezvousSessionDelegate</font>}>, URL="@ref chip::Controller::DeviceCommissioner"]
   }
 
   # This section represents device-only elements
@@ -20,7 +20,7 @@ digraph RendezvousSession
   subgraph cluster_transport {
     label=<<b>Transport</b>>
 
-    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SecurePairingSessionDelegate</font>}>, URL="@ref chip::SecurePairingSessionDelegate"]
+    RendezvousSession [shape=record, label=<{RendezvousSession|<font point-size="11">SessionEstablishmentDelegate</font>}>, URL="@ref chip::SessionEstablishmentDelegate"]
     TransportBle [label="Transport::BLE", URL="@ref chip::Transport::BLE"]
     TransportInet [label="Transport::?", style=dashed, color=gray]
   }
@@ -29,9 +29,9 @@ digraph RendezvousSession
   # Main relationships
   #############################
   RendezvousParameters [shape=ellipse, URL="@ref chip::RendezvousParameters"]
-  RendezvousParameters -> { ChipDeviceController, RendezvousDeviceDelegate} [arrowhead=none]
+  RendezvousParameters -> { DeviceCommissioner, RendezvousDeviceDelegate} [arrowhead=none]
 
-  {ChipDeviceController, RendezvousDeviceDelegate} -> RendezvousSession
+  {DeviceCommissioner, RendezvousDeviceDelegate} -> RendezvousSession
   RendezvousSession -> TransportBle
   RendezvousSession -> TransportInet [style=dashed, color=gray]
 }

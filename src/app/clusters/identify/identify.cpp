@@ -47,9 +47,14 @@
 #include "identify.h"
 
 // this file contains all the common includes for clusters in the util
+#include <app/Command.h>
 #include <app/util/af.h>
+#include <app/util/common.h>
 
-#include "common.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
 
 using namespace chip;
 
@@ -98,7 +103,7 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, A
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(uint16_t time)
+bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uint16_t time)
 {
     EmberStatus sendStatus;
     // This Identify callback writes the new attribute, which will trigger the
@@ -115,7 +120,7 @@ bool emberAfIdentifyClusterIdentifyCallback(uint16_t time)
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryCallback(void)
+bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,11 +48,7 @@
  * @{
  */
 
-#ifndef SILABS_AF_API
-#define SILABS_AF_API
-
-// Micro and compiler specific typedefs and macros
-//#include PLATFORM_HEADER
+#pragma once
 
 #ifndef CONFIGURATION_HEADER
 #define CONFIGURATION_HEADER "config.h"
@@ -68,38 +64,13 @@
 #include "stack/include/ember-random-api.h"
 #include "stack/include/ember-types.h"
 #include "stack/include/error.h"
-#else
-// Includes needed for ember related functions for the SoC
-//  #include "stack/include/ember.h"
 #endif // EZSP_HOST
-
-// HAL - hardware abstraction layer
-//#include "hal/hal.h"
-//#include "plugin/serial/serial.h"  // Serial utility APIs
-
-//#include "stack/include/event.h"
-//#include "stack/include/error.h"
 
 #include "af-types.h"
 
-//#include "app/framework/util/print.h"
-//#include "app/framework/util/time-util.h"
 #include "client-api.h"
 #include "debug-printing.h"
 #include "ember-print.h"
-
-#include "gen/af-structs.h"
-#include "gen/att-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/call-command-handler.h"
-#include "gen/callback.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
-#include "gen/enums.h"
-#include "gen/print-cluster.h"
-//#include "app/util/serial/command-interpreter2.h"
-//#include "app/framework/cli/zcl-cli.h"
 
 /** @name Attribute Storage */
 // @{
@@ -580,13 +551,13 @@ void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x);
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length byte.
  */
-void emberAfCopyString(uint8_t * dest, uint8_t * src, uint8_t size);
+void emberAfCopyString(uint8_t * dest, const uint8_t * src, uint8_t size);
 /*
  * @brief Function that copies a ZCL long string into a buffer.  The size
  * parameter should indicate the maximum number of characters to copy to the
  * destination buffer not including the length bytes.
  */
-void emberAfCopyLongString(uint8_t * dest, uint8_t * src, uint16_t size);
+void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size);
 /*
  * @brief Function that determines the length of a zigbee Cluster Library string
  *   (where the first byte is assumed to be the length).
@@ -599,12 +570,46 @@ uint8_t emberAfStringLength(const uint8_t * buffer);
 uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
+ * @brief Function that copies (part of) a ZCL typed list into a buffer. The index parameter
+ * may indicate a specific member of the list, or the list length, or the whole list if it
+ * is equal to -1.
+ *
+ * Individual elements may be accessed by an index of type 16-bit unsigned integer.
+ * Elements are numbered from 1 upwards. The element with index 0 is always of type
+ * uint16, and holds the number of elements contained in the list, which may be zero.
+ * If the zeroth element contains 0xffff, the list is a non value and is considered
+ * undefined.
+ *
+ * When writing, dest points to the list to write to, src points to the value to write, and index is the index to write at.
+ *
+ * When reading (i.e write is false), dest is the location to read into, src points to the list, and index is the index to read
+ * from.
+ *
+ * When reading or writing if the index leads to read or write outside of the
+ * allocated size for the list, this function will return 0.
+ *
+ * @return The number of bytes copied
+ */
+uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
+                         int32_t index);
+
+/*
  * @brief Function that determines the size of a zigbee Cluster Library
  * attribute value (where the attribute could be non-string, string, or long
  * string). For strings, the size includes the length of the string plus the
  * number of the string's length prefix byte(s).
  */
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer);
+uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
+                                   const uint8_t * buffer);
+
+/*
+ * @brief Function that determines the size of a zigbee Cluster Library
+ * attribute List[T] where T could be of any type.
+ * The size is expressed in bytes, and includes the used length consumed
+ * by list entries plus the 2 bytes used to represent the number of actual
+ * entries in the list.
+ */
+uint16_t emberAfAttributeValueListSize(chip::ClusterId clusterId, chip::AttributeId attributeId, const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -674,6 +679,9 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
 
+/** @brief Returns true if a given ZCL data type is a list type. */
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
+
 /**
  * @brief The mask applied by ::emberAfNextSequence when generating ZCL
  * sequence numbers.
@@ -724,7 +732,7 @@ int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool si
  */
 void emberAfGetEui64(EmberEUI64 returnEui64);
 
-#ifdef EZSP_HOST
+#if (BIGENDIAN_CPU) || defined(EZSP_HOST)
 // Normally this is provided by the stack code, but on the host
 // it is provided by the application code.
 void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
@@ -1699,18 +1707,18 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::Endp
 // @{
 // Frame control fields (8 bits total)
 // Bits 0 and 1 are Frame Type Sub-field
-#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (BIT(0) | BIT(1))
-#define ZCL_CLUSTER_SPECIFIC_COMMAND BIT(0)
+#define ZCL_FRAME_CONTROL_FRAME_TYPE_MASK (EMBER_BIT(0) | EMBER_BIT(1))
+#define ZCL_CLUSTER_SPECIFIC_COMMAND EMBER_BIT(0)
 #define ZCL_PROFILE_WIDE_COMMAND 0
 #define ZCL_GLOBAL_COMMAND (ZCL_PROFILE_WIDE_COMMAND)
 // Bit 2 is Manufacturer Specific Sub-field
-#define ZCL_MANUFACTURER_SPECIFIC_MASK BIT(2)
+#define ZCL_MANUFACTURER_SPECIFIC_MASK EMBER_BIT(2)
 // Bit 3 is Direction Sub-field
-#define ZCL_FRAME_CONTROL_DIRECTION_MASK BIT(3)
-#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT BIT(3)
+#define ZCL_FRAME_CONTROL_DIRECTION_MASK EMBER_BIT(3)
+#define ZCL_FRAME_CONTROL_SERVER_TO_CLIENT EMBER_BIT(3)
 #define ZCL_FRAME_CONTROL_CLIENT_TO_SERVER 0
 // Bit 4 is Disable Default Response Sub-field
-#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK BIT(4)
+#define ZCL_DISABLE_DEFAULT_RESPONSE_MASK EMBER_BIT(4)
 // Bits 5 to 7 are reserved
 
 #define ZCL_DIRECTION_CLIENT_TO_SERVER 0
@@ -1724,8 +1732,8 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::Endp
 #define EMBER_AF_ZCL_MANUFACTURER_SPECIFIC_OVERHEAD 5
 
 // Permitted values for emberAfSetFormAndJoinMode
-#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ BIT(0)
-#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ BIT(1)
+#define FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ EMBER_BIT(0)
+#define FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ EMBER_BIT(1)
 #define FIND_AND_JOIN_MODE_ALLOW_BOTH (FIND_AND_JOIN_MODE_ALLOW_2_4_GHZ | FIND_AND_JOIN_MODE_ALLOW_SUB_GHZ)
 
 /** @} END ZCL macros */
@@ -1847,5 +1855,3 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
-
-#endif // SILABS_AF_API

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,86 +20,105 @@
  *      This file implements a chip-im-responder, for the
  *      CHIP Interaction Data Model Protocol.
  *
- *      Currently it provides simple command handler with sample cluster and command
+ *      Currently it provides simple command and read handler with sample cluster
  *
  */
 
-#include "common.h"
-
-#include "app/InteractionModelEngine.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
+#include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include "InteractionModelEngine.h"
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
-#include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-namespace {
-
-// The CommandHandler object
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-chip::SecureSessionMgr gSessionManager;
-chip::SecurePairingUsingTestSecret gTestPairing;
-
-// Callback handler when a CHIP EchoRequest is received.
-void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
+namespace chip {
+namespace app {
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    static bool statusCodeFlipper = false;
+
+    if (aClusterId != kTestClusterId || aCommandId != kTestCommandId || aEndPointId != kTestEndPointId)
+    {
+        return;
+    }
 
     if (aReader.GetLength() != 0)
     {
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::Command::CommandParams commandParams = { 1,  // Endpoint
-                                                        0,  // GroupId
-                                                        6,  // ClusterId
-                                                        40, // CommandId
-                                                        (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
+    chip::app::CommandPathParams commandPathParams = { kTestEndPointId, // Endpoint
+                                                       kTestGroupId,    // GroupId
+                                                       kTestClusterId,  // ClusterId
+                                                       kTestCommandId,  // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
 
     uint8_t effectIdentifier = 1; // Dying light
     uint8_t effectVariant    = 1;
 
-    chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
+    if (statusCodeFlipper)
+    {
+        printf("responder constructing status code in command");
+        apCommandObj->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                    Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeSuccess);
+    }
+    else
+    {
+        printf("responder constructing command data in command");
 
-    chip::TLV::TLVWriter writer = apCommandObj->CreateCommandDataElementTLVWriter();
+        chip::TLV::TLVWriter * writer;
 
-    printf("responder constructing response");
-    err = writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, dummyType);
-    SuccessOrExit(err);
+        err = apCommandObj->PrepareCommand(&commandPathParams);
+        SuccessOrExit(err);
 
-    err = writer.Put(chip::TLV::ContextTag(1), effectIdentifier);
-    SuccessOrExit(err);
+        writer = apCommandObj->GetCommandDataElementTLVWriter();
+        err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
+        SuccessOrExit(err);
 
-    err = writer.Put(chip::TLV::ContextTag(2), effectVariant);
-    SuccessOrExit(err);
+        err = writer->Put(chip::TLV::ContextTag(2), effectVariant);
+        SuccessOrExit(err);
 
-    err = writer.EndContainer(dummyType);
-    SuccessOrExit(err);
-
-    err = writer.Finalize();
-    SuccessOrExit(err);
-
-    err = apCommandObj->AddCommand(commandParams);
-    SuccessOrExit(err);
+        err = apCommandObj->FinishCommand();
+        SuccessOrExit(err);
+    }
+    statusCodeFlipper = !statusCodeFlipper;
 
 exit:
     return;
 }
+
+} // namespace app
+} // namespace chip
+
+namespace {
+chip::TransportMgr<chip::Transport::UDP> gTransportManager;
+chip::SecureSessionMgr gSessionManager;
+chip::SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::InteractionModelDelegate mockDelegate;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
+    const chip::Transport::AdminId gAdminId = 0;
+    chip::Transport::AdminPairingTable admins;
+    chip::Transport::AdminPairingInfo * adminInfo = admins.AssignAdminId(gAdminId, chip::kTestDeviceNodeId);
+
+    VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     InitializeChip();
 
@@ -107,31 +126,28 @@ int main(int argc, char * argv[])
         chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId, HandleCommandRequestReceived);
     printf("Listening for IM requests...\n");
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
-        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId);
 
     if (err != CHIP_NO_ERROR)
     {
-        printf("CommandHandler failed, err:%s\n", chip::ErrorStr(err));
+        printf("IM responder failed, err:%s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 

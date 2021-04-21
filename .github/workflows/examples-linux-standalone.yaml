@@ -19,19 +19,17 @@ on:
     pull_request:
 
 jobs:
-    linux-standalone:
+    linux_standalone:
         name: Linux Standalone
 
         env:
             BUILD_TYPE: gn_linux
-            BUILD_VERSION: 0.2.14
-            BUILD_IMAGE: chip-build
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.4.18
+            image: connectedhomeip/chip-build:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -43,11 +41,10 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Build example Standalone Echo Client
@@ -58,10 +55,17 @@ jobs:
               run:
                   scripts/examples/gn_build_example.sh examples/shell/standalone
                   out/shell_debug
-            - name: Build example Standalone All Clusters Server 
+            - name: Build example Standalone All Clusters Server
               run:
                   scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
                   out/all_clusters_debug chip_bypass_rendezvous=true
+            - name: Build example lighting app with RPCs
+              run:
+                  scripts/examples/gn_build_example.sh examples/lighting-app/linux
+                  out/lighting_app_debug_rpc 'import("//with_pw_rpc.gni")'
+            - name: Build example Standalone Bridge
+              run:
+                  scripts/examples/gn_build_example.sh examples/bridge-app/linux out/bridge_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -76,7 +80,10 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: |
+                      out/all_clusters_debug/all-clusters-server
+                      out/bridge_debug/bridge-app-server
                       out/chip_tool_debug/chip-tool
+                      out/lighting_app_debug_rpc/chip-lighting-app
                       out/shell_debug/chip-shell
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
@@ -84,6 +91,6 @@ jobs:
               run: find out -type d -name "dbus" -exec rm -rf {} +
             - name: Remove gen binaries for CodeQL Analysis
               run: find out -type d -name "gen" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

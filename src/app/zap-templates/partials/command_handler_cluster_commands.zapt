@@ -1,7 +1,11 @@
 {{#if (zcl_command_arguments_count this.id)}}
-uint32_t payloadOffset = cmd->payloadStartIndex;
+uint16_t payloadOffset = cmd->payloadStartIndex;
 {{#zcl_command_arguments}}
+{{#if (isOctetString type)}}
+chip::ByteSpan {{asSymbol label}};
+{{else}}
 {{asUnderlyingZclType type}} {{asSymbol label}};
+{{/if}}
 {{/zcl_command_arguments}}
 
 {{#zcl_command_arguments}}
@@ -16,12 +20,23 @@ if ({{presentIf}})
   {
     return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
   }
-  {{asSymbol label}} = emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen);
-  {{#unless (isLastElement index count)}}
-  {{#if (isString type)}}
-  payloadOffset += emberAf{{asReadType type}}Length({{asSymbol label}}) + {{asReadTypeLength type}};
+  {{#if (isSigned type)}}
+  {{asSymbol label}} = static_cast<{{asUnderlyingZclType type}}>(emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen));
+  {{else if (isOctetString type)}}
+  {
+  uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+  {{asSymbol label}} = chip::ByteSpan(rawData + {{asReadTypeLength type}}, emberAf{{asReadType type}}Length(rawData));
+  }
   {{else}}
-  payloadOffset += {{asReadTypeLength type}};
+  {{asSymbol label}} = emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen);
+  {{/if}}
+  {{#unless (isLastElement index count)}}
+  {{#if (isOctetString type)}}
+  payloadOffset = static_cast<uint16_t>(payloadOffset + {{asSymbol label}}.size() + {{asReadTypeLength type}});
+  {{else if (isString type)}}
+  payloadOffset = static_cast<uint16_t>(payloadOffset + emberAf{{asReadType type}}Length({{asSymbol label}}) + {{asReadTypeLength type}});
+  {{else}}
+  payloadOffset = static_cast<uint16_t>(payloadOffset + {{asReadTypeLength type}});
   {{/if}}
   {{/unless}}
   {{/if}}
@@ -35,4 +50,4 @@ else
 {{/zcl_command_arguments}}
 
 {{/if}}
-wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(nullptr{{#zcl_command_arguments}}, {{asSymbol label}}{{/zcl_command_arguments}});

@@ -17,7 +17,7 @@ from pathlib import Path
 import serial # type: ignore
 import importlib
 
-from pw_hdlc_lite.rpc import HdlcRpcClient
+from pw_hdlc.rpc import HdlcRpcClient, default_channels
 
 # Point the script to the .proto file with our RPC services.
 PROTO = Path(os.environ["PW_ROOT"], "pw_rpc/pw_rpc_protos/echo.proto")
@@ -31,7 +31,9 @@ class Error(Exception):
 
 class PigweedDevice:
     def __init__(self, device_tty, baud, platform_module=None, platform_args=None):
-        self.pw_rpc_client = HdlcRpcClient(serial.Serial(device_tty, baud), [PROTO])
+        ser = serial.Serial(device_tty, baud, timeout=0.01)
+        self.pw_rpc_client = HdlcRpcClient(lambda: ser.read(4096),
+                                           [PROTO], default_channels(ser.write))
         self._platform = None
         print("Platform args: %s" % platform_args)
         print("Platform module: %s" % platform_module)

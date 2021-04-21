@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,18 @@
 namespace chip {
 namespace Ble {
 
-using ::chip::System::PacketBuffer;
+constexpr size_t kTransferProtocolHeaderFlagsSize = 1; // Size in bytes of enocded BTP fragment header flag bits
+constexpr size_t kTransferProtocolSequenceNumSize = 1; // Size in bytes of encoded BTP sequence number
+constexpr size_t kTransferProtocolAckSize         = 1; // Size in bytes of encoded BTP fragment acknowledgement number
+constexpr size_t kTransferProtocolMsgLenSize      = 2; // Size in byte of encoded BTP total fragmented message length
+
+constexpr size_t kTransferProtocolMaxHeaderSize =
+    kTransferProtocolHeaderFlagsSize + kTransferProtocolAckSize + kTransferProtocolSequenceNumSize + kTransferProtocolMsgLenSize;
+constexpr size_t kTransferProtocolMidFragmentMaxHeaderSize =
+    kTransferProtocolHeaderFlagsSize + kTransferProtocolAckSize + kTransferProtocolSequenceNumSize;
+constexpr size_t kTransferProtocolStandaloneAckHeaderSize =
+    kTransferProtocolHeaderFlagsSize + kTransferProtocolAckSize + kTransferProtocolSequenceNumSize;
+
 using ::chip::System::PacketBufferHandle;
 
 typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in BtpEngine::IsValidAck and
@@ -76,16 +87,17 @@ public:
         kState_Error      = 3
     } State_t; // [READ-ONLY] Current state
 
-    enum
+    // Masks for BTP fragment header flag bits.
+    enum class HeaderFlags : uint8_t
     {
-        kHeaderFlag_StartMessage    = 0x01,
-        kHeaderFlag_ContinueMessage = 0x02,
-        kHeaderFlag_EndMessage      = 0x04,
-        kHeaderFlag_FragmentAck     = 0x08,
+        kStartMessage    = 0x01,
+        kContinueMessage = 0x02,
+        kEndMessage      = 0x04,
+        kFragmentAck     = 0x08,
 #if CHIP_ENABLE_CHIPOBLE_TEST
-        kHeaderFlag_CommandMessage = 0x10,
+        kCommandMessage = 0x10,
 #endif
-    }; // Masks for BTP fragment header flag bits.
+    };
 
     static const uint16_t sDefaultFragmentSize;
     static const uint16_t sMaxFragmentSize;
@@ -118,7 +130,10 @@ public:
     inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); }
     inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
     inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
-    inline bool IsCommandPacket(const PacketBufferHandle & p) { return GetFlag(*(p->Start()), kHeaderFlag_CommandMessage); }
+    inline bool IsCommandPacket(const PacketBufferHandle & p)
+    {
+        return BitFlags<HeaderFlags>(*(p->Start())).Has(HeaderFlags::kCommandMessage);
+    }
     inline void PushPacketTag(const PacketBufferHandle & p, PacketType_t type)
     {
         p->SetStart(p->Start() - sizeof(type));

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,10 @@
 
 #pragma once
 
-#include <controller/CHIPPersistentStorageDelegate.h>
+#include <map>
+#include <string>
+
+#include <core/CHIPPersistentStorageDelegate.h>
 
 class PythonPersistentStorageDelegate;
 
@@ -29,16 +32,18 @@ typedef void (*DeleteKeyValueFunct)(const uint8_t * key);
 namespace chip {
 namespace Controller {
 
-// TODO: Implement this.
 class PythonPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
     PythonPersistentStorageDelegate() {}
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override {}
-    void GetKeyValue(const char * key) override {}
-    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void SetKeyValue(const char * key, const char * value) override {}
-    void DeleteKeyValue(const char * key) override {}
+    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
+    void AsyncSetKeyValue(const char * key, const char * value) override;
+    void AsyncDeleteKeyValue(const char * key) override;
+
+private:
+    PersistentStorageResultDelegate * mDelegate;
+    std::map<std::string, std::string> mStorage;
 };
 
 } // namespace Controller

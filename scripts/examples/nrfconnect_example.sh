@@ -16,12 +16,14 @@
 #    limitations under the License.
 #
 
-# Run bootstrap to set up e.g. Pigweed correctly
-source "$(dirname "$0")/../../scripts/bootstrap.sh"
+# Run bootstrap and activate to set up e.g. Pigweed correctly
+source "$(dirname "$0")/../../scripts/activate.sh"
 
 cd "$(dirname "$0")/../../examples"
 
 APP="$1"
+BOARD="$2"
+shift 2
 
 if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" ]]; then
     echo "Usage: $0 <application>" >&2
@@ -30,8 +32,13 @@ if [[ ! -f "$APP/nrfconnect/CMakeLists.txt" ]]; then
     exit 1
 fi
 
+if [ -z "$BOARD" ]; then
+    echo "No mandatory BOARD argument supplied!"
+    exit 1
+fi
+
 set -x
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 env
 
-west build -b nrf52840dk_nrf52840 -d "$APP/nrfconnect/build" "$APP/nrfconnect"
+west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$@"

@@ -19,10 +19,11 @@ on:
     pull_request:
 
 jobs:
-    templates:
+    zap_templates:
         name: ZAP templates generation
 
         runs-on: ubuntu-18.04
+        if: github.actor != 'restyled-io[bot]'
 
         steps:
             - name: Checkout

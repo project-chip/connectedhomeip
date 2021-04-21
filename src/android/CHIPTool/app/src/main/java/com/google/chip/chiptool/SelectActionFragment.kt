@@ -17,12 +17,19 @@
  */
 package com.google.chip.chiptool
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.util.FragmentUtil
+import kotlinx.android.synthetic.main.select_action_fragment.provisionThreadCredentialsBtn
+import kotlinx.android.synthetic.main.select_action_fragment.provisionWifiCredentialsBtn
 import kotlinx.android.synthetic.main.select_action_fragment.view.*
 
 /** Fragment to select from various options to interact with a CHIP device. */
@@ -35,17 +42,58 @@ class SelectActionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.select_action_fragment, container, false).apply {
       scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
-      provisionWifiCredentialsBtn.setOnClickListener {
-        getCallback()?.onProvisionWifiCredentialsClicked()
+      provisionWifiCredentialsBtn.apply {
+        isEnabled = hasLocationPermission()
+        setOnClickListener { getCallback()?.onProvisionWifiCredentialsClicked() }
       }
-      provisionThreadCredentialsBtn.setOnClickListener {
-        getCallback()?.onProvisionThreadCredentialsClicked()
+      provisionThreadCredentialsBtn.apply {
+        isEnabled = hasLocationPermission()
+        setOnClickListener { getCallback()?.onProvisionThreadCredentialsClicked() }
       }
       otCommissioningBtn.setOnClickListener { getCallback()?.handleCommissioningClicked() }
       echoClientBtn.setOnClickListener { getCallback()?.handleEchoClientClicked() }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
     }
+  }
+
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+
+    if (savedInstanceState != null) return
+    if (hasLocationPermission()) return
+
+    val permissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+      if (granted) {
+        provisionWifiCredentialsBtn.isEnabled = true
+        provisionThreadCredentialsBtn.isEnabled = true
+      } else {
+        provisionWifiCredentialsBtn.isEnabled = false
+        provisionThreadCredentialsBtn.isEnabled = false
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.location_permission_denied_title)
+            .setMessage(R.string.location_permission_denied_message)
+            .setPositiveButton(R.string.text_ok) { dialog, _ -> dialog.dismiss() }
+            .setCancelable(false)
+            .create()
+            .show()
+      }
+    }
+
+    permissionRequest.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+  }
+
+  private fun hasLocationPermission(): Boolean {
+    val locationPermissionState =
+        ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+
+    return PackageManager.PERMISSION_GRANTED == locationPermissionState
   }
 
   private fun getCallback() = FragmentUtil.getHost(this, Callback::class.java)

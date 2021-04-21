@@ -51,10 +51,18 @@
 // *****************************************************************************
 
 #include "ias-zone-server.h"
+#include <app/Command.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 #include <system/SystemLayer.h>
+
+#include "gen/att-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/callback.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
 
 using namespace chip;
 
@@ -341,7 +349,7 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCode, uint8_t zoneId)
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::Command * commandObj, uint8_t enrollResponseCode, uint8_t zoneId)
 {
     EndpointId endpoint;
     uint8_t epZoneId;

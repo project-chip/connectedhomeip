@@ -31,10 +31,6 @@
 #include <support/RandUtils.h>
 #include <utility>
 
-using namespace chip;
-using namespace std;
-using namespace chip::TLV;
-
 namespace chip {
 
 bool IsCHIPTag(uint8_t tag)
@@ -57,8 +53,9 @@ bool SetupPayload::isValidQRCodePayload()
     {
         return false;
     }
-
-    if (rendezvousInformation > RendezvousInformationFlags::kAllMask)
+    chip::RendezvousInformationFlags allvalid(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork,
+                                              RendezvousInformationFlag::kSoftAP);
+    if (!rendezvousInformation.HasOnly(allvalid))
     {
         return false;
     }
@@ -73,7 +70,7 @@ bool SetupPayload::isValidQRCodePayload()
         return false;
     }
 
-    if (version == 0 && rendezvousInformation == RendezvousInformationFlags::kNone && discriminator == 0 && setUpPINCode == 0)
+    if (version == 0 && !rendezvousInformation.HasAny(allvalid) && discriminator == 0 && setUpPINCode == 0)
     {
         return false;
     }
@@ -83,10 +80,10 @@ bool SetupPayload::isValidQRCodePayload()
 
 bool SetupPayload::isValidManualCode()
 {
-    // The discriminator for manual setup code is 4 least significant bits
+    // The discriminator for manual setup code is 4 most significant bits
     // in a regular 12 bit discriminator. Let's make sure that the provided
     // discriminator fits within 12 bits (kPayloadDiscriminatorFieldLengthInBits).
-    // The manual setup code generator will only use 4 least significant bits from
+    // The manual setup code generator will only use 4 most significant bits from
     // it.
     if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
     {
@@ -105,7 +102,7 @@ bool SetupPayload::isValidManualCode()
     return true;
 }
 
-CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, string data)
+CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, std::string data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OptionalQRCodeInfo info;
@@ -135,9 +132,9 @@ exit:
     return err;
 }
 
-vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData()
+std::vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData() const
 {
-    vector<OptionalQRCodeInfo> returnedOptionalInfo;
+    std::vector<OptionalQRCodeInfo> returnedOptionalInfo;
     for (auto & entry : optionalVendorData)
     {
         returnedOptionalInfo.push_back(entry.second);
@@ -156,7 +153,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::addSerialNumber(string serialNumber)
+CHIP_ERROR SetupPayload::addSerialNumber(std::string serialNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OptionalQRCodeInfoExtension info;
@@ -186,7 +183,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::getSerialNumber(string & outSerialNumber)
+CHIP_ERROR SetupPayload::getSerialNumber(std::string & outSerialNumber) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OptionalQRCodeInfoExtension info;
@@ -199,7 +196,7 @@ CHIP_ERROR SetupPayload::getSerialNumber(string & outSerialNumber)
         outSerialNumber = info.data;
         break;
     case (optionalQRCodeInfoTypeUInt32):
-        outSerialNumber = to_string(info.uint32);
+        outSerialNumber = std::to_string(info.uint32);
         break;
     default:
         err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -249,14 +246,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info)
+CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(optionalExtensionData.find(tag) != optionalExtensionData.end(), err = CHIP_ERROR_KEY_NOT_FOUND);
-    info = optionalExtensionData[tag];
-
-exit:
-    return err;
+    const auto it = optionalExtensionData.find(tag);
+    VerifyOrReturnError(it != optionalExtensionData.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    info = it->second;
+    return CHIP_NO_ERROR;
 }
 
 optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
@@ -275,9 +270,9 @@ optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
     return elemType;
 }
 
-vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
+std::vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
 {
-    vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
+    std::vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
     for (auto & entry : optionalExtensionData)
     {
         returnedOptionalInfo.push_back(entry.second);
@@ -288,8 +283,8 @@ vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
 bool SetupPayload::operator==(SetupPayload & input)
 {
     bool isIdentical = true;
-    vector<OptionalQRCodeInfo> inputOptionalVendorData;
-    vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;
+    std::vector<OptionalQRCodeInfo> inputOptionalVendorData;
+    std::vector<OptionalQRCodeInfoExtension> inputOptionalExtensionData;
 
     VerifyOrExit(this->version == input.version && this->vendorID == input.vendorID && this->productID == input.productID &&
                      this->requiresCustomFlow == input.requiresCustomFlow &&

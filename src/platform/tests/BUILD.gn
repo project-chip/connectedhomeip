@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
@@ -31,8 +32,8 @@ if (chip_device_platform != "none") {
       test_sources += [ "TestPlatformMgr.cpp" ]
     }
 
-    if (chip_enable_mdns && chip_enable_happy_tests &&
-        chip_device_platform == "linux") {
+    if (chip_mdns != "none" && chip_enable_happy_tests &&
+        (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       test_sources += [ "TestMdns.cpp" ]
     }
 
@@ -70,6 +71,10 @@ if (chip_device_platform != "none") {
         "TestCHIPoBLEStackMgrDriver.cpp",
       ]
       tests = [ "TestCHIPoBLEStackMgr" ]
+    }
+
+    if (current_os == "zephyr") {
+      test_sources += [ "TestKeyValueStoreMgr.cpp" ]
     }
   }
 } else {

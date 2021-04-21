@@ -25,65 +25,12 @@ from __future__ import absolute_import
 import abc
 import optparse
 import shlex
-import six
 
 
-class ChipBleBase(six.with_metaclass(abc.ABCMeta, object)):
+class ChipBleBase(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def scan(self, line):
-        """ API to initiatae BLE scanning for -t user_timeout seconds."""
-        return
-
-    @abc.abstractmethod
-    def SubscribeBleCharacteristic(self, connObj, svcId, charId, subscribe):
-        """ Called by Chip to (un-)subscribe to a characteristic of a service."""
-        return
-
-    @abc.abstractmethod
-    def WriteBleCharacteristic(self, connObj, svcId, charId, buffer, length):
-        """ Called by ChipDeviceMgr.py to satisfy a request by Chip to transmit a packet over BLE."""
-        return
-
-    @abc.abstractmethod
-    def scan_connect(self, line):
-        """ API to perform both scan and connect operations in one call."""
-        return
-
-    @abc.abstractmethod
-    def disconnect(self):
-        """ API to initiate BLE disconnect procedure."""
-        return
-
-    @abc.abstractmethod
-    def connect(self, identifier):
-        """ API to initiate BLE connection to peripheral device whose identifier == identifier."""
-        return
-
-    @abc.abstractmethod
-    def CloseBle(self, connObj):
-        """ Called by Chip to close the BLE connection."""
-        return
-
-    @abc.abstractmethod
-    def GetBleEvent(self):
-        """ Called by ChipDeviceMgr.py on behalf of Chip to retrieve a queued message."""
-        return
-
-    @abc.abstractmethod
-    def devMgrCB(self):
-        """A callback used by ChipDeviceMgr.py to drive the runloop while the
-        main thread waits for the Chip thread to complete its operation."""
-        return
-
-    @abc.abstractmethod
-    def readlineCB(self):
-        """A callback used by readline to drive the runloop while the main thread
-        waits for commandline input from the user."""
-        return
-
-    @abc.abstractmethod
-    def setInputHook(self, hookFunc):
-        """Set the PyOS_InputHook to call the specific function."""
+        """ API to initiate BLE scanning for -t user_timeout seconds."""
         return
 
     @abc.abstractmethod
@@ -100,8 +47,6 @@ class ChipBleBase(six.with_metaclass(abc.ABCMeta, object)):
 
         if cmd == "scan":
             line += "ble-scan [-t <timeout>] [<name>|<identifier>] [-q <quiet>]"
-        elif cmd == "scan-connect":
-            line += "ble-scan-connect [-t <timeout>] <name> [-q <quiet>]"
 
         self.logger.info(line)
 

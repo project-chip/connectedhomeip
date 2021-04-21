@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +35,11 @@
 #include <utility>
 
 namespace chip {
+
+namespace Transport {
+class TCPTest;
+};
+
 namespace Inet {
 
 class InetLayer;
@@ -50,6 +55,7 @@ class InetLayer;
 class DLL_EXPORT TCPEndPoint : public EndPointBasis
 {
     friend class InetLayer;
+    friend class ::chip::Transport::TCPTest;
 
 public:
     /** Control switch indicating whether the application is receiving data. */
@@ -305,7 +311,7 @@ public:
     INET_ERROR AckReceive(uint16_t len);
 
     /**
-     * @brief   Push message text back to the head of the receive queue.
+     * @brief   Set the receive queue, for testing.
      *
      * @param[out]  data    Message text to push.
      *
@@ -314,14 +320,9 @@ public:
      *
      * @details
      *  This method may only be called by data reception event handlers to
-     *  put an unacknowledged portion of data back on the receive queue. The
-     *  operational semantics are undefined if the caller is outside the scope
-     *  of a data reception event handler, \c data is not the \c chip::System::PacketBuffer
-     *  provided to the handler, or \c data does not contain the unacknowledged
-     *  portion remaining after the bytes acknowledged by a prior call to the
-     *  <tt>AckReceive(uint16_t len)</tt> method.
+     *  put data on the receive queue for unit test purposes.
      */
-    INET_ERROR PutBackReceivedData(chip::System::PacketBufferHandle data);
+    INET_ERROR SetReceivedDataForTesting(chip::System::PacketBufferHandle data);
 
     /**
      * @brief   Extract the length of the data awaiting first transmit.
@@ -430,19 +431,21 @@ public:
     /**
      * @brief   Type of data reception event handling function.
      *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     * @param[in]   data        The data received.
+     * @param[in]   endPoint        The TCP endpoint associated with the event.
+     * @param[in]   data            The data received.
+     *
+     * @retval      INET_NO_ERROR   If the received data can be handled by higher layers.
+     * @retval      other           If the received data can not be used, and higher layers will not see it.
      *
      * @details
      *  Provide a function of this type to the \c OnDataReceived delegate
      *  member to process data reception events on \c endPoint where \c data
      *  is the message text received.
      *
-     *  A data reception event handler must acknowledge data processed using
-     *  the \c AckReceive method. The \c Free method on the data buffer must
-     *  also be invoked unless the \c PutBackReceivedData is used instead.
+     *  If this function returns an error, the connection will be closed, since higher layers
+     *  are not able to process the data for a better response.
      */
-    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
+    typedef INET_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -559,6 +562,11 @@ public:
     OnTCPSendIdleChangedFunct OnTCPSendIdleChanged;
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
+    /**
+     * Size of the largest TCP packet that can be received.
+     */
+    constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
+
 private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
@@ -665,7 +673,6 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO();
     void HandlePendingIO();
     void ReceiveData();
     void HandleIncomingConnection();

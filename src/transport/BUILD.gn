@@ -13,46 +13,44 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
 import("${chip_root}/src/ble/ble.gni")
 
 static_library("transport") {
   output_name = "libTransportLayer"
 
   sources = [
-    "NetworkProvisioning.cpp",
-    "NetworkProvisioning.h",
+    "AdminPairingTable.cpp",
+    "AdminPairingTable.h",
+    "CASESession.cpp",
+    "CASESession.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
-    "RendezvousParameters.h",
-    "RendezvousSession.cpp",
-    "RendezvousSession.h",
     "RendezvousSessionDelegate.h",
-    "SecurePairingSession.cpp",
-    "SecurePairingSession.h",
+    "SecureMessageCodec.cpp",
+    "SecureMessageCodec.h",
     "SecureSession.cpp",
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
-    "TransportMgr.cpp",
+    "SessionEstablishmentDelegate.h",
     "TransportMgr.h",
+    "TransportMgrBase.cpp",
+    "TransportMgrBase.h",
   ]
-
-  if (chip_config_network_layer_ble) {
-    sources += [
-      "BLE.cpp",
-      "BLE.h",
-    ]
-  }
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/credentials",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport/raw",
+    "${nlio_root}:nlio",
   ]
 }

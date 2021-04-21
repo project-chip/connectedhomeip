@@ -16,26 +16,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 #include "Server.h"
 #include "support/ErrorStr.h"
 
+#include "OnboardingCodesUtil.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <support/ThreadOperationalDataset.h>
+
+#include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
 
 #include "Keyboard.h"
 #include "LED.h"
+#include "LEDWidget.h"
 #include "TimersManager.h"
 #include "app_config.h"
 
-#define FACTORY_RESET_TRIGGER_TIMEOUT 6000
-#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
-#define APP_TASK_PRIORITY 2
-#define APP_EVENT_QUEUE_SIZE 10
+constexpr uint32_t kFactoryResetTriggerTimeout = 6000;
+constexpr uint8_t kAppEventQueueSize           = 10;
 
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
@@ -47,8 +50,6 @@ static LEDWidget sLockLED;
 
 static bool sIsThreadProvisioned     = false;
 static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
@@ -62,12 +63,11 @@ int AppTask::StartAppTask()
 {
     int err = CHIP_NO_ERROR;
 
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreate(kAppEventQueueSize, sizeof(AppEvent));
     if (sAppEventQueue == NULL)
     {
-        err = CHIP_ERROR_MAX;
         K32W_LOG("Failed to allocate app event queue");
-        assert(err == CHIP_NO_ERROR);
+        assert(false);
     }
 
     return err;
@@ -79,6 +79,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // QR code will be used with CHIP Tool
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     TMR_Init();
 
@@ -125,8 +128,7 @@ int AppTask::Init()
 
     // Print the current software version
     char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
-    size_t currentFirmwareRevLen;
-    err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
+    err = ConfigurationMgr().GetFirmwareRevisionString(currentFirmwareRev, sizeof(currentFirmwareRev));
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
@@ -168,16 +170,10 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
-
-        // Consider the system to be "fully connected" if it has service
-        // connectivity and it is able to interact with the service on a regular basis.
-        bool isFullyConnected = sHaveServiceConnectivity;
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -193,11 +189,11 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-            if (isFullyConnected)
+            if (sHaveServiceConnectivity)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount && (!sIsThreadAttached || !isFullyConnected))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -220,7 +216,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -241,6 +237,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == JOIN_BUTTON)
     {
         button_event.Handler = JoinHandler;
+    }
+    else if (pin_no == BLE_BUTTON)
+    {
+        button_event.Handler = BleHandler;
     }
 
     sAppTask.PostEvent(&button_event);
@@ -278,6 +278,9 @@ void AppTask::HandleKeyboard(void)
             break;
         case gKBD_EventPB3_c:
             ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
+            break;
+        case gKBD_EventPB4_c:
+            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
         default:
             break;
@@ -329,7 +332,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
     }
     else
     {
-        uint32_t resetTimeout = FACTORY_RESET_TRIGGER_TIMEOUT;
+        uint32_t resetTimeout = kFactoryResetTriggerTimeout;
 
         if (sAppTask.mFunction != kFunction_NoneSelected)
         {
@@ -337,14 +340,6 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             return;
         }
 
-        /*
-        if (SoftwareUpdateMgr().IsInProgress())
-        {
-            K32W_LOG("Canceling In Progress Software Update");
-            SoftwareUpdateMgr().Abort();
-            K32W_LOG("OTA processs was cancelled!");
-        }
-        */
         K32W_LOG("Factory Reset Triggered. Push the RESET button within %u ms to cancel!", resetTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
@@ -355,7 +350,7 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
         sStatusLED.Blink(500);
         sLockLED.Blink(500);
 
-        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+        sAppTask.StartTimer(kFactoryResetTriggerTimeout);
     }
 }
 
@@ -406,48 +401,23 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
 void AppTask::ThreadStart()
 {
-    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
+    chip::Thread::OperationalDataset dataset{};
 
-    memset(networkInfo.ThreadNetworkName, 0, chip::DeviceLayer::Internal::kMaxThreadNetworkNameLength + 1);
-    memcpy(networkInfo.ThreadNetworkName, "OpenThread", 10);
+    constexpr uint8_t xpanid[]    = { 0xde, 0xad, 0x00, 0xbe, 0xef, 0x00, 0xca, 0xfe };
+    constexpr uint8_t masterkey[] = {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
+    };
+    constexpr uint16_t panid   = 0xabcd;
+    constexpr uint16_t channel = 15;
 
-    networkInfo.ThreadExtendedPANId[0] = 0xde;
-    networkInfo.ThreadExtendedPANId[1] = 0xad;
-    networkInfo.ThreadExtendedPANId[2] = 0x00;
-    networkInfo.ThreadExtendedPANId[3] = 0xbe;
-    networkInfo.ThreadExtendedPANId[4] = 0xef;
-    networkInfo.ThreadExtendedPANId[5] = 0x00;
-    networkInfo.ThreadExtendedPANId[6] = 0xca;
-    networkInfo.ThreadExtendedPANId[7] = 0xfe;
-
-    networkInfo.ThreadMasterKey[0]  = 0x00;
-    networkInfo.ThreadMasterKey[1]  = 0x11;
-    networkInfo.ThreadMasterKey[2]  = 0x22;
-    networkInfo.ThreadMasterKey[3]  = 0x33;
-    networkInfo.ThreadMasterKey[4]  = 0x44;
-    networkInfo.ThreadMasterKey[5]  = 0x55;
-    networkInfo.ThreadMasterKey[6]  = 0x66;
-    networkInfo.ThreadMasterKey[7]  = 0x77;
-    networkInfo.ThreadMasterKey[8]  = 0x88;
-    networkInfo.ThreadMasterKey[9]  = 0x99;
-    networkInfo.ThreadMasterKey[10] = 0xAA;
-    networkInfo.ThreadMasterKey[11] = 0xBB;
-    networkInfo.ThreadMasterKey[12] = 0xCC;
-    networkInfo.ThreadMasterKey[13] = 0xDD;
-    networkInfo.ThreadMasterKey[14] = 0xEE;
-    networkInfo.ThreadMasterKey[15] = 0xFF;
-
-    networkInfo.ThreadPANId   = 0xabcd;
-    networkInfo.ThreadChannel = 15;
-
-    networkInfo.FieldPresent.ThreadExtendedPANId = true;
-    networkInfo.FieldPresent.ThreadMeshPrefix    = false;
-    networkInfo.FieldPresent.ThreadPSKc          = false;
-    networkInfo.NetworkId                        = 0;
-    networkInfo.FieldPresent.NetworkId           = true;
+    dataset.SetNetworkName("OpenThread");
+    dataset.SetExtendedPanId(xpanid);
+    dataset.SetMasterKey(masterkey);
+    dataset.SetPanId(panid);
+    dataset.SetChannel(channel);
 
     ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(networkInfo);
+    ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     ThreadStackMgr().SetThreadEnabled(true);
 }
 
@@ -466,6 +436,37 @@ void AppTask::JoinHandler(AppEvent * aEvent)
      * In a future PR, these parameters will be sent via BLE.
      */
     ThreadStart();
+}
+
+void AppTask::BleHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
+        return;
+
+    if (sAppTask.mFunction != kFunction_NoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        K32W_LOG("Stopped BLE Advertising!");
+    }
+    else
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+
+        if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+        {
+            K32W_LOG("Started BLE Advertising!");
+        }
+        else
+        {
+            K32W_LOG("OpenDefaultPairingWindow() failed");
+        }
+    }
 }
 
 void AppTask::CancelTimer()
@@ -563,5 +564,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         K32W_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 }

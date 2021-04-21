@@ -20,8 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface OnOffViewController : UIViewController <CHIPDeviceControllerDelegate>
-
+@interface OnOffViewController : UIViewController <UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate>
 @end
 
 NS_ASSUME_NONNULL_END

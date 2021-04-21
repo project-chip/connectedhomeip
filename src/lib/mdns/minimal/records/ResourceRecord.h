@@ -31,7 +31,7 @@ namespace Minimal {
 class ResourceRecord
 {
 public:
-    static constexpr uint64_t kDefaultTtl = 30;
+    static constexpr uint32_t kDefaultTtl = 120; // 2 minutes
 
     virtual ~ResourceRecord() {}
 
@@ -41,8 +41,8 @@ public:
     QClass GetClass() const { return QClass::IN; }
     QType GetType() const { return mType; }
 
-    uint64_t GetTtl() const { return mTtl; }
-    ResourceRecord & SetTtl(uint64_t ttl)
+    uint32_t GetTtl() const { return mTtl; }
+    ResourceRecord & SetTtl(uint32_t ttl)
     {
         mTtl = ttl;
         return *this;
@@ -60,7 +60,7 @@ protected:
 
 private:
     QType mType;
-    uint64_t mTtl = kDefaultTtl;
+    uint32_t mTtl = kDefaultTtl;
     FullQName mQName;
 };
 

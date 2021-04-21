@@ -23,15 +23,19 @@
 #include "ButtonHandler.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
-#include "QRCodeUtil.h"
+#include "OnboardingCodesUtil.h"
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
 
 #include <assert.h>
+
+#include <lib/support/CodeUtils.h>
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -41,29 +45,31 @@
 #include <platform/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (4096)
+#define APP_TASK_STACK_SIZE (1536)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
+namespace {
 TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
-static TaskHandle_t sAppTaskHandle;
-static QueueHandle_t sAppEventQueue;
+TaskHandle_t sAppTaskHandle;
+QueueHandle_t sAppEventQueue;
 
-static LEDWidget sStatusLED;
-static LEDWidget sLockLED;
+LEDWidget sStatusLED;
+LEDWidget sLockLED;
 
-static bool sIsThreadProvisioned     = false;
-static bool sIsThreadEnabled         = false;
-static bool sIsThreadAttached        = false;
-static bool sIsPairedToAccount       = false;
-static bool sHaveBLEConnections      = false;
-static bool sHaveServiceConnectivity = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sHaveServiceConnectivity = false;
+
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
+} // namespace
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -82,7 +88,8 @@ int AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, &sAppTaskHandle) == pdPASS)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle != NULL)
     {
         err = CHIP_NO_ERROR;
     }
@@ -113,7 +120,7 @@ int AppTask::Init()
         appError(err);
     }
 
-    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -131,14 +138,14 @@ int AppTask::Init()
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
     UpdateClusterState();
 
+    ConfigurationMgr().LogDeviceConfig();
+
     // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    uint32_t setupPinCode;
     std::string QRCode;
 
-    if (GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
+    if (GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
     {
-        EFR32_LOG("SetupPINCode: [%09u]", setupPinCode);
         LCDWriteQRCode((uint8_t *) QRCode.c_str());
     }
     else
@@ -146,7 +153,7 @@ int AppTask::Init()
         EFR32_LOG("Getting QR code failed!");
     }
 #else
-    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 #endif
 
     return err;
@@ -186,9 +193,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
-            sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
-            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
@@ -213,7 +218,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && (!sIsThreadAttached || !sHaveServiceConnectivity))
+            else if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -323,7 +328,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
     // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
     {
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
@@ -368,29 +373,27 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = kFunction_StartThread;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, start Thread Network
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
+        // If the button was released before factory reset got initiated, start BLE advertissement in fast mode
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
         {
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
-#if CHIP_ENABLE_OPENTHREAD
-            if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+
+            if (!ConnectivityMgr().IsThreadProvisioned())
             {
-                StartDefaultThreadNetwork();
-                EFR32_LOG("Device is not commissioned to a Thread network. Starting with the default configuration.");
+                // Enable BLE advertisements
+                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
             }
             else
             {
-                EFR32_LOG("Device is commissioned to a Thread network.");
+                EFR32_LOG("Network is already provisioned, Ble advertissement not enabled");
             }
-#else
-            EFR32_LOG("Thread is not defined.");
-#endif
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {

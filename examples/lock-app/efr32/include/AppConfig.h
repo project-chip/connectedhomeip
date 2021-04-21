@@ -21,6 +21,8 @@
 
 // ---- Lock Example App Config ----
 
+#define APP_TASK_NAME "APP"
+
 // EFR32 WSTK Buttons
 #define PB0 0
 #define PB1 1
@@ -57,7 +59,6 @@ extern "C" {
 #endif
 
 void efr32LogInit(void);
-void efr32RandomInit(void);
 
 void efr32Log(const char * aFormat, ...);
 #define EFR32_LOG(...) efr32Log(__VA_ARGS__);

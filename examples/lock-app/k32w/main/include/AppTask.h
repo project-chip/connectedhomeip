@@ -38,6 +38,8 @@ public:
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
 
+    void UpdateClusterState(void);
+
 private:
     friend AppTask & GetAppTask(void);
 
@@ -54,6 +56,7 @@ private:
     static void KBD_Callback(uint8_t events);
     static void HandleKeyboard(void);
     static void JoinHandler(AppEvent * aEvent);
+    static void BleHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);

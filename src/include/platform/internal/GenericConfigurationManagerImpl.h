@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -25,6 +25,12 @@
 
 #pragma once
 
+#include <support/BitFlags.h>
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+#include <support/LifetimePersistedCounter.h>
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -47,12 +53,15 @@ public:
     // ===== Methods that implement the ConfigurationManager abstract interface.
 
     CHIP_ERROR _Init();
-    CHIP_ERROR _ConfigureChiptack();
+    CHIP_ERROR _GetVendorName(char * buf, size_t bufSize);
     CHIP_ERROR _GetVendorId(uint16_t & vendorId);
+    CHIP_ERROR _GetProductName(char * buf, size_t bufSize);
     CHIP_ERROR _GetProductId(uint16_t & productId);
+    CHIP_ERROR _GetProductRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR _GetProductRevision(uint16_t & productRev);
     CHIP_ERROR _StoreProductRevision(uint16_t productRev);
-    CHIP_ERROR _GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen);
+    CHIP_ERROR _GetFirmwareRevisionString(char * buf, size_t bufSize);
+    CHIP_ERROR _GetFirmwareRevision(uint32_t & firmwareRev);
     CHIP_ERROR _GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
                                      uint8_t & second);
     CHIP_ERROR _GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
@@ -60,6 +69,8 @@ public:
     CHIP_ERROR _GetPrimaryWiFiMACAddress(uint8_t * buf);
     CHIP_ERROR _StorePrimaryWiFiMACAddress(const uint8_t * buf);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
+    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     CHIP_ERROR _StorePrimary802154MACAddress(const uint8_t * buf);
     CHIP_ERROR _GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR _StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen);
@@ -88,6 +99,10 @@ public:
     CHIP_ERROR _StoreSetupDiscriminator(uint16_t setupDiscriminator);
     CHIP_ERROR _GetFabricId(uint64_t & fabricId);
     CHIP_ERROR _StoreFabricId(uint64_t fabricId);
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    CHIP_ERROR _GetLifetimeCounter(uint16_t & lifetimeCounter);
+    CHIP_ERROR _IncrementLifetimeCounter();
+#endif
     CHIP_ERROR _GetServiceId(uint64_t & serviceId);
     CHIP_ERROR _GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
     CHIP_ERROR _StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
@@ -114,20 +129,22 @@ public:
     bool _OperationalDeviceCredentialsProvisioned();
     void _UseManufacturerCredentialsAsOperational(bool val);
 #endif
+    void _LogDeviceConfig();
 
 protected:
-    enum
+    enum class Flags : uint8_t
     {
-        kFlag_IsServiceProvisioned                    = 0x01,
-        kFlag_IsMemberOfFabric                        = 0x02,
-        kFlag_IsPairedToAccount                       = 0x04,
-        kFlag_OperationalDeviceCredentialsProvisioned = 0x08,
-        kFlag_UseManufacturerCredentialsAsOperational = 0x10,
+        kIsServiceProvisioned                    = 0x01,
+        kIsMemberOfFabric                        = 0x02,
+        kIsPairedToAccount                       = 0x04,
+        kOperationalDeviceCredentialsProvisioned = 0x08,
+        kUseManufacturerCredentialsAsOperational = 0x10,
     };
 
-    uint8_t mFlags;
-
-    void LogDeviceConfig();
+    BitFlags<Flags> mFlags;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    chip::LifetimePersistedCounter mLifetimePersistedCounter;
+#endif
     CHIP_ERROR PersistProvisioningData(ProvisioningDataSet & provData);
 
 private:
@@ -152,6 +169,13 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint16_t & productId)
 {
     productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(uint32_t & firmwareRev)
+{
+    firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
     return CHIP_NO_ERROR;
 }
 

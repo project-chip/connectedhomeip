@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "af.h"
 #include "debug-printing.h"
-#include "gen/gen_config.h"
 
+#include <platform/CHIPDeviceConfig.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 bool emberAfPrintReceivedMessages = true;
@@ -29,7 +31,7 @@ using namespace chip::Logging;
 
 void emberAfPrint(int category, const char * format, ...)
 {
-    if (format != NULL)
+    if (format != nullptr)
     {
         va_list args;
         va_start(args, format);
@@ -40,7 +42,7 @@ void emberAfPrint(int category, const char * format, ...)
 
 void emberAfPrintln(int category, const char * format, ...)
 {
-    if (format != NULL)
+    if (format != nullptr)
     {
         va_list args;
         va_start(args, format);
@@ -49,26 +51,32 @@ void emberAfPrintln(int category, const char * format, ...)
     }
 }
 
-// TODO: issue #3662 - Unbounded stack in emberAfPrintBuffer()
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstack-usage="
+// TODO: add unit tests.
 
 void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, bool withSpace)
 {
-    if (buffer != NULL && length > 0)
+    if (buffer != nullptr && length > 0)
     {
-        const char * perByteFormatStr = withSpace ? "%02hhX " : "%02hhX";
-        uint8_t perByteCharCount      = withSpace ? 3 : 2;
+        constexpr uint16_t kBufferSize = CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE;
+        const char * perByteFormatStr  = withSpace ? "%02X " : "%02X";
+        const uint8_t perByteCharCount = withSpace ? 3 : 2;
+        const uint16_t bytesPerBuffer  = static_cast<uint16_t>((kBufferSize - 1) / perByteCharCount);
+        char result[kBufferSize];
 
-        uint32_t outStringLength = length * perByteCharCount + 1;
-        char result[outStringLength];
-        for (uint32_t dst_idx = 0, index = 0; dst_idx < outStringLength - 1 && index < length; dst_idx += perByteCharCount, index++)
+        uint16_t index = 0;
+        while (index < length)
         {
-
-            snprintf(result + dst_idx, outStringLength - dst_idx, perByteFormatStr, buffer[index]);
+            const uint16_t remainingBytes = static_cast<uint16_t>(length - index);
+            const uint16_t segmentLength  = chip::min(bytesPerBuffer, remainingBytes);
+            const uint16_t segmentEnd     = static_cast<uint16_t>(index + segmentLength);
+            const uint32_t outStringEnd   = segmentLength * perByteCharCount;
+            for (uint32_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
+            {
+                snprintf(result + dst_idx, outStringEnd - dst_idx + 1, perByteFormatStr, buffer[index]);
+            }
+            result[outStringEnd] = 0;
+            emberAfPrint(category, "%s", result);
         }
-        result[outStringLength - 1] = 0;
-        emberAfPrint(category, "%s", result);
     }
     else
     {
@@ -76,9 +84,7 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
     }
 }
 
-#pragma GCC diagnostic pop // -Wstack-usage
-
 void emberAfPrintString(int category, const uint8_t * string)
 {
-    emberAfPrint(category, "%s", string);
+    emberAfPrint(category, "%.*s", emberAfStringLength(string), string + 1);
 }

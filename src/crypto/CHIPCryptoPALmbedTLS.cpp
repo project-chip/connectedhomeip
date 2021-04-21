@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@
 #include <mbedtls/x509_csr.h>
 
 #include <core/CHIPSafeCasts.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
+#include <support/SafePointerCast.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <string.h>
@@ -194,9 +195,7 @@ Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
 static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
-    static_assert(sizeof(context->mOpaque) >= sizeof(mbedtls_sha256_context), "Need more memory for SHA256 Context");
-    static_assert(std::is_trivially_copyable<mbedtls_sha256_context>(), "mbedtls_sha256_context values must copyable");
-    return reinterpret_cast<mbedtls_sha256_context *>(context->mOpaque);
+    return SafePointerCast<mbedtls_sha256_context *>(context);
 }
 
 CHIP_ERROR Hash_SHA256_stream::Begin(void)
@@ -293,7 +292,8 @@ CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * 
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(slen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen >= kMin_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(slen <= kMax_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -410,14 +410,12 @@ mbedtls_ecp_group_id MapECPGroupId(SupportedECPKeyTypes keyType)
 
 static inline mbedtls_ecp_keypair * to_keypair(P256KeypairContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(P256KeypairContext) >= sizeof(mbedtls_ecp_keypair), "Need more memory for mbedtls_ecp_keypair");
-    return reinterpret_cast<mbedtls_ecp_keypair *>(context->mBytes);
+    return SafePointerCast<mbedtls_ecp_keypair *>(context);
 }
 
 static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(P256KeypairContext) >= sizeof(mbedtls_ecp_keypair), "Need more memory for mbedtls_ecp_keypair");
-    return reinterpret_cast<const mbedtls_ecp_keypair *>(context->mBytes);
+    return SafePointerCast<const mbedtls_ecp_keypair *>(context);
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
@@ -641,7 +639,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
-    BufBound bbuf(output, len);
+    Encoding::BufferWriter bbuf(output, len);
     uint8_t privkey[kP256_PrivateKey_Length];
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -667,7 +665,7 @@ exit:
 
 CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 {
-    BufBound bbuf(mPublicKey, mPublicKey.Length());
+    Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
 
     int result       = 0;
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -767,8 +765,7 @@ typedef struct Spake2p_Context
 
 static inline Spake2p_Context * to_inner_spake2p_context(Spake2pOpaqueContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(context->mOpaque) >= sizeof(Spake2p_Context), "Need more memory for Spake2p Context");
-    return reinterpret_cast<Spake2p_Context *>(context->mOpaque);
+    return SafePointerCast<Spake2p_Context *>(context);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)

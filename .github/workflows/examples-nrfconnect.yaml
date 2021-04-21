@@ -25,9 +25,10 @@ jobs:
             BUILD_TYPE: nrfconnect
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.4.18
+            image: connectedhomeip/chip-build-nrf-platform:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -39,29 +40,41 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
+            - name: Update nRF Connect SDK revision to the currently recommended.
+              run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update"
             # https://github.com/project-chip/connectedhomeip/issues/3100
             # - name: Initialize CodeQL
             #   uses: github/codeql-action/init@v1
             #   with:
             #       languages: "cpp, python"
             #       queries: +security-and-quality
-            - name: Build example nRF Connect SDK Lock App
-              run: scripts/examples/nrfconnect_example.sh lock-app
-            - name: Build example nRF Connect SDK Lighting App
-              run: scripts/examples/nrfconnect_example.sh lighting-app
-            - name: Build example nRF Connect SDK Shell
-              run: scripts/examples/nrfconnect_example.sh shell
+            - name: Build example nRF Connect SDK Lock App on nRF52840 DK
+              run: scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Lighting App on nRF52840 DK
+              run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
+              run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
+            - name: Build example nRF Connect SDK Shell on nRF52840 DK
+              run: scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Pigweed on nRF52840 DK
+              run: scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Lock App on nRF5340 DK
+              run: scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp
+            - name: Build example nRF Connect SDK Lighting App on nRF5340 DK
+              run: scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp
+            - name: Build example nRF Connect SDK Shell on nRF5340 DK
+              run: scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
             - name: Run unit tests for Zephyr native_posix_64 platform
               run:
-                  scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64
+                  scripts/run_in_build_env.sh "scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64"
             - name: Copy aside build products
               run: |
                   mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
-                  cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf \
+                  cp examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
                       /tmp/output_binaries/$BUILD_TYPE-build/chip-lock.elf
-                  cp examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \
+                  cp examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
                       /tmp/output_binaries/$BUILD_TYPE-build/chip-lighting.elf
-                  cp examples/shell/nrfconnect/build/zephyr/zephyr.elf \
+                  cp examples/shell/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
                       /tmp/output_binaries/$BUILD_TYPE-build/chip-shell.elf
             - name: Binary artifact suffix
               id: outsuffix

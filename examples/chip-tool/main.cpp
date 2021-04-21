@@ -19,19 +19,25 @@
 #include "commands/common/Commands.h"
 
 #include "commands/clusters/Commands.h"
+#include "commands/discover/Commands.h"
 #include "commands/pairing/Commands.h"
 #include "commands/payload/Commands.h"
+#include "commands/reporting/Commands.h"
 
-#include <transport/SecurePairingSession.h>
+#include <protocols/secure_channel/PASESession.h>
 
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
+    InitDataModelHandler();
+
     Commands commands;
+    registerCommandsDiscover(commands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands);
+    registerCommandsReporting(commands);
     registerClusters(commands);
 
     return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);

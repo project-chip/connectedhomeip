@@ -1,8 +1,21 @@
 # Connected Home over IP
 
-![Main](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
-![Examples](https://github.com/project-chip/connectedhomeip/workflows/Examples/badge.svg)
+![Builds](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
+
+![Examples - EFR32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20EFR32/badge.svg)
+![Examples - nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)
+![Examples - QPG6100](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG6100/badge.svg)
+![Examples - Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)
+![Examples - ESP32](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20ESP32/badge.svg)
+![Examples - K32W](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20K32W/badge.svg)
+
+![Android](https://github.com/project-chip/connectedhomeip/workflows/Android/badge.svg)
+
+![Unit / Interation Tests](https://github.com/project-chip/connectedhomeip/workflows/Unit%20/%20Interation%20Tests/badge.svg)
+![Cirque](https://github.com/project-chip/connectedhomeip/workflows/Cirque/badge.svg)
 ![QEMU](https://github.com/project-chip/connectedhomeip/workflows/QEMU/badge.svg)
+
+![ZAP Templates](https://github.com/project-chip/connectedhomeip/workflows/ZAP/badge.svg)
 
 # What is Project Connected Home over IP?
 
@@ -148,25 +161,22 @@ Instructions about how to build Project Connected Home over IP can be found
 
 The Connected Home over IP repository is structured as follows:
 
-| File / Folder                        | Contents                                                                                                             |
-| ------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
-| `.default-version`                   | Default Project CHIP version if none is available via source code control tags, `.dist-version`, or `.local-version` |
-| `build/`                             | Build system support content and build output directories                                                            |
-| [BUILDING.md](./docs/BUILDING.md)    | More detailed information on configuring and building Project CHIP for different targets                             |
-| `CODE_OF_CONDUCT.md`                 | Code of Conduct for Project CHIP, and contributions to it                                                            |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | Guidelines for contributing to Project CHIP                                                                          |
-| `CONTRIBUTORS.md`                    | Contributors to Project CHIP                                                                                         |
-| `docs/`                              | Documentation                                                                                                        |
-| `examples/`                          | Example firmware applications that demonstrate use of Project CHIP technology                                        |
-| `integrations/`                      | Third party integrations related to this project                                                                     |
-| `integrations/docker/`               | Docker scripts and Dockerfiles                                                                                       |
-| `LICENSE`                            | Project CHIP [License file](./LICENSE) (Apache 2.0)                                                                  |
-| `Makefile-Android`                   | Convenience makefile for building Project CHIP against Android                                                       |
-| `Makefile-Standalone`                | Convenience makefile for building Project CHIP as a standalone package on desktop and server systems                 |
-| `README.md`                          | This file                                                                                                            |
-| `src/`                               | Implementation of Project CHIP                                                                                       |
-| `third_party/`                       | Third-party code used by Project CHIP                                                                                |
-| `tools/`                             | Tools needed to work with the Project CHIP repo                                                                      |
+| File / Folder                        | Contents                                                                                 |
+| ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| `build/`                             | Build system support content and build output directories                                |
+| [BUILDING.md](./docs/BUILDING.md)    | More detailed information on configuring and building Project CHIP for different targets |
+| `CODE_OF_CONDUCT.md`                 | Code of Conduct for Project CHIP, and contributions to it                                |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Guidelines for contributing to Project CHIP                                              |
+| `docs/`                              | Documentation                                                                            |
+| `examples/`                          | Example firmware applications that demonstrate use of Project CHIP technology            |
+| `integrations/`                      | Third party integrations related to this project                                         |
+| `integrations/docker/`               | Docker scripts and Dockerfiles                                                           |
+| `LICENSE`                            | Project CHIP [License file](./LICENSE) (Apache 2.0)                                      |
+| `BUILD.gn`                           | Top level GN build file                                                                  |
+| `README.md`                          | This file                                                                                |
+| `src/`                               | Implementation of Project CHIP                                                           |
+| `third_party/`                       | Third-party code used by Project CHIP                                                    |
+| `scripts/`                           | Scripts needed to work with the Project CHIP repo                                        |
 
 # License
 

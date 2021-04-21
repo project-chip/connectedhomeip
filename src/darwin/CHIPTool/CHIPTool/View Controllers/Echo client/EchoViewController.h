@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface EchoViewController : UIViewController <CHIPDeviceControllerDelegate>
+@interface EchoViewController : UIViewController
 @end
 
 NS_ASSUME_NONNULL_END

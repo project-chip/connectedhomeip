@@ -17,13 +17,17 @@
 
 /**
  *    @file
- *      This file defines the classes corresponding to CHIP Exchange Context.
+ *      This file defines the classes corresponding to CHIP Exchange Context Delegate.
  *
  */
 
 #pragma once
 
+#include <messaging/ApplicationExchangeDispatch.h>
+#include <messaging/ExchangeMessageDispatch.h>
+#include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -38,10 +42,10 @@ class ExchangeContext;
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
-class DLL_EXPORT ExchangeDelegate
+class DLL_EXPORT ExchangeDelegateBase
 {
 public:
-    virtual ~ExchangeDelegate() {}
+    virtual ~ExchangeDelegateBase() {}
 
     /**
      * @brief
@@ -49,11 +53,10 @@ public:
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *  @param[in]    protocolId    The protocol identifier of the received message.
-     *  @param[in]    msgType       The message type of the corresponding protocol.
+     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
-    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    System::PacketBufferHandle payload) = 0;
 
     /**
@@ -73,6 +76,23 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
+
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr) = 0;
+};
+
+class DLL_EXPORT ExchangeDelegate : public ExchangeDelegateBase
+{
+public:
+    virtual ~ExchangeDelegate() {}
+
+    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SecureSessionMgr * sessionMgr)
+    {
+        mMessageDispatch.Init(rmMgr, sessionMgr);
+        return &mMessageDispatch;
+    }
+
+private:
+    ApplicationExchangeDispatch mMessageDispatch;
 };
 
 } // namespace Messaging

@@ -39,14 +39,26 @@ parser.add_argument('--build_number', default='0.0', help='configure the chip bu
 parser.add_argument('--build_dir', help='directory to build in')
 parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
+parser.add_argument('--plat-name', help='platform name to embed in generated filenames')
 
 args = parser.parse_args()
 
+class InstalledScriptInfo:
+    """Information holder about a script that is to be installed."""
+
+    def __init__(self, name):
+      self.name = name
+      self.installName = os.path.splitext(name)[0]
+
+
 chipDLLName = '_ChipDeviceCtrl.so'
-deviceManagerShellName = 'chip-device-ctrl.py'
-chipControllerShellInstalledName = os.path.splitext(deviceManagerShellName)[0]
 packageName = args.package_name
 chipPackageVer = args.build_number
+
+installScripts = [
+    InstalledScriptInfo('chip-device-ctrl.py'),
+    InstalledScriptInfo('chip-repl.py'),
+]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -85,29 +97,50 @@ try:
           os.makedirs(os.path.dirname(dstFile), exist_ok=True)
           shutil.copyfile(srcFile, dstFile)
 
-    os.rename(os.path.join(tmpDir, deviceManagerShellName),
-              os.path.join(tmpDir, chipControllerShellInstalledName))
+    for script in installScripts:
+      os.rename(os.path.join(tmpDir, script.name),
+                os.path.join(tmpDir, script.installName))
 
     # Define a custom version of the bdist_wheel command that configures the
-    # resultant wheel as platform-specific (i.e. not "pure"). 
+    # resultant wheel as platform-specific (i.e. not "pure").
     class bdist_wheel_override(bdist_wheel):
         def finalize_options(self):
             bdist_wheel.finalize_options(self)
             self.root_is_pure = False
-    
-    # Select required packages based on the target system.
+
+    requiredPackages = [
+        "coloredlogs",
+        'construct',
+        'ipython',
+    ]
+
+    if platform.system() == 'Darwin':
+        requiredPackages.append('pyobjc-framework-corebluetooth')
+
     if platform.system() == 'Linux':
-        requiredPackages = [
-            'dbus-python',
-            'pgi'
-        ]
-    else:
-        requiredPackages = []
-    
+        requiredPackages.append('dbus-python')
+        requiredPackages.append('pygobject')
+
     #
     # Build the chip package...
     #
-     
+    packages=[
+            'chip',
+            'chip.ble',
+            'chip.ble.commissioning',
+            'chip.configuration',
+            'chip.clusters',
+            'chip.discovery',
+            'chip.exceptions',
+            'chip.internal',
+            'chip.interaction_model',
+            'chip.logging',
+            'chip.native',
+            'chip.clusters',
+            'chip.tlv',
+            'chip.setup_payload',
+    ]
+
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
     setup(
@@ -124,9 +157,7 @@ try:
             'Programming Language :: Python :: 3',
         ],
         python_requires='>=2.7',
-        packages=[
-            packageName                     # Arrange to install a package named "chip"
-        ],
+        packages=packages,
         package_dir={
             '':tmpDir,                      # By default, look in the tmp directory for packages/modules to be included.
         },
@@ -135,14 +166,17 @@ try:
                 chipDLLName                   # Include the wrapper DLL as package data in the "chip" package.
             ]
         },
-        scripts=[                           # Install the Device controller Shell as an executable script in the 'bin' directory.
-            os.path.join(tmpDir, chipControllerShellInstalledName)
-        ],
+        scripts = [name for name in map(
+            lambda script: os.path.join(tmpDir, script.installName),
+            installScripts
+        )],
         install_requires=requiredPackages,
         options={
             'bdist_wheel':{
                 'universal':False,
-                'dist_dir':distDir         # Place the generated .whl in the dist directory.
+                'dist_dir':distDir,         # Place the generated .whl in the dist directory.
+                'py_limited_api':'cp37',
+                'plat_name':args.plat_name,
             },
             'egg_info':{
                 'egg_base':tmpDir           # Place the .egg-info subdirectory in the tmp directory.

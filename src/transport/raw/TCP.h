@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,7 @@
 #include <inet/IPEndPointBasis.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
+#include <support/CodeUtils.h>
 #include <transport/raw/Base.h>
 
 namespace chip {
@@ -100,13 +101,40 @@ class DLL_EXPORT TCPBase : public Base
         kInitialized = 1, /**< State after class is listening and ready. */
     };
 
+protected:
+    /**
+     *  State for each active connection
+     */
+    struct ActiveConnectionState
+    {
+        void Init(Inet::TCPEndPoint * endPoint)
+        {
+            mEndPoint = endPoint;
+            mReceived = nullptr;
+        }
+
+        void Free()
+        {
+            mEndPoint->Free();
+            mEndPoint = nullptr;
+            mReceived = nullptr;
+        }
+        bool InUse() const { return mEndPoint != nullptr; }
+
+        // Associated endpoint.
+        Inet::TCPEndPoint * mEndPoint;
+
+        // Buffers received but not yet consumed.
+        System::PacketBufferHandle mReceived;
+    };
+
 public:
-    TCPBase(Inet::TCPEndPoint ** activeConnectionsBuffer, size_t bufferSize, PendingPacket * packetBuffers,
+    TCPBase(ActiveConnectionState * activeConnectionsBuffer, size_t bufferSize, PendingPacket * packetBuffers,
             size_t packetsBuffersSize) :
         mActiveConnections(activeConnectionsBuffer),
         mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
     {
-        std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
+        // activeConnectionsBuffer must be initialized by the caller.
         for (size_t i = 0; i < mPendingPacketsSize; ++i)
         {
             mPendingPackets[i].peerAddress = PeerAddress::Uninitialized();
@@ -129,6 +157,11 @@ public:
      *   Nodes.
      */
     CHIP_ERROR Init(TcpListenParameters & params);
+
+    /**
+     * Close the open endpoint without destroying the object
+     */
+    void Close() override;
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override;
 
@@ -153,11 +186,14 @@ public:
     void CloseActiveConnections();
 
 private:
+    friend class TCPTest;
+
     /**
      * Find an active connection to the given peer or return nullptr if
      * no active connection exists.
      */
-    Inet::TCPEndPoint * FindActiveConnection(const PeerAddress & addr);
+    ActiveConnectionState * FindActiveConnection(const PeerAddress & addr);
+    ActiveConnectionState * FindActiveConnection(const Inet::TCPEndPoint * endPoint);
 
     /**
      * Sends the specified message once a connection has been established.
@@ -186,16 +222,17 @@ private:
     /**
      * Process a single message of the specified size from a buffer.
      *
-     * @param peerAddress the peer the data is coming from
-     * @param buffer the buffer containing the message
-     * @param messageSize how much of the head contains the actual message
+     * @param[in]     peerAddress   The peer the data is coming from.
+     * @param[in,out] state         The connection state, which contains the message. On entry, the payload points to the message
+     *                              body (after the length). On exit, it points after the message (or the queue is null, if there
+     *                              is no other data).
+     * @param[in]     messageSize   Size of the single message.
      */
-    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, const System::PacketBufferHandle & buffer,
-                                                  uint16_t messageSize);
+    CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveConnectionState * state, uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer);
+    static INET_ERROR OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct
@@ -226,7 +263,7 @@ private:
     size_t mUsedEndPointCount = 0;
 
     // Currently active connections
-    Inet::TCPEndPoint ** mActiveConnections;
+    ActiveConnectionState * mActiveConnections;
     const size_t mActiveConnectionsSize;
 
     // Data to be sent when connections succeed
@@ -238,10 +275,17 @@ template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
 class TCP : public TCPBase
 {
 public:
-    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize) {}
+    TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize)
+    {
+        for (size_t i = 0; i < kActiveConnectionsSize; ++i)
+        {
+            mConnectionsBuffer[i].Init(nullptr);
+        }
+    }
 
 private:
-    Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize] = { 0 };
+    friend class TCPTest;
+    TCPBase::ActiveConnectionState mConnectionsBuffer[kActiveConnectionsSize];
     PendingPacket mPendingPackets[kPendingPacketSize];
 };
 

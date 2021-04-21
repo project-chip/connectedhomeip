@@ -28,6 +28,10 @@ function atomicType(arg)
     return 'chip::AttributeId';
   case 'cluster_id':
     return 'chip::ClusterId';
+  case 'device_type_id':
+    return 'chip::DeviceTypeId';
+  case 'fabric_id':
+    return 'chip::FabricId';
   case 'ieee_address':
     return 'uint64_t';
   default:

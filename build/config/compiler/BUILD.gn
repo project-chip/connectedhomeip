@@ -12,11 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
 
-import("//build/config/compiler/compiler.gni")
-import("//build/config/target.gni")
+import("${build_root}/config/compiler/compiler.gni")
+import("${build_root}/config/target.gni")
+
+if (current_os == "mac") {
+  import("${build_root}/config/mac/mac_sdk.gni")
+}
 
 declare_args() {
   # Enable -Werror. This can be disabled if using a different compiler
@@ -24,13 +28,10 @@ declare_args() {
   treat_warnings_as_errors = true
 }
 
-_is_embedded_arm = current_os != "ios" && current_os != "mac_os" &&
-                   (current_cpu == "arm" || current_cpu == "arm64")
-
-if (_is_embedded_arm) {
-  import("//build/config/arm.gni")
+if (current_cpu == "arm" || current_cpu == "arm64") {
+  import("${build_root}/config/arm.gni")
 } else if (current_cpu == "x86" || current_cpu == "x86_64") {
-  import("//build/config/x86.gni")
+  import("${build_root}/config/x86.gni")
 }
 
 config("release") {
@@ -45,7 +46,14 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (_is_embedded_arm) {
+  if (current_os == "mac") {
+    cflags += [
+      "-target",
+      mac_target_triple,
+    ]
+  } else if (current_os == "ios") {
+    # iOS ABI currently set by chip_xcode_build_connector.sh
+  } else if (current_cpu == "arm" || current_cpu == "arm64") {
     if (arm_arch != "") {
       cflags += [ "-march=${arm_arch}" ]
     }
@@ -92,6 +100,7 @@ config("abi_default") {
       ]
     }
   }
+  asmflags = cflags
   ldflags = cflags
 }
 
@@ -157,6 +166,7 @@ config("strict_warnings") {
     "-Wall",
     "-Wextra",
     "-Wshadow",
+    "-Wunreachable-code",
   ]
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
@@ -169,7 +179,10 @@ config("strict_warnings") {
   }
 
   if (is_clang) {
-    cflags += [ "-Wimplicit-fallthrough" ]
+    cflags += [
+      "-Wimplicit-fallthrough",
+      "-Wheader-hygiene",
+    ]
   }
 
   if (current_os == "linux" || current_os == "android") {
@@ -197,15 +210,11 @@ config("symbols_default") {
   cflags = [ "-g${symbol_level}" ]
 }
 
-config("gnu14") {
-  cflags_c = [ "-std=gnu11" ]
-  cflags_objc = [ "-std=gnu11" ]
-  cflags_cc = [ "-std=gnu++14" ]
-  cflags_objcc = [ "-std=gnu++14" ]
-}
-
 config("std_default") {
-  configs = [ ":gnu14" ]
+  cflags_c = [ "-std=${c_standard}" ]
+  cflags_objc = [ "-std=${c_standard}" ]
+  cflags_cc = [ "-std=${cpp_standard}" ]
+  cflags_objcc = [ "-std=${cpp_standard}" ]
 }
 
 config("cosmetic_default") {
@@ -228,7 +237,83 @@ config("runtime_default") {
   }
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   is_asan=true
+#   is_sanitize_fatal=false
+#
+
+declare_args() {
+  # Enable address sanitizer
+  is_asan = false
+
+  # Enable memory sanitizer
+  is_msan = false
+
+  # enable undefined behavior sanitizer
+  is_ubsan = false
+
+  # Exit on sanitize error. Generally standard libraries may get errors
+  # so not stopping on the first error is often useful
+  is_sanitize_fatal = true
+}
+
+config("sanitize_address") {
+  cflags = [
+    "-fsanitize=address",
+    "-fno-omit-frame-pointer",
+  ]
+  ldflags = cflags
+}
+
+config("sanitize_memory") {
+  cflags = [
+    "-fsanitize=memory",
+    "-fsanitize-memory-track-origins",
+    "-fno-omit-frame-pointer",
+  ]
+  ldflags = cflags
+}
+
+config("sanitize_undefined_behavior") {
+  cflags = [
+    "-fvisibility=hidden",
+    "-fsanitize=undefined",
+    "-fsanitize=float-divide-by-zero",
+    "-fsanitize=unsigned-integer-overflow",
+    "-fsanitize=implicit-conversion",
+    "-fsanitize=nullability",
+  ]
+  ldflags = cflags
+}
+
+config("sanitize_recover_all") {
+  cflags = [ "-fsanitize-recover=all" ]
+  ldflags = cflags
+}
+
 config("sanitize_default") {
+  configs = []
+
+  if (is_asan) {
+    configs += [ ":sanitize_address" ]
+  }
+
+  if (is_msan) {
+    configs += [ ":sanitize_memory" ]
+  }
+
+  if (is_ubsan) {
+    configs += [ ":sanitize_undefined_behavior" ]
+  }
+
+  if (!is_sanitize_fatal) {
+    configs += [ ":sanitize_recover_all" ]
+  }
 }
 
 config("fuzzing_default") {
@@ -258,11 +343,23 @@ config("exceptions_default") {
   configs = [ ":no_exceptions" ]
 }
 
-config("unwind_tables_default") {
+config("unwind_tables") {
+  cflags = [ "-funwind-tables" ]
+}
+
+config("no_unwind_tables") {
   cflags = [
     "-fno-unwind-tables",
     "-fno-asynchronous-unwind-tables",
   ]
+}
+
+config("unwind_tables_default") {
+  if (exclude_unwind_tables) {
+    configs = [ ":no_unwind_tables" ]
+  } else {
+    configs = [ ":unwind_tables" ]
+  }
 }
 
 config("size_default") {

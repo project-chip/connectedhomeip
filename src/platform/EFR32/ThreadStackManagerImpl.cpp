@@ -34,6 +34,8 @@
 
 #include <openthread/platform/entropy.h>
 
+#include <support/CHIPPlatformMemory.h>
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -65,41 +67,6 @@ bool ThreadStackManagerImpl::IsInitialized()
     return sInstance.mThreadStackLock != NULL;
 }
 
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStart(void)
-{
-    // If Thread-over-BLE is enabled, ensure that ToBLE advertising is stopped before
-    // starting CHIPoBLE advertising.  This is accomplished by disabling the OpenThread
-    // IPv6 interface via a call to otIp6SetEnabled(false).
-    //
-    // On platforms where there is no native support for simultaneous BLE advertising
-    // it is necessary to coordinate between the different
-    // advertising modes a CHIP device may employ.  This arises in particular when a
-    // device supports both CHIPoBLE and ToBLE, each of which requires a separate advertising
-    // regime.  The OnCHIPoBLEAdvertisingStart()/OnCHIPoBLEAdvertisingStop() methods handle
-    // the switching between the two modes.
-    //
-#if OPENTHREAD_CONFIG_ENABLE_TOBLE
-    LockThreadStack();
-    otIp6SetEnabled(OTInstance(), false);
-    UnlockThreadStack();
-#endif
-}
-
-void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
-{
-    // If Thread-over-BLE is enabled, and a Thread provision exists, ensure that ToBLE
-    // advertising is re-activated once CHIPoBLE advertising stops.
-    //
-#if OPENTHREAD_CONFIG_ENABLE_TOBLE
-    LockThreadStack();
-    if (otThreadGetDeviceRole(OTInstance()) != OT_DEVICE_ROLE_DISABLED && otDatasetIsCommissioned(OTInstance()))
-    {
-        otIp6SetEnabled(OTInstance(), true);
-    }
-    UnlockThreadStack();
-#endif
-}
-
 } // namespace DeviceLayer
 } // namespace chip
 
@@ -122,4 +89,77 @@ extern "C" void otSysEventSignalPending(void)
 {
     BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
     portYIELD_FROM_ISR(yieldRequired);
+}
+
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    CHIPPlatformMemoryFree(aPtr);
+}
+
+/**
+ * @brief Openthread UART implementation for the CLI is conflicting
+ *        with the UART implemented for Pigweed RPC as they use the same UART port
+ *
+ *        We now only build the uart as implemented in
+ *        connectedhomeip/examples/platform/efr32/uart.c
+ *        and remap OT functions to use our uart api.
+ *
+ *        For now OT CLI isn't usable when the examples are built with pw_rpc
+ */
+
+#ifndef PW_RPC_ENABLED
+#include "uart.h"
+#endif
+
+extern "C" __WEAK otError otPlatUartEnable(void)
+{
+#ifdef PW_RPC_ENABLED
+    return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    uartConsoleInit();
+    return OT_ERROR_NONE;
+#endif
+}
+
+extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
+{
+#ifdef PW_RPC_ENABLED
+    return OT_ERROR_NOT_IMPLEMENTED;
+#else
+    if (uartConsoleWrite((const char *) aBuf, aBufLength) > 0)
+    {
+        otPlatUartSendDone();
+        return OT_ERROR_NONE;
+    }
+    return OT_ERROR_FAILED;
+#endif
+}
+
+extern "C" __WEAK void efr32UartProcess(void)
+{
+#ifndef PW_RPC_ENABLED
+    uint8_t tempBuf[128] = { 0 };
+    // will read the data available up to 128bytes
+    uint16_t count = uartConsoleRead((char *) tempBuf, 128);
+    if (count > 0)
+    {
+        // ot process Received data for CLI cmds
+        otPlatUartReceived(tempBuf, count);
+    }
+#endif
+}
+
+extern "C" __WEAK otError otPlatUartFlush(void)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
+}
+
+extern "C" __WEAK otError otPlatUartDisable(void)
+{
+    return OT_ERROR_NOT_IMPLEMENTED;
 }

@@ -31,20 +31,18 @@
 
 #include <climits>
 
-using namespace std;
-
 namespace chip {
 
 static const char codes[]        = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D',
                               'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
-                              'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '*', '+', '-', '.' };
+                              'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', '+', '-', '.', '/' };
 static const int kBase41ChunkLen = 3;
 static const int kBytesChunkLen  = 2;
 static const int kRadix          = sizeof(codes) / sizeof(codes[0]);
 
-string base41Encode(const uint8_t * buf, size_t buf_len)
+std::string base41Encode(const uint8_t * buf, size_t buf_len)
 {
-    string result;
+    std::string result;
 
     // eat little-endian uint16_ts from the byte array
     // encode as 3 base41 characters
@@ -129,12 +127,12 @@ static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
         kBogus, // ''', =39
         kBogus, // '(', =40
         kBogus, // ')', =41
-        37,     // '*', =42
-        38,     // '+', =43
+        kBogus, // '*', =42
+        37,     // '+', =43
         kBogus, // ',', =44
-        39,     // '-', =45
-        40,     // '.', =46
-        kBogus, // '/', =47
+        38,     // '-', =45
+        39,     // '.', =46
+        40,     // '/', =47
         0,      // '0', =48
         1,      // '1', =49
         2,      // '2', =50
@@ -192,7 +190,7 @@ static inline CHIP_ERROR decodeChar(char c, uint8_t & value)
     return 0;
 }
 
-CHIP_ERROR base41Decode(string base41, vector<uint8_t> & result)
+CHIP_ERROR base41Decode(std::string base41, std::vector<uint8_t> & result)
 {
     result.clear();
 

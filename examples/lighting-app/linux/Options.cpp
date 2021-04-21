@@ -18,6 +18,8 @@
 
 #include "Options.h"
 
+#include <platform/CHIPDeviceLayer.h>
+
 #include <core/CHIPError.h>
 #include <support/CHIPArgParser.hpp>
 
@@ -31,12 +33,31 @@ LinuxDeviceOptions gDeviceOptions;
 enum
 {
     kDeviceOption_BleDevice = 0x1000,
+    kDeviceOption_WiFi      = 0x1001,
+    kDeviceOption_Thread    = 0x1002,
 };
 
-OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOption_BleDevice }, {} };
+OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+                                  { "wifi", kNoArgument, kDeviceOption_WiFi },
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_ENABLE_OPENTHREAD
+                                  { "thread", kNoArgument, kDeviceOption_Thread },
+#endif // CHIP_ENABLE_OPENTHREAD
+                                  {} };
 
 const char * sDeviceOptionHelp = "  --ble-device <number>\n"
                                  "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+                                 "\n"
+                                 "  --wifi\n"
+                                 "       Enable WiFi management via wpa_supplicant.\n"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_ENABLE_OPENTHREAD
+                                 "\n"
+                                 "  --thread\n"
+                                 "       Enable Thread management via ot-agent.\n"
+#endif // CHIP_ENABLE_OPENTHREAD
                                  "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -52,6 +73,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             PrintArgError("%s: invalid value specified for ble device number: %s\n", aProgram, aValue);
             retval = false;
         }
+        break;
+
+    case kDeviceOption_WiFi:
+        LinuxDeviceOptions::GetInstance().mWiFi = true;
+        break;
+
+    case kDeviceOption_Thread:
+        LinuxDeviceOptions::GetInstance().mThread = true;
         break;
 
     default:

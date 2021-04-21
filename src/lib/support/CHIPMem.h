@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,30 +81,6 @@ extern void MemoryShutdown();
  *
  * @param[in]  size             Specifies requested memory size in bytes.
  *
- * @param[in]  isLongTermAlloc  A Boolean indicating whether (true) or not (false) the
- *                              requested memory block is for long term use. A long term
- *                              allocation is memory that should stay allocated until secure
- *                              session/handshake is complete. Examples of a long term
- *                              allocation include blocks allocated for CASE/PASE objects
- *                              and their context data. A short term allocation is a memory
- *                              needed to perform specific operation and can be released
- *                              immediately after that. This input helps to optimize memory
- *                              utilization in a memory constrained system. Use of this parameter
- *                              is arbitrary and depends on function implementer. For example,
- *                              this parameter is ignored when the C Standard Library malloc()
- *                              is used.
- *
- * @retval  Pointer to a memory block in case of success.
- * @retval  NULL-pointer if memory allocation fails.
- *
- */
-extern void * MemoryAlloc(size_t size, bool isLongTermAlloc);
-
-/**
- * This function is called by the CHIP layer to allocate a block of memory of "size" bytes.
- *
- * @param[in]  size             Specifies requested memory size in bytes.
- *
  * @retval  Pointer to a memory block in case of success.
  * @retval  NULL-pointer if memory allocation fails.
  *
@@ -165,7 +141,12 @@ extern void MemoryFree(void * p);
 template <typename T, typename... Args>
 inline T * New(Args &&... args)
 {
-    return new (MemoryAlloc(sizeof(T))) T(std::forward<Args>(args)...);
+    void * p = MemoryAlloc(sizeof(T));
+    if (p != nullptr)
+    {
+        return new (p) T(std::forward<Args>(args)...);
+    }
+    return nullptr;
 }
 
 /**
@@ -180,6 +161,44 @@ inline void Delete(T * p)
 {
     p->~T();
     MemoryFree(p);
+}
+
+// See MemoryDebugCheckPointer().
+extern bool MemoryInternalCheckPointer(const void * p, size_t min_size);
+
+/**
+ * In debug builds, test the validity of a pointer obtained from a chip::Platform memory allocation.
+ *
+ * @param[in]  p                Pointer to a memory block previously allocated with MemoryAlloc, MemoryCalloc,
+ *                              MemoryRealloc, or New, and not freed.
+ * @param[in]  min_size         Gives a size that the allocated block is expected to be able to hold.
+ *
+ * @e Unless configured with #CHIP_CONFIG_MEMORY_DEBUG_CHECKS, this function returns `true` without performing
+ * any check, inlined with the expectation that the compiler can remove any associated failure code.
+ *
+ * With #CHIP_CONFIG_MEMORY_DEBUG_CHECKS enabled:
+ *
+ * This function is guaranteed to return `false` if \a p is `nullptr`. The function returns `true` if \a p is a valid
+ * pointer to an allocation *and* the implementation memory manager is in a fully functioning state.
+ *
+ * @note For non-null \a p, the function *may* return `true` even if the pointer is invalid. That is, a particular
+ *       implementation or configuration is not guaranteed to catch any particular faulty state.
+ * @note For non-null \a p, the function return value *may* be incorrect if the memory manager is in a faulty state
+ *       (e.g. corrupt heap), even if the faulty state does not directly involve \a p.
+ * @note For non-null \a p, the function *may* abort the program rather than return at all if the memory manager is in
+ *       a faulty state, even if \a p is valid.
+ * @note For a non-null \a p, checking *may* be slow.
+ *
+ *
+ * @return  An implementation- and configuration-defined estimate of whether \a p is a valid allocated pointer.
+ */
+inline bool MemoryDebugCheckPointer(const void * p, size_t min_size = 0)
+{
+#if CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+    return MemoryInternalCheckPointer(p, min_size);
+#else  // CHIP_CONFIG_MEMORY_DEBUG_CHECKS
+    return true;
+#endif // CHIP_CONFIG_MEMORY_DEBUG_CHECKS
 }
 
 } // namespace Platform

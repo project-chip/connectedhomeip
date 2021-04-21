@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("//build/config/android_abi.gni")
+import("${build_root}/config/android_abi.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
 shared_library("jni") {
@@ -35,7 +36,7 @@ android_library("java") {
 
   data_deps = [
     ":jni",
-    "//build/chip/java:shared_cpplib",
+    "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
   sources = [

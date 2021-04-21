@@ -12,36 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 
 assert(chip_build_tools)
+
+chip_data_model("data_model") {
+  cluster_sources = [
+    "media-playback-client",
+    "thermostat-client",
+  ]
+
+  zap_pregenerated_dir = "gen"
+
+  use_default_client_callbacks = true
+}
 
 executable("chip-tool") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
+    "commands/discover/DiscoverCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
+    "commands/reporting/ReportingCommand.cpp",
     "config/PersistentStorage.cpp",
     "main.cpp",
   ]
 
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
+  deps = [
+    ":data_model",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }

@@ -38,8 +38,6 @@
 
 #include <system/SystemPacketBuffer.h>
 
-using namespace ::chip;
-
 // Preprocessor Macros
 
 #define SetStatusFailed(aTestStatus)                                                                                               \
@@ -115,7 +113,7 @@ extern uint32_t gSendIntervalMs;
 
 extern const char * gInterfaceName;
 
-extern Inet::InterfaceId gInterfaceId;
+extern chip::Inet::InterfaceId gInterfaceId;
 
 extern uint16_t gSendSize;
 
@@ -131,37 +129,39 @@ extern bool IsSender();
 extern bool IsTesting(const TestStatus & aTestStatus);
 extern bool WasSuccessful(const TestStatus & aTestStatus);
 
-extern System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
-extern System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength);
-extern System::PacketBufferHandle MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
-extern System::PacketBufferHandle MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
+extern chip::System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
+extern chip::System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength);
+extern chip::System::PacketBufferHandle MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
+extern chip::System::PacketBufferHandle MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
 
-extern bool HandleDataReceived(const System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleDataReceived(const chip::System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                bool aCheckBuffer, uint8_t aFirstValue);
-extern bool HandleDataReceived(const System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleDataReceived(const chip::System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                bool aCheckBuffer);
-extern bool HandleICMPv4DataReceived(System::PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleICMPv4DataReceived(chip::System::PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                      bool aCheckBuffer);
-extern bool HandleICMPv6DataReceived(System::PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleICMPv6DataReceived(chip::System::PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                      bool aCheckBuffer);
 
 // Timer Callback Handler
 
-extern void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
+extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
 
 // Raw Endpoint Callback Handlers
 
-extern void HandleRawMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBufferHandle & aBuffer,
-                                     const Inet::IPPacketInfo * aPacketInfo);
-extern void HandleRawReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
-                                  const Inet::IPPacketInfo * aPacketInfo);
+extern void HandleRawMessageReceived(const chip::Inet::IPEndPointBasis * aEndPoint,
+                                     const chip::System::PacketBufferHandle & aBuffer,
+                                     const chip::Inet::IPPacketInfo * aPacketInfo);
+extern void HandleRawReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
+                                  const chip::Inet::IPPacketInfo * aPacketInfo);
 
 // UDP Endpoint Callback Handlers
 
-extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBufferHandle & aBuffer,
-                                     const Inet::IPPacketInfo * aPacketInfo);
-extern void HandleUDPReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
-                                  const Inet::IPPacketInfo * aPacketInfo);
+extern void HandleUDPMessageReceived(const chip::Inet::IPEndPointBasis * aEndPoint,
+                                     const chip::System::PacketBufferHandle & aBuffer,
+                                     const chip::Inet::IPPacketInfo * aPacketInfo);
+extern void HandleUDPReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
+                                  const chip::Inet::IPPacketInfo * aPacketInfo);
 
 } // namespace Common
 

@@ -33,16 +33,6 @@
             "output": "src/controller/CHIPClusters.cpp"
         },
         {
-            "path": "templates/chip/CHIPClustersObjc.zapt",
-            "name": "Objc ZCL API Header",
-            "output": "/src/darwin/Framework/CHIP/CHIPClustersObjc.h"
-        },
-        {
-            "path": "templates/chip/CHIPClustersObjc-src.zapt",
-            "name": "Objc ZCL API",
-            "output": "/src/darwin/Framework/CHIP/CHIPClustersObjc.mm"
-        },
-        {
             "path": "templates/chip/chip-zcl-zpro-codec-api.zapt",
             "name": "CHIP ZCL API Header",
             "output": "src/app/chip-zcl-zpro-codec-api.h"
@@ -51,6 +41,16 @@
             "path": "templates/chip/encoder-src.zapt",
             "name": "CHIP ZCL API",
             "output": "src/app/encoder.cpp"
+        },
+        {
+            "path": "templates/chip/python-CHIPClusters-cpp.zapt",
+            "name": "CHIP ZCL API for Python (native code)",
+            "output": "src/controller/python/chip/clusters/CHIPClusters.cpp"
+        },
+        {
+            "path": "templates/chip/python-CHIPClusters-py.zapt",
+            "name": "CHIP ZCL API for Python",
+            "output": "src/controller/python/chip/clusters/CHIPClusters.py"
         }
     ]
 }

@@ -41,7 +41,10 @@
 
 #include "attribute-storage.h"
 #include "af.h"
-#include "common.h"
+#include "app/util/common.h"
+
+#include "gen/attribute-type.h"
+#include "gen/callback.h"
 
 using namespace chip;
 
@@ -70,11 +73,11 @@ uint8_t emberEndpointCount = 0;
 
 // If we have attributes that are more than 2 bytes, then
 // we need this data block for the defaults
-#ifdef GENERATED_DEFAULTS
+#if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #endif // GENERATED_DEFAULTS
 
-#ifdef GENERATED_MIN_MAX_DEFAULTS
+#if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
@@ -175,6 +178,11 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType)
 {
     return (attributeType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType)
+{
+    return dataType == ZCL_ARRAY_ATTRIBUTE_TYPE;
 }
 
 // This function is used to call the per-cluster default response callback
@@ -365,33 +373,60 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // This function does mem copy, but smartly, which means that if the type is a
 // string, it will copy as much as it can.
 // If src == NULL, then this method will set memory to zeroes
-static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am, bool write,
-                                          uint16_t readLength)
+// See documentation for emAfReadOrWriteAttribute for the semantics of
+// readLength when reading and writing.
+//
+// The index argument is used exclusively for List. When reading or writing a List attribute, it could take 3 types of values:
+//  -1: Read/Write the whole list content, including the number of elements in the list
+//   0: Read/Write the number of elements in the list, represented as a uint16_t
+//   n: Read/Write the nth element of the list
+static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am,
+                                          bool write, uint16_t readLength, int32_t index)
 {
     EmberAfAttributeType attributeType = am->attributeType;
-    uint16_t size                      = (readLength == 0) ? am->size : readLength;
+    // readLength == 0 for a read indicates that we should just trust that the
+    // caller has enough space for an attribute...
+    bool ignoreReadLength = write || (readLength == 0);
+    uint16_t bufferSize   = ignoreReadLength ? am->size : readLength;
 
     if (emberAfIsStringAttributeType(attributeType))
     {
-        emberAfCopyString(dest, src, static_cast<uint8_t>(size - 1));
+        if (bufferSize < 1)
+        {
+            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        }
+        emberAfCopyString(dest, src, static_cast<uint8_t>(bufferSize - 1));
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
-        emberAfCopyLongString(dest, src, static_cast<uint16_t>(size - 2));
+        if (bufferSize < 2)
+        {
+            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        }
+        emberAfCopyLongString(dest, src, static_cast<uint16_t>(bufferSize - 2));
+    }
+    else if (emberAfIsThisDataTypeAListType(attributeType))
+    {
+        if (bufferSize < 2)
+        {
+            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        }
+
+        emberAfCopyList(clusterId, am, write, dest, src, index);
     }
     else
     {
-        if (!write && readLength != 0 && readLength < am->size)
+        if (!ignoreReadLength && readLength < am->size)
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
         if (src == NULL)
         {
-            memset(dest, 0, size);
+            memset(dest, 0, am->size);
         }
         else
         {
-            memmove(dest, src, size);
+            memmove(dest, src, am->size);
         }
     }
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -487,7 +522,7 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write)
+                                       uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
 {
     uint8_t i;
     uint16_t attributeOffsetIndex = 0;
@@ -560,7 +595,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                                             attRecord->endpoint, attRecord->clusterId, am,
                                                             emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
                                                             emberAfAttributeSize(am))
-                                            : typeSensitiveMemCopy(dst, src, am, write, readLength));
+                                            : typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index));
                             }
                         }
                         else

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2014-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,23 +47,6 @@
 #define ChipLogDebugBtpEngine(MOD, MSG, ...)
 #endif
 
-#define CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE 1 // Size in bytes of enocded BTP fragment header flag bits
-#define CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE 1 // Size in bytes of encoded BTP sequence number
-#define CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE 1          // Size in bytes of encoded BTP fragment acknowledgement number
-#define CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE 2      // Size in byte of encoded BTP total fragmented message length
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE                                                                                 \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
-     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_MSG_LEN_SIZE)
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE                                                                    \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
-     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
-
-#define CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE                                                                      \
-    (CHIP_BLE_TRANSFER_PROTOCOL_HEADER_FLAGS_SIZE + CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE +                                          \
-     CHIP_BLE_TRANSFER_PROTOCOL_SEQUENCE_NUM_SIZE)
-
 namespace chip {
 namespace Ble {
 
@@ -72,10 +55,10 @@ static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
     a_seq_num = static_cast<SequenceNumber_t>(0xff & ((a_seq_num) + 1));
 }
 
-static inline bool DidReceiveData(uint8_t rx_flags)
+static inline bool DidReceiveData(BitFlags<BtpEngine::HeaderFlags> rx_flags)
 {
-    return (GetFlag(rx_flags, BtpEngine::kHeaderFlag_StartMessage) || GetFlag(rx_flags, BtpEngine::kHeaderFlag_ContinueMessage) ||
-            GetFlag(rx_flags, BtpEngine::kHeaderFlag_EndMessage));
+    return rx_flags.HasAny(BtpEngine::HeaderFlags::kStartMessage, BtpEngine::HeaderFlags::kContinueMessage,
+                           BtpEngine::HeaderFlags::kEndMessage);
 }
 
 static void PrintBufDebug(const System::PacketBufferHandle & buf)
@@ -226,11 +209,11 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
     VerifyOrExit(data->EnsureReservedSize(CHIP_CONFIG_BLE_PKT_RESERVED_SIZE), err = BLE_ERROR_NO_MEMORY);
 
     // Ensure enough space for standalone ack payload.
-    VerifyOrExit(data->MaxDataLength() >= CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(data->MaxDataLength() >= kTransferProtocolStandaloneAckHeaderSize, err = BLE_ERROR_NO_MEMORY);
     characteristic = data->Start();
 
     // Since there's no preexisting message payload, we can write BTP header without adjusting data start pointer.
-    characteristic[0] = kHeaderFlag_FragmentAck;
+    characteristic[0] = static_cast<uint8_t>(HeaderFlags::kFragmentAck);
 
     // Acknowledge most recently received sequence number.
     characteristic[1] = GetAndRecordRxAckSeqNum();
@@ -240,7 +223,7 @@ BLE_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
     characteristic[2] = GetAndIncrementNextTxSeqNum();
 
     // Set ack payload data length.
-    data->SetDataLength(CHIP_BLE_TRANSFER_PROTOCOL_STANDALONE_ACK_HEADER_SIZE);
+    data->SetDataLength(kTransferProtocolStandaloneAckHeaderSize);
 
 exit:
     return err;
@@ -262,8 +245,8 @@ exit:
 BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle data, SequenceNumber_t & receivedAck,
                                                   bool & didReceiveAck)
 {
-    BLE_ERROR err    = BLE_NO_ERROR;
-    uint8_t rx_flags = 0;
+    BLE_ERROR err = BLE_NO_ERROR;
+    BitFlags<HeaderFlags> rx_flags;
     // BLE data uses little-endian byte order.
     Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
 
@@ -272,15 +255,15 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
     mRxCharCount++;
 
     // Get header flags, always in first byte.
-    VerifyOrExit(reader.Read8(&rx_flags).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(reader.Read8(rx_flags.RawStorage()).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    if (GetFlag(rx_flags, kHeaderFlag_CommandMessage))
+    if (rx_flags.Has(HeaderFlags::kCommandMessage))
         SetRxPacketType(kType_Control);
     else
         SetRxPacketType(kType_Data);
 #endif
 
-    didReceiveAck = GetFlag(rx_flags, kHeaderFlag_FragmentAck);
+    didReceiveAck = rx_flags.Has(HeaderFlags::kFragmentAck);
 
     // Get ack number, if any.
     if (didReceiveAck)
@@ -326,7 +309,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
         Encoding::LittleEndian::Reader startReader(data->Start(), data->DataLength());
 
         // Verify StartMessage header flag set.
-        VerifyOrExit(rx_flags & kHeaderFlag_StartMessage, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
+        VerifyOrExit(rx_flags.Has(HeaderFlags::kStartMessage), err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
         VerifyOrExit(startReader.Read16(&mRxLength).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
@@ -335,7 +318,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
         data->ConsumeHead(startReader.OctetsRead());
 
         // Create a new buffer for use as the Rx re-assembly area.
-        mRxBuf = PacketBuffer::New();
+        mRxBuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
         VerifyOrExit(!mRxBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
@@ -345,10 +328,10 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
     else if (mRxState == kState_InProgress)
     {
         // Verify StartMessage header flag NOT set, since we're in the middle of receiving a message.
-        VerifyOrExit((rx_flags & kHeaderFlag_StartMessage) == 0, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
+        VerifyOrExit(!rx_flags.Has(HeaderFlags::kStartMessage), err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
         // Verify ContinueMessage or EndMessage header flag set.
-        VerifyOrExit((rx_flags & kHeaderFlag_ContinueMessage) || (rx_flags & kHeaderFlag_EndMessage),
+        VerifyOrExit(rx_flags.HasAny(HeaderFlags::kContinueMessage, HeaderFlags::kEndMessage),
                      err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
         // Add received fragment to reassembled message buffer.
@@ -365,9 +348,9 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
         ExitNow();
     }
 
-    if (rx_flags & kHeaderFlag_EndMessage)
+    if (rx_flags.Has(HeaderFlags::kEndMessage))
     {
-        // Trim remainder, if any, of received PacketBuffer based on sender-specified length of reassembled message.
+        // Trim remainder, if any, of the received packet buffer based on sender-specified length of reassembled message.
         int padding = mRxBuf->DataLength() - mRxLength;
 
         if (padding > 0)
@@ -389,7 +372,7 @@ exit:
         mRxState = kState_Error;
 
         // Dump protocol engine state, plus header flags and received data length.
-        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags);
+        ChipLogError(Ble, "HandleCharacteristicReceived failed, err = %d, rx_flags = %u", err, rx_flags.Raw());
         if (didReceiveAck)
         {
             ChipLogError(Ble, "With rx'd ack = %u", receivedAck);
@@ -455,8 +438,8 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         PrintBufDebug(data);
 
         // Determine fragment header size.
-        uint8_t header_size = send_ack ? CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE
-                                       : (CHIP_BLE_TRANSFER_PROTOCOL_MAX_HEADER_SIZE - CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
+        uint8_t header_size =
+            send_ack ? kTransferProtocolMaxHeaderSize : (kTransferProtocolMaxHeaderSize - kTransferProtocolAckSize);
 
         // Ensure enough headroom exists for the BTP header, and any headroom needed by the lower BLE layers.
         if (!mTxBuf->EnsureReservedSize(header_size + CHIP_CONFIG_BLE_PKT_RESERVED_SIZE))
@@ -474,17 +457,16 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         characteristic -= header_size;
         mTxBuf->SetStart(characteristic);
         uint8_t cursor = 1; // first position past header flags byte
-
-        characteristic[0] = kHeaderFlag_StartMessage;
+        BitFlags<HeaderFlags> headerFlags(HeaderFlags::kStartMessage);
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
         if (TxPacketType() == kType_Control)
-            SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
+            headerFlags.Set(HeaderFlags::kCommandMessage);
 #endif
 
         if (send_ack)
         {
-            SetFlag(characteristic[0], kHeaderFlag_FragmentAck, true);
+            headerFlags.Set(HeaderFlags::kFragmentAck);
             characteristic[cursor++] = GetAndRecordRxAckSeqNum();
             ChipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
         }
@@ -497,7 +479,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         {
             mTxBuf->SetDataLength(static_cast<uint16_t>(mTxLength + cursor));
             mTxLength = 0;
-            SetFlag(characteristic[0], kHeaderFlag_EndMessage, true);
+            headerFlags.Set(HeaderFlags::kEndMessage);
             mTxState = kState_Complete;
             mTxPacketCount++;
         }
@@ -507,6 +489,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
+        characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
         PrintBufDebug(data);
     }
@@ -522,22 +505,21 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         characteristic += mTxFragmentSize;
 
         // prepend header
-        characteristic -= send_ack
-            ? CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE
-            : (CHIP_BLE_TRANSFER_PROTOCOL_MID_FRAGMENT_MAX_HEADER_SIZE - CHIP_BLE_TRANSFER_PROTOCOL_ACK_SIZE);
+        characteristic -= send_ack ? kTransferProtocolMidFragmentMaxHeaderSize
+                                   : (kTransferProtocolMidFragmentMaxHeaderSize - kTransferProtocolAckSize);
         mTxBuf->SetStart(characteristic);
         uint8_t cursor = 1; // first position past header flags byte
 
-        characteristic[0] = kHeaderFlag_ContinueMessage;
+        BitFlags<HeaderFlags> headerFlags(HeaderFlags::kContinueMessage);
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
         if (TxPacketType() == kType_Control)
-            SetFlag(characteristic[0], kHeaderFlag_CommandMessage, true);
+            headerFlags.Set(HeaderFlags::kCommandMessage);
 #endif
 
         if (send_ack)
         {
-            SetFlag(characteristic[0], kHeaderFlag_FragmentAck, true);
+            headerFlags.Set(HeaderFlags::kFragmentAck);
             characteristic[cursor++] = GetAndRecordRxAckSeqNum();
             ChipLogDebugBtpEngine(Ble, "===> encoded piggybacked ack, ack_num = %u", characteristic[cursor - 1]);
         }
@@ -548,7 +530,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         {
             mTxBuf->SetDataLength(static_cast<uint16_t>(mTxLength + cursor));
             mTxLength = 0;
-            SetFlag(characteristic[0], kHeaderFlag_EndMessage, true);
+            headerFlags.Set(HeaderFlags::kEndMessage);
             mTxState = kState_Complete;
             mTxPacketCount++;
         }
@@ -558,6 +540,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
             mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
+        characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send additional fragment:");
         PrintBufDebug(mTxBuf);
     }

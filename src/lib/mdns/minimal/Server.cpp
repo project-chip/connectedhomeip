@@ -26,20 +26,6 @@ namespace mdns {
 namespace Minimal {
 namespace {
 
-struct BroadcastIpAddresses
-{
-    chip::Inet::IPAddress ipv6;
-    chip::Inet::IPAddress ipv4;
-
-    BroadcastIpAddresses()
-    {
-        chip::Inet::IPAddress::FromString("FF02::FB", ipv6);
-        chip::Inet::IPAddress::FromString("224.0.0.251", ipv4);
-    }
-};
-
-const BroadcastIpAddresses kBroadcastIp;
-
 class ShutdownOnError
 {
 public:
@@ -64,6 +50,71 @@ private:
 
 } // namespace
 
+namespace BroadcastIpAddresses {
+
+// Get standard mDNS Broadcast addresses
+
+void GetIpv6Into(chip::Inet::IPAddress & dest)
+{
+    if (!chip::Inet::IPAddress::FromString("FF02::FB", dest))
+    {
+        ChipLogError(Discovery, "Failed to parse standard IPv6 broadcast address");
+    }
+}
+
+void GetIpv4Into(chip::Inet::IPAddress & dest)
+{
+    if (!chip::Inet::IPAddress::FromString("224.0.0.251", dest))
+    {
+        ChipLogError(Discovery, "Failed to parse standard IPv4 broadcast address");
+    }
+}
+
+} // namespace BroadcastIpAddresses
+
+namespace {
+
+CHIP_ERROR JoinMulticastGroup(chip::Inet::InterfaceId interfaceId, chip::Inet::UDPEndPoint * endpoint,
+                              chip::Inet::IPAddressType addressType)
+{
+
+    chip::Inet::IPAddress address;
+
+    if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv6)
+    {
+        BroadcastIpAddresses::GetIpv6Into(address);
+#if INET_CONFIG_ENABLE_IPV4
+    }
+    else if (addressType == chip::Inet::IPAddressType::kIPAddressType_IPv4)
+    {
+        BroadcastIpAddresses::GetIpv4Into(address);
+#endif // INET_CONFIG_ENABLE_IPV4
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return endpoint->JoinMulticastGroup(interfaceId, address);
+}
+
+const char * AddressTypeStr(chip::Inet::IPAddressType addressType)
+{
+    switch (addressType)
+    {
+    case chip::Inet::IPAddressType::kIPAddressType_IPv6:
+        return "IPv6";
+#if INET_CONFIG_ENABLE_IPV4
+    case chip::Inet::IPAddressType::kIPAddressType_IPv4:
+        return "IPv4";
+#endif // INET_CONFIG_ENABLE_IPV4
+    default:
+        return "UNKNOWN";
+    }
+}
+
+} // namespace
+
 ServerBase::~ServerBase()
 {
     Shutdown();
@@ -75,10 +126,22 @@ void ServerBase::Shutdown()
     {
         if (mEndpoints[i].udp != nullptr)
         {
-            mEndpoints[i].udp->Close();
+            mEndpoints[i].udp->Free();
             mEndpoints[i].udp = nullptr;
         }
     }
+}
+
+bool ServerBase::IsListening() const
+{
+    for (size_t i = 0; i < mEndpointCount; i++)
+    {
+        if (mEndpoints[i].udp != nullptr)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
@@ -93,33 +156,27 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
 
     while (it->Next(&interfaceId, &addressType))
     {
-        if (endpointIndex >= mEndpointCount)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ReturnErrorCodeIf(endpointIndex >= mEndpointCount, CHIP_ERROR_NO_MEMORY);
 
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
+        info->interfaceId   = interfaceId;
 
-        CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
+        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->udp));
+
+        ReturnErrorOnFailure(info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
+
+        ReturnErrorOnFailure(info->udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+
+        CHIP_ERROR err = JoinMulticastGroup(interfaceId, info->udp, addressType);
         if (err != CHIP_NO_ERROR)
         {
-            return err;
-        }
+            char interfaceName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+            chip::Inet::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
 
-        info->udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-
-        info->udp->AppState          = static_cast<void *>(this);
-        info->udp->OnMessageReceived = OnUdpPacketReceived;
-
-        err = info->udp->Listen();
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
+            // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
+            ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
+                         AddressTypeStr(addressType), chip::ErrorStr(err));
         }
 
         endpointIndex++;
@@ -182,12 +239,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
@@ -224,12 +281,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv6BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+            err = info->udp->SendTo(mIpv4BroadcastAddress, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">CHIPTool</string>
     <string name="barcode_scanner_activity_toolbar_title">QR Scan</string>
+    <string name="text_ok">Ok</string>
+    <string name="location_permission_denied_title">Location permission required</string>
+    <string name="location_permission_denied_message">Since location permission was denied, some functions of the app may be unavailable. </string>
     <string name="chip_device_info_title">CHIP Device Info:</string>
     <string name="chip_device_info_subtitle">Please manually connect to this device\'s soft AP using the information below.</string>
     <string name="chip_device_info_version_label">Version:</string>
@@ -26,6 +29,7 @@
     <string name="echo_client_btn_text">Echo Client</string>
     <string name="on_off_level_btn_text">Light On/Off &amp; Level Cluster</string>
     <string name="enter_ip_address_hint_text">Enter IP Address (eg. 192.168.10.2)</string>
+    <string name="enter_device_id_hint_text">Enter Device ID</string>
     <string name="echo_input_hint_text">Enter message for device</string>
 
     <string name="send_command_on_btn_text">On</string>
@@ -81,5 +85,10 @@
     <string name="enter_thread_xpanid_text">11:11:11:11:22:22:22:22</string>
     <string name="enter_thread_master_key_text">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
     <string name="enter_thread_save_network_btn">Save network</string>
+
+    <string name="nfc_tag_action_title">CHIP NFC Tag read. Choose an action:</string>
+    <string name="nfc_tag_action_show">Show device information</string>
+    <string name="nfc_tag_action_wifi">Provision into Wi-Fi network</string>
+    <string name="nfc_tag_action_thread">Provision into Thread network</string>
 
 </resources>

@@ -38,14 +38,14 @@
 {
     NSError * error;
     CHIPManualSetupPayloadParser * parser =
-        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"000003949100001000011"];
+        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"636108753500001000015"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 1234);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertTrue(payload.requiresCustomFlow);
@@ -90,14 +90,14 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertFalse(payload.requiresCustomFlow);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
-    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationWiFi);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
 }
 
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G00800800583ND0UOGMHARTH7-40Y1CLJ/I7O"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -109,7 +109,7 @@
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertFalse(payload.requiresCustomFlow);
-    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationWiFi);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"1"]);
 
     NSArray<CHIPOptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];

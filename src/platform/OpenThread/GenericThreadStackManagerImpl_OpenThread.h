@@ -26,6 +26,13 @@
 #pragma once
 
 #include <openthread/instance.h>
+#include <openthread/netdata.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+#include <openthread/srp_client.h>
+#endif
+
+#include <lib/mdns/platform/Mdns.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -33,8 +40,6 @@ namespace DeviceLayer {
 class ThreadStackManagerImpl;
 
 namespace Internal {
-
-class DeviceNetworkInfo;
 
 /**
  * Provides a generic implementation of ThreadStackManager features that works in conjunction
@@ -65,10 +70,11 @@ protected:
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     bool _IsThreadEnabled(void);
     CHIP_ERROR _SetThreadEnabled(bool val);
+
     bool _IsThreadProvisioned(void);
     bool _IsThreadAttached(void);
-    CHIP_ERROR _GetThreadProvision(DeviceNetworkInfo & netInfo, bool includeCredentials);
-    CHIP_ERROR _SetThreadProvision(const DeviceNetworkInfo & netInfo);
+    CHIP_ERROR _GetThreadProvision(ByteSpan & netInfo);
+    CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
     void _ErasePersistentInfo(void);
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType(void);
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
@@ -80,9 +86,19 @@ protected:
     CHIP_ERROR _GetAndLogThreadTopologyMinimal(void);
     CHIP_ERROR _GetAndLogThreadTopologyFull(void);
     CHIP_ERROR _GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR _GetSlaacIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
+    CHIP_ERROR _GetExternalIPv6Address(chip::Inet::IPAddress & addr);
+    CHIP_ERROR _GetPollPeriod(uint32_t & buf);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+    CHIP_ERROR _AddSrpService(const char * aInstanceName, const char * aName, uint16_t aPort, chip::Mdns::TextEntry * aTxtEntries,
+                              size_t aTxtEntiresSize, uint32_t aLeaseInterval, uint32_t aKeyLeaseInterval);
+    CHIP_ERROR _RemoveSrpService(const char * aInstanceName, const char * aName);
+    CHIP_ERROR _RemoveAllSrpServices();
+    CHIP_ERROR _SetupSrpHost(const char * aHostName);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     // ===== Members available to the implementation subclass.
 
@@ -98,6 +114,42 @@ private:
 
     otInstance * mOTInst;
     ConnectivityManager::ThreadPollingConfig mPollingConfig;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+
+    struct SrpClient
+    {
+        static constexpr uint8_t kServiceId           = 0x5d;
+        static constexpr uint8_t kMaxServicesNumber   = 3;
+        static constexpr uint8_t kMaxInstanceNameSize = 64;
+        static constexpr uint8_t kMaxNameSize         = 16;
+        static constexpr uint8_t kMaxHostNameSize     = 32;
+        static constexpr uint8_t kMaxTxtEntriesNumber = 4;
+        static constexpr uint8_t kMaxTxtValueSize     = 255;
+        static constexpr uint8_t kMaxTxtKeySize       = 16;
+
+        struct Service
+        {
+            otSrpClientService mService;
+            char mInstanceName[kMaxInstanceNameSize];
+            char mName[kMaxNameSize];
+            otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
+            uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
+            char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];
+        };
+
+        char mHostName[kMaxHostNameSize];
+        otIp6Address mHostAddress;
+        Service mServices[kMaxServicesNumber];
+    };
+
+    SrpClient mSrpClient;
+
+    static void OnSrpClientNotification(otError aError, const otSrpClientHostInfo * aHostInfo, const otSrpClientService * aServices,
+                                        const otSrpClientService * aRemovedServices, void * aContext);
+    static void OnSrpClientStateChange(const otSockAddr * aServerSockAddr, void * aContext);
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
     static void OnJoinerComplete(otError aError, void * aContext);
     void OnJoinerComplete(otError aError);

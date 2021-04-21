@@ -90,6 +90,8 @@ public:
 
     void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
 
+    void Close() override { return CloseImpl<0>(); }
+
     /**
      * Initialization method that forwards arguments for initialization to each of the underlying
      * transports.
@@ -97,12 +99,13 @@ public:
      * Transports are assumed to have an Init call with EXACTLY one argument. This method MUST initialize
      * all underlying transports.
      *
-     * @param args initialization arguments, forwarded as-is to the underlying transports.
+     * @param delegate the delegate to handle messages.
+     * @param args     initialization arguments, forwarded as-is to the underlying transports.
      */
     template <typename... Args, typename std::enable_if<(sizeof...(Args) == sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR Init(Args &&... args)
+    CHIP_ERROR Init(RawTransportDelegate * delegate, Args &&... args)
     {
-        return InitImpl(std::forward<Args>(args)...);
+        return InitImpl(delegate, std::forward<Args>(args)...);
     }
 
 private:
@@ -152,6 +155,25 @@ private:
     {}
 
     /**
+     * Recursive disconnect implementation iterating through transport members.
+     *
+     * @tparam N the index of the underlying transport to send close to
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    void CloseImpl()
+    {
+        std::get<N>(mTransports).Close();
+        CloseImpl<N + 1>();
+    }
+
+    /**
+     * CloseImpl template for out of range N.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    void CloseImpl()
+    {}
+
+    /**
      * Recursive sendmessage implementation iterating through transport members.
      *
      * Message is sent through the first transport from index N or above, which returns 'CanSendToPeer'
@@ -163,7 +185,7 @@ private:
      * @param msgBuf the data to send.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf)
+    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle && msgBuf)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
@@ -195,7 +217,7 @@ private:
      * @param rest tail arguments to be passed to the rest of transport Init methods.
      */
     template <typename InitArg, typename... Rest>
-    CHIP_ERROR InitImpl(InitArg && arg, Rest &&... rest)
+    CHIP_ERROR InitImpl(RawTransportDelegate * delegate, InitArg && arg, Rest &&... rest)
     {
         auto transport = &std::get<sizeof...(TransportTypes) - sizeof...(Rest) - 1>(mTransports);
 
@@ -205,9 +227,9 @@ private:
             return err;
         }
 
-        transport->SetMessageReceiveHandler(&OnMessageReceive, this);
+        transport->SetDelegate(delegate);
 
-        return InitImpl(std::forward<Rest>(rest)...);
+        return InitImpl(delegate, std::forward<Rest>(rest)...);
     }
 
     /**
@@ -215,18 +237,7 @@ private:
      *
      * Provided to ensure that recursive InitImpl finishes compiling.
      */
-    CHIP_ERROR InitImpl() { return CHIP_NO_ERROR; }
-
-    /**
-     * Handler passed to all underlying transports at init time.
-     *
-     * Calls the underlying Base message receive handler whenever any of the underlying transports
-     * receives a message.
-     */
-    static void OnMessageReceive(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle msg, Tuple * t)
-    {
-        t->HandleMessageReceived(header, source, std::move(msg));
-    }
+    CHIP_ERROR InitImpl(RawTransportDelegate * delegate) { return CHIP_NO_ERROR; }
 
     std::tuple<TransportTypes...> mTransports;
 };

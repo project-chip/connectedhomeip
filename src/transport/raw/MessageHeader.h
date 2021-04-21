@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,18 +26,20 @@
 #include <cstdint>
 #include <string.h>
 
+#include <type_traits>
+
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <core/PeerId.h>
+#include <protocols/Protocols.h>
 #include <support/BitFlags.h>
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 
-/// Convenience type to make it clear a number represents a node id.
-typedef uint64_t NodeId;
+static constexpr size_t kMaxTagLen = 16;
 
-static constexpr NodeId kUndefinedNodeId = 0ULL;
-static constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
-static constexpr size_t kMaxTagLen       = 16;
+static constexpr size_t kMaxAppMessageLen = 1200;
 
 typedef int PacketHeaderFlags;
 
@@ -85,8 +87,8 @@ enum class FlagValues : uint16_t
 
 };
 
-using Flags   = BitFlags<uint16_t, FlagValues>;
-using ExFlags = BitFlags<uint8_t, ExFlagValues>;
+using Flags   = BitFlags<FlagValues>;
+using ExFlags = BitFlags<ExFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |8 bit Security Flags|
@@ -132,9 +134,6 @@ public:
 
     uint16_t GetEncryptionKeyID() const { return mEncryptionKeyID; }
 
-    /** Get the length of encrypted payload. */
-    uint16_t GetPayloadLength() const { return mPayloadLength; }
-
     Header::Flags & GetFlags() { return mFlags; }
     const Header::Flags & GetFlags() const { return mFlags; }
 
@@ -167,13 +166,6 @@ public:
     {
         mSourceNodeId.ClearValue();
         mFlags.Clear(Header::FlagValues::kSourceNodeIdPresent);
-        return *this;
-    }
-
-    /** Set the secure payload length for this header. */
-    PacketHeader & SetPayloadLength(uint16_t len)
-    {
-        mPayloadLength = len;
         return *this;
     }
 
@@ -241,6 +233,22 @@ public:
     CHIP_ERROR Decode(const uint8_t * data, uint16_t size, uint16_t * decode_size);
 
     /**
+     * A version of Decode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Decode(const uint8_t (&data)[N], uint16_t * decode_size)
+    {
+        return Decode(data, N, decode_size);
+    }
+
+    /**
+     * A version of Decode that decodes from the start of a PacketBuffer and
+     * consumes the bytes we decoded from.
+     */
+    CHIP_ERROR DecodeAndConsume(const System::PacketBufferHandle & buf);
+
+    /**
      * Encodes a header into the given buffer.
      *
      * @param data - the buffer to write to
@@ -254,6 +262,32 @@ public:
      */
     CHIP_ERROR Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const;
 
+    /**
+     * A version of Encode that uses the type system to determine available
+     * space.
+     */
+    template <int N>
+    inline CHIP_ERROR Encode(uint8_t (&data)[N], uint16_t * encode_size) const
+    {
+        return Encode(data, N, encode_size);
+    }
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer before the
+     * PacketBuffer's current data.
+     */
+    CHIP_ERROR EncodeBeforeData(const System::PacketBufferHandle & buf) const;
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer at the start of the
+     * current data space.  This assumes that someone has already preallocated
+     * space for the header.
+     */
+    inline CHIP_ERROR EncodeAtStart(const System::PacketBufferHandle & buf, uint16_t * encode_size) const
+    {
+        return Encode(buf->Start(), buf->DataLength(), encode_size);
+    }
+
 private:
     /// Represents the current encode/decode header version
     static constexpr int kHeaderVersion = 2;
@@ -266,9 +300,6 @@ private:
 
     /// Intended recipient of the message.
     Optional<NodeId> mDestinationNodeId;
-
-    /// Length of application data (payload)
-    uint16_t mPayloadLength = 0;
 
     /// Encryption Key ID
     uint16_t mEncryptionKeyID = 0;
@@ -289,23 +320,29 @@ private:
 class PayloadHeader
 {
 public:
+    constexpr PayloadHeader() { SetProtocol(Protocols::NotSpecified); }
     PayloadHeader & operator=(const PayloadHeader &) = default;
-
-    /**
-     * Gets the vendor id in the current message.
-     *
-     * NOTE: the vendor id is optional and may be missing.
-     */
-    const Optional<uint16_t> & GetVendorId() const { return mVendorId; }
 
     /** Get the Session ID from this header. */
     uint16_t GetExchangeID() const { return mExchangeID; }
 
     /** Get the Protocol ID from this header. */
-    uint16_t GetProtocolID() const { return mProtocolID; }
+    Protocols::Id GetProtocolID() const { return mProtocolID; }
+
+    /** Check whether the header has a given protocol */
+    bool HasProtocol(Protocols::Id protocol) const { return mProtocolID == protocol; }
 
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
+
+    /** Check whether the header has a given secure message type */
+    bool HasMessageType(uint8_t type) const { return mMessageType == type; }
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    bool HasMessageType(MessageType type) const
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(static_cast<uint8_t>(type));
+    }
 
     /**
      * Gets the Acknowledged Message Counter from this header.
@@ -314,36 +351,29 @@ public:
      */
     const Optional<uint32_t> & GetAckId() const { return mAckId; }
 
-    /** Set the vendor id for this header. */
-    PayloadHeader & SetVendorId(uint16_t id)
+    /**
+     * Set the message type for this header.  This requires setting the protocol
+     * id as well, because the meaning of a message type is only relevant given
+     * a specific protocol.
+     *
+     * This should only be used for cases when we don't have a strongly typed
+     * message type and hence can't automatically determine the protocol from
+     * the message type.
+     */
+    PayloadHeader & SetMessageType(Protocols::Id protocol, uint8_t type)
     {
-        mVendorId.SetValue(id);
-        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent);
-
-        return *this;
-    }
-
-    /** Set the vendor id for this header. */
-    PayloadHeader & SetVendorId(Optional<uint16_t> id)
-    {
-        mVendorId = id;
-        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent, id.HasValue());
-
-        return *this;
-    }
-
-    /** Clear the vendor id for this header. */
-    PayloadHeader & ClearVendorId()
-    {
-        mVendorId.ClearValue();
-
-        return *this;
-    }
-
-    /** Set the secure message type for this header. */
-    PayloadHeader & SetMessageType(uint8_t type)
-    {
+        SetProtocol(protocol);
         mMessageType = type;
+        return *this;
+    }
+
+    /** Set the secure message type, with the protocol id derived from the
+        message type. */
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    PayloadHeader & SetMessageType(MessageType type)
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        SetMessageType(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(type));
         return *this;
     }
 
@@ -351,13 +381,6 @@ public:
     PayloadHeader & SetExchangeID(uint16_t id)
     {
         mExchangeID = id;
-        return *this;
-    }
-
-    /** Set the Protocol ID for this header. */
-    PayloadHeader & SetProtocolID(uint16_t id)
-    {
-        mProtocolID = id;
         return *this;
     }
 
@@ -412,7 +435,7 @@ public:
      *  @return Returns 'true' if the current message is requesting an acknowledgment from the recipient, else 'false'.
      *
      */
-    bool IsNeedsAck() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_NeedsAck); }
+    bool NeedsAck() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_NeedsAck); }
 
     /**
      * A call to `Encode` will require at least this many bytes on the current
@@ -439,6 +462,22 @@ public:
     CHIP_ERROR Decode(const uint8_t * data, uint16_t size, uint16_t * decode_size);
 
     /**
+     * A version of Decode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Decode(const uint8_t (&data)[N], uint16_t * decode_size)
+    {
+        return Decode(data, N, decode_size);
+    }
+
+    /**
+     * A version of Decode that decodes from the start of a PacketBuffer and
+     * consumes the bytes we decoded from.
+     */
+    CHIP_ERROR DecodeAndConsume(const System::PacketBufferHandle & buf);
+
+    /**
      * Encodes the encrypted part of the header into the given buffer.
      *
      * @param data - the buffer to write to
@@ -452,7 +491,41 @@ public:
      */
     CHIP_ERROR Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const;
 
+    /**
+     * A version of Encode that uses the type system to determine available
+     * space.
+     */
+    template <uint16_t N>
+    inline CHIP_ERROR Encode(uint8_t (&data)[N], uint16_t * decode_size) const
+    {
+        return Encode(data, N, decode_size);
+    }
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer before the
+     * PacketBuffer's current data.
+     */
+    CHIP_ERROR EncodeBeforeData(const System::PacketBufferHandle & buf) const;
+
+    /**
+     * A version of Encode that encodes into a PacketBuffer at the start of the
+     * current data space.  This assumes that someone has already preallocated
+     * space for the header.
+     */
+    inline CHIP_ERROR EncodeAtStart(const System::PacketBufferHandle & buf, uint16_t * encode_size) const
+    {
+        return Encode(buf->Start(), buf->DataLength(), encode_size);
+    }
+
 private:
+    constexpr void SetProtocol(Protocols::Id protocol)
+    {
+        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_VendorIdPresent, protocol.GetVendorId() != VendorId::Common);
+        mProtocolID = protocol;
+    }
+
+    constexpr bool HaveVendorId() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_VendorIdPresent); }
+
     /// Packet type (application data, security control packets, e.g. pairing,
     /// configuration, rekey etc)
     uint8_t mMessageType = 0;
@@ -460,11 +533,8 @@ private:
     /// Security session identifier
     uint16_t mExchangeID = 0;
 
-    /// Vendor identifier
-    Optional<uint16_t> mVendorId;
-
     /// Protocol identifier
-    uint16_t mProtocolID = 0;
+    Protocols::Id mProtocolID = Protocols::NotSpecified;
 
     /// Bit flag indicators for CHIP Exchange header
     Header::ExFlags mExchangeFlags;

@@ -20,6 +20,9 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "MinimalMdnsServer.h"
+#include "ServiceNaming.h"
+
 #include <mdns/minimal/ResponseSender.h>
 #include <mdns/minimal/Server.h>
 #include <mdns/minimal/core/FlatAllocatedQName.h>
@@ -30,8 +33,10 @@
 #include <mdns/minimal/responders/Txt.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
-#include <support/ReturnMacros.h>
 #include <support/StringBuilder.h>
+
+// Enable detailed mDNS logging for received queries
+#undef DETAIL_LOGGING
 
 namespace chip {
 namespace Mdns {
@@ -39,6 +44,7 @@ namespace {
 
 using namespace mdns::Minimal;
 
+#ifdef DETAIL_LOGGING
 const char * ToString(QClass qClass)
 {
     switch (qClass)
@@ -85,99 +91,18 @@ void LogQuery(const QueryData & data)
 
     ChipLogDetail(Discovery, "%s", logString.c_str());
 }
-
-class AllInterfaces : public ListenIterator
-{
-public:
-    AllInterfaces() {}
-
-    bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
-    {
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = INET_NULL_INTERFACEID;
-            *type  = chip::Inet::kIPAddressType_IPv4;
-            mState = State::kIpV6;
-
-            SkipToFirstValidInterface();
-            return true;
-        }
 #else
-        mState = State::kIpV6;
-        SkipToFirstValidInterface();
+void LogQuery(const QueryData & data) {}
 #endif
 
-        if (!mIterator.HasCurrent())
-        {
-            return false;
-        }
-
-        *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::kIPAddressType_IPv6;
-
-        for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
-        {
-        }
-        return true;
-    }
-
-private:
-    enum class State
-    {
-        kIpV4,
-        kIpV6,
-    };
-    State mState = State::kIpV4;
-    chip::Inet::InterfaceIterator mIterator;
-
-    void SkipToFirstValidInterface()
-    {
-        do
-        {
-            if (!SkipCurrentInterface())
-            {
-                break;
-            }
-        } while (mIterator.Next());
-    }
-
-    bool SkipCurrentInterface()
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false; // nothing to try.
-        }
-
-        if (!mIterator.IsUp() || !mIterator.SupportsMulticast())
-        {
-            return true; // not a usable interface
-        }
-        char name[64];
-        if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Interface iterator failed to get interface name.");
-            return true;
-        }
-
-        if (strncmp(name, "lo", 2) == 0)
-        {
-            ChipLogDetail(Discovery, "Skipping interface '%s' (assume local loopback)", name);
-            return true;
-        }
-        return false;
-    }
-};
-
 class AdvertiserMinMdns : public ServiceAdvertiser,
-                          public ServerDelegate, // gets queries
-                          public ParserDelegate  // parses queries
+                          public MdnsPacketDelegate, // receive query packets
+                          public ParserDelegate      // parses queries
 {
 public:
-    AdvertiserMinMdns() : mResponseSender(&mServer, &mQueryResponder)
-
+    AdvertiserMinMdns() : mResponseSender(&GlobalMinimalMdnsServer::Server(), &mQueryResponder)
     {
-        mServer.SetDelegate(this);
+        GlobalMinimalMdnsServer::Instance().SetQueryDelegate(this);
 
         for (size_t i = 0; i < kMaxAllocatedResponders; i++)
         {
@@ -193,12 +118,10 @@ public:
     // Service advertiser
     CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
-    CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) override;
-    CHIP_ERROR Advertise(const CommisionableAdvertisingParameters & params) override;
+    CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
 
-    // ServerDelegate
-    void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
-    void OnResponse(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override {}
+    // MdnsPacketDelegate
+    void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     // ParserDelegate
     void OnHeader(ConstHeaderRef & header) override { mMessageId = header.GetMessageId(); }
@@ -209,6 +132,15 @@ private:
     /// Sets the query responder to a blank state and frees up any
     /// allocated memory.
     void Clear();
+
+    /// Advertise available records configured within the server
+    ///
+    /// Usable as boot-time advertisement of available SRV records.
+    void AdvertiseRecords();
+
+    /// Determine if advertisement on the specified interface/address is ok given the
+    /// interfaces on which the mDNS server is listening
+    bool ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr);
 
     QueryResponderSettings AddAllocatedResponder(Responder * responder)
     {
@@ -266,15 +198,12 @@ private:
         return FullQName();
     }
 
-    FullQName GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params);
-    FullQName GetCommisionableTextEntries(const CommisionableAdvertisingParameters & params);
+    FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
-    static constexpr size_t kMaxEndPoints           = 10;
     static constexpr size_t kMaxRecords             = 16;
     static constexpr size_t kMaxAllocatedResponders = 16;
     static constexpr size_t kMaxAllocatedQNameData  = 8;
 
-    Server<kMaxEndPoints> mServer;
     QueryResponder<kMaxRecords> mQueryResponder;
     ResponseSender mResponseSender;
 
@@ -291,9 +220,11 @@ private:
     };
 };
 
-void AdvertiserMinMdns::OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
+void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+#ifdef DETAIL_LOGGING
     ChipLogDetail(Discovery, "MinMdns received a query.");
+#endif
 
     mCurrentSource = info;
     if (!ParsePacket(data, this))
@@ -322,13 +253,14 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 
 CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
 {
-    mServer.Shutdown();
+    GlobalMinimalMdnsServer::Server().Shutdown();
 
-    AllInterfaces allInterfaces;
-
-    ReturnErrorOnFailure(mServer.Listen(inetLayer, &allInterfaces, port));
+    ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
+
+    AdvertiseRecords();
+
     return CHIP_NO_ERROR;
 }
 
@@ -361,19 +293,16 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 {
     Clear();
 
-    char uniqueName[64] = "";
+    char nameBuffer[64] = "";
 
     /// need to set server name
-    size_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
-    if (len >= sizeof(uniqueName))
-    {
-        ChipLogError(Discovery, "Failed to allocate QNames.");
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
-    FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
-    FullQName serverName             = AllocateQName(uniqueName, "local");
+    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chip", "_tcp", "local");
+
+    ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
+    FullQName serverName = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -425,21 +354,24 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters & params)
+CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
     Clear();
 
     // TODO: need to detect colisions here
     char nameBuffer[64] = "";
-    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), "chip-%016" PRIX64, GetRandU64());
+    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), "%016" PRIX64, GetRandU64());
     if (len >= sizeof(nameBuffer))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning ? "_chipc" : "_chipd";
 
-    FullQName operationalServiceName = AllocateQName("_chipc", "_udp", "local");
-    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chipc", "_udp", "local");
-    FullQName serverName             = AllocateQName(nameBuffer, "local");
+    FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
+    FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
+
+    ReturnErrorOnFailure(MakeHostName(nameBuffer, sizeof(nameBuffer), params.GetMac()));
+    FullQName serverName = AllocateQName(nameBuffer, "local");
 
     if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
     {
@@ -479,8 +411,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
     }
 
     {
-        sprintf(nameBuffer, "S%03d", params.GetShortDiscriminator());
-        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
+        sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
+        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
         if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
@@ -494,8 +426,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
     }
 
     {
-        sprintf(nameBuffer, "L%04d", params.GetLongDiscriminator());
-        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
+        sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
+        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
         if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
                  .SetReportAdditional(operationalServerName)
@@ -509,8 +441,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
 
     if (params.GetVendorId().HasValue())
     {
-        sprintf(nameBuffer, "V%d", params.GetVendorId().Value());
-        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
+        sprintf(nameBuffer, "_V%d", params.GetVendorId().Value());
+        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
         if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
@@ -536,7 +468,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters 
     return CHIP_NO_ERROR;
 }
 
-FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params)
+FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
     // a discriminator always exists
     char txtDiscriminator[32];
@@ -551,156 +483,104 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommisioningAdvert
     char txtVidPid[64];
     if (params.GetProductId().HasValue())
     {
-        sprintf(txtVidPid, "V=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
+        sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
     }
     else
     {
-        sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
-    }
-
-    return AllocateQName(txtDiscriminator, txtVidPid);
-}
-
-CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisionableAdvertisingParameters & params)
-{
-    Clear();
-
-    // TODO: need to detect colisions here
-    char nameBuffer[64] = "";
-    size_t len          = snprintf(nameBuffer, sizeof(nameBuffer), "chip-%016" PRIX64, GetRandU64());
-    if (len >= sizeof(nameBuffer))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    FullQName operationalServiceName = AllocateQName("_chipd", "_udp", "local");
-    FullQName operationalServerName  = AllocateQName(nameBuffer, "_chipd", "_udp", "local");
-    FullQName serverName             = AllocateQName(nameBuffer, "local");
-
-    if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
-    {
-        ChipLogError(Discovery, "Failed to allocate QNames.");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    if (!AddResponder<PtrResponder>(operationalServiceName, operationalServerName)
-             .SetReportAdditional(operationalServerName)
-             .SetReportInServiceListing(true)
-             .IsValid())
-    {
-        ChipLogError(Discovery, "Failed to add service PTR record mDNS responder");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    if (!AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
-             .SetReportAdditional(serverName)
-             .IsValid())
-    {
-        ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-    if (!AddResponder<IPv6Responder>(serverName).IsValid())
-    {
-        ChipLogError(Discovery, "Failed to add IPv6 mDNS responder");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    if (params.IsIPv4Enabled())
-    {
-        if (!AddResponder<IPv4Responder>(serverName).IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add IPv4 mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    {
-        sprintf(nameBuffer, "S%03d", params.GetShortDiscriminator());
-        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", "_chipd", "_udp", "local");
-        ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-
-        if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add short discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    {
-        sprintf(nameBuffer, "L%04d", params.GetLongDiscriminator());
-        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", "_chipd", "_udp", "local");
-        ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-        if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add long discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    if (params.GetVendorId().HasValue())
-    {
-        sprintf(nameBuffer, "V%d", params.GetVendorId().Value());
-        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", "_chipd", "_udp", "local");
-        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-
-        if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add vendor discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    if (!AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, GetCommisionableTextEntries(params)))
-             .SetReportAdditional(serverName)
-             .IsValid())
-    {
-        ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commisionable device'.");
-
-    return CHIP_NO_ERROR;
-}
-
-FullQName AdvertiserMinMdns::GetCommisionableTextEntries(const CommisionableAdvertisingParameters & params)
-{
-    // a discriminator always exists
-    char txtDiscriminator[32];
-    sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
-
-    if (!params.GetVendorId().HasValue())
-    {
-        return AllocateQName(txtDiscriminator);
-    }
-
-    // Need to also set a vid/pid string
-    char txtVidPid[64];
-    if (params.GetProductId().HasValue())
-    {
-        sprintf(txtVidPid, "V=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
-    }
-    else
-    {
-        sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
+        sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
     char txtPairingInstrHint[128];
     if (params.GetPairingInstr().HasValue() && params.GetPairingHint().HasValue())
     {
         sprintf(txtPairingInstrHint, "P=%s+%d", params.GetPairingInstr().Value(), params.GetPairingHint().Value());
+        return AllocateQName(txtDiscriminator, txtVidPid, txtPairingInstrHint);
+    }
+    else
+    {
+        return AllocateQName(txtDiscriminator, txtVidPid);
+    }
+}
+
+bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
+{
+    auto & server = GlobalMinimalMdnsServer::Server();
+    for (unsigned i = 0; i < server.GetEndpointCount(); i++)
+    {
+        const ServerBase::EndpointInfo & info = server.GetEndpoints()[i];
+
+        if (info.udp == nullptr)
+        {
+            continue;
+        }
+
+        if (info.interfaceId != id)
+        {
+            continue;
+        }
+
+        if (info.addressType != addr.Type())
+        {
+            continue;
+        }
+
+        return true;
     }
 
-    return AllocateQName(txtDiscriminator, txtVidPid, txtPairingInstrHint);
+    return false;
+}
+
+void AdvertiserMinMdns::AdvertiseRecords()
+{
+    chip::Inet::InterfaceAddressIterator interfaceAddress;
+
+    if (!interfaceAddress.Next())
+    {
+        return;
+    }
+
+    for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
+    {
+        if (!Internal::IsCurrentInterfaceUsable(interfaceAddress))
+        {
+            continue;
+        }
+
+        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), interfaceAddress.GetAddress()))
+        {
+            continue;
+        }
+
+        chip::Inet::IPPacketInfo packetInfo;
+
+        packetInfo.Clear();
+        packetInfo.SrcAddress = interfaceAddress.GetAddress();
+        if (interfaceAddress.GetAddress().IsIPv4())
+        {
+            BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
+        }
+        else
+        {
+            BroadcastIpAddresses::GetIpv6Into(packetInfo.DestAddress);
+        }
+        packetInfo.SrcPort   = kMdnsPort;
+        packetInfo.DestPort  = kMdnsPort;
+        packetInfo.Interface = interfaceAddress.GetInterfaceId();
+
+        QueryData queryData(QType::PTR, QClass::IN, false /* unicast */);
+        queryData.SetIsBootAdvertising(true);
+
+        mQueryResponder.ClearBroadcastThrottle();
+
+        CHIP_ERROR err = mResponseSender.Respond(0, queryData, &packetInfo);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to advertise records: %s", ErrorStr(err));
+        }
+    }
+
+    // Once all automatic broadcasts are done, allow immediate replies once.
+    mQueryResponder.ClearBroadcastThrottle();
 }
 
 AdvertiserMinMdns gAdvertiser;

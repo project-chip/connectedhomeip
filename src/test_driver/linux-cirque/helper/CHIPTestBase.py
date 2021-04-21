@@ -93,7 +93,28 @@ class CHIPVirtualHome:
         ret = requests.get(self._build_request_url('device_cmd', [self.home_id, device_id, cmd]),
                            params={'stream': stream},
                            stream=stream)
-        return ret if stream else ret.json()
+        if stream:
+            return ret
+
+        ret_struct = ret.json()
+        command_ret_code = ret_struct.get('return_code', None)
+        if command_ret_code == None:
+            # could be 0
+            self.logger.error("cannot get command return code")
+            raise Exception("cannot get command return code")
+        self.logger.info(
+            "command return code: {}".format(
+                ret_struct.get('return_code', 'Unknown'))
+        )
+        command_output = ret_struct.get('output', None)
+        if command_output == None:
+            # could be empty string
+            self.logger.error("cannot get command output")
+            raise Exception("cannot get command output")
+        self.logger.info(
+            "command output: \n{}".format(ret_struct.get('output', ''))
+        )
+        return ret_struct
 
     def sequenceMatch(self, string, patterns):
         last_find = 0
@@ -110,18 +131,32 @@ class CHIPVirtualHome:
     def connect_to_thread_network(self):
         self.logger.info("Running commands to form Thread network")
         for device in self.non_ap_devices:
-            self.execute_device_cmd(device['id'],
-                                    "bash -c 'ot-ctl panid 0x1234 && \
-                             ot-ctl ifconfig up && \
-                             ot-ctl thread start'")
-        self.logger.info("Waiting for Thread network to be formed...")
-        time.sleep(10)
-        roles = set()
+            self.wait_for_device_output(device['id'], "Border router agent started.", 5)
+        otInitCommands = [
+            "ot-ctl thread stop",
+            "ot-ctl ifconfig down",
+            "ot-ctl dataset set active 0e080000000000010000000300000d35060004001fffe00208dead00beef00cafe0708fd01234567890abc051000112233445566778899aabbccddeeff030a4f70656e546872656164010212340410ad463152f9622c7297ec6c6c543a63e70c0302a0ff",
+            "ot-ctl ifconfig up",
+            "ot-ctl thread start",
+            "ot-ctl dataset active", # Emit
+        ]
         for device in self.non_ap_devices:
-            reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
-            roles.add(reply['output'].split()[0])
-        self.assertTrue('leader' in roles)
-        self.assertTrue('router' in roles or 'child' in roles)
+            # Set default openthread provisioning
+            for cmd in otInitCommands:
+                self.execute_device_cmd(device['id'], cmd)
+        self.logger.info("Waiting for Thread network to be formed...")
+        threadNetworkFormed = False
+        for i in range(30):
+            roles = set()
+            for device in self.non_ap_devices:
+                # We can only check the status of ot-agent by query its state.
+                reply = self.execute_device_cmd(device['id'], 'ot-ctl state')
+                roles.add(reply['output'].split()[0])
+            if ('leader' in roles) and ('router' in roles or 'child' in roles):
+                threadNetworkFormed = True
+                break
+            time.sleep(1)
+        self.assertTrue(threadNetworkFormed)
         self.logger.info("Thread network formed")
 
     def enable_wifi_on_device(self):
@@ -161,6 +196,17 @@ class CHIPVirtualHome:
 
     def get_device_log(self, device_id):
         return self.query_api('device_log', [self.home_id, device_id], binary=True)
+
+    def wait_for_device_output(self, device_id, pattern, timeout = 1):
+        due = time.time() + timeout
+        while True:
+            if self.sequenceMatch(self.get_device_log(device_id).decode(), [pattern, ]):
+                return True
+            if time.time() < due:
+                time.sleep(1)
+            else:
+                break
+        return False
 
     def assertTrue(self, exp, note=None):
         '''
@@ -246,7 +292,7 @@ class CHIPVirtualHome:
             ret_log = self.get_device_log(device['id'])
             # Use this format for easier sort
             f_name = '{}-{}-{}.log'.format(device['type'],
-                                           timestamp, device['id'][-8:])
+                                           timestamp, device['id'][:8])
             self.logger.debug("device log name: \n{}".format(f_name))
             with open(os.path.join(log_dir, f_name), 'wb') as fp:
                 fp.write(ret_log)

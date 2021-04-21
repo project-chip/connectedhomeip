@@ -19,6 +19,8 @@
 
 #include <support/Pool.h>
 
+#include <nlassert.h>
+
 namespace chip {
 
 StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity,
@@ -67,7 +69,7 @@ void StaticAllocatorBitmap::Deallocate(void * element)
     assert(index < Capacity());
 
     auto value = mUsage[word].fetch_and(~(kBit1 << offset));
-    assert((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
+    nlASSERT((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
     mAllocated--;
 }
 

@@ -24,12 +24,12 @@ jobs:
         env:
             EFR32_BOARD: BRD4161A
             BUILD_TYPE: gn_efr32
-            BUILD_VERSION: 0.2.14
 
         runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.4.18
+            image: connectedhomeip/chip-build-efr32:latest
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -40,11 +40,10 @@ jobs:
               with:
                   fetch-depth: 0
                   submodules: true
-            - name: Initialize CodeQL
-              uses: github/codeql-action/init@v1
-              with:
-                  languages: "cpp, python"
-                  queries: +security-and-quality
+#             - name: Initialize CodeQL
+#               uses: github/codeql-action/init@v1
+#               with:
+#                   languages: "cpp, python"
             - name: Build example EFR32 Lock App for BRD4161A
               run:
                   scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/
@@ -53,6 +52,15 @@ jobs:
               run:
                   scripts/examples/gn_efr32_example.sh
                   examples/lighting-app/efr32/ out/lighting_app_debug BRD4161A
+            - name: Build example EFR32 Lighting App for BRD4161A with RPCs
+              run:
+                  scripts/examples/gn_efr32_example.sh
+                  examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A
+                  -args='import("//with_pw_rpc.gni")'
+            - name: Build example EFR32 Window Covering for BRD4161A
+              run:
+                  scripts/examples/gn_efr32_example.sh examples/window-app/efr32/
+                  out/window_app_debug BRD4161A
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -69,10 +77,11 @@ jobs:
                   path: |
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
                       out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
+                      out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove SiliconLabs binaries for CodeQL Analysis
               run: find out -type d -name "SiliconLabs" -exec rm -rf {} +
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
+#             - name: Perform CodeQL Analysis
+#               if: ${{ github.event_name == 'push' }}
+#               uses: github/codeql-action/analyze@v1

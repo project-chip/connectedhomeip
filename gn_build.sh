@@ -73,14 +73,36 @@ echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
 extra_args=""
+user_args=""
+ninja_args=()
+
+while getopts :d:j:k:l:nt:vw: opt; do
+    case "$opt" in
+        [nv])
+            ninja_args+=("-$opt")
+            ;;
+        [djkltw])
+            ninja_args+=("-$opt" "$OPTARG")
+            ;;
+        '?')
+            printf '\nError: unknown option -%s\n' "$OPTARG"
+            printf 'Usage: %s [ninja-options] [gn-args]\n' "$0"
+            exit 1
+            ;;
+    esac
+done
+shift $((OPTIND - 1))
 
 for arg; do
     case $arg in
         enable_qpg6100_builds=true)
             qpg6100_enabled=1
             ;;
+        enable_efr32_builds=true)
+            efr32_enabled=1
+            ;;
     esac
-    extra_args+=" $arg"
+    user_args+=" $arg"
 done
 
 # Android SDK setup
@@ -97,15 +119,11 @@ fi
 echo
 
 # EFR32 SDK setup
-efr32_sdk_args=""
-
-if [[ -d "$EFR32_SDK_ROOT/protocol/" ]]; then
-    efr32_sdk_args+="efr32_sdk_root=\"$EFR32_SDK_ROOT\" efr32_board=\"$EFR32_BOARD\""
-    extra_args+=" $efr32_sdk_args enable_efr32_builds=true"
-    echo 'To build the EFR32 lock sample as a standalone project':
-    echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug --args='$efr32_sdk_args'; ninja -C out/debug)"
+if [[ -z "$efr32_enabled" ]]; then
+    echo "Hint: Pass enable_efr32_builds=true to enable building for EFR32"
 else
-    echo "Hint: Set \$EFR32_SDK_ROOT to enable building for EFR32"
+    echo 'To build the EFR32 lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/efr32; gn gen out/debug; ninja -C out/debug)"
 fi
 
 # K32W SDK setup
@@ -134,11 +152,26 @@ fi
 
 echo
 
+# TI SimpleLink SDK setup
+ti_simplelink_sdk_args=""
+
+if [[ -d "${TI_SIMPLELINK_SDK_ROOT}/source" && -f "${TI_SYSCONFIG_ROOT}/sysconfig_cli.sh" ]]; then
+    ti_simplelink_sdk_args+="ti_simplelink_sdk_root=\"$TI_SIMPLELINK_SDK_ROOT\" ti_sysconfig_root=\"$TI_SYSCONFIG_ROOT\""
+    extra_args+=" $ti_simplelink_sdk_args enable_ti_simplelink_builds=true"
+
+    echo 'To build the cc13x2x7_26x2x7 lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/cc13x2x7_26x2x7; gn gen out/debug --args='$ti_simplelink_sdk_args'; ninja -C out/debug)"
+else
+    echo "Hint: Set \$TI_SIMPLELINK_SDK_ROOT and \$TI_SYSCONFIG_ROOT to enable building for cc13x2_26x2"
+fi
+
+echo
+
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
-gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args$user_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_arg$user_args"
 
 _chip_banner "Build: Ninja build"
 
-time ninja -C "$CHIP_ROOT/out/debug" all check
+time ninja -C "$CHIP_ROOT/out/debug" "${ninja_args[@]}" all check

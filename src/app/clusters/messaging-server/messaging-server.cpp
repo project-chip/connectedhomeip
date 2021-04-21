@@ -41,6 +41,7 @@
 
 #include "messaging-server.h"
 #include "../../include/af.h"
+#include <app/Command.h>
 
 using namespace chip;
 
@@ -51,9 +52,9 @@ static EmberAfPluginMessagingServerMessage msgTable[EMBER_AF_MESSAGING_CLUSTER_S
 
 // These bits are used by the messageStatusControl to indicate whether or not
 // a message is valid, active, or if it is a "send now" message
-#define VALID BIT(0)
-#define ACTIVE BIT(1)
-#define NOW BIT(2)
+#define VALID EMBER_BIT(0)
+#define ACTIVE EMBER_BIT(1)
+#define NOW EMBER_BIT(2)
 
 #define messageIsValid(ep) (msgTable[ep].messageStatusControl & VALID)
 #define messageIsActive(ep) (msgTable[ep].messageStatusControl & ACTIVE)
@@ -85,7 +86,7 @@ void emberAfMessagingClusterServerInitCallback(EndpointId endpoint)
     msgTable[ep].messageStatusControl &= ~VALID;
 }
 
-bool emberAfMessagingClusterGetLastMessageCallback(void)
+bool emberAfMessagingClusterGetLastMessageCallback(chip::app::Command * commandObj)
 {
     EndpointId endpoint = emberAfCurrentEndpoint();
     EmberAfPluginMessagingServerMessage message;
@@ -108,10 +109,12 @@ bool emberAfMessagingClusterGetLastMessageCallback(void)
 #if defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_0) || defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1B) ||                                   \
     defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_0) || defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1) ||                                    \
     defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1A)
-bool emberAfMessagingClusterMessageConfirmationCallback(uint32_t messageId, uint32_t confirmationTime)
+bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * commandObj, uint32_t messageId,
+                                                        uint32_t confirmationTime)
 #else
-bool emberAfMessagingClusterMessageConfirmationCallback(uint32_t messageId, uint32_t confirmationTime,
-                                                        uint8_t messageConfirmationControl, uint8_t * messageResponse)
+bool emberAfMessagingClusterMessageConfirmationCallback(chip::app::Command * commandObj, uint32_t messageId,
+                                                        uint32_t confirmationTime, uint8_t messageConfirmationControl,
+                                                        uint8_t * messageResponse)
 #endif
 {
     emberAfMessagingClusterPrintln("RX: MessageConfirmation 0x%4x, 0x%4x", messageId, confirmationTime);

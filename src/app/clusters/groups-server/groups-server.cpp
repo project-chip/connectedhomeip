@@ -46,8 +46,15 @@
 // *******************************************************************
 #include "groups-server.h"
 
+#include <app/Command.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
+
+#include "gen/att-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
+#include "gen/command-id.h"
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
@@ -145,7 +152,7 @@ static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId grou
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
 
@@ -167,7 +174,7 @@ bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
+bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
@@ -200,7 +207,7 @@ bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
     return true;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * commandObj, uint8_t groupCount, uint8_t * groupList)
 {
     EmberStatus status;
     uint8_t i, j;
@@ -228,8 +235,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
             status = emberGetBinding(i, &entry);
             if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING) && (entry.local == emberAfCurrentEndpoint()))
             {
-                list[listLen]     = LOW_BYTE(entry.groupId);
-                list[listLen + 1] = HIGH_BYTE(entry.groupId);
+                list[listLen]     = EMBER_LOW_BYTE(entry.groupId);
+                list[listLen + 1] = EMBER_HIGH_BYTE(entry.groupId);
                 listLen           = static_cast<uint8_t>(listLen + 2);
                 count++;
             }
@@ -248,8 +255,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
                 {
                     if (entry.local == emberAfCurrentEndpoint() && entry.groupId == groupId)
                     {
-                        list[listLen]     = LOW_BYTE(groupId);
-                        list[listLen + 1] = HIGH_BYTE(groupId);
+                        list[listLen]     = EMBER_LOW_BYTE(groupId);
+                        list[listLen + 1] = EMBER_HIGH_BYTE(groupId);
                         listLen           = static_cast<uint8_t>(listLen + 2);
                         count++;
                     }
@@ -282,7 +289,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
+bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, GroupId groupId)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;
@@ -313,7 +320,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
     return true;
 }
 
-bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
+bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::Command * commandObj)
 {
     EmberStatus sendStatus;
     uint8_t i;
@@ -361,7 +368,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
     return true;
 }
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(GroupId groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;

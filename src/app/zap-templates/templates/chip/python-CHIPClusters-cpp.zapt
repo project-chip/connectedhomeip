@@ -1,0 +1,113 @@
+{{> header}}
+
+#include <core/CHIPCore.h>
+
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
+#include <lib/support/Span.h>
+
+#include <controller/CHIPClusters.h>
+#include <controller/CHIPDevice.h>
+
+#include "gen/CHIPClientCallbacks.h"
+
+using namespace chip;
+using namespace chip::app;
+
+namespace {
+
+// Define pointers for external ZCL response delegates.
+
+using SuccessResponseDelegate = void(*)();
+using FailureResponseDelegate = void(*)(uint8_t);
+SuccessResponseDelegate gSuccessResponseDelegate;
+FailureResponseDelegate gFailureResponseDelegate;
+
+// Define callbacks for ZCL commands and attribute requests.
+
+void OnDefaultSuccessResponse(void * /* context */)
+{
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+void OnDefaultFailureResponse(void * /* context */, uint8_t status)
+{
+    if (gFailureResponseDelegate != nullptr)
+        gFailureResponseDelegate(status);
+}
+
+template<class AttributeType>
+void OnAttributeResponse(void * /* context */, AttributeType)
+{
+    if (gSuccessResponseDelegate != nullptr)
+        gSuccessResponseDelegate();
+}
+
+chip::Callback::Callback<DefaultSuccessCallback> gDefaultSuccessCallback{OnDefaultSuccessResponse, nullptr};
+chip::Callback::Callback<DefaultFailureCallback> gDefaultFailureCallback{OnDefaultFailureResponse, nullptr};
+chip::Callback::Callback<BooleanAttributeCallback> gBooleanAttributeCallback{OnAttributeResponse<bool>, nullptr};
+chip::Callback::Callback<Int8uAttributeCallback> gInt8uAttributeCallback{OnAttributeResponse<uint8_t>, nullptr};
+chip::Callback::Callback<Int8sAttributeCallback> gInt8sAttributeCallback{OnAttributeResponse<int8_t>, nullptr};
+chip::Callback::Callback<Int16uAttributeCallback> gInt16uAttributeCallback{OnAttributeResponse<uint16_t>, nullptr};
+chip::Callback::Callback<Int16sAttributeCallback> gInt16sAttributeCallback{OnAttributeResponse<int16_t>, nullptr};
+chip::Callback::Callback<Int32uAttributeCallback> gInt32uAttributeCallback{OnAttributeResponse<uint32_t>, nullptr};
+chip::Callback::Callback<Int32sAttributeCallback> gInt32sAttributeCallback{OnAttributeResponse<int32_t>, nullptr};
+chip::Callback::Callback<Int64uAttributeCallback> gInt64uAttributeCallback{OnAttributeResponse<uint64_t>, nullptr};
+chip::Callback::Callback<Int64sAttributeCallback> gInt64sAttributeCallback{OnAttributeResponse<int64_t>, nullptr};
+chip::Callback::Callback<StringAttributeCallback> gStringAttributeCallback{OnAttributeResponse<ByteSpan>, nullptr};
+
+} // namespace
+
+extern "C" {
+
+void chip_ime_SetSuccessResponseDelegate(SuccessResponseDelegate delegate)
+{
+    gSuccessResponseDelegate = delegate;
+}
+
+void chip_ime_SetFailureResponseDelegate(FailureResponseDelegate delegate)
+{
+    gFailureResponseDelegate = delegate;
+}
+
+{{#chip_server_clusters}}
+// Cluster {{asCamelCased name false}}
+
+{{#chip_server_cluster_commands}}
+CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId{{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}const uint8_t * {{asCamelCased label}}, uint32_t {{asCamelCased label}}_Len{{else}}{{chipType}} {{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}})
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::{{asCamelCased clusterName false}}Cluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.{{asCamelCased name false}}(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isString type)}}chip::ByteSpan({{asCamelCased label}}, {{asCamelCased label}}_Len){{else}}{{asCamelCased label}}{{/if}}
+    {{/chip_server_cluster_command_arguments}});
+}
+{{/chip_server_cluster_commands}}
+
+{{#chip_server_cluster_attributes}}
+{{#unless isList}}
+CHIP_ERROR chip_ime_ReadAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttribute{{asCamelCased name false}}(g{{asCallbackAttributeType atomicTypeId}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+{{#if (isReportableAttribute)}}
+CHIP_ERROR chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::{{asCamelCased parent.name false}}Cluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttribute{{asCamelCased name false}}(g{{asCallbackAttributeType atomicTypeId}}AttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+}
+{{/if}}
+{{/unless}}
+{{/chip_server_cluster_attributes}}
+
+// End of Cluster {{asCamelCased name false}}
+{{/chip_server_clusters}}
+
+}

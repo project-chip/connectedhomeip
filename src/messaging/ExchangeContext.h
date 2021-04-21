@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,19 +24,23 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <messaging/ExchangeACL.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
+#include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
+
 namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
+class ExchangeMessageDispatch;
 
 class ExchangeContextDeletor
 {
@@ -50,10 +54,12 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
+    friend class MessageCounterSyncMgr;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -89,13 +95,10 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
-     *  @param[in]    msgPayload    A handle to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    msgPayload    A handle to the packet buffer holding the CHIP message.
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
-     *  @param[in]    msgCtxt       A pointer to an application-specific context object to be associated
-     *                              with the message being sent.
-
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
      *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
      *                                                       CHIP message protocol version that is supported.
@@ -105,8 +108,19 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, const SendFlags & sendFlags,
-                           void * msgCtxt = nullptr);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+                           const SendFlags & sendFlags);
+
+    /**
+     * A strongly-message-typed version of SendMessage.
+     */
+    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
+    {
+        static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
+        return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
+                           std::move(msgPayload), sendFlags);
+    }
 
     /**
      *  Handle a received CHIP message on this exchange.
@@ -115,7 +129,9 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
-     *  @param[in]    msgBuf        A handle to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    peerAddress   The address of the sender
+     *
+     *  @param[in]    msgBuf        A handle to the packet buffer holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
@@ -123,19 +139,40 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
-    ExchangeDelegate * GetDelegate() const { return mDelegate; }
-    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
-    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
+    ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+    ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
+
+    ExchangeMessageDispatch * GetMessageDispatch();
+
+    ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
+    {
+        if (mExchangeACL == nullptr)
+        {
+            Transport::AdminPairingInfo * admin = table.FindAdmin(mSecureSession.GetAdminId());
+            if (admin != nullptr)
+            {
+                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+            }
+        }
+
+        return mExchangeACL;
+    }
 
     SecureSessionHandle GetSecureSession() { return mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
+
+    void SetAppState(void * state) { mAppState = state; }
+
+    void * GetAppState() const { return mAppState; }
+
+    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
@@ -146,28 +183,21 @@ public:
     void Abort();
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegate * delegate);
+                            ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
 
     void SetResponseTimeout(Timeout timeout);
 
 private:
-    enum class ExFlagValues : uint16_t
-    {
-        kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
-        kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
-    };
-
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ReliableMessageContext mReliableMessageContext;
-    ExchangeDelegate * mDelegate   = nullptr;
-    ExchangeManager * mExchangeMgr = nullptr;
+    ExchangeDelegateBase * mDelegate = nullptr;
+    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeACL * mExchangeACL       = nullptr;
+    void * mAppState                 = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
-
-    BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
@@ -184,6 +214,13 @@ private:
     bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
+
+    /**
+     * A subset of SendMessage functionality that does not perform message
+     * counter sync for group keys.
+     */
+    CHIP_ERROR SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf,
+                               const SendFlags & sendFlags, Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 

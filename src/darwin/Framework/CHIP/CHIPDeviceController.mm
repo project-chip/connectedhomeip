@@ -14,60 +14,46 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#import <Foundation/Foundation.h>
-
-#include <app/chip-zcl-zpro-codec.h>
-
 #import "CHIPDeviceController.h"
+
 #import "CHIPDevicePairingDelegateBridge.h"
-#import "CHIPDeviceStatusDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
+#import "gen/CHIPClustersObjc.h"
+
+#include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
-#include <inet/IPAddress.h>
 #include <support/CHIPMem.h>
-#include <system/SystemPacketBuffer.h>
 
-static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
+static const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.controller.workqueue";
+static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
-constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
-
-@implementation AddressInfo
-- (instancetype)initWithIP:(NSString *)ip
-{
-    if (self = [super init]) {
-        _ip = ip;
-    }
-    return self;
-}
-@end
+static NSString * const kErrorMemoryInit = @"Init Memory failure";
+static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
+static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
+static NSString * const kErrorNetworkDispatchQueueInit = @"Init failure while initializing a dispatch queue for the network events";
+static NSString * const kErrorPairDevice = @"Failure while pairing the device";
+static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
+static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
+static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
+static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 @interface CHIPDeviceController ()
 
 @property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
 
-// queue used to call select on the system and inet layer fds., remove this with NW Framework.
-// primarily used to not block the work queue
-@property (atomic, readonly) dispatch_queue_t chipSelectQueue;
-/**
- *  The Controller delegate.
- *  Note: Getter is not thread safe.
- */
-@property (readonly, weak, nonatomic) id<CHIPDeviceControllerDelegate> delegate;
+// queue used to serialize all work performed by the CHIPDeviceController
+@property (atomic, readonly) dispatch_queue_t chipWorkQueue;
 
-/**
- * The delegate queue where delegate callbacks will run
- */
-@property (readonly, nonatomic) dispatch_queue_t delegateQueue;
-@property (readonly) chip::Controller::DeviceCommissioner * cppController;
+@property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
-@property (readonly) CHIPDeviceStatusDelegateBridge * deviceStatusDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
-
+@property (readonly) chip::NodeId localDeviceId;
+@property (readonly) uint16_t listenPort;
 @end
 
 @implementation CHIPDeviceController
@@ -86,81 +72,129 @@ constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
 - (instancetype)init
 {
     if (self = [super init]) {
+        CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
-        _lock = [[NSRecursiveLock alloc] init];
-
-        _chipSelectQueue = dispatch_queue_create(CHIP_SELECT_QUEUE, DISPATCH_QUEUE_SERIAL);
-        if (!_chipSelectQueue) {
+        _chipWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
+        if ([self checkForStartError:(_chipWorkQueue != nil) logMsg:kErrorNetworkDispatchQueueInit]) {
             return nil;
         }
 
-        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
-            CHIP_LOG_ERROR("Error: Failed in memory init");
-            return nil;
-        }
-
-        _deviceStatusDelegateBridge = new CHIPDeviceStatusDelegateBridge();
-        if (!_deviceStatusDelegateBridge) {
-            CHIP_LOG_ERROR("Error: couldn't create device status delegate bridge");
-            return nil;
-        }
-        dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.controller.callback", DISPATCH_QUEUE_SERIAL);
-        _deviceStatusDelegateBridge->setDelegate(self, callbackQueue);
-
-        _cppController = new chip::Controller::DeviceCommissioner();
-        if (!_cppController) {
-            CHIP_LOG_ERROR("Error: couldn't create c++ controller");
+        errorCode = chip::Platform::MemoryInit();
+        if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorMemoryInit]) {
             return nil;
         }
 
         _pairingDelegateBridge = new CHIPDevicePairingDelegateBridge();
-        if (!_pairingDelegateBridge) {
-            CHIP_LOG_ERROR("Error: couldn't create pairing delegate");
-            delete _cppController;
-            _cppController = NULL;
+        if ([self checkForInitError:(_pairingDelegateBridge != nullptr) logMsg:kErrorPairingInit]) {
             return nil;
         }
 
         _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge();
-        if (!_persistentStorageDelegateBridge) {
-            CHIP_LOG_ERROR("Error: couldn't create persistent storage delegate");
-            delete _cppController;
-            _cppController = NULL;
-            delete _pairingDelegateBridge;
-            _pairingDelegateBridge = NULL;
+        if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
             return nil;
         }
-
-        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge)) {
-            CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
-            delete _cppController;
-            _cppController = NULL;
-            delete _pairingDelegateBridge;
-            _pairingDelegateBridge = NULL;
-            delete _persistentStorageDelegateBridge;
-            _persistentStorageDelegateBridge = NULL;
-            return nil;
-        }
-
-        // Start the IO pump
-        dispatch_async(_chipSelectQueue, ^() {
-            self.cppController->ServiceEvents();
-        });
     }
     return self;
 }
 
-// MARK: CHIPDeviceStatusDelegate
-- (void)onMessageReceived:(NSData *)message
+- (BOOL)isRunning
 {
-    CHIP_LOG_METHOD_ENTRY();
+    __block BOOL commissionerInitialized;
+    dispatch_sync(_chipWorkQueue, ^{
+        commissionerInitialized = [self _isRunning];
+    });
+    return commissionerInitialized;
+}
 
-    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
-    if (strongDelegate && [self delegateQueue]) {
-        dispatch_async(self.delegateQueue, ^{
-            [strongDelegate deviceControllerOnMessage:message];
-        });
+- (BOOL)_isRunning
+{
+    return _cppCommissioner != nullptr;
+}
+
+- (BOOL)shutdown
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        if (_cppCommissioner) {
+            CHIP_LOG_DEBUG("%@", kInfoStackShutdown);
+            _cppCommissioner->Shutdown();
+            delete _cppCommissioner;
+            _cppCommissioner = nullptr;
+        }
+    });
+
+    return YES;
+}
+
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue
+{
+    __block BOOL commissionerInitialized = NO;
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self _isRunning]) {
+            commissionerInitialized = YES;
+            return;
+        }
+
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+
+        _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate, queue);
+        // initialize NodeID if needed
+        [self _getControllerNodeId];
+
+        _cppCommissioner = new chip::Controller::DeviceCommissioner();
+        if ([self checkForInitError:(_cppCommissioner != nullptr) logMsg:kErrorMemoryInit]) {
+            return;
+        }
+
+        if (_listenPort) {
+            errorCode = _cppCommissioner->SetUdpListenPort(_listenPort);
+            if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+                return;
+            }
+        }
+
+        chip::Controller::ControllerInitParams params {
+            .storageDelegate = _persistentStorageDelegateBridge,
+            .mDeviceAddressUpdateDelegate = _pairingDelegateBridge,
+        };
+
+        errorCode = _cppCommissioner->Init(_localDeviceId, params, _pairingDelegateBridge);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
+            return;
+        }
+
+        // Start the IO pump
+        self.cppCommissioner->ServiceEvents();
+    });
+
+    return YES;
+}
+
+- (NSNumber *)getControllerNodeId
+{
+    __block NSNumber * nodeID;
+    dispatch_sync(_chipWorkQueue, ^{
+        nodeID = [self _getControllerNodeId];
+    });
+    return nodeID;
+}
+
+- (NSNumber *)_getControllerNodeId
+{
+    uint16_t idStringLen = 32;
+    char deviceIdString[idStringLen];
+    if (CHIP_NO_ERROR
+        != _persistentStorageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
+        _localDeviceId = arc4random();
+        _localDeviceId = _localDeviceId << 32 | arc4random();
+        CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
+        _persistentStorageDelegateBridge->AsyncSetKeyValue(
+            CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+    } else {
+        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
+        [scanner scanHexLongLong:&_localDeviceId];
+        CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }
+    return [NSNumber numberWithUnsignedLongLong:_localDeviceId];
 }
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -168,116 +202,182 @@ constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    __block BOOL success;
+    dispatch_sync(_chipWorkQueue, ^{
+        chip::RendezvousParameters params
+            = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
-    [self.lock lock];
-
-    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
-    err = self.cppController->PairDevice(deviceID, params);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, failed in pairing the device", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->PairDevice(deviceID, params);
         }
-        return NO;
-    }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
 
-    return YES;
+    return success;
+}
+
+- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
+                          address:(NSString *)address
+                             port:(uint16_t)port
+                            error:(NSError * __autoreleasing *)error
+{
+    __block BOOL success;
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+        chip::Controller::SerializedDevice serializedTestDevice;
+        chip::Inet::IPAddress addr;
+        chip::Inet::IPAddress::FromString([address UTF8String], addr);
+
+        if ([self _isRunning]) {
+            errorCode = _cppCommissioner->PairTestDeviceWithoutSecurity(
+                deviceID, chip::Transport::PeerAddress::UDP(addr, port), serializedTestDevice);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+
+    return success;
 }
 
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    __block BOOL success;
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
-    [self.lock lock];
-
-    err = self.cppController->UnpairDevice(deviceID);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, failed in unpairing the device", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->UnpairDevice(deviceID);
         }
-        return NO;
-    }
+        success = ![self checkForError:errorCode logMsg:kErrorUnpairDevice error:error];
+    });
 
-    return YES;
+    return success;
 }
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    __block BOOL success;
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
-    [self.lock lock];
-    err = self.cppController->StopPairing(deviceID);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, failed in stopping the pairing process", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->StopPairing(deviceID);
         }
-        return NO;
-    }
+        success = ![self checkForError:errorCode logMsg:kErrorStopPairing error:error];
+    });
 
-    return YES;
+    return success;
 }
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::Device * cppDevice = nil;
+    __block CHIPDevice * chipDevice = nil;
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+        chip::Controller::Device * device = nullptr;
 
-    [self.lock lock];
-    err = self.cppController->GetDevice(deviceID, &cppDevice);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR || !cppDevice) {
-        CHIP_LOG_ERROR("Error(%d): %@, failed in getting device instance", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
         }
-        return nil;
-    }
 
-    cppDevice->SetDelegate(_deviceStatusDelegateBridge);
+        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
+            return;
+        }
 
-    return [[CHIPDevice alloc] initWithDevice:cppDevice];
+        chipDevice = [[CHIPDevice alloc] initWithDevice:device];
+    });
+
+    return chipDevice;
 }
 
-- (BOOL)disconnect:(NSError * __autoreleasing *)error
+- (void)setListenPort:(uint16_t)port
 {
-    return YES;
+    _listenPort = port;
 }
 
-- (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue
+- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId
 {
-    [self.lock lock];
-    if (delegate && queue) {
-        self->_delegate = delegate;
-        self->_delegateQueue = queue;
-    } else {
-        self->_delegate = nil;
-        self->_delegateQueue = NULL;
-    }
-    [self.lock unlock];
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+        chip::Controller::Device * device = nullptr;
+
+        if ([self _isRunning]) {
+            errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
+        }
+
+        if (errorCode != CHIP_NO_ERROR) {
+            return;
+        }
+
+        errorCode = self.cppCommissioner->UpdateDevice(device, fabricId);
+
+        if (errorCode != CHIP_NO_ERROR) {
+            return;
+        }
+    });
 }
 
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
 {
-    [self.lock lock];
-    _pairingDelegateBridge->setDelegate(delegate, queue);
-    [self.lock unlock];
+    dispatch_async(_chipWorkQueue, ^{
+        self->_pairingDelegateBridge->setDelegate(delegate, queue);
+    });
 }
 
-- (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue
+- (BOOL)checkForInitError:(BOOL)condition logMsg:(NSString *)logMsg
 {
-    [self.lock lock];
-    _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
-    [self.lock unlock];
+    if (condition) {
+        return NO;
+    }
+
+    CHIP_LOG_ERROR("Error: %@", logMsg);
+
+    if (_cppCommissioner) {
+        delete _cppCommissioner;
+        _cppCommissioner = NULL;
+    }
+
+    if (_pairingDelegateBridge) {
+        delete _pairingDelegateBridge;
+        _pairingDelegateBridge = NULL;
+    }
+
+    if (_persistentStorageDelegateBridge) {
+        delete _persistentStorageDelegateBridge;
+        _persistentStorageDelegateBridge = NULL;
+    }
+
+    return YES;
+}
+
+- (BOOL)checkForStartError:(BOOL)condition logMsg:(NSString *)logMsg
+{
+    if (condition) {
+        return NO;
+    }
+
+    CHIP_LOG_ERROR("Error: %@", logMsg);
+
+    if (_cppCommissioner) {
+        delete _cppCommissioner;
+        _cppCommissioner = NULL;
+    }
+
+    return YES;
+}
+
+- (BOOL)checkForError:(CHIP_ERROR)errorCode logMsg:(NSString *)logMsg error:(NSError * __autoreleasing *)error
+{
+    if (CHIP_NO_ERROR == errorCode) {
+        return NO;
+    }
+
+    CHIP_LOG_ERROR("Error(%d): %@, %@", errorCode, [CHIPError errorForCHIPErrorCode:errorCode], logMsg);
+    if (error) {
+        *error = [CHIPError errorForCHIPErrorCode:errorCode];
+    }
+
+    return YES;
 }
 
 @end

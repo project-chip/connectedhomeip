@@ -25,29 +25,51 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController_deprecated.h>
+#include <controller/CHIPDeviceController.h>
 
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <support/ThreadOperationalDataset.h>
 #include <transport/RendezvousSessionDelegate.h>
 
 namespace chip {
-namespace DeviceController {
+namespace Controller {
+
+extern "C" {
+typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(CHIP_ERROR err);
+}
 
 class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
 {
 public:
     ~ScriptDevicePairingDelegate() = default;
     void SetWifiCredential(const char * ssid, const char * password);
+    void SetThreadCredential(uint8_t channel, uint16_t panId, uint8_t (&masterKey)[chip::Thread::kSizeMasterKey]);
+    void SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback);
+
     void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) override;
 
     void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
                                            RendezvousDeviceCredentialsDelegate * callback) override;
 
+    void OnPairingComplete(CHIP_ERROR error) override;
+
 private:
     // WiFi Provisioning Data
     char mWifiSSID[chip::DeviceLayer::Internal::kMaxWiFiSSIDLength + 1];
     char mWifiPassword[chip::DeviceLayer::Internal::kMaxWiFiKeyLength];
+
+    // Thread Provisioning Data
+    chip::Thread::OperationalDataset mThreadInfo = {};
+
+    enum class Mode
+    {
+        Wifi,
+        Thread
+    };
+
+    Mode mMode                                                              = Mode::Wifi;
+    DevicePairingDelegate_OnPairingCompleteFunct mOnPairingCompleteCallback = nullptr;
 };
 
-} // namespace DeviceController
+} // namespace Controller
 } // namespace chip

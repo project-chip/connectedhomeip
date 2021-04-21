@@ -27,10 +27,15 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 #include <support/CHIPMem.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <thread>
 
-#include "MdnsImpl.h"
+#include <arpa/inet.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <net/if.h>
+#include <netinet/in.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -47,6 +52,72 @@ static void GDBus_Thread()
 }
 #endif
 
+void PlatformManagerImpl::WiFIIPChangeListener()
+{
+    int sock;
+    if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to init netlink socket for ip addresses.");
+        return;
+    }
+
+    struct sockaddr_nl addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.nl_family = AF_NETLINK;
+    addr.nl_groups = RTMGRP_IPV4_IFADDR;
+
+    if (bind(sock, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+    {
+        ChipLogError(DeviceLayer, "Failed to bind netlink socket for ip addresses.");
+        return;
+    }
+
+    ssize_t len;
+    char buffer[4096];
+    for (struct nlmsghdr * header = reinterpret_cast<struct nlmsghdr *>(buffer); (len = recv(sock, header, sizeof(buffer), 0)) > 0;)
+    {
+        for (struct nlmsghdr * messageHeader = header;
+             (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
+             messageHeader = NLMSG_NEXT(messageHeader, len))
+        {
+            if (header->nlmsg_type == RTM_NEWADDR)
+            {
+                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(header);
+                struct rtattr * routeInfo         = IFA_RTA(addressMessage);
+                size_t rtl                        = IFA_PAYLOAD(header);
+
+                while (rtl && RTA_OK(routeInfo, rtl))
+                {
+                    if (routeInfo->rta_type == IFA_LOCAL)
+                    {
+                        char name[IFNAMSIZ];
+                        ChipDeviceEvent event;
+                        if_indextoname(addressMessage->ifa_index, name);
+                        if (strcmp(name, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME) != 0)
+                        {
+                            continue;
+                        }
+
+                        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                        event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+                        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                        inet_ntop(AF_INET, RTA_DATA(routeInfo), event.InternetConnectivityChange.address,
+                                  sizeof(event.InternetConnectivityChange.address));
+
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", name,
+                                      event.InternetConnectivityChange.address);
+
+                        PlatformMgr().LockChipStack();
+                        PlatformMgr().PostEvent(&event);
+                        PlatformMgr().UnlockChipStack();
+                    }
+                    routeInfo = RTA_NEXT(routeInfo, rtl);
+                }
+            }
+        }
+    }
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
@@ -59,6 +130,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     std::thread gdbusThread(GDBus_Thread);
     gdbusThread.detach();
 #endif
+
+    std::thread wifiIPThread(WiFIIPChangeListener);
+    wifiIPThread.detach();
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();

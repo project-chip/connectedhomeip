@@ -20,6 +20,8 @@ static_library("bdx") {
   sources = [
     "BdxMessages.cpp",
     "BdxMessages.h",
+    "BdxTransferSession.cpp",
+    "BdxTransferSession.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -27,6 +29,8 @@ static_library("bdx") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
+    "${chip_root}/src/transport",
   ]
 }

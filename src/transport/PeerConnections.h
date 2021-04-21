@@ -19,6 +19,7 @@
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <system/TimeSource.h>
+#include <transport/AdminPairingTable.h>
 #include <transport/PeerConnectionState.h>
 
 namespace chip {
@@ -114,7 +115,7 @@ public:
                 mStates[i].SetLocalKeyID(localKeyId);
                 mStates[i].SetLastActivityTimeMs(mTimeSource.GetCurrentMonotonicTimeMs());
 
-                if (peerNode.HasValue())
+                if (peerNode.ValueOr(kUndefinedNodeId) != kUndefinedNodeId)
                 {
                     mStates[i].SetPeerNodeId(peerNode.Value());
                 }
@@ -226,11 +227,49 @@ public:
             }
             if (peerKeyId == kAnyKeyId || iter->GetPeerKeyID() == peerKeyId)
             {
-                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
+                if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
+                    iter->GetPeerNodeId() == nodeId.Value())
                 {
                     state = iter;
                     break;
                 }
+            }
+        }
+        return state;
+    }
+
+    /**
+     * Get a peer connection state given the local Encryption Key Id.
+     *
+     * @param keyId Encryption key ID assigned by the local node.
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
+     *
+     * @return the state found, nullptr if not found
+     */
+    CHECK_RETURN_VALUE
+    PeerConnectionState * FindPeerConnectionState(uint16_t keyId, PeerConnectionState * begin)
+    {
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        assert(begin == nullptr || (begin >= iter && begin < &mStates[kMaxConnectionCount]));
+
+        if (begin != nullptr)
+        {
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (!iter->IsInitialized())
+            {
+                continue;
+            }
+
+            if (iter->GetLocalKeyID() == keyId)
+            {
+                state = iter;
+                break;
             }
         }
         return state;
@@ -266,7 +305,8 @@ public:
             }
             if (iter->GetLocalKeyID() == localKeyId)
             {
-                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
+                if (nodeId.ValueOr(kUndefinedNodeId) == kUndefinedNodeId || iter->GetPeerNodeId() == kUndefinedNodeId ||
+                    iter->GetPeerNodeId() == nodeId.Value())
                 {
                     state = iter;
                     break;

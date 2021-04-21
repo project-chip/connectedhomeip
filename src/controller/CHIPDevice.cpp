@@ -35,15 +35,19 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#include <app/CommandSender.h>
+#include <app/util/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <protocols/Protocols.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip::Inet;
 using namespace chip::System;
@@ -51,49 +55,109 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
+// TODO: This is a placeholder delegate for exchange context created in Device::SendMessage()
+//       Delete this class when Device::SendMessage() is obsoleted.
+class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle payload) override
+    {}
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+};
 
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
+{
     System::PacketBufferHandle resend;
+    bool loadedSecureSession = false;
+    Messaging::SendFlags sendFlags;
 
-    VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // If there is no secure connection to the device, try establishing it
-    if (mState != ConnectionState::SecureConnected)
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (!loadedSecureSession)
     {
-        err = LoadSecureSessionParameters(ResetTransport::kNo);
-        SuccessOrExit(err);
-    }
-    else
-    {
-        // Secure connection already exists
+        // Secure connection already existed
         // Hold on to the buffer, in case session resumption and resend is needed
-        resend = buffer.Retain();
+        // Cloning data, instead of increasing the ref count, as the original
+        // buffer might get modified by lower layers before the send fails. So,
+        // that buffer cannot be used for resends.
+        resend = buffer.CloneData();
     }
 
-    err    = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
+    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currenlty, we use a temporary Protocol
+    // TempZCL to carry over legacy ZCL messages, use an ephemeral exchange to send message and use its unsolicited message
+    // handler to receive messages. We need to set flag kFromInitiator to allow receiver to deliver message to corresponding
+    // unsolicited message handler, and we also need to set flag kNoAutoRequestAck since there is no persistent exchange to
+    // receive the ack message. This logic need to be deleted after we converting all legacy ZCL messages to IM messages.
+    sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
+
+    DeviceExchangeDelegate delegate;
+    exchange->SetDelegate(&delegate);
+
+    CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
+
     buffer = nullptr;
-    ChipLogDetail(Controller, "SendMessage returned %d", err);
+    ChipLogDetail(Controller, "SendMessage returned %s", ErrorStr(err));
 
     // The send could fail due to network timeouts (e.g. broken pipe)
-    // Try sesion resumption if needed
+    // Try session resumption if needed
     if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
     {
         mState = ConnectionState::NotConnected;
 
-        err = LoadSecureSessionParameters(ResetTransport::kYes);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
-        err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
+        err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(err);
     }
 
-exit:
-    return err;
+    if (exchange != nullptr)
+    {
+        exchange->Close();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
+{
+    didLoad = false;
+
+    // If there is no secure connection to the device, try establishing it
+    if (mState != ConnectionState::SecureConnected)
+    {
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+        didLoad = true;
+    }
+    else
+    {
+        Transport::PeerConnectionState * connectionState = nullptr;
+        connectionState                                  = mSessionManager->GetPeerConnectionState(mSecureSession);
+
+        // Check if the connection state has the correct transport information
+        if (connectionState == nullptr || connectionState->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined ||
+            connectionState->GetTransport() != nullptr)
+        {
+            mState = ConnectionState::NotConnected;
+            ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+            didLoad = true;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::SendCommands()
+{
+    bool loadedSecureSession = false;
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
+    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -107,15 +171,19 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 
     CHIP_ZERO_AT(serializable);
 
-    memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
+    serializable.mOpsCreds   = mPairing;
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
-    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
-    VerifyOrExit(
-        CHIP_NO_ERROR ==
-            Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
-        error = CHIP_ERROR_INTERNAL);
+    serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
+    serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
+
+    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
+                  "The underlying type of Transport::Type is not uint8_t.");
+    serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
+
+    SuccessOrExit(error = Inet::GetInterfaceName(mDeviceAddress.GetInterface(), Uint8::to_char(serializable.mInterfaceName),
+                                                 sizeof(serializable.mInterfaceName)));
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
-    mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
+    mDeviceAddress.GetIPAddress().ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
@@ -145,50 +213,70 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
+    Inet::IPAddress ipAddress;
+    uint16_t port;
+    Inet::InterfaceId interfaceId;
+
     // The second parameter to FromString takes the strlen value. We are subtracting 1
     // from the sizeof(serializable.mDeviceAddr) to account for null termination, since
     // strlen doesn't include null character in the size.
     VerifyOrExit(
-        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, mDeviceAddr),
+        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, ipAddress),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
-    memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
-    mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
-    mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mPairing  = serializable.mOpsCreds;
+    mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
+    port      = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mAdminId  = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
-    mInterface = INET_NULL_INTERFACEID;
+    interfaceId = INET_NULL_INTERFACEID;
     if (serializable.mInterfaceName[0] != '\0')
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         LOCK_TCPIP_CORE();
 #endif
-        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), mInterface);
+        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), interfaceId);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
         VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
     }
 
+    static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
+                  "The underlying type of Transport::Type is not uint8_t.");
+    switch (static_cast<Transport::Type>(serializable.mDeviceTransport))
+    {
+    case Transport::Type::kUdp:
+        mDeviceAddress = Transport::PeerAddress::UDP(ipAddress, port, interfaceId);
+        break;
+    case Transport::Type::kBle:
+        mDeviceAddress = Transport::PeerAddress::BLE();
+        break;
+    case Transport::Type::kTcp:
+    case Transport::Type::kUndefined:
+    default:
+        ExitNow(error = CHIP_ERROR_INTERNAL);
+    }
+
 exit:
     return error;
 }
 
-void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+void Device::OnNewConnection(SecureSessionHandle session)
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
 }
 
-void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+void Device::OnConnectionExpired(SecureSessionHandle session)
 {
     mState         = ConnectionState::NotConnected;
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -196,50 +284,68 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         {
             mStatusDelegate->OnMessage(std::move(msgBuf));
         }
-
-        // TODO: The following callback processing will need further work
-        //       1. The response needs to be parsed as per cluster definition. The response callback
-        //          should carry the parsed response values.
-        //       2. The reports callbacks should also be called with the parsed reports.
-        //       3. The callbacks would be tracked using exchange context. On receiving the
-        //          message, the exchange context in the message should be matched against
-        //          the registered callbacks.
-        // GitHub issue: https://github.com/project-chip/connectedhomeip/issues/3910
-        Cancelable * ca = mResponses.mNext;
-        while (ca != &mResponses)
+        else
         {
-            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
-            // Let's advance to the next cancelable, as the current one will get removed
-            // from the list (and once removed, its next will point to itself)
-            ca = ca->mNext;
-            if (cb != nullptr)
-            {
-                ChipLogProgress(Controller, "Dispatching response callback %p", cb);
-                cb->Cancel();
-                cb->mCall(cb->mContext);
-            }
-        }
-
-        ca = mReports.mNext;
-        while (ca != &mReports)
-        {
-            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
-            // Let's advance to the next cancelable, as the current one might get removed
-            // from the list in the callback (and if removed, its next will point to itself)
-            ca = ca->mNext;
-            if (cb != nullptr)
-            {
-                ChipLogProgress(Controller, "Dispatching report callback %p", cb);
-                cb->mCall(cb->mContext);
-            }
+            HandleDataModelMessage(mDeviceId, std::move(msgBuf));
         }
     }
+}
+
+CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)
+{
+    // TODO: This code is temporary, and must be updated to use the Cluster API.
+    // Issue: https://github.com/project-chip/connectedhomeip/issues/4725
+
+    // Construct and send "open pairing window" message to the device
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    System::PacketBufferTLVWriter writer;
+
+    writer.Init(std::move(buf));
+    writer.ImplicitProfileId = chip::Protocols::ServiceProvisioning::Id.ToTLVProfileId();
+
+    ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 1), timeout));
+
+    if (option != PairingWindowOption::kOriginalSetupCode)
+    {
+        ReturnErrorOnFailure(writer.Put(TLV::ProfileTag(writer.ImplicitProfileId, 2), setupPayload.discriminator));
+
+        PASEVerifier verifier;
+        bool randomSetupPIN = (option == PairingWindowOption::kTokenWithRandomPIN);
+        ReturnErrorOnFailure(PASESession::GeneratePASEVerifier(verifier, randomSetupPIN, setupPayload.setUpPINCode));
+        ReturnErrorOnFailure(writer.PutBytes(TLV::ProfileTag(writer.ImplicitProfileId, 3),
+                                             reinterpret_cast<const uint8_t *>(verifier), sizeof(verifier)));
+    }
+
+    System::PacketBufferHandle outBuffer;
+    ReturnErrorOnFailure(writer.Finalize(&outBuffer));
+
+    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::Id, 0, std::move(outBuffer)));
+
+    setupPayload.version               = 0;
+    setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Device::UpdateAddress(const Transport::PeerAddress & addr)
+{
+    bool didLoad;
+
+    ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
+
+    Transport::PeerConnectionState * connectionState = mSessionManager->GetPeerConnectionState(mSecureSession);
+    VerifyOrReturnError(connectionState != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mDeviceAddress = addr;
+    connectionState->SetPeerAddress(addr);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SecurePairingSession pairingSession;
+    PASESession pairingSession;
 
     if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
     {
@@ -257,13 +363,16 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                 ,
             Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                ,
+            Transport::BleListenParameters(mBleLayer)
+#endif
         );
         SuccessOrExit(err);
     }
 
-    err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
-        &pairingSession);
+    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
+                                      SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
     SuccessOrExit(err);
 
 exit:
@@ -275,36 +384,38 @@ exit:
     return err;
 }
 
-bool Device::GetIpAddress(Inet::IPAddress & addr) const
+bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
 {
     if (mState == ConnectionState::NotConnected)
         return false;
-    addr = mDeviceAddr;
+
+    addr = mDeviceAddress.GetIPAddress();
+    port = mDeviceAddress.GetPort();
     return true;
 }
 
-void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
+void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    CallbackInfo info                 = { endpoint, cluster };
-    Callback::Cancelable * cancelable = onResponse->Cancel();
-
-    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
-
-    cancelable->mInfoScalar = 0;
-    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    mResponses.Enqueue(cancelable);
+    mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback);
 }
 
-void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport)
+void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
+                              Callback::Cancelable * onReportCallback)
 {
-    CallbackInfo info                 = { endpoint, cluster };
-    Callback::Cancelable * cancelable = onReport->Cancel();
+    mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
+}
 
-    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
-
-    cancelable->mInfoScalar = 0;
-    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    mReports.Enqueue(cancelable);
+void Device::InitCommandSender()
+{
+    if (mCommandSender != nullptr)
+    {
+        mCommandSender->Shutdown();
+        mCommandSender = nullptr;
+    }
+#if CHIP_ENABLE_INTERACTION_MODEL
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+    ChipLogFunctError(err);
+#endif
 }
 
 } // namespace Controller

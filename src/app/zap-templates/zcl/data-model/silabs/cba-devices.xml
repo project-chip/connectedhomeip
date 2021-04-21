@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2008,2020 Silicon Labs.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>BACnet Tunneled Device</name>
+    <domain>CBA</domain>
+    <typeName>CBA BACnet Tunneled Device</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0105</profileId>
+    <deviceId editable="false">0x000a</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Commissioning</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Time</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Generic Tunnel</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">BACnet Protocol Tunnel</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>CBA-onofflight</name>
+    <domain>CBA</domain>
+    <typeName>CBA On/Off Light</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x109</profileId>
+    <deviceId editable="false">0x0100</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Time</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="true">Occupancy Sensing</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Commissioning</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>CBA-onofflightswitch</name>
+    <domain>CBA</domain>
+    <typeName>CBA On/Off Light Switch</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x105</profileId>
+    <deviceId editable="false">0x0103</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Time</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">On/Off Switch Configuration</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Commissioning</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>CBA-tstat</name>
+    <domain>CBA</domain>
+    <typeName>CBA Thermostat</typeName>
+    <zigbeeType>Sleepy End Device</zigbeeType>
+    <profileId editable="false">0x105</profileId>
+    <deviceId editable="false">0x0301</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Time</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Thermostat</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Thermostat User Interface Configuration</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="true">Fan control</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="true">Temperature measurement</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="true">Occupancy Sensing</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="true">Relative Humidity Measurement</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Commissioning</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>CBA-tempsensor</name>
+    <domain>CBA</domain>
+    <typeName>CBA Temperature Sensor</typeName>
+    <zigbeeType>Sleepy End Device</zigbeeType>
+    <profileId editable="false">0x105</profileId>
+    <deviceId editable="false">0x0302</deviceId>
+    <clusters lockOthers="true">
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Power Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="false">Alarms</include>
+      <include client="false" server="false" clientLocked="true" serverLocked="false">Time</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Temperature measurement</include>
+      <include client="true" server="false" clientLocked="false" serverLocked="true">Groups</include>
+      <include client="false" server="true" clientLocked="true" serverLocked="true">Commissioning</include>
+    </clusters>
+  </deviceType>
+  <deviceType>
+    <name>CBA-config</name>
+    <domain>CBA</domain>
+    <typeName>CBA Config Tool</typeName>
+    <zigbeeType>Coordinator</zigbeeType>
+    <profileId editable="false">0x0105</profileId>
+    <deviceId editable="false">0x0005</deviceId>
+    <clusters lockOthers="false">
+      <include client="true" server="true" clientLocked="true" serverLocked="true">Basic</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Identify</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Groups</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Scenes</include>
+      <include client="true" server="false" clientLocked="true" serverLocked="true">Commissioning</include>
+    </clusters>
+  </deviceType>
+</configurator>

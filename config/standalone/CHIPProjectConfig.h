@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@
 #define CHIP_CONFIG_ENABLE_ARG_PARSER 1
 
 // Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 // Enable reading DRBG seed data from /dev/(u)random.
@@ -65,7 +65,7 @@
 
 #define CHIP_CONFIG_LEGACY_KEY_EXPORT_DELEGATE 0
 
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC 300
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 
 #define CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING 1
 

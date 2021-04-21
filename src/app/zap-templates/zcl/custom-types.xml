@@ -20,5 +20,33 @@ limitations under the License.
     <type id="0xF3" name="group_id" size="2" description="Group Id" discrete="true" />
     <type id="0xF4" name="command_id" size="1" description="Command Id" discrete="true" />
     <type id="0xF5" name="node_id" size="8" description="Node Id" discrete="true" />
+    <type id="0xF6" name="device_type_id" size="4" description="Device Type Id" discrete="true" />
+    <type id="0xF7" name="fabric_id" size="8" description="Fabric Id" discrete="true" />
   </atomic>
+  <enum name="GroupKeySecurityPolicy" type="ENUM8">
+    <item name="Standard" value="0x00"/>
+    <item name="LowLatency" value="0x01"/>
+  </enum>  
+  <struct name="GroupState">
+    <item name="VendorId" type="INT16U"/>
+    <item name="VendorGroupId" type="INT16U"/>
+    <item name="GroupKeySetIndex" type="INT16U"/>
+  </struct>
+  <struct name="GroupKey">
+    <item name="VendorId" type="INT16U"/>
+    <item name="GroupKeyIndex" type="INT16U"/>
+    <item name="GroupKeyRoot" type="OCTET_STRING" length="16"/>
+    <item name="GroupKeyEpochStartTime" type="INT64U"/>
+    <item name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy"/>    
+  </struct>
+   <struct name="DeviceType">
+     <item name="type" type="DEVICE_TYPE_ID"/>
+     <item name="revision" type="INT16U"/>
+   </struct>
+  <struct name="FabricDescriptor">
+     <item name="FabricId" type="FABRIC_ID"/>
+     <item name="VendorId" type="INT16U"/> // Change INT16U to new type VendorID #2395
+     <item name="Label" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
+     <item name="NodeId" type="NODE_ID"/>
+   </struct>
 </configurator>

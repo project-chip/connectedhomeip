@@ -14,6 +14,7 @@ import chip.devicecontroller.ChipDeviceControllerException
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.util.DeviceIdUtil
 import kotlinx.android.synthetic.main.on_off_client_fragment.*
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.*
 
@@ -50,7 +51,7 @@ class OnOffClientFragment : Fragment() {
                   Toast.LENGTH_SHORT).show()
           commandType = ChipCommandType.LEVEL
           levelValue = levelBar.progress
-          if (deviceController.isConnected) sendCommand() else connectToDevice()
+          sendCommand()
         }
       })
     }
@@ -58,7 +59,7 @@ class OnOffClientFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    ipAddressEd.setText(deviceController.ipAddress ?: requireContext().getString(R.string.enter_ip_address_hint_text))
+    deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -86,27 +87,19 @@ class OnOffClientFragment : Fragment() {
   private fun sendOnCommandClick() {
     commandType = ChipCommandType.ON
     levelValue = 0
-    if (deviceController.isConnected) sendCommand() else connectToDevice()
+    sendCommand()
   }
 
   private fun sendOffCommandClick() {
     commandType = ChipCommandType.OFF
     levelValue = 0
-    if (deviceController.isConnected) sendCommand() else connectToDevice()
+    sendCommand()
   }
 
   private fun sendToggleCommandClick() {
     commandType = ChipCommandType.TOGGLE
     levelValue = 0
-    if (deviceController.isConnected) sendCommand() else connectToDevice()
-  }
-
-  private fun connectToDevice() {
-    commandStatusTv.text = requireContext().getString(R.string.echo_status_connecting)
-    deviceController.apply {
-      disconnectDevice()
-      beginConnectDevice(ipAddressEd.text.toString())
-    }
+    sendCommand()
   }
 
   private fun sendCommand() {
@@ -115,12 +108,16 @@ class OnOffClientFragment : Fragment() {
       return
     }
 
-    commandStatusTv.text =
-        requireContext().getString(R.string.send_command_type_label_text, chipCommandType.name, levelValue)
+    commandStatusTv.text = requireContext()
+      .getString(R.string.send_command_type_label_text, chipCommandType.name, levelValue)
 
     try {
       // mask levelValue from integer to uint8_t and if null use 0
-      deviceController.beginSendCommand(commandType, ( 0xff and (levelValue ?: 0)))
+      deviceController.sendCommand(
+        DeviceIdUtil.getLastDeviceId(requireContext()),
+        commandType,
+        ( 0xff and (levelValue ?: 0))
+      )
     } catch (e: ChipDeviceControllerException) {
       commandStatusTv.text = e.toString()
     }

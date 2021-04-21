@@ -18,12 +18,13 @@ import("${chip_root}/src/lib/core/core.gni")
 
 static_library("shell") {
   output_name = "libCHIPShell"
+  output_dir = "${root_out_dir}/lib"
 
   sources = [
     "commands.cpp",
     "commands.h",
-    "shell.cpp",
-    "shell.h",
+    "shell_core.cpp",
+    "shell_core.h",
     "streamer.cpp",
     "streamer.h",
   ]

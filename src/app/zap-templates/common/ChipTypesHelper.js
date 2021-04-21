@@ -26,14 +26,24 @@ function asBasicType(type)
   case 'chip::EventId':
   case 'chip::GroupId':
     return 'uint16_t';
+  case 'chip::DeviceTypeId':
+    return 'uint32_t';
   case 'chip::NodeId':
+  case 'chip::FabricId':
     return 'uint64_t';
   default:
     return type;
   }
 }
 
+const signedTypes = [ 'INT8S', 'INT16S', 'INT32S', 'INT64S' ];
+function isSigned(type)
+{
+  return signedTypes.includes(type);
+}
+
 //
 // Module exports
 //
 exports.asBasicType = asBasicType;
+exports.isSigned    = isSigned;

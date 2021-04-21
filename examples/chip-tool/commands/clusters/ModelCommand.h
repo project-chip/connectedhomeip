@@ -23,39 +23,24 @@
 #include <app/chip-zcl-zpro-codec.h>
 #include <core/CHIPEncoding.h>
 
-// Limits on endpoint values.  Could be wrong, if we start using endpoint 0 for
-// something.
-#define CHIP_ZCL_ENDPOINT_MIN 0x01
+// Limits on endpoint values.
+#define CHIP_ZCL_ENDPOINT_MIN 0x00
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
-class ModelCommand : public Command, public chip::Controller::DeviceStatusDelegate
+class ModelCommand : public Command
 {
 public:
-    ModelCommand(const char * commandName, uint16_t clusterId, uint8_t commandId) :
-        Command(commandName), mClusterId(clusterId), mCommandId(commandId)
-    {}
+    ModelCommand(const char * commandName) : Command(commandName) {}
 
     void AddArguments() { AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId); }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
-    /////////// DeviceStatusDelegate Interface /////////
-    void OnMessage(PacketBufferHandle buffer) override;
-    void OnStatusChange(void) override;
-
-    virtual PacketBufferHandle EncodeCommand(uint8_t endPointId) = 0;
-    virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
-    virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
+    virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 
 private:
-    CHIP_ERROR RunInternal(NodeId remoteId);
-    CHIP_ERROR RunCommandInternal(ChipDevice * device);
-
-    void PrintBuffer(const PacketBufferHandle & buffer) const;
-
     ChipDeviceCommissioner mCommissioner;
-    const uint16_t mClusterId;
-    const uint8_t mCommandId;
+    ChipDevice * mDevice;
     uint8_t mEndPointId;
 };

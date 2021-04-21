@@ -74,9 +74,10 @@ public:
     INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr);
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
-    INET_ERROR Listen();
-    INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR Listen(IPEndPointBasis::OnMessageReceivedFunct onMessageReceived,
+                      IPEndPointBasis::OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
+    INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close();
@@ -95,7 +96,7 @@ private:
     uint8_t NumICMPTypes;
     const uint8_t * ICMPTypes;
 
-    void HandleDataReceived(chip::System::PacketBufferHandle msg);
+    void HandleDataReceived(chip::System::PacketBufferHandle && msg);
     INET_ERROR GetPCB(IPAddressType addrType);
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
@@ -107,7 +108,6 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO();
     void HandlePendingIO();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlassert.gni")
 
@@ -31,10 +32,18 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_OPENSSL=${chip_crypto_openssl}",
     "CHIP_WITH_OPENSSL=${chip_crypto_openssl}",
   ]
+
+  if (chip_with_se05x == 1) {
+    defines += [ "CHIP_CRYPTO_HSM=1" ]
+    defines += [ "CHIP_CRYPTO_HSM_NXP=1" ]
+  } else {
+    defines += [ "CHIP_CRYPTO_HSM=0" ]
+    defines += [ "CHIP_CRYPTO_HSM_NXP=0" ]
+  }
 }
 
 if (chip_crypto == "openssl") {
-  import("//build/config/linux/pkg_config.gni")
+  import("${build_root}/config/linux/pkg_config.gni")
 
   pkg_config("openssl_config") {
     packages = [ "openssl" ]
@@ -60,13 +69,26 @@ static_library("crypto") {
   ]
 
   public_configs = []
+
   if (chip_crypto == "mbedtls") {
     sources += [ "CHIPCryptoPALmbedTLS.cpp" ]
-    public_deps += [ "${mbedtls_root}:mbedtls" ]
+
+    external_mbedtls = current_os == "zephyr"
+
+    if (!external_mbedtls) {
+      public_deps += [ "${mbedtls_root}:mbedtls" ]
+    }
   } else if (chip_crypto == "openssl") {
     sources += [ "CHIPCryptoPALOpenSSL.cpp" ]
     public_configs += [ ":openssl_config" ]
   } else {
     assert(false, "Invalid CHIP crypto")
+  }
+
+  if (chip_with_se05x == 1) {
+    sources += [ "hsm/nxp/CHIPCryptoPALHsm_SE05X_Spake2p.cpp" ]
+    sources += [ "hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.cpp" ]
+    public_deps += [ "${chip_root}/third_party/simw-top-mini:se05x" ]
+    public_configs += [ "${chip_root}/third_party/simw-top-mini:se05x_config" ]
   }
 }

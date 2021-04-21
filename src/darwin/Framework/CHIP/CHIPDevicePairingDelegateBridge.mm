@@ -17,7 +17,6 @@
 
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPError.h"
-#import <Foundation/Foundation.h>
 
 CHIPDevicePairingDelegateBridge::CHIPDevicePairingDelegateBridge(void)
     : mDelegate(nil)
@@ -37,9 +36,9 @@ void CHIPDevicePairingDelegateBridge::setDelegate(id<CHIPDevicePairingDelegate> 
     }
 }
 
-PairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSessionDelegate::Status status)
+CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSessionDelegate::Status status)
 {
-    PairingStatus rv = kUnknownStatus;
+    CHIPPairingStatus rv = kUnknownStatus;
     switch (status) {
     case chip::RendezvousSessionDelegate::Status::SecurePairingSuccess:
         rv = kSecurePairingSuccess;
@@ -64,7 +63,7 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDele
     id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
     if ([strongDelegate respondsToSelector:@selector(onStatusUpdate:)]) {
         if (strongDelegate && mQueue) {
-            PairingStatus pairingStatus = MapStatus(status);
+            CHIPPairingStatus pairingStatus = MapStatus(status);
             dispatch_async(mQueue, ^{
                 [strongDelegate onStatusUpdate:pairingStatus];
             });
@@ -75,18 +74,13 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDele
 void CHIPDevicePairingDelegateBridge::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
 {
     NSLog(@"DevicePairingDelegate Requesting network credentials");
+}
 
-    mCallback = callback;
-    mHandler = ^(NSString * ssid, NSString * passwd) {
-        mCallback->SendNetworkCredentials([ssid UTF8String], [passwd UTF8String]);
-    };
+void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password) {}
 
-    id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        dispatch_async(mQueue, ^{
-            [strongDelegate onNetworkCredentialsRequested:mHandler];
-        });
-    }
+void CHIPDevicePairingDelegateBridge::SendThreadCredentials(NSData * threadDataSet)
+{
+    NSLog(@"Thread Provisioning is still a WIP, pairing will timeout...");
 }
 
 void CHIPDevicePairingDelegateBridge::OnOperationalCredentialsRequested(
@@ -120,6 +114,21 @@ void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
             dispatch_async(mQueue, ^{
                 NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
                 [strongDelegate onPairingDeleted:nsError];
+            });
+        }
+    }
+}
+
+void CHIPDevicePairingDelegateBridge::OnAddressUpdateComplete(chip::NodeId nodeId, CHIP_ERROR error)
+{
+    NSLog(@"OnAddressUpdateComplete. Status %d", error);
+
+    id<CHIPDevicePairingDelegate> strongDelegate = mDelegate;
+    if ([strongDelegate respondsToSelector:@selector(onAddressUpdated:)]) {
+        if (strongDelegate && mQueue) {
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
+                [strongDelegate onAddressUpdated:nsError];
             });
         }
     }

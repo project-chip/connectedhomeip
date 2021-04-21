@@ -27,6 +27,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
 {
@@ -49,9 +50,12 @@ void EchoClient::Shutdown()
         mExchangeCtx->Abort();
         mExchangeCtx = nullptr;
     }
+
+    OnEchoResponseReceived = nullptr;
+    mExchangeMgr           = nullptr;
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, const Messaging::SendFlags & sendFlags)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -71,8 +75,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
     }
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload),
-                                    Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = mExchangeCtx->SendMessage(MsgType::EchoRequest, std::move(payload), sendFlags);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -83,8 +86,8 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
     return err;
 }
 
-void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                   uint8_t msgType, System::PacketBufferHandle payload)
+void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
+                                   const PayloadHeader & payloadHeader, System::PacketBufferHandle payload)
 {
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called
@@ -94,7 +97,7 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
 
     // Verify that the message is an Echo Response.
     // If not, close the exchange and free the payload.
-    if (protocolId != kProtocol_Echo || msgType != kEchoMessageType_EchoResponse)
+    if (!payloadHeader.HasMessageType(MsgType::EchoResponse))
     {
         ec->Close();
         mExchangeCtx = nullptr;
@@ -120,5 +123,6 @@ void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
 }
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip

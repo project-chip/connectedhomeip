@@ -22,17 +22,30 @@
 #include <transport/RendezvousSessionDelegate.h>
 
 namespace chip {
-namespace DeviceController {
+namespace Controller {
 
 void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const char * password)
 {
     strncpy(mWifiSSID, ssid, sizeof(mWifiSSID));
     strncpy(mWifiPassword, password, sizeof(mWifiPassword));
+    mMode = Mode::Wifi;
+}
+
+void ScriptDevicePairingDelegate::SetThreadCredential(uint8_t channel, uint16_t panId,
+                                                      uint8_t (&masterKey)[chip::Thread::kSizeMasterKey])
+{
+    mThreadInfo.SetChannel(channel);
+    mThreadInfo.SetPanId(panId);
+    mThreadInfo.SetMasterKey(masterKey);
+    mMode = Mode::Thread;
 }
 
 void ScriptDevicePairingDelegate::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
 {
-    callback->SendNetworkCredentials(mWifiSSID, mWifiPassword);
+    if (mMode == Mode::Wifi)
+        callback->SendNetworkCredentials(mWifiSSID, mWifiPassword);
+    else
+        callback->SendThreadCredentials(mThreadInfo.AsByteSpan());
 }
 
 void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
@@ -42,5 +55,18 @@ void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char *
     ChipLogDetail(Controller, "ScriptDevicePairingDelegate::OnOperationalCredentialsRequested\n");
 }
 
-} // namespace DeviceController
+void ScriptDevicePairingDelegate::SetKeyExchangeCallback(DevicePairingDelegate_OnPairingCompleteFunct callback)
+{
+    mOnPairingCompleteCallback = callback;
+}
+
+void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
+{
+    if (mOnPairingCompleteCallback != nullptr)
+    {
+        mOnPairingCompleteCallback(error);
+    }
+}
+
+} // namespace Controller
 } // namespace chip

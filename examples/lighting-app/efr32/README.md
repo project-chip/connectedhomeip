@@ -1,4 +1,4 @@
-# CHIP EFR32 Lighting Example
+#CHIP EFR32 Lighting Example
 
 An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
@@ -12,6 +12,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
         -   [Notes](#notes)
+    -   [Running Pigweed RPC console](#running-pigweed-rpc-console)
 
 <hr>
 
@@ -39,11 +40,6 @@ Silicon Labs platform.
 
 ## Building
 
--   Download the [sdk_support](https://github.com/SiliconLabs/sdk_support) from
-    GitHub and export the path with :
-
-            $ export EFR32_SDK_ROOT=<Path to cloned git repo>
-
 -   Download the
     [Simplicity Commander](https://www.silabs.com/mcu/programming-options)
     command line tool, and ensure that `commander` is your shell search path.
@@ -55,17 +51,16 @@ Silicon Labs platform.
 
 -   Install some additional tools(likely already present for CHIP developers):
 
-           # Linux
-           $ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
+#Linux \$ sudo apt-get install git libwebkitgtk-1.0-0 ninja-build
 
-           # Mac OS X
-           $ brew install ninja
+#Mac OS X \$ brew install ninja
 
 -   Supported hardware:
 
     MG12 boards:
 
     -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
+    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
     -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
     -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
         915MHz@19dBm
@@ -77,12 +72,21 @@ Silicon Labs platform.
 
 *   Build the example application:
 
+          cd ~/connectedhomeip
+          ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app BRD4161A
+
+-   To delete generated executable, libraries and object files use:
+
+          $ cd ~/connectedhomeip
+          $ rm -rf ./out/
+
+OR use GN/Ninja directly
+
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
-          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
           $ export EFR32_BOARD=BRD4161A
-          $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" efr32_board=\"${EFR32_BOARD}\""
+          $ gn gen out/debug
           $ ninja -C out/debug
 
 -   To delete generated executable, libraries and object files use:
@@ -90,16 +94,16 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
           $ rm -rf out/
 
-OR use the script
+*   Build the example with pigweed RCP use GN/Ninja Directly
 
-          cd ~/connectedhomeip
-          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ git submodule update --init
+          $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
-          ./scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/debug/efr32_lighting_app
+          $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+          $ ninja -C out/debug
 
--   To delete generated executable, libraries and object files use:
-    $ cd ~/connectedhomeip
-          $ rm -rf out/debug/efr32_lighting_app
+    [Running Pigweed RPC console](#running-pigweed-rpc-console)
 
 <a name="flashing"></a>
 
@@ -108,7 +112,7 @@ OR use the script
 -   On the command line:
 
           $ cd ~/connectedhomeip/examples/lighting-app/efr32
-          $ python3 out/debug/chip-efr32-lighting-example.out.flash.py
+          $ python3 out/debug/chip-efr32-lighting-example.flash.py
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -207,17 +211,18 @@ combination with JLinkRTTClient as follows:
         -   _Solid On_ ; Light is on
         -   _Off_ ; Light is off
 
-    **Push Button 0** - Press and Release : If not commissioned, start thread
-    with default configurations (DEBUG)
+    **Push Button 0**
 
+        -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+            for 30 seconds. The device will then switch to a slower interval advertisement.
+            After 15 minutes, the adverstiment stops.
 
-        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+        -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
             Releasing the button within the 6-second window cancels the factory reset
             procedure. **LEDs** blink in unison when the factory reset procedure is
             initiated.
 
-    **Push Button 1**
-        Toggles the light state On/Off
+    **Push Button 1** Toggles the light state On/Off
 
 -   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log
@@ -264,11 +269,48 @@ combination with JLinkRTTClient as follows:
     need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
-          # On Border Router :
-          $ sudo ip addr add dev <Network interface> 2002::2/64
+#On Border Router: \$ sudo ip addr add dev <Network interface> 2002::2/64
 
-          # On PC (Linux) :
-          $ sudo ip addr add dev <Network interface> 2002::1/64
+#On PC(Linux): \$ sudo ip addr add dev <Network interface> 2002::1/64
 
-          # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2
+#Add Ipv6 route on PC(Linux) \$ sudo ip route add <Thread global ipv6 prefix>/64
+via 2002::2
+
+<a name="running-pigweed-rpc-console"></a>
+
+## Running Pigweed RPC console
+
+-   As part of building the example with RPCs enabled the lighting_app python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/lighting_app_wheels. To install
+    the wheel files without rebuilding:
+    `pip3 install out/debug/lighting_app_wheels/*.whl`
+
+-   To use the lighting-app console after it has been installed run:
+    `python3 -m lighting_app.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
+
+-   Then you can simulate a button press or realease using the following command
+    where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
+    RELEASE Test toggling the LED with
+    `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
+
+-   You can also Get and Set the light directly using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True)`
+
+## Memory settings
+
+While most of the RAM usage in CHIP is static, allowing easier debugging and
+optimization with symbols analysis, we still need some HEAP for the crypto and
+OpenThread. Size of the HEAP can be modified by changing the value of the
+`SL_STACK_SIZE` define inside of the BUILD.gn file of this example. Please take
+note that a HEAP size smaller than 5k can and will cause a Mbedtls failure
+during the BLE rendez-vous.
+
+To track memory usage you can set `enable_heap_monitoring = true` either in the
+BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
+console the RAM usage of each individual task and the number of Memory
+allocation and Free. While this is not extensive monitoring you're welcome to
+modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+tracking code inside the `trackAlloc` and `trackFree` function

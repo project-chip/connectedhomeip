@@ -18,40 +18,33 @@
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import <CHIP/CHIPDeviceStatusDelegate.h>
 #import <Foundation/Foundation.h>
 
 @class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ControllerOnConnectedBlock)(void);
-typedef void (^ControllerOnMessageBlock)(NSData * message);
-typedef void (^ControllerOnErrorBlock)(NSError * error);
-
-@protocol CHIPDeviceControllerDelegate;
 @protocol CHIPDevicePairingDelegate;
 @protocol CHIPPersistentStorageDelegate;
 
-@interface AddressInfo : NSObject
+@interface CHIPDeviceController : NSObject
 
-@property (readonly, copy) NSString * ip;
-- (instancetype)initWithIP:(NSString *)ip;
-
-@end
-
-@interface CHIPDeviceController : NSObject <CHIPDeviceStatusDelegate>
+@property (readonly, nonatomic) BOOL isRunning;
 
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
+                          address:(NSString *)address
+                             port:(uint16_t)port
+                            error:(NSError * __autoreleasing *)error;
+- (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
 - (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
-
-- (BOOL)disconnect:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -62,13 +55,9 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 + (CHIPDeviceController *)sharedController;
 
 /**
- * Set the Delegate for the Device Controller as well as the Queue on which the Delegate callbacks will be triggered
- *
- * @param[in] delegate The delegate the Device Controller should use
- *
- * @param[in] queue The queue on which the Device Controller will deliver callbacks
+ * Return the Node Id assigned to the controller.
  */
-- (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
+- (NSNumber *)getControllerNodeId;
 
 /**
  * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
@@ -80,42 +69,19 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 /**
- * Set the Delegate for the persistent storage  as well as the Queue on which the Delegate callbacks will be triggered
+ * Start the CHIP Stack. Repeated calls to startup without calls to shutdown in between are NO-OPs. Use the isRunning property to
+ * check if the stack needs to be started up.
  *
- * @param[in] delegate The delegate for persistent storage
+ * @param[in] storageDelegate The delegate for persistent storage
  *
- * @param[in] queue The queue on which the callbacks will be delivered
+ * @param[in] queue The queue on which the storage callbacks will be delivered
  */
-- (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue;
-
-@end
-
-/**
- * The protocol definition for the CHIPDeviceControllerDelegate
- *
- * All delegate methods will be called on the supplied Delegate Queue.
- */
-@protocol CHIPDeviceControllerDelegate <NSObject>
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue;
 
 /**
- * Notify the delegate when a connection request succeeds
- *
+ * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
  */
-- (void)deviceControllerOnConnected;
-
-/**
- * Notify the delegate that a message was received
- *
- * @param[in] message The received message
- */
-- (void)deviceControllerOnMessage:(NSData *)message;
-
-/**
- * Notify the Delegate that an error occurred
- *
- * @param[in] error The error that occurred
- */
-- (void)deviceControllerOnError:(NSError *)error;
+- (BOOL)shutdown;
 
 @end
 

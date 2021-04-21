@@ -29,25 +29,69 @@
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
 
-using namespace chip;
+namespace chip {
 
-static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
+static uint32_t chunk1PayloadRepresentation(const SetupPayload & payload)
 {
-    constexpr int discriminatorOffset = kCustomFlowRequiredFieldLengthInBits;
-    constexpr int pinCodeOffset       = discriminatorOffset + kManualSetupDiscriminatorFieldLengthInBits;
-    uint32_t result                   = payload.requiresCustomFlow ? 1 : 0;
+    /* <1 digit> Represents:
+     *     - <bits 1..0> Discriminator <bits 11.10>
+     *     - <bit 2> VID/PID present flag
+     */
 
-    static_assert(kManualSetupDiscriminatorFieldBitMask <= UINT32_MAX >> discriminatorOffset, "Discriminator won't fit");
-    result |= static_cast<uint32_t>((payload.discriminator & kManualSetupDiscriminatorFieldBitMask) << discriminatorOffset);
+    constexpr int kDiscriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupChunk1DiscriminatorMsbitsLength);
+    constexpr uint32_t kDiscriminatorMask = (1 << kManualSetupChunk1DiscriminatorMsbitsLength) - 1;
 
-    static_assert(pinCodeOffset + kSetupPINCodeFieldLengthInBits <= std::numeric_limits<uint32_t>::digits, "PIN code won't fit");
-    result |= static_cast<uint32_t>(payload.setUpPINCode << pinCodeOffset);
+    static_assert(kManualSetupChunk1VidPidPresentBitPos >=
+                      kManualSetupChunk1DiscriminatorMsbitsPos + kManualSetupChunk1DiscriminatorMsbitsLength,
+                  "Discriminator won't fit");
+
+    uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
+    uint32_t vidPidPresentFlag  = payload.requiresCustomFlow ? 1 : 0;
+
+    uint32_t result = (discriminatorChunk << kManualSetupChunk1DiscriminatorMsbitsPos) |
+        (vidPidPresentFlag << kManualSetupChunk1VidPidPresentBitPos);
+
+    return result;
+}
+
+static uint32_t chunk2PayloadRepresentation(const SetupPayload & payload)
+{
+    /* <5 digits> Represents:
+     *     - <bits 13..0> PIN Code <bits 13..0>
+     *     - <bits 15..14> Discriminator <bits 9..8>
+     */
+
+    constexpr int kDiscriminatorShift     = (kPayloadDiscriminatorFieldLengthInBits - kManualSetupDiscriminatorFieldLengthInBits);
+    constexpr uint32_t kDiscriminatorMask = (1 << kManualSetupChunk2DiscriminatorLsbitsLength) - 1;
+    constexpr uint32_t kPincodeMask       = (1 << kManualSetupChunk2PINCodeLsbitsLength) - 1;
+
+    uint32_t discriminatorChunk = (payload.discriminator >> kDiscriminatorShift) & kDiscriminatorMask;
+
+    uint32_t result = ((payload.setUpPINCode & kPincodeMask) << kManualSetupChunk2PINCodeLsbitsPos) |
+        (discriminatorChunk << kManualSetupChunk2DiscriminatorLsbitsPos);
+
+    return result;
+}
+
+static uint32_t chunk3PayloadRepresentation(const SetupPayload & payload)
+{
+    /* <4 digits> Represents:
+     *     - <bits 12..0> PIN Code <bits 26..14>
+     */
+
+    constexpr int kPincodeShift     = (kSetupPINCodeFieldLengthInBits - kManualSetupChunk3PINCodeMsbitsLength);
+    constexpr uint32_t kPincodeMask = (1 << kManualSetupChunk3PINCodeMsbitsLength) - 1;
+
+    uint32_t result = ((payload.setUpPINCode >> kPincodeShift) & kPincodeMask) << kManualSetupChunk3PINCodeMsbitsPos;
+
     return result;
 }
 
 // TODO: issue #3663 - Unbounded stack in src/setup_payload
+#if !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstack-usage="
+#endif
 
 static std::string decimalStringWithPadding(uint32_t number, int minLength)
 {
@@ -56,7 +100,9 @@ static std::string decimalStringWithPadding(uint32_t number, int minLength)
     return std::string(buf);
 }
 
+#if !defined(__clang__)
 #pragma GCC diagnostic pop
+#endif
 
 CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
 {
@@ -66,8 +112,22 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint32_t shortDecimal     = shortPayloadRepresentation(mSetupPayload);
-    std::string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
+    static_assert(kManualSetupCodeChunk1CharLength + kManualSetupCodeChunk2CharLength + kManualSetupCodeChunk3CharLength ==
+                      kManualSetupShortCodeCharLength,
+                  "Manual code length mismatch");
+    static_assert(kManualSetupChunk1DiscriminatorMsbitsLength + kManualSetupChunk2DiscriminatorLsbitsLength ==
+                      kManualSetupDiscriminatorFieldLengthInBits,
+                  "Discriminator won't fit");
+    static_assert(kManualSetupChunk2PINCodeLsbitsLength + kManualSetupChunk3PINCodeMsbitsLength == kSetupPINCodeFieldLengthInBits,
+                  "PIN code won't fit");
+
+    uint32_t chunk1 = chunk1PayloadRepresentation(mSetupPayload);
+    uint32_t chunk2 = chunk2PayloadRepresentation(mSetupPayload);
+    uint32_t chunk3 = chunk3PayloadRepresentation(mSetupPayload);
+
+    std::string decimalString = decimalStringWithPadding(chunk1, kManualSetupCodeChunk1CharLength);
+    decimalString += decimalStringWithPadding(chunk2, kManualSetupCodeChunk2CharLength);
+    decimalString += decimalStringWithPadding(chunk3, kManualSetupCodeChunk3CharLength);
 
     if (mSetupPayload.requiresCustomFlow)
     {
@@ -79,3 +139,5 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::
     outDecimalString = decimalString;
     return CHIP_NO_ERROR;
 }
+
+} // namespace chip

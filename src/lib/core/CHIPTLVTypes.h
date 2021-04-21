@@ -46,7 +46,7 @@ enum TLVType
     kTLVType_Null      = 0x14,
     kTLVType_Structure = 0x15,
     kTLVType_Array     = 0x16,
-    kTLVType_Path      = 0x17
+    kTLVType_List      = 0x17
 };
 
 // TODO: Move to private namespace
@@ -80,7 +80,7 @@ enum class TLVElementType : int8_t
     Null           = 0x14,
     Structure      = 0x15,
     Array          = 0x16,
-    Path           = 0x17,
+    List           = 0x17,
     EndOfContainer = 0x18
 };
 
@@ -151,12 +151,12 @@ inline bool TLVTypeHasLength(TLVElementType type)
  */
 inline bool TLVTypeIsContainer(TLVElementType type)
 {
-    return type >= TLVElementType::Structure && type <= TLVElementType::Path;
+    return type >= TLVElementType::Structure && type <= TLVElementType::List;
 }
 
 inline bool TLVTypeIsContainer(TLVType type)
 {
-    return type >= kTLVType_Structure && type <= kTLVType_Path;
+    return type >= kTLVType_Structure && type <= kTLVType_List;
 }
 
 /**

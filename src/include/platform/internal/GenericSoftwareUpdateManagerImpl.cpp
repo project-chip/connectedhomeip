@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -217,7 +217,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     }
 
     // Allocate a buffer to hold the image query.
-    mImageQueryPacketBuffer = PacketBuffer::New();
+    mImageQueryPacketBuffer = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     VerifyOrExit(mImageQueryPacketBuffer != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = imageQuery.pack(mImageQueryPacketBuffer);

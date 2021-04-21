@@ -81,7 +81,7 @@
         {
             "label": "Build Shell",
             "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/shell out/shell",
+            "command": "scripts/examples/gn_build_example.sh examples/shell/standalone out/shell",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
@@ -115,6 +115,19 @@
             }
         },
         {
+            "label": "Build QPG6100 Lock Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lock-app/qpg6100 out/qpg6100_lock_app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/qpg6100_lock_app/"
+                ]
+            }
+        },
+        {
             "label": "Build EFR32 Lock Example",
             "type": "shell",
             "command": "scripts/examples/gn_build_example.sh examples/lock-app/efr32 out/efr32_lock_app",
@@ -124,6 +137,19 @@
                 "fileLocation": [
                     "relative",
                     "${workspaceFolder}/out/efr32_lock_app/"
+                ]
+            }
+        },
+        {
+            "label": "Build EFR32 Light Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/lighting-app/efr32 out/efr32_lighting_app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/efr32_lighting/"
                 ]
             }
         },
@@ -155,54 +181,93 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Build nRF Connect Lock Example",
+            "label": "Build nRF Connect Lock Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/lock-app/nrfconnect/build"
+                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840"
                 ]
             }
         },
         {
-            "label": "Build nRF Connect Lighting Example",
+            "label": "Build nRF Connect Lighting Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build"
+                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840"
                 ]
             }
         },
         {
-            "label": "Build nRF Connect Shell Example",
+            "label": "Build nRF Connect Shell Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/shell/nrfconnect/build"
+                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf52840dk_nrf52840"
                 ]
             }
         },
         {
-            "label": "Build nRF Connect Pigweed Example",
+            "label": "Build nRF Connect Pigweed Example (nRF52840)",
             "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/examples/pigweed-app/nrfconnect/build"
+                    "${workspaceFolder}/examples/pigweed-app/nrfconnect/build/nrf52840dk_nrf52840"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF Connect Lock Example (nRF5340)",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/lock-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF Connect Lighting Example (nRF5340)",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF Connect Shell Example (nRF5340)",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp"
                 ]
             }
         }

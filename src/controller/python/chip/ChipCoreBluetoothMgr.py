@@ -29,7 +29,7 @@ from Foundation import *
 
 import logging
 import objc
-import six.moves.queue
+import queue
 import time
 
 from .ChipBleUtility import (
@@ -74,8 +74,8 @@ BLE_PERIPHERAL_STATE_DISCONNECTED = 0
 CBCharacteristicWriteWithResponse = 0
 CBCharacteristicWriteWithoutResponse = 1
 
-CHIP_SERVICE = CBUUID.UUIDWithString_(u"0000FEAF-0000-1000-8000-00805F9B34FB")
-CHIP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FEAF")
+CHIP_SERVICE = CBUUID.UUIDWithString_(u"0000FFF6-0000-1000-8000-00805F9B34FB")
+CHIP_SERVICE_SHORT = CBUUID.UUIDWithString_(u"FFF6")
 CHIP_TX = CBUUID.UUIDWithString_(u"18EE2EF5-263D-4559-959F-4F9C429F9D11")
 CHIP_RX = CBUUID.UUIDWithString_(u"18EE2EF5-263D-4559-959F-4F9C429F9D12")
 CHROMECAST_SETUP_SERVICE = CBUUID.UUIDWithString_(
@@ -154,7 +154,7 @@ class CoreBluetoothManager(ChipBleBase):
         self.peripheral_list = []
         self.peripheral_adv_list = []
         self.bg_peripheral_name = None
-        self.chip_queue = six.moves.queue.Queue()
+        self.chip_queue = queue.Queue()
 
         self.manager = CBCentralManager.alloc()
         self.manager.initWithDelegate_queue_options_(self, None, None)
@@ -174,24 +174,6 @@ class CoreBluetoothManager(ChipBleBase):
 
         self.setInputHook(self.readlineCB)
         self.devCtrl = devCtrl
-        self.devCtrl.SetBlockingCB(self.devMgrCB)
-
-        def HandleBleEventCB():
-            return self.GetBleEvent()
-
-        def HandleBleWriteCharCB(connObj, svcId, charId, buffer, length):
-            return self.WriteBleCharacteristic(connObj, svcId, charId, buffer, length)
-
-        def HandleBleSubscribeCB(connObj, svcId, charId, subscribe):
-            return self.SubscribeBleCharacteristic(connObj, svcId, charId, subscribe)
-
-        def HandleBleCloseCB(connObj):
-            return self.CloseBle(connObj)
-
-        self.devCtrl.SetBleEventCB(HandleBleEventCB)
-        self.devCtrl.SetBleWriteCharCB(HandleBleWriteCharCB)
-        self.devCtrl.SetBleSubscribeCharCB(HandleBleSubscribeCB)
-        self.devCtrl.SetBleCloseCB(HandleBleCloseCB)
 
         # test if any connections currently exist (left around from a previous run) and disconnect if need be.
         peripherals = self.manager.retrieveConnectedPeripheralsWithServices_(
@@ -536,150 +518,6 @@ class CoreBluetoothManager(ChipBleBase):
         self.manager.stopScan()
         self.bg_peripheral_name = None
         self.logger.info("scanning stopped")
-
-    def connect(self, identifier):
-        """ API to initiate BLE connection to peripheral device whose identifier == identifier."""
-        self.logger.info("trying to connect to " + identifier)
-
-        if self.connect_state:
-            self.logger.error("ERROR: Connection to a BLE device already exists!")
-        else:
-            for peripheral in self.peripheral_adv_list:
-                p = peripheral.peripheral
-                devIdInfo = peripheral.getPeripheralDevIdInfo()
-                if not devIdInfo:
-                    # Not a chip device
-                    continue
-                p_id = str(p.identifier().UUIDString())
-                p_name = str(p.name())
-
-                self.logger.debug(p_id + " vs " + str(identifier))
-                self.logger.debug(p_name + " vs " + str(identifier))
-
-                if p_id == str(identifier) or p_name == str(identifier) or str(devIdInfo.discriminator) == str(identifier):
-                    self.loop_condition = False
-                    self.peripheral = p
-                    self.manager.connectPeripheral_options_(p, None)
-
-                    self.runLoopUntil(LoopCondition("connect", 15.0))
-                    # Cleanup when the connect fails due to timeout,
-                    # otherwise CoreBluetooth will continue to try to connect after this
-                    # API exits.
-                    if not self.connect_state:
-                        self.manager.cancelPeripheralConnection_(p)
-                        self.peripheral = None
-
-                    break
-
-        ret = True if self.loop_condition and self.connect_state else False
-
-        resString = "connect " + ("success" if ret else "fail")
-        self.logger.info(resString)
-
-        return ret
-
-    def disconnect(self):
-        """ API to initiate BLE disconnect procedure."""
-        self.logger.info("disconnecting")
-
-        if (
-            self.peripheral
-            and self.peripheral.state() != BLE_PERIPHERAL_STATE_DISCONNECTED
-        ):
-            self.loop_condition = False
-            self.manager.cancelPeripheralConnection_(self.peripheral)
-
-            self.runLoopUntil(LoopCondition("disconnect", 10.0))
-
-        resString = "disconnect " + (
-            "success" if self.loop_condition and not self.connect_state else "fail"
-        )
-        self.logger.info(resString)
-
-        self.characteristics = {}
-        # del self.peripheral_list[:]
-        # self.peripheral_list = []
-        self.peripheral = None
-        self.service = None
-
-    def scan_connect(self, line):
-        """ API to perform both scan and connect operations in one call."""
-
-        args = self.ParseInputLine(line, "scan-connect")
-
-        if not args:
-            return
-
-        self.scan_quiet = args[1]
-        self.scan(line)
-
-        if len(self.peripheral_list):
-            return self.connect(args[2])
-        else:
-            self.logger.info(
-                "Failed to scan device named: " + args[2] + ". Connection skipped."
-            )
-            return False
-
-    def isConnected(self):
-        if (
-            self.peripheral
-            and self.peripheral.state() != BLE_ERROR_REMOTE_DEVICE_DISCONNECTED
-        ):
-            return True
-
-        return False
-
-    def WriteBleCharacteristic(self, connObj, svcId, charId, buffer, length):
-        """ Called by ChipDeviceMgr.py to satisfy a request by Chip to transmit a packet over BLE."""
-        result = False
-
-        bytes = ChipUtility.VoidPtrToByteArray(buffer, length)
-        bytes = NSData.dataWithBytes_length_(
-            bytes, len(bytes)
-        )  # convert bytearray to NSData
-
-        svcId = _VoidPtrToCBUUID(svcId, 16)
-        charId = _VoidPtrToCBUUID(charId, 16)
-
-        if (
-            self.peripheral
-            and self.peripheral.state() != BLE_ERROR_REMOTE_DEVICE_DISCONNECTED
-        ):
-            for char in self.characteristics[svcId]:
-                if char.UUID() == charId:
-                    self.peripheral.writeValue_forCharacteristic_type_(
-                        bytes, char, CBCharacteristicWriteWithResponse
-                    )
-                    result = True
-                    break
-        else:
-            self.logger.warning("WARNING: peripheral is no longer connected.")
-
-        return result
-
-    def SubscribeBleCharacteristic(self, connObj, svcId, charId, subscribe):
-        """ Called by Chip to (un-)subscribe to a characteristic of a service."""
-        result = False
-
-        svcId = _VoidPtrToCBUUID(svcId, 16)
-        charId = _VoidPtrToCBUUID(charId, 16)
-
-        if (
-            self.peripheral
-            and self.peripheral.state() != BLE_ERROR_REMOTE_DEVICE_DISCONNECTED
-        ):
-            for char in self.characteristics[svcId]:
-                if char.UUID() == charId:
-                    self.peripheral.setNotifyValue_forCharacteristic_(
-                        True if subscribe else False, char
-                    )
-                    result = True
-                    break
-        else:
-            self.logger.warning("WARNING: peripheral is no longer connected.")
-
-        return result
 
     def ble_debug_log(self, line):
         args = self.ParseInputLine(line)

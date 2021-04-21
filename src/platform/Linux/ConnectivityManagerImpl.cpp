@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
+#include <cstdlib>
 #include <new>
 
 #include <support/CodeUtils.h>
@@ -255,17 +256,18 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-uint16_t ConnectivityManagerImpl::mConnectivityFlag;
+BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
+    ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
 bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
 {
-    return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
+    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
 }
 
 bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
 {
-    return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
+    return mConnectivityFlag.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
 }
 
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
@@ -326,8 +328,8 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
     state = wpa_fi_w1_wpa_supplicant1_interface_get_state(mWpaSupplicant.iface);
     if (g_strcmp0(state, "completed") == 0)
     {
-        SetFlag(mConnectivityFlag, kFlag_HaveIPv4InternetConnectivity, true);
-        SetFlag(mConnectivityFlag, kFlag_HaveIPv6InternetConnectivity, true);
+        mConnectivityFlag.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity)
+            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity);
         ret = true;
     }
 
@@ -619,7 +621,7 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    mConnectivityFlag            = 0;
+    mConnectivityFlag.ClearAll();
     mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
     mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
     mWpaSupplicant.proxy         = nullptr;
@@ -842,12 +844,33 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     GError * err    = nullptr;
     GVariant * args = nullptr;
     GVariantBuilder builder;
+    gboolean result;
 
     // Clean up current network if exists
     if (mWpaSupplicant.networkPath)
     {
-        g_object_unref(mWpaSupplicant.networkPath);
-        mWpaSupplicant.networkPath = nullptr;
+        GError * error = nullptr;
+
+        result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
+                                                                              nullptr, &error);
+
+        if (result)
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
+            g_free(mWpaSupplicant.networkPath);
+            mWpaSupplicant.networkPath = nullptr;
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
+                            error ? error->message : "unknown error");
+            ret = CHIP_ERROR_INTERNAL;
+        }
+
+        if (error != nullptr)
+            g_error_free(error);
+
+        SuccessOrExit(ret);
     }
 
     g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
@@ -856,8 +879,8 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
     args = g_variant_builder_end(&builder);
 
-    gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args,
-                                                                                &mWpaSupplicant.networkPath, nullptr, &err);
+    result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args, &mWpaSupplicant.networkPath,
+                                                                       nullptr, &err);
 
     if (result)
     {
@@ -888,6 +911,46 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
             if (gerror != nullptr)
                 g_error_free(gerror);
 
+            // Iterate on the network interface to see if we already have beed assigned addresses.
+            // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+            // This should be removed or find a better place once we depercate the rendezvous session.
+            for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
+            {
+                char ifName[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+                if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
+                    strncmp(ifName, CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, sizeof(ifName)) == 0)
+                {
+                    chip::Inet::IPAddress addr = it.GetAddress();
+                    if (addr.IsIPv4())
+                    {
+                        ChipDeviceEvent event;
+                        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                        event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
+                        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+                        addr.ToString(event.InternetConnectivityChange.address);
+
+                        ChipLogDetail(DeviceLayer, "Got IP address on interface: %s IP: %s", ifName,
+                                      event.InternetConnectivityChange.address);
+
+                        PlatformMgr().PostEvent(&event);
+                    }
+                }
+            }
+
+            // Run dhclient for IP on WiFi.
+            // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
+            char cmdBuffer[128];
+            sprintf(cmdBuffer, "dhclient -nw %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            int dhclientSystemRet = system(cmdBuffer);
+            if (dhclientSystemRet != 0)
+            {
+                ChipLogError(DeviceLayer, "Failed to run dhclient, system() returns %d", dhclientSystemRet);
+            }
+            else
+            {
+                ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
+            }
+
             // Return success as long as the device is connected to the network
             ret = CHIP_NO_ERROR;
         }
@@ -915,6 +978,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
         ret = CHIP_ERROR_INTERNAL;
     }
 
+exit:
     if (err != nullptr)
         g_error_free(err);
 

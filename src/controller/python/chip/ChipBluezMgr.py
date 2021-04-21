@@ -35,17 +35,14 @@ import threading
 import time
 import traceback
 import uuid
-import six.moves.queue
-
+import queue
 
 from ctypes import *
-import six
-from six.moves import range
 
 try:
     from gi.repository import GObject
 except Exception as ex:
-    log(ex)
+    logging.exception("Unable to find GObject from gi.repository")
     from pgi.repository import GObject
 
 from .ChipUtility import ChipUtility
@@ -69,10 +66,10 @@ from .ChipBleUtility import (
 
 from .ChipBleBase import ChipBleBase
 
-chip_service = uuid.UUID("0000FEAF-0000-1000-8000-00805F9B34FB")
+chip_service = uuid.UUID("0000FFF6-0000-1000-8000-00805F9B34FB")
 chip_tx = uuid.UUID("18EE2EF5-263D-4559-959F-4F9C429F9D11")
 chip_rx = uuid.UUID("18EE2EF5-263D-4559-959F-4F9C429F9D12")
-chip_service_short = uuid.UUID("0000FEAF-0000-0000-0000-000000000000")
+chip_service_short = uuid.UUID("0000FFF6-0000-0000-0000-000000000000")
 chromecast_setup_service = uuid.UUID("0000FEA0-0000-1000-8000-00805F9B34FB")
 chromecast_setup_service_short = uuid.UUID("0000FEA0-0000-0000-0000-000000000000")
 
@@ -97,7 +94,7 @@ def get_bluez_objects(bluez, bus, interface, prefix_path):
     results = []
     if bluez is None or bus is None or interface is None or prefix_path is None:
         return results
-    for item in six.iteritems(bluez.GetManagedObjects()):
+    for item in bluez.GetManagedObjects().items():
         delegates = item[1].get(interface)
         if not delegates:
             continue
@@ -798,7 +795,7 @@ class BluezManager(ChipBleBase):
         self.scan_quiet = False
         self.peripheral_list = []
         self.device_uuid_list = []
-        self.chip_queue = six.moves.queue.Queue()
+        self.chip_queue = queue.Queue()
         self.Gmainloop = None
         self.daemon_thread = None
         self.adapter = None
@@ -820,28 +817,9 @@ class BluezManager(ChipBleBase):
         self.devMgr = devMgr
         self.devMgr.SetBlockingCB(self.devMgrCB)
 
-        def HandleBleEventCB():
-            return self.GetBleEvent()
-
-        def HandleBleWriteCharCB(connObj, svcId, charId, buffer, length):
-            return self.WriteBleCharacteristic(connObj, svcId, charId, buffer, length)
-
-        def HandleBleSubscribeCB(connObj, svcId, charId, subscribe):
-            return self.SubscribeBleCharacteristic(connObj, svcId, charId, subscribe)
-
-        def HandleBleCloseCB(connObj):
-            return self.CloseBle(connObj)
-
-        self.devMgr.SetBleEventCB(HandleBleEventCB)
-        self.devMgr.SetBleWriteCharCB(HandleBleWriteCharCB)
-        self.devMgr.SetBleSubscribeCharCB(HandleBleSubscribeCB)
-        self.devMgr.SetBleCloseCB(HandleBleCloseCB)
-
     def __del__(self):
         self.disconnect()
         self.setInputHook(self.orig_input_hook)
-        self.devMgr.SetBlockingCB(None)
-        self.devMgr.SetBleEventCB(None)
 
     def ble_adapter_select(self, identifier=None):
         if self.adapter:
@@ -852,6 +830,15 @@ class BluezManager(ChipBleBase):
         self.adapter.Powered(False)
         self.adapter.Powered(True)
 
+    def get_adapters(self):
+        return [
+            BluezDbusAdapter(p["object"], self.bluez, self.bus, self.logger)
+            for p in get_bluez_objects(
+                self.bluez, self.bus, ADAPTER_INTERFACE, "/org/bluez"
+            )
+        ]
+
+
     def ble_adapter_print(self):
         try:
             adapters = [
@@ -861,7 +848,7 @@ class BluezManager(ChipBleBase):
                 )
             ]
             for i in range(len(adapters)):
-                self.logger.info("adapter %s = %s" % (i, adapters[i].Address))
+                self.logger.info("AdapterName: %s   AdapterAddress: %s" % (adapters[i].path.replace("/org/bluez/", ""), adapters[i].Address))
         except dbus.exceptions.DBusException as ex:
             self.logger.debug(str(ex))
 
@@ -877,7 +864,7 @@ class BluezManager(ChipBleBase):
                 return adapters[0]
             if len(adapters) > 0:
                 for adapter in adapters:
-                    if str(adapter.Address).upper() == str(identifier).upper():
+                    if str(adapter.Address).upper() == str(identifier).upper() or "/org/bluez/{}".format(identifier) == str(adapter.path):
                         return adapter
             self.logger.info(
                 "adapter %s cannot be found, expect the ble mac address" % (identifier)
@@ -933,24 +920,6 @@ class BluezManager(ChipBleBase):
 
         if self.orig_input_hook:
             self.orig_input_hook()
-
-    def scan_connect(self, line):
-        """ API to perform both scan and connect operations in one call."""
-        args = self.ParseInputLine(line, "scan-connect")
-        if not args:
-            return False
-        if not self.adapter:
-            self.logger.info("use default adapter")
-            self.ble_adapter_select()
-        self.scan_quiet = args[1]
-        self.scan(line)
-        if self.target:
-            return self.connect(args[2])
-        else:
-            self.logger.info(
-                "Failed to scan device named: " + args[2] + ". Connection skipped."
-            )
-            return False
 
     def dump_scan_result(self, device):
         self.logger.info("{0:<16}= {1}".format("Name", device.Name))
@@ -1036,270 +1005,12 @@ class BluezManager(ChipBleBase):
         )
         return True
 
-    def chipServieCharConnect(self):
-        gatt_dic = {
-            "services": [chip_service, chip_service_short],
-            "chars": [chip_tx, chip_rx],
-        }
-        self.service = self.target.service_discover(gatt_dic)
-        if self.service is None:
-            self.logger.info("chip service cannot be found")
-            return False
-
-        self.rx = self.service.find_characteristic(chip_rx)
-        if self.rx is None:
-            self.logger.info("chip rx char cannot be found")
-            return False
-
-        self.tx = self.service.find_characteristic(chip_tx)
-        if self.tx is None:
-            self.logger.info("chip tx char cannot be found")
-            self.connect_state = False
-            return False
-
-        return True
-
-    def connect_bg_implementation(self, **kwargs):
-        self.connect_state = False
-        if self.adapter is None:
-            self.logger.info("adapter is not configured")
-            return
-        self.target.device_register_signal()
-        self.target.device_bg_connect(True)
-        if self.chipServieCharConnect():
-            self.logger.info("connect success")
-            self.connect_state = True
-        else:
-            self.logger.info("connect fail")
-            self.connect_state = False
-
-    def disconnect_bg_implementation(self, **kwargs):
-        if self.target:
-            self.target.device_bg_connect(False)
-        if self.tx:
-            self.tx.destroy()
-            self.tx = None
-        if self.rx:
-            self.rx.destroy()
-            self.rx = None
-        if self.service:
-            self.service.destroy()
-            self.service = None
-
     def get_peripheral_devIdInfo(self, peripheral):
         if not peripheral.ServiceData:
             return None
         for advuuid in peripheral.ServiceData:
             if str(advuuid).lower() == str(chip_service).lower():
                 return ParseServiceData(bytes(peripheral.ServiceData[advuuid]))
-        return None
-
-    def connect(self, identifier):
-        found = False
-        self.logger.info("trying to connect to " + identifier)
-        for p in self.peripheral_list:
-            p_discriminator = None
-            devIdInfo = self.get_peripheral_devIdInfo(p)
-            if not devIdInfo:
-                # Not a chip device
-                continue
-            p_discriminator = devIdInfo.discriminator
-            p_id = str(p.device_id)
-            p_name = str(p.Name)
-            p_address = str(p.Address)
-            self.logger.debug(p_id + " vs " + str(identifier))
-            self.logger.debug(p_name + " vs " + str(identifier))
-            self.logger.debug(p_address + " vs " + str(identifier))
-            self.logger.debug(str(p_discriminator) + " vs " + str(identifier))
-            if (
-                p_id == str(identifier)
-                or p_name == str(identifier)
-                or p_address.upper() == str(identifier).upper()
-                or str(p_discriminator) == str(identifier)
-            ):
-                self.target = p
-                found = True
-                break
-        if found:
-            self.runLoopUntil(
-                self.connect_bg_implementation,
-                identifier=identifier,
-                timeout=BLE_CONNECT_TIMEOUT_SEC,
-            )
-            if self.connect_state:
-                return True
-            else:
-                return False
-        else:
-            print("device cannot be found")
-            return False
-
-    def disconnect(self):
-        self.runLoopUntil(self.disconnect_bg_implementation)
-        for i in range(2):
-            n = gc.collect()
-            self.logger.debug("Unreached objects: %d", n)
-            self.logger.debug("Final Garbage:")
-            self.logger.debug(pprint.pformat(gc.garbage))
-
-    def WriteCharactertisticSuccessCB(self, *args):
-        self.logger.debug("write complete")
-        if self.devMgr:
-            txEvent = BleTxEvent(
-                charId=self.charId_tx, svcId=self.svcId_tx, status=True
-            )
-            self.chip_queue.put(txEvent)
-            self.devMgr.DriveBleIO()
-
-    def WriteCharactertisticErrorCB(self, *args):
-        self.logger.debug("write fail, error:" + repr(args))
-        if self.devMgr:
-            txEvent = BleTxEvent(
-                charId=self.charId_tx, svcId=self.svcId_tx, status=False
-            )
-            self.chip_queue.put(txEvent)
-            self.devMgr.DriveBleIO()
-
-    def WriteBleCharacteristic(self, connObj, svcId, charId, buffer, length):
-        self.logger.debug("write start")
-        result = False
-        if self.target and self.target.Connected:
-            converted_data = ChipUtility.VoidPtrToByteArray(buffer, length)
-            self.charId_tx = bytearray(
-                uuid.UUID(str(VoidPtrToUUIDString(charId, 16))).bytes
-            )
-            self.svcId_tx = bytearray(
-                uuid.UUID(str(VoidPtrToUUIDString(svcId, 16))).bytes
-            )
-            self.tx.WriteValue(
-                dbus.Array([dbus.Byte(i) for i in converted_data], "y"),
-                options="",
-                reply_handler=self.WriteCharactertisticSuccessCB,
-                error_handler=self.WriteCharactertisticErrorCB,
-                timeout=BLE_WRITE_CHARACTERISTIC_TIMEOUT_SEC,
-            )
-            result = True
-        else:
-            self.logger.warning("WARNING: peripheral is no longer connected.")
-        return result
-
-    def receivedNotificationCB(self, data):
-        self.logger.debug("received data")
-        bytes = bytearray(data)
-        if self.devMgr:
-            rxEvent = BleRxEvent(
-                charId=self.charId_rx, svcId=self.svcId_rx, buffer=bytes
-            )
-            self.chip_queue.put(rxEvent)
-            self.devMgr.DriveBleIO()
-
-    def subscribeSuccessCb(self, *args):
-        self.logger.debug("subscribe complete")
-        if self.rx.Notifying:
-            success = True
-        else:
-            success = False
-        operation = BLE_SUBSCRIBE_OPERATION_SUBSCRIBE
-        if self.devMgr:
-            subscribeEvent = BleSubscribeEvent(
-                charId=self.charId_rx,
-                svcId=self.svcId_rx,
-                status=success,
-                operation=operation,
-            )
-            self.chip_queue.put(subscribeEvent)
-            self.devMgr.DriveBleIO()
-
-    def subscribeErrorCb(self, *args):
-        self.logger.error("subscribe fail, error:" + repr(args))
-        success = False
-        operation = BLE_SUBSCRIBE_OPERATION_SUBSCRIBE
-        if self.devMgr:
-            subscribeEvent = BleSubscribeEvent(
-                charId=self.charId_rx,
-                svcId=self.svcId_rx,
-                status=success,
-                operation=operation,
-            )
-            self.chip_queue.put(subscribeEvent)
-            self.devMgr.DriveBleIO()
-
-    def unsubscribeSuccessCb(self, *args):
-        self.logger.debug("unsubscribe complete")
-        success = True
-        operation = BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE
-        if self.devMgr:
-            subscribeEvent = BleSubscribeEvent(
-                charId=self.charId_rx,
-                svcId=self.svcId_rx,
-                status=success,
-                operation=operation,
-            )
-            self.chip_queue.put(subscribeEvent)
-            self.devMgr.DriveBleIO()
-
-    def unsubscribeErrorCb(self, *args):
-        self.logger.error("unsubscribe fail, error:" + repr(args))
-        success = False
-        operation = BLE_SUBSCRIBE_OPERATION_UNSUBSCRIBE
-        if self.devMgr:
-            subscribeEvent = BleSubscribeEvent(
-                charId=self.charId_rx,
-                svcId=self.svcId_rx,
-                status=success,
-                operation=operation,
-            )
-            self.chip_queue.put(subscribeEvent)
-            self.devMgr.DriveBleIO()
-
-    def SubscribeBleCharacteristic(self, connObj, svcId, charId, subscribe):
-        result = False
-        self.charId_rx = bytearray(uuid.UUID(VoidPtrToUUIDString(charId, 16)).bytes)
-        self.svcId_rx = bytearray(uuid.UUID(str(VoidPtrToUUIDString(svcId, 16))).bytes)
-
-        if self.target and self.target.Connected:
-            try:
-                if subscribe:
-                    self.logger.debug("try to subscribe")
-                    self.rx.StartNotify(
-                        cbfunct=self.receivedNotificationCB,
-                        reply_handler=self.subscribeSuccessCb,
-                        error_handler=self.subscribeErrorCb,
-                        timeout=BLE_SUBSCRIBE_TIMEOUT_SEC,
-                    )
-                else:
-                    self.logger.debug("try to unsubscribe")
-                    self.rx.StopNotify(
-                        reply_handler=self.unsubscribeSuccessCb,
-                        error_handler=self.unsubscribeErrorCb,
-                        timeout=BLE_SUBSCRIBE_TIMEOUT_SEC,
-                    )
-            except Exception as ex:
-                self.logger.debug(traceback.format_exc())
-                self.logger.debug("(un)subscribe error")
-            result = True
-        else:
-            self.logger.warning("WARNING: peripheral is no longer connected.")
-        return result
-
-    def GetBleEvent(self):
-        """ Called by ChipDeviceMgr.py on behalf of Chip to retrieve a queued message."""
-        if not self.chip_queue.empty():
-            ev = self.chip_queue.get()
-
-            if isinstance(ev, BleRxEvent):
-                eventStruct = BleRxEventStruct.fromBleRxEvent(ev)
-                return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleTxEvent):
-                eventStruct = BleTxEventStruct.fromBleTxEvent(ev)
-                return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleSubscribeEvent):
-                eventStruct = BleSubscribeEventStruct.fromBleSubscribeEvent(ev)
-                return cast(pointer(eventStruct), c_void_p).value
-            elif isinstance(ev, BleDisconnectEvent):
-                eventStruct = BleDisconnectEventStruct.fromBleDisconnectEvent(ev)
-                return cast(pointer(eventStruct), c_void_p).value
-
         return None
 
     def ble_debug_log(self, line):

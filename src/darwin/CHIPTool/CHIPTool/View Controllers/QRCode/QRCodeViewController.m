@@ -20,6 +20,7 @@
 // local imports
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
+#import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
 
 // system imports
@@ -50,6 +51,9 @@
 @property (strong, nonatomic) UITextField * manualCodeTextField;
 @property (strong, nonatomic) UIButton * doneManualCodeButton;
 
+@property (strong, nonatomic) UIButton * nfcScanButton;
+@property (readwrite) BOOL sessionIsActive;
+
 @property (strong, nonatomic) UIView * setupPayloadView;
 @property (strong, nonatomic) UILabel * manualCodeLabel;
 @property (strong, nonatomic) UIButton * resetButton;
@@ -65,7 +69,11 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
-@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
+@property (nonatomic, strong) CHIPNetworkCommissioning * cluster;
+
+@property (strong, nonatomic) NFCNDEFReaderSession * session;
+@property (strong, nonatomic) CHIPSetupPayload * setupPayload;
+@property (strong, nonatomic) DeviceSelector * deviceList;
 @end
 
 @implementation QRCodeViewController {
@@ -100,6 +108,19 @@
     // Title
     UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
 
+    // stack view
+    UIStackView * stackView = [UIStackView new];
+    stackView.axis = UILayoutConstraintAxisVertical;
+    stackView.distribution = UIStackViewDistributionFill;
+    stackView.alignment = UIStackViewAlignmentLeading;
+    stackView.spacing = 15;
+    [self.view addSubview:stackView];
+
+    stackView.translatesAutoresizingMaskIntoConstraints = false;
+    [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
+    [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+
     // Manual entry view
     _manualCodeTextField = [UITextField new];
     _doneManualCodeButton = [UIButton new];
@@ -108,19 +129,45 @@
     _manualCodeTextField.keyboardType = UIKeyboardTypeNumberPad;
     [_doneManualCodeButton setTitle:@"Go" forState:UIControlStateNormal];
     UIView * manualEntryView = [CHIPUIViewUtils viewWithUITextField:_manualCodeTextField button:_doneManualCodeButton];
-    [self.view addSubview:manualEntryView];
+    [stackView addArrangedSubview:manualEntryView];
 
     manualEntryView.translatesAutoresizingMaskIntoConstraints = false;
     [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
 
+    _nfcScanButton = [UIButton new];
+    [_nfcScanButton setTitle:@"Scan NFC Tag" forState:UIControlStateNormal];
+    [_nfcScanButton addTarget:self action:@selector(startScanningNFCTags:) forControlEvents:UIControlEventTouchDown];
+    _nfcScanButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    _nfcScanButton.titleLabel.textColor = [UIColor blackColor];
+    _nfcScanButton.layer.cornerRadius = 5;
+    _nfcScanButton.clipsToBounds = YES;
+    _nfcScanButton.backgroundColor = UIColor.systemBlueColor;
+    [stackView addArrangedSubview:_nfcScanButton];
+
+    _nfcScanButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_nfcScanButton.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor].active = YES;
+    [_nfcScanButton.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    [_nfcScanButton.heightAnchor constraintEqualToConstant:40].active = YES;
+
+    _deviceList = [DeviceSelector new];
+    [_deviceList setEnabled:NO];
+
+    UILabel * deviceIDLabel = [UILabel new];
+    deviceIDLabel.text = @"Paired Devices:";
+    UIView * deviceIDView = [CHIPUIViewUtils viewWithLabel:deviceIDLabel textField:_deviceList];
+    [stackView addArrangedSubview:deviceIDView];
+
+    deviceIDView.translatesAutoresizingMaskIntoConstraints = false;
+    [deviceIDView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = true;
+
     // Results view
     _setupPayloadView = [UIView new];
     [self.view addSubview:_setupPayloadView];
 
     _setupPayloadView.translatesAutoresizingMaskIntoConstraints = false;
-    [_setupPayloadView.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:10].active = YES;
+    [_setupPayloadView.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:10].active = YES;
     [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
@@ -141,7 +188,7 @@
     [self.view addSubview:_qrCodeViewPreview];
 
     _qrCodeViewPreview.translatesAutoresizingMaskIntoConstraints = false;
-    [_qrCodeViewPreview.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:30].active = YES;
+    [_qrCodeViewPreview.topAnchor constraintEqualToAnchor:_nfcScanButton.bottomAnchor constant:30].active = YES;
     [_qrCodeViewPreview.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_qrCodeViewPreview.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_qrCodeViewPreview.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-50].active = YES;
@@ -151,12 +198,11 @@
     _errorLabel.text = @"Error Text";
     _errorLabel.textColor = UIColor.blackColor;
     _errorLabel.font = [UIFont systemFontOfSize:17];
-    [self.view addSubview:_errorLabel];
+    [stackView addArrangedSubview:_errorLabel];
 
     _errorLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_errorLabel.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_errorLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    [_errorLabel.topAnchor constraintEqualToAnchor:manualEntryView.bottomAnchor constant:40].active = YES;
 
     // Reset button
     _resetButton = [UIButton new];
@@ -243,6 +289,8 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+    [_session invalidateSession];
+    _session = nil;
 }
 
 - (void)dismissKeyboard
@@ -255,13 +303,9 @@
     [super viewDidLoad];
     [self setupUI];
 
-    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
-
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
-    self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:callbackQueue];
+    self.chipController = InitializeCHIP();
     [self.chipController setPairingDelegate:self queue:callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -270,27 +314,63 @@
     [self qrCodeInitialState];
 }
 
-// MARK: CHIPDeviceControllerDelegate
-- (void)deviceControllerOnConnected
+// MARK: NFCNDEFReaderSessionDelegate
+
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages
 {
-    NSLog(@"Status: Device connected");
+    [_session invalidateSession];
+    NSString * errorMessage;
+    if (messages.count == 1) {
+        for (NFCNDEFMessage * message in messages) {
+            if (message.records.count == 1) {
+                for (NFCNDEFPayload * payload in message.records) {
+                    NSString * payloadType = [[NSString alloc] initWithData:payload.type encoding:NSUTF8StringEncoding];
+                    if ([payloadType isEqualToString:@"U"]) {
+                        NSURL * payloadURI = [payload wellKnownTypeURIPayload];
+                        NSLog(@"Payload text:%@", payloadURI);
+                        if (payloadURI) {
+                            /* CHIP Issue #415
+                             Once #415 goes in, there will b no need to replace _ with spaces.
+                            */
+                            NSString * qrCode = [[payloadURI absoluteString] stringByReplacingOccurrencesOfString:@"_"
+                                                                                                       withString:@" "];
+                            NSLog(@"Scanned code string:%@", qrCode);
+                            [self scannedQRCode:qrCode];
+                        }
+                    } else {
+                        errorMessage = @"Record must be of type text.";
+                    }
+                }
+            } else {
+                errorMessage = @"Only one record in NFC tag is accepted.";
+            }
+        }
+    } else {
+        errorMessage = @"Only one message in NFC tag is accepted.";
+    }
+    if ([errorMessage length] > 0) {
+        NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.nfctagscanning"
+                                                     code:1
+                                                 userInfo:@{ NSLocalizedDescriptionKey : errorMessage }];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+            [self showError:error];
+        });
+    }
 }
 
-- (void)deviceControllerOnError:(nonnull NSError *)error
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didInvalidateWithError:(nonnull NSError *)error
 {
-    NSLog(@"Status: Device Controller error %@", [error description]);
-}
-
-- (void)deviceControllerOnMessage:(nonnull NSData *)message
-{
+    NSLog(@"If no NFC reading UI is appearing, target may me missing the appropriate capability. Turn on Near Field Communication "
+          @"Tag Reading under the Capabilities tab for the project’s target. A paid developer account is needed for this.");
+    _session = nil;
 }
 
 // MARK: CHIPDevicePairingDelegate
-- (void)onNetworkCredentialsRequested:(SendNetworkCredentials)handler
+- (void)onPairingComplete:(NSError *)error
 {
-    NSLog(@"Network credential requested for pairing");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-        [self retrieveAndSendWifiCredentialsUsing:handler];
+        [self->_deviceList refreshDeviceList];
+        [self retrieveAndSendWifiCredentials];
     });
 }
 
@@ -376,7 +456,7 @@
     [self handleRendezVous:payload];
 }
 
-- (void)retrieveAndSendWifiCredentialsUsing:(SendNetworkCredentials)sendCredentials
+- (void)retrieveAndSendWifiCredentials
 {
     UIAlertController * alertController =
         [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
@@ -430,10 +510,97 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 sendCredentials(networkSSID.text, networkPassword.text);
+                                                 [strongSelf addWiFiNetwork:networkSSID.text password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
+{
+    self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
+                                                           endpoint:0
+                                                              queue:dispatch_get_main_queue()];
+    NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+    NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+    uint64_t breadcrumb = 0;
+    uint32_t timeoutMs = 3000;
+
+    __weak typeof(self) weakSelf = self;
+    [_cluster addWiFiNetwork:networkId
+                 credentials:credentials
+                  breadcrumb:breadcrumb
+                   timeoutMs:timeoutMs
+           completionHandler:^(NSError * error, NSDictionary * values) {
+               [weakSelf onAddNetworkResponse:error isWiFi:YES];
+           }];
+}
+
+- (void)addThreadNetwork:(NSData *)threadDataSet
+{
+    self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
+                                                           endpoint:0
+                                                              queue:dispatch_get_main_queue()];
+    uint64_t breadcrumb = 0;
+    uint32_t timeoutMs = 3000;
+
+    __weak typeof(self) weakSelf = self;
+    [_cluster addThreadNetwork:threadDataSet
+                    breadcrumb:breadcrumb
+                     timeoutMs:timeoutMs
+             completionHandler:^(NSError * error, NSDictionary * values) {
+                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
+             }];
+}
+
+- (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi
+{
+    if (error != nil) {
+        NSLog(@"Error adding network: %@", error);
+        return;
+    }
+
+    NSData * networkId;
+    if (isWiFi) {
+        NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+        networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+    } else {
+        uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+        networkId = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
+    }
+    uint64_t breadcrumb = 0;
+    uint32_t timeoutMs = 3000;
+
+    __weak typeof(self) weakSelf = self;
+    [_cluster enableNetwork:networkId
+                 breadcrumb:breadcrumb
+                  timeoutMs:timeoutMs
+          completionHandler:^(NSError * err, NSDictionary * values) {
+              [weakSelf onEnableNetworkResponse:err];
+          }];
+}
+
+- (void)onEnableNetworkResponse:(NSError *)error
+{
+    if (error != nil) {
+        NSLog(@"Error enabling network: %@", error);
+    }
+
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    [controller updateDevice:deviceId fabricId:0];
+}
+
+- (void)onAddressUpdated:(NSError *)error
+{
+    if (error.code != CHIPSuccess) {
+        NSLog(@"Error retrieving device informations over Mdns: %@", error);
+        return;
+    }
+}
+
+- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
+{
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
@@ -498,12 +665,11 @@
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationThread:
-    case kRendezvousInformationEthernet:
+    case kRendezvousInformationOnNetwork:
     case kRendezvousInformationAllMask:
         NSLog(@"Rendezvous Unknown");
         break;
-    case kRendezvousInformationWiFi:
+    case kRendezvousInformationSoftAP:
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
@@ -526,9 +692,10 @@
 {
     NSError * error;
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
-    [self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error];
-    deviceID++;
-    CHIPSetNextAvailableDeviceID(deviceID);
+    if ([self.chipController pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:&error]) {
+        deviceID++;
+        CHIPSetNextAvailableDeviceID(deviceID);
+    }
 }
 
 - (void)handleRendezVousWiFi:(NSString *)name
@@ -591,15 +758,16 @@
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self->_captureSession stopRunning];
+        [self->_session invalidateSession];
     });
     CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
     NSError * error;
-    CHIPSetupPayload * payload = [parser populatePayload:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [self postScanningQRCodeState];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-            [self displayQRCodeInSetupPayloadView:payload withError:error];
+            [self displayQRCodeInSetupPayloadView:self->_setupPayload withError:error];
         });
     });
 }
@@ -650,6 +818,16 @@
     [self qrCodeInitialState];
 }
 
+- (IBAction)startScanningNFCTags:(id)sender
+{
+    if (!_session) {
+        _session = [[NFCNDEFReaderSession alloc] initWithDelegate:self
+                                                            queue:dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT)
+                                         invalidateAfterFirstRead:NO];
+    }
+    [_session beginSession];
+}
+
 - (IBAction)enteredManualCode:(id)sender
 {
     NSString * decimalString = _manualCodeTextField.text;
@@ -658,9 +836,9 @@
     CHIPManualSetupPayloadParser * parser =
         [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:decimalString];
     NSError * error;
-    CHIPSetupPayload * payload = [parser populatePayload:&error];
+    _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, INDICATOR_DELAY), dispatch_get_main_queue(), ^{
-        [self displayManualCodeInSetupPayloadView:payload decimalString:decimalString withError:error];
+        [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
     [_manualCodeTextField resignFirstResponder];
 }

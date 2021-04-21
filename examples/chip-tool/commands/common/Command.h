@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/util/DataModelHandler.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>
@@ -78,7 +79,6 @@ public:
     using ChipDevice             = ::chip::Controller::Device;
     using PeerAddress            = ::chip::Transport::PeerAddress;
     using IPAddress              = ::chip::Inet::IPAddress;
-    using PacketBuffer           = ::chip::System::PacketBuffer;
     using PacketBufferHandle     = ::chip::System::PacketBufferHandle;
     using NodeId                 = ::chip::NodeId;
 
@@ -144,7 +144,11 @@ public:
     virtual CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) = 0;
 
     bool GetCommandExitStatus() const { return mCommandExitStatus; }
-    void SetCommandExitStatus(bool status) { mCommandExitStatus = status; }
+    void SetCommandExitStatus(bool status)
+    {
+        mCommandExitStatus = status;
+        UpdateWaitForResponse(false);
+    }
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(uint16_t duration);

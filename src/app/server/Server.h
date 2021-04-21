@@ -19,14 +19,25 @@
 
 #include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
+#include <messaging/ExchangeMgr.h>
+#include <transport/AdminPairingTable.h>
+#include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
+#include <transport/raw/BLE.h>
 #include <transport/raw/UDP.h>
 
+constexpr size_t kMaxBlePendingPackets = 1;
+
+using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP, chip::Transport::UDP>;
-#else
-using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
+                                            ,
+                                            chip::Transport::UDP
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                            ,
+                                            chip::Transport::BLE<kMaxBlePendingPackets>
+#endif
+                                            >;
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server
@@ -35,3 +46,32 @@ using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
  * @param [in] delegate   An optional AppDelegate
  */
 void InitServer(AppDelegate * delegate = nullptr);
+
+CHIP_ERROR AddTestPairing();
+
+chip::Transport::AdminPairingTable & GetGlobalAdminPairingTable();
+
+namespace chip {
+
+enum class ResetAdmins
+{
+    kYes,
+    kNo,
+};
+
+enum class PairingWindowAdvertisement
+{
+    kBle,
+    kMdns,
+};
+
+SecureSessionMgr & SessionManager();
+Messaging::ExchangeManager & ExchangeManager();
+
+} // namespace chip
+
+/**
+ * Open the pairing window using default configured parameters.
+ */
+CHIP_ERROR OpenDefaultPairingWindow(chip::ResetAdmins resetAdmins,
+                                    chip::PairingWindowAdvertisement advertisementMode = chip::PairingWindowAdvertisement::kBle);

@@ -47,6 +47,9 @@ const size_t kMAX_Point_Length           = kP256_Point_Length;
 const size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 const size_t kMAX_CSR_Length             = 512;
 
+const size_t kMin_Salt_Length = 8;
+const size_t kMax_Salt_Length = 16;
+
 const size_t kP256_PrivateKey_Length = 32;
 const size_t kP256_PublicKey_Length  = 65;
 
@@ -224,7 +227,7 @@ public:
     virtual const PK & Pubkey() = 0;
 };
 
-struct P256KeypairContext
+struct alignas(size_t) P256KeypairContext
 {
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
@@ -354,7 +357,7 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_b
  *        All implementations must check for std::is_trivially_copyable.
  **/
 
-struct HashSHA256OpaqueContext
+struct alignas(size_t) HashSHA256OpaqueContext
 {
     uint8_t mOpaque[kMAX_Hash_SHA256_Context_Size];
 };
@@ -458,13 +461,14 @@ public:
     /**
      * @brief Initialize Spake2+ with some context specific information.
      *
-     * @param context     The spake2p session will bootstrap from this hash context.
-     *                    If the provided context pointer is null, the spake2p session will bootstrap
-     *                    from a blank hash context.
+     * @param context     The context is arbitrary but should include information about the
+     *                    protocol being run, contain the transcript for negotiation, include
+     *                    the PKBDF parameters, etc.
+     * @param context_len The length of the context.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(const Hash_SHA256_stream * context);
+    virtual CHIP_ERROR Init(const uint8_t * context, size_t context_len);
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -480,8 +484,9 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin, size_t Lin_len);
+    virtual CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+                                     size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
+                                     size_t Lin_len);
 
     /**
      * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
@@ -497,18 +502,21 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len);
+    virtual CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
+                                   size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
+                                   size_t w1in_len);
 
     /**
      * @brief Compute the first round of the protocol.
      *
+     * @param pab      X value from commissioner.
+     * @param pab_len  X length.
      * @param out     The output first round Spake2+ contribution.
      * @param out_len The output first round Spake2+ contribution length.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundOne(uint8_t * out, size_t * out_len);
+    virtual CHIP_ERROR ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Compute the second round of the protocol.
@@ -520,7 +528,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
+    virtual CHIP_ERROR ComputeRoundTwo(const uint8_t * in, size_t in_len, uint8_t * out, size_t * out_len);
 
     /**
      * @brief Confirm that each party computed the same keys.
@@ -530,7 +538,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
+    virtual CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
 
     /**
      * @brief Return the shared secret.
@@ -717,7 +725,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR InitImpl(const Hash_SHA256_stream * context) = 0;
+    virtual CHIP_ERROR InitImpl() = 0;
 
     /**
      * @brief Hash in_len bytes of in into the internal hash context.
@@ -796,7 +804,7 @@ protected:
     uint8_t * Ke;
 };
 
-struct Spake2pOpaqueContext
+struct alignas(size_t) Spake2pOpaqueContext
 {
     uint8_t mOpaque[kMAX_Spake2p_Context_Size];
 };
@@ -829,7 +837,7 @@ public:
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
-    CHIP_ERROR InitImpl(const Hash_SHA256_stream * context) override;
+    CHIP_ERROR InitImpl() override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
     CHIP_ERROR HashFinalize(uint8_t * out) override;
     CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,

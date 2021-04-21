@@ -62,6 +62,53 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
+CHIPDeviceController * InitializeCHIP(void)
+{
+    static dispatch_queue_t callbackQueue;
+    static CHIPToolPersistentStorageDelegate * storage = nil;
+    static dispatch_once_t onceToken;
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    dispatch_once(&onceToken, ^{
+        storage = [[CHIPToolPersistentStorageDelegate alloc] init];
+        callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
+        [controller startup:storage queue:callbackQueue];
+    });
+
+    return controller;
+}
+
+CHIPDevice * CHIPGetPairedDevice(void)
+{
+    CHIPDeviceController * controller = InitializeCHIP();
+
+    CHIPDevice * device = nil;
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID();
+    if (deviceId > 1) {
+        // Let's use the last device that was paired
+        deviceId--;
+        NSError * error;
+        device = [controller getPairedDevice:deviceId error:&error];
+    }
+
+    return device;
+}
+
+CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
+{
+    CHIPDeviceController * controller = InitializeCHIP();
+
+    NSError * error;
+    return [controller getPairedDevice:deviceId error:&error];
+}
+
+void CHIPUnpairDeviceWithID(uint64_t deviceId)
+{
+    CHIPDeviceController * controller = InitializeCHIP();
+
+    NSError * error;
+    [controller unpairDevice:deviceId error:&error];
+}
+
 @implementation CHIPToolPersistentStorageDelegate
 
 // MARK: CHIPPersistentStorageDelegate

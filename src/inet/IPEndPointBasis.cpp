@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,8 +99,6 @@
 namespace chip {
 namespace Inet {
 
-using chip::System::PacketBuffer;
-
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 union PeerSockAddr
 {
@@ -109,6 +107,11 @@ union PeerSockAddr
     sockaddr_in6 in6;
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+IPEndPointBasis::JoinMulticastGroupHandler IPEndPointBasis::sJoinMulticastGroupHandler;
+IPEndPointBasis::LeaveMulticastGroupHandler IPEndPointBasis::sLeaveMulticastGroupHandler;
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
@@ -180,7 +183,17 @@ exit:
 #endif // LWIP_IPV4 && LWIP_IGMP
 #endif // INET_CONFIG_ENABLE_IPV4
 
-#if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+// unusual define check for LWIP_IPV6_ND is because espressif fork
+// of LWIP does not define the _ND constant.
+#if LWIP_IPV6_MLD && (!defined(LWIP_IPV6_ND) || LWIP_IPV6_ND) && LWIP_IPV6
+#define HAVE_IPV6_MULTICAST
+#else
+// Within Project CHIP multicast support is highly desirable: used for mDNS
+// as well as group communication.
+#undef HAVE_IPV6_MULTICAST
+#endif
+
+#ifdef HAVE_IPV6_MULTICAST
 static INET_ERROR LwIPIPv6JoinLeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress,
                                                   err_t (*aMethod)(struct netif *, const LWIP_IPV6_ADDR_T *))
 {
@@ -488,12 +501,19 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case kIPAddressType_IPv6: {
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+        if (sJoinMulticastGroupHandler != nullptr)
+        {
+            return sJoinMulticastGroupHandler(aInterfaceId, aAddress);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#ifdef HAVE_IPV6_MULTICAST
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
-#else  // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#else  // HAVE_IPV6_MULTICAST
         lRetval = INET_ERROR_NOT_SUPPORTED;
-#endif // LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
+#endif // HAVE_IPV6_MULTICAST
         SuccessOrExit(lRetval);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -573,6 +593,13 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case kIPAddressType_IPv6: {
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+        if (sLeaveMulticastGroupHandler != nullptr)
+        {
+            return sLeaveMulticastGroupHandler(aInterfaceId, aAddress);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
@@ -678,12 +705,12 @@ done:
 System::Error IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
                                                      System::EventType aEventType, System::PacketBufferHandle aBuffer)
 {
-    System::PacketBuffer * buf = aBuffer.Release_ForNow();
-    System::Error error        = aLayer.PostEvent(aTarget, aEventType, (uintptr_t) buf);
-    if (error != INET_NO_ERROR)
+    System::Error error =
+        aLayer.PostEvent(aTarget, aEventType, (uintptr_t) System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(aBuffer));
+    if (error == INET_NO_ERROR)
     {
-        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to retake it so that it will be freed.
-        (void) System::PacketBufferHandle::Adopt(buf);
+        // If PostEvent() succeeded, it has ownership of the buffer, so we need to release it (without freeing it).
+        static_cast<void>(std::move(aBuffer).UnsafeRelease());
     }
     return error;
 }
@@ -1051,16 +1078,6 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
     return INET_NO_ERROR;
 }
 
-SocketEvents IPEndPointBasis::PrepareIO()
-{
-    SocketEvents res;
-
-    if (mState == kState_Listening && OnMessageReceived != nullptr)
-        res.SetRead();
-
-    return res;
-}
-
 void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 {
     INET_ERROR lStatus = INET_NO_ERROR;
@@ -1070,7 +1087,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
-    lBuffer = PacketBuffer::New(0);
+    lBuffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSizeWithoutReserve, 0);
 
     if (!lBuffer.IsNull())
     {
@@ -1171,6 +1188,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     if (lStatus == INET_NO_ERROR)
     {
+        lBuffer.RightSize();
         OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
     }
     else
@@ -1319,7 +1337,7 @@ void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
             if (content != NULL && OnMessageReceived != NULL)
             {
                 size_t count                              = dispatch_data_get_size(content);
-                System::PacketBufferHandle * packetBuffer = System::PacketBuffer::NewWithAvailableSize(count);
+                System::PacketBufferHandle * packetBuffer = System::PacketBufferHandle::New(count);
                 dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
                     memmove(packetBuffer->Start() + offset, buffer, size);
                     return true;

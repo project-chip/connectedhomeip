@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC
  *    All rights reserved.
  *
@@ -169,7 +169,7 @@ static PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatt
 
     VerifyOrExit(aPatternStartOffset <= aDesiredLength, );
 
-    lBuffer = PacketBuffer::New();
+    lBuffer = PacketBufferHandle::New(aDesiredLength);
     VerifyOrExit(!lBuffer.IsNull(), );
 
     aDesiredLength = min(lBuffer->MaxDataLength(), aDesiredLength);
@@ -295,7 +295,7 @@ static bool HandleICMPDataReceived(PacketBufferHandle aBuffer, uint16_t aHeaderL
     return (lStatus);
 }
 
-bool HandleICMPv4DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleICMPv4DataReceived(PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint16_t lICMPHeaderLength = sizeof(ICMPv4EchoHeader);
     bool lStatus;
@@ -305,7 +305,7 @@ bool HandleICMPv4DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats
     return (lStatus);
 }
 
-bool HandleICMPv6DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleICMPv6DataReceived(PacketBufferHandle && aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint16_t lICMPHeaderLength = sizeof(ICMPv6EchoHeader);
     bool lStatus;
@@ -374,8 +374,8 @@ void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];
 
-    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer, sizeof(lSourceAddressBuffer));
-    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer, sizeof(lDestinationAddressBuffer));
+    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer);
+    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer);
 
     printf("Raw message received from %s to %s (%zu bytes)\n", lSourceAddressBuffer, lDestinationAddressBuffer,
            static_cast<size_t>(aBuffer->DataLength()));
@@ -387,7 +387,7 @@ void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
 
     if (aPacketInfo != nullptr)
     {
-        aPacketInfo->SrcAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
+        aPacketInfo->SrcAddress.ToString(lAddressBuffer);
     }
     else
     {
@@ -405,8 +405,8 @@ void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuf
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];
 
-    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer, sizeof(lSourceAddressBuffer));
-    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer, sizeof(lDestinationAddressBuffer));
+    aPacketInfo->SrcAddress.ToString(lSourceAddressBuffer);
+    aPacketInfo->DestAddress.ToString(lDestinationAddressBuffer);
 
     printf("UDP packet received from %s:%u to %s:%u (%zu bytes)\n", lSourceAddressBuffer, aPacketInfo->SrcPort,
            lDestinationAddressBuffer, aPacketInfo->DestPort, static_cast<size_t>(aBuffer->DataLength()));
@@ -419,7 +419,7 @@ void HandleUDPReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
 
     if (aPacketInfo != nullptr)
     {
-        aPacketInfo->SrcAddress.ToString(lAddressBuffer, sizeof(lAddressBuffer));
+        aPacketInfo->SrcAddress.ToString(lAddressBuffer);
         lSourcePort = aPacketInfo->SrcPort;
     }
     else

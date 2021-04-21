@@ -14,14 +14,25 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+import("common_flags.gni")
+
+declare_args() {
+  # Enable strict schema checks.
+  chip_enable_schema_check =
+      is_debug && (current_os == "linux" || current_os == "mac")
+}
 
 config("app_config") {
   include_dirs = [
-    "gen",
     "util",
     ".",
     "${target_gen_dir}/include",
   ]
+  if (chip_enable_schema_check) {
+    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=1" ]
+  } else {
+    defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=0" ]
+  }
 }
 
 static_library("app") {
@@ -33,10 +44,59 @@ static_library("app") {
     "CommandHandler.cpp",
     "CommandSender.cpp",
     "InteractionModelEngine.cpp",
-    "MessageDef.cpp",
-    "MessageDef.h",
+    "MessageDef/AttributeDataElement.cpp",
+    "MessageDef/AttributeDataElement.h",
+    "MessageDef/AttributeDataList.cpp",
+    "MessageDef/AttributeDataList.h",
+    "MessageDef/AttributeDataVersionList.cpp",
+    "MessageDef/AttributeDataVersionList.h",
+    "MessageDef/AttributePath.cpp",
+    "MessageDef/AttributePath.h",
+    "MessageDef/AttributePathList.cpp",
+    "MessageDef/AttributePathList.h",
+    "MessageDef/AttributeStatusElement.cpp",
+    "MessageDef/AttributeStatusElement.h",
+    "MessageDef/AttributeStatusList.cpp",
+    "MessageDef/AttributeStatusList.h",
+    "MessageDef/Builder.cpp",
+    "MessageDef/Builder.h",
+    "MessageDef/CommandDataElement.cpp",
+    "MessageDef/CommandDataElement.h",
+    "MessageDef/CommandList.cpp",
+    "MessageDef/CommandList.h",
+    "MessageDef/CommandPath.cpp",
+    "MessageDef/CommandPath.h",
+    "MessageDef/EventDataElement.cpp",
+    "MessageDef/EventDataElement.h",
+    "MessageDef/EventList.cpp",
+    "MessageDef/EventList.h",
+    "MessageDef/EventPath.cpp",
+    "MessageDef/EventPath.h",
+    "MessageDef/EventPathList.cpp",
+    "MessageDef/EventPathList.h",
+    "MessageDef/InvokeCommand.cpp",
+    "MessageDef/InvokeCommand.h",
+    "MessageDef/ListBuilder.cpp",
+    "MessageDef/ListBuilder.h",
+    "MessageDef/ListParser.cpp",
+    "MessageDef/ListParser.h",
+    "MessageDef/MessageDefHelper.cpp",
+    "MessageDef/MessageDefHelper.h",
+    "MessageDef/Parser.cpp",
+    "MessageDef/Parser.h",
+    "MessageDef/ReadRequest.cpp",
+    "MessageDef/ReadRequest.h",
+    "MessageDef/ReportData.cpp",
+    "MessageDef/ReportData.h",
+    "MessageDef/StatusElement.cpp",
+    "MessageDef/StatusElement.h",
+    "MessageDef/WriteRequest.cpp",
+    "MessageDef/WriteResponse.cpp",
+    "ReadClient.cpp",
+    "ReadHandler.cpp",
     "decoder.cpp",
     "encoder.cpp",
+    "reporting/Engine.cpp",
   ]
 
   public_deps = [

@@ -2517,6 +2517,29 @@
 #define emberAfDiagnosticsClusterPrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_DIAGNOSTICS_CLUSTER)
 
+// Printing macros for cluster: Application Basic
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER)
+#define emberAfApplicationBasicClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, __VA_ARGS__)
+#define emberAfApplicationBasicClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfApplicationBasicClusterFlush()
+#define emberAfApplicationBasicClusterDebugExec(x)                                                                                 \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER))                                                             \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfApplicationBasicClusterPrintBuffer(buffer, len, withSpace)                                                          \
+    emberAfPrintBuffer(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfApplicationBasicClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, (buffer))
+#else
+#define emberAfApplicationBasicClusterPrint(...)
+#define emberAfApplicationBasicClusterPrintln(...)
+#define emberAfApplicationBasicClusterFlush()
+#define emberAfApplicationBasicClusterDebugExec(x)
+#define emberAfApplicationBasicClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfApplicationBasicClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER)
+
 // Printing macros for cluster: ZLL Commissioning
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ZLL_COMMISSIONING_CLUSTER)
 #define emberAfZllCommissioningClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_ZLL_COMMISSIONING_CLUSTER, __VA_ARGS__)

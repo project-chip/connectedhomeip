@@ -1,52 +1,51 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Nest Labs, Inc.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+/* See Project CHIP LICENSE file for licensing information. */
+#include <platform/logging/LogV.h>
 
-/**
- *    @file
- *          Provides implementations for the CHIP and LwIP logging
- *          functions on Silicon Labs EFR32 platforms.
- *
- *          Logging should be initialized by a call to efr32LogInit().  A
- *          spooler task is created that sends the logs to the UART.  Log
- *          entries are queued. If the queue is full then by default error
- *          logs wait indefinitely until a slot is available whereas
- *          non-error logs are dropped to avoid delays.
- */
-/* this file behaves like a config.h, comes first */
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
-#include <support/CodeUtils.h>
+#include <support/SafeString.h>
 #include <support/logging/CHIPLogging.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <openthread/platform/logging.h>
+#endif
+
+#include <FreeRTOS.h>
 #include <queue.h>
 #include <retargetserial.h>
 #include <stdio.h>
+#include <string.h>
 #include <task.h>
+
+#ifdef PW_RPC_ENABLED
+#include "PigweedLogger.h"
+#endif
 
 // RTT Buffer size and name
 #ifndef LOG_RTT_BUFFER_INDEX
 #define LOG_RTT_BUFFER_INDEX 0
 #endif
 
+/**
+ * @def LOG_RTT_BUFFER_NAME
+ *
+ * RTT's name. Only used if LOG_RTT_BUFFER_INDEX is not 0. Otherwise,
+ * the buffer name is fixed to "Terminal".
+ *
+ */
 #ifndef LOG_RTT_BUFFER_NAME
 #define LOG_RTT_BUFFER_NAME "Terminal"
 #endif
 
+/**
+ * @def LOG_RTT_BUFFER_SIZE
+ *
+ * LOG RTT's buffer size. Only used if LOG_RTT_BUFFER_INDEX is not 0. To
+ * configure buffer #0 size, check the BUFFER_SIZE_UP definition in
+ * SEGGER_RTT_Conf.h
+ *
+ */
 #ifndef LOG_RTT_BUFFER_SIZE
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
@@ -61,32 +60,41 @@
 #define LOG_DETAIL "<detail> "
 #define LOG_LWIP "<lwip  > "
 #define LOG_EFR32 "<efr32 > "
+// If a new category string LOG_* is created, add it in the MaxStringLength arguments below
+static constexpr size_t kMaxCategoryStrLen = chip::MaxStringLength(LOG_ERROR, LOG_WARN, LOG_INFO, LOG_DETAIL, LOG_LWIP, LOG_EFR32);
 
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
-
+#if EFR32_LOG_ENABLED
 static bool sLogInitialized = false;
+#endif
+#if LOG_RTT_BUFFER_INDEX != 0
 static uint8_t sLogBuffer[LOG_RTT_BUFFER_SIZE];
+static uint8_t sCmdLineBuffer[LOG_RTT_BUFFER_SIZE];
+#endif
 
+#if EFR32_LOG_ENABLED
 /**
  * Print a log message to RTT
  */
 static void PrintLog(const char * msg)
 {
-#if EFR32_LOG_ENABLED
     if (sLogInitialized)
     {
         size_t sz;
         sz = strlen(msg);
-        SEGGER_RTT_WriteNoLock(0, msg, sz);
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
+#ifdef PW_RPC_ENABLED
+        PigweedLogger::putString(msg, sz);
+#endif
 
         const char * newline = "\r\n";
         sz                   = strlen(newline);
-        SEGGER_RTT_WriteNoLock(0, newline, sz);
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
+#ifdef PW_RPC_ENABLED
+        PigweedLogger::putString(newline, sz);
+#endif
     }
-#endif // EFR32_LOG_ENABLED
 }
+#endif // EFR32_LOG_ENABLED
 
 /**
  * Initialize Segger RTT for logging
@@ -94,8 +102,19 @@ static void PrintLog(const char * msg)
 extern "C" void efr32LogInit(void)
 {
 #if EFR32_LOG_ENABLED
+#if LOG_RTT_BUFFER_INDEX != 0
     SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
                               SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+
+    SEGGER_RTT_ConfigDownBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sCmdLineBuffer, LOG_RTT_BUFFER_SIZE,
+                                SEGGER_RTT_MODE_NO_BLOCK_SKIP);
+#else
+    SEGGER_RTT_SetFlagsUpBuffer(LOG_RTT_BUFFER_INDEX, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
+#endif
+
+#ifdef PW_RPC_ENABLED
+    PigweedLogger::init();
+#endif
     sLogInitialized = true;
 #endif // EFR32_LOG_ENABLED
 }
@@ -109,7 +128,8 @@ extern "C" void efr32Log(const char * aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    static_assert(sizeof(formattedMsg) > kMaxCategoryStrLen); // Greater than to at least accommodate a ending Null Character
 
     strcpy(formattedMsg, LOG_EFR32);
     size_t prefixLen = strlen(formattedMsg);
@@ -142,20 +162,22 @@ void __attribute__((weak)) OnLogOutput(void) {}
 
 namespace chip {
 namespace Logging {
+namespace Platform {
 
 /**
  * CHIP log output functions.
  */
-void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
+void LogV(const char * module, uint8_t category, const char * aFormat, va_list v)
 {
 #if EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
     if (IsCategoryEnabled(category))
     {
-        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+        char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t formattedMsgLen;
 
-        constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 3;
-        static_assert(sizeof(formattedMsg) > maxPrefixLen);
+        // len for Category string + "[" + Module name + "] " (Brackets and space =3)
+        constexpr size_t maxPrefixLen = kMaxCategoryStrLen + chip::Logging::kMaxModuleNameLen + 3;
+        static_assert(sizeof(formattedMsg) > maxPrefixLen); // Greater than to at least accommodate a ending Null Character
 
         switch (category)
         {
@@ -163,7 +185,6 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
             strcpy(formattedMsg, LOG_ERROR);
             break;
         case kLogCategory_Progress:
-        case kLogCategory_Retain:
         default:
             strcpy(formattedMsg, LOG_INFO);
             break;
@@ -175,11 +196,9 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
         formattedMsgLen = strlen(formattedMsg);
 
         // Form the log prefix, e.g. "[DL] "
-        formattedMsg[formattedMsgLen++] = '[';
-        GetModuleName(formattedMsg + formattedMsgLen, module);
-        formattedMsgLen                 = strlen(formattedMsg);
-        formattedMsg[formattedMsgLen++] = ']';
-        formattedMsg[formattedMsgLen++] = ' ';
+        snprintf(formattedMsg + formattedMsgLen, sizeof(formattedMsg) - formattedMsgLen, "[%s] ", module);
+        formattedMsg[sizeof(formattedMsg) - 1] = 0;
+        formattedMsgLen                        = strlen(formattedMsg);
 
         size_t len = vsnprintf(formattedMsg + formattedMsgLen, sizeof formattedMsg - formattedMsgLen, aFormat, v);
 
@@ -192,10 +211,11 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
     }
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED && _CHIP_USE_LOGGING
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip
 
@@ -208,7 +228,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     strcpy(formattedMsg, LOG_LWIP);
     size_t prefixLen = strlen(formattedMsg);
@@ -228,7 +248,7 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #endif
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
@@ -239,12 +259,12 @@ extern "C" void LwIPLog(const char * aFormat, ...)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
-    IgnoreUnusedVariable(aLogRegion);
+    (void) aLogRegion;
     va_list v;
 
     va_start(v, aFormat);
 #if EFR32_LOG_ENABLED
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     if (sLogInitialized)
     {
@@ -288,11 +308,11 @@ extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const ch
     }
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 #endif // EFR32_LOG_ENABLED
     va_end(v);
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif // CHIP_ENABLE_OPENTHREAD
 
 #if HARD_FAULT_LOG_ENABLE && EFR32_LOG_ENABLED
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
 
 #include "QueryReplyFilter.h"
 
-#include <support/ReturnMacros.h>
 #include <system/SystemClock.h>
 
 #define RETURN_IF_ERROR(err)                                                                                                       \
@@ -74,7 +73,6 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         const uint64_t kTimeNowMs = chip::System::Platform::Layer::GetClock_MonotonicMS();
 
         QueryReplyFilter queryReplyFilter(query);
-
         QueryResponderRecordFilter responseFilter;
 
         responseFilter.SetReplyFilter(&queryReplyFilter);
@@ -108,7 +106,8 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         mSendState.SetResourceType(ResourceType::kAdditional);
 
         QueryReplyFilter queryReplyFilter(query);
-        queryReplyFilter.SetIgnoreNameMatch(true);
+
+        queryReplyFilter.SetIgnoreNameMatch(true).SetSendingAdditionalItems(true);
 
         QueryResponderRecordFilter responseFilter;
         responseFilter
@@ -151,7 +150,7 @@ CHIP_ERROR ResponseSender::FlushReply()
 
 CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
 {
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(kPacketSizeBytes);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBufferHandle::New(kPacketSizeBytes);
     ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mResponseBuilder.Reset(std::move(buffer));

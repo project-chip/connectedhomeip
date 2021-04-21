@@ -19,16 +19,27 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 
+include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
+
+# Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+# TODO: temporary fix to remove after solving static addressing problem on nrf5340
+if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
+endif()
 
-include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
+list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
+find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(chip-nrf52840-lighting-example)
+project(chip-nrfconnect-lighting-example)
 
-target_include_directories(app PRIVATE 
-                           main/include 
-                           ${LIGHTING_COMMON} 
-                           ${NRFCONNECT_COMMON}/util/include 
+target_compile_options(app PRIVATE -Werror)
+
+target_include_directories(app PRIVATE
+                           main/include
+                           ${CHIP_ROOT}/src/app
+                           ${LIGHTING_COMMON}
+                           ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
 
 target_sources(app PRIVATE
@@ -36,13 +47,13 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
+               ${LIGHTING_COMMON}/gen/attribute-size.cpp
                ${LIGHTING_COMMON}/gen/call-command-handler.cpp
                ${LIGHTING_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp
-               ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
+               ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
@@ -58,9 +69,12 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
                )
 
 if (CONFIG_CHIP_PW_RPC)
@@ -72,29 +86,66 @@ include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
-set(dir_pw_third_party_nanopb PRESENT CACHE STRING ${CHIP_ROOT}/third_party/nanopb/repo FORCE)
+set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 
-pw_proto_library(pigweed_lighting_protolib
+pw_proto_library(button_service
   SOURCES
-    main/pigweed_lighting.proto
+    ${CHIP_ROOT}/examples/common/pigweed/protos/button_service.proto
+  PREFIX
+    button_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(device_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.proto
+  INPUTS
+    ${CHIP_ROOT}/examples/common/pigweed/protos/device_service.options
+  PREFIX
+    device_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_protos
+)
+
+pw_proto_library(lighting_service
+  SOURCES
+    ${CHIP_ROOT}/examples/lighting-app/lighting-common/lighting_service/lighting_service.proto
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/lighting-app/lighting-common/
+  DEPS
+    pw_protobuf.common_protos
 )
 
 target_sources(app PRIVATE
   main/Rpc.cpp
+  ../../common/pigweed/RpcService.cpp
+  ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
 target_include_directories(app PRIVATE
   ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
-)
+  ${PIGWEED_ROOT}/pw_sys_io/public
+  ${CHIP_ROOT}/src/lib/support
+  ${CHIP_ROOT}/src/system
+  ../../common
+  ../../common/pigweed/nrfconnect)
 
 target_link_libraries(app PRIVATE
-  pigweed_lighting_protolib.nanopb_rpc
-  pw_hdlc_lite
+  button_service.nanopb_rpc
+  device_service.nanopb_rpc
+  lighting_service.nanopb_rpc
+  pw_checksum
+  pw_hdlc
   pw_log
   pw_rpc.server
 )

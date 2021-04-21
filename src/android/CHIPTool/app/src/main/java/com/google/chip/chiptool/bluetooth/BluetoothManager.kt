@@ -39,6 +39,11 @@ class BluetoothManager {
   }
 
   suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
+
+    if (! bluetoothAdapter.isEnabled) {
+      bluetoothAdapter.enable();
+    }
+
     val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
       Log.e(TAG, "No bluetooth scanner found")
       return null
@@ -185,6 +190,6 @@ class BluetoothManager {
 
   companion object {
     private const val TAG = "chip.BluetoothManager"
-    private const val CHIP_UUID = "0000FEAF-0000-1000-8000-00805F9B34FB"
+    private const val CHIP_UUID = "0000FFF6-0000-1000-8000-00805F9B34FB"
   }
 }

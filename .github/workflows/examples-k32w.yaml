@@ -1,0 +1,73 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - K32W
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    k32w:
+        name: K32W
+        env:
+            BUILD_TYPE: gn_k32w
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: connectedhomeip/chip-build-k32w:latest
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+#            - name: Initialize CodeQL
+#              uses: github/codeql-action/init@v1
+#              with:
+#                  languages: "cpp"
+#                  queries: +security-and-quality
+            - name: Build example K32W Lock App
+              run: scripts/examples/k32w_example.sh
+                   examples/lock-app/k32w out/lock_app_debug
+            - name: Build example K32W Lighting App
+              run: scripts/examples/k32w_example.sh
+                   examples/lighting-app/k32w out/lighting_app_debug
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v2
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: |
+                      out/lock_app_debug/chip-k32w061-lock-example.out
+                      out/lighting_app_debug/chip-k32w061-light-example
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+#            - name: Perform CodeQL Analysis
+#              if: ${{ github.event_name == 'push' }}
+#              uses: github/codeql-action/analyze@v1

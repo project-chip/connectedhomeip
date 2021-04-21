@@ -24,14 +24,9 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
-#define _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
-
 #include <app/Command.h>
-#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
-#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -44,17 +39,19 @@
 namespace chip {
 namespace app {
 
-class DLL_EXPORT CommandHandler : public Command
+class CommandHandler : public Command
 {
 public:
-    CHIP_ERROR SendCommandResponse();
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload);
+    CHIP_ERROR AddStatusCode(const CommandPathParams * apCommandPathParams,
+                             const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
+                             const uint16_t aProtocolCode) override;
 
 private:
+    friend class TestCommandInteraction;
+    CHIP_ERROR SendCommandResponse();
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };
 } // namespace app
 } // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H

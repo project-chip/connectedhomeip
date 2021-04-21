@@ -56,9 +56,9 @@ public:
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
     uint16_t GetBoundPort();
-    INET_ERROR Listen();
-    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle msg,
+    INET_ERROR Listen(OnMessageReceivedFunct onMessageReceived, OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
                       uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
     void Close();
@@ -74,7 +74,7 @@ private:
     void Init(InetLayer * inetLayer);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    void HandleDataReceived(chip::System::PacketBufferHandle msg);
+    void HandleDataReceived(chip::System::PacketBufferHandle && msg);
     INET_ERROR GetPCB(IPAddressType addrType4);
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
@@ -87,7 +87,6 @@ private:
     uint16_t mBoundPort;
 
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO();
     void HandlePendingIO();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };

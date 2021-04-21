@@ -80,6 +80,7 @@
 
 #include "ias-zone-client.h"
 #include "af.h"
+#include <app/Command.h>
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -306,8 +307,8 @@ static uint8_t findIasZoneServerByNodeId(EmberNodeId nodeId)
     return i;
 }
 
-bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
-                                                               uint16_t delay)
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(chip::app::Command * commandObj, uint16_t zoneStatus,
+                                                               uint8_t extendedStatus, uint8_t zoneId, uint16_t delay)
 {
     uint8_t serverIndex = findIasZoneServerByNodeId(emberAfCurrentCommand()->source);
     uint8_t status      = EMBER_ZCL_STATUS_NOT_FOUND;
@@ -327,7 +328,7 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
     return true;
 }
 
-bool emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t manufacturerCode)
+bool emberAfIasZoneClusterZoneEnrollRequestCallback(chip::app::Command * commandObj, uint16_t zoneType, uint16_t manufacturerCode)
 {
     EmberAfIasEnrollResponseCode responseCode = EMBER_ZCL_IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT;
     uint8_t zoneId                            = UNKNOWN_ZONE_ID;
@@ -402,8 +403,8 @@ static EmberStatus sendCommand(EmberNodeId destAddress)
 static void setCieAddress(EmberNodeId destAddress)
 {
     uint8_t writeAttributes[] = {
-        LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
-        HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
         ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE,
         0,
         0,
@@ -488,11 +489,11 @@ void emberAfPluginIasZoneClientZdoMessageReceivedCallback(EmberNodeId emberNodeI
 void readIasZoneServerAttributes(EmberNodeId nodeId)
 {
     uint8_t iasZoneAttributeIds[] = {
-        LOW_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),  HIGH_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),  EMBER_HIGH_BYTE(ZCL_ZONE_STATE_ATTRIBUTE_ID),
 
-        LOW_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),   HIGH_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),   EMBER_HIGH_BYTE(ZCL_ZONE_TYPE_ATTRIBUTE_ID),
 
-        LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), EMBER_HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
     };
     emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
@@ -505,8 +506,8 @@ void readIasZoneServerAttributes(EmberNodeId nodeId)
 void readIasZoneServerCieAddress(EmberNodeId nodeId)
 {
     uint8_t iasZoneAttributeIds[] = {
-        LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
-        HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
+        EMBER_HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
     };
     emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
                               ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));

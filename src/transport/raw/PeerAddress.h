@@ -43,7 +43,11 @@ namespace Transport {
  * will keep the same TCP channel.
  *
  */
-enum class Type
+
+/**
+ * Here we specified Type to be uint8_t, so the PeerAddress can be serialized easily.
+ */
+enum class Type : uint8_t
 {
     kUndefined,
     kUdp,
@@ -120,6 +124,12 @@ public:
         + 5 /* 16 bit interger */              //
         + 1 /* NullTerminator */;
 
+    template <size_t N>
+    inline void ToString(char (&buf)[N]) const
+    {
+        ToString(buf, N);
+    }
+
     void ToString(char * buf, size_t bufSize) const
     {
         char ip_addr[kInetMaxAddrLen];
@@ -130,11 +140,11 @@ public:
             snprintf(buf, bufSize, "UNDEFINED");
             break;
         case Type::kUdp:
-            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            mIPAddress.ToString(ip_addr);
             snprintf(buf, bufSize, "UDP:%s:%d", ip_addr, mPort);
             break;
         case Type::kTcp:
-            mIPAddress.ToString(ip_addr, sizeof(ip_addr));
+            mIPAddress.ToString(ip_addr);
             snprintf(buf, bufSize, "TCP:%s:%d", ip_addr, mPort);
             break;
         case Type::kBle:

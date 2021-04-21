@@ -53,11 +53,9 @@ exit:
     return err;
 }
 
-void PersistentStorage::SetDelegate(PersistentStorageResultDelegate * delegate) {}
+void PersistentStorage::SetStorageDelegate(PersistentStorageResultDelegate * delegate) {}
 
-void PersistentStorage::GetKeyValue(const char * key) {}
-
-CHIP_ERROR PersistentStorage::GetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::string iniValue;
@@ -79,7 +77,7 @@ exit:
     return err;
 }
 
-void PersistentStorage::SetKeyValue(const char * key, const char * value)
+void PersistentStorage::AsyncSetKeyValue(const char * key, const char * value)
 {
     auto section = mConfig.sections[kDefaultSectionName];
     section[key] = std::string(value);
@@ -88,7 +86,7 @@ void PersistentStorage::SetKeyValue(const char * key, const char * value)
     CommitConfig();
 }
 
-void PersistentStorage::DeleteKeyValue(const char * key)
+void PersistentStorage::AsyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
     section.erase(key);
@@ -119,12 +117,14 @@ exit:
 
 uint16_t PersistentStorage::GetListenPort()
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    uint16_t chipListenPort = CHIP_PORT;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // By default chip-tool listens on CHIP_PORT + 1. This is done in order to avoid
+    // having 2 servers listening on CHIP_PORT when one runs an accessory server locally.
+    uint16_t chipListenPort = CHIP_PORT + 1;
 
     char value[6];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
-    err           = GetKeyValue(kPortKey, value, size);
+    err           = SyncGetKeyValue(kPortKey, value, size);
     if (CHIP_NO_ERROR == err)
     {
         uint16_t tmpValue;
@@ -146,7 +146,7 @@ LogCategory PersistentStorage::GetLoggingLevel()
 
     char value[9];
     uint16_t size = static_cast<uint16_t>(sizeof(value));
-    err           = GetKeyValue(kLoggingKey, value, size);
+    err           = SyncGetKeyValue(kLoggingKey, value, size);
     if (CHIP_NO_ERROR == err)
     {
         if (strcasecmp(value, "none") == 0)
@@ -164,10 +164,6 @@ LogCategory PersistentStorage::GetLoggingLevel()
         else if (strcasecmp(value, "detail") == 0)
         {
             chipLogLevel = kLogCategory_Detail;
-        }
-        else if (strcasecmp(value, "retain") == 0)
-        {
-            chipLogLevel = kLogCategory_Retain;
         }
     }
 

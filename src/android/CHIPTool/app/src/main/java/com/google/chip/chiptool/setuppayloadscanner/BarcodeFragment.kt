@@ -28,11 +28,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
+import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
+import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
@@ -112,20 +115,36 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
         }
     }
 
+    @SuppressLint("MissingPermission")
     override fun handleScannedQrCode(barcode: Barcode) {
         Handler(Looper.getMainLooper()).post {
             stopCamera()
 
-            val payload = SetupPayloadParser().parseQrCode(barcode.displayValue)
+            lateinit var payload: SetupPayload
+            try {
+                payload = SetupPayloadParser().parseQrCode(barcode.displayValue)
+            } catch (ex: UnrecognizedQrCodeException) {
+                Log.e(TAG, "Unrecognized QR Code", ex)
+                Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+
+                // Restart camera view.
+                if (hasCameraPermission() && !cameraStarted) {
+                    startCamera()
+                }
+                return@post
+            }
             val deviceInfo = CHIPDeviceInfo(
                 payload.version,
                 payload.vendorId,
                 payload.productId,
                 payload.discriminator,
                 payload.setupPinCode,
-                payload.optionalQRCodeInfo.mapValues { (_, info) ->  QrCodeInfo(info.tag, info.type, info.data, info.int32) }
+                payload.optionalQRCodeInfo.mapValues { (_, info) ->
+                    QrCodeInfo(info.tag, info.type, info.data, info.int32)
+                }
             )
-            FragmentUtil.getHost(this, Callback::class.java)?.onCHIPDeviceInfoReceived(deviceInfo)
+            FragmentUtil.getHost(this, Callback::class.java)
+                ?.onCHIPDeviceInfoReceived(deviceInfo)
         }
     }
 

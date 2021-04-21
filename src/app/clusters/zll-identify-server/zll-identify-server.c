@@ -56,6 +56,7 @@
 // this file contains all the common includes for clusters in the util
 #include "app/framework/include/af.h"
 #include "app/framework/util/common.h"
+#include <app/Command.h>
 
 #ifndef EZSP_HOST
 #include "hal/hal.h"
@@ -148,7 +149,7 @@ void emberAfPluginZllIdentifyServerTriggerEffectEndpointEventHandler(uint8_t end
     }
 }
 
-bool emberAfIdentifyClusterTriggerEffectCallback(uint8_t effectId, uint8_t effectVariant)
+bool emberAfIdentifyClusterTriggerEffectCallback(chip::app::Command * commandObj, uint8_t effectId, uint8_t effectVariant)
 {
     uint8_t endpoint             = emberAfCurrentEndpoint();
     EmAfZllIdentifyState * state = getZllIdentifyState(endpoint);

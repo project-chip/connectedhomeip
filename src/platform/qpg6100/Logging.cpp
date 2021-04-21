@@ -1,38 +1,24 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
-/**
- *    @file
- *          Provides implementations for the CHIP and LwIP logging functions
- *          on Qorvo platforms.
- */
+/* See Project CHIP LICENSE file for licensing information. */
+#include <platform/logging/LogV.h>
 
 #include "qvCHIP.h"
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <support/logging/CHIPLogging.h>
+#include <core/CHIPConfig.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <support/CHIPPlatformMemory.h>
+#include <support/logging/Constants.h>
+
+#include <ctype.h>
+#include <string.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <openthread/platform/logging.h>
+#include <openthread/platform/memory.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
+constexpr uint8_t kPrintfModuleLwip       = 0x01;
+constexpr uint8_t kPrintfModuleOpenThread = 0x02;
+constexpr uint8_t kPrintfModuleLogging    = 0x03;
 
 namespace chip {
 namespace DeviceLayer {
@@ -50,53 +36,48 @@ void __attribute__((weak)) OnLogOutput(void) {}
 
 namespace chip {
 namespace Logging {
+namespace Platform {
 
 /**
  * CHIP log output function.
  */
 
-void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
+void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    if (IsCategoryEnabled(category))
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    size_t prefixLen;
+
+    prefixLen = 0;
+
+    // No build-time switches in Qorvo logging module.
+    // Add small prefix to show logging category for now.
+    formattedMsg[prefixLen++] = '[';
+    switch (category)
     {
-        char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        size_t prefixLen;
-
-        prefixLen = 0;
-
-        // No build-time switches in Qorvo logging module.
-        // Add small prefix to show logging category for now.
-        formattedMsg[prefixLen++] = '[';
-        switch (category)
-        {
-        case kLogCategory_Error:
-            formattedMsg[prefixLen++] = 'E';
-            break;
-        case kLogCategory_Detail:
-            formattedMsg[prefixLen++] = 'D';
-            break;
-        case kLogCategory_Progress:
-        case kLogCategory_Retain:
-        default:
-            formattedMsg[prefixLen++] = 'P';
-            break;
-        }
-        formattedMsg[prefixLen++] = ']';
-        formattedMsg[prefixLen++] = '[';
-        GetModuleName(&formattedMsg[prefixLen], module);
-        prefixLen                 = strlen(formattedMsg);
-        formattedMsg[prefixLen++] = ']';
-        formattedMsg[prefixLen++] = ' ';
-
-        vsnprintf(&formattedMsg[prefixLen], sizeof(formattedMsg) - prefixLen, msg, v);
-
-        qvCHIP_Printf(module, formattedMsg);
-
-        // Let the application know that a log message has been emitted.
-        DeviceLayer::OnLogOutput();
+    case kLogCategory_Error:
+        formattedMsg[prefixLen++] = 'E';
+        break;
+    case kLogCategory_Detail:
+        formattedMsg[prefixLen++] = 'D';
+        break;
+    case kLogCategory_Progress:
+    default:
+        formattedMsg[prefixLen++] = 'P';
+        break;
     }
+    snprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, "][%s] ", module);
+    formattedMsg[sizeof(formattedMsg) - 2] = 0; // -2 to allow at least one char for the vsnprintf
+    prefixLen                              = strlen(formattedMsg);
+
+    vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
+
+    qvCHIP_Printf(kPrintfModuleLogging, formattedMsg);
+
+    // Let the application know that a log message has been emitted.
+    chip::DeviceLayer::OnLogOutput();
 }
 
+} // namespace Platform
 } // namespace Logging
 } // namespace chip
 
@@ -105,7 +86,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
  */
 extern "C" void LwIPLog(const char * msg, ...)
 {
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     va_list v;
 
@@ -119,28 +100,43 @@ extern "C" void LwIPLog(const char * msg, ...)
         formattedMsg[len] = 0;
     }
 
-    qvCHIP_Printf(0x1, formattedMsg);
+    qvCHIP_Printf(kPrintfModuleLwip, formattedMsg);
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// Implementation taken from openthread repo - examples\platforms\qpg6095
-#include "uart_qorvo.h"
-
 extern "C" void otPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
-    char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+
+    va_list v;
 
     va_start(v, aFormat);
-    size_t len = vsnprintf(formattedMsg, sizeof(formattedMsg), aFormat, v);
+    vsnprintf(formattedMsg, sizeof(formattedMsg), aFormat, v);
     va_end(v);
 
-    qvCHIP_Printf(0x2, formattedMsg);
+    qvCHIP_Printf(kPrintfModuleOpenThread, formattedMsg);
 
     // Let the application know that a log message has been emitted.
-    DeviceLayer::OnLogOutput();
+    chip::DeviceLayer::OnLogOutput();
 }
 
+// TODO: have qpg6100 openthread platform implementation defines the APIs.
+// It is not perfect to have the openthread platform calloc/free
+// APIs defined here. If a dedicated source file (e.g. Memory.cpp)
+// that includes only the two functions is used, the target file
+// Memory.o will be thrown away whening linking the libary because
+// there is no one referring the symbols (We are not linking
+// the 'platform' library against openthread).
+extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
+{
+    return CHIPPlatformMemoryCalloc(aNum, aSize);
+}
+
+extern "C" void otPlatFree(void * aPtr)
+{
+    CHIPPlatformMemoryFree(aPtr);
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
