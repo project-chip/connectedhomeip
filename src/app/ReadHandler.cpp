@@ -39,6 +39,7 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     mpDelegate        = apDelegate;
     mSuppressResponse = true;
     mGetToAllEvents   = true;
+    ClearClusterInfo();
     MoveToState(HandlerState::Initialized);
 
 exit:
@@ -48,9 +49,11 @@ exit:
 
 void ReadHandler::Shutdown()
 {
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoListToPool(this);
     ClearExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
     mpDelegate = nullptr;
+    ClearClusterInfo();
 }
 
 CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
@@ -92,6 +95,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 exit:
+    ChipLogFunctError(err);
+    Shutdown();
     return err;
 }
 
@@ -102,6 +107,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
 
     ReadRequest::Parser readRequestParser;
     EventPathList::Parser eventPathListParser;
+    AttributePathList::Parser attributePathListParser;
     TLV::TLVReader eventPathListReader;
 
     reader.Init(std::move(aPayload));
@@ -116,6 +122,18 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     err = readRequestParser.CheckSchemaValidity();
     SuccessOrExit(err);
 #endif
+
+    err = readRequestParser.GetAttributePathList(&attributePathListParser);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else
+    {
+        SuccessOrExit(err);
+        ProcessAttributePathList(attributePathListParser);
+    }
+
     err = readRequestParser.GetEventPathList(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -153,6 +171,74 @@ exit:
     return err;
 }
 
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aAttributePathListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        {
+            AttributePathParams attributePathParams;
+            AttributePath::Parser path;
+            NodeId nodeId             = 0;
+            EndpointId endpointId     = 0;
+            ClusterId clusterId       = 0;
+            FieldId fieldId           = 0;
+            ClusterInfo * clusterInfo = nullptr;
+            err                       = path.Init(reader);
+            SuccessOrExit(err);
+            err = path.GetNodeId(&nodeId);
+            SuccessOrExit(err);
+            err = path.GetEndpointId(&endpointId);
+            SuccessOrExit(err);
+            err = path.GetClusterId(&clusterId);
+            SuccessOrExit(err);
+            err = path.GetFieldId(&fieldId);
+            SuccessOrExit(err);
+            attributePathParams.mNodeId     = nodeId;
+            attributePathParams.mEndpointId = endpointId;
+            attributePathParams.mClusterId  = clusterId;
+            attributePathParams.mFieldId    = fieldId;
+
+            for (long i = 0; i < mNumClusterInfos; ++i)
+            {
+                if (mpClusterInfoList[i].mAttributePathParams.IsSamePath(attributePathParams))
+                {
+                    clusterInfo = &mpClusterInfoList[i];
+                    break;
+                }
+            }
+            if (clusterInfo == nullptr)
+            {
+                err = InteractionModelEngine::GetInstance()->GetFirstAvailableClusterInfo(clusterInfo);
+                SuccessOrExit(err);
+                ++mNumClusterInfos;
+            }
+            clusterInfo->mAttributePathParams = attributePathParams;
+            if (nullptr == mpClusterInfoList)
+            {
+                // this the first cluster instance for this read handler
+                // mNumClusterInfoList has already be incremented
+                mpClusterInfoList = clusterInfo;
+            }
+            clusterInfo->SetDirty();
+        }
+    }
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
 const char * ReadHandler::GetStateStr() const
 {
 #if CHIP_DETAIL_LOGGING
@@ -177,5 +263,14 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     ChipLogDetail(DataManagement, "IM RH moving to [%s]", GetStateStr());
 }
 
+CHIP_ERROR ReadHandler::GetProcessingClusterInfo(ClusterInfo *& apClusterInfo)
+{
+    if (mpClusterInfoList == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    apClusterInfo = &mpClusterInfoList[mCurProcessingClusterInfoIdx];
+    return CHIP_NO_ERROR;
+}
 } // namespace app
 } // namespace chip
