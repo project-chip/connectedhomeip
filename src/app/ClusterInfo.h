@@ -28,6 +28,7 @@ struct ClusterInfo
     ClusterInfo(const AttributePathParams & aAttributePathParams, bool aDirty) :
         mAttributePathParams(aAttributePathParams), mDirty(aDirty)
     {}
+    ClusterInfo() {}
     bool IsDirty() { return mDirty; }
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }

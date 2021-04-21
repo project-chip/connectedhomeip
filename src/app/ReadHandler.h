@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/InteractionModelDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -99,6 +100,11 @@ public:
 
     virtual ~ReadHandler() = default;
 
+    CHIP_ERROR GetProcessingClusterInfo(ClusterInfo *& apClusterInfo);
+    long GetProcessingClusterIndex() { return mCurProcessingClusterInfoIdx; };
+    void IncreaseProcessingClusterIndex() { mCurProcessingClusterInfoIdx++; };
+    long GetNumClusterInfos() { return mNumClusterInfos; };
+
 private:
     enum class HandlerState
     {
@@ -108,11 +114,13 @@ private:
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle aPayload);
-
+    CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
     CHIP_ERROR ClearExistingExchangeContext();
+    void ClearClusterInfo();
+    void ReleaseClusterInfoList();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
@@ -125,6 +133,9 @@ private:
 
     // Current Handler state
     HandlerState mState;
+    ClusterInfo * mpClusterInfoList   = nullptr;
+    long mCurProcessingClusterInfoIdx = 0;
+    long mNumClusterInfos             = 0;
 };
 } // namespace app
 } // namespace chip

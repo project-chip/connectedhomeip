@@ -64,10 +64,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
 
     // Add command data here
-
-    uint8_t effectIdentifier = 1; // Dying light
-    uint8_t effectVariant    = 1;
-
     if (statusCodeFlipper)
     {
         printf("responder constructing status code in command");
@@ -84,10 +80,10 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         SuccessOrExit(err);
 
         writer = apCommandObj->GetCommandDataElementTLVWriter();
-        err    = writer->Put(chip::TLV::ContextTag(1), effectIdentifier);
+        err    = writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
         SuccessOrExit(err);
 
-        err = writer->Put(chip::TLV::ContextTag(2), effectVariant);
+        err = writer->Put(chip::TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
         SuccessOrExit(err);
 
         err = apCommandObj->FinishCommand();
@@ -99,6 +95,27 @@ exit:
     return;
 }
 
+CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
+                                 TLV::TLVWriter & aWriter)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(aClusterId == kTestClusterId && aEndPointId == kTestEndPointId, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (aFieldId == kRootFieldId || aFieldId == 1)
+    {
+        err = aWriter.Put(TLV::ContextTag(kTestFieldId1), kTestFieldValue1);
+        SuccessOrExit(err);
+    }
+    if (aFieldId == kRootFieldId || aFieldId == 2)
+    {
+        err = aWriter.Put(TLV::ContextTag(kTestFieldId2), kTestFieldValue2);
+        SuccessOrExit(err);
+    }
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
 } // namespace app
 } // namespace chip
 

@@ -240,9 +240,44 @@ DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aComman
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
+CHIP_ERROR __attribute__((weak))
+ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId, TLV::TLVWriter & aWriter)
+{
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8,
+                  aClusterId, aNodeId, aEndPointId, aFieldId);
+    ChipLogError(DataManagement,
+                 "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR __attribute__((weak))
+WriteSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId, TLV::TLVReader & aReader)
+{
+    ChipLogDetail(DataManagement,
+                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8,
+                  aClusterId, aNodeId, aEndPointId, aFieldId);
+    ChipLogError(DataManagement,
+                 "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
+    return CHIP_NO_ERROR;
+}
+
 uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
 {
     return static_cast<uint16_t>(apReadClient - mReadClients);
 }
+
+CHIP_ERROR InteractionModelEngine::GetFirstAvailableClusterInfo(ClusterInfo *& apClusterInfo)
+{
+    if (mNumClusterInfos >= IM_SERVER_MAX_NUM_PATH_GROUPS)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    apClusterInfo = &mClusterInfoPool[mNumClusterInfos];
+    mNumClusterInfos++;
+    apClusterInfo->ClearDirty();
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip
