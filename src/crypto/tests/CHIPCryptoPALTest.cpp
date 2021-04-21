@@ -662,7 +662,12 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
     const char * msg  = "Hello World!";
     size_t msg_length = strlen(msg);
 
+#ifdef ENABLE_HSM_EC_KEY
+    P256KeypairHSM keypair;
+    keypair.SetKeyId(0x11223344);
+#else
     P256Keypair keypair;
+#endif
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -680,7 +685,13 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
                              0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F };
     size_t hash_length   = sizeof(hash);
 
+#ifdef ENABLE_HSM_EC_KEY
+    P256KeypairHSM keypair;
+    keypair.SetKeyId(0x11223344);
+#else
     P256Keypair keypair;
+#endif
+
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256ECDSASignature signature;
@@ -849,10 +860,21 @@ static void TestECDSA_ValidationHashInvalidParam(nlTestSuite * inSuite, void * i
 
 static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
+#ifdef ENABLE_HSM_EC_KEY
+    P256KeypairHSM keypair1;
+    keypair1.SetKeyId(0x11223344);
+#else
     P256Keypair keypair1;
+#endif
+
     NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
 
+#ifdef ENABLE_HSM_EC_KEY
+    P256KeypairHSM keypair2;
+    keypair2.SetKeyId(0x11223355);
+#else
     P256Keypair keypair2;
+#endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
@@ -959,13 +981,23 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 
 static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
 {
+#ifdef ENABLE_HSM_EC_KEY
+    P256KeypairHSM keypair;
+    keypair.SetKeyId(0x11223344);
+#else
     P256Keypair keypair;
+#endif
+
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
     P256SerializedKeypair serialized;
     NL_TEST_ASSERT(inSuite, keypair.Serialize(serialized) == CHIP_NO_ERROR);
 
+#ifdef ENABLE_HSM_EC_KEY
+    P256KeypairHSM keypair_dup;
+#else
     P256Keypair keypair_dup;
+#endif
     NL_TEST_ASSERT(inSuite, keypair_dup.Deserialize(serialized) == CHIP_NO_ERROR);
 
     const char * msg         = "Test Message for Keygen";
@@ -989,7 +1021,7 @@ static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
     for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
     {
         const struct spake2p_fe_mul_tv * vector = fe_mul_tvs[vectorIndex];
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1026,7 +1058,7 @@ static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inCont
     {
         const struct spake2p_fe_rw_tv * vector = fe_rw_tvs[vectorIndex];
 
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1057,7 +1089,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
     {
         const struct spake2p_hmac_tv * vector = hmac_tvs[vectorIndex];
 
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1091,7 +1123,7 @@ static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext
         out_len                                    = sizeof(output);
         const struct spake2p_point_mul_tv * vector = point_mul_tvs[vectorIndex];
 
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1131,7 +1163,7 @@ static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inCont
         out_len                                       = sizeof(output);
         const struct spake2p_point_muladd_tv * vector = point_muladd_tvs[vectorIndex];
 
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1177,7 +1209,7 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
         out_len                                   = sizeof(output);
         const struct spake2p_point_rw_tv * vector = point_rw_tvs[vectorIndex];
 
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1207,7 +1239,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
     {
         const struct spake2p_point_valid_tv * vector = point_valid_tvs[vectorIndex];
 
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
         Spake2pHSM_P256_SHA256_HKDF_HMAC spake2p;
 #else
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
@@ -1231,7 +1263,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 // We need to "generate" specific field elements
 // to do so we need to override the specific method
 class Test_Spake2p_P256_SHA256_HKDF_HMAC :
-#if CHIP_CRYPTO_HSM
+#ifdef ENABLE_HSM_SPAKE
     public Spake2pHSM_P256_SHA256_HKDF_HMAC
 #else
     public Spake2p_P256_SHA256_HKDF_HMAC

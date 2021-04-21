@@ -33,8 +33,18 @@
  */
 #define ENABLE_HSM_SPAKE_PROVER 1
 
+/*
+ * Enable HSM for Generate EC Key
+ */
+#define ENABLE_HSM_GENERATE_EC_KEY 0
+
+
 #if ((CHIP_CRYPTO_HSM) && ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER)))
 #define ENABLE_HSM_SPAKE
+#endif
+
+#if ((CHIP_CRYPTO_HSM) && (ENABLE_HSM_GENERATE_EC_KEY))
+#define ENABLE_HSM_EC_KEY
 #endif
 
 #endif //#ifndef _CHIP_CRYPTO_PAL_HSM_CONFIG_H_
