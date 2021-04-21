@@ -97,27 +97,27 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  */
 typedef struct
 {
-#if (BIGENDIAN_CPU)
+#if defined(BIGENDIAN_CPU) && (BIGENDIAN_CPU != 0)
+// Big endian
 #if (UINTPTR_MAX == UINT32_MAX)
     uint32_t align : 16;
-#elif (UINTPTR_MAX == UINT64_MAX)
-    uint64_t align : 48;
-#endif
-#endif
-
-    /**
-     * Actual value.
-     */
     uint16_t value;
-
-#if (!BIGENDIAN_CPU)
-#if (UINTPTR_MAX == UINT32_MAX)
-    uint32_t align : 16;
 #elif (UINTPTR_MAX == UINT64_MAX)
     uint64_t align : 48;
+    uint16_t value;
 #endif
+#else
+// Little endian
+#if (UINTPTR_MAX == UINT32_MAX)
+    uint16_t value;
+    uint32_t align : 16;
+#elif (UINTPTR_MAX == UINT64_MAX)
+    uint16_t value;
+    uint64_t align : 48;
 #endif
-} EmberAfAlignValue;
+
+#endif // defined(BIGENDIAN_CPU) && (BIGENDIAN_CPU != 0)
+} EmberAfAlignValue16;
 
 /**
  * @brief Type for default values.
@@ -137,7 +137,7 @@ typedef union
     /**
      * Actual default value if the attribute size is 2 bytes or less.
      */
-    EmberAfAlignValue defaultValue;
+    EmberAfAlignValue16 defaultValue;
 } EmberAfDefaultAttributeValue;
 
 /**
@@ -176,7 +176,7 @@ typedef union
     /**
      * Default value of the attribute.
      */
-    EmberAfAlignValue defaultValue;
+    EmberAfAlignValue16 defaultValue;
     /**
      * Points to the min max attribute value structure, if min/max is
      * supported for this attribute.
