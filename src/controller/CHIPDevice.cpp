@@ -280,8 +280,8 @@ exit:
 
 void Device::OnNewConnection(Messaging::ExchangeDelegate * exchangeDelegate, SecureSessionHandle session, uint8_t secureSessionType)
 {
-    mState         = secureSessionType == PairingSession::SecureSessionType::kCASESession ? ConnectionState::SecureConnected
-                                                                                          : ConnectionState::PinConnected;
+    mState = secureSessionType == PairingSession::SecureSessionType::kCASESession ? ConnectionState::SecureConnected
+                                                                                  : ConnectionState::PinConnected;
     mSecureSession = session;
 
     if (!mDeviceAttestation.IsDeviceAttested())
