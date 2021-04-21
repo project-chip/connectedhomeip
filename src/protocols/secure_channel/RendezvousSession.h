@@ -68,18 +68,10 @@ class SecureSessionHandle;
  */
 class RendezvousSession : public SessionEstablishmentDelegate,
                           public RendezvousSessionDelegate,
-                          public RendezvousDeviceCredentialsDelegate,
                           public NetworkProvisioningDelegate,
                           public TransportMgrDelegate
 {
 public:
-    enum State : uint8_t
-    {
-        kInit = 0,
-        kSecurePairing,
-        kRendezvousComplete,
-    };
-
     RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
     ~RendezvousSession() override;
 
@@ -116,11 +108,6 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
 
-    //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
-    void SendNetworkCredentials(const char * ssid, const char * passwd) override;
-    void SendThreadCredentials(ByteSpan threadData) override;
-    void SendOperationalCredentials() override;
-
     //////////// NetworkProvisioningDelegate Implementation ///////////////
     void OnNetworkProvisioningError(CHIP_ERROR error) override;
     void OnNetworkProvisioningComplete() override;
@@ -148,7 +135,6 @@ private:
     CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
 
-    Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
@@ -156,17 +142,12 @@ private:
     NetworkProvisioning mNetworkProvision;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
     TransportMgrBase * mTransportMgr;
-    uint16_t mNextKeyId                         = 0;
-    SecureSessionMgr * mSecureSessionMgr        = nullptr;
-    SecureSessionHandle * mPairingSessionHandle = nullptr;
+    uint16_t mNextKeyId                  = 0;
+    SecureSessionMgr * mSecureSessionMgr = nullptr;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
 
-    RendezvousSession::State mCurrentState = State::kInit;
-    void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
-
-    void InitPairingSessionHandle();
-    void ReleasePairingSessionHandle();
+    void Cleanup();
 };
 
 } // namespace chip
