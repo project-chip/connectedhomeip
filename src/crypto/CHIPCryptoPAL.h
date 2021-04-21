@@ -290,7 +290,8 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
+                                          P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.
      **/

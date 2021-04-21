@@ -43,7 +43,6 @@ typedef struct hsm_pake_context_s
 namespace chip {
 namespace Crypto {
 
-
 #if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 /* Spake HSM class */
 
@@ -58,12 +57,14 @@ public:
 
 #if ENABLE_HSM_SPAKE_VERIFIER
     CHIP_ERROR BeginVerifier(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin, size_t Lin_len) override;
+                             size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * Lin,
+                             size_t Lin_len) override;
 #endif
 
 #if ENABLE_HSM_SPAKE_PROVER
     CHIP_ERROR BeginProver(const uint8_t * my_identity, size_t my_identity_len, const uint8_t * peer_identity,
-                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in, size_t w1in_len) override;
+                           size_t peer_identity_len, const uint8_t * w0in, size_t w0in_len, const uint8_t * w1in,
+                           size_t w1in_len) override;
 #endif
 
     CHIP_ERROR ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len) override;
@@ -77,7 +78,6 @@ public:
 
 #endif //#if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 
-
 #if ENABLE_HSM_GENERATE_EC_KEY
 /* Nist256 Key pair HSM class */
 
@@ -87,7 +87,7 @@ public:
     P256KeypairHSM()
     {
         provisioned_key = false;
-        keyid = 0;
+        keyid           = 0;
     }
 
     ~P256KeypairHSM();
@@ -102,16 +102,16 @@ public:
 
     virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
 
-    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const override;
+    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
+                                          P256ECDHDerivedSecret & out_secret) const override;
 
     bool provisioned_key;
 
     void SetKeyId(int id) { keyid = id; }
 
-    int GetKeyId( void ) { return keyid; }
+    int GetKeyId(void) { return keyid; }
 
 private:
-
     int keyid;
 };
 #endif //#if ENABLE_HSM_GENERATE_EC_KEY

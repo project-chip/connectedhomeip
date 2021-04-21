@@ -49,6 +49,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define HSM_ECC_KEYID 0x11223344
+
 using namespace chip;
 using namespace chip::Crypto;
 
@@ -664,7 +666,7 @@ static void TestECDSA_Signing_SHA256_Msg(nlTestSuite * inSuite, void * inContext
 
 #ifdef ENABLE_HSM_EC_KEY
     P256KeypairHSM keypair;
-    keypair.SetKeyId(0x11223344);
+    keypair.SetKeyId(HSM_ECC_KEYID);
 #else
     P256Keypair keypair;
 #endif
@@ -687,7 +689,7 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
 
 #ifdef ENABLE_HSM_EC_KEY
     P256KeypairHSM keypair;
-    keypair.SetKeyId(0x11223344);
+    keypair.SetKeyId(HSM_ECC_KEYID);
 #else
     P256Keypair keypair;
 #endif
@@ -862,7 +864,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
 {
 #ifdef ENABLE_HSM_EC_KEY
     P256KeypairHSM keypair1;
-    keypair1.SetKeyId(0x11223344);
+    keypair1.SetKeyId(HSM_ECC_KEYID);
 #else
     P256Keypair keypair1;
 #endif
@@ -983,7 +985,7 @@ static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)
 {
 #ifdef ENABLE_HSM_EC_KEY
     P256KeypairHSM keypair;
-    keypair.SetKeyId(0x11223344);
+    keypair.SetKeyId(HSM_ECC_KEYID);
 #else
     P256Keypair keypair;
 #endif

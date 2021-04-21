@@ -24,20 +24,23 @@
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
 
-#define MAX_SHA_ONE_SHOT_DATA_LEN   900
-#define NIST256_HEADER_OFFSET       26
+#define MAX_SHA_ONE_SHOT_DATA_LEN 900
+#define NIST256_HEADER_OFFSET 26
 
 namespace chip {
 namespace Crypto {
 
 P256KeypairHSM::~P256KeypairHSM()
 {
-    if (keyid != 0) {
-        if (provisioned_key == false) {
+    if (keyid != 0)
+    {
+        if (provisioned_key == false)
+        {
             ChipLogDetail(Crypto, "Deleting key with id - %x !", keyid);
             se05x_delete_key(keyid);
         }
-        else {
+        else
+        {
             ChipLogDetail(Crypto, "Provisioned key ! Not deleting key in HSM");
         }
     }
@@ -48,11 +51,14 @@ CHIP_ERROR P256KeypairHSM::Initialize()
     CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
     sss_status_t status    = kStatus_SSS_Success;
     sss_object_t keyObject = { 0 };
-    uint8_t pubkey[128]    = {0,};
-    size_t pubKeyLen       = sizeof(pubkey);
-    size_t pbKeyBitLen     = sizeof(pubkey) * 8;
+    uint8_t pubkey[128]    = {
+        0,
+    };
+    size_t pubKeyLen   = sizeof(pubkey);
+    size_t pbKeyBitLen = sizeof(pubkey) * 8;
 
-    if (keyid == 0) {
+    if (keyid == 0)
+    {
         ChipLogDetail(Crypto, "Keyid not set !. Set key id using 'SetKeyId' member class !");
         goto exit;
     }
@@ -62,7 +68,8 @@ CHIP_ERROR P256KeypairHSM::Initialize()
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    if (provisioned_key == false) {
+    if (provisioned_key == false)
+    {
 
         status = sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 256,
                                                 kKeyObject_Mode_Transient);
@@ -73,7 +80,8 @@ CHIP_ERROR P256KeypairHSM::Initialize()
         status = sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
         VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
     }
-    else {
+    else
+    {
 
         // if the key is provisioned already, only get the public key,
         // and set it in public key member of this class.
@@ -90,8 +98,8 @@ CHIP_ERROR P256KeypairHSM::Initialize()
         /* Set the public key */
         const P256PublicKey & public_key = Pubkey();
         VerifyOrExit(pubKeyLen > NIST256_HEADER_OFFSET, error = CHIP_ERROR_INTERNAL);
-        VerifyOrExit( (pubKeyLen - NIST256_HEADER_OFFSET) <= kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
-        memcpy((void*)Uint8::to_const_uchar(public_key), pubkey + NIST256_HEADER_OFFSET, pubKeyLen - NIST256_HEADER_OFFSET);
+        VerifyOrExit((pubKeyLen - NIST256_HEADER_OFFSET) <= kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
+        memcpy((void *) Uint8::to_const_uchar(public_key), pubkey + NIST256_HEADER_OFFSET, pubKeyLen - NIST256_HEADER_OFFSET);
     }
 
     error = CHIP_NO_ERROR;
@@ -99,17 +107,18 @@ exit:
     return error;
 }
 
-
 CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
 {
     CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
     sss_digest_t digest_ctx    = { 0 };
     sss_asymmetric_t asymm_ctx = { 0 };
-    uint8_t hash[32]           = { 0,};
-    size_t hashLen             = sizeof(hash);
+    uint8_t hash[32]           = {
+        0,
+    };
+    size_t hashLen         = sizeof(hash);
     sss_status_t status    = kStatus_SSS_Success;
     sss_object_t keyObject = { 0 };
-    size_t siglen = out_signature.Capacity();
+    size_t siglen          = out_signature.Capacity();
 
     VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -155,8 +164,7 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     status = sss_key_object_get_handle(&keyObject, keyid);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status =
-        sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
+    status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_asymmetric_sign_digest(&asymm_ctx, hash, hashLen, Uint8::to_uchar(out_signature), &siglen);
@@ -177,14 +185,13 @@ exit:
     return error;
 }
 
-
 CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
 {
     CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
     sss_asymmetric_t asymm_ctx = { 0 };
-    sss_status_t status    = kStatus_SSS_Success;
-    sss_object_t keyObject = { 0 };
-    size_t siglen = out_signature.Capacity();
+    sss_status_t status        = kStatus_SSS_Success;
+    sss_object_t keyObject     = { 0 };
+    size_t siglen              = out_signature.Capacity();
 
     VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(hash_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -201,11 +208,10 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_len
     status = sss_key_object_get_handle(&keyObject, keyid);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status =
-        sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
+    status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_asymmetric_sign_digest(&asymm_ctx, (uint8_t*)hash, hash_length, Uint8::to_uchar(out_signature), &siglen);
+    status = sss_asymmetric_sign_digest(&asymm_ctx, (uint8_t *) hash, hash_length, Uint8::to_uchar(out_signature), &siglen);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     SuccessOrExit(out_signature.SetLength(siglen));
@@ -230,7 +236,7 @@ CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
     {
         /* Set the public key */
         const P256PublicKey & public_key = Pubkey();
-        bbuf.Put((void*)Uint8::to_const_uchar(public_key), public_key.Length());
+        bbuf.Put((void *) Uint8::to_const_uchar(public_key), public_key.Length());
     }
 
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
@@ -257,7 +263,7 @@ CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
 
     /* Set the public key */
     const P256PublicKey & public_key = Pubkey();
-    Encoding::BufferWriter bbuf((uint8_t*)Uint8::to_const_uchar(public_key), public_key.Length());
+    Encoding::BufferWriter bbuf((uint8_t *) Uint8::to_const_uchar(public_key), public_key.Length());
 
     VerifyOrExit(input.Length() == public_key.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     bbuf.Put((const uint8_t *) input, public_key.Length());
@@ -277,11 +283,11 @@ exit:
 
 CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    const uint8_t *rem_pubKey = NULL;
-    size_t rem_pubKeyLen = 0;
-    size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
-    smStatus_t smstatus = SM_NOT_OK;
+    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    const uint8_t * rem_pubKey = NULL;
+    size_t rem_pubKeyLen       = 0;
+    size_t secret_length       = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
+    smStatus_t smstatus        = SM_NOT_OK;
 
     VerifyOrExit(keyid != 0, error = CHIP_ERROR_HSM);
 
@@ -289,7 +295,7 @@ CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_publi
 
     se05x_sessionOpen();
 
-    rem_pubKey = Uint8::to_const_uchar(remote_public_key);
+    rem_pubKey    = Uint8::to_const_uchar(remote_public_key);
     rem_pubKeyLen = remote_public_key.Length();
 
     VerifyOrExit(rem_pubKey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -307,5 +313,5 @@ exit:
     return error;
 }
 
-} // namespace Crypto {
-} // namespace chip {
+} // namespace Crypto
+} // namespace chip
