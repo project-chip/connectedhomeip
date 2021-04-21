@@ -595,6 +595,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Pump Configuration and Control
+ *
+ */
+@interface CHIPPumpConfigurationAndControl : CHIPCluster
+
+- (void)readAttributeMaxPressure:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxFlow:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler;
+- (void)readAttributeCapacity:(ResponseHandler)completionHandler;
+- (void)configureAttributeCapacity:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(int16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCapacity:(ResponseHandler)reportHandler;
+- (void)readAttributeOperationMode:(ResponseHandler)completionHandler;
+- (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Scenes
  *
  */
