@@ -93,7 +93,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err                            = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr, 0);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr, 0, nullptr, 0);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     GenerateReportData(apSuite, apContext, buf);
