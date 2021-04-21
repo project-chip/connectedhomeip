@@ -68,6 +68,7 @@ namespace DeviceLayer {
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+            [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
         BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
@@ -95,7 +96,6 @@ namespace DeviceLayer {
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];
-        [_centralManager initWithDelegate:self queue:_workQueue];
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
@@ -120,6 +120,7 @@ namespace DeviceLayer {
     case CBManagerStatePoweredOff:
         ChipLogDetail(Ble, "CBManagerState: OFF");
         [self stop];
+        _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
         break;
     case CBManagerStateUnauthorized:
         ChipLogDetail(Ble, "CBManagerState: Unauthorized");
@@ -308,6 +309,7 @@ namespace DeviceLayer {
 {
     [self stopScanning];
     [self disconnect];
+    _centralManager.delegate = nil;
     _centralManager = nil;
     _peripheral = nil;
 }
