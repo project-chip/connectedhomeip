@@ -18,11 +18,11 @@
 
 #include <support/logging/CHIPLogging.h>
 
-#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 
 #include "AppTask.h"
 #include "LightingManager.h"

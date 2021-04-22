@@ -39,7 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "reporting.h"
+#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>

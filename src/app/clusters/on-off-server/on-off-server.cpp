@@ -40,7 +40,7 @@
  ******************************************************************************/
 #include "on-off-server.h"
 
-#include "af.h"
+#include <app/util/af.h>
 
 #include "gen/att-storage.h"
 #include "gen/attribute-id.h"

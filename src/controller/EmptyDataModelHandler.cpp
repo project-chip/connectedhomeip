@@ -22,7 +22,7 @@
 // defaults so that the controller library is self-sufficient and a controller
 // which has not yet implemented ZCL handlers builds without linker errors.
 
-#include <app/util/DataModelHandler.h>
+#include <app/server/DataModelHandler.h>
 
 __attribute__((weak)) void InitDataModelHandler() {}
 __attribute__((weak)) void HandleDataModelMessage(chip::NodeId nodeId, chip::System::PacketBufferHandle buffer) {}

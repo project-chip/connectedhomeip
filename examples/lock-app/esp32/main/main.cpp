@@ -16,9 +16,7 @@
  */
 
 #include "CHIPDeviceManager.h"
-#include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
-#include "Server.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -28,6 +26,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/server/DataModelHandler.h>
+#include <app/server/Server.h>
 
 #include <cmath>
 #include <cstdio>

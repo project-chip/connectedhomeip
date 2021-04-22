@@ -38,9 +38,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "client-api.h"
 #include "app/util/common.h"
-#include "util.h"
+#include <app/util/client-api.h>
+#include <app/util/util.h>
 #include <stdarg.h>
 
 using namespace chip;

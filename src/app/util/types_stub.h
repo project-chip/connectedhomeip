@@ -45,7 +45,7 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
-#include "basic-types.h"
+#include <app/util/basic-types.h>
 
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");

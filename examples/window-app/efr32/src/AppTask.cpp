@@ -20,10 +20,10 @@
 #include <AppConfig.h>
 #include <AppTask.h>
 #include <LcdPainter.h>
-#include <OnboardingCodesUtil.h>
-#include <Server.h>
 #include <Service.h>
-#include <attribute-storage.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <gen/attribute-id.h>
 #include <gen/attribute-type.h>
 #include <gen/cluster-id.h>

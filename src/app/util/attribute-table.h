@@ -41,7 +41,7 @@
 
 #pragma once
 
-#include "af.h"
+#include <app/util/af.h>
 
 #define ZCL_NULL_ATTRIBUTE_TABLE_INDEX 0xFFFF
 

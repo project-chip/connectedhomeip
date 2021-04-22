@@ -20,7 +20,7 @@
  *   This file provides an implementation of functions for sending messages.
  */
 
-#include "chip-message-send.h"
+#include <app/util/chip-message-send.h>
 
 #include <assert.h>
 #include <inet/InetLayer.h>

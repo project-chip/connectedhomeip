@@ -43,13 +43,13 @@
 #include "app/util/common.h"
 
 // for pulling in defines dealing with EITHER server or client
-#include "af-main.h"
+#include <app/util/af-main.h>
 
 #include "gen/cluster-id.h"
 
 // the EM260 host needs to include the config file
 #ifdef EZSP_HOST
-#include "config.h"
+#include <app/util/config.h>
 #endif
 
 //------------------------------------------------------------------------------

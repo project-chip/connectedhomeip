@@ -51,7 +51,7 @@
 #pragma once
 
 #ifndef CONFIGURATION_HEADER
-#define CONFIGURATION_HEADER "config.h"
+#define CONFIGURATION_HEADER <app/util/config.h>
 #endif
 #include CONFIGURATION_HEADER
 
@@ -66,11 +66,11 @@
 #include "stack/include/error.h"
 #endif // EZSP_HOST
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
-#include "client-api.h"
-#include "debug-printing.h"
-#include "ember-print.h"
+#include <app/util/client-api.h>
+#include <app/util/debug-printing.h>
+#include <app/util/ember-print.h>
 
 /** @name Attribute Storage */
 // @{

@@ -21,13 +21,13 @@
  *          when calling ember callbacks.
  */
 
-#include "ember-compatibility-functions.h"
+#include <app/util/ember-compatibility-functions.h>
 
 #include <app/Command.h>
+#include <app/util/util.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
-#include <util/util.h>
 
 namespace chip {
 namespace app {

@@ -20,7 +20,7 @@
  * @brief Implementation for the Descriptor Server Cluster
  ***************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>

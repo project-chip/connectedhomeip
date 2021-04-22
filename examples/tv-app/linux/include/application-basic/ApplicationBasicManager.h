@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 #include <core/CHIPError.h>
 
 #include "../endpoint-configuration/EndpointConfigurationStorage.h"

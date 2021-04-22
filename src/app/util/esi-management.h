@@ -41,7 +41,7 @@
 
 #pragma once
 
-#include "af.h"
+#include <app/util/af.h>
 
 #ifndef EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE
 #define EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE 3

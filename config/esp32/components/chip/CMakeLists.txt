@@ -142,14 +142,13 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
 
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
-    "${CHIP_ROOT}/src/include/"
+    "${CHIP_ROOT}/src/include"
     "${CHIP_ROOT}/src/lib"
-    "${CHIP_ROOT}/src/"
-    "${CHIP_ROOT}/src/system"
+    "${CHIP_ROOT}/src"
     "${CHIP_ROOT}/third_party/nlassert/repo/include"
+    "${CHIP_ROOT}/third_party/nlio/repo/include"
     "${CMAKE_CURRENT_BINARY_DIR}/src/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
-    "${CMAKE_CURRENT_BINARY_DIR}/gen/third_party/connectedhomeip/src/app/include"
     "${CMAKE_CURRENT_BINARY_DIR}/gen/include"
 )
 

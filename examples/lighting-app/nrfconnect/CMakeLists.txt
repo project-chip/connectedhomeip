@@ -37,7 +37,6 @@ target_compile_options(app PRIVATE -Werror)
 
 target_include_directories(app PRIVATE
                            main/include
-                           ${CHIP_ROOT}/src/app
                            ${LIGHTING_COMMON}
                            ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)

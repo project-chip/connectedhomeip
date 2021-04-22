@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "debug-printing.h"
+#include <app/util/debug-printing.h>
 
 #include <stdbool.h>
 #include <stdint.h>

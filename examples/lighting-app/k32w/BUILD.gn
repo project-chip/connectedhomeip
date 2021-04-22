@@ -39,9 +39,6 @@ k32w_sdk("sdk") {
     "main",
     "${k32w_platform_dir}/app/project_include",
     "${k32w_platform_dir}/app/support",
-    "${chip_root}/examples/lighting-app/lighting-common",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
     "${k32w_platform_dir}/util/include",
   ]
 

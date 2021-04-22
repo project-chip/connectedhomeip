@@ -93,10 +93,7 @@ template("lwip_target") {
   }
 
   config("${lwip_target_name}_base_config") {
-    include_dirs = [
-      "${lwip_root}/repo/lwip/src/include",
-      "include",
-    ]
+    include_dirs = [ "${lwip_root}/repo/lwip/src/include" ]
 
     # These options may have overlap with lwipopts.h, however this is harmless
     # as long the options are the same and if they are not the same it's a

@@ -17,10 +17,10 @@
 
 #include <bitset>
 
-#include "Base41.cpp"
-#include "QRCodeSetupPayloadGenerator.cpp"
-#include "QRCodeSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
+#include <setup_payload/Base41.cpp>
+#include <setup_payload/QRCodeSetupPayloadGenerator.cpp>
+#include <setup_payload/QRCodeSetupPayloadParser.cpp>
+#include <setup_payload/SetupPayload.cpp>
 
 namespace chip {
 

@@ -20,7 +20,7 @@
  * @brief Implementation for the Binding Server Cluster
  ***************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 
 #include <app/Command.h>
 #include <app/util/binding-table.h>

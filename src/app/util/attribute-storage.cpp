@@ -39,9 +39,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "attribute-storage.h"
-#include "af.h"
 #include "app/util/common.h"
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 
 #include "gen/attribute-type.h"
 #include "gen/callback.h"

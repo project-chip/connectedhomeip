@@ -21,12 +21,12 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include <app/Command.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>

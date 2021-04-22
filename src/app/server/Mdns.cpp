@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "Mdns.h"
+#include <app/server/Mdns.h>
 
 #include <inttypes.h>
 
@@ -29,7 +29,7 @@
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
 
-#include "Server.h"
+#include <app/server/Server.h>
 
 namespace chip {
 namespace app {

@@ -18,8 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "af.h"
-#include "debug-printing.h"
+#include <app/util/af.h>
+#include <app/util/debug-printing.h>
 
 #include <platform/CHIPDeviceConfig.h>
 #include <support/CodeUtils.h>

@@ -1,5 +1,5 @@
-#include "ManualSetupPayloadParser.h"
-#include "QRCodeSetupPayloadParser.h"
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>

@@ -42,7 +42,7 @@
 #pragma once
 
 //#include PLATFORM_HEADER
-#include "af.h"
+#include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #include "gen/att-storage.h"

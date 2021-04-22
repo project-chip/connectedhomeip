@@ -90,19 +90,19 @@
 
 // determines the number of in-clusters and out-clusters based on defines
 // in config.h
-#include "af-main.h"
+#include <app/util/af-main.h>
 
 //#include "app/framework/security/af-security.h"
 //#include "app/framework/security/crypto-state.h"
 #include "app/util/common.h"
-#include "attribute-storage.h"
-#include "attribute-table.h"
-#include "config.h"
 #include "gen/callback.h"
+#include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
+#include <app/util/config.h>
 //#include "print.h"
-#include "binding-table.h"
-#include "chip-message-send.h"
-#include "util.h"
+#include <app/util/binding-table.h>
+#include <app/util/chip-message-send.h>
+#include <app/util/util.h>
 
 using namespace chip;
 

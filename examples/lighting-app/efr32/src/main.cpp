@@ -36,9 +36,9 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "DataModelHandler.h"
-#include "Server.h"
 #include "init_efrPlatform.h"
+#include <app/server/DataModelHandler.h>
+#include <app/server/Server.h>
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"

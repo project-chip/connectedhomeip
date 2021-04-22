@@ -24,8 +24,8 @@
 #pragma once
 
 #include <app/Command.h>
+#include <app/util/af-types.h>
 #include <lib/core/CHIPCore.h>
-#include <util/af-types.h>
 
 namespace chip {
 namespace app {

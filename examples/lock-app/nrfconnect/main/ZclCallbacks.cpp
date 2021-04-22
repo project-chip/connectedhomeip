@@ -21,11 +21,11 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 
 using namespace ::chip;
 

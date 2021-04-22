@@ -37,11 +37,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af-event.h"
-#include "af.h"
 #include "app/util/common.h"
 #include "door-lock-server.h"
-#include "time-util.h"
+#include <app/util/af-event.h>
+#include <app/util/af.h>
+#include <app/util/time-util.h>
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"

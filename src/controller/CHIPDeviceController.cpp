@@ -40,7 +40,7 @@
 #endif
 
 #include <app/InteractionModelEngine.h>
-#include <app/util/DataModelHandler.h>
+#include <app/server/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>

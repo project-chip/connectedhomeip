@@ -51,9 +51,9 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
-#include "af-enums.h"
-#include "basic-types.h"
-#include "types_stub.h" // For various types.
+#include <app/util/af-enums.h>
+#include <app/util/basic-types.h>
+#include <app/util/types_stub.h> // For various types.
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"

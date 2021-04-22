@@ -23,11 +23,6 @@ declare_args() {
 }
 
 config("app_config") {
-  include_dirs = [
-    "util",
-    ".",
-    "${target_gen_dir}/include",
-  ]
   if (chip_enable_schema_check) {
     defines = [ "CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK=1" ]
   } else {
@@ -97,10 +92,10 @@ static_library("app") {
     "decoder.cpp",
     "encoder.cpp",
     "reporting/Engine.cpp",
+    "reporting/Engine.h",
   ]
 
   public_deps = [
-    ":codec_headers",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
@@ -113,10 +108,4 @@ static_library("app") {
     ":app_config",
     "${chip_root}/src:includes",
   ]
-}
-
-copy("codec_headers") {
-  sources = [ "chip-zcl-zpro-codec.h" ]
-
-  outputs = [ "${target_gen_dir}/include/app/{{source_file_part}}" ]
 }

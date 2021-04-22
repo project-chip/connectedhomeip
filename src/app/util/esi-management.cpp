@@ -39,8 +39,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "esi-management.h"
-#include "af.h"
+#include <app/util/af.h>
+#include <app/util/esi-management.h>
 #include <assert.h>
 
 using namespace chip;
