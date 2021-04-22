@@ -434,7 +434,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example",
             "servertype": "openocd",
             "searchDir": [
                 "${workspaceRoot}/config/mbed/scripts",
@@ -499,7 +499,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example",
             "servertype": "openocd",
             "searchDir": [
                 "${workspaceRoot}/config/mbed/scripts",
