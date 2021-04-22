@@ -311,7 +311,7 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommisioning();
+            app::Mdns::AdvertiseCommisionable();
             OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }

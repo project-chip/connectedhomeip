@@ -65,9 +65,6 @@ int main(int argc, char * argv[])
     // Init ZCL Data Model and CHIP App Server
     InitServer();
 
-    // Init Mdns Server
-    app::Mdns::StartServer();
-
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:

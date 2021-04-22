@@ -23,11 +23,11 @@ namespace chip {
 namespace app {
 namespace Mdns {
 
-/// Set MDNS operational advertisement
+/// Start operational advertising
 CHIP_ERROR AdvertiseOperational();
 
-/// Set MDNS commisioning advertisement
-CHIP_ERROR AdvertiseCommisioning();
+/// Start commisionable node advertising
+CHIP_ERROR AdvertiseCommisionable();
 
 /// (Re-)starts the minmdns server
 void StartServer();
