@@ -52,7 +52,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     mEventLoopTask          = NULL;
     mChipTimerActive        = false;
 
-    mChipStackLock = xSemaphoreCreateMutex();
+    mChipStackLock = xSemaphoreCreateRecursiveMutex();
     if (mChipStackLock == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to create CHIP stack lock");
@@ -82,19 +82,19 @@ exit:
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_LockChipStack(void)
 {
-    xSemaphoreTake(mChipStackLock, portMAX_DELAY);
+    xSemaphoreTakeRecursive(mChipStackLock, portMAX_DELAY);
 }
 
 template <class ImplClass>
 bool GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_TryLockChipStack(void)
 {
-    return xSemaphoreTake(mChipStackLock, 0) == pdTRUE;
+    return xSemaphoreTakeRecursive(mChipStackLock, 0) == pdTRUE;
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_UnlockChipStack(void)
 {
-    xSemaphoreGive(mChipStackLock);
+    xSemaphoreGiveRecursive(mChipStackLock);
 }
 
 template <class ImplClass>

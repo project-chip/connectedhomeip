@@ -237,7 +237,6 @@ exit:
             ChipLogError(Inet, "Secure transport could not find a valid PeerConnection: %s", errStr);
         }
     }
-
     return err;
 }
 

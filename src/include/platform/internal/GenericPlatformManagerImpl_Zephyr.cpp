@@ -48,6 +48,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // Zephyr mutex is already recursive lock.
     k_mutex_init(&mChipStackLock);
 
     k_msgq_init(&mChipEventQueue, reinterpret_cast<char *>(&mChipEventRingBuffer), sizeof(ChipDeviceEvent),

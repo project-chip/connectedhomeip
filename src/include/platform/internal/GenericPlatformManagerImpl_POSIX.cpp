@@ -64,8 +64,11 @@ template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    pthread_mutexattr_t lock_attr;
 
-    mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutexattr_init(&lock_attr);
+    pthread_mutexattr_settype(&lock_attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&mChipStackLock, &lock_attr);
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();

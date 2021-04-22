@@ -37,6 +37,7 @@
 #include <core/CHIPKeyIds.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <support/logging/CHIPLogging.h>
@@ -84,6 +85,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
+    DeviceLayer::CHIPPlatformLock platformLock;
+
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
 
     // If a group message is to be transmitted to a destination node whose message counter is unknown.
@@ -106,7 +109,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     {
         err = SendMessageImpl(protocolId, msgType, std::move(msgBuf), sendFlags, state);
     }
-
     return err;
 }
 

@@ -163,6 +163,22 @@ extern PlatformManager & PlatformMgr();
  */
 extern PlatformManagerImpl & PlatformMgrImpl();
 
+/**
+ * The RAII wrapper of CHIP Platform lock.
+ */
+class CHIPPlatformLock
+{
+public:
+    CHIPPlatformLock() { PlatformMgr().LockChipStack(); }
+    ~CHIPPlatformLock() { PlatformMgr().UnlockChipStack(); }
+
+private:
+    // No copy, move or assignment.
+    CHIPPlatformLock(const CHIPPlatformLock &)  = delete;
+    CHIPPlatformLock(const CHIPPlatformLock &&) = delete;
+    CHIPPlatformLock & operator=(const CHIPPlatformLock &) = delete;
+};
+
 } // namespace DeviceLayer
 } // namespace chip
 
