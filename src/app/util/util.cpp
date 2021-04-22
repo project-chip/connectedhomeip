@@ -307,6 +307,9 @@ void emberAfInit(void)
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
     emberAfPluginDescriptorServerInitCallback();
 #endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+    emberAfPluginOperationalCredentialsServerInitCallback();
+#endif
 
     emAfCallInits();
 }

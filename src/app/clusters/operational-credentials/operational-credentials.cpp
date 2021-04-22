@@ -114,14 +114,9 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
 AdminPairingInfo * retrieveCurrentAdmin()
 {
     uint64_t fabricId = emberAfCurrentCommand()->source;
-    uint64_t nodeId;
-    CHIP_ERROR err = ConfigurationMgr().GetDeviceId(nodeId);
-    if (err == CHIP_NO_ERROR)
-    {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId  %" PRIX64 ".", fabricId);
-        return GetGlobalAdminPairingTable().FindAdmin(fabricId, nodeId);
-    }
-    return nullptr;
+    // TODO: Figure out how to get device node id so we can do FindAdmin(fabricId, nodeId)...
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId  %" PRIX64 ".", fabricId);
+    return GetGlobalAdminPairingTable().FindAdmin(fabricId);
 }
 
 class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
@@ -165,8 +160,8 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
     AdminId adminId;
     CHIP_ERROR err;
 
-    // Fetch current admin
-    admin = retrieveCurrentAdmin();
+    // Fetch matching admin
+    admin = GetGlobalAdminPairingTable().FindAdmin(fabricId, nodeId, vendorId);
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_SUCCESS); // Admin has already been removed
 
     // Delete admin

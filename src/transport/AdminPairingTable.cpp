@@ -155,7 +155,7 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(AdminId adminId)
     return nullptr;
 }
 
-AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId)
+AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId)
 {
     for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
     {
@@ -164,6 +164,43 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId
             ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu.", i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), fabricId);
         }
         if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId)
+        {
+            ChipLogProgress(Discovery, "Found a match!");
+            return &mStates[i];
+        }
+    }
+
+    return nullptr;
+}
+
+AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId)
+{
+    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    {
+        if (mStates[i].IsInitialized())
+        {
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu nodeId %llu.", i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), fabricId, nodeId);
+        }
+        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId && mStates[i].GetNodeId() == nodeId)
+        {
+            ChipLogProgress(Discovery, "Found a match!");
+            return &mStates[i];
+        }
+    }
+
+    return nullptr;
+}
+
+AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId, uint16_t vendorId)
+{
+    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    {
+        if (mStates[i].IsInitialized())
+        {
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.", 
+                            i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), mStates[i].GetVendorId(), fabricId, nodeId, vendorId);
+        }
+        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId && mStates[i].GetNodeId() == nodeId && mStates[i].GetVendorId() == vendorId)
         {
             ChipLogProgress(Discovery, "Found a match!");
             return &mStates[i];

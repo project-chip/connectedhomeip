@@ -217,7 +217,11 @@ public:
 
     AdminPairingInfo * FindAdmin(AdminId adminId);
 
+    AdminPairingInfo * FindAdmin(FabricId fabricId);
+
     AdminPairingInfo * FindAdmin(FabricId fabricId, NodeId nodeId);
+
+    AdminPairingInfo * FindAdmin(FabricId fabricId, NodeId nodeId, uint16_t vendorId);
 
     void Reset();
 
