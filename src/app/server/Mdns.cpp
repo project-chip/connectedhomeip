@@ -111,9 +111,8 @@ CHIP_ERROR AdvertiseOperational()
 }
 
 /// Set MDNS commisioning advertisement
-CHIP_ERROR AdvertiseCommisioning()
+CHIP_ERROR AdvertiseCommisionable()
 {
-
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
     uint8_t mac[8];
@@ -171,7 +170,7 @@ void StartServer()
 // so configuraton should be added to enable commissioning advertising based on supported
 // Rendezvous methods.
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        err = app::Mdns::AdvertiseCommisioning();
+        err = app::Mdns::AdvertiseCommisionable();
 #endif
     }
 
