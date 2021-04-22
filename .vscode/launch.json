@@ -436,7 +436,10 @@
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
             "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
             "servertype": "openocd",
-            "searchDir": ["./scripts", "${env:OPENOCD_PATH/scripts}"],
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
             "configFiles": ["CY8CPROTO_062_4343W.tcl"],
             "overrideLaunchCommands": [
                 "set mem inaccessible-by-default off",
@@ -498,7 +501,10 @@
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
             "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
             "servertype": "openocd",
-            "searchDir": ["./scripts", "${env:OPENOCD_PATH/scripts}"],
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
             "configFiles": ["CY8CPROTO_062_4343W.tcl"],
             "overrideLaunchCommands": [
                 "monitor psoc6 sflash_restrictions 1",
