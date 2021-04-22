@@ -65,6 +65,10 @@ protected:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
+
+    // InitPlatformObjects allows app can init the platform related objects for computing only, without enable RF stack, this is
+    // used for unit tests for FreeRTOS.
+    CHIP_ERROR _InitPlatformObjects();
     void _LockChipStack(void);
     bool _TryLockChipStack(void);
     void _UnlockChipStack(void);

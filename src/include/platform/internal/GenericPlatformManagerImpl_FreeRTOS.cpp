@@ -43,10 +43,8 @@ namespace Internal {
 template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitPlatformObjects(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     vTaskSetTimeOutState(&mNextTimerBaseTime);
     mNextTimerDurationTicks = 0;
     mEventLoopTask          = NULL;
@@ -56,7 +54,7 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     if (mChipStackLock == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to create CHIP stack lock");
-        ExitNow(err = CHIP_ERROR_NO_MEMORY);
+        return CHIP_ERROR_NO_MEMORY;
     }
 
 #if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE) && CHIP_CONFIG_FREERTOS_USE_STATIC_QUEUE
@@ -68,15 +66,20 @@ CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
     if (mChipEventQueue == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to allocate CHIP event queue");
-        ExitNow(err = CHIP_ERROR_NO_MEMORY);
+        return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
-    err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
-    SuccessOrExit(err);
+    return CHIP_NO_ERROR;
+}
 
-exit:
-    return err;
+template <class ImplClass>
+CHIP_ERROR GenericPlatformManagerImpl_FreeRTOS<ImplClass>::_InitChipStack(void)
+{
+    ReturnErrorOnFailure(_InitPlatformObjects());
+
+    // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
+    ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>

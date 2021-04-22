@@ -53,6 +53,11 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
     return 0;
 }
 
+CHIP_ERROR PlatformManagerImpl::InitPlatformObjects()
+{
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitPlatformObjects();
+}
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;

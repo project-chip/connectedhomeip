@@ -51,6 +51,9 @@ public:
     CHIP_ERROR InitLwIPCoreLock(void);
     static void HandleESPSystemEvent(void * arg, esp_event_base_t eventBase, int32_t eventId, void * eventData);
 
+    // ===== Only call generic platform init routine, for ESP32 unit tests only.
+    CHIP_ERROR InitPlatformObjects();
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
