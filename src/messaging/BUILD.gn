@@ -20,10 +20,6 @@ static_library("messaging") {
   sources = [
     "ApplicationExchangeDispatch.cpp",
     "ApplicationExchangeDispatch.h",
-    "Channel.cpp",
-    "Channel.h",
-    "ChannelContext.cpp",
-    "ChannelContext.h",
     "ErrorCategory.cpp",
     "ErrorCategory.h",
     "ExchangeACL.h",
