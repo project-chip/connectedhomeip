@@ -30,8 +30,8 @@ executable("chip-tv-app") {
   ]
 
   deps = [
-    "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/examples/platform/linux:chip_examples_project_linux_platform_main",
+    "${chip_root}/examples/tv-app/tv-common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/inipp",
   ]

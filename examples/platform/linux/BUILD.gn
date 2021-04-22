@@ -19,11 +19,14 @@ config("chip_examples_project_linux_platform_main_config") {
 }
 
 source_set("chip_examples_project_linux_platform_main") {
-  sources = [ "AppMain.cpp", "AppMain.h", "Options.cpp", "Options.h" ]
-
-  public_deps = [
-    "${chip_root}/src/lib",
+  sources = [
+    "AppMain.cpp",
+    "AppMain.h",
+    "Options.cpp",
+    "Options.h",
   ]
+
+  public_deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":chip_examples_project_linux_platform_main_config" ]
 }
