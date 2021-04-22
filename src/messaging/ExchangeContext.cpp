@@ -85,7 +85,11 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
+    // TODO(#6220): We add this check to make platforms that does not implemented full platform (i.e. Android) can compile, and does
+    // not means that those platforms do not need this.
+#if CONFIG_DEVICE_LAYER
     DeviceLayer::CHIPPlatformLock platformLock;
+#endif
 
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
 
