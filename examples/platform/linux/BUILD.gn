@@ -12,23 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-executable("chip-all-clusters-app") {
-  sources = [ "main.cpp" ]
+config("chip_examples_project_linux_platform_main_config") {
+  include_dirs = [ "." ]
+}
 
-  deps = [
-    "${chip_root}/examples/all-clusters-app/all-clusters-common",
-    "${chip_root}/examples/platform/linux:chip_examples_project_linux_platform_main",
+source_set("chip_examples_project_linux_platform_main") {
+  sources = [ "AppMain.cpp", "AppMain.h", "Options.cpp", "Options.h" ]
+
+  public_deps = [
     "${chip_root}/src/lib",
   ]
 
-  cflags = [ "-Wconversion" ]
-
-  output_dir = root_out_dir
-}
-
-group("linux") {
-  deps = [ ":chip-all-clusters-app" ]
+  public_configs = [ ":chip_examples_project_linux_platform_main_config" ]
 }
