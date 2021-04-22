@@ -15,8 +15,7 @@
 name: Build example - QPG6100
 
 on:
-    push:
-    pull_request:
+  workflow_dispatch:
 
 jobs:
     qpg6100:
