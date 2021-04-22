@@ -203,7 +203,8 @@ guide
 [Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
 for step-by-step instructions.
 
-
 ## Video demo
 
-See [Unlocking the Future of Project CHIP Webinar](https://www.nxp.com/design/training/unlocking-the-future-of-project-chip:TIP-EEE-UNLOCKING-THE-FUTURE-OF-PROJECT-CHIP) for an in-depth analysis of NXP capabilities for Project CHIP. 
+See
+[Unlocking the Future of Project CHIP Webinar](https://www.nxp.com/design/training/unlocking-the-future-of-project-chip:TIP-EEE-UNLOCKING-THE-FUTURE-OF-PROJECT-CHIP)
+for an in-depth analysis of NXP capabilities for Project CHIP.
