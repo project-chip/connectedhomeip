@@ -17,7 +17,7 @@
 
 #include <platform/LockTracker.h>
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -32,7 +32,7 @@ void AssertChipStackLockedByCurrentThread(const char * file, int line)
     if (!chip::DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread())
     {
         ChipLogError(DeviceLayer, "Chip stack locking error at '%s:%d'. Code is unsafe/racy", file, line);
-#if defined(CHIP_STACK_LOCK_TRACKING_ERROR_FATAL)
+#if CHIP_STACK_LOCK_TRACKING_ERROR_FATAL
         chipDie();
 #endif
     }
