@@ -32,31 +32,15 @@
 #include <transport/raw/UDP.h>
 
 #include <ChipShellCollection.h>
+#include <Common.h>
 
 using namespace chip;
 using namespace Shell;
 using namespace Logging;
 
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
-#endif
-constexpr size_t kMaxPayloadSize  = 1280;
-constexpr size_t kResponseTimeOut = 1000;
-
 namespace {
 
-Messaging::ExchangeManager gExchangeMgr;
 Messaging::ExchangeContext * gExchangeCtx = nullptr;
-SecureSessionMgr gSessionMgr;
-Inet::IPAddress gDestAddr;
-
-Transport::AdminId gAdminId = 0;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-#endif
-TransportMgr<Transport::UDP> gUDPManager;
 
 class SendArguments
 {

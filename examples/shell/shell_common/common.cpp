@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,20 +15,15 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <Common.h>
 
-#include <platform/CHIPDeviceConfig.h>
+chip::Messaging::ExchangeManager gExchangeMgr;
+chip::SecureSessionMgr gSessionMgr;
+chip::Inet::IPAddress gDestAddr;
 
-extern "C" {
-// A list of shell commands provided by ChipShell
-void cmd_base64_init(void);
-void cmd_btp_init(void);
-void cmd_device_init(void);
-void cmd_misc_init(void);
-void cmd_otcli_init(void);
+chip::Transport::AdminId gAdminId = 0;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CONTROLLER
-void cmd_ping_init(void);
-void cmd_send_init(void);
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 #endif
-}
+chip::TransportMgr<chip::Transport::UDP> gUDPManager;
