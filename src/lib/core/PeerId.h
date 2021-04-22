@@ -27,6 +27,7 @@ constexpr NodeId kUndefinedNodeId = 0ULL;
 constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
 
 constexpr FabricId kUndefinedFabricId = 0ULL;
+constexpr uint16_t kUndefinedVendorId = 0U;
 
 /// A peer is identified by a node id within a fabric
 class PeerId

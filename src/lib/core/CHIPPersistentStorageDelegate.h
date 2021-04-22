@@ -126,6 +126,15 @@ public:
      */
     virtual CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+
+    /**
+     * @brief
+     *   Deletes the value for the key
+     *
+     * @param[in] key Key to be deleted
+     */
+    virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     /**
      * @brief
      *   Deletes the value for the key

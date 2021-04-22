@@ -38,6 +38,8 @@
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
+#include <transport/AdminPairingTable.h>
+#include <app/util/basic-types.h>
 
 #include <inttypes.h>
 
@@ -168,7 +170,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     // This marks any connection where we send data to as 'active'
     mPeerConnections.MarkConnectionActive(state);
-    admin = mAdmins->FindAdmin(state->GetAdminId());
+    admin = mAdmins->FindAdminWithId(state->GetAdminId());
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     localNodeId = admin->GetNodeId();
 
@@ -374,6 +376,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
 
     Transport::AdminPairingInfo * admin = nullptr;
 
+    bool modifiedAdmin = false;
+    NodeId localNodeId;
+    FabricId fabricId;
+
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     if (state == nullptr)
@@ -382,7 +388,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
-    admin = mAdmins->FindAdmin(state->GetAdminId());
+    admin = mAdmins->FindAdminWithId(state->GetAdminId());
     VerifyOrExit(admin != nullptr,
                  ChipLogError(Inet, "Secure transport received packet for unknown admin (%p, %d) pairing, discarding", state,
                               state->GetAdminId()));
@@ -390,8 +396,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     {
         VerifyOrExit(
             admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(Inet, "Secure transport received message, but destination node ID doesn't match our node ID, discarding"));
+            ChipLogError(Inet, "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding", 
+                                packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
     }
+    ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
     mPeerConnections.MarkConnectionActive(state);
 
     if (!packetHeader.IsSecureSessionControlMsg() && !state->IsPeerMsgCounterSynced() &&
@@ -419,6 +427,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
+
+    // See operational-credentials-server.cpp for explanation as to why fabricId is being set to commissioner node id
+    // This is temporary code until AddOptCert is implemented through which an admin will be correctly added with the correct fields.
+    // TODO: Remove temporary code once AddOptCert is implemented
     if (packetHeader.GetSourceNodeId().HasValue())
     {
         if (state->GetPeerNodeId() == kUndefinedNodeId)
@@ -427,9 +439,36 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
     }
 
+    // TODO: Remove temporary code once AddOptCert is implemented
     if (packetHeader.GetDestinationNodeId().HasValue())
     {
-        admin->SetNodeId(packetHeader.GetDestinationNodeId().Value());
+        localNodeId = packetHeader.GetDestinationNodeId().Value();
+        if (localNodeId != kUndefinedNodeId && admin->GetNodeId() != localNodeId)
+        {
+            admin->SetNodeId(localNodeId);
+            ChipLogProgress(Inet, "Setting nodeID %" PRIX64 " on admin.", admin->GetNodeId());
+            modifiedAdmin = true;
+        }
+        
+    }
+
+    // TODO: Remove temporary code once AddOptCert is implemented
+    if (packetHeader.GetSourceNodeId().HasValue())
+    {
+        fabricId = packetHeader.GetSourceNodeId().Value();
+        if (fabricId != kUndefinedFabricId && admin->GetFabricId() != fabricId)
+        {
+            admin->SetFabricId(packetHeader.GetSourceNodeId().Value());
+            ChipLogProgress(Inet, "Setting fabricID %" PRIX64 " on admin.", admin->GetFabricId());
+            modifiedAdmin = true;
+        }
+    }
+
+    // TODO: Remove temporary code once AddOptCert is implemented
+    if (modifiedAdmin)
+    {
+        ChipLogProgress(Inet, "Since admin was modified, persisting changes to KVS");
+        mAdmins->Store(admin->GetAdminId());
     }
 
     // TODO: once mDNS address resolution is available reconsider if this is required

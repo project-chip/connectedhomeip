@@ -686,7 +686,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     Device * device                    = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
 
     VerifyOrExit(remoteDeviceId != kAnyNodeId && remoteDeviceId != kUndefinedNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
