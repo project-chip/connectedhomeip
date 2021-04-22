@@ -42,8 +42,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetFabricCallback(chip::app::Command * commandObj, ByteSpan fabricId, ByteSpan fabricSecret,
-                                                         uint64_t breadcrumb, uint32_t timeoutMs)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
+                                                                   uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);

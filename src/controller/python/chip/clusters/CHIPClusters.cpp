@@ -1373,17 +1373,17 @@ CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(chi
     cluster.Associate(device, ZCLendpointId);
     return cluster.CommissioningComplete(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel());
 }
-CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_SetFabric(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                                 chip::GroupId, const uint8_t * fabricId, uint32_t fabricId_Len,
-                                                                 const uint8_t * fabricSecret, uint32_t fabricSecret_Len,
-                                                                 uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(chip::Controller::Device * device,
+                                                                           chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                           uint8_t location, const uint8_t * countryCode,
+                                                                           uint32_t countryCode_Len, uint64_t breadcrumb,
+                                                                           uint32_t timeoutMs)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GeneralCommissioningCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.SetFabric(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                             chip::ByteSpan(fabricId, fabricId_Len), chip::ByteSpan(fabricSecret, fabricSecret_Len), breadcrumb,
-                             timeoutMs);
+    return cluster.SetRegulatoryConfig(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), location,
+                                       chip::ByteSpan(countryCode, countryCode_Len), breadcrumb, timeoutMs);
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_GeneralCommissioning_FabricId(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,

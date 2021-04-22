@@ -1906,32 +1906,6 @@
                                   ZCL_ANNOUNCE_OTA_SERVER_COMMAND_ID, "uuuu", serverLocation, vendorId, announcementReason,        \
                                   metadataForNode);
 
-/** @brief Command description for SetFabric
- *
- * Command: SetFabric
- * @param fabricId OCTET_STRING
- * @param fabricSecret OCTET_STRING
- * @param breadcrumb INT64U
- * @param timeoutMs INT32U
- */
-#define emberAfFillCommandGeneral                                                                                                  \
-    CommissioningClusterSetFabric(fabricId, fabricSecret, breadcrumb, timeoutMs)                                                   \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_FABRIC_COMMAND_ID, "uuuu", fabricId, fabricSecret, breadcrumb, timeoutMs);
-
-/** @brief Command description for SetFabricResponse
- *
- * Command: SetFabricResponse
- * @param errorCode INT8U
- * @param debugText CHAR_STRING
- */
-#define emberAfFillCommandGeneral                                                                                                  \
-    CommissioningClusterSetFabricResponse(errorCode, debugText)                                                                    \
-        emberAfFillExternalBuffer(mask,                                                                                            \
-                                                                                                                                   \
-                                  ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "uu", errorCode, debugText);
-
 /** @brief Command description for ArmFailSafe
  *
  * Command: ArmFailSafe
@@ -1948,7 +1922,7 @@
 /** @brief Command description for ArmFailSafeResponse
  *
  * Command: ArmFailSafeResponse
- * @param errorCode INT8U
+ * @param errorCode GeneralCommissioningError
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral                                                                                                  \
@@ -1974,7 +1948,7 @@
 /** @brief Command description for SetRegulatoryConfigResponse
  *
  * Command: SetRegulatoryConfigResponse
- * @param errorCode INT8U
+ * @param errorCode GeneralCommissioningError
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral                                                                                                  \
@@ -1995,7 +1969,7 @@
 /** @brief Command description for CommissioningCompleteResponse
  *
  * Command: CommissioningCompleteResponse
- * @param errorCode INT8U
+ * @param errorCode GeneralCommissioningError
  * @param debugText CHAR_STRING
  */
 #define emberAfFillCommandGeneral                                                                                                  \

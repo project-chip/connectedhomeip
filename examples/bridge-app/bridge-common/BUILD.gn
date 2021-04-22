@@ -20,6 +20,7 @@ chip_data_model("bridge-common") {
   cluster_sources = [
     "basic",
     "bindings",
+    "general-commissioning-server",
     "level-control",
     "network-commissioning",
     "on-off-server",

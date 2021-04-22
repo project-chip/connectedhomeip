@@ -1826,13 +1826,13 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chi
                                                                              uint8_t * debugText);
 
 /**
- * @brief General Commissioning Cluster SetFabricResponse Command callback
+ * @brief General Commissioning Cluster SetRegulatoryConfigResponse Command callback
  * @param errorCode
  * @param debugText
  */
 
-bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                 uint8_t * debugText);
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                           uint8_t * debugText);
 
 /**
  * @brief Groups Cluster AddGroupResponse Command callback
