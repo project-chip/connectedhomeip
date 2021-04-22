@@ -1,4 +1,20 @@
-
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #include <iostream>
 #include <thread>
@@ -6,6 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <core/CHIPError.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -29,54 +46,6 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
 }
-
-CHIP_ERROR PrintQRCodeContent()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // If we do not have a discriminator, generate one
-    chip::SetupPayload payload;
-    uint32_t setUpPINCode;
-    uint16_t setUpDiscriminator;
-    uint16_t vendorId;
-    uint16_t productId;
-    std::string result;
-
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
-    SuccessOrExit(err);
-
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
-    SuccessOrExit(err);
-
-    err = ConfigurationMgr().GetVendorId(vendorId);
-    SuccessOrExit(err);
-
-    err = ConfigurationMgr().GetProductId(productId);
-    SuccessOrExit(err);
-
-    payload.version       = 0;
-    payload.vendorID      = vendorId;
-    payload.productID     = productId;
-    payload.setUpPINCode  = setUpPINCode;
-    payload.discriminator = setUpDiscriminator;
-
-    // Wrap it so SuccessOrExit can work
-    {
-        chip::QRCodeSetupPayloadGenerator generator(payload);
-        err = generator.payloadBase41Representation(result);
-        SuccessOrExit(err);
-    }
-
-    std::cout << "SetupPINCode: [" << setUpPINCode << "]" << std::endl;
-    // There might be whitespace in setup QRCode, add brackets to make it clearer.
-    std::cout << "SetupQRCode:  [" << result << "]" << std::endl;
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        std::cerr << "Failed to generate QR Code: " << ErrorStr(err) << std::endl;
-    }
-    return err;
-}
 } // namespace
 
 int ChipLinuxAppInit(int argc, char ** argv)
@@ -92,12 +61,12 @@ int ChipLinuxAppInit(int argc, char ** argv)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = PrintQRCodeContent();
-    SuccessOrExit(err);
+    ConfigurationMgr().LogDeviceConfig();
+    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
 
 #if defined(PW_RPC_ENABLED)
     chip::rpc::Init();
-    std::cerr << "PW_RPC initialized." << std::endl;
+    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
@@ -121,14 +90,14 @@ int ChipLinuxAppInit(int argc, char ** argv)
     if (LinuxDeviceOptions::GetInstance().mThread)
     {
         SuccessOrExit(err = chip::DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
-        std::cerr << "Thread initialized." << std::endl;
+        ChipLogProgress(NotSpecified, "Thread initialized.");
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        std::cerr << "Failed to run Linux Lighting App: " << ErrorStr(err) << std::endl;
+        ChipLogProgress(NotSpecified, "Failed to run Linux Lighting App: %s ", ErrorStr(err));
         // End the program with non zero error code to indicate a error.
         return 1;
     }
