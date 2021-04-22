@@ -909,7 +909,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     {
         /* Stop advertising and defer restart for when stop confirmation is received from the stack */
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-        sInstance.StopAdvertising();       
+        sInstance.StopAdvertising();
         sInstance.mFlags.Set(Flags::kRestartAdvertising);
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
