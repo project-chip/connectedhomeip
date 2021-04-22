@@ -371,6 +371,21 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
         [self->_deviceList refreshDeviceList];
         [self retrieveAndSendWifiCredentials];
+        
+        CHIPOperationalCredentials *opCreds = [[CHIPOperationalCredentials alloc] initWithDevice:CHIPGetPairedDevice()
+                                                                                        endpoint:0
+                                                                                           queue:dispatch_get_main_queue()];
+        [opCreds setFabric:kCHIPToolTmpVendorId completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+            if (error) {
+                NSLog(@"Got back error trying to getFabricId %@", error);
+            } else {
+                NSLog(@"Got back fabricID values %@, storing it", values);
+                NSNumber * fabricID = [values objectForKey:@"FabricId"];
+                CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey, fabricID);
+            }
+        }];
+        
+        
     });
 }
 
