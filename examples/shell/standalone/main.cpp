@@ -23,6 +23,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include <ChipShellCollection.h>
 
@@ -45,8 +46,11 @@ int main()
     cmd_device_init();
     cmd_btp_init();
     cmd_otcli_init();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CONTROLLER
     cmd_ping_init();
     cmd_send_init();
+#endif
 
     shell_task(nullptr);
     return 0;
