@@ -76,8 +76,11 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: |
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
+                      out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out.map
                       out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
+                      out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out.map
                       out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out
+                      out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out.map
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove SiliconLabs binaries for CodeQL Analysis
