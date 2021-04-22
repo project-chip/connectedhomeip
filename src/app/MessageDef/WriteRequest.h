@@ -148,6 +148,14 @@ public:
      *  @return A reference to *this
      */
     WriteRequest::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
+
+    /**
+     *  @brief Get reference to AttributeDataList::Builder
+     *
+     *  @return A reference to AttributeDataList::Builder
+     */
+    AttributeDataList::Builder & GetAttributeDataListBuilder();
+
     /**
      *  @brief Mark the end of this WriteRequest
      *

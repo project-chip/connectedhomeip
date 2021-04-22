@@ -28,11 +28,13 @@
 #include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>
+#include <app/AttributePathParams.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace app {
 class ReadClient;
+class WriteClient;
 class CommandSender;
 
 /**
@@ -130,6 +132,42 @@ public:
      * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
      */
     virtual CHIP_ERROR CommandResponseError(const CommandSender * apCommandSender, CHIP_ERROR aError)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a WriteClient has received an Write Response containing a status code.
+     */
+    virtual CHIP_ERROR WriteResponseStatus(const WriteClient * apWriteClient,
+                                             const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, AttributePathParams & aAttributePathParams, uint8_t aCommandIndex)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a Write Response has already been processed.
+     */
+    virtual CHIP_ERROR WriteResponseProcessed(const WriteClient * apWriteClient) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * Notification that a Write Client has received an Write Response and fails to process a attribute data element in that
+     * write response
+     */
+    virtual CHIP_ERROR WriteResponseProtocolError(const WriteClient * apWriteClient, uint8_t aAttributeIndex)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * Notification that a write client encountered an asynchronous failure.
+     * @param[in]  aCWriteClient write interactions
+     * @param[in]  aError         A error that could be CHIP_ERROR_TIMEOUT when write client fails to receive, or other error when
+     *                            fail to process write response.
+     * @retval # CHIP_ERROR_NOT_IMPLEMENTED if not implemented
+     */
+    virtual CHIP_ERROR WriteResponseError(const WriteClient * apWriteClient, CHIP_ERROR aError)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
