@@ -17,10 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("window-common") {
-  cluster_sources = [
-    "bindings",
-    "network-commissioning",
-  ]
+  zap_file = "window-app.zap"
 
   zap_pregenerated_dir = "gen"
 }
