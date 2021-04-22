@@ -52,14 +52,17 @@ RUN set -x \
 # ------------------------------------------------------------------------------
 # Install openocd
 RUN set -x \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    openocd \
+    && (mkdir -p /opt/openocd \
+    && cd /opt/openocd \
+    && wget --progress=dot:giga https://github.com/cypresssemiconductorco/openocd/releases/download/release-v4.2.0/openocd-4.2.0.1430-linux.tar.gz \
+    && tar --strip-components=1 -xzf openocd-4.2.0.1430-linux.tar.gz \
+    && rm openocd-4.2.0.1430-linux.tar.gz) \
     && : # last line
 
 # ------------------------------------------------------------------------------
 # Configure environment variables
 ENV MBED_GCC_ARM_PATH=/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/
 ENV MBED_OS_PATH=/opt/mbed-os/
-ENV OPENOCD_PATH=/usr/share/openocd/
+ENV OPENOCD_PATH=/opt/openocd/
 
-ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}"
+ENV PATH="${PATH}:${MBED_GCC_ARM_PATH}:${OPENOCD_PATH}/bin"
