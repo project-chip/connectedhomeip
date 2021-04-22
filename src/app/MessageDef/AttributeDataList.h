@@ -66,6 +66,8 @@ public:
      */
     AttributeDataElement::Builder & CreateAttributeDataElementBuilder();
 
+    AttributeDataElement::Builder & GetAttributeDataElementBuilder();
+
     /**
      *  @brief Mark the end of this AttributeDataList
      *

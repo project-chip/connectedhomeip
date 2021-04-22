@@ -47,7 +47,7 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
     err = ProcessCommandMessage(std::move(payload), CommandRoleId::HandlerId);
     SuccessOrExit(err);
 
-    SendCommandResponse();
+    err = SendCommandResponse();
 
 exit:
     ChipLogFunctError(err);

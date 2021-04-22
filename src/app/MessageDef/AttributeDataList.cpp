@@ -102,6 +102,11 @@ exit:
     return mAttributeDataElementBuilder;
 }
 
+AttributeDataElement::Builder & AttributeDataList::Builder::GetAttributeDataElementBuilder()
+{
+    return mAttributeDataElementBuilder;
+}
+
 AttributeDataList::Builder & AttributeDataList::Builder::EndOfAttributeDataList()
 {
     EndOfContainer();

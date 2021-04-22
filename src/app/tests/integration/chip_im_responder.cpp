@@ -125,6 +125,23 @@ exit:
     ChipLogFunctError(err);
     return err;
 }
+
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    AttributePathParams attributePathParams;
+    attributePathParams.mNodeId     = 1;
+    attributePathParams.mEndpointId = 2;
+    attributePathParams.mClusterId  = 3;
+    attributePathParams.mFieldId    = 4;
+    attributePathParams.mListIndex  = 5;
+    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
+
+    err = apWriteHandler->AddAttributeStatusCode(attributePathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                                 Protocols::SecureChannel::Id, Protocols::InteractionModel::ProtocolCode::Success);
+    ChipLogFunctError(err);
+    return err;
+}
 } // namespace app
 } // namespace chip
 

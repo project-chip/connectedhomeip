@@ -90,6 +90,8 @@ static_library("app") {
     "MessageDef/WriteResponse.cpp",
     "ReadClient.cpp",
     "ReadHandler.cpp",
+    "WriteClient.cpp",
+    "WriteHandler.cpp",
     "decoder.cpp",
     "encoder-common.cpp",
     "reporting/Engine.cpp",
