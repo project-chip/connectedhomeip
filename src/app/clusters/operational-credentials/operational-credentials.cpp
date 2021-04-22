@@ -46,9 +46,9 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterGetFabricIdCallback(chip::app::Command * commandObj)
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * commandObj, uint16_t VendorId)
 {
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: GetFabricId");
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: SetFabric with vendorId %d", VendorId);
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
