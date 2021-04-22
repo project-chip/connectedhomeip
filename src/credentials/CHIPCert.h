@@ -71,6 +71,7 @@ enum
     kTag_ExtendedKeyUsage       = 3, /**< [ array ] Enumerated values giving the purposes for which the public key can be used. */
     kTag_SubjectKeyIdentifier   = 4, /**< [ byte string ] Identifier of the certificate's public key. */
     kTag_AuthorityKeyIdentifier = 5, /**< [ byte string ] Identifier of the public key used to sign the certificate. */
+    kTag_FutureExtension        = 6, /**< [ byte string ] Arbitrary extention. DER encoded SEQUENCE as in X.509 form. */
 
     // ---- Context-specific Tags for ECDSASignature Structure ----
     kTag_ECDSASignature_r = 1, /**< [ byte string ] ECDSA r value, in ASN.1 integer encoding. */
@@ -145,10 +146,11 @@ enum class CertFlags : uint16_t
     kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extension is present in the certificate. */
     kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extension is present in the certificate. */
     kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extension is present in the certificate. */
-    kPathLenConstraintPresent    = 0x0020, /**< Path length constraint is present in the certificate. */
-    kIsCA                        = 0x0040, /**< Indicates that certificate is a CA certificate. */
-    kIsTrustAnchor               = 0x0080, /**< Indicates that certificate is a trust anchor. */
-    kTBSHashPresent              = 0x0100, /**< Indicates that TBS hash of the certificate was generated and stored. */
+    kExtPresent_FutureIsCritical = 0x0020, /**< Future extension marked as critical is present in the certificate. */
+    kPathLenConstraintPresent    = 0x0040, /**< Path length constraint is present in the certificate. */
+    kIsCA                        = 0x0080, /**< Indicates that certificate is a CA certificate. */
+    kIsTrustAnchor               = 0x0100, /**< Indicates that certificate is a trust anchor. */
+    kTBSHashPresent              = 0x0200, /**< Indicates that TBS hash of the certificate was generated and stored. */
 };
 
 /** CHIP Certificate Decode Flags

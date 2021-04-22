@@ -127,11 +127,11 @@ oids = [
     ( "EllipticCurve",  "prime256v1",              1,       [ iso(1), member_body(2), us(840), ansi_X9_62(10045), curves(3), prime(1), 7 ]                  ),
 
     # Certificate Extensions
-    ( "Extension",      "AuthorityKeyIdentifier",  1,       [ joint_iso_ccitt(2), ds(5), 29, 35 ]                                                           ),
-    ( "Extension",      "SubjectKeyIdentifier",    2,       [ joint_iso_ccitt(2), ds(5), 29, 14 ]                                                           ),
-    ( "Extension",      "KeyUsage",                3,       [ joint_iso_ccitt(2), ds(5), 29, 15 ]                                                           ),
-    ( "Extension",      "BasicConstraints",        4,       [ joint_iso_ccitt(2), ds(5), 29, 19 ]                                                           ),
-    ( "Extension",      "ExtendedKeyUsage",        5,       [ joint_iso_ccitt(2), ds(5), 29, 37 ]                                                           ),
+    ( "Extension",      "BasicConstraints",        1,       [ joint_iso_ccitt(2), ds(5), 29, 19 ]                                                           ),
+    ( "Extension",      "KeyUsage",                2,       [ joint_iso_ccitt(2), ds(5), 29, 15 ]                                                           ),
+    ( "Extension",      "ExtendedKeyUsage",        3,       [ joint_iso_ccitt(2), ds(5), 29, 37 ]                                                           ),
+    ( "Extension",      "SubjectKeyIdentifier",    4,       [ joint_iso_ccitt(2), ds(5), 29, 14 ]                                                           ),
+    ( "Extension",      "AuthorityKeyIdentifier",  5,       [ joint_iso_ccitt(2), ds(5), 29, 35 ]                                                           ),
 
     # Key Purposes
     ( "KeyPurpose",     "ServerAuth",              1,       [ iso(1), organization(3), dod(6), internet(1), security(5), mechanisms(5), pkix(7), 3, 1 ]     ),
