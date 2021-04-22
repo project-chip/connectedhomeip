@@ -284,8 +284,8 @@ void ReadHandler::ClearClusterInfo()
 void ReadHandler::ReleaseClusterInfoList()
 {
     long numClusterInfosToBeAffected = 0;
-    long numberClusterInfosPool = InteractionModelEngine::GetInstance()->GetNumClusterInfos();
-    ClusterInfo * clusterInfoPool = InteractionModelEngine::GetInstance()->GetClusterInfoPool();
+    long numberClusterInfosPool      = InteractionModelEngine::GetInstance()->GetNumClusterInfos();
+    ClusterInfo * clusterInfoPool    = InteractionModelEngine::GetInstance()->GetClusterInfoPool();
 
     if (mNumClusterInfos == 0)
     {
