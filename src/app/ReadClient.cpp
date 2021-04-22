@@ -379,8 +379,6 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
-        err = WriteSingleClusterData(clusterInfo, dataReader);
-        SuccessOrExit(err);
     }
 
     if (CHIP_END_OF_TLV == err)

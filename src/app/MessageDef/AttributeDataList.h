@@ -67,6 +67,13 @@ public:
     AttributeDataElement::Builder & CreateAttributeDataElementBuilder();
 
     /**
+     *  @brief Get reference to AttributeDataElement::Builder
+     *
+     *  @return A reference to AttributeDataElement::Builder
+     */
+    AttributeDataElement::Builder & GetAttributeDataElementBuilder();
+
+    /**
      *  @brief Mark the end of this AttributeDataList
      *
      *  @return A reference to *this

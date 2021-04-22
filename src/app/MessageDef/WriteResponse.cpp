@@ -139,6 +139,11 @@ exit:
     return mAttributeStatusListBuilder;
 }
 
+AttributeStatusList::Builder & WriteResponse::Builder::GetAttributeStatusListBuilder()
+{
+    return mAttributeStatusListBuilder;
+}
+
 WriteResponse::Builder & WriteResponse::Builder::EndOfWriteResponse()
 {
     EndOfContainer();

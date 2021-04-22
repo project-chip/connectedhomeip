@@ -44,6 +44,8 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
+#include <app/WriteClient.h>
+#include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
@@ -54,6 +56,8 @@
 #define CHIP_MAX_NUM_READ_HANDLER 1
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
 #define IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#define CHIP_MAX_NUM_WRITE_CLIENT 1
+#define CHIP_MAX_NUM_WRITE_HANDLER 1
 
 namespace chip {
 namespace app {
@@ -123,6 +127,17 @@ public:
     CHIP_ERROR NewReadClient(ReadClient ** const apReadClient);
 
     /**
+     *  Retrieve a WriteClient that the SDK consumer can use to send do a write.  If the call succeeds, the consumer
+     *  is responsible for calling Shutdown() on the WriteClient once it's done using it.
+     *
+     *  @param[out]    apWriteClient    A pointer to the WriteClient object.
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no WriteClient available
+     *  @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR NewWriteClient(WriteClient ** const apWriteClient, intptr_t aAppIdentifier);
+
+    /**
      *  Get read client index in mReadClients
      *
      *  @param[in]    apReadClient    A pointer to a read client object.
@@ -130,6 +145,8 @@ public:
      *  @retval  the index in mReadClients array
      */
     uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
+
+    uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
@@ -153,12 +170,21 @@ private:
     void OnReadRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+    /**
+     * Called when Interaction Model receives a Write Request message.  Errors processing
+     * the Write Request are handled entirely within this function.
+     */
+    void OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
+                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER];
     CommandSender mCommandSenderObjs[CHIP_MAX_NUM_COMMAND_SENDER];
     ReadClient mReadClients[CHIP_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_MAX_NUM_READ_HANDLER];
+    WriteClient mWriteClients[CHIP_MAX_NUM_WRITE_CLIENT];
+    WriteHandler mWriteHandlers[CHIP_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
     ClusterInfo mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
@@ -179,6 +205,6 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
  */
 bool ServerClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId);
 CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter);
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader);
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip
