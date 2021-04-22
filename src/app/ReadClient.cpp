@@ -231,7 +231,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     }
     SuccessOrExit(err);
 
-    err = report.GetEventDataList(&eventList);
+    err                = report.GetEventDataList(&eventList);
     isEventListPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {
@@ -247,7 +247,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
         SuccessOrExit(err);
     }
 
-    err = report.GetAttributeDataList(&attributeDataList);
+    err                        = report.GetAttributeDataList(&attributeDataList);
     isAttributeDataListPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {

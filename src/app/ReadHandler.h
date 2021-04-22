@@ -139,7 +139,7 @@ private:
 
     // Current Handler state
     HandlerState mState;
-    ClusterInfo * mpClusterInfoList     = nullptr;
+    ClusterInfo * mpClusterInfoList   = nullptr;
     long mCurProcessingClusterInfoIdx = 0;
     long mNumClusterInfos             = 0;
 };

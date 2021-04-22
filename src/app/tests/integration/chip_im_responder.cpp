@@ -98,7 +98,7 @@ exit:
 CHIP_ERROR ReadSingleClusterData(NodeId aNodeId, ClusterId aClusterId, EndpointId aEndPointId, FieldId aFieldId,
                                  TLV::TLVWriter & aWriter)
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(aClusterId == kTestClusterId && aEndPointId == kTestEndPointId, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (aFieldId == kRootFieldId || aFieldId == 1)

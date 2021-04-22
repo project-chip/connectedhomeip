@@ -227,11 +227,11 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
-//Release clusterInfo list for the read handler to pool and shrink the rear of clusterInfo List forward if any
+// Release clusterInfo list for the read handler to pool and shrink the rear of clusterInfo List forward if any
 void InteractionModelEngine::ReleaseClusterInfoListToPool(ReadHandler * const apReadHandler)
 {
     ClusterInfo * const clusterInfoList = apReadHandler->GetClusterInfoList();
-    long numClusterInfos              = apReadHandler->GetNumClusterInfos();
+    long numClusterInfos                = apReadHandler->GetNumClusterInfos();
     long numClusterInfosToBeAffected;
 
     if (numClusterInfos == 0)

@@ -59,7 +59,7 @@ namespace app {
 
 constexpr size_t kMaxSecureSduLengthBytes = 1024;
 constexpr uint32_t kImMessageTimeoutMsec  = 3000;
-constexpr FieldId kRootFieldId  = 0;
+constexpr FieldId kRootFieldId            = 0;
 /**
  * @class InteractionModelEngine
  *
