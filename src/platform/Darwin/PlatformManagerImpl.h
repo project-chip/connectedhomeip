@@ -65,7 +65,7 @@ private:
     void _UnlockChipStack(){};
     void _PostEvent(const ChipDeviceEvent * event);
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool _IsChipStackLockedByCurrentThread() const { return false; };
 #endif
 

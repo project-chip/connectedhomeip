@@ -96,7 +96,7 @@ public:
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
@@ -187,7 +187,7 @@ extern PlatformManagerImpl & PlatformMgrImpl();
 namespace chip {
 namespace DeviceLayer {
 
-#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
 inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
 {
     return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
