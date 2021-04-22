@@ -210,7 +210,7 @@ int Initialize(void * aContext)
         return FAILURE;
 
     TestContext * ctx = reinterpret_cast<TestContext *>(aContext);
-    err = ctx->Init(&sSuite, &gTransportMgr);
+    err               = ctx->Init(&sSuite, &gTransportMgr);
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 

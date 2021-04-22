@@ -34,8 +34,8 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PairingSession.h>
 #include <transport/MessageCounterManagerInterface.h>
+#include <transport/PairingSession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionHandle.h>

@@ -41,7 +41,8 @@ CHIP_ERROR MessageCounterManager::Init(Messaging::ExchangeManager * exchangeMgr)
     VerifyOrReturnError(exchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     mExchangeMgr = exchangeMgr;
 
-    ReturnErrorOnFailure(mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, this));
+    ReturnErrorOnFailure(
+        mExchangeMgr->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, this));
 
     return CHIP_NO_ERROR;
 }
@@ -306,7 +307,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, std::array<uint8_t, kChallengeSize> challenge)
+CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
+                                                         std::array<uint8_t, kChallengeSize> challenge)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
@@ -356,8 +358,8 @@ void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext *
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    uint8_t * req    = msgBuf->Start();
-    size_t reqlen    = msgBuf->DataLength();
+    uint8_t * req = msgBuf->Start();
+    size_t reqlen = msgBuf->DataLength();
 
     ChipLogDetail(ExchangeManager, "Received MsgCounterSyncReq request");
 

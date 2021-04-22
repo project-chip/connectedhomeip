@@ -81,7 +81,7 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    nlTestSuite * mSuite           = nullptr;
+    nlTestSuite * mSuite = nullptr;
 };
 
 void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
@@ -91,15 +91,15 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SecureSessionHandle localSession = ctx.GetSessionLocalToPeer();
-    SecureSessionHandle peerSession = ctx.GetSessionPeerToLocal();
+    SecureSessionHandle peerSession  = ctx.GetSessionPeerToLocal();
 
     Transport::PeerConnectionState * localState = ctx.GetSecureSessionManager().GetPeerConnectionState(localSession);
-    Transport::PeerConnectionState * peerState = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    Transport::PeerConnectionState * peerState  = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
 
     err = ctx.GetMessageCounterManager().SendMsgCounterSyncReq(localSession, localState);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    MessageCounter & peerCounter = peerState->GetSessionMessageCounter().GetLocalMessageCounter();
+    MessageCounter & peerCounter      = peerState->GetSessionMessageCounter().GetLocalMessageCounter();
     PeerMessageCounter & localCounter = localState->GetSessionMessageCounter().GetPeerMessageCounter();
     NL_TEST_ASSERT(inSuite, localCounter.IsSyncCompleted());
     NL_TEST_ASSERT(inSuite, localCounter.GetCounter() == peerCounter.Value());
@@ -115,8 +115,8 @@ void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    CHIP_ERROR err = ctx.GetMessageCounterManager().AddToRetransmissionTable(ctx.GetSessionLocalToPeer(), ctx.GetDestinationNodeId(),
-                                                                     payloadHeader, std::move(buffer));
+    CHIP_ERROR err = ctx.GetMessageCounterManager().AddToRetransmissionTable(
+        ctx.GetSessionLocalToPeer(), ctx.GetDestinationNodeId(), payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -140,7 +140,7 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
 void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
 
     uint16_t payload_len = sizeof(PAYLOAD);
 
@@ -154,9 +154,9 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     err = ctx.GetSecureSessionManager().SendMessage(ctx.GetSessionLocalToPeer(), payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    //ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
+    // ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
 
-    //NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+    // NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 }
 
 // Test Suite

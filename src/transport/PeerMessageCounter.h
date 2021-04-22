@@ -122,10 +122,7 @@ public:
     }
 
     /* Test-only */
-    uint32_t GetCounter()
-    {
-        return mSynced.mMaxCounter;
-    }
+    uint32_t GetCounter() { return mSynced.mMaxCounter; }
 
 private:
     enum class Status
