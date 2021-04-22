@@ -4161,16 +4161,16 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             emberAfGeneralCommissioningClusterCommissioningCompleteCallback(apCommandObj);
             break;
         }
-        case ZCL_SET_FABRIC_COMMAND_ID: {
+        case ZCL_SET_REGULATORY_CONFIG_COMMAND_ID: {
             // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
             // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
             // Any error value TLVUnpackError means we have received an illegal value.
             CHIP_ERROR TLVError       = CHIP_NO_ERROR;
             CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
-            chip::ByteSpan fabricId;
-            bool fabricIdExists = false;
-            chip::ByteSpan fabricSecret;
-            bool fabricSecretExists = false;
+            uint8_t location;
+            bool locationExists = false;
+            const uint8_t * countryCode;
+            bool countryCodeExists = false;
             uint64_t breadcrumb;
             bool breadcrumbExists = false;
             uint32_t timeoutMs;
@@ -4182,38 +4182,31 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
                 {
                 case 0:
-                    if (fabricIdExists)
+                    if (locationExists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
                         TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
                         break;
                     }
-                    {
-                        const uint8_t * data = nullptr;
-                        TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                        fabricId             = chip::ByteSpan(data, aDataTlv.GetLength());
-                    }
+                    TLVUnpackError = aDataTlv.Get(location);
                     if (CHIP_NO_ERROR == TLVUnpackError)
                     {
-                        fabricIdExists = true;
+                        locationExists = true;
                         validArgumentCount++;
                     }
                     break;
                 case 1:
-                    if (fabricSecretExists)
+                    if (countryCodeExists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
                         TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
                         break;
                     }
-                    {
-                        const uint8_t * data = nullptr;
-                        TLVUnpackError       = aDataTlv.GetDataPtr(data);
-                        fabricSecret         = chip::ByteSpan(data, aDataTlv.GetLength());
-                    }
+                    // TODO(#5542): The cluster handlers should accept a ByteSpan for all string types.
+                    TLVUnpackError = aDataTlv.GetDataPtr(countryCode);
                     if (CHIP_NO_ERROR == TLVUnpackError)
                     {
-                        fabricSecretExists = true;
+                        countryCodeExists = true;
                         validArgumentCount++;
                     }
                     break;
@@ -4272,7 +4265,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGeneralCommissioningClusterSetFabricCallback(apCommandObj, fabricId, fabricSecret, breadcrumb, timeoutMs);
+                emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(
+                    apCommandObj, location, const_cast<uint8_t *>(countryCode), breadcrumb, timeoutMs);
             }
             else
             {

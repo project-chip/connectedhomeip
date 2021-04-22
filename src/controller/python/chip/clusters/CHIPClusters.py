@@ -263,9 +263,9 @@ class ChipClusters:
                 },
                 "CommissioningComplete": {
                 },
-                "SetFabric": {
-                    "fabricId": "bytes",
-                    "fabricSecret": "bytes",
+                "SetRegulatoryConfig": {
+                    "location": "int",
+                    "countryCode": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
@@ -877,9 +877,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterGeneralCommissioning_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: bytes, fabricSecret: bytes, breadcrumb: int, timeoutMs: int):
-        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric(
-                device, ZCLendpoint, ZCLgroupid, fabricId, len(fabricId), fabricSecret, len(fabricSecret), breadcrumb, timeoutMs
+    def ClusterGeneralCommissioning_CommandSetRegulatoryConfig(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, location: int, countryCode: bytes, breadcrumb: int, timeoutMs: int):
+        countryCode = countryCode.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(
+                device, ZCLendpoint, ZCLgroupid, location, countryCode, len(countryCode), breadcrumb, timeoutMs
         )
     def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
@@ -1822,9 +1823,9 @@ class ChipClusters:
         # Cluster GeneralCommissioning Command CommissioningComplete
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.restype = ctypes.c_uint32
-        # Cluster GeneralCommissioning Command SetFabric
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning Command SetRegulatoryConfig
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute FabricId
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.restype = ctypes.c_uint32

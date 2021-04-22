@@ -39,11 +39,11 @@ typedef struct _AudioOutputInfo
     uint8_t * Name;
 } EmberAfAudioOutputInfo;
 
-// Struct for BasicCommissioningInfo
-typedef struct _BasicCommissioningInfo
+// Struct for BasicCommissioningInfoType
+typedef struct _BasicCommissioningInfoType
 {
     uint32_t FailSafeExpiryLengthMs;
-} EmberAfBasicCommissioningInfo;
+} EmberAfBasicCommissioningInfoType;
 
 // Struct for BlockThreshold
 typedef struct _BlockThreshold

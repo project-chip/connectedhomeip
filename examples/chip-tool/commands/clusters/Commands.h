@@ -307,9 +307,9 @@ static void OnGeneralCommissioningClusterCommissioningCompleteResponse(void * co
     command->SetCommandExitStatus(true);
 }
 
-static void OnGeneralCommissioningClusterSetFabricResponse(void * context, uint8_t errorCode, uint8_t * debugText)
+static void OnGeneralCommissioningClusterSetRegulatoryConfigResponse(void * context, uint8_t errorCode, uint8_t * debugText)
 {
-    ChipLogProgress(chipTool, "GeneralCommissioningClusterSetFabricResponse");
+    ChipLogProgress(chipTool, "GeneralCommissioningClusterSetRegulatoryConfigResponse");
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(true);
@@ -6582,9 +6582,9 @@ private:
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ArmFailSafe                                                       |   0x02 |
-| * CommissioningComplete                                             |   0x06 |
-| * SetFabric                                                         |   0x00 |
+| * ArmFailSafe                                                       |   0x00 |
+| * CommissioningComplete                                             |   0x04 |
+| * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricId                                                          | 0x0000 |
@@ -6613,7 +6613,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x02) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6647,7 +6647,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x06) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x04) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -6663,20 +6663,20 @@ private:
 };
 
 /*
- * Command SetFabric
+ * Command SetRegulatoryConfig
  */
-class GeneralCommissioningSetFabric : public ModelCommand
+class GeneralCommissioningSetRegulatoryConfig : public ModelCommand
 {
 public:
-    GeneralCommissioningSetFabric() : ModelCommand("set-fabric")
+    GeneralCommissioningSetRegulatoryConfig() : ModelCommand("set-regulatory-config")
     {
-        AddArgument("fabricId", &mFabricId);
-        AddArgument("fabricSecret", &mFabricSecret);
+        AddArgument("location", 0, UINT8_MAX, &mLocation);
+        AddArgument("countryCode", &mCountryCode);
         AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
         ModelCommand::AddArguments();
     }
-    ~GeneralCommissioningSetFabric()
+    ~GeneralCommissioningSetRegulatoryConfig()
     {
         delete onSuccessCallback;
         delete onFailureCallback;
@@ -6684,24 +6684,23 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x02) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.SetFabric(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                 chip::ByteSpan(chip::Uint8::from_char(mFabricId), strlen(mFabricId)),
-                                 chip::ByteSpan(chip::Uint8::from_char(mFabricSecret), strlen(mFabricSecret)), mBreadcrumb,
-                                 mTimeoutMs);
+        return cluster.SetRegulatoryConfig(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mLocation,
+                                           chip::ByteSpan(chip::Uint8::from_char(mCountryCode), strlen(mCountryCode)), mBreadcrumb,
+                                           mTimeoutMs);
     }
 
 private:
-    chip::Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>(
-            OnGeneralCommissioningClusterSetFabricResponse, this);
+    chip::Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * onSuccessCallback =
+        new chip::Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>(
+            OnGeneralCommissioningClusterSetRegulatoryConfigResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mFabricId;
-    char * mFabricSecret;
+    uint8_t mLocation;
+    char * mCountryCode;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -10589,10 +10588,10 @@ void registerClusterGeneralCommissioning(Commands & commands)
     const char * clusterName = "GeneralCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<GeneralCommissioningArmFailSafe>(),     make_unique<GeneralCommissioningCommissioningComplete>(),
-        make_unique<GeneralCommissioningSetFabric>(),       make_unique<DiscoverGeneralCommissioningAttributes>(),
-        make_unique<ReadGeneralCommissioningFabricId>(),    make_unique<ReadGeneralCommissioningBreadcrumb>(),
-        make_unique<WriteGeneralCommissioningBreadcrumb>(), make_unique<ReadGeneralCommissioningClusterRevision>(),
+        make_unique<GeneralCommissioningArmFailSafe>(),         make_unique<GeneralCommissioningCommissioningComplete>(),
+        make_unique<GeneralCommissioningSetRegulatoryConfig>(), make_unique<DiscoverGeneralCommissioningAttributes>(),
+        make_unique<ReadGeneralCommissioningFabricId>(),        make_unique<ReadGeneralCommissioningBreadcrumb>(),
+        make_unique<WriteGeneralCommissioningBreadcrumb>(),     make_unique<ReadGeneralCommissioningClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);

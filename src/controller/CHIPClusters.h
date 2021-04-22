@@ -423,8 +423,8 @@ public:
     CHIP_ERROR ArmFailSafe(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                            uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
     CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::ByteSpan fabricId, chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t location, chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
     // Cluster Attributes
     CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -435,9 +435,9 @@ public:
                                         uint64_t value);
 
 private:
-    static constexpr CommandId kArmFailSafeCommandId           = 0x02;
-    static constexpr CommandId kCommissioningCompleteCommandId = 0x06;
-    static constexpr CommandId kSetFabricCommandId             = 0x00;
+    static constexpr CommandId kArmFailSafeCommandId           = 0x00;
+    static constexpr CommandId kCommissioningCompleteCommandId = 0x04;
+    static constexpr CommandId kSetRegulatoryConfigCommandId   = 0x02;
 };
 
 class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase

@@ -205,9 +205,9 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
 
 #define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
-#define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x02)
-#define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x06)
-#define ZCL_SET_FABRIC_COMMAND_ID (0x00)
+#define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x00)
+#define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x04)
+#define ZCL_SET_REGULATORY_CONFIG_COMMAND_ID (0x02)
 
 #define GROUP_KEY_MANAGEMENT_CLUSTER_ID 0xF004
 
@@ -2497,9 +2497,9 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ArmFailSafe                                                       |   0x02 |
-| * CommissioningComplete                                             |   0x06 |
-| * SetFabric                                                         |   0x00 |
+| * ArmFailSafe                                                       |   0x00 |
+| * CommissioningComplete                                             |   0x04 |
+| * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricId                                                          | 0x0000 |
@@ -2536,34 +2536,27 @@ PacketBufferHandle encodeGeneralCommissioningClusterCommissioningCompleteCommand
 }
 
 /*
- * Command SetFabric
+ * Command SetRegulatoryConfig
  */
-PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                     chip::ByteSpan fabricId, chip::ByteSpan fabricSecret,
-                                                                     uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeGeneralCommissioningClusterSetRegulatoryConfigCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                               uint8_t location, chip::ByteSpan countryCode,
+                                                                               uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    COMMAND_HEADER("SetFabric", GENERAL_COMMISSIONING_CLUSTER_ID);
-    size_t fabricIdStrLen = fabricId.size();
-    if (!CanCastTo<uint8_t>(fabricIdStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricIdStrLen);
-        return PacketBufferHandle();
-    }
+    COMMAND_HEADER("SetRegulatoryConfig", GENERAL_COMMISSIONING_CLUSTER_ID);
 
-    size_t fabricSecretStrLen = fabricSecret.size();
-    if (!CanCastTo<uint8_t>(fabricSecretStrLen))
+    size_t countryCodeStrLen = countryCode.size();
+    if (!CanCastTo<uint8_t>(countryCodeStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricSecretStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, countryCodeStrLen);
         return PacketBufferHandle();
     }
 
     buf.Put8(kFrameControlClusterSpecificCommand)
         .Put8(seqNum)
-        .Put8(ZCL_SET_FABRIC_COMMAND_ID)
-        .Put(static_cast<uint8_t>(fabricIdStrLen))
-        .Put(fabricId.data(), fabricId.size())
-        .Put(static_cast<uint8_t>(fabricSecretStrLen))
-        .Put(fabricSecret.data(), fabricSecret.size())
+        .Put8(ZCL_SET_REGULATORY_CONFIG_COMMAND_ID)
+        .Put8(location)
+        .Put(static_cast<uint8_t>(countryCodeStrLen))
+        .Put(countryCode.data(), countryCode.size())
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();

@@ -987,12 +987,16 @@
             { 0x0029, 0x04,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* OTA Software Update Server (server): ApplyUpdateRequestResponse */           \
             { 0x002A, 0x00, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* OTA Software Update Client (server): AnnounceOtaServer */      \
-            { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): SetFabric */                   \
-            { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): SetFabricResponse */           \
-            { 0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): ArmFailSafe */                 \
-            { 0x0030, 0x03, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): ArmFailSafeResponse */         \
-            { 0x0030, 0x06, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): CommissioningComplete */       \
-            { 0x0030, 0x07,                                                                                                        \
+            { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): ArmFailSafe */                 \
+            { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): ArmFailSafeResponse */         \
+            {                                                                                                                      \
+                0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
+            }, /* General Commissioning (server): SetRegulatoryConfig */                                                           \
+            {                                                                                                                      \
+                0x0030, 0x03, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
+            },                                                   /* General Commissioning (server): SetRegulatoryConfigResponse */ \
+            { 0x0030, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): CommissioningComplete */       \
+            { 0x0030, 0x05,                                                                                                        \
               ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): CommissioningCompleteResponse */             \
             { 0x0031, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): ScanNetworks */                \
             { 0x0031, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): ScanNetworksResponse */        \

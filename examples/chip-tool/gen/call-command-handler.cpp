@@ -728,7 +728,7 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
             wasHandled = emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(nullptr, errorCode, debugText);
             break;
         }
-        case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
+        case ZCL_SET_REGULATORY_CONFIG_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             uint8_t errorCode;
             uint8_t * debugText;
@@ -745,7 +745,7 @@ EmberAfStatus emberAfGeneralCommissioningClusterClientCommandParse(EmberAfCluste
             }
             debugText = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfGeneralCommissioningClusterSetFabricResponseCallback(nullptr, errorCode, debugText);
+            wasHandled = emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(nullptr, errorCode, debugText);
             break;
         }
         default: {

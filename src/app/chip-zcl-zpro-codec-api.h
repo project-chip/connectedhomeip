@@ -1421,9 +1421,9 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribu
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ArmFailSafe                                                       |   0x02 |
-| * CommissioningComplete                                             |   0x06 |
-| * SetFabric                                                         |   0x00 |
+| * ArmFailSafe                                                       |   0x00 |
+| * CommissioningComplete                                             |   0x04 |
+| * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricId                                                          | 0x0000 |
@@ -1449,11 +1449,11 @@ encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, ch
 
 /**
  * @brief
- *    Encode an SetFabric command for General Commissioning server into buffer including the APS frame
+ *    Encode an SetRegulatoryConfig command for General Commissioning server into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
-encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan fabricId,
-                                                  chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+encodeGeneralCommissioningClusterSetRegulatoryConfigCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t location,
+                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief

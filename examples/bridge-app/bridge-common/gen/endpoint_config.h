@@ -26,61 +26,67 @@
 #if BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
-        /* 0 - Default for cluster: "Basic", attribute: "VendorName". side: server, big-endian */                                  \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+        /* 0 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, big-endian */                    \
+        1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                \
                                                                                                                                    \
-            /* 32 - Default for cluster: "Basic", attribute: "ProductName". side: server, big-endian */                            \
+            /* 8 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, big-endian */              \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 16 - Default for cluster: "Basic", attribute: "VendorName". side: server, big-endian */                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 64 - Default for cluster: "Basic", attribute: "UserLabel". side: server, big-endian */                              \
+            /* 48 - Default for cluster: "Basic", attribute: "ProductName". side: server, big-endian */                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 96 - Default for cluster: "Basic", attribute: "Location". side: server, big-endian */                               \
+            /* 80 - Default for cluster: "Basic", attribute: "UserLabel". side: server, big-endian */                              \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 112 - Default for cluster: "Basic", attribute: "Location". side: server, big-endian */                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
                                                                                                                                    \
-            /* 112 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, big-endian */                 \
+            /* 128 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, big-endian */                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 176 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, big-endian */                       \
+            /* 192 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, big-endian */                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 180 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, big-endian */                 \
+            /* 196 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, big-endian */                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 244 - Default for cluster: "Basic", attribute: "VendorName". side: server, big-endian */                            \
+            /* 260 - Default for cluster: "Basic", attribute: "VendorName". side: server, big-endian */                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 276 - Default for cluster: "Basic", attribute: "ProductName". side: server, big-endian */                           \
+            /* 292 - Default for cluster: "Basic", attribute: "ProductName". side: server, big-endian */                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 308 - Default for cluster: "Basic", attribute: "UserLabel". side: server, big-endian */                             \
+            /* 324 - Default for cluster: "Basic", attribute: "UserLabel". side: server, big-endian */                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 340 - Default for cluster: "Basic", attribute: "Location". side: server, big-endian */                              \
+            /* 356 - Default for cluster: "Basic", attribute: "Location". side: server, big-endian */                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
                                                                                                                                    \
-            /* 356 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, big-endian */                 \
+            /* 372 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, big-endian */                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 420 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, big-endian */                       \
+            /* 436 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, big-endian */                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 424 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, big-endian */                 \
+            /* 440 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, big-endian */                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -90,61 +96,67 @@
 #else // !BIGENDIAN_CPU
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
-        /* 0 - Default for cluster: "Basic", attribute: "VendorName". side: server, little-endian */                               \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+        /* 0 - Default for cluster: "General Commissioning", attribute: "FabricId". side: server, little-endian */                 \
+        1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                \
                                                                                                                                    \
-            /* 32 - Default for cluster: "Basic", attribute: "ProductName". side: server, little-endian */                         \
+            /* 8 - Default for cluster: "General Commissioning", attribute: "Breadcrumb". side: server, little-endian */           \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* 16 - Default for cluster: "Basic", attribute: "VendorName". side: server, little-endian */                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 64 - Default for cluster: "Basic", attribute: "UserLabel". side: server, little-endian */                           \
+            /* 48 - Default for cluster: "Basic", attribute: "ProductName". side: server, little-endian */                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 96 - Default for cluster: "Basic", attribute: "Location". side: server, little-endian */                            \
+            /* 80 - Default for cluster: "Basic", attribute: "UserLabel". side: server, little-endian */                           \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 112 - Default for cluster: "Basic", attribute: "Location". side: server, little-endian */                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
                                                                                                                                    \
-            /* 112 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, little-endian */              \
+            /* 128 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, little-endian */              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 176 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, little-endian */                    \
+            /* 192 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, little-endian */                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 180 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, little-endian */              \
+            /* 196 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, little-endian */              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 244 - Default for cluster: "Basic", attribute: "VendorName". side: server, little-endian */                         \
+            /* 260 - Default for cluster: "Basic", attribute: "VendorName". side: server, little-endian */                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 276 - Default for cluster: "Basic", attribute: "ProductName". side: server, little-endian */                        \
+            /* 292 - Default for cluster: "Basic", attribute: "ProductName". side: server, little-endian */                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 308 - Default for cluster: "Basic", attribute: "UserLabel". side: server, little-endian */                          \
+            /* 324 - Default for cluster: "Basic", attribute: "UserLabel". side: server, little-endian */                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 340 - Default for cluster: "Basic", attribute: "Location". side: server, little-endian */                           \
+            /* 356 - Default for cluster: "Basic", attribute: "Location". side: server, little-endian */                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                        \
                                                                                                                                    \
-            /* 356 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, little-endian */              \
+            /* 372 - Default for cluster: "Basic", attribute: "HardwareVersionString". side: server, little-endian */              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 420 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, little-endian */                    \
+            /* 436 - Default for cluster: "Basic", attribute: "SoftwareVersion". side: server, little-endian */                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 424 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, little-endian */              \
+            /* 440 - Default for cluster: "Basic", attribute: "SoftwareVersionString". side: server, little-endian */              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -153,7 +165,7 @@
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (14)
+#define GENERATED_DEFAULTS_COUNT (16)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -181,36 +193,40 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 51
+#define GENERATED_ATTRIBUTE_COUNT 54
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* Network Commissioning (server): cluster revision */  \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },     /* On/off (server): cluster revision */                 \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* On/off (server): on/off */                           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },     /* Level Control (server): cluster revision */          \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },   /* Level Control (server): current level */             \
+        { 0x0000, ZAP_TYPE(OCTET_STRING), 8, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* General Commissioning (server): FabricId */       \
+            { 0x0001, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
+              ZAP_LONG_DEFAULTS_INDEX(8) },                                 /* General Commissioning (server): Breadcrumb */       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* General Commissioning (server): cluster revision */ \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* Network Commissioning (server): cluster revision */ \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },      /* On/off (server): cluster revision */                \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },  /* On/off (server): on/off */                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* Level Control (server): cluster revision */         \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* Level Control (server): current level */            \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
               ZAP_SIMPLE_DEFAULT(3) }, /* Basic (server): cluster revision */                                                      \
             { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
               ZAP_EMPTY_DEFAULT() }, /* Basic (server): InteractionModelVersion */                                                 \
             { 0x0001, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(0) },                                                      /* Basic (server): VendorName */  \
+              ZAP_LONG_DEFAULTS_INDEX(16) },                                                     /* Basic (server): VendorName */  \
             { 0x0002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* Basic (server): VendorID */    \
             { 0x0003, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(32) },                                                     /* Basic (server): ProductName */ \
+              ZAP_LONG_DEFAULTS_INDEX(48) },                                                     /* Basic (server): ProductName */ \
             { 0x0004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* Basic (server): ProductID */   \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(64) }, /* Basic (server): UserLabel */                                                       \
+              ZAP_LONG_DEFAULTS_INDEX(80) }, /* Basic (server): UserLabel */                                                       \
             { 0x0006, ZAP_TYPE(CHAR_STRING), 16, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(96) }, /* Basic (server): Location */                                                        \
+              ZAP_LONG_DEFAULTS_INDEX(112) }, /* Basic (server): Location */                                                       \
             { 0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
               ZAP_SIMPLE_DEFAULT(0x00) }, /* Basic (server): HardwareVersion */                                                    \
             { 0x0008, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(112) }, /* Basic (server): HardwareVersionString */                                          \
+              ZAP_LONG_DEFAULTS_INDEX(128) }, /* Basic (server): HardwareVersionString */                                          \
             { 0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
-              ZAP_LONG_DEFAULTS_INDEX(176) }, /* Basic (server): SoftwareVersion */                                                \
+              ZAP_LONG_DEFAULTS_INDEX(192) }, /* Basic (server): SoftwareVersion */                                                \
             { 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(180) },                              /* Basic (server): SoftwareVersionString */             \
+              ZAP_LONG_DEFAULTS_INDEX(196) },                              /* Basic (server): SoftwareVersionString */             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },     /* On/off (server): cluster revision */                 \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* On/off (server): on/off */                           \
             { 0x4003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                            \
@@ -232,23 +248,23 @@
             { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
               ZAP_EMPTY_DEFAULT() }, /* Basic (server): InteractionModelVersion */                                                 \
             { 0x0001, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(244) },                                                    /* Basic (server): VendorName */  \
+              ZAP_LONG_DEFAULTS_INDEX(260) },                                                    /* Basic (server): VendorName */  \
             { 0x0002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* Basic (server): VendorID */    \
             { 0x0003, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(276) },                                                    /* Basic (server): ProductName */ \
+              ZAP_LONG_DEFAULTS_INDEX(292) },                                                    /* Basic (server): ProductName */ \
             { 0x0004, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* Basic (server): ProductID */   \
             { 0x0005, ZAP_TYPE(CHAR_STRING), 32, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(308) }, /* Basic (server): UserLabel */                                                      \
+              ZAP_LONG_DEFAULTS_INDEX(324) }, /* Basic (server): UserLabel */                                                      \
             { 0x0006, ZAP_TYPE(CHAR_STRING), 16, ZAP_ATTRIBUTE_MASK(SINGLETON) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_LONG_DEFAULTS_INDEX(340) }, /* Basic (server): Location */                                                       \
+              ZAP_LONG_DEFAULTS_INDEX(356) }, /* Basic (server): Location */                                                       \
             { 0x0007, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
               ZAP_SIMPLE_DEFAULT(0x00) }, /* Basic (server): HardwareVersion */                                                    \
             { 0x0008, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(356) }, /* Basic (server): HardwareVersionString */                                          \
+              ZAP_LONG_DEFAULTS_INDEX(372) }, /* Basic (server): HardwareVersionString */                                          \
             { 0x0009, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                          \
-              ZAP_LONG_DEFAULTS_INDEX(420) }, /* Basic (server): SoftwareVersion */                                                \
+              ZAP_LONG_DEFAULTS_INDEX(436) }, /* Basic (server): SoftwareVersion */                                                \
             { 0x000A, ZAP_TYPE(CHAR_STRING), 64, ZAP_ATTRIBUTE_MASK(SINGLETON),                                                    \
-              ZAP_LONG_DEFAULTS_INDEX(424) },                              /* Basic (server): SoftwareVersionString */             \
+              ZAP_LONG_DEFAULTS_INDEX(440) },                              /* Basic (server): SoftwareVersionString */             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },     /* On/off (server): cluster revision */                 \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* On/off (server): on/off */                           \
             { 0x4003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                            \
@@ -283,56 +299,59 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 9
+#define GENERATED_CLUSTER_COUNT 10
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
-            0x0031, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                                   \
-        }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                              \
+            0x0030, ZAP_ATTRIBUTE_INDEX(0), 3, 18, ZAP_CLUSTER_MASK(SERVER), NULL                                                  \
+        }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                              \
+            {                                                                                                                      \
+                0x0031, ZAP_ATTRIBUTE_INDEX(3), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(1),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(4),                                                                                              \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(6),                                                                                              \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
             { 0x0028,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(5),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(8),                                                                                              \
               12,                                                                                                                  \
               254,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayBasicServer }, /* Endpoint: 1, Cluster: Basic (server) */                                               \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(17),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(20),                                                                                             \
               6,                                                                                                                   \
               9,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(23),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(26),                                                                                             \
               5,                                                                                                                   \
               7,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 2, Cluster: Level Control (server) */                                \
             { 0x0028,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(28),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(31),                                                                                             \
               12,                                                                                                                  \
               254,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayBasicServer }, /* Endpoint: 2, Cluster: Basic (server) */                                               \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(40),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(43),                                                                                             \
               6,                                                                                                                   \
               9,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 3, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(46),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(49),                                                                                             \
               5,                                                                                                                   \
               7,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
@@ -344,8 +363,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 1, 2 }, { ZAP_CLUSTER_INDEX(1), 3, 260 }, { ZAP_CLUSTER_INDEX(4), 3, 270 },                        \
-            { ZAP_CLUSTER_INDEX(7), 2, 16 },                                                                                       \
+        { ZAP_CLUSTER_INDEX(0), 2, 20 }, { ZAP_CLUSTER_INDEX(2), 3, 260 }, { ZAP_CLUSTER_INDEX(5), 3, 270 },                       \
+            { ZAP_CLUSTER_INDEX(8), 2, 16 },                                                                                       \
     }
 
 // Largest attribute size is needed for various buffers
@@ -355,7 +374,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (508)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (548)
+#define ATTRIBUTE_MAX_SIZE (566)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (4)
@@ -399,7 +418,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (62)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (68)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* On/off (server): Off */                                        \
@@ -447,6 +466,13 @@
             { 0x0028, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): ShutDown */                                    \
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): Leave */                                       \
             { 0x0028, 0x02, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Basic (server): Leave */                                       \
+            { 0x0030, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): ArmFailSafe */                 \
+            { 0x0030, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): ArmFailSafeResponse */         \
+            { 0x0030, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): SetRegulatoryConfig */         \
+            { 0x0030, 0x03, ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* General Commissioning (server): SetRegulatoryConfigResponse */ \
+            { 0x0030, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* General Commissioning (server): CommissioningComplete */       \
+            { 0x0030, 0x05,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* General Commissioning (server): CommissioningCompleteResponse */             \
             { 0x0031, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): ScanNetworks */                \
             { 0x0031, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Network Commissioning (server): ScanNetworksResponse */        \
             { 0x0031, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Network Commissioning (server): AddWiFiNetwork */              \

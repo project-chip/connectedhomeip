@@ -1110,55 +1110,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
-    : public Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> {
+class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
+    : public Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> {
 public:
-    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>(CallbackFn, this)
+    CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge() {};
+    ~CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge *>(context);
-        if (callback && callback->mQueue) {
-            dispatch_async(callback->mQueue, ^{
-                callback->mHandler(nil, @ {
-                    @"errorCode" : [NSNumber numberWithUnsignedChar:errorCode],
-                    @"debugText" : [NSString stringWithFormat:@"%s", debugText],
-                });
-                callback->Cancel();
-                delete callback;
-            });
-        }
-    };
-
-private:
-    ResponseHandler mHandler;
-    dispatch_queue_t mQueue;
-};
-
-class CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge
-    : public Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> {
-public:
-    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>(CallbackFn, this)
-        , mHandler(handler)
-        , mQueue(queue)
-    {
-    }
-
-    ~CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge() {};
-
-    static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
-    {
-        CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge *>(context);
+        CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -5401,10 +5368,14 @@ private:
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)commissioningComplete:(ResponseHandler)completionHandler
+- (void)setRegulatoryConfig:(uint8_t)location
+                countryCode:(NSString *)countryCode
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge * onSuccess
-        = new CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge * onSuccess
+        = new CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5417,36 +5388,10 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.CommissioningComplete(onSuccess->Cancel(), onFailure->Cancel());
-    if (err != CHIP_NO_ERROR) {
-        delete onSuccess;
-        delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
-    }
-}
-- (void)setFabric:(NSData *)fabricId
-         fabricSecret:(NSData *)fabricSecret
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
-{
-    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * onSuccess
-        = new CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(completionHandler, [self callbackQueue]);
-    if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
-    if (!onFailure) {
-        delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
-        return;
-    }
-
-    CHIP_ERROR err = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) fabricId.bytes, fabricId.length),
-        chip::ByteSpan((const uint8_t *) fabricSecret.bytes, fabricSecret.length), breadcrumb, timeoutMs);
+    CHIP_ERROR err = self.cppCluster.SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location,
+        chip::ByteSpan((const uint8_t *) [countryCode dataUsingEncoding:NSUTF8StringEncoding].bytes,
+            [countryCode lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
+        breadcrumb, timeoutMs);
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

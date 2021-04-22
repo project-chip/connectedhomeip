@@ -1372,32 +1372,17 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Co
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                             uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                           uint8_t * debugText)
 {
-    ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
+    ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
 
-    Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, errorCode, debugText);
-    return true;
-}
-
-bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                 uint8_t * debugText)
-{
-    ChipLogProgress(Zcl, "SetFabricResponse:");
-    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    ChipLogProgress(Zcl, "  debugText: %s", debugText);
-
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetFabricResponseCallback");
-
-    Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
     return true;
 }
