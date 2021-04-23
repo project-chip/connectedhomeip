@@ -129,38 +129,35 @@ void * __wrap_calloc(size_t num, size_t size)
 
 void * __wrap_realloc(void * ptr, size_t new_size)
 {
+
+    void * new_ptr = NULL;
+
     if (new_size)
     {
-        void * new_ptr = pvPortMalloc(new_size);
-        if (new_ptr)
+        size_t old_ptr_size = xPortMallocUsableSize(ptr);
+        if (new_size <= old_ptr_size)
         {
-            /* If passed-in `ptr` was NULL, `realloc(NULL, size)`
-             must be equivalent to `malloc(size)`. */
-            if (ptr)
-            {
-                size_t old_ptr_size = xPortMallocUsableSize(ptr);
-                if (new_size > old_ptr_size)
-                {
-                    memset(reinterpret_cast<uint8_t *>(new_ptr) + old_ptr_size, 0, (new_size - old_ptr_size));
-                    memcpy(new_ptr, ptr, old_ptr_size);
-                    vPortFree(ptr);
-                }
-                else
-                {
-                    /* Return old pointer if the newly allocated size is smaller
-                    or equal to the allocated size for old_ptr */
-                    return ptr;
-                }
-            }
-            return new_ptr;
+        	/* Return old pointer if the newly allocated size is smaller
+			or equal to the allocated size for old_ptr */
+            return ptr;
         }
-    }
-    else
-    {
-        vPortFree(ptr);
+
+        /* if old_ptr is NULL, then old_ptr_size is zero and new_ptr will be returned */
+        new_ptr = pvPortMalloc(new_size);
+
+        if (!new_ptr)
+        {
+            return NULL;
+        }
+
+        memset(reinterpret_cast<uint8_t *>(new_ptr) + old_ptr_size, 0, (new_size - old_ptr_size));
+        memcpy(new_ptr, ptr, old_ptr_size);
+
     }
 
-    return NULL;
+    vPortFree(ptr);
+
+    return new_ptr;
 }
 
 void * __wrap__malloc_r(void * REENT, size_t size)
