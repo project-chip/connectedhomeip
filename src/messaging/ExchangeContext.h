@@ -192,8 +192,8 @@ private:
     bool IsResponseExpected() const;
 
     /**
-     *  Set whether a response is expected on this exchange based on if flag kExpectResponse
-     *  is set or not in sendFlags when send a message over exchange.
+     *  Track whether we are now expecting a response to a message sent via this exchange (because that
+     *  message had the kExpectResponse flag set in its sendFlags).
      *
      *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
      *                                  (false) a response is currently expected on this
