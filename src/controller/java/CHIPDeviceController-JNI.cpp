@@ -263,13 +263,13 @@ JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jlong dev
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
 
-        sBleLayer.mAppState         = (void *) self;
-        RendezvousParameters params = RendezvousParameters()
-                                          .SetSetupPINCode(pinCode)
-                                          .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                          .SetBleLayer(&sBleLayer)
-                                          .SetPeerAddress(Transport::PeerAddress::BLE());
-        err = wrapper->Controller()->PairDevice(deviceId, params);
+    sBleLayer.mAppState         = (void *) self;
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetSetupPINCode(pinCode)
+                                      .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+                                      .SetBleLayer(&sBleLayer)
+                                      .SetPeerAddress(Transport::PeerAddress::BLE());
+    err = wrapper->Controller()->PairDevice(deviceId, params);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -499,38 +499,38 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
     jmethodID commandMethodID = env->GetMethodID(commandCls, "getValue", "()I");
     jint commandID            = env->CallIntMethod(commandObj, commandMethodID);
 
-        System::PacketBufferHandle buffer;
+    System::PacketBufferHandle buffer;
 
-        // Hardcode endpoint to 1 for now
-        uint8_t endpoint = 1;
+    // Hardcode endpoint to 1 for now
+    uint8_t endpoint = 1;
 
-        switch (commandID)
-        {
-        case 0:
-            buffer = encodeOnOffClusterOffCommand(0, endpoint);
-            break;
-        case 1:
-            buffer = encodeOnOffClusterOnCommand(0, endpoint);
-            break;
-        case 2:
-            buffer = encodeOnOffClusterToggleCommand(0, endpoint);
-            break;
-        case 3:
-            buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
-            break;
-        default:
-            ChipLogError(Controller, "Unknown command: %d", commandID);
-            return;
-        }
+    switch (commandID)
+    {
+    case 0:
+        buffer = encodeOnOffClusterOffCommand(0, endpoint);
+        break;
+    case 1:
+        buffer = encodeOnOffClusterOnCommand(0, endpoint);
+        break;
+    case 2:
+        buffer = encodeOnOffClusterToggleCommand(0, endpoint);
+        break;
+    case 3:
+        buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
+        break;
+    default:
+        ChipLogError(Controller, "Unknown command: %d", commandID);
+        return;
+    }
 
-        if (buffer.IsNull())
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
-        }
+    if (buffer.IsNull())
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+    }
+    else
+    {
+        err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
+    }
 
     if (err != CHIP_NO_ERROR)
     {
