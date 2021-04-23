@@ -31,7 +31,7 @@
 #include <support/RandUtils.h>
 
 #if defined(PW_RPC_ENABLED)
-#include <Rpc.h>
+#include <CommonRpc.h>
 #endif
 
 #include "Options.h"
