@@ -22,9 +22,9 @@
  *
  */
 
-#include "TestMessagingLayer.h"
-
 #include <nlunit-test.h>
+
+int TestChannel();
 
 int main()
 {

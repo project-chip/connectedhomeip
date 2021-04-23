@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
-#include <messaging/Channel.h>
-#include <messaging/ChannelContext.h>
+#include <channel/Channel.h>
+#include <channel/ChannelContext.h>
+#include <channel/Manager.h>
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {
@@ -40,7 +41,7 @@ void ChannelHandle::Release()
     if (mAssociation == nullptr)
         return;
 
-    mAssociation->mChannelContext->mExchangeManager->ReleaseChannelHandle(mAssociation);
+    mAssociation->mChannelContext->mChannelManager->ReleaseChannelHandle(mAssociation);
     mAssociation = nullptr;
 }
 

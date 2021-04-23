@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/PASESession.h>
@@ -64,7 +65,7 @@ public:
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
 
-    OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
+    Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
 
 private:
     SecureSessionMgr mSecureSessionMgr;
@@ -76,7 +77,7 @@ private:
     Transport::AdminPairingTable mAdmins;
     Transport::AdminId mSrcAdminId  = 0;
     Transport::AdminId mDestAdminId = 1;
-    OperationalCredentialSet mOperationalCredentialSet;
+    Credentials::OperationalCredentialSet mOperationalCredentialSet;
 };
 
 } // namespace Test

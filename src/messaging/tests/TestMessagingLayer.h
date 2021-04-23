@@ -28,7 +28,6 @@
 extern "C" {
 #endif
 
-int TestChannel();
 int TestExchangeMgr(void);
 int TestMessageCounterSyncMgr(void);
 int TestReliableMessageProtocol(void);

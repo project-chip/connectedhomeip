@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,40 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
-import("//build_overrides/nlunit_test.gni")
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
-
-chip_test_suite("tests") {
-  output_name = "libMessagingLayerTests"
+static_library("channel") {
+  output_name = "libChannelAPI"
 
   sources = [
-    "MessagingContext.cpp",
-    "MessagingContext.h",
-    "TestExchangeMgr.cpp",
-    "TestMessagingLayer.h",
-    "TestReliableMessageProtocol.cpp",
+    "Channel.cpp",
+    "Channel.h",
+    "ChannelContext.cpp",
+    "ChannelContext.h",
+    "Manager.cpp",
+    "Manager.h",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols",
-    "${chip_root}/src/transport",
-    "${chip_root}/src/transport/raw/tests:helpers",
-    "${nlio_root}:nlio",
-    "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestExchangeMgr",
-    "TestReliableMessageProtocol",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/secure_channel",
   ]
 }

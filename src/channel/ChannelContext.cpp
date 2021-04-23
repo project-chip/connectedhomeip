@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 
-#include <messaging/Channel.h>
-#include <messaging/ChannelContext.h>
+#include <channel/Channel.h>
+#include <channel/ChannelContext.h>
+#include <channel/Manager.h>
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {
@@ -24,7 +25,7 @@ namespace Messaging {
 
 void ChannelContextDeletor::Release(ChannelContext * context)
 {
-    context->mExchangeManager->ReleaseChannelContext(context);
+    context->mChannelManager->ReleaseChannelContext(context);
 }
 
 void ChannelContext::Start(const ChannelBuilder & builder)
@@ -337,7 +338,7 @@ void ChannelContext::EnterReadyState(SecureSessionHandle session)
     mState = ChannelState::kReady;
 
     mStateVars.mReady.mSession = session;
-    mExchangeManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
+    mChannelManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
 }
 
 void ChannelContext::OnConnectionExpired(SecureSessionHandle session)
@@ -361,13 +362,13 @@ void ChannelContext::ExitReadyState()
 void ChannelContext::EnterFailedState(CHIP_ERROR error)
 {
     mState = ChannelState::kFailed;
-    mExchangeManager->NotifyChannelEvent(this, [error](ChannelDelegate * delegate) { delegate->OnFail(error); });
+    mChannelManager->NotifyChannelEvent(this, [error](ChannelDelegate * delegate) { delegate->OnFail(error); });
 }
 
 void ChannelContext::EnterClosedState()
 {
     mState = ChannelState::kClosed;
-    mExchangeManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnClosed(); });
+    mChannelManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnClosed(); });
 }
 
 } // namespace Messaging
