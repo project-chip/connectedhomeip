@@ -20,7 +20,9 @@ set(CHIP_SHELL_DIR "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/she
 
 
 idf_component_register(SRCS main.cpp
+                      "${CHIP_SHELL_DIR}/shell_common/common.cpp"
                       "${CHIP_SHELL_DIR}/shell_common/cmd_ping.cpp"
+                      "${CHIP_SHELL_DIR}/shell_common/cmd_send.cpp"                      
                       PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CHIP_SHELL_DIR}/shell_common/include"

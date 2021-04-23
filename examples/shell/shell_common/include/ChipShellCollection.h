@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceConfig.h>
-
 extern "C" {
 // A list of shell commands provided by ChipShell
 void cmd_base64_init(void);
@@ -26,9 +24,6 @@ void cmd_btp_init(void);
 void cmd_device_init(void);
 void cmd_misc_init(void);
 void cmd_otcli_init(void);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_CONTROLLER
 void cmd_ping_init(void);
 void cmd_send_init(void);
-#endif
 }
