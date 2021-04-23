@@ -202,7 +202,6 @@ CHIP_ERROR RendezvousSession::Pair(uint32_t setupPINCode)
     ReturnErrorCodeIf(ctxt == nullptr, CHIP_ERROR_INTERNAL);
 
     CHIP_ERROR err = mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, mNextKeyId++, ctxt, this);
-    ctxt->Release();
     return err;
 }
 

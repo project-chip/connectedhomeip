@@ -44,13 +44,13 @@ using TestContext = chip::Test::MessagingContext;
 class LoopbackTransport : public Transport::Base
 {
 public:
-    /// Transports are required to have a constructor that takes exactly one argument
+    /// Transports are required to have an init method that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
-        mNumMessageSend++;
+        mSentMessageCount++;
         HandleMessageReceived(header, address, std::move(msgBuf));
 
         return CHIP_NO_ERROR;
@@ -58,7 +58,7 @@ public:
 
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 
-    uint32_t mNumMessageSend     = 0;
+    uint32_t mSentMessageCount     = 0;
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
 };
 
@@ -120,9 +120,9 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, context, &delegate) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
-    gLoopback.mNumMessageSend   = 0;
+    gLoopback.mSentMessageCount   = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     PASESession pairing1;
@@ -142,7 +142,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     TestSecurePairingDelegate delegateAccessory;
     PASESession pairingAccessory;
 
-    gLoopback.mNumMessageSend = 0;
+    gLoopback.mSentMessageCount = 0;
 
     NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
@@ -160,7 +160,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessageSend == 5);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 }
@@ -258,7 +258,7 @@ static nlTestSuite sSuite =
 };
 // clang-format on
 
-TestContext sContext;
+static TestContext sContext;
 
 // clang-format on
 //
