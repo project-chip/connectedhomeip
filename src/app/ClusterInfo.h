@@ -34,7 +34,7 @@ struct ClusterInfo
     void ClearDirty() { mDirty = false; }
     bool IsSamePath(const ClusterInfo & other) const { return other.mAttributePathParams.IsSamePath(mAttributePathParams); }
     AttributePathParams mAttributePathParams;
-    bool mDirty = false;
+    bool mDirty          = false;
     ClusterInfo * mpNext = nullptr;
 };
 } // namespace app

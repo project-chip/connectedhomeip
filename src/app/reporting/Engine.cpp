@@ -77,7 +77,7 @@ exit:
 CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler)
 {
     CHIP_ERROR err                               = CHIP_NO_ERROR;
-    ClusterInfo * clusterInfo = apReadHandler->GetCluterInfolist();
+    ClusterInfo * clusterInfo                    = apReadHandler->GetCluterInfolist();
     AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
     SuccessOrExit(reportDataBuilder.GetError());
     // TODO: Need to handle multiple chunk of message
@@ -86,7 +86,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeDataList(ReportData::Builder & 
         if (clusterInfo->IsDirty())
         {
             AttributeDataElement::Builder attributeDataElementBuilder = attributeDataList.CreateAttributeDataElementBuilder();
-            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u, Field %u is dirty", clusterInfo->mAttributePathParams.mClusterId, clusterInfo->mAttributePathParams.mFieldId);
+            ChipLogDetail(DataManagement, "<RE:Run> Cluster %u, Field %u is dirty", clusterInfo->mAttributePathParams.mClusterId,
+                          clusterInfo->mAttributePathParams.mFieldId);
             // Retrieve data for this cluster instance and clear its dirty flag.
             err = RetrieveClusterData(attributeDataElementBuilder, *clusterInfo);
             VerifyOrExit(err == CHIP_NO_ERROR,

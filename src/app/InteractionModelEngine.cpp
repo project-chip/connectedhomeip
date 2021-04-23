@@ -279,22 +279,21 @@ CHIP_ERROR InteractionModelEngine::GetFirstAvailableClusterInfo(ClusterInfo *& a
     return CHIP_NO_ERROR;
 }
 
-
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo * apClusterInfo)
 {
     ClusterInfo * clusterInfo = apClusterInfo;
     while (clusterInfo != nullptr)
     {
         ClusterInfo * current = clusterInfo;
-        clusterInfo = current->mpNext;
-        current->mDirty = false;
-        current->mpNext    = nullptr;
+        clusterInfo           = current->mpNext;
+        current->mDirty       = false;
+        current->mpNext       = nullptr;
     }
 }
 
 CHIP_ERROR InteractionModelEngine::AcquireClusterInfo(ClusterInfo *& aClusterInfo, AttributePathParams & aAttributePathParams)
 {
-    for(uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
+    for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
     {
         if (!mClusterInfoPool[index].mDirty)
         {
@@ -307,7 +306,7 @@ CHIP_ERROR InteractionModelEngine::AcquireClusterInfo(ClusterInfo *& aClusterInf
                 // first cluster in list
                 aClusterInfo = &mClusterInfoPool[index];
             }
-            mClusterInfoPool[index].mDirty = true;
+            mClusterInfoPool[index].mDirty               = true;
             mClusterInfoPool[index].mAttributePathParams = aAttributePathParams;
             return CHIP_NO_ERROR;
         }

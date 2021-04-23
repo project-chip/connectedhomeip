@@ -128,7 +128,7 @@ private:
 
     // Current Handler state
     HandlerState mState;
-    ClusterInfo * mpClusterInfoList   = nullptr;
+    ClusterInfo * mpClusterInfoList = nullptr;
 };
 } // namespace app
 } // namespace chip

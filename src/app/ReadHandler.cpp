@@ -50,7 +50,7 @@ exit:
 void ReadHandler::Shutdown()
 {
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpClusterInfoList);
-    mpClusterInfoList            = nullptr;
+    mpClusterInfoList = nullptr;
     ClearExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
     mpDelegate = nullptr;
@@ -184,7 +184,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
         {
             AttributePathParams attributePathParams;
             AttributePath::Parser path;
-            err                       = path.Init(reader);
+            err = path.Init(reader);
             SuccessOrExit(err);
             err = path.GetNodeId(&(attributePathParams.mNodeId));
             SuccessOrExit(err);
@@ -192,7 +192,7 @@ CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAt
             SuccessOrExit(err);
             err = path.GetClusterId(&(attributePathParams.mClusterId));
             SuccessOrExit(err);
-            err = path.GetFieldId(&(attributePathParams.mFieldId ));
+            err = path.GetFieldId(&(attributePathParams.mFieldId));
             SuccessOrExit(err);
             err = InteractionModelEngine::GetInstance()->AcquireClusterInfo(mpClusterInfoList, attributePathParams);
         }
