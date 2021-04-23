@@ -54,7 +54,10 @@ public:
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
 
 private:
     chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;

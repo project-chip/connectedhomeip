@@ -56,13 +56,12 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate & kvs)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id)
+CHIP_ERROR AdminPairingInfo::DeleteFromKVS(PersistentStorageDelegate & storageDelegate, AdminId id)
 {
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
-    kvs.AsyncDeleteKeyValue(key);
-    return CHIP_NO_ERROR;
+    return storageDelegate.SyncDeleteKeyValue(key);
 }
 
 constexpr size_t AdminPairingInfo::KeySize()

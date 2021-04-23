@@ -86,13 +86,13 @@ void PersistentStorage::AsyncSetKeyValue(const char * key, const char * value)
     CommitConfig();
 }
 
-void PersistentStorage::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
     section.erase(key);
 
     mConfig.sections[kDefaultSectionName] = section;
-    CommitConfig();
+    return CommitConfig();
 }
 
 CHIP_ERROR PersistentStorage::CommitConfig()

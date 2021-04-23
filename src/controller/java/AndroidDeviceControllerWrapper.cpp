@@ -394,7 +394,7 @@ exit:
     GetJavaEnv()->DeleteLocalRef(valueString);
 }
 
-void AndroidDeviceControllerWrapper::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
     jclass storageCls = GetPersistentStorageClass();
     jmethodID method  = GetJavaEnv()->GetStaticMethodID(storageCls, "deleteKeyValue", "(Ljava/lang/String;)V");
@@ -417,4 +417,6 @@ void AndroidDeviceControllerWrapper::AsyncDeleteKeyValue(const char * key)
 exit:
     GetJavaEnv()->ExceptionClear();
     GetJavaEnv()->DeleteLocalRef(keyString);
+
+    return err;
 }

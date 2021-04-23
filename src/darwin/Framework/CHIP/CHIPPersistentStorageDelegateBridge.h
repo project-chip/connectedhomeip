@@ -36,7 +36,7 @@ public:
 
     void AsyncSetKeyValue(const char * key, const char * value) override;
 
-    void AsyncDeleteKeyValue(const char * key) override;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
 private:
     id<CHIPPersistentStorageDelegate> mDelegate;

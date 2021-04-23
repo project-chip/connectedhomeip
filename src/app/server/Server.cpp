@@ -98,7 +98,7 @@ class ServerStorageDelegate : public PersistentStorageDelegate
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override { return PersistedStorage::KeyValueStoreMgr().Delete(key); }
 };
 
 ServerStorageDelegate gServerStorage;

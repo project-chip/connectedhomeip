@@ -74,10 +74,10 @@ void PythonPersistentStorageDelegate::AsyncSetKeyValue(const char * key, const c
     mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
 }
 
-void PythonPersistentStorageDelegate::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
 {
     mStorage.erase(key);
-    mDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
+    return CHIP_NO_ERROR
 }
 
 } // namespace Controller

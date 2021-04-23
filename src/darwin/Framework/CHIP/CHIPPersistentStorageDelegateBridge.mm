@@ -133,7 +133,7 @@ void CHIPPersistentStorageDelegateBridge::AsyncSetKeyValue(const char * key, con
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_async(mWorkQueue, ^{
@@ -151,4 +151,10 @@ void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
             }
         }
     });
+
+    // TODO: ideally the error from the dispatch should be returned
+    // however we expect to replace the storage delegate with KVS so for now
+    // we return no error (return used to be void due to async dispatch anyway)
+
+    return CHIP_NO_ERROR;
 }

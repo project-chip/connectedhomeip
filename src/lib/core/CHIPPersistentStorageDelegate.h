@@ -132,7 +132,7 @@ public:
      *
      * @param[in] key Key to be deleted
      */
-    virtual void AsyncDeleteKeyValue(const char * key) = 0;
+    virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) = 0;
 };
 
 } // namespace chip

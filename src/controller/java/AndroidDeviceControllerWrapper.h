@@ -59,7 +59,7 @@ public:
     void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
     void AsyncSetKeyValue(const char * key, const char * value) override;
-    void AsyncDeleteKeyValue(const char * key) override;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
     jlong ToJNIHandle()
     {
