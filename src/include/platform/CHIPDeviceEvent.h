@@ -199,7 +199,7 @@ enum PublicEventTypes
     kInterfaceIpAddressChanged,
 
     /**
-     * Srp clientHost 
+     * Srp clientHost
      *
      * Signals that the last srp client request has been setup
      */

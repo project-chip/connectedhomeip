@@ -152,7 +152,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
         if (event->ThreadStateChange.AddressChanged)
         {
-            const otSrpClientHostInfo * hostInfo =  otSrpClientGetHostInfo(Impl()->OTInstance());
+            const otSrpClientHostInfo * hostInfo = otSrpClientGetHostInfo(Impl()->OTInstance());
             if (hostInfo && hostInfo->mName)
             {
                 Impl()->_SetupSrpHost(hostInfo->mName);
@@ -1016,7 +1016,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
         }
 
         ChipDeviceEvent event;
-        event.Type  = DeviceEventType::kSrpClientRequestComplete;
+        event.Type = DeviceEventType::kSrpClientRequestComplete;
         PlatformMgr().PostEvent(&event);
 
         break;
