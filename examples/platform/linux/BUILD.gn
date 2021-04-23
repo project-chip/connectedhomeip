@@ -13,12 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
-config("chip_app_main_config") {
+config("app-main-config") {
   include_dirs = [ "." ]
 }
 
-source_set("chip_app_main") {
+source_set("app-main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
@@ -26,7 +27,11 @@ source_set("chip_app_main") {
     "Options.h",
   ]
 
+  if (chip_enable_pw_rpc) {
+    defines = [ "PW_RPC_ENABLED" ]
+  }
+
   public_deps = [ "${chip_root}/src/lib" ]
 
-  public_configs = [ ":chip_app_main_config" ]
+  public_configs = [ ":app-main-config" ]
 }

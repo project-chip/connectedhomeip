@@ -30,6 +30,10 @@
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
 
+#if defined(PW_RPC_ENABLED)
+#include <Rpc.h>
+#endif
+
 #include "Options.h"
 
 using namespace chip;
@@ -63,6 +67,11 @@ int ChipLinuxAppInit(int argc, char ** argv)
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
+
+#if defined(PW_RPC_ENABLED)
+    chip::rpc::Init();
+    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
+#endif // defined(PW_RPC_ENABLED)
 
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
