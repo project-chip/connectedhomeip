@@ -183,8 +183,9 @@ private:
     void Reset();
 
     /**
-     *  Determine whether a response is expected for messages sent over
-     *  this exchange.
+     *  Determine whether a response is currently expected for a message that was sent over
+     *  this exchange.  While this is true, attempts to send other messages that expect a response
+     *  will fail.
      *
      *  @return Returns 'true' if response expected, else 'false'.
      */
