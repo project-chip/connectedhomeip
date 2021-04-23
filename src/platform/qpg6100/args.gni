@@ -29,6 +29,12 @@ lwip_api = true
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
+chip_inet_config_enable_tcp_endpoint = false
+chip_inet_config_enable_raw_endpoint = false
+
+# Size opt's
+#chip_progress_logging = false
+chip_detail_logging = false
 
 chip_build_tests = false
 
