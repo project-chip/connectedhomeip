@@ -54,7 +54,7 @@
 using namespace chip;
 using namespace chip::Crypto;
 
-class Test_P256Keypair:
+class Test_P256Keypair :
 #ifdef ENABLE_HSM_EC_KEY
     public P256KeypairHSM
 #else
@@ -77,7 +77,7 @@ public:
     }
 };
 
-class TestSpake2p_P256_SHA256_HKDF_HMAC:
+class TestSpake2p_P256_SHA256_HKDF_HMAC :
 #ifdef ENABLE_HSM_SPAKE
     public Spake2pHSM_P256_SHA256_HKDF_HMAC
 #else
@@ -87,7 +87,6 @@ class TestSpake2p_P256_SHA256_HKDF_HMAC:
 public:
     TestSpake2p_P256_SHA256_HKDF_HMAC() {}
 };
-
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
@@ -719,7 +718,6 @@ static void TestECDSA_Signing_SHA256_Hash(nlTestSuite * inSuite, void * inContex
     size_t hash_length   = sizeof(hash);
 
     Test_P256Keypair keypair;
-
 
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
 
