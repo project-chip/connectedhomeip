@@ -470,8 +470,7 @@ static void ChipEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_
         advertise();
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    case DeviceLayer::DeviceEventType::kThreadStateChange:
-        VerifyOrReturn(event->ThreadStateChange.AddressChanged);
+    case DeviceLayer::DeviceEventType::kSrpClientRequestComplete:
         advertise();
         break;
 #endif

@@ -197,6 +197,13 @@ enum PublicEventTypes
      * wifi/ethernet interface.
      */
     kInterfaceIpAddressChanged,
+
+    /**
+     * Srp clientHost 
+     *
+     * Signals that the last srp client request has been setup
+     */
+    kSrpClientRequestComplete,
 };
 
 /**
