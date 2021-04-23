@@ -50,16 +50,25 @@
 
 #define LWIP_SOCKET 0
 
-// TODO: seems like this is unnecessary on Thread-only platforms
+#ifdef INET_CONFIG_ENABLE_RAW_ENDPOINT
 #define LWIP_RAW 1
 #define MEMP_NUM_RAW_PCB (5)
+#else
+#define LWIP_RAW 0
+#define MEMP_NUM_RAW_PCB 0
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+#ifdef INET_CONFIG_ENABLE_TCP_ENDPOINT
+#define LWIP_TCP 1
+#else
+#define LWIP_TCP 0
+#define MEMP_NUM_TCP_PCB 0
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 // TODO: verify count
 #define MEMP_NUM_UDP_PCB (7)
 
-#define LWIP_HAVE_LOOPIF (0)
-
 // TODO: not sure why this is disabled
+#define LWIP_HAVE_LOOPIF (0)
 #define LWIP_NETIF_LOOPBACK (0)
 
 #define MEMP_NUM_NETCONN (0)
