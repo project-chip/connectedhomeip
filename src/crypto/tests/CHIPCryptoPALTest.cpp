@@ -54,15 +54,15 @@
 using namespace chip;
 using namespace chip::Crypto;
 
-
 #ifdef ENABLE_HSM_EC_KEY
-class Test_P256Keypair : public P256KeypairHSM {
-   public:
-      Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
-      Test_P256Keypair(int keyId) { SetKeyId(keyId); }
+class Test_P256Keypair : public P256KeypairHSM
+{
+public:
+    Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
+    Test_P256Keypair(int keyId) { SetKeyId(keyId); }
 };
 #else
-using Test_P256Keypair = P256Keypair;
+using Test_P256Keypair                  = P256Keypair;
 #endif
 
 #ifdef ENABLE_HSM_SPAKE
@@ -70,7 +70,6 @@ using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
 #else
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 #endif
-
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
