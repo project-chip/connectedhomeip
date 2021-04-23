@@ -271,7 +271,7 @@ public:
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
 
     /**
      * @brief A function to sign a hash using ECDSA
@@ -281,7 +281,7 @@ public:
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -290,7 +290,7 @@ public:
      * @param out_secret Buffer to write out secret into. This is a byte array representing the x coordinate of the shared secret.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
+    CHIP_ERROR ECDH_derive_secret(const P256PublicKey & remote_public_key,
                                           P256ECDHDerivedSecret & out_secret) const override;
 
     /** @brief Return public key for the keypair.

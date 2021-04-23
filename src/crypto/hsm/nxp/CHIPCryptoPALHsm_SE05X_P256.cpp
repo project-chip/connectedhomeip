@@ -62,7 +62,7 @@ CHIP_ERROR P256KeypairHSM::Initialize()
     if (keyid == 0)
     {
         ChipLogDetail(Crypto, "Keyid not set !. Set key id using 'SetKeyId' member class !");
-        goto exit;
+        ExitNow();
     }
 
     se05x_sessionOpen();
@@ -237,17 +237,18 @@ CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
 
     {
         /* Set the public key */
-        const P256PublicKey & public_key = Pubkey();
-        bbuf.Put((void *) Uint8::to_const_uchar(public_key), public_key.Length());
+        P256PublicKey & public_key = const_cast<P256PublicKey&>(Pubkey());
+        bbuf.Put(Uint8::to_uchar(public_key), public_key.Length());
     }
 
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sizeof(privkey) >= 4 , error = CHIP_ERROR_INTERNAL);
 
-    /* When HSM is used for ECC key generation, store key info in private key buffer */
-    privkey[0] = (uint8_t)(keyid >> 24) & 0xFF;
-    privkey[1] = (uint8_t)(keyid >> 16) & 0xFF;
-    privkey[2] = (uint8_t)(keyid >> 8) & 0xFF;
-    privkey[3] = (uint8_t) keyid & 0xFF;
+    {
+        /* When HSM is used for ECC key generation, store key info in private key buffer */
+        Encoding::LittleEndian::BufferWriter privkey_bbuf(privkey, sizeof(privkey));
+        privkey_bbuf.Put32(keyid);
+    }
 
     bbuf.Put(privkey, sizeof(privkey));
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -268,14 +269,14 @@ CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
     Encoding::BufferWriter bbuf((uint8_t *) Uint8::to_const_uchar(public_key), public_key.Length());
 
     VerifyOrExit(input.Length() == public_key.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.Put((const uint8_t *) input, public_key.Length());
+    bbuf.Put(static_cast<uint8_t*>(input), public_key.Length());
 
     /* Set private key info */
     VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
     {
-        const uint8_t * privkey = Uint8::to_const_uchar(input) + public_key.Length();
         /* When HSM is used for ECC key generation, key info in stored in private key buffer */
-        keyid = privkey[3] | privkey[2] << 8 | privkey[1] << 16 | privkey[0] << 24;
+        const uint8_t * privkey = Uint8::to_const_uchar(input) + public_key.Length();
+        keyid = privkey[0] | privkey[1] << 8 | privkey[2] << 16 | privkey[3] << 24;
     }
 
     error = CHIP_NO_ERROR;
