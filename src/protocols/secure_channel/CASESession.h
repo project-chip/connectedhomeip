@@ -203,13 +203,13 @@ private:
                     SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
-    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR1(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR1(const System::PacketBufferHandle & msg);
     CHIP_ERROR SendSigmaR2();
-    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg);
-    CHIP_ERROR HandleSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2_and_SendSigmaR3(const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR2(const System::PacketBufferHandle & msg);
     CHIP_ERROR SendSigmaR3();
-    CHIP_ERROR HandleSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleSigmaR3(const System::PacketBufferHandle & msg);
 
     CHIP_ERROR SendSigmaR1Resume();
     CHIP_ERROR HandleSigmaR1Resume_and_SendSigmaR2Resume(const PacketHeader & header, const System::PacketBufferHandle & msg);
@@ -226,7 +226,7 @@ private:
     CHIP_ERROR ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen);
 
     void SendErrorMsg(SigmaErrorType errorCode);
-    void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    void HandleErrorMsg(const System::PacketBufferHandle & msg);
 
     // TODO: Remove this and replace with system method to retrieve current time
     CHIP_ERROR SetEffectiveTime(void);
