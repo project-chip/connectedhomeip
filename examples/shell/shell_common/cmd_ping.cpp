@@ -161,7 +161,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     char * requestData = nullptr;
 
     uint32_t size = gPingArguments.GetEchoReqSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_MESSAGE_TOO_LONG);
 
     requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
     VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
