@@ -37,6 +37,7 @@
 using namespace chip;
 using namespace Shell;
 using namespace Logging;
+using chip::Inet::IPAddress;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
@@ -143,7 +144,7 @@ TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
 
 Messaging::ExchangeManager gExchangeManager;
 SecureSessionMgr gSessionManager;
-Inet::IPAddress gDestAddr;
+IPAddress gDestAddr;
 
 bool EchoIntervalExpired(void)
 {
@@ -259,7 +260,7 @@ void StartPinging(streamer_t * stream, char * destination)
     Transport::AdminPairingInfo * adminInfo = nullptr;
     uint32_t maxEchoCount                   = 0;
 
-    if (!Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
