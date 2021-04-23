@@ -296,7 +296,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_le
 
 CHIP_ERROR CASESession::SendSigmaR1()
 {
-    uint16_t data_len = static_cast<uint16_t>(kSigmaParamRandomNumberSize + sizeof(uint16_t) +
+    uint16_t data_len = static_cast<uint16_t>(kSigmaParamRandomNumberSize + sizeof(uint16_t) + sizeof(uint16_t) +
                                               mOpCredSet->GetCertCount() * kTrustedRootIdSize + kP256_PublicKey_Length);
 
     System::PacketBufferHandle msg_R1;
@@ -319,6 +319,8 @@ CHIP_ERROR CASESession::SendSigmaR1()
     {
         uint16_t n_trusted_roots = mOpCredSet->GetCertCount();
         Encoding::LittleEndian::BufferWriter bbuf(&msg[kSigmaParamRandomNumberSize], data_len - kSigmaParamRandomNumberSize);
+        // Initiator's session ID
+        bbuf.Put16(mConnectionState.GetLocalKeyID());
         // Step 2/3
         bbuf.Put16(n_trusted_roots);
         for (uint16_t i = 0; i < n_trusted_roots; ++i)
@@ -346,21 +348,24 @@ CHIP_ERROR CASESession::SendSigmaR1()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR1_and_SendSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR1_and_SendSigmaR2(const System::PacketBufferHandle & msg)
 {
-    ReturnErrorOnFailure(HandleSigmaR1(header, msg));
+    ReturnErrorOnFailure(HandleSigmaR1(msg));
     ReturnErrorOnFailure(SendSigmaR2());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR1(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const uint8_t * buf   = msg->Start();
-    uint16_t buflen       = msg->DataLength();
-    uint16_t fixed_buflen = kSigmaParamRandomNumberSize + sizeof(uint16_t) + kTrustedRootIdSize + kP256_PublicKey_Length;
+    uint16_t encryptionKeyId = 0;
+
+    const uint8_t * buf = msg->Start();
+    uint16_t buflen     = msg->DataLength();
+    uint16_t fixed_buflen =
+        kSigmaParamRandomNumberSize + sizeof(encryptionKeyId) + sizeof(uint16_t) + kTrustedRootIdSize + kP256_PublicKey_Length;
     uint32_t n_trusted_roots;
 
     Encoding::LittleEndian::BufferWriter bbuf(mRemotePubKey, mRemotePubKey.Length());
@@ -375,6 +380,10 @@ CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System:
 
     // Let's skip the random number portion of the message
     buf += kSigmaParamRandomNumberSize;
+
+    encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
+    buf += sizeof(encryptionKeyId);
+
     n_trusted_roots = chip::Encoding::LittleEndian::Read16(buf);
     // Step 1/2
     err = FindValidTrustedRoot(&buf, n_trusted_roots);
@@ -383,12 +392,8 @@ CHIP_ERROR CASESession::HandleSigmaR1(const PacketHeader & header, const System:
     bbuf.Put(buf, kP256_PublicKey_Length);
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (header.GetSourceNodeId().HasValue() && mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
-    {
-        mConnectionState.SetPeerNodeId(header.GetSourceNodeId().Value());
-    }
-
-    mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
+    ChipLogDetail(Inet, "Peer assigned session key ID %d", encryptionKeyId);
+    mConnectionState.SetPeerKeyID(encryptionKeyId);
 
 exit:
 
@@ -509,7 +514,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
                           msg_R2_Encrypted->Start(), tag, sizeof(tag));
     SuccessOrExit(err);
 
-    data_len = static_cast<uint16_t>(kSigmaParamRandomNumberSize + kTrustedRootIdSize + kP256_PublicKey_Length +
+    data_len = static_cast<uint16_t>(kSigmaParamRandomNumberSize + sizeof(uint16_t) + kTrustedRootIdSize + kP256_PublicKey_Length +
                                      msg_r2_signed_enc_len + sizeof(tag));
 
     msg_R2 = System::PacketBufferHandle::New(data_len);
@@ -521,6 +526,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
         Encoding::LittleEndian::BufferWriter bbuf(msg_R2->Start(), data_len);
 
         bbuf.Put(msg_rand->Start(), kSigmaParamRandomNumberSize);
+        // Responder's session ID
+        bbuf.Put16(mConnectionState.GetLocalKeyID());
         // Step 2
         bbuf.Put(mTrustedRootId.mId, mTrustedRootId.mLen);
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
@@ -553,15 +560,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR2_and_SendSigmaR3(const System::PacketBufferHandle & msg)
 {
-    ReturnErrorOnFailure(HandleSigmaR2(header, msg));
+    ReturnErrorOnFailure(HandleSigmaR2(msg));
     ReturnErrorOnFailure(SendSigmaR3());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -588,15 +595,22 @@ CHIP_ERROR CASESession::HandleSigmaR2(const PacketHeader & header, const System:
 
     const uint8_t * tag = buf + buflen - kTAGSize;
 
+    uint16_t encryptionKeyId = 0;
+
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
     ChipLogDetail(Inet, "Received SigmaR2 msg");
 
-    mConnectionState.SetPeerKeyID(header.GetEncryptionKeyID());
-
     // Step 1
     // skip random part
     buf += kSigmaParamRandomNumberSize;
+
+    encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
+    buf += sizeof(encryptionKeyId);
+
+    ChipLogDetail(Inet, "Peer assigned session key ID %d", encryptionKeyId);
+    mConnectionState.SetPeerKeyID(encryptionKeyId);
+
     err = FindValidTrustedRoot(&buf, 1);
     SuccessOrExit(err);
 
@@ -806,7 +820,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System::PacketBufferHandle & msg)
+CHIP_ERROR CASESession::HandleSigmaR3(const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -878,10 +892,6 @@ CHIP_ERROR CASESession::HandleSigmaR3(const PacketHeader & header, const System:
 
     err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed->Start(), msg_r3_signed_len, sigmaR3SignedData);
     SuccessOrExit(err);
-
-    VerifyOrExit(header.GetSourceNodeId().ValueOr(kUndefinedNodeId) == mConnectionState.GetPeerNodeId(),
-                 err = CHIP_ERROR_WRONG_NODE_ID);
-    VerifyOrExit(header.GetEncryptionKeyID() == mConnectionState.GetPeerKeyID(), err = CHIP_ERROR_INVALID_KEY_ID);
 
     err = mCommissioningHash.Finish(mMessageDigest);
     SuccessOrExit(err);
@@ -1066,7 +1076,7 @@ CHIP_ERROR CASESession::SetEffectiveTime(void)
     return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
 }
 
-void CASESession::HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg)
+void CASESession::HandleErrorMsg(const System::PacketBufferHandle & msg)
 {
     // Error message processing
     const uint8_t * buf  = msg->Start();
@@ -1105,6 +1115,19 @@ void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
 
     mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
+    if (packetHeader.GetSourceNodeId().HasValue())
+    {
+        if (mConnectionState.GetPeerNodeId() == kUndefinedNodeId)
+        {
+            mConnectionState.SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
+        }
+        else
+        {
+            VerifyOrExit(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
+                         err = CHIP_ERROR_WRONG_NODE_ID);
+        }
+    }
+
     if (mLocalNodeId == kUndefinedNodeId)
     {
         mLocalNodeId = packetHeader.GetDestinationNodeId().ValueOr(kUndefinedNodeId);
@@ -1117,19 +1140,19 @@ void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
     case Protocols::SecureChannel::MsgType::CASE_SigmaR1:
-        err = HandleSigmaR1_and_SendSigmaR2(packetHeader, msg);
+        err = HandleSigmaR1_and_SendSigmaR2(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::CASE_SigmaR2:
-        err = HandleSigmaR2_and_SendSigmaR3(packetHeader, msg);
+        err = HandleSigmaR2_and_SendSigmaR3(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::CASE_SigmaR3:
-        err = HandleSigmaR3(packetHeader, msg);
+        err = HandleSigmaR3(msg);
         break;
 
     case Protocols::SecureChannel::MsgType::CASE_SigmaErr:
-        HandleErrorMsg(packetHeader, msg);
+        HandleErrorMsg(msg);
         break;
 
     default:
