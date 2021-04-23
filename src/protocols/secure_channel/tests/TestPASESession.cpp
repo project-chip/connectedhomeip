@@ -58,7 +58,7 @@ public:
 
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 
-    uint32_t mSentMessageCount     = 0;
+    uint32_t mSentMessageCount   = 0;
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
 };
 
@@ -122,7 +122,7 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
-    gLoopback.mSentMessageCount   = 0;
+    gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     PASESession pairing1;
