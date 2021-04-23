@@ -18,6 +18,7 @@
 #include "AndroidDeviceControllerWrapper.h"
 #include "CHIPJNIError.h"
 
+#include <algorithm>
 #include <memory>
 
 #include <support/ThreadOperationalDataset.h>
@@ -306,7 +307,7 @@ void AndroidDeviceControllerWrapper::SetStorageDelegate(PersistentStorageResultD
     mStorageResultDelegate = delegate;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)
 {
     jstring keyString       = NULL;
     jstring valueString     = NULL;
@@ -334,7 +335,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, cha
             if (value != nullptr)
             {
                 valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
-                size       = strlcpy(value, valueChars, size);
+                memcpy(value, valueChars, std::min(size, stringLength));
                 if (size < stringLength)
                 {
                     err = CHIP_ERROR_NO_MEMORY;
@@ -342,11 +343,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, cha
             }
             else
             {
-                size = stringLength;
-                err  = CHIP_ERROR_NO_MEMORY;
+                err = CHIP_ERROR_NO_MEMORY;
             }
-            // Increment size to account for null termination
-            size += 1;
+            size = stringLength;
         }
     }
     else
@@ -365,7 +364,7 @@ exit:
     return err;
 }
 
-void AndroidDeviceControllerWrapper::AsyncSetKeyValue(const char * key, const char * value)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
     jclass storageCls = GetPersistentStorageClass();
     jmethodID method  = GetJavaEnv()->GetStaticMethodID(storageCls, "setKeyValue", "(Ljava/lang/String;Ljava/lang/String;)V");
@@ -378,7 +377,8 @@ void AndroidDeviceControllerWrapper::AsyncSetKeyValue(const char * key, const ch
 
     err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
     SuccessOrExit(err);
-    err = N2J_NewStringUTF(GetJavaEnv(), value, valueString);
+
+    err = N2J_NewStringUTF(GetJavaEnv(), static_cast<const char *>(value), size, valueString);
     SuccessOrExit(err);
 
     GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString, valueString);
