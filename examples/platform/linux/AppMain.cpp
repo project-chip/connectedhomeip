@@ -64,11 +64,6 @@ int ChipLinuxAppInit(int argc, char ** argv)
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
 
-#if defined(PW_RPC_ENABLED)
-    chip::rpc::Init();
-    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
-#endif // defined(PW_RPC_ENABLED)
-
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)

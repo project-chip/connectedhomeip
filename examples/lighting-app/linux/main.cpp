@@ -86,6 +86,12 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+#if defined(PW_RPC_ENABLED)
+    chip::rpc::Init();
+    ChipLogProgress(NotSpecified, "PW_RPC initialized.");
+#endif // defined(PW_RPC_ENABLED)
+
     LightingMgr().Init();
     ChipLinuxAppMainLoop();
     return 0;

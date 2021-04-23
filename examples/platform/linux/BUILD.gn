@@ -14,11 +14,11 @@
 
 import("//build_overrides/chip.gni")
 
-config("chip_examples_project_linux_platform_main_config") {
+config("chip_app_main_config") {
   include_dirs = [ "." ]
 }
 
-source_set("chip_examples_project_linux_platform_main") {
+source_set("chip_app_main") {
   sources = [
     "AppMain.cpp",
     "AppMain.h",
@@ -28,5 +28,5 @@ source_set("chip_examples_project_linux_platform_main") {
 
   public_deps = [ "${chip_root}/src/lib" ]
 
-  public_configs = [ ":chip_examples_project_linux_platform_main_config" ]
+  public_configs = [ ":chip_app_main_config" ]
 }
