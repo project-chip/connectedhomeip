@@ -196,7 +196,7 @@ private:
      *  is set or not in sendFlags when send a message over exchange.
      *
      *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
-     *                                  (false) a response is expected on this
+     *                                  (false) a response is currently expected on this
      *                                  exchange.
      */
     void SetResponseExpected(bool inResponseExpected);
