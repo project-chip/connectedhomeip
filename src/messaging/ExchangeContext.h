@@ -182,7 +182,22 @@ private:
     void Free();
     void Reset();
 
+    /**
+     *  Determine whether a response is expected for messages sent over
+     *  this exchange.
+     *
+     *  @return Returns 'true' if response expected, else 'false'.
+     */
     bool IsResponseExpected() const;
+
+    /**
+     *  Set whether a response is expected on this exchange based on if flag kExpectResponse
+     *  is set or not in sendFlags when send a message over exchange.
+     *
+     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
+     *                                  (false) a response is expected on this
+     *                                  exchange.
+     */
     void SetResponseExpected(bool inResponseExpected);
 
     /**
