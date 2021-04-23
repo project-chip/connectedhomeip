@@ -15,6 +15,10 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 
+declare_args() {
+  chip_build_shell_lib = false
+}
+
 config("includes") {
   include_dirs = [ "." ]
 }
@@ -36,6 +40,10 @@ static_library("lib") {
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_build_shell_lib) {
+    public_deps += [ "${chip_root}/src/lib/shell" ]
+  }
 
   if (chip_device_platform != "none") {
     public_deps += [ "${chip_root}/src/app/server" ]

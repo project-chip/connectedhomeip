@@ -29,8 +29,13 @@ if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 endif()
 
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
+if (CONFIG_ENABLE_CHIP_SHELL)
+    list(APPEND CHIP_REQURIE_COMPONENTS console)
+endif()
+
 idf_component_register(SRCS chip.c chip.cpp
-                       PRIV_REQUIRES freertos lwip bt mdns mbedtls fatfs)
+                       PRIV_REQUIRES ${CHIP_REQURIE_COMPONENTS})
 
 # Prepare initial args file (lacking compile flags)
 # This will be saved as args.gn.in
@@ -55,6 +60,10 @@ endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)
     chip_gn_arg_append("chip_mdns"                          "\"platform\"")
+endif()
+
+if (CONFIG_ENABLE_CHIP_SHELL)
+    chip_gn_arg_append("chip_build_shell_lib"                   "true")
 endif()
 
 
@@ -149,6 +158,11 @@ idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
+endif()
+
+if (CONFIG_ENABLE_CHIP_SHELL)
+    idf_component_get_property(console_lib console COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${console_lib}>)
 endif()
 
 if(NOT CONFIG_USE_MINIMAL_MDNS)
