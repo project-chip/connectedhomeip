@@ -54,39 +54,23 @@
 using namespace chip;
 using namespace chip::Crypto;
 
-class Test_P256Keypair :
-#ifdef ENABLE_HSM_EC_KEY
-    public P256KeypairHSM
-#else
-    public P256Keypair
-#endif
-{
-public:
-    Test_P256Keypair()
-    {
-#ifdef ENABLE_HSM_EC_KEY
-        SetKeyId(HSM_ECC_KEYID);
-#endif
-    }
 
-    Test_P256Keypair(int hsmkeyid)
-    {
 #ifdef ENABLE_HSM_EC_KEY
-        SetKeyId(hsmkeyid);
-#endif
-    }
+class Test_P256Keypair : public P256KeypairHSM {
+   public:
+      Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
+      Test_P256Keypair(int keyId) { SetKeyId(keyId); }
 };
+#else
+using Test_P256Keypair = P256Keypair;
+#endif
 
-class TestSpake2p_P256_SHA256_HKDF_HMAC :
 #ifdef ENABLE_HSM_SPAKE
-    public Spake2pHSM_P256_SHA256_HKDF_HMAC
+using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
 #else
-    public Spake2p_P256_SHA256_HKDF_HMAC
+using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 #endif
-{
-public:
-    TestSpake2p_P256_SHA256_HKDF_HMAC() {}
-};
+
 
 static uint32_t gs_test_entropy_source_called = 0;
 static int test_entropy_source(void * data, uint8_t * output, size_t len, size_t * olen)
@@ -890,7 +874,11 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     Test_P256Keypair keypair1;
     NL_TEST_ASSERT(inSuite, keypair1.Initialize() == CHIP_NO_ERROR);
 
+#ifdef ENABLE_HSM_EC_KEY
     Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
+#else
+    Test_P256Keypair keypair2;
+#endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
