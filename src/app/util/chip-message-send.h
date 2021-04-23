@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include "types_stub.h" // For EmberApsFrame, EmberStatus, node ids.
+#include <app/util/types_stub.h> // For EmberApsFrame, EmberStatus, node ids.
 
 /**
  * @brief

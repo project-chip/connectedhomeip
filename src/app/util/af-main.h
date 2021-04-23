@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
 //#include CONFIGURATION_HEADER
 //#include PLATFORM_HEADER     // Micro and compiler specific typedefs and macros

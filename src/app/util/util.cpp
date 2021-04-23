@@ -40,11 +40,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af-event.h"
-#include "af-main.h"
-#include "af.h"
 #include "app/util/common.h"
 #include <app/reporting/reporting.h>
+#include <app/util/af-event.h>
+#include <app/util/af-main.h>
+#include <app/util/af.h>
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"

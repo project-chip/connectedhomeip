@@ -42,11 +42,11 @@
 #pragma once
 
 // App framework
-#include "af.h"
-#include "attribute-storage.h"
-#include "attribute-table.h"
-#include "time-util.h"
-#include "util.h"
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/attribute-table.h>
+#include <app/util/time-util.h>
+#include <app/util/util.h>
 
 // the variables used to setup and send responses to cluster messages
 extern EmberApsFrame emberAfResponseApsFrame;

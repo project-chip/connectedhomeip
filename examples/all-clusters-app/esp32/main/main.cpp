@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "AppDelegate.h"
 #include "BluetoothWidget.h"
 #include "Button.h"
 #include "CHIPDeviceManager.h"
@@ -24,10 +23,8 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
-#include "OnboardingCodesUtil.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
-#include "Server.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -48,8 +45,11 @@
 #include <string>
 #include <vector>
 
+#include <app/server/AppDelegate.h>
+#include <app/server/Mdns.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <server/Mdns.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>

@@ -42,7 +42,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
 bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, chip::GroupId groupId,
                                                     uint8_t sceneId);

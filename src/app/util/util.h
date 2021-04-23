@@ -47,6 +47,8 @@
 
 #pragma once
 
+#include <inttypes.h>
+
 // User asserts can override SLAB_ASSERT and should be defined as follows:
 // void userAssert (int file, int line);                   // declaration
 // #define USER_ASSERT(file, line) userAssert(file, line)  // definition
@@ -80,7 +82,7 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #define ZCL_NULL_CLUSTER_ID 0xFFFF
 
-#include "af.h"
+#include <app/util/af.h>
 
 // Override APS retry: 0 - don't touch, 1 - always set, 2 - always unset
 typedef enum
