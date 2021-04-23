@@ -201,6 +201,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ThrowError(env, err);
+        StackUnlockGuard unlockGuard;
         JNI_OnUnload(jvm, reserved);
     }
 
@@ -209,6 +210,7 @@ exit:
 
 void JNI_OnUnload(JavaVM * jvm, void * reserved)
 {
+    ScopedPthreadLock lock(&sStackLock);
     ChipLogProgress(Controller, "JNI_OnUnload() called");
 
     // If the IO thread has been started, shut it down and wait for it to exit.
@@ -216,6 +218,8 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     {
         sShutdown = true;
         sSystemLayer.WakeSelect();
+
+        StackUnlockGuard unlockGuard;
         pthread_join(sIOThread, NULL);
     }
 
@@ -232,6 +236,7 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
 
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = NULL;
     long result                              = 0;
@@ -262,21 +267,19 @@ exit:
 
 JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        sBleLayer.mAppState         = (void *) self;
-        RendezvousParameters params = RendezvousParameters()
-                                          .SetSetupPINCode(pinCode)
-                                          .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                          .SetBleLayer(&sBleLayer)
-                                          .SetPeerAddress(Transport::PeerAddress::BLE());
-        err = wrapper->Controller()->PairDevice(deviceId, params);
-    }
+    sBleLayer.mAppState         = (void *) self;
+    RendezvousParameters params = RendezvousParameters()
+                                      .SetSetupPINCode(pinCode)
+                                      .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+                                      .SetBleLayer(&sBleLayer)
+                                      .SetPeerAddress(Transport::PeerAddress::BLE());
+    err = wrapper->Controller()->PairDevice(deviceId, params);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -287,15 +290,13 @@ JNI_METHOD(void, pairDevice)(JNIEnv * env, jobject self, jlong handle, jlong dev
 
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "unpairDevice() called with device ID");
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        err = wrapper->Controller()->UnpairDevice(deviceId);
-    }
+    err = wrapper->Controller()->UnpairDevice(deviceId);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -306,15 +307,13 @@ JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong d
 
 JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "stopDevicePairing() called with device ID");
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        err = wrapper->Controller()->StopPairing(deviceId);
-    }
+    err = wrapper->Controller()->StopPairing(deviceId);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -325,6 +324,7 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     chip::Inet::IPAddress deviceIPAddr;
@@ -335,12 +335,9 @@ JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlon
     deviceIPAddr.FromString(deviceAddrStr, deviceIPAddr);
     env->ReleaseStringUTFChars(deviceAddr, deviceAddrStr);
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        Controller::SerializedDevice mSerializedTestDevice;
-        err = wrapper->Controller()->PairTestDeviceWithoutSecurity(kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr),
-                                                                   mSerializedTestDevice);
-    }
+    Controller::SerializedDevice mSerializedTestDevice;
+    err = wrapper->Controller()->PairTestDeviceWithoutSecurity(kRemoteDeviceId, chip::Transport::PeerAddress::UDP(deviceIPAddr),
+                                                               mSerializedTestDevice);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -351,16 +348,14 @@ JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlon
 
 JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     Device * chipDevice                      = nullptr;
 
     ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        err = wrapper->Controller()->GetDevice(deviceId, &chipDevice);
-    }
+    err = wrapper->Controller()->GetDevice(deviceId, &chipDevice);
 
     if (err != CHIP_NO_ERROR || !chipDevice)
     {
@@ -373,12 +368,10 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
 {
-    Device * chipDevice = reinterpret_cast<Device *>(handle);
+    ScopedPthreadLock lock(&sStackLock);
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        return chipDevice->IsActive();
-    }
+    Device * chipDevice = reinterpret_cast<Device *>(handle);
+    return chipDevice->IsActive();
 }
 
 void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device ** chipDevice)
@@ -386,10 +379,7 @@ void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device *
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(wrapperHandle);
     CHIP_ERROR err                           = CHIP_NO_ERROR;
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        err = wrapper->Controller()->GetDevice(deviceId, chipDevice);
-    }
+    err = wrapper->Controller()->GetDevice(deviceId, chipDevice);
 
     if (err != CHIP_NO_ERROR || !chipDevice)
     {
@@ -400,6 +390,7 @@ void GetCHIPDevice(JNIEnv * env, long wrapperHandle, uint64_t deviceId, Device *
 
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     Device * chipDevice = nullptr;
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
@@ -408,11 +399,8 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     uint16_t port;
     char addrStr[50];
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        if (!chipDevice->GetAddress(addr, port))
-            return nullptr;
-    }
+    if (!chipDevice->GetAddress(addr, port))
+        return nullptr;
 
     addr.ToString(addrStr);
     return env->NewStringUTF(addrStr);
@@ -420,6 +408,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
 
 JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring messageObj)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
 
@@ -430,10 +419,10 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
     const char * messageStr = env->GetStringUTFChars(messageObj, 0);
     size_t messageLen       = strlen(messageStr);
 
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::NewWithData(messageStr, messageLen);
+    if (buffer.IsNull())
     {
-        ScopedPthreadLock lock(&sStackLock);
-
-        System::PacketBufferHandle buffer = System::PacketBufferHandle::NewWithData(messageStr, messageLen);
+        buffer = System::PacketBufferHandle::NewWithData(messageStr, messageLen);
         if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
@@ -455,6 +444,7 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
 
 JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jobject commandObj, jint aValue)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
 
@@ -466,40 +456,37 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
     jmethodID commandMethodID = env->GetMethodID(commandCls, "getValue", "()I");
     jint commandID            = env->CallIntMethod(commandObj, commandMethodID);
 
+    System::PacketBufferHandle buffer;
+
+    // Hardcode endpoint to 1 for now
+    uint8_t endpoint = 1;
+
+    switch (commandID)
     {
-        ScopedPthreadLock lock(&sStackLock);
-        System::PacketBufferHandle buffer;
+    case 0:
+        buffer = encodeOnOffClusterOffCommand(0, endpoint);
+        break;
+    case 1:
+        buffer = encodeOnOffClusterOnCommand(0, endpoint);
+        break;
+    case 2:
+        buffer = encodeOnOffClusterToggleCommand(0, endpoint);
+        break;
+    case 3:
+        buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t) (aValue & 0xff), 0xFFFF, 0, 0);
+        break;
+    default:
+        ChipLogError(Controller, "Unknown command: %d", commandID);
+        return;
+    }
 
-        // Hardcode endpoint to 1 for now
-        uint8_t endpoint = 1;
-
-        switch (commandID)
-        {
-        case 0:
-            buffer = encodeOnOffClusterOffCommand(0, endpoint);
-            break;
-        case 1:
-            buffer = encodeOnOffClusterOnCommand(0, endpoint);
-            break;
-        case 2:
-            buffer = encodeOnOffClusterToggleCommand(0, endpoint);
-            break;
-        case 3:
-            buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
-            break;
-        default:
-            ChipLogError(Controller, "Unknown command: %d", commandID);
-            return;
-        }
-
-        if (buffer.IsNull())
-        {
-            err = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
-        }
+    if (buffer.IsNull())
+    {
+        err = CHIP_ERROR_NO_MEMORY;
+    }
+    else
+    {
+        err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
     }
 
     if (err != CHIP_NO_ERROR)
@@ -511,17 +498,14 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
 
 JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint duration)
 {
+    ScopedPthreadLock lock(&sStackLock);
     CHIP_ERROR err      = CHIP_NO_ERROR;
     Device * chipDevice = nullptr;
     chip::SetupPayload setupPayload;
 
     GetCHIPDevice(env, handle, deviceId, &chipDevice);
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode,
-                                            setupPayload);
-    }
+    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::PairingWindowOption::kOriginalSetupCode, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -549,6 +533,7 @@ exit:
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
 {
+    ScopedPthreadLock lock(&sStackLock);
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
     const auto valueBegin               = env->GetByteArrayElements(value, nullptr);
     const auto valueLength              = env->GetArrayLength(value);
@@ -565,9 +550,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
     buffer = System::PacketBufferHandle::NewWithData(valueBegin, valueLength);
     VerifyOrExit(!buffer.IsNull(), ChipLogError(Controller, "Failed to allocate packet buffer"));
 
-    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));
-    pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
 }
@@ -575,6 +558,7 @@ exit:
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleWriteConfirmation)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::Ble::ChipBleUUID svcUUID;
@@ -584,9 +568,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleWriteConfirmation)
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleWriteConfirmation() called with invalid characteristic ID"));
 
-    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleWriteConfirmation(connObj, &svcUUID, &charUUID);
-    pthread_mutex_unlock(&sStackLock);
 exit:
     return;
 }
@@ -594,6 +576,7 @@ exit:
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::Ble::ChipBleUUID svcUUID;
@@ -603,9 +586,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleSubscribeComplete() called with invalid characteristic ID"));
 
-    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleSubscribeComplete(connObj, &svcUUID, &charUUID);
-    pthread_mutex_unlock(&sStackLock);
 exit:
     return;
 }
@@ -613,6 +594,7 @@ exit:
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
+    ScopedPthreadLock lock(&sStackLock);
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
     chip::Ble::ChipBleUUID svcUUID;
@@ -622,24 +604,22 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)
     VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
                  ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid characteristic ID"));
 
-    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleUnsubscribeComplete(connObj, &svcUUID, &charUUID);
-    pthread_mutex_unlock(&sStackLock);
 exit:
     return;
 }
 
 JNI_ANDROID_CHIP_STACK_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 {
+    ScopedPthreadLock lock(&sStackLock);
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
-    pthread_mutex_lock(&sStackLock);
     sBleLayer.HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
-    pthread_mutex_unlock(&sStackLock);
 }
 
 JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handle)
 {
+    ScopedPthreadLock lock(&sStackLock);
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "deleteDeviceController() called");
@@ -652,7 +632,6 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -669,7 +648,10 @@ void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    env->CallStaticVoidMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    {
+        StackUnlockGuard unlockGuard;
+        env->CallStaticVoidMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -683,7 +665,6 @@ exit:
 bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
                               const uint8_t * characteristicData, uint32_t characteristicDataLen)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jbyteArray svcIdObj;
@@ -713,8 +694,11 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj,
-                                             characteristicDataObj);
+    {
+        StackUnlockGuard unlockGuard;
+        rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj,
+                                                 characteristicDataObj);
+    }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -730,7 +714,6 @@ exit:
 
 bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jbyteArray svcIdObj;
@@ -749,7 +732,10 @@ bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t 
     err = N2J_ByteArray(env, charId, 16, charIdObj);
     SuccessOrExit(err);
 
-    method = env->GetStaticMethodID(sAndroidChipStackCls, "onSubscribeCharacteristic", "(I[B[B)Z");
+    {
+        StackUnlockGuard unlockGuard;
+        method = env->GetStaticMethodID(sAndroidChipStackCls, "onSubscribeCharacteristic", "(I[B[B)Z");
+    }
     VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     ChipLogProgress(Controller, "Calling Java SubscribeCharacteristic");
@@ -772,7 +758,6 @@ exit:
 
 bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jbyteArray svcIdObj;
@@ -798,7 +783,10 @@ bool HandleUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    {
+        StackUnlockGuard unlockGuard;
+        rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj), svcIdObj, charIdObj);
+    }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -814,7 +802,6 @@ exit:
 
 bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -832,7 +819,10 @@ bool HandleCloseConnection(BLE_CONNECTION_OBJECT connObj)
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
-    rc         = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    {
+        StackUnlockGuard unlockGuard;
+        rc = (bool) env->CallStaticBooleanMethod(sAndroidChipStackCls, method, static_cast<jint>(tmpConnObj));
+    }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
@@ -847,7 +837,6 @@ exit:
 
 uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -858,7 +847,10 @@ uint16_t HandleGetMTU(BLE_CONNECTION_OBJECT connObj)
 
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
-    method = env->GetStaticMethodID(sAndroidChipStackCls, "onGetMTU", "(I)I");
+    {
+        StackUnlockGuard unlockGuard;
+        method = env->GetStaticMethodID(sAndroidChipStackCls, "onGetMTU", "(I)I");
+    }
     VerifyOrExit(method != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     ChipLogProgress(Controller, "Calling Java onGetMTU");
@@ -881,7 +873,6 @@ exit:
 
 void HandleNewConnection(void * appState, const uint16_t discriminator)
 {
-    StackUnlockGuard unlockGuard;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env;
     jmethodID method;
@@ -902,7 +893,10 @@ void HandleNewConnection(void * appState, const uint16_t discriminator)
     ChipLogProgress(Controller, "Calling Java onConnectDeviceComplete");
 
     env->ExceptionClear();
-    env->CallVoidMethod(self, method);
+    {
+        StackUnlockGuard unlockGuard;
+        env->CallVoidMethod(self, method);
+    }
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
 exit:
