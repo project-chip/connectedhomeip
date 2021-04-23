@@ -1221,32 +1221,17 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Co
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                             uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                           uint8_t * debugText)
 {
-    ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
+    ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
 
-    Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, errorCode, debugText);
-    return true;
-}
-
-bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                 uint8_t * debugText)
-{
-    ChipLogProgress(Zcl, "SetFabricResponse:");
-    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
-    ChipLogProgress(Zcl, "  debugText: %s", debugText);
-
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetFabricResponseCallback");
-
-    Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
     return true;
 }
@@ -1345,6 +1330,130 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * co
     Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback> * cb =
         Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, timeout);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                        uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "AddThreadNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddThreadNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                      uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "AddWiFiNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddWiFiNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                      uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "DisableNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterDisableNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                     uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "EnableNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterEnableNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                     uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "RemoveNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterRemoveNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
+    chip::app::Command * commandObj, uint8_t errorCode, uint8_t * debugText,
+    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults)
+{
+    ChipLogProgress(Zcl, "ScanNetworksResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+    ChipLogProgress(Zcl, "  wifiScanResults: %p", wifiScanResults);
+    ChipLogProgress(Zcl, "  threadScanResults: %p", threadScanResults);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterScanNetworksResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText, wifiScanResults, threadScanResults);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                           uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "UpdateThreadNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateThreadNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                         uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "UpdateWiFiNetworkResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback");
+
+    Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> * cb =
+        Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
     return true;
 }
 

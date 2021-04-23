@@ -396,11 +396,11 @@ NS_ASSUME_NONNULL_BEGIN
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
 - (void)commissioningComplete:(ResponseHandler)completionHandler;
-- (void)setFabric:(NSData *)fabricId
-         fabricSecret:(NSData *)fabricSecret
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler;
+- (void)setRegulatoryConfig:(uint8_t)location
+                countryCode:(NSString *)countryCode
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler;
 
 - (void)readAttributeFabricId:(ResponseHandler)completionHandler;
 - (void)readAttributeBreadcrumb:(ResponseHandler)completionHandler;
@@ -590,6 +590,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)updateFabricLabel:(NSString *)label completionHandler:(ResponseHandler)completionHandler;
 
 - (void)readAttributeFabricsList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Pump Configuration and Control
+ *
+ */
+@interface CHIPPumpConfigurationAndControl : CHIPCluster
+
+- (void)readAttributeMaxPressure:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxFlow:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler;
+- (void)readAttributeCapacity:(ResponseHandler)completionHandler;
+- (void)configureAttributeCapacity:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(int16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCapacity:(ResponseHandler)reportHandler;
+- (void)readAttributeOperationMode:(ResponseHandler)completionHandler;
+- (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

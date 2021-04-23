@@ -116,6 +116,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
@@ -205,9 +206,9 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
 
 #define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
-#define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x02)
-#define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x06)
-#define ZCL_SET_FABRIC_COMMAND_ID (0x00)
+#define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x00)
+#define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x04)
+#define ZCL_SET_REGULATORY_CONFIG_COMMAND_ID (0x02)
 
 #define GROUP_KEY_MANAGEMENT_CLUSTER_ID 0xF004
 
@@ -258,6 +259,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_GET_FABRIC_ID_COMMAND_ID (0x00)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
+
+#define PUMP_CONFIG_CONTROL_CLUSTER_ID 0x0200
 
 #define SCENES_CLUSTER_ID 0x0005
 #define ZCL_ADD_SCENE_COMMAND_ID (0x00)
@@ -2497,9 +2500,9 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ArmFailSafe                                                       |   0x02 |
-| * CommissioningComplete                                             |   0x06 |
-| * SetFabric                                                         |   0x00 |
+| * ArmFailSafe                                                       |   0x00 |
+| * CommissioningComplete                                             |   0x04 |
+| * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricId                                                          | 0x0000 |
@@ -2536,34 +2539,27 @@ PacketBufferHandle encodeGeneralCommissioningClusterCommissioningCompleteCommand
 }
 
 /*
- * Command SetFabric
+ * Command SetRegulatoryConfig
  */
-PacketBufferHandle encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                     chip::ByteSpan fabricId, chip::ByteSpan fabricSecret,
-                                                                     uint64_t breadcrumb, uint32_t timeoutMs)
+PacketBufferHandle encodeGeneralCommissioningClusterSetRegulatoryConfigCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                               uint8_t location, chip::ByteSpan countryCode,
+                                                                               uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    COMMAND_HEADER("SetFabric", GENERAL_COMMISSIONING_CLUSTER_ID);
-    size_t fabricIdStrLen = fabricId.size();
-    if (!CanCastTo<uint8_t>(fabricIdStrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricIdStrLen);
-        return PacketBufferHandle();
-    }
+    COMMAND_HEADER("SetRegulatoryConfig", GENERAL_COMMISSIONING_CLUSTER_ID);
 
-    size_t fabricSecretStrLen = fabricSecret.size();
-    if (!CanCastTo<uint8_t>(fabricSecretStrLen))
+    size_t countryCodeStrLen = countryCode.size();
+    if (!CanCastTo<uint8_t>(countryCodeStrLen))
     {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, fabricSecretStrLen);
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, countryCodeStrLen);
         return PacketBufferHandle();
     }
 
     buf.Put8(kFrameControlClusterSpecificCommand)
         .Put8(seqNum)
-        .Put8(ZCL_SET_FABRIC_COMMAND_ID)
-        .Put(static_cast<uint8_t>(fabricIdStrLen))
-        .Put(fabricId.data(), fabricId.size())
-        .Put(static_cast<uint8_t>(fabricSecretStrLen))
-        .Put(fabricSecret.data(), fabricSecret.size())
+        .Put8(ZCL_SET_REGULATORY_CONFIG_COMMAND_ID)
+        .Put8(location)
+        .Put(static_cast<uint8_t>(countryCodeStrLen))
+        .Put(countryCode.data(), countryCode.size())
         .Put64(breadcrumb)
         .Put32(timeoutMs);
     COMMAND_FOOTER();
@@ -3635,6 +3631,145 @@ PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(u
 PacketBufferHandle encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadOperationalCredentialsClusterRevision", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster PumpConfigurationAndControl                                 | 0x0200 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxPressure                                                       | 0x0000 |
+| * MaxSpeed                                                          | 0x0001 |
+| * MaxFlow                                                           | 0x0002 |
+| * EffectiveOperationMode                                            | 0x0011 |
+| * EffectiveControlMode                                              | 0x0012 |
+| * Capacity                                                          | 0x0013 |
+| * OperationMode                                                     | 0x0020 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodePumpConfigurationAndControlClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverPumpConfigurationAndControlAttributes", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MaxPressure
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxPressureAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlMaxPressure", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MaxSpeed
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlMaxSpeed", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute MaxFlow
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxFlowAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlMaxFlow", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute EffectiveOperationMode
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(uint8_t seqNum,
+                                                                                               EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlEffectiveOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute EffectiveControlMode
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(uint8_t seqNum,
+                                                                                             EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlEffectiveControlMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0012);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute Capacity
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadCapacityAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlCapacity", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0013);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint,
+                                                                                      uint16_t minInterval, uint16_t maxInterval,
+                                                                                      int16_t change)
+{
+    COMMAND_HEADER("ReportPumpConfigurationAndControlCapacity", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0013)
+        .Put8(41)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    buf.Put16(static_cast<uint16_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OperationMode
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0020);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint,
+                                                                                       uint8_t operationMode)
+{
+    COMMAND_HEADER("WritePumpConfigurationAndControlOperationMode", PUMP_CONFIG_CONTROL_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0020)
+        .Put8(48)
+        .Put8(static_cast<uint8_t>(operationMode));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadPumpConfigurationAndControlClusterRevision", PUMP_CONFIG_CONTROL_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

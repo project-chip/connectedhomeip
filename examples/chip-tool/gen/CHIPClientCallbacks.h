@@ -74,7 +74,8 @@ typedef void (*DoorLockClusterUnlockWithTimeoutResponseCallback)(void * context)
 typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
 typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
                                                                                  uint8_t * debugText);
-typedef void (*GeneralCommissioningClusterSetFabricResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
+                                                                               uint8_t * debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);

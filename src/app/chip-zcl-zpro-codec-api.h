@@ -45,6 +45,7 @@
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
@@ -1421,9 +1422,9 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribu
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ArmFailSafe                                                       |   0x02 |
-| * CommissioningComplete                                             |   0x06 |
-| * SetFabric                                                         |   0x00 |
+| * ArmFailSafe                                                       |   0x00 |
+| * CommissioningComplete                                             |   0x04 |
+| * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricId                                                          | 0x0000 |
@@ -1449,11 +1450,11 @@ encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, ch
 
 /**
  * @brief
- *    Encode an SetFabric command for General Commissioning server into buffer including the APS frame
+ *    Encode an SetRegulatoryConfig command for General Commissioning server into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
-encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan fabricId,
-                                                  chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+encodeGeneralCommissioningClusterSetRegulatoryConfigCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t location,
+                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -2086,6 +2087,107 @@ chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsL
  */
 chip::System::PacketBufferHandle
 encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster PumpConfigurationAndControl                                 | 0x0200 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxPressure                                                       | 0x0000 |
+| * MaxSpeed                                                          | 0x0001 |
+| * MaxFlow                                                           | 0x0002 |
+| * EffectiveOperationMode                                            | 0x0011 |
+| * EffectiveControlMode                                              | 0x0012 |
+| * Capacity                                                          | 0x0013 |
+| * OperationMode                                                     | 0x0020 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePumpConfigurationAndControlClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the max pressure attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadMaxPressureAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the max speed attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the max flow attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxFlowAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the effective operation mode attribute into buffer including
+ * the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the effective control mode attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the capacity attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadCapacityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server configure report command for the capacity attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the operation mode attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server write command for the operation mode attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint8_t operationMode);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the cluster revision attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |

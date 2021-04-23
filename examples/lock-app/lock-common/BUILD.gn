@@ -20,6 +20,7 @@ chip_data_model("lock-common") {
   cluster_sources = [
     "basic",
     "bindings",
+    "general-commissioning-server",
     "network-commissioning",
     "on-off-server",
   ]

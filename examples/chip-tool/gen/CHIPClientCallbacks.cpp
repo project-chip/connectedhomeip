@@ -1387,17 +1387,17 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chi
     return true;
 }
 
-bool emberAfGeneralCommissioningClusterSetFabricResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
-                                                                 uint8_t * debugText)
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                           uint8_t * debugText)
 {
-    ChipLogProgress(Zcl, "SetFabricResponse:");
+    ChipLogProgress(Zcl, "SetRegulatoryConfigResponse:");
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetFabricResponseCallback");
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
 
-    Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> * cb =
-        Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
     return true;
 }

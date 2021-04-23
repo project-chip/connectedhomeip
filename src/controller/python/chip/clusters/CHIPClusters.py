@@ -263,9 +263,9 @@ class ChipClusters:
                 },
                 "CommissioningComplete": {
                 },
-                "SetFabric": {
-                    "fabricId": "bytes",
-                    "fabricSecret": "bytes",
+                "SetRegulatoryConfig": {
+                    "location": "int",
+                    "countryCode": "bytes",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
@@ -413,6 +413,8 @@ class ChipClusters:
                 "UpdateFabricLabel": {
                     "label": "bytes",
                 },
+            },
+            "PumpConfigurationAndControl": {
             },
             "Scenes": {
                 "AddScene": {
@@ -635,6 +637,16 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "OperationalCredentials": [
+                "ClusterRevision",
+            ],
+            "PumpConfigurationAndControl": [
+                "MaxPressure",
+                "MaxSpeed",
+                "MaxFlow",
+                "EffectiveOperationMode",
+                "EffectiveControlMode",
+                "Capacity",
+                "OperationMode",
                 "ClusterRevision",
             ],
             "Scenes": [
@@ -877,9 +889,10 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterGeneralCommissioning_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: bytes, fabricSecret: bytes, breadcrumb: int, timeoutMs: int):
-        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric(
-                device, ZCLendpoint, ZCLgroupid, fabricId, len(fabricId), fabricSecret, len(fabricSecret), breadcrumb, timeoutMs
+    def ClusterGeneralCommissioning_CommandSetRegulatoryConfig(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, location: int, countryCode: bytes, breadcrumb: int, timeoutMs: int):
+        countryCode = countryCode.encode("utf-8") + b'\x00'
+        return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(
+                device, ZCLendpoint, ZCLgroupid, location, countryCode, len(countryCode), breadcrumb, timeoutMs
         )
     def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
@@ -1326,6 +1339,24 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterOperationalCredentials_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxPressure(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxSpeed(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxSpeed(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeMaxFlow(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeEffectiveOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeEffectiveControlMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveControlMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeCapacity(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Capacity(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ConfigureAttributeCapacity(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_PumpConfigurationAndControl_Capacity(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterPumpConfigurationAndControl_ReadAttributeOperationMode(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode(device, ZCLendpoint, ZCLgroupid)
+    def ClusterPumpConfigurationAndControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeSceneCount(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Scenes_SceneCount(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeCurrentScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1822,9 +1853,9 @@ class ChipClusters:
         # Cluster GeneralCommissioning Command CommissioningComplete
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.restype = ctypes.c_uint32
-        # Cluster GeneralCommissioning Command SetFabric
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetFabric.restype = ctypes.c_uint32
+        # Cluster GeneralCommissioning Command SetRegulatoryConfig
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute FabricId
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.restype = ctypes.c_uint32
@@ -1999,6 +2030,34 @@ class ChipClusters:
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxPressure
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxPressure.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxSpeed
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxSpeed.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxSpeed.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute MaxFlow
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_MaxFlow.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute EffectiveOperationMode
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveOperationMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute EffectiveControlMode
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveControlMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_EffectiveControlMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute Capacity
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Capacity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_Capacity.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ConfigureAttribute Capacity
+        self._chipLib.chip_ime_ConfigureAttribute_PumpConfigurationAndControl_Capacity.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_int16]
+        self._chipLib.chip_ime_ConfigureAttribute_PumpConfigurationAndControl_Capacity.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute OperationMode
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_OperationMode.restype = ctypes.c_uint32
+        # Cluster PumpConfigurationAndControl ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Scenes
         # Cluster Scenes Command AddScene
         self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]

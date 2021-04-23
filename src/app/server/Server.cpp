@@ -276,17 +276,6 @@ public:
         return CHIP_NO_ERROR;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    void RendezvousComplete() const override
-    {
-        // Once rendezvous completed, assume we are operational
-        if (app::Mdns::AdvertiseOperational() != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
-        }
-    }
-#endif
-
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
     void SetBLE(bool ble) { isBLE = ble; }
     void SetAdminId(AdminId id) { mAdmin = id; }
@@ -465,6 +454,33 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
+static void ChipEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    const auto advertise = [] {
+        CHIP_ERROR err = app::Mdns::AdvertiseOperational();
+        if (err != CHIP_NO_ERROR)
+            ChipLogError(AppServer, "Failed to start operational advertising: %s", chip::ErrorStr(err));
+    };
+
+    switch (event->Type)
+    {
+    case DeviceLayer::DeviceEventType::kInternetConnectivityChange:
+        VerifyOrReturn(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established);
+        advertise();
+        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case DeviceLayer::DeviceEventType::kThreadStateChange:
+        VerifyOrReturn(event->ThreadStateChange.AddressChanged);
+        advertise();
+        break;
+#endif
+    default:
+        break;
+    }
+}
+#endif
+
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
 void InitServer(AppDelegate * delegate)
@@ -537,11 +553,10 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-// Starting mDNS server only for Thread devices due to problem reported in issue #5076.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+// ESP32 examples have a custom logic for enabling DNS-SD
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
     app::Mdns::StartServer();
-#endif
+    PlatformMgr().AddEventHandler(ChipEventHandler, {});
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);

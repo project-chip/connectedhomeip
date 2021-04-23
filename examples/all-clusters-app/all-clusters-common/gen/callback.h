@@ -2179,15 +2179,15 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * 
 bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::Command * commandObj);
 
 /**
- * @brief General Commissioning Cluster SetFabric Command callback
- * @param fabricId
- * @param fabricSecret
+ * @brief General Commissioning Cluster SetRegulatoryConfig Command callback
+ * @param location
+ * @param countryCode
  * @param breadcrumb
  * @param timeoutMs
  */
 
-bool emberAfGeneralCommissioningClusterSetFabricCallback(chip::app::Command * commandObj, chip::ByteSpan fabricId,
-                                                         chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
+                                                                   uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief Groups Cluster AddGroup Command callback
