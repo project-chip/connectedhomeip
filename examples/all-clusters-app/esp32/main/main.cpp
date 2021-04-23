@@ -56,6 +56,7 @@
 #include <support/ErrorStr.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
 using namespace ::chip;
@@ -153,6 +154,12 @@ public:
     {
         return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[attributeIndex];
     }
+    bool IsBooleanAttribute()
+    {
+        auto & attribute = this->attribute();
+        auto & value     = std::get<1>(attribute);
+        return value == "On" || value == "Off";
+    }
     virtual std::string GetTitle()
     {
         auto & attribute = this->attribute();
@@ -162,8 +169,15 @@ public:
         snprintf(buffer, sizeof(buffer), "%s : %s", name.c_str(), value.c_str());
         return buffer;
     }
-    virtual int GetItemCount() { return 2; }
-    virtual std::string GetItemText(int i) { return i == 0 ? "+" : "-"; }
+    virtual int GetItemCount() { return IsBooleanAttribute() ? 1 : 2; }
+    virtual std::string GetItemText(int i)
+    {
+        if (IsBooleanAttribute())
+        {
+            return "Toggle";
+        }
+        return i == 0 ? "+" : "-";
+    }
     virtual void ItemAction(int i)
     {
         auto & attribute = this->attribute();
@@ -183,6 +197,19 @@ public:
                 emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(n * 100));
             }
             value = buffer;
+        }
+        else if (IsBooleanAttribute())
+        {
+            auto & name    = std::get<0>(attribute);
+            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
+            value          = (value == "On") ? "Off" : "On";
+
+            if (name == "OnOff" && cluster == "OnOff")
+            {
+                uint8_t attributeValue = (value == "On") ? 1 : 0;
+                emberAfWriteServerAttribute(endpointIndex + 1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
+                                            (uint8_t *) &attributeValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+            }
         }
         else
         {
@@ -347,6 +374,14 @@ void SetupPretendDevices()
     AddAttribute("BPM", "72");
     AddCluster("Step Counter");
     AddAttribute("Steps", "9876");
+
+    AddDevice("Light Bulb");
+    AddEndpoint("1");
+    AddCluster("OnOff");
+    AddAttribute("OnOff", "Off");
+    AddEndpoint("2");
+    AddCluster("OnOff");
+    AddAttribute("OnOff", "Off");
 
     AddDevice("Thermometer");
     AddEndpoint("External");
