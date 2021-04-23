@@ -32,7 +32,7 @@
 #include <transport/raw/UDP.h>
 
 #include <ChipShellCollection.h>
-#include <Common.h>
+#include <Globals.h>
 
 using namespace chip;
 using namespace Shell;
@@ -142,7 +142,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     }
 
     // Create a new exchange context.
-    gExchangeCtx = gExchangeMgr.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
+    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
     VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     size = gSendArguments.GetPayloadSize();
@@ -205,8 +205,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionMgr.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
-                                 SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                     SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -256,10 +256,10 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
-        err = gSessionMgr.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
 
-        err = gExchangeMgr.Init(&gSessionMgr);
+        err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
     else
@@ -267,10 +267,10 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
 
-        err = gSessionMgr.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
 
-        err = gExchangeMgr.Init(&gSessionMgr);
+        err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
 
@@ -290,8 +290,8 @@ void ProcessCommand(streamer_t * stream, char * destination)
 #endif
     gUDPManager.Close();
 
-    gExchangeMgr.Shutdown();
-    gSessionMgr.Shutdown();
+    gExchangeManager.Shutdown();
+    gSessionManager.Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR))

@@ -33,7 +33,7 @@
 #include <transport/raw/UDP.h>
 
 #include <ChipShellCollection.h>
-#include <Common.h>
+#include <Globals.h>
 
 using namespace chip;
 using namespace Shell;
@@ -202,8 +202,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionMgr.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
-                                 SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                     SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -269,10 +269,10 @@ void StartPinging(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
 
-        err = gSessionMgr.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
 
-        err = gExchangeMgr.Init(&gSessionMgr);
+        err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
     else
@@ -280,10 +280,10 @@ void StartPinging(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
 
-        err = gSessionMgr.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
 
-        err = gExchangeMgr.Init(&gSessionMgr);
+        err = gExchangeManager.Init(&gSessionManager);
         SuccessOrExit(err);
     }
 
@@ -292,7 +292,7 @@ void StartPinging(streamer_t * stream, char * destination)
     SuccessOrExit(err);
 
     // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeMgr, { kTestDeviceNodeId, 0, gAdminId });
+    err = gEchoClient.Init(&gExchangeManager, { kTestDeviceNodeId, 0, gAdminId });
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
@@ -333,8 +333,8 @@ void StartPinging(streamer_t * stream, char * destination)
     gUDPManager.Close();
 
     gEchoClient.Shutdown();
-    gExchangeMgr.Shutdown();
-    gSessionMgr.Shutdown();
+    gExchangeManager.Shutdown();
+    gSessionManager.Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR))

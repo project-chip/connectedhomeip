@@ -34,7 +34,7 @@ target_include_directories(app PRIVATE
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(app PRIVATE
-    ${APP_ROOT}/shell_common/common.cpp
+    ${APP_ROOT}/shell_common/globals.cpp
     ${APP_ROOT}/shell_common/cmd_base64.cpp
     ${APP_ROOT}/shell_common/cmd_device.cpp
     ${APP_ROOT}/shell_common/cmd_misc.cpp

@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#include <Common.h>
+#include <Globals.h>
 
-chip::Messaging::ExchangeManager gExchangeMgr;
-chip::SecureSessionMgr gSessionMgr;
+chip::Messaging::ExchangeManager gExchangeManager;
+chip::SecureSessionMgr gSessionManager;
 chip::Inet::IPAddress gDestAddr;
 
 chip::Transport::AdminId gAdminId = 0;

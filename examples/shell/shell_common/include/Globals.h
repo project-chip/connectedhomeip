@@ -30,8 +30,8 @@ constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr size_t kMaxPayloadSize  = 1280;
 constexpr size_t kResponseTimeOut = 1000;
 
-extern chip::Messaging::ExchangeManager gExchangeMgr;
-extern chip::SecureSessionMgr gSessionMgr;
+extern chip::Messaging::ExchangeManager gExchangeManager;
+extern chip::SecureSessionMgr gSessionManager;
 extern chip::Inet::IPAddress gDestAddr;
 
 extern chip::Transport::AdminId gAdminId;
