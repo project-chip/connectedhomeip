@@ -23,6 +23,7 @@
  */
 
 #include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include <core/CHIPEncoding.h>
 
 #if ENABLE_HSM_GENERATE_EC_KEY
 
@@ -276,7 +277,7 @@ CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
     {
         /* When HSM is used for ECC key generation, key info in stored in private key buffer */
         const uint8_t * privkey = Uint8::to_const_uchar(input) + public_key.Length();
-        keyid                   = privkey[0] | privkey[1] << 8 | privkey[2] << 16 | privkey[3] << 24;
+        keyid                   = Encoding::LittleEndian::Get32(privkey);
     }
 
     error = CHIP_NO_ERROR;
