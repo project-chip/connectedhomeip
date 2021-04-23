@@ -17,7 +17,7 @@
 
 #include <channel/Channel.h>
 #include <channel/ChannelContext.h>
-#include <channel/ChannelMgr.h>
+#include <channel/Manager.h>
 #include <messaging/ExchangeMgr.h>
 
 namespace chip {

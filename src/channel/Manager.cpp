@@ -15,14 +15,7 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Defines the CHIP Channel Manager class and its supporting types
- *      for channel management.
- *
- */
-
-#include <channel/ChannelMgr.h>
+#include <channel/Manager.h>
 
 namespace chip {
 namespace Messaging {

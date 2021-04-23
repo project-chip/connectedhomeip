@@ -22,8 +22,8 @@ static_library("channel") {
     "Channel.h",
     "ChannelContext.cpp",
     "ChannelContext.h",
-    "ChannelMgr.cpp",
-    "ChannelMgr.h",
+    "Manager.cpp",
+    "Manager.h",
   ]
 
   cflags = [ "-Wconversion" ]

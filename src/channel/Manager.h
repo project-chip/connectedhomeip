@@ -15,13 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Defines the CHIP ChannelManager class and its supporting types
- *      for channel management.
- *
- */
-
 #pragma once
 
 #include <array>
