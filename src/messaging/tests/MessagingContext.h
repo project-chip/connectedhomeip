@@ -52,18 +52,30 @@ public:
         Inet::IPAddress::FromString("127.0.0.1", addr);
         return addr;
     }
-    static constexpr NodeId GetSourceNodeId() { return 123654; }
-    static constexpr NodeId GetDestinationNodeId() { return 111222333; }
+    NodeId GetSourceNodeId() { return mSourceNodeId; }
+    NodeId GetDestinationNodeId() { return mDestinationNodeId; }
 
-    static constexpr uint16_t GetLocalKeyId() { return 1; }
-    static constexpr uint16_t GetPeerKeyId() { return 2; }
-    static constexpr uint16_t GetAdminId() { return 0; }
+    void SetSourceNodeId(NodeId nodeId) { mSourceNodeId = nodeId; }
+    void SetDestinationNodeId(NodeId nodeId) { mDestinationNodeId = nodeId; }
+
+    uint16_t GetLocalKeyId() { return mLocalKeyId; }
+    uint16_t GetPeerKeyId() { return mPeerKeyId; }
+
+    void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
+    void SetPeerKeyId(uint16_t id) { mPeerKeyId = id; }
+
+    uint16_t GetAdminId() { return mSrcAdminId; }
+    void SetAdminId(Transport::AdminId id)
+    {
+        mSrcAdminId  = id;
+        mDestAdminId = id;
+    }
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
 
-    Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
-    Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegateBase * delegate);
+    Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegateBase * delegate);
 
     Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
 
@@ -71,6 +83,10 @@ private:
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
 
+    NodeId mSourceNodeId      = 123654;
+    NodeId mDestinationNodeId = 111222333;
+    uint16_t mLocalKeyId      = 1;
+    uint16_t mPeerKeyId       = 2;
     Optional<Transport::PeerAddress> mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
     SecurePairingUsingTestSecret mPairingLocalToPeer;
