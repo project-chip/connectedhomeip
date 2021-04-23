@@ -18,12 +18,5 @@
 
 #pragma once
 
-#include <CommonRpc.h>
-
-namespace chip {
-namespace rpc {
-
-class LightingService;
-
-} // namespace rpc
-} // namespace chip
+int ChipLinuxAppInit(int argc, char ** argv);
+void ChipLinuxAppMainLoop();

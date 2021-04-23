@@ -33,7 +33,7 @@
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
 
-#include "Server.h"
+#include "AppMain.h"
 
 #include <support/ErrorStr.h>
 
@@ -57,25 +57,7 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 
 int main(int argc, char * argv[])
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = chip::Platform::MemoryInit();
-    SuccessOrExit(err);
-
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
-    // Init ZCL Data Model and CHIP App Server
-    InitServer();
-
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        std::cerr << "Failed to run TV App: " << ErrorStr(err) << std::endl;
-        // End the program with non zero error code to indicate a error.
-        return 1;
-    }
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    ChipLinuxAppMainLoop();
     return 0;
 }
