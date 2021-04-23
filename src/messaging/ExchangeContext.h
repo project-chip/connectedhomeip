@@ -72,23 +72,6 @@ public:
     bool IsInitiator() const;
 
     /**
-     *  Determine whether a response is expected for messages sent over
-     *  this exchange.
-     *
-     *  @return Returns 'true' if response expected, else 'false'.
-     */
-    bool IsResponseExpected() const;
-
-    /**
-     *  Set whether a response is expected on this exchange.
-     *
-     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
-     *                                  (false) a response is expected on this
-     *                                  exchange.
-     */
-    void SetResponseExpected(bool inResponseExpected);
-
-    /**
      *  Send a CHIP message on this exchange.
      *
      *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
@@ -198,6 +181,25 @@ private:
                             ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
+
+    /**
+     *  Determine whether a response is currently expected for a message that was sent over
+     *  this exchange.  While this is true, attempts to send other messages that expect a response
+     *  will fail.
+     *
+     *  @return Returns 'true' if response expected, else 'false'.
+     */
+    bool IsResponseExpected() const;
+
+    /**
+     *  Track whether we are now expecting a response to a message sent via this exchange (because that
+     *  message had the kExpectResponse flag set in its sendFlags).
+     *
+     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
+     *                                  (false) a response is currently expected on this
+     *                                  exchange.
+     */
+    void SetResponseExpected(bool inResponseExpected);
 
     /**
      *  Search for an existing exchange that the message applies to.
