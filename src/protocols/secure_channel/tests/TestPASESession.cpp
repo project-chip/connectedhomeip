@@ -79,13 +79,10 @@ public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle buffer) override
     {
-        IsOnMessageReceivedCalled = true;
         ec->Close();
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
-
-    bool IsOnMessageReceivedCalled = false;
 };
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)

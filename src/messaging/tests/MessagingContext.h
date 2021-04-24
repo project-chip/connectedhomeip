@@ -52,19 +52,19 @@ public:
         Inet::IPAddress::FromString("127.0.0.1", addr);
         return addr;
     }
-    NodeId GetSourceNodeId() { return mSourceNodeId; }
-    NodeId GetDestinationNodeId() { return mDestinationNodeId; }
+    NodeId GetSourceNodeId() const { return mSourceNodeId; }
+    NodeId GetDestinationNodeId() const { return mDestinationNodeId; }
 
     void SetSourceNodeId(NodeId nodeId) { mSourceNodeId = nodeId; }
     void SetDestinationNodeId(NodeId nodeId) { mDestinationNodeId = nodeId; }
 
-    uint16_t GetLocalKeyId() { return mLocalKeyId; }
-    uint16_t GetPeerKeyId() { return mPeerKeyId; }
+    uint16_t GetLocalKeyId() const { return mLocalKeyId; }
+    uint16_t GetPeerKeyId() const { return mPeerKeyId; }
 
     void SetLocalKeyId(uint16_t id) { mLocalKeyId = id; }
     void SetPeerKeyId(uint16_t id) { mPeerKeyId = id; }
 
-    uint16_t GetAdminId() { return mSrcAdminId; }
+    uint16_t GetAdminId() const { return mSrcAdminId; }
     void SetAdminId(Transport::AdminId id)
     {
         mSrcAdminId  = id;
