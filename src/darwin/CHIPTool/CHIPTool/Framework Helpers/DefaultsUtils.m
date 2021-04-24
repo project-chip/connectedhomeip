@@ -115,14 +115,14 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 - (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
 {
     NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    NSLog(@"CHIPPersistentStorageDelegate Async Get Value for Key: %@, value %@", key, value);
     completionHandler(key, value);
 }
 
 - (NSString *)CHIPGetKeyValue:(NSString *)key
 {
     NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    NSLog(@"CHIPPersistentStorageDelegate Sync Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
@@ -137,5 +137,11 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
     completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
+
+- (BOOL)CHIPSetKeyValue:(NSString *)key value:(NSString *)value {
+    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    return YES;
+}
+
 
 @end

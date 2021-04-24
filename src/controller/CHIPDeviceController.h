@@ -196,7 +196,7 @@ public:
      */
     CHIP_ERROR UpdateDevice(Device * device, uint64_t fabricId);
 
-    void PersistDevice(Device * device);
+    void PersistDevice(Device * device, bool sync = false);
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
@@ -414,7 +414,7 @@ private:
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
-    void PersistDeviceList();
+    void PersistDeviceList(bool sync = false);
 
     void FreeRendezvousSession();
 

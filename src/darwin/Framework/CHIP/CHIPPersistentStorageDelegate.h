@@ -38,7 +38,7 @@ typedef void (^CHIPSendDeleteStatus)(NSString * key, NSError * status);
 - (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler;
 
 /**
- * Get the value for the given key
+ * Get the value for the given key synchronously
  *
  */
 - (NSString *)CHIPGetKeyValue:(NSString *)key;
@@ -48,6 +48,12 @@ typedef void (^CHIPSendDeleteStatus)(NSString * key, NSError * status);
  *
  */
 - (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(CHIPSendSetStatus)completionHandler;
+
+/**
+ * Set the value of the key to the given value synchronously
+ *
+ */
+- (BOOL)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
 
 /**
  * Delete the key and corresponding value

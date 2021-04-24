@@ -43,7 +43,7 @@
 {
     uint64_t nextDeviceID = CHIPGetNextAvailableDeviceID();
     _deviceList = [NSMutableArray new];
-    for (uint64_t i = 0; i < nextDeviceID; i++) {
+    for (uint64_t i = 1; i < nextDeviceID; i++) {
         if (CHIPGetPairedDeviceWithID(i) != nil) {
             [_deviceList addObject:[@(i) stringValue]];
         }

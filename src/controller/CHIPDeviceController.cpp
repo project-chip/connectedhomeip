@@ -376,7 +376,7 @@ CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 }
 
-void DeviceController::PersistDevice(Device * device)
+void DeviceController::PersistDevice(Device * device, bool sync)
 {
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
     // requires a valid storage delegate. However, test pairing usecase, that's used
@@ -387,8 +387,16 @@ void DeviceController::PersistDevice(Device * device)
     {
         SerializedDevice serialized;
         device->Serialize(serialized);
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+        if (sync)
+        {
+            PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                              mStorageDelegate->SyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+        }
+        else
+        {
+            PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                              mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+        }
     }
 }
 
@@ -926,7 +934,12 @@ void DeviceCommissioner::OnRendezvousComplete()
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
-    PersistDevice(device);
+    // Newly paired devices should be stored synchronously because we cannot mark pairing complete
+    // until they are available in storage
+    PersistDevice(device, true);
+    // Also persist the device list at this time
+    // This makes sure that a newly added device is immediately available
+    PersistDeviceList(true);
 
     RendezvousCleanup(CHIP_NO_ERROR);
 }
@@ -963,7 +976,7 @@ exit:
     }
 }
 
-void DeviceCommissioner::PersistDeviceList()
+void DeviceCommissioner::PersistDeviceList(bool sync)
 {
     if (mStorageDelegate != nullptr && mPairedDevicesUpdated)
     {
@@ -975,8 +988,16 @@ void DeviceCommissioner::PersistDeviceList()
             const char * value = mPairedDevices.SerializeBase64(serialized, requiredSize);
             if (value != nullptr && requiredSize <= size)
             {
-                PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                                  mStorageDelegate->AsyncSetKeyValue(key, value));
+                if (sync)
+                {
+                    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
+                                      mStorageDelegate->SyncSetKeyValue(key, value));
+                }
+                else
+                {
+                    PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
+                                      mStorageDelegate->AsyncSetKeyValue(key, value));
+                }
                 mPairedDevicesUpdated = false;
             }
             chip::Platform::MemoryFree(serialized);

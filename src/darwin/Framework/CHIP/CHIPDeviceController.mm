@@ -280,7 +280,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             errorCode = self.cppCommissioner->GetDevice(deviceID, &device);
         }
 
-        if ([self checkForError:errorCode logMsg:kErrorGetPairedDevice error:error]) {
+        if ([self checkForError:errorCode logMsg:[NSString stringWithFormat:@"%@ : %llu", kErrorGetPairedDevice, deviceID] error:error]) {
             return;
         }
 

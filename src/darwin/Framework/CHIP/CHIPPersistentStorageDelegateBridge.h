@@ -36,6 +36,8 @@ public:
 
     void AsyncSetKeyValue(const char * key, const char * value) override;
 
+    CHIP_ERROR SyncSetKeyValue(const char * key, const char * value) override;
+
     void AsyncDeleteKeyValue(const char * key) override;
 
 private:

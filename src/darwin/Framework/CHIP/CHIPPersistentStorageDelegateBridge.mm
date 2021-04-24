@@ -117,7 +117,7 @@ void CHIPPersistentStorageDelegateBridge::AsyncSetKeyValue(const char * key, con
     NSString * keyString = [NSString stringWithUTF8String:key];
     NSString * valueString = [NSString stringWithUTF8String:value];
     dispatch_async(mWorkQueue, ^{
-        NSLog(@"PersistentStorageDelegate Set Key %@, Value %@", keyString, valueString);
+        NSLog(@"PersistentStorageDelegate Async Set Key %@, Value %@", keyString, valueString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
         if (strongDelegate && mQueue) {
@@ -127,10 +127,30 @@ void CHIPPersistentStorageDelegateBridge::AsyncSetKeyValue(const char * key, con
         } else {
             [mDefaultPersistentStorage setObject:valueString forKey:keyString];
             if (mSetStatusHandler) {
-                mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+                mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
             }
         }
     });
+}
+
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key, const char * value)
+{
+    NSString * keyString = [NSString stringWithUTF8String:key];
+    NSString * valueString = [NSString stringWithUTF8String:value];
+    __block BOOL success = YES;
+
+    dispatch_sync(mWorkQueue, ^{
+        NSLog(@"PersistentStorageDelegate Sync Set Key %@, Value %@", keyString, valueString);
+        id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
+        if (strongDelegate && mQueue) {
+            dispatch_sync(mQueue, ^{
+                success = [strongDelegate CHIPSetKeyValue:keyString value:valueString];
+            });
+        } else {
+            [mDefaultPersistentStorage setObject:valueString forKey:keyString];
+        }
+    });
+    return success ? CHIP_NO_ERROR : CHIP_ERROR_PERSISTED_STORAGE_FAILED;
 }
 
 void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
@@ -147,7 +167,7 @@ void CHIPPersistentStorageDelegateBridge::AsyncDeleteKeyValue(const char * key)
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
             if (mDeleteStatusHandler) {
-                mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
+                mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
             }
         }
     });

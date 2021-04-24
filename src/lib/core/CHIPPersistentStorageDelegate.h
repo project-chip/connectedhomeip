@@ -128,6 +128,16 @@ public:
 
     /**
      * @brief
+     *   Set the value for the key to a byte buffer.
+     *
+     * @param[in] key Key to be set
+     * @param[in] value Value to be set
+     * @param[in] size Size of the Value
+     */
+    virtual CHIP_ERROR SyncSetKeyValue(const char * key, const char * value) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief
      *   Deletes the value for the key
      *
      * @param[in] key Key to be deleted
