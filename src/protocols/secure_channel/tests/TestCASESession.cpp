@@ -67,6 +67,7 @@ public:
     CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
 };
 
+namespace {
 TransportMgrBase gTransportMgr;
 LoopbackTransport gLoopback;
 
@@ -81,6 +82,7 @@ P256SerializedKeypair accessoryOpKeysSerialized;
 
 P256Keypair commissionerOpKeys;
 P256Keypair accessoryOpKeys;
+} // namespace
 
 enum
 {
