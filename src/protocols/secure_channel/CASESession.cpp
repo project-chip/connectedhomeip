@@ -382,8 +382,6 @@ CHIP_ERROR CASESession::HandleSigmaR1(const System::PacketBufferHandle & msg)
     buf += kSigmaParamRandomNumberSize;
 
     encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
-    buf += sizeof(encryptionKeyId);
-
     n_trusted_roots = chip::Encoding::LittleEndian::Read16(buf);
     // Step 1/2
     err = FindValidTrustedRoot(&buf, n_trusted_roots);
@@ -606,7 +604,6 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     buf += kSigmaParamRandomNumberSize;
 
     encryptionKeyId = chip::Encoding::LittleEndian::Read16(buf);
-    buf += sizeof(encryptionKeyId);
 
     ChipLogDetail(Inet, "Peer assigned session key ID %d", encryptionKeyId);
     mConnectionState.SetPeerKeyID(encryptionKeyId);
@@ -651,8 +648,9 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     msg_r2_encrypted = const_cast<uint8_t *>(buf);
 
     err = AES_CCM_decrypt(msg_r2_encrypted,
-                          buflen - kSigmaParamRandomNumberSize - kTrustedRootIdSize - kP256_PublicKey_Length - kTAGSize, nullptr, 0,
-                          tag, kTAGSize, sr2k, kAEADKeySize, kIVSR2, kIVLength, msg_r2_encrypted);
+                          buflen - kSigmaParamRandomNumberSize - sizeof(encryptionKeyId) - kTrustedRootIdSize -
+                              kP256_PublicKey_Length - kTAGSize,
+                          nullptr, 0, tag, kTAGSize, sr2k, kAEADKeySize, kIVSR2, kIVLength, msg_r2_encrypted);
     SuccessOrExit(err);
 
     // Step 5
@@ -668,8 +666,8 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     VerifyOrExit(!msg_R2_Signed.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
     msg_R2_Signed->SetDataLength(msg_r2_signed_len);
 
-    sigLen = buflen - kSigmaParamRandomNumberSize - kTrustedRootIdSize - kP256_PublicKey_Length - sizeof(uint16_t) -
-        remoteDeviceOpCertLen - kTAGSize;
+    sigLen = buflen - kSigmaParamRandomNumberSize - sizeof(encryptionKeyId) - kTrustedRootIdSize - kP256_PublicKey_Length -
+        sizeof(uint16_t) - remoteDeviceOpCertLen - kTAGSize;
     err = ConstructSignedCredentials(&buf, remoteDeviceOpCert, remoteDeviceOpCertLen, msg_R2_Signed, sigmaR2SignedData, sigLen);
     SuccessOrExit(err);
 

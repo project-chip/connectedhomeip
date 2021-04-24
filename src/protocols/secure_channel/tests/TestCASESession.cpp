@@ -28,6 +28,7 @@
 #include <core/CHIPSafeCasts.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CHIPOperationalCredentials.h>
+#include <messaging/tests/MessagingContext.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <stdarg.h>
 #include <support/CHIPMem.h>
@@ -39,6 +40,35 @@
 using namespace chip;
 using namespace Credentials;
 using namespace TestCerts;
+
+using namespace chip;
+using namespace chip::Inet;
+using namespace chip::Transport;
+using namespace chip::Messaging;
+using namespace chip::Protocols;
+
+using TestContext = chip::Test::MessagingContext;
+
+class LoopbackTransport : public Transport::Base
+{
+public:
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    {
+        ReturnErrorOnFailure(mMessageSendError);
+        mSentMessageCount++;
+        HandleMessageReceived(header, address, std::move(msgBuf));
+
+        return CHIP_NO_ERROR;
+    }
+
+    bool CanSendToPeer(const PeerAddress & address) override { return true; }
+
+    uint32_t mSentMessageCount   = 0;
+    CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
+};
+
+TransportMgrBase gTransportMgr;
+LoopbackTransport gLoopback;
 
 OperationalCredentialSet commissionerDevOpCred;
 OperationalCredentialSet accessoryDevOpCred;
@@ -62,23 +92,12 @@ enum
 class TestCASESecurePairingDelegate : public SessionEstablishmentDelegate
 {
 public:
-    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                               System::PacketBufferHandle msgBuf) override
-    {
-        mNumMessageSend++;
-        return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, std::move(msgBuf)) : mMessageSendError;
-    }
-
     void OnSessionEstablishmentError(CHIP_ERROR error) override { mNumPairingErrors++; }
 
     void OnSessionEstablished() override { mNumPairingComplete++; }
 
-    uint32_t mNumMessageSend     = 0;
     uint32_t mNumPairingErrors   = 0;
     uint32_t mNumPairingComplete = 0;
-    CHIP_ERROR mMessageSendError = CHIP_NO_ERROR;
-
-    CASESession * peer = nullptr;
 };
 
 void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
@@ -97,51 +116,70 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 
 void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegate;
     CASESession pairing;
 
+    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    ExchangeContext * context = ctx.NewExchangeToLocal(&pairing);
+
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            Optional<NodeId>::Value(1), 2, 0, nullptr) != CHIP_NO_ERROR);
+                                            Optional<NodeId>::Value(1), 2, 0, nullptr, nullptr) != CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                            Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_NO_ERROR);
+                                            Optional<NodeId>::Value(1), 2, 0, context, &delegate) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
-    delegate.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     CASESession pairing1;
+    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+
+    gLoopback.mSentMessageCount = 0;
+    gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+    ExchangeContext * context1  = ctx.NewExchangeToLocal(&pairing1);
 
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                             Optional<NodeId>::Value(1), 2, 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                                             Optional<NodeId>::Value(1), 2, 0, context1, &delegate) == CHIP_ERROR_BAD_REQUEST);
+    gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
 void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
                                            TestCASESecurePairingDelegate & delegateCommissioner)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     CASESession pairingAccessory;
     CASESessionSerializable serializableCommissioner;
     CASESessionSerializable serializableAccessory;
 
-    delegateCommissioner.peer = &pairingAccessory;
-    delegateAccessory.peer    = &pairingCommissioner;
+    gLoopback.mSentMessageCount = 0;
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&gTransportMgr) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite,
+                   ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
+                       Protocols::SecureChannel::MsgType::CASE_SigmaR1, &pairingAccessory) == CHIP_NO_ERROR);
+
+    ExchangeContext * contextCommissioner = ctx.NewExchangeToLocal(&pairingCommissioner);
 
     NL_TEST_ASSERT(inSuite,
                    pairingAccessory.WaitForSessionEstablishment(&accessoryDevOpCred, Optional<NodeId>::Value(1), 0,
                                                                 &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), &commissionerDevOpCred,
-                                                        Optional<NodeId>::Value(2), 1, 0, &delegateCommissioner) == CHIP_NO_ERROR);
+                                                        Optional<NodeId>::Value(2), 1, 0, contextCommissioner,
+                                                        &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
-
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumMessageSend == 2);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
     NL_TEST_ASSERT(inSuite, pairingCommissioner.ToSerializable(serializableCommissioner) == CHIP_NO_ERROR);
@@ -229,17 +267,47 @@ static const nlTest sTests[] =
     NL_TEST_SENTINEL()
 };
 // clang-format on
-//
+
+int CASE_TestSecurePairing_Setup(void * inContext);
+int CASE_TestSecurePairing_Teardown(void * inContext);
+
+// clang-format off
+static nlTestSuite sSuite =
+{
+    "Test-CHIP-SecurePairing",
+    &sTests[0],
+    CASE_TestSecurePairing_Setup,
+    CASE_TestSecurePairing_Teardown,
+};
+// clang-format on
+
+static TestContext sContext;
+
 /**
  *  Set up the test suite.
  */
 int CASE_TestSecurePairing_Setup(void * inContext)
 {
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
     CHIP_ERROR error;
     CertificateKeyId trustedRootId = { .mId = sTestCert_Root01_SubjectKeyId, .mLen = sTestCert_Root01_SubjectKeyId_Len };
 
     error = chip::Platform::MemoryInit();
     SuccessOrExit(error);
+
+    gTransportMgr.Init(&gLoopback);
+
+    error = ctx.Init(&sSuite, &gTransportMgr);
+    SuccessOrExit(error);
+
+    ctx.SetSourceNodeId(kAnyNodeId);
+    ctx.SetDestinationNodeId(kAnyNodeId);
+    ctx.SetLocalKeyId(0);
+    ctx.SetPeerKeyId(0);
+    ctx.SetAdminId(kUndefinedAdminId);
+
+    gTransportMgr.SetSecureSessionMgr(&ctx.GetSecureSessionManager());
 
     error = commissionerOpKeysSerialized.SetLength(sTestCert_Node01_01_PublicKey_Len + sTestCert_Node01_01_PrivateKey_Len);
     SuccessOrExit(error);
@@ -313,6 +381,7 @@ exit:
  */
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
+    reinterpret_cast<TestContext *>(inContext)->Shutdown();
     commissionerDevOpCred.Release();
     accessoryDevOpCred.Release();
     commissionerCertificateSet.Release();
@@ -321,23 +390,13 @@ int CASE_TestSecurePairing_Teardown(void * inContext)
     return SUCCESS;
 }
 
-// clang-format off
-static nlTestSuite sSuite =
-{
-    "Test-CHIP-SecurePairing",
-    &sTests[0],
-    CASE_TestSecurePairing_Setup,
-    CASE_TestSecurePairing_Teardown,
-};
-// clang-format on
-
 /**
  *  Main
  */
 int TestCASESession()
 {
     // Run test suit against one context
-    nlTestRunner(&sSuite, nullptr);
+    nlTestRunner(&sSuite, &sContext);
 
     return (nlTestRunnerStats(&sSuite));
 }
