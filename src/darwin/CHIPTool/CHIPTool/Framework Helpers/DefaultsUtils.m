@@ -138,10 +138,10 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
     completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
-- (BOOL)CHIPSetKeyValue:(NSString *)key value:(NSString *)value {
+- (BOOL)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
+{
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
     return YES;
 }
-
 
 @end
