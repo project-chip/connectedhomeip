@@ -31,7 +31,7 @@ typedef enum {
 typedef enum {
   HAL_OCCUPANCY_STATE_UNOCCUPIED = 0x00,
   HAL_OCCUPANCY_STATE_OCCUPIED = 0x01,
-  
+
 } HalOccupancyState;
 
 /** @brief Initializes the occupancy sensor, along with any hardware
