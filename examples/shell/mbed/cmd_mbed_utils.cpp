@@ -1017,6 +1017,4 @@ void cmd_mbed_utils_init()
     shell_register(&cmds_network_root, 1);
     shell_register(&cmds_socket_root, 1);
     shell_register(&cmds_server_root, 1);
-
-    // chip::DeviceLayer::ConnectivityMgrImpl().ProvisionWiFiNetwork("CHIPnet", "11223344");
 }
