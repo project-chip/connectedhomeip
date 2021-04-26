@@ -116,6 +116,12 @@ public:
     CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize);
     CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize);
     CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
+    CHIP_ERROR _GetDeviceType(uint16_t & deviceType);
+    CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR _GetInitialPairingHint(uint16_t & pairingHint);
+    CHIP_ERROR _GetInitialPairingInstruction(char * buf, size_t bufSize);
+    CHIP_ERROR _GetSecondaryPairingHint(uint16_t & pairingHint);
+    CHIP_ERROR _GetSecondaryPairingInstruction(char * buf, size_t bufSize);
     CHIP_ERROR _ConfigureChipStack();
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void);
@@ -176,6 +182,27 @@ template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFirmwareRevision(uint32_t & firmwareRev)
 {
     firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceType(uint16_t & deviceType)
+{
+    deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetInitialPairingHint(uint16_t & pairingHint)
+{
+    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT);
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSecondaryPairingHint(uint16_t & pairingHint)
+{
+    pairingHint = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT);
     return CHIP_NO_ERROR;
 }
 

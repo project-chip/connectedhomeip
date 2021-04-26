@@ -24,6 +24,7 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -115,6 +116,12 @@ CHIP_ERROR AdvertiseCommisioning()
 
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
+    // TODO: this code assumes the device always boots into commissioning mode
+    // fix this once we are able to configure default boot behavior 
+    // and when we can determine whether we have been commissioned yet
+    bool notYetCommissioned = true;
+    advertiseParameters.SetCommissioningMode(notYetCommissioned, false);
+
     uint8_t mac[8];
     advertiseParameters.SetMac(FillMAC(mac));
 
@@ -144,6 +151,76 @@ CHIP_ERROR AdvertiseCommisioning()
     }
     advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
 
+    if (DeviceLayer::ConfigurationMgr().GetDeviceType(value) != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Discovery, "DNS-SD Device Type not set");
+    }
+    else
+    {
+        advertiseParameters.SetDeviceType(chip::Optional<uint16_t>::Value(value));
+    }
+
+    char deviceName[129];
+    if (DeviceLayer::ConfigurationMgr().GetDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Discovery, "DNS-SD Device Name not set");
+    }
+    else
+    {
+        advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
+    }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    size_t rotatingDeviceIdHexBufferSize = 0;
+    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
+    advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
+#endif
+
+    // TODO: check if commissioned yet, and if commissioned, use secondary
+    if (notYetCommissioned)
+    {
+        if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Hint not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+        }
+
+        char pairingInst[129];
+        if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
+        }
+    }
+    else
+    {
+        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingHint(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Hint not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+        }
+
+        char pairingInst[129];
+        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
+        }
+    }
+
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
     return mdnsAdvertiser.Advertise(advertiseParameters);
@@ -159,6 +236,7 @@ void StartServer()
     if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
     {
         err = app::Mdns::AdvertiseOperational();
+        // TODO: add commissionable advertising when enabled
     }
     else
     {
@@ -175,6 +253,24 @@ void StartServer()
         ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));
     }
 }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize  = 0;
+    uint16_t lifetimeCounter = 0;
+    SuccessOrExit(error =
+                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                      rotatingDeviceIdHexBufferSize));
+exit:
+    return error;
+}
+#endif
 
 } // namespace Mdns
 } // namespace app

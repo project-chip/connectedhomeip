@@ -55,6 +55,20 @@ std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
     return typeBuilder.str();
 }
 
+std::string GetFullTypeWithSubTypes(const char * type, MdnsServiceProtocol protocol, const char * subTypes[], size_t subTypeSize)
+{
+    std::ostringstream typeBuilder;
+    typeBuilder << type;
+    typeBuilder << (protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? kProtocolUdp : kProtocolTcp);
+    for (int i=0; i<(int)subTypeSize; i++) 
+    {
+        typeBuilder << ",";
+        typeBuilder << subTypes[i];
+
+    }
+    return typeBuilder.str();
+}
+
 } // namespace
 
 namespace chip {
@@ -462,7 +476,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
 
-    std::string regtype  = GetFullType(service->mType, service->mProtocol);
+    std::string regtype  = GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
     uint32_t interfaceId = GetInterfaceId(service->mInterface);
 
     TXTRecordRef record;

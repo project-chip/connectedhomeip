@@ -86,7 +86,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "instance-name", kArgumentRequired, kOptionInstanceName },
-    nullptr,
+    {nullptr},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
@@ -246,8 +246,7 @@ int main(int argc, char ** args)
 
         if (mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
         {
-            printf("Server failed to listen on all interfaces\n");
-            return 1;
+            printf("Server failed to listen on all interfaces ... continuing\n");
         }
     }
 

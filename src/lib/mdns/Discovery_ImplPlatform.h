@@ -65,6 +65,7 @@ private:
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
     CHIP_ERROR SetupHostname(chip::ByteSpan macOrEui64);
+    static void PrintEntries(const MdnsService * service);
 
     OperationalAdvertisingParameters mOperationalAdvertisingParams;
     bool mIsOperationalPublishing = false;

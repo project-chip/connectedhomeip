@@ -17,6 +17,7 @@
 
 #include <cstdio>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <inet/InetInterface.h>
@@ -41,7 +42,7 @@ struct Options
 {
     bool enableIpV4           = false;
     bool unicastAnswers       = true;
-    uint32_t runtimeMs        = 500;
+    uint32_t runtimeMs        = 5000;
     uint16_t querySendPort    = 5353;
     uint16_t listenPort       = 5388;
     const char * query        = "_services._dns-sd._udp.local";
@@ -151,7 +152,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "query-port", kArgumentRequired, kOptionQueryPort },
     { "timeout-ms", kArgumentRequired, kOptionRuntimeMs },
     { "multicast-reply", kNoArgument, kOptionMulticastReplies },
-    nullptr,
+    {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
@@ -317,8 +318,7 @@ int main(int argc, char ** args)
 
         if (mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
         {
-            printf("Server failed to listen on all interfaces\n");
-            return 1;
+            printf("Server failed to listen on all interfaces ... continuing\n");
         }
     }
 

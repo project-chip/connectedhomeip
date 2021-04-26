@@ -34,7 +34,7 @@ public:
 
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override
     {
-        ChipLogError(Discovery, "mDNS advertising not available. Operational Advertisement failed.");
+       ChipLogError(Discovery, "mDNS advertising not available. Operational Advertisement failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 

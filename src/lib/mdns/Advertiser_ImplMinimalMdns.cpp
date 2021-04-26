@@ -471,7 +471,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning ? "_chipc" : "_chipd";
+    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
@@ -516,35 +516,6 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
         }
     }
 
-    {
-        sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
-        FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
-        ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-
-        if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add short discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
-    {
-        sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
-        FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
-        ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
-        if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
-                 .SetReportAdditional(operationalServerName)
-                 .SetReportInServiceListing(true)
-                 .IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add long discriminator PTR record mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
-    }
-
     if (params.GetVendorId().HasValue())
     {
         sprintf(nameBuffer, "_V%d", params.GetVendorId().Value());
@@ -556,8 +527,86 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
                  .SetReportInServiceListing(true)
                  .IsValid())
         {
-            ChipLogError(Discovery, "Failed to add vendor discriminator PTR record mDNS responder");
+            ChipLogError(Discovery, "Failed to add vendor PTR record mDNS responder");
             return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    if (params.GetDeviceType().HasValue())
+    {
+        sprintf(nameBuffer, "_T%d", params.GetDeviceType().Value());
+        FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+        ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+
+        if (!AddResponder<PtrResponder>(vendorServiceName, operationalServerName)
+                 .SetReportAdditional(operationalServerName)
+                 .SetReportInServiceListing(true)
+                 .IsValid())
+        {
+            ChipLogError(Discovery, "Failed to add device type PTR record mDNS responder");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+
+    // the following sub types only apply to commissionable node advertisements
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        {
+            sprintf(nameBuffer, "_S%03d", params.GetShortDiscriminator());
+            FullQName shortServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+
+            if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
+                    .SetReportAdditional(operationalServerName)
+                    .SetReportInServiceListing(true)
+                    .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add short discriminator PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        {
+            sprintf(nameBuffer, "_L%04d", params.GetLongDiscriminator());
+            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
+                    .SetReportAdditional(operationalServerName)
+                    .SetReportInServiceListing(true)
+                    .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add long discriminator PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        {
+            sprintf(nameBuffer, "_C%d", params.GetCommissioningMode() ? 1 : 0);
+            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
+                    .SetReportAdditional(operationalServerName)
+                    .SetReportInServiceListing(true)
+                    .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add commissioning mode PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
+        }
+
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        {
+            sprintf(nameBuffer, "_A1");
+            FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
+            ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
+            if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
+                    .SetReportAdditional(operationalServerName)
+                    .SetReportInServiceListing(true)
+                    .IsValid())
+            {
+                ChipLogError(Discovery, "Failed to add open window commissioning mode PTR record mDNS responder");
+                return CHIP_ERROR_NO_MEMORY;
+            }
         }
     }
 
@@ -576,15 +625,6 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
-    // a discriminator always exists
-    char txtDiscriminator[32];
-    sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
-
-    if (!params.GetVendorId().HasValue())
-    {
-        return AllocateQName(txtDiscriminator);
-    }
-
     // Need to also set a vid/pid string
     char txtVidPid[64];
     if (params.GetProductId().HasValue())
@@ -596,15 +636,86 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
-    char txtPairingInstrHint[128];
-    if (params.GetPairingInstr().HasValue() && params.GetPairingHint().HasValue())
+    char txtDeviceType[32];
+    if (params.GetDeviceType().HasValue())
     {
-        sprintf(txtPairingInstrHint, "P=%s+%d", params.GetPairingInstr().Value(), params.GetPairingHint().Value());
-        return AllocateQName(txtDiscriminator, txtVidPid, txtPairingInstrHint);
+        sprintf(txtDeviceType, "DT=%d", params.GetDeviceType().Value());
     }
     else
     {
-        return AllocateQName(txtDiscriminator, txtVidPid);
+        sprintf(txtDeviceType, "");
+    }
+
+    char txtDeviceName[64];
+    if (params.GetDeviceName().HasValue())
+    {
+        sprintf(txtDeviceName, "DN=%s", params.GetDeviceName().Value());
+    }
+    else
+    {
+        sprintf(txtDeviceName, "");
+    }
+
+    // the following sub types only apply to commissionable node advertisements
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        // a discriminator always exists
+        char txtDiscriminator[32];
+        sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
+
+        if (!params.GetVendorId().HasValue())
+        {
+            return AllocateQName(txtDiscriminator);
+        }
+
+        char txtCommissioningMode[32];
+        sprintf(txtCommissioningMode, "CM=%d", params.GetCommissioningMode() ? 1 : 0);
+
+        char txtOpenWindowCommissioningMode[32];
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        {
+            sprintf(txtOpenWindowCommissioningMode, "AP=1");
+        }
+        else
+        {
+            sprintf(txtOpenWindowCommissioningMode, "");
+        }
+
+        char txtRotatingDeviceId[128];
+        if (params.GetRotatingId().HasValue())
+        {
+            sprintf(txtPairingHint, "RI=%s", params.GetRotatingId().Value());
+        }
+        else
+        {
+            sprintf(txtPairingHint, "");
+        }
+
+        char txtPairingHint[32];
+        if (params.GetPairingHint().HasValue())
+        {
+            sprintf(txtPairingHint, "PH=%d", params.GetPairingHint().Value());
+        }
+        else
+        {
+            sprintf(txtPairingHint, "");
+        }
+
+        char txtPairingInstr[256];
+        if (params.GetPairingInstr().HasValue())
+        {
+            sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr().Value());
+        }
+        else
+        {
+            sprintf(txtPairingInstr, "");
+        }
+
+        return AllocateQName(txtDiscriminator, txtVidPid, txtCommissioningMode, txtOpenWindowCommissioningMode, txtDeviceType, txtDeviceName, txtRotatingDeviceId, txtPairingHint, txtPairingInstr);
+    }
+    else
+    {
+        return AllocateQName(txtVidPid, txtDeviceType, txtDeviceName);
     }
 }
 

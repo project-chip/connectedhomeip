@@ -34,8 +34,8 @@ static constexpr size_t kMaxMacSize = 8;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
-    kCommissioning,
-    kCommissionable,
+    kCommissionableNode,
+    kCommissioner,
 };
 
 template <class Derived>
@@ -139,6 +139,36 @@ public:
     }
     Optional<uint16_t> GetProductId() const { return mProductId; }
 
+    CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled, bool openWindow)
+    {
+        mCommissioningModeEnabled = modeEnabled;
+        mOpenWindowCommissioningMode = openWindow;
+        return *this;
+    }
+    bool GetCommissioningMode() const { return mCommissioningModeEnabled; }
+    bool GetOpenWindowCommissioningMode() const { return mOpenWindowCommissioningMode; }
+
+    CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
+    {
+        mDeviceType = deviceType;
+        return *this;
+    }
+    Optional<uint16_t> GetDeviceType() const { return mDeviceType; }
+
+    CommissionAdvertisingParameters & SetDeviceName(Optional<const char *> deviceName)
+    {
+        mDeviceName = deviceName;
+        return *this;
+    }
+    Optional<const char *> GetDeviceName() const { return mDeviceName; }
+
+    CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
+    {
+        mRotatingId = rotatingId;
+        return *this;
+    }
+    Optional<const char *> GetRotatingId() const { return mRotatingId; }
+
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
         mPairingInstr = pairingInstr;
@@ -146,12 +176,12 @@ public:
     }
     Optional<const char *> GetPairingInstr() const { return mPairingInstr; }
 
-    CommissionAdvertisingParameters & SetPairingHint(Optional<uint8_t> pairingHint)
+    CommissionAdvertisingParameters & SetPairingHint(Optional<uint16_t> pairingHint)
     {
         mPairingHint = pairingHint;
         return *this;
     }
-    Optional<uint8_t> GetPairingHint() const { return mPairingHint; }
+    Optional<uint16_t> GetPairingHint() const { return mPairingHint; }
 
     CommissionAdvertisingParameters & SetCommissionAdvertiseMode(CommssionAdvertiseMode mode)
     {
@@ -163,11 +193,16 @@ public:
 private:
     uint8_t mShortDiscriminator  = 0;
     uint16_t mLongDiscriminator  = 0; // 12-bit according to spec
-    CommssionAdvertiseMode mMode = CommssionAdvertiseMode::kCommissioning;
+    CommssionAdvertiseMode mMode = CommssionAdvertiseMode::kCommissionableNode;
+    bool mCommissioningModeEnabled = false;
+    bool mOpenWindowCommissioningMode = false;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
+    chip::Optional<uint16_t> mDeviceType;
+    chip::Optional<const char *> mDeviceName;
+    chip::Optional<const char *> mRotatingId;
     chip::Optional<const char *> mPairingInstr;
-    chip::Optional<uint8_t> mPairingHint;
+    chip::Optional<uint16_t> mPairingHint;
 };
 
 /// Handles advertising of CHIP nodes
