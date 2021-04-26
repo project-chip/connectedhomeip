@@ -183,6 +183,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     uint16_t deviceIdLength = sizeof(_localDeviceId);
     if (CHIP_NO_ERROR
         != _persistentStorageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
+        _localDeviceId = arc4random();
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
 
