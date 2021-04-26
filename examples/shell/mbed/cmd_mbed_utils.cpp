@@ -237,6 +237,7 @@ int cmd_network_interface(int argc, char ** argv)
     char intName[IF_NAMESIZE];
     InterfaceId intId;
     INET_ERROR err;
+    uint8_t intCounter = 0;
 
     streamer_t * sout = streamer_get();
 
@@ -270,6 +271,13 @@ int cmd_network_interface(int argc, char ** argv)
                    addrIterator.HasBroadcastAddress() ? "has" : "no");
             addrIterator.Next();
         }
+
+        intCounter++;
+    }
+
+    if (intCounter == 0)
+    {
+        streamer_printf(sout, "    no interface is available\n");
     }
 
 exit:
@@ -977,7 +985,7 @@ static const shell_command_t cmds_socket[] = {
     { &cmd_socket_client, "client",
       "Create client and send test message to server via specific socket.\n"
       "\tUsage: socket client <type>[UDP/TCP] <ip> <port> <message> <wait for response flag>[wait - optional]\n"
-      "\tExample: socket echo TCP 127.0.0.1 7 Hello wait" },
+      "\tExample: socket client TCP 127.0.0.1 7 Hello wait" },
     { &cmd_socket_bsd, "bsd",
       "BSD IP communication test via specific socket. Send message in loopback.\n"
       "\tUsage: socket echo <type> <message>" },
@@ -1009,4 +1017,6 @@ void cmd_mbed_utils_init()
     shell_register(&cmds_network_root, 1);
     shell_register(&cmds_socket_root, 1);
     shell_register(&cmds_server_root, 1);
+
+    // chip::DeviceLayer::ConnectivityMgrImpl().ProvisionWiFiNetwork("CHIPnet", "11223344");
 }

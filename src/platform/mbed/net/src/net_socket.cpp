@@ -368,7 +368,7 @@ ssize_t mbed_send(int fd, const void * buf, size_t len, int flags)
         socket->set_blocking(false);
     }
 
-    tr_info("Socket fd %d send %d bytes", fd, ret);
+    tr_info("Socket fd %d send %d bytes", fd, len);
     ret = socket->getNetSocket()->send(buf, len);
     if (ret < 0)
     {
