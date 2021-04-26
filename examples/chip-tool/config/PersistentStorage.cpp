@@ -89,24 +89,27 @@ exit:
 
 CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     std::string iniValue;
 
     auto section = mConfig.sections[kDefaultSectionName];
     auto it      = section.find(key);
-    VerifyOrExit(it != section.end(), err = CHIP_ERROR_KEY_NOT_FOUND);
+    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
 
-    VerifyOrExit(inipp::extract(section[key], iniValue), err = CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorCodeIf(!inipp::extract(section[key], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
 
     iniValue = Base64ToString(iniValue);
 
-    size = static_cast<uint16_t>(iniValue.size());
-    VerifyOrExit(size <= static_cast<size_t>(size) - 1, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
+    if (dataSize > size)
+    {
+        size = dataSize;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
 
-    memcpy(value, iniValue.data(), size);
+    size = dataSize;
+    memcpy(value, iniValue.data(), dataSize);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
