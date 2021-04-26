@@ -1014,11 +1014,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnSrpClientNotificatio
                 otService = next;
             } while (otService);
         }
-
-        ChipDeviceEvent event;
-        event.Type = DeviceEventType::kSrpClientRequestComplete;
-        PlatformMgr().PostEvent(&event);
-
         break;
     }
     case OT_ERROR_PARSE:
