@@ -20,7 +20,6 @@
 
 #include "OpenFileHandleAsFileDescriptor.h"
 #include "common.h"
-#include <atomic>
 #include <mstd_atomic>
 #include <netsocket/TCPSocket.h>
 #include <netsocket/UDPSocket.h>

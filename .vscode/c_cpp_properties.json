@@ -14,7 +14,7 @@
         },
         {
             "name": "clang debug (GN)",
-            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.clang.jcd eson",
+            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.clang.json",
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "gnu++14",

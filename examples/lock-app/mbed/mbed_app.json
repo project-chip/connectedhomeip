@@ -14,8 +14,6 @@
             "mbed-trace.enable": false
         },
         "DISCO_L475VG_IOT01A": {
-            "lwip.ipv6-enabled": true,
-            "lwip.raw-socket-enabled": true,
             "target.components_add": [
                 "wifi_ism43362",
                 "BlueNRG_MS"
@@ -36,8 +34,6 @@
             "function-button": "NC"
         },
         "CY8CPROTO_062_4343W": {
-            "lwip.ipv6-enabled": true,
-            "lwip.raw-socket-enabled": true,
             "target.network-default-interface-type": "WIFI",
             "target.macros_add": [
                 "MXCRYPTO_DISABLED",

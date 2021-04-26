@@ -1,4 +1,5 @@
-#include "netdb.h"
+#include <net_dns.h>
+#include <netdb.h>
 
 int getaddrinfo(const char * nodename, const char * servname, const struct addrinfo * hints, struct addrinfo ** res)
 {

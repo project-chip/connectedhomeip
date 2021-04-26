@@ -49,7 +49,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
         mChipStackMutex.~Mutex();
         new (&mChipStackMutex) rtos::Mutex();
 
-        mShouldRunEventLoop.store(true, std::memory_order_relaxed);
+        mShouldRunEventLoop.store(true);
     }
     else
     {
@@ -159,7 +159,7 @@ void PlatformManagerImpl::_RunEventLoop()
     {
         SysUpdate();
         SysProcess();
-    } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
+    } while (mShouldRunEventLoop.load());
 
     UnlockChipStack();
 }
@@ -190,7 +190,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
     LockChipStack();
 
-    mShouldRunEventLoop.store(false, std::memory_order_relaxed);
+    mShouldRunEventLoop.store(false);
     // If running, break out of the loop
     if (IsLoopActive())
     {
