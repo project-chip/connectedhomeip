@@ -326,10 +326,10 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, voi
         }
         else
         {
-            if (value != nullptr)
+            if (buffer != nullptr)
             {
                 valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
-                memcpy(value, valueChars, std::min(size, stringLength));
+                memcpy(buffer, valueChars, std::min<size_t>(size, stringLength));
                 if (size < stringLength)
                 {
                     err = CHIP_ERROR_NO_MEMORY;
@@ -381,6 +381,8 @@ exit:
     GetJavaEnv()->ExceptionClear();
     GetJavaEnv()->DeleteLocalRef(keyString);
     GetJavaEnv()->DeleteLocalRef(valueString);
+
+    return err;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
