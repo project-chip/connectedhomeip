@@ -156,9 +156,8 @@ class CHIPToolActivity :
 
     lateinit var setupPayload: SetupPayload
     try {
-      // TODO: Issue #4504 - Remove replacing _ with spaces after problem described in #415 will be fixed.
       setupPayload =
-        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase().replace('_', ' '))
+        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized QR Code", ex)
       Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()

@@ -86,7 +86,7 @@ CHIP_ERROR SetupPayloadParseCommand::Parse(std::string codeString, chip::SetupPa
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (IsQRCode(codeString))
     {
-        ChipLogDetail(SetupPayload, "Parsing base41Representation: %s", codeString.c_str());
+        ChipLogDetail(SetupPayload, "Parsing base38Representation: %s", codeString.c_str());
         err = QRCodeSetupPayloadParser(codeString).populatePayload(payload);
     }
     else

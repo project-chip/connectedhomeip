@@ -74,8 +74,6 @@ void ShareQRCodeOverNFC(chip::RendezvousInformationFlags aRendezvousFlags)
     std::string QRCode;
     ReturnOnFailure(GetQRCode(QRCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)));
 
-    // TODO: Issue #4504 - Remove replacing spaces with _ after problem described in #415 will be fixed.
-    std::replace(QRCode.begin(), QRCode.end(), ' ', '_');
     ReturnOnFailure(NFCMgr().StartTagEmulation(QRCode.c_str(), QRCode.size()));
 }
 #endif
@@ -116,7 +114,7 @@ CHIP_ERROR GetQRCode(std::string & aQRCode, chip::RendezvousInformationFlags aRe
 
     // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
     // generating payload
-    err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase41Representation(aQRCode);
+    err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(aQRCode);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err)));
 
 exit:
