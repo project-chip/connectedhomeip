@@ -37,8 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Set the value of the key to the given value
  *
  */
-- (void)CHIPSetKeyValue:(NSString *)key
-                  value:(NSString *)value;
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value;
 
 /**
  * Delete the key and corresponding value
