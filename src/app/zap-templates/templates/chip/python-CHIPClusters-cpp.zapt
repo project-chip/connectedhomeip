@@ -6,10 +6,10 @@
 #include <app/InteractionModelEngine.h>
 #include <lib/support/Span.h>
 
-#include <controller/CHIPClusters.h>
 #include <controller/CHIPDevice.h>
 
 #include "gen/CHIPClientCallbacks.h"
+#include "gen/CHIPClusters.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -71,7 +71,7 @@ void chip_ime_SetFailureResponseDelegate(FailureResponseDelegate delegate)
     gFailureResponseDelegate = delegate;
 }
 
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
 // Cluster {{asCamelCased name false}}
 
 {{#chip_server_cluster_commands}}
@@ -108,6 +108,6 @@ CHIP_ERROR chip_ime_ConfigureAttribute_{{asCamelCased parent.name false}}_{{asCa
 {{/chip_server_cluster_attributes}}
 
 // End of Cluster {{asCamelCased name false}}
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
 
 }

@@ -20,8 +20,8 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
-#include "controller/CHIPClusters.h"
 #include "gen/CHIPClientCallbacks.h"
+#include "gen/CHIPClusters.h"
 
 enum class PairingMode
 {
