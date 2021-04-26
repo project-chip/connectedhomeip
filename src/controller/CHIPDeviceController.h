@@ -135,7 +135,6 @@ public:
  */
 class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
                                     public Messaging::ExchangeMgrDelegate,
-                                    public PersistentStorageResultDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
                                     public Mdns::ResolverDelegate,
 #endif
@@ -272,9 +271,6 @@ private:
     //////////// ExchangeMgrDelegate Implementation ///////////////
     void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
-
-    //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////

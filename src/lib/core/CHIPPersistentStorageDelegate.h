@@ -23,42 +23,10 @@
 
 namespace chip {
 
-class DLL_EXPORT PersistentStorageResultDelegate
-{
-public:
-    enum class Operation : uint8_t
-    {
-        kGET = 0,
-        kSET,
-        kDELETE,
-    };
-
-    virtual ~PersistentStorageResultDelegate() {}
-
-    /**
-     * @brief
-     *   Called on completion of an operation in PersistentStorageDelegate API
-     *
-     * @param[in] key Key for which the status is being returned
-     * @param[in] op Operation that was being performed on the key
-     * @param[in] result CHIP_NO_ERROR or corresponding error code
-     */
-    virtual void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR result) = 0;
-};
-
 class DLL_EXPORT PersistentStorageDelegate
 {
 public:
     virtual ~PersistentStorageDelegate() {}
-
-    /**
-     * @brief
-     *   Set the callback object with methods that are called on completion
-     *   of the operation.
-     *
-     * @param[in] delegate The callback object
-     */
-    virtual void SetStorageDelegate(PersistentStorageResultDelegate * delegate) = 0;
 
     /**
      * @brief

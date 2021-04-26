@@ -29,11 +29,6 @@
 namespace chip {
 namespace Controller {
 
-void PythonPersistentStorageDelegate::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
-{
-    mDelegate = delegate;
-}
-
 CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
     auto val = mStorage.find(key);

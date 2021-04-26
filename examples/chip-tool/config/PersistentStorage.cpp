@@ -86,8 +86,6 @@ exit:
     return err;
 }
 
-void PersistentStorage::SetStorageDelegate(PersistentStorageResultDelegate * delegate) {}
-
 CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -23,7 +23,6 @@
 
 #include <support/ThreadOperationalDataset.h>
 
-using chip::PersistentStorageResultDelegate;
 using chip::Controller::DeviceCommissioner;
 
 namespace {
@@ -302,11 +301,6 @@ void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle 
 
 void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 
-void AndroidDeviceControllerWrapper::SetStorageDelegate(PersistentStorageResultDelegate * delegate)
-{
-    mStorageResultDelegate = delegate;
-}
-
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)
 {
     jstring keyString       = NULL;
@@ -383,11 +377,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, con
 
     GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString, valueString);
 
-    if (mStorageResultDelegate)
-    {
-        mStorageResultDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kSET, CHIP_NO_ERROR);
-    }
-
 exit:
     GetJavaEnv()->ExceptionClear();
     GetJavaEnv()->DeleteLocalRef(keyString);
@@ -408,11 +397,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
     SuccessOrExit(err);
 
     GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString);
-
-    if (mStorageResultDelegate)
-    {
-        mStorageResultDelegate->OnPersistentStorageStatus(key, PersistentStorageResultDelegate::Operation::kDELETE, CHIP_NO_ERROR);
-    }
 
 exit:
     GetJavaEnv()->ExceptionClear();

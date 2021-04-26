@@ -56,7 +56,6 @@ public:
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
@@ -83,7 +82,6 @@ private:
 
     ChipDeviceControllerPtr mController;
     chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-    chip::PersistentStorageResultDelegate * mStorageResultDelegate   = nullptr;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

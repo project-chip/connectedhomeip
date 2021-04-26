@@ -73,39 +73,6 @@ void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(
     });
 }
 
-void CHIPPersistentStorageDelegateBridge::SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate)
-{
-    dispatch_async(mWorkQueue, ^{
-        if (delegate) {
-            mCallback = delegate;
-
-            mSetStatusHandler = ^(NSString * key, NSError * status) {
-                chip::PersistentStorageResultDelegate * callback = mCallback;
-                if (callback) {
-                    dispatch_async(mWorkQueue, ^{
-                        callback->OnPersistentStorageStatus([key UTF8String],
-                            chip::PersistentStorageResultDelegate::Operation::kSET, [CHIPError errorToCHIPErrorCode:status]);
-                    });
-                }
-            };
-
-            mDeleteStatusHandler = ^(NSString * key, NSError * status) {
-                chip::PersistentStorageResultDelegate * callback = mCallback;
-                if (callback) {
-                    dispatch_async(mWorkQueue, ^{
-                        callback->OnPersistentStorageStatus([key UTF8String],
-                            chip::PersistentStorageResultDelegate::Operation::kDELETE, [CHIPError errorToCHIPErrorCode:status]);
-                    });
-                }
-            };
-        } else {
-            mCallback = nil;
-            mSetStatusHandler = nil;
-            mDeleteStatusHandler = nil;
-        }
-    });
-}
-
 CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) = 0;
 {
     __block CHIP_ERROR error = CHIP_NO_ERROR;
@@ -146,7 +113,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
     return error;
 }
 
-void CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key, const void * value, uint16_t size) = 0;
+CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key, const void * value, uint16_t size) = 0;
 {
     std::string base64Value = StringToBase64(std::string(static_cast<const char *> value, size));
 
@@ -157,15 +124,18 @@ void CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key, cons
 
     id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
     if (strongDelegate && mQueue) {
-        dispatch_async(mQueue, ^{
-            [strongDelegate CHIPSetKeyValue:keyString value:valueString handler:mSetStatusHandler];
+        dispatch_sync(mQueue, ^{
+            [strongDelegate CHIPSetKeyValue:keyString value:valueString];
         });
     } else {
         [mDefaultPersistentStorage setObject:valueString forKey:keyString];
-        if (mSetStatusHandler) {
-            mSetStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
-        }
     }
+
+    // TODO: ideally the error from the dispatch should be returned
+    // however we expect to replace the storage delegate with KVS so for now
+    // we return no error (return used to be void due to async dispatch anyway)
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * key)
@@ -176,14 +146,11 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * 
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
         if (strongDelegate && mQueue) {
-            dispatch_async(mQueue, ^{
-                [strongDelegate CHIPDeleteKeyValue:keyString handler:mDeleteStatusHandler];
+            dispatch_sync(mQueue, ^{
+                [strongDelegate CHIPDeleteKeyValue:keyString];
             });
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
-            if (mDeleteStatusHandler) {
-                mDeleteStatusHandler(keyString, [CHIPError errorForCHIPErrorCode:0]);
-            }
         }
     });
 

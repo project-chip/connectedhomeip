@@ -19,10 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^SendKeyValue)(NSString * key, NSString * value);
-typedef void (^CHIPSendSetStatus)(NSString * key, NSError * status);
-typedef void (^CHIPSendDeleteStatus)(NSString * key, NSError * status);
-
 /**
  * The protocol definition for the CHIPPersistenStorageDelegate
  *
@@ -47,13 +43,13 @@ typedef void (^CHIPSendDeleteStatus)(NSString * key, NSError * status);
  * Set the value of the key to the given value
  *
  */
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(CHIPSendSetStatus)completionHandler;
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
 
 /**
  * Delete the key and corresponding value
  *
  */
-- (void)CHIPDeleteKeyValue:(NSString *)key handler:(CHIPSendDeleteStatus)completionHandler;
+- (void)CHIPDeleteKeyValue:(NSString *)key
 
 @end
 

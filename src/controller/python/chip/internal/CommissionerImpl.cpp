@@ -30,8 +30,6 @@ namespace {
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
-
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
@@ -47,9 +45,6 @@ public:
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
     }
-
-private:
-    chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;
 };
 
 // FIXME: implement this class
