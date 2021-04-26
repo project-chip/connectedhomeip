@@ -32,7 +32,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/message_counter/MessageCounterManager.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -48,7 +48,7 @@ static System::Layer gSystemLayer;
 static SecureSessionMgr gSessionManager;
 static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
-static message_counter::MessageCounterManager gMessageCounterManager;
+static secure_channel::MessageCounterManager gMessageCounterManager;
 static const Transport::AdminId gAdminId = 0;
 constexpr ClusterId kTestClusterId       = 6;
 constexpr EndpointId kTestEndpointId     = 1;

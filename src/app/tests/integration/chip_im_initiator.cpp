@@ -33,7 +33,7 @@
 #include <core/CHIPCore.h>
 #include <mutex>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/message_counter/MessageCounterManager.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -58,7 +58,7 @@ chip::app::ReadClient * gpReadClient = nullptr;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
-chip::message_counter::MessageCounterManager gMessageCounterManager;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 chip::Inet::IPAddress gDestAddr;
 
