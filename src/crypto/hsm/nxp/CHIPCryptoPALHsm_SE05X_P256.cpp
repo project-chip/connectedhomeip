@@ -112,10 +112,10 @@ exit:
 
 CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
 {
-    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
-    sss_digest_t digest_ctx    = { 0 };
-    sss_asymmetric_t asymm_ctx = { 0 };
-    uint8_t hash[kSHA256_Hash_Length]           = {
+    CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
+    sss_digest_t digest_ctx           = { 0 };
+    sss_asymmetric_t asymm_ctx        = { 0 };
+    uint8_t hash[kSHA256_Hash_Length] = {
         0,
     };
     size_t hashLen         = sizeof(hash);
@@ -214,7 +214,8 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_len
     status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_asymmetric_sign_digest(&asymm_ctx, const_cast<uint8_t*>(hash), hash_length, Uint8::to_uchar(out_signature), &siglen);
+    status =
+        sss_asymmetric_sign_digest(&asymm_ctx, const_cast<uint8_t *>(hash), hash_length, Uint8::to_uchar(out_signature), &siglen);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     SuccessOrExit(out_signature.SetLength(siglen));
@@ -234,7 +235,9 @@ CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     size_t len       = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
-    uint8_t privkey[kP256_PrivateKey_Length] = {0,};
+    uint8_t privkey[kP256_PrivateKey_Length] = {
+        0,
+    };
 
     {
         /* Set the public key */
