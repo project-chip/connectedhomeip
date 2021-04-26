@@ -72,7 +72,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncSetKeyValue(const char * key, co
 CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
 {
     mStorage.erase(key);
-    return CHIP_NO_ERROR
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller
