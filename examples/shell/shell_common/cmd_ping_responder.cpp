@@ -54,8 +54,8 @@ public:
         {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
             mTcp = tcp;
-            ReturnErrorOnFailure(mTCPManager.Init(chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer)
-                                                      .SetAddressType(kIPAddressType_IPv4)));
+            ReturnErrorOnFailure(mTCPManager.Init(
+                chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4)));
             ReturnErrorOnFailure(
                 mSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &mTCPManager, &mAdmins));
 #else
@@ -64,8 +64,8 @@ public:
         }
         else
         {
-            ReturnErrorOnFailure(mUDPManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
-                                                      .SetAddressType(kIPAddressType_IPv4)));
+            ReturnErrorOnFailure(mUDPManager.Init(
+                chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4)));
             ReturnErrorOnFailure(
                 mSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &mUDPManager, &mAdmins));
         }
