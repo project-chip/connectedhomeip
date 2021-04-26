@@ -35,7 +35,7 @@ namespace Crypto {
 
 P256KeypairHSM::~P256KeypairHSM()
 {
-    if (keyid != 0)
+    if (keyid != kKeyId_NotInitialized)
     {
         if (provisioned_key == false)
         {
@@ -115,7 +115,7 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
     sss_digest_t digest_ctx    = { 0 };
     sss_asymmetric_t asymm_ctx = { 0 };
-    uint8_t hash[32]           = {
+    uint8_t hash[kSHA256_Hash_Length]           = {
         0,
     };
     size_t hashLen         = sizeof(hash);
@@ -126,7 +126,7 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
     VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_signature != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(keyid != 0, error = CHIP_ERROR_HSM);
+    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
 
     ChipLogDetail(Crypto, "ECDSA_sign_msg: Using SE05X for Ecc Sign!");
 
@@ -177,11 +177,11 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length
 
     error = CHIP_NO_ERROR;
 exit:
-    if (asymm_ctx.session != NULL)
+    if (asymm_ctx.session != nullptr)
     {
         sss_asymmetric_context_free(&asymm_ctx);
     }
-    if (digest_ctx.session != NULL)
+    if (digest_ctx.session != nullptr)
     {
         sss_digest_context_free(&digest_ctx);
     }
@@ -197,9 +197,9 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_len
     size_t siglen              = out_signature.Capacity();
 
     VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(hash_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_signature != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(keyid != 0, error = CHIP_ERROR_HSM);
+    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
 
     ChipLogDetail(Crypto, "ECDSA_sign_hash: Using SE05X for Ecc Sign!");
 
@@ -214,14 +214,14 @@ CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_len
     status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_asymmetric_sign_digest(&asymm_ctx, (uint8_t *) hash, hash_length, Uint8::to_uchar(out_signature), &siglen);
+    status = sss_asymmetric_sign_digest(&asymm_ctx, const_cast<uint8_t*>(hash), hash_length, Uint8::to_uchar(out_signature), &siglen);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     SuccessOrExit(out_signature.SetLength(siglen));
 
     error = CHIP_NO_ERROR;
 exit:
-    if (asymm_ctx.session != NULL)
+    if (asymm_ctx.session != nullptr)
     {
         sss_asymmetric_context_free(&asymm_ctx);
     }
@@ -234,7 +234,7 @@ CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     size_t len       = output.Length() == 0 ? output.Capacity() : output.Length();
     Encoding::BufferWriter bbuf(output, len);
-    uint8_t privkey[kP256_PrivateKey_Length];
+    uint8_t privkey[kP256_PrivateKey_Length] = {0,};
 
     {
         /* Set the public key */
@@ -288,12 +288,12 @@ exit:
 CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
     CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
-    const uint8_t * rem_pubKey = NULL;
+    const uint8_t * rem_pubKey = nullptr;
     size_t rem_pubKeyLen       = 0;
     size_t secret_length       = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
     smStatus_t smstatus        = SM_NOT_OK;
 
-    VerifyOrExit(keyid != 0, error = CHIP_ERROR_HSM);
+    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
 
     ChipLogDetail(Crypto, "ECDH_derive_secret: Using SE05X for ECDH !");
 
@@ -302,9 +302,7 @@ CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_publi
     rem_pubKey    = Uint8::to_const_uchar(remote_public_key);
     rem_pubKeyLen = remote_public_key.Length();
 
-    VerifyOrExit(rem_pubKey != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(out_secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(gex_sss_chip_ctx.ks.session != nullptr, error = CHIP_ERROR_INTERNAL);
 
     smstatus = Se05x_API_ECGenSharedSecret(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, rem_pubKey,
                                            rem_pubKeyLen, Uint8::to_uchar(out_secret), &secret_length);
