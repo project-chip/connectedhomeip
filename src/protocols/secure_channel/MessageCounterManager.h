@@ -27,7 +27,7 @@
 #include <transport/MessageCounterManagerInterface.h>
 
 namespace chip {
-namespace message_counter {
+namespace secure_channel {
 
 class ExchangeManager;
 
@@ -169,5 +169,5 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };
 
-} // namespace message_counter
+} // namespace secure_channel
 } // namespace chip

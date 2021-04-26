@@ -9,6 +9,7 @@ chip_test_suite("tests") {
   output_name = "libSecureChannelTests"
 
   test_sources = [
+    "TestMessageCounterManager.cpp",
     "TestPASESession.cpp",
     "TestStatusReport.cpp",
   ]
@@ -17,6 +18,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/protocols/secure_channel",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
