@@ -78,9 +78,6 @@ constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
 
 constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
-// Maximum key ID is 65535 (given it's uint16_t type)
-constexpr uint16_t kMaxKeyIDStringSize = 6;
-
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
