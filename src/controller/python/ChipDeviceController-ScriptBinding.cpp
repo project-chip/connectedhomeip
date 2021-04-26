@@ -143,10 +143,16 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
     initParams.imDelegate = &PythonInteractionModelDelegate::Instance();
 #endif
 
+    SuccessOrExit(err = sStorageDelegate.Init());
     SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams, &sPairingDelegate));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:
+    if (err != CHIP_NO_ERROR && (*outDevCtrl) != nullptr)
+    {
+        delete *outDevCtrl;
+        *outDevCtrl = nullptr;
+    }
     return err;
 }
 

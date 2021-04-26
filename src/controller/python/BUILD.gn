@@ -86,6 +86,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/transport",
+    "${chip_root}/third_party/inipp",
   ]
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
   configs += [ ":controller_wno_deprecate" ]

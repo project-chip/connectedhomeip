@@ -22,8 +22,7 @@
 #include <string>
 
 #include <core/CHIPPersistentStorageDelegate.h>
-
-class PythonPersistentStorageDelegate;
+#include <inipp/inipp.h>
 
 typedef void (*GetKeyValueFunct)(const uint8_t * key, uint8_t * value, uint16_t * size);
 typedef void (*SetKeyValueFunct)(const uint8_t * key, const uint8_t * value);
@@ -32,18 +31,20 @@ typedef void (*DeleteKeyValueFunct)(const uint8_t * key);
 namespace chip {
 namespace Controller {
 
-class PythonPersistentStorageDelegate : public PersistentStorageDelegate
+class PythonPersistentStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    PythonPersistentStorageDelegate() {}
-    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override;
+    CHIP_ERROR Init();
+
+    /////////// PersistentStorageDelegate Interface /////////
+    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
     void AsyncSetKeyValue(const char * key, const char * value) override;
     void AsyncDeleteKeyValue(const char * key) override;
 
 private:
-    PersistentStorageResultDelegate * mDelegate;
-    std::map<std::string, std::string> mStorage;
+    CHIP_ERROR CommitConfig();
+    inipp::Ini<char> mConfig;
 };
 
 } // namespace Controller
