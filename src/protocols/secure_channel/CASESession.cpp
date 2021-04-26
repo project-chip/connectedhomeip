@@ -89,7 +89,6 @@ void CASESession::Clear()
     // It's done so that no security related information will be leaked.
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
     mCommissioningHash.Clear();
-    mLocalNodeId     = kUndefinedNodeId;
     mPairingComplete = false;
     mConnectionState.Reset();
     if (mTrustedRootId.mId != nullptr)
@@ -150,14 +149,12 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     const NodeId peerNodeId = mConnectionState.GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(CanCastTo<uint64_t>(mLocalNodeId), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
     memset(&serializable, 0, sizeof(serializable));
     serializable.mSharedSecretLen  = static_cast<uint16_t>(mSharedSecret.Length());
     serializable.mMessageDigestLen = static_cast<uint16_t>(sizeof(mMessageDigest));
     serializable.mPairingComplete  = (mPairingComplete) ? 1 : 0;
-    serializable.mLocalNodeId      = mLocalNodeId;
     serializable.mPeerNodeId       = peerNodeId;
     serializable.mLocalKeyId       = mConnectionState.GetLocalKeyID();
     serializable.mPeerKeyId        = mConnectionState.GetPeerKeyID();
@@ -179,7 +176,6 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mSharedSecret, serializable.mSharedSecret, mSharedSecret.Length());
     memcpy(mMessageDigest, serializable.mMessageDigest, serializable.mMessageDigestLen);
 
-    mLocalNodeId = serializable.mLocalNodeId;
     mConnectionState.SetPeerNodeId(serializable.mPeerNodeId);
     mConnectionState.SetLocalKeyID(serializable.mLocalKeyId);
     mConnectionState.SetPeerKeyID(serializable.mPeerKeyId);
@@ -187,7 +183,7 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId, uint16_t myKeyId,
+CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
                              SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -197,8 +193,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
 
-    mDelegate    = delegate;
-    mLocalNodeId = myNodeId.ValueOr(kUndefinedNodeId);
+    mDelegate = delegate;
     mConnectionState.SetLocalKeyID(myKeyId);
     mOpCredSet = operationalCredentialSet;
 
@@ -210,10 +205,10 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 }
 
 CHIP_ERROR
-CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                         uint16_t myKeyId, SessionEstablishmentDelegate * delegate)
+CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                         SessionEstablishmentDelegate * delegate)
 {
-    ReturnErrorOnFailure(Init(operationalCredentialSet, myNodeId, myKeyId, delegate));
+    ReturnErrorOnFailure(Init(operationalCredentialSet, myKeyId, delegate));
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaR1;
     mPairingComplete = false;
@@ -224,15 +219,14 @@ CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalC
 }
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress,
-                                         OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                         NodeId peerNodeId, uint16_t myKeyId, ExchangeContext * exchangeCtxt,
-                                         SessionEstablishmentDelegate * delegate)
+                                         OperationalCredentialSet * operationalCredentialSet, NodeId peerNodeId, uint16_t myKeyId,
+                                         ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = Init(operationalCredentialSet, myNodeId, myKeyId, delegate);
+    err = Init(operationalCredentialSet, myKeyId, delegate);
 
     // We are setting the exchange context specifically before checking for error.
     // This is to make sure the exchange will get closed if Init() returned an error.
@@ -1124,15 +1118,6 @@ void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
             VerifyOrExit(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
                          err = CHIP_ERROR_WRONG_NODE_ID);
         }
-    }
-
-    if (mLocalNodeId == kUndefinedNodeId)
-    {
-        mLocalNodeId = packetHeader.GetDestinationNodeId().ValueOr(kUndefinedNodeId);
-    }
-    else if (packetHeader.GetDestinationNodeId().HasValue())
-    {
-        VerifyOrExit(mLocalNodeId == packetHeader.GetDestinationNodeId().Value(), err = CHIP_ERROR_WRONG_NODE_ID);
     }
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))

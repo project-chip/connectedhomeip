@@ -63,7 +63,6 @@ struct CASESessionSerializable
     uint16_t mMessageDigestLen;
     uint8_t mMessageDigest[kSHA256_Hash_Length];
     uint8_t mPairingComplete;
-    NodeId mLocalNodeId;
     NodeId mPeerNodeId;
     uint16_t mLocalKeyId;
     uint16_t mPeerKeyId;
@@ -86,14 +85,13 @@ public:
      *
      * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
      *                                      certificates
-     * @param myNodeId                      Node id of local node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param delegate                      Callback object
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId,
-                                           uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                           SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -102,7 +100,6 @@ public:
      * @param peerAddress                   Address of peer with which to establish a session.
      * @param operationalCredentialSet      CHIP Certificate Set used to store the chain root of trust an validate peer node
      *                                      certificates
-     * @param myNodeId                      Node id of local node
      * @param peerNodeId                    Node id of the peer node
      * @param myKeyId                       Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt                  The exchange context to send and receive messages with the peer
@@ -111,8 +108,8 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, OperationalCredentialSet * operationalCredentialSet,
-                                Optional<NodeId> myNodeId, NodeId peerNodeId, uint16_t myKeyId,
-                                Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                                NodeId peerNodeId, uint16_t myKeyId, Messaging::ExchangeContext * exchangeCtxt,
+                                SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -199,8 +196,7 @@ private:
         kUnexpected           = 0xff,
     };
 
-    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                    SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR Init(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR SendSigmaR1();
     CHIP_ERROR HandleSigmaR1_and_SendSigmaR2(const System::PacketBufferHandle & msg);
@@ -260,8 +256,6 @@ private:
     };
 
 protected:
-    NodeId mLocalNodeId = kUndefinedNodeId;
-
     bool mPairingComplete = false;
 
     Transport::PeerConnectionState mConnectionState;
