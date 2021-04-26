@@ -47,7 +47,11 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS()
     info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
-    gDelegate->OnAdminPersistedToStorage(mAdmin, mFabricId, mNodeId);
+    if (gDelegate != nullptr)
+    {
+        gDelegate->OnAdminPersistedToStorage(mAdmin, mFabricId, mNodeId);
+    }
+   
     return gStorage->SyncSetKeyValue(key, &info, sizeof(info));
 }
 
@@ -72,7 +76,11 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS()
     mVendorId  = Encoding::LittleEndian::HostSwap16(info.mVendorId);
     ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
 
-    gDelegate->OnAdminPersistedToStorage(id, mFabricId, mNodeId);
+    if (gDelegate != nullptr)
+    {
+        gDelegate->OnAdminPersistedToStorage(id, mFabricId, mNodeId);
+    }
+    
     return CHIP_NO_ERROR;
 }
 
@@ -88,7 +96,10 @@ CHIP_ERROR AdminPairingInfo::DeleteFromKVS(AdminId id)
     ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
     gStorage->AsyncDeleteKeyValue(key);
-    gDelegate->OnAdminDeletedFromStorage(id);
+    if (gDelegate != nullptr)
+    {
+        gDelegate->OnAdminDeletedFromStorage(id);
+    }
     return CHIP_NO_ERROR;
 }
 

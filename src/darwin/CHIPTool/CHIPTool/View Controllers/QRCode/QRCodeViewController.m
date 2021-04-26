@@ -365,18 +365,17 @@
     _session = nil;
 }
 
-// MARK: CHIPDevicePairingDelegate
-- (void)onPairingComplete:(NSError *)error
+- (void)setVendorIDOnAccessory
 {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-        [self->_deviceList refreshDeviceList];
-        [self retrieveAndSendWifiCredentials];
-        
-        CHIPOperationalCredentials *opCreds = [[CHIPOperationalCredentials alloc] initWithDevice:CHIPGetPairedDevice()
+    NSLog(@"Call to setVendorIDOnAccessory");
+    CHIPDevice *device = CHIPGetPairedDevice();
+    if (device)
+    {
+        CHIPOperationalCredentials *opCreds = [[CHIPOperationalCredentials alloc] initWithDevice:device
                                                                                         endpoint:0
                                                                                            queue:dispatch_get_main_queue()];
         [opCreds setFabric:kCHIPToolTmpVendorId completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-            if (error) {
+            if (error.code != CHIPSuccess) {
                 NSLog(@"Got back error trying to getFabricId %@", error);
             } else {
                 NSLog(@"Got back fabricID values %@, storing it", values);
@@ -384,9 +383,24 @@
                 CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey, fabricID);
             }
         }];
-        
-        
-    });
+    }
+}
+    
+
+// MARK: CHIPDevicePairingDelegate
+- (void)onPairingComplete:(NSError *)error
+{
+    if (error.code != CHIPSuccess)
+    {
+        NSLog(@"Got pairing error back %@", error);
+    } else {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+            [self->_deviceList refreshDeviceList];
+            [self retrieveAndSendWifiCredentials];
+            [self setVendorIDOnAccessory];
+        });
+    }
+    
 }
 
 // MARK: UI Helper methods

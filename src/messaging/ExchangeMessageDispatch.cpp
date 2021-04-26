@@ -64,11 +64,28 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
         }
 #endif
     }
-
+    ChipLogProgress(Zcl, "ShanaLog in SendMessage");
+    if (!IsTransportReliable())
+    {
+        ChipLogProgress(Zcl, "ShanaLog IsTransportReliable is false");
+    }
+    if (reliableMessageContext->AutoRequestAck())
+    {
+        ChipLogProgress(Zcl, "ShanaLog AutoRequestAck is true");
+    }
+    if (mReliableMessageMgr != nullptr)
+    {
+        ChipLogProgress(Zcl, "ShanaLog ReliableMessageMgr is not nil");
+    }
+    if (isReliableTransmission)
+    {
+        ChipLogProgress(Zcl, "ShanaLog isReliableTransmission is true");
+    }
     if (!IsTransportReliable() && reliableMessageContext->AutoRequestAck() && mReliableMessageMgr != nullptr &&
         isReliableTransmission)
     {
         payloadHeader.SetNeedsAck(true);
+        ChipLogProgress(Zcl, "ShanaLog SetNeedsAck to true");
 
         ReliableMessageMgr::RetransTableEntry * entry = nullptr;
 
