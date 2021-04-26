@@ -1071,7 +1071,7 @@
  *
  * Pairing Hint, bitmap value of methods to put device into pairing mode
  * when it has not yet been commissioned.
- * 
+ *
  * Bits:
  * 0 - Power Cycle
  * 5 - See Device Manual
@@ -1085,7 +1085,7 @@
  * CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION
  *
  * Pairing Instruction, when device has not yet been commissioned
- * 
+ *
  * Meaning is depedent upon pairing hint value.
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION
@@ -1097,7 +1097,7 @@
  *
  * Pairing Hint, bitmap value of methods to put device into pairing mode
  * when it has already been commissioned.
- * 
+ *
  * Bits:
  * 2 - Visit Administrator UX (always true for secondary)
  * 5 - See Device Manual
@@ -1110,7 +1110,7 @@
  * CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION
  *
  * Pairing Instruction, when device has not yet been commissioned
- * 
+ *
  * Meaning is depedent upon pairing hint value.
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION

@@ -134,10 +134,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         return true;
     case kOptionCommisioningDeviceName:
         gOptions.deviceName = Optional<const char *>::Value(static_cast<const char *>(aValue));
-        return true; 
+        return true;
     case kOptionCommisioningRotatingId:
         gOptions.rotatingId = Optional<const char *>::Value(static_cast<const char *>(aValue));
-        return true; 
+        return true;
     case kOptionCommisioningPairingInstr:
         gOptions.pairingInstr = Optional<const char *>::Value(static_cast<const char *>(aValue));
         return true;
@@ -146,7 +146,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         return true;
     case kOptionOperationalFabricId:
         if (sscanf(aValue, "%" SCNx64, &gOptions.fabricId) != 1)
-         { 
+         {
              PrintArgError("%s: Invalid fabric id: %s\n", aProgram, aValue);
              return false;
          }
@@ -259,12 +259,12 @@ int main(int argc, char ** args)
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
     }
- 
+
     CHIP_ERROR err;
 
     if (gOptions.advertisingMode == AdvertisingMode::kCommissionableNode)
-    { 
-        printf("Advertise Commissionable Node\n"); 
+    {
+        printf("Advertise Commissionable Node\n");
         err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommissionAdvertisingParameters()
                                                                       .EnableIpV4(gOptions.enableIpV4)
                                                                       .SetPort(CHIP_PORT)
@@ -308,7 +308,7 @@ int main(int argc, char ** args)
     {
         fprintf(stderr, "FAILED to determine advertising type.\n");
         return 1;
-    } 
+    }
 
     if (err != CHIP_NO_ERROR)
     {

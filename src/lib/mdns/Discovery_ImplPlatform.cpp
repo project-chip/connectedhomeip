@@ -164,7 +164,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char deviceTypeSubType[8];
     const char * subTypes[6];
     size_t subTypeSize = 0;
-    
+
     if (!mMdnsInitialized)
     {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -218,12 +218,12 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
         textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
                                         strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
-    
+
         snprintf(commissioningModeBuf, sizeof(commissioningModeBuf), "%u", params.GetCommissioningMode() ? 1 : 0);
         textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
                                             strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
-                                            
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode()) 
+
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
             snprintf(additionalPairingBuf, sizeof(additionalPairingBuf), "1");
             textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalPairingBuf),
@@ -257,7 +257,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         subTypes[subTypeSize++] = longDiscriminatorSubtype;
         snprintf(commissioningModeSubType, sizeof(commissioningModeSubType), "_C%u", params.GetCommissioningMode() ? 1 : 0);
         subTypes[subTypeSize++] = commissioningModeSubType;
-        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode()) 
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
             snprintf(openWindowSubType, sizeof(openWindowSubType), "_A1");
             subTypes[subTypeSize++] = openWindowSubType;
@@ -287,15 +287,15 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     return error;
 }
 
-void DiscoveryImplPlatform::PrintEntries(const MdnsService * service) 
+void DiscoveryImplPlatform::PrintEntries(const MdnsService * service)
 {
     printf("printEntries port=%d, mTextEntrySize=%d, mSubTypeSize=%d\n", (int)(service->mPort), (int)(service->mTextEntrySize), (int)(service->mSubTypeSize));
-    for (int i=0; i<(int)service->mTextEntrySize; i++) 
+    for (int i=0; i<(int)service->mTextEntrySize; i++)
     {
         printf(" entry [%d] : %s %s\n", i, service->mTextEntries[i].mKey, (char*)(service->mTextEntries[i].mData));
     }
 
-    for (int i=0; i<(int)service->mSubTypeSize; i++) 
+    for (int i=0; i<(int)service->mSubTypeSize; i++)
     {
         printf(" type [%d] : %s\n", i, service->mSubTypes[i]);
     }

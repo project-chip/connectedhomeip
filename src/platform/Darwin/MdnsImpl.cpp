@@ -60,7 +60,7 @@ std::string GetFullTypeWithSubTypes(const char * type, MdnsServiceProtocol proto
     std::ostringstream typeBuilder;
     typeBuilder << type;
     typeBuilder << (protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? kProtocolUdp : kProtocolTcp);
-    for (int i=0; i<(int)subTypeSize; i++) 
+    for (int i=0; i<(int)subTypeSize; i++)
     {
         typeBuilder << ",";
         typeBuilder << subTypes[i];
