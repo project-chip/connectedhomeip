@@ -28,10 +28,9 @@ std::string StringToBase64(const std::string & value)
 {
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value.length())]);
 
-    uint32_t len =
-        chip::Base64Encode32(reinterpret_cast<const uint8_t *>(value.data()), static_cast<uint32_t>(value.length()), buffer.get());
-    if (len == UINT32_MAX)
-    {
+    uint32_t len = chip::Base64Encode32(
+        reinterpret_cast<const uint8_t *>(value.data()), static_cast<uint32_t>(value.length()), buffer.get());
+    if (len == UINT32_MAX) {
         return "";
     }
 
@@ -43,8 +42,7 @@ std::string Base64ToString(const std::string & b64Value)
     std::unique_ptr<uint8_t[]> buffer(new uint8_t[BASE64_MAX_DECODED_LEN(b64Value.length())]);
 
     uint32_t len = chip::Base64Decode32(b64Value.data(), static_cast<uint32_t>(b64Value.length()), buffer.get());
-    if (len == UINT32_MAX)
-    {
+    if (len == UINT32_MAX) {
         return "";
     }
 
