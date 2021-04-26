@@ -37,9 +37,8 @@ project(chip-nrfconnect-lock-example)
 
 target_include_directories(app PRIVATE 
                            main/include 
-                           ${CHIP_ROOT}/src/app
                            ${LOCK_COMMON} 
-                           ${NRFCONNECT_COMMON}/util/include 
+                           ${NRFCONNECT_COMMON}/util/include
                            ${NRFCONNECT_COMMON}/app/include)
 
 target_sources(app PRIVATE

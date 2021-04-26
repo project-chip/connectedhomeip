@@ -21,8 +21,8 @@
 #pragma once
 
 #include "af-structs.h"
-#include "af-types.h"
-#include "basic-types.h"
+#include <app/util/af-types.h>
+#include <app/util/basic-types.h>
 
 #include <app/Command.h>
 #include <lib/support/Span.h>

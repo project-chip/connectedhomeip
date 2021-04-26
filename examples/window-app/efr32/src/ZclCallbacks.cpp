@@ -22,8 +22,8 @@
 
 #include <AppConfig.h>
 #include <AppTask.h>
-#include <DataModelHandler.h>
 #include <app/Command.h>
+#include <app/server/DataModelHandler.h>
 #include <app/util/af-types.h>
 #include <gen/attribute-id.h>
 #include <gen/cluster-id.h>

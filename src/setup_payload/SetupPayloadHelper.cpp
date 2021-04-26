@@ -181,7 +181,7 @@ CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCod
         return err;
     }
     QRCodeSetupPayloadGenerator generator(setupPayload);
-    err = generator.payloadBase41Representation(outCode);
+    err = generator.payloadBase38Representation(outCode);
     return err;
 }
 

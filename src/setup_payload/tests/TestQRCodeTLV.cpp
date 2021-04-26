@@ -78,7 +78,7 @@ void TestSimpleWrite(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -89,7 +89,7 @@ void TestSimpleRead(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(result);
@@ -150,11 +150,11 @@ void TestOptionalDataWriteSerial(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    err = generator.payloadBase41Representation(result);
+    err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -165,7 +165,7 @@ void TestOptionalDataWrite(nlTestSuite * inSuite, void * inContext)
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -209,7 +209,7 @@ void TestOptionalDataWriteNoBuffer(nlTestSuite * inSuite, void * inContext)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
-    CHIP_ERROR err = generator.payloadBase41Representation(result);
+    CHIP_ERROR err = generator.payloadBase38Representation(result);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
@@ -220,7 +220,7 @@ void TestOptionalDataWriteSmallBuffer(nlTestSuite * inSuite, void * inContext)
     QRCodeSetupPayloadGenerator generator(inPayload);
     string result;
     uint8_t optionalInfo[kSmallBufferSizeInBytes];
-    CHIP_ERROR err = generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    CHIP_ERROR err = generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 

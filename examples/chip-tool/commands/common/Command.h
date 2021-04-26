@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/util/DataModelHandler.h>
+#include <app/server/DataModelHandler.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>

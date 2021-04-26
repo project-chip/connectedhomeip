@@ -344,53 +344,12 @@ exit:
     return err;
 }
 
-ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
-{
-    ChannelContext * channelContext = nullptr;
-
-    // Find an existing Channel matching the builder
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesBuilder(builder))
-        {
-            channelContext = context;
-            return false;
-        }
-        return true;
-    });
-
-    if (channelContext == nullptr)
-    {
-        // create a new channel if not found
-        channelContext = mChannelContexts.CreateObject(this);
-        if (channelContext == nullptr)
-            return ChannelHandle{ nullptr };
-        channelContext->Start(builder);
-    }
-    else
-    {
-        channelContext->Retain();
-    }
-
-    ChannelContextHandleAssociation * association = mChannelHandles.CreateObject(channelContext, delegate);
-    channelContext->Release();
-    return ChannelHandle{ association };
-}
-
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     if (mDelegate != nullptr)
     {
         mDelegate->OnNewConnection(session, this);
     }
-
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesSession(session, mgr))
-        {
-            context->OnNewConnection(session);
-            return false;
-        }
-        return true;
-    });
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
@@ -408,15 +367,6 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
     }
-
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesSession(session, mgr))
-        {
-            context->OnConnectionExpired(session);
-            return false;
-        }
-        return true;
-    });
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
@@ -429,29 +379,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
         source.ToString(addrBuffer, sizeof(addrBuffer));
         ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
                      addrBuffer);
-        return;
-    }
-
-    auto node     = peer.Value();
-    auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->IsCasePairing() && context->MatchNodeId(node))
-        {
-            CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
-            if (err != CHIP_NO_ERROR)
-                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".",
-                             chip::ErrorStr(err), static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
-            return false;
-        }
-        return true;
-    });
-
-    if (notFound)
-    {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager,
-                     "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
-                     addrBuffer, static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
         return;
     }
 }

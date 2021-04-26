@@ -20,10 +20,10 @@
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
+#include <app/server/DataModelHandler.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/StorablePeerConnection.h>
-#include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -43,7 +43,7 @@
 #include <transport/SecureSessionMgr.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#include "Mdns.h"
+#include <app/server/Mdns.h>
 #endif
 
 using namespace ::chip;

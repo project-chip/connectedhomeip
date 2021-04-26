@@ -243,17 +243,17 @@ public:
     /** @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize();
+    virtual CHIP_ERROR Initialize();
 
     /** @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Serialize(P256SerializedKeypair & output);
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output);
 
     /** @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+    virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
 
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR

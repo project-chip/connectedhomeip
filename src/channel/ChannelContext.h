@@ -24,9 +24,9 @@
 
 #include <variant>
 
+#include <channel/Channel.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/mdns/platform/Mdns.h>
-#include <messaging/Channel.h>
 #include <transport/CASESession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSessionMgr.h>
@@ -36,6 +36,7 @@ namespace Messaging {
 
 class ExchangeManager;
 class ChannelContext;
+class ChannelManager;
 
 class ChannelContextDeletor
 {
@@ -76,7 +77,9 @@ public:
 class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SessionEstablishmentDelegate
 {
 public:
-    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kNone), mExchangeManager(exchangeManager) {}
+    ChannelContext(ExchangeManager * exchangeManager, ChannelManager * channelManager) :
+        mState(ChannelState::kNone), mExchangeManager(exchangeManager), mChannelManager(channelManager)
+    {}
 
     void Start(const ChannelBuilder & builder);
 
@@ -121,6 +124,7 @@ private:
 
     ChannelState mState;
     ExchangeManager * mExchangeManager;
+    ChannelManager * mChannelManager;
 
     enum class PrepareState
     {
@@ -180,7 +184,7 @@ public:
     ~ChannelContextHandleAssociation() { mChannelContext->Release(); }
 
 private:
-    friend class ExchangeManager;
+    friend class ChannelManager;
     friend class ChannelHandle;
     ChannelContext * mChannelContext;
     ChannelDelegate * mChannelDelegate;

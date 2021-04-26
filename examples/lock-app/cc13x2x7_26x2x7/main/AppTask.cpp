@@ -20,7 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "Server.h"
+#include <app/server/Server.h>
 
 #include "FreeRTOS.h"
 
@@ -28,9 +28,9 @@
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 
-#include "DataModelHandler.h"
+#include <app/server/DataModelHandler.h>
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>

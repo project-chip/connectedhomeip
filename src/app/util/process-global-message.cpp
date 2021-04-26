@@ -39,7 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 
 #include <app/clusters/ias-zone-client/ias-zone-client.h>
 #include <app/reporting/reporting.h>

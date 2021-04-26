@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "basic-types.h"
+#include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPError.h>
 #include <support/DLLUtil.h>

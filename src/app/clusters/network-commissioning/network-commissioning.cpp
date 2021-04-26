@@ -21,6 +21,7 @@
 #include <cstring>
 #include <type_traits>
 
+#include <app/util/af.h>
 #include <gen/att-storage.h>
 #include <gen/attribute-id.h>
 #include <gen/attribute-type.h>
@@ -28,7 +29,6 @@
 #include <gen/cluster-id.h>
 #include <gen/command-id.h>
 #include <gen/enums.h>
-#include <util/af.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
