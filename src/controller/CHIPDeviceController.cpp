@@ -44,7 +44,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
-#include <protocols/message_counter/MessageCounterManager.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -116,8 +116,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    message_counter::MessageCounterManager * messageCounterManager = nullptr;
-    Transport::AdminPairingInfo * admin                            = nullptr;
+    secure_channel::MessageCounterManager * messageCounterManager = nullptr;
+    Transport::AdminPairingInfo * admin                           = nullptr;
 
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -152,10 +152,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
-    mTransportMgr = chip::Platform::New<DeviceTransportMgr>();
-    mSessionMgr   = chip::Platform::New<SecureSessionMgr>();
-    mExchangeMgr  = chip::Platform::New<Messaging::ExchangeManager>();
-    messageCounterManager  = chip::Platform::New<message_counter::MessageCounterManager>();
+    mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
+    mSessionMgr            = chip::Platform::New<SecureSessionMgr>();
+    mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
+    messageCounterManager  = chip::Platform::New<secure_channel::MessageCounterManager>();
     mMessageCounterManager = messageCounterManager;
 
     err = mTransportMgr->Init(
