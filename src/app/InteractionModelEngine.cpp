@@ -55,10 +55,10 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     for (uint32_t index = 0; index < IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
     {
-        mClusterInfoPool[index].mpNext = &mClusterInfoPool[index+1];
+        mClusterInfoPool[index].mpNext = &mClusterInfoPool[index + 1];
     }
-    mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS-1].mpNext = nullptr;
-    mpNextAvaiableClusterInfo = mClusterInfoPool;
+    mClusterInfoPool[IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
+    mpNextAvaiableClusterInfo                                  = mClusterInfoPool;
 
 exit:
     return err;
@@ -295,7 +295,7 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo * apClusterInfo)
         lastClusterInfo = lastClusterInfo->mpNext;
     }
     lastClusterInfo->ClearDirty();
-    lastClusterInfo->mpNext = mpNextAvaiableClusterInfo;
+    lastClusterInfo->mpNext   = mpNextAvaiableClusterInfo;
     mpNextAvaiableClusterInfo = apClusterInfo;
 }
 
@@ -305,9 +305,9 @@ CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfo, Attrib
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    aClusterInfo = mpNextAvaiableClusterInfo;
-    mpNextAvaiableClusterInfo = mpNextAvaiableClusterInfo->mpNext;
-    aClusterInfo->mpNext = nullptr;
+    aClusterInfo                       = mpNextAvaiableClusterInfo;
+    mpNextAvaiableClusterInfo          = mpNextAvaiableClusterInfo->mpNext;
+    aClusterInfo->mpNext               = nullptr;
     aClusterInfo->mAttributePathParams = aAttributePathParams;
     return CHIP_NO_ERROR;
 }

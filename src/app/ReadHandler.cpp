@@ -173,7 +173,7 @@ exit:
 
 CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     ClusterInfo * LastClusterInfo = nullptr;
     TLV::TLVReader reader;
     aAttributePathListParser.GetReader(&reader);
