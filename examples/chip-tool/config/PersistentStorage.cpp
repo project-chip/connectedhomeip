@@ -37,6 +37,7 @@ constexpr const char kLoggingKey[]         = "LoggingLevel";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
 
 namespace {
+
 std::string StringToBase64(const std::string & value)
 {
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value.length())]);

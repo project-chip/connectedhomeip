@@ -31,12 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
  * Get the value for the given key
  *
  */
-- (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler;
-
-/**
- * Get the value for the given key
- *
- */
 - (NSString *)CHIPGetKeyValue:(NSString *)key;
 
 /**
@@ -44,15 +38,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 - (void)CHIPSetKeyValue:(NSString *)key
-                  value:(NSString *)value
+                  value:(NSString *)value;
 
-    /**
-     * Delete the key and corresponding value
-     *
-     */
-    - (void)CHIPDeleteKeyValue
-                       :(NSString *)key
+/**
+ * Delete the key and corresponding value
+ *
+ */
+- (void)CHIPDeleteKeyValue:(NSString *)key;
 
-    @end
+@end
 
-    NS_ASSUME_NONNULL_END
+NS_ASSUME_NONNULL_END

@@ -183,13 +183,13 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     uint16_t deviceIdLength = sizeof(_localDeviceId);
     if (CHIP_NO_ERROR
         != _persistentStorageDelegateBridge->SyncGetKeyValue(
-            CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength) {
+            CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
 
         _persistentStorageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
     } else {
-        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
+        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithFormat: @"%lld", _localDeviceId]];
         [scanner scanHexLongLong:&_localDeviceId];
         CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }
