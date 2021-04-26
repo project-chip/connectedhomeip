@@ -119,7 +119,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     secure_channel::MessageCounterManager * messageCounterManager = nullptr;
-    Transport::AdminPairingInfo * admin                            = nullptr;
+    Transport::AdminPairingInfo * admin                           = nullptr;
 
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 

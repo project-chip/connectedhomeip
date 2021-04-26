@@ -28,8 +28,8 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/Constants.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
