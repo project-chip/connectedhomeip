@@ -1078,7 +1078,7 @@
  * 8 - Press Reset for N seconds (see pairing instruction for value of N)
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT
-#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT (1 | 1>>5 | 1>>8)
+#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT (1 | 1 >> 5 | 1 >> 8)
 #endif
 
 /**
@@ -1103,7 +1103,7 @@
  * 5 - See Device Manual
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT
-#define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT (1>>2 | 1>>8)
+#define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT (1 >> 2 | 1 >> 8)
 #endif
 
 /**

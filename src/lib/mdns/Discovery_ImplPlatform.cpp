@@ -217,38 +217,38 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     {
         snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
         textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
-                                        strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
+                                         strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
 
         snprintf(commissioningModeBuf, sizeof(commissioningModeBuf), "%u", params.GetCommissioningMode() ? 1 : 0);
         textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
-                                            strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
+                                         strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
 
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
             snprintf(additionalPairingBuf, sizeof(additionalPairingBuf), "1");
             textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalPairingBuf),
-                                                strnlen(additionalPairingBuf, sizeof(additionalPairingBuf)) };
+                                             strnlen(additionalPairingBuf, sizeof(additionalPairingBuf)) };
         }
 
         if (params.GetRotatingId().HasValue())
         {
             snprintf(rotatingIdBuf, sizeof(rotatingIdBuf), "%s", params.GetRotatingId().Value());
             textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingIdBuf),
-                                            strnlen(rotatingIdBuf, sizeof(rotatingIdBuf)) };
+                                             strnlen(rotatingIdBuf, sizeof(rotatingIdBuf)) };
         }
 
         if (params.GetPairingHint().HasValue())
         {
             snprintf(pairingHintBuf, sizeof(pairingHintBuf), "%u", params.GetPairingHint().Value());
             textEntries[textEntrySize++] = { "PH", reinterpret_cast<const uint8_t *>(pairingHintBuf),
-                                            strnlen(pairingHintBuf, sizeof(pairingHintBuf)) };
+                                             strnlen(pairingHintBuf, sizeof(pairingHintBuf)) };
         }
 
         if (params.GetPairingInstr().HasValue())
         {
             snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s", params.GetPairingInstr().Value());
             textEntries[textEntrySize++] = { "PI", reinterpret_cast<const uint8_t *>(pairingInstrBuf),
-                                            strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
+                                             strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
         }
 
         snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
@@ -289,13 +289,14 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
 void DiscoveryImplPlatform::PrintEntries(const MdnsService * service)
 {
-    printf("printEntries port=%d, mTextEntrySize=%d, mSubTypeSize=%d\n", (int)(service->mPort), (int)(service->mTextEntrySize), (int)(service->mSubTypeSize));
-    for (int i=0; i<(int)service->mTextEntrySize; i++)
+    printf("printEntries port=%d, mTextEntrySize=%d, mSubTypeSize=%d\n", (int) (service->mPort), (int) (service->mTextEntrySize),
+           (int) (service->mSubTypeSize));
+    for (int i = 0; i < (int) service->mTextEntrySize; i++)
     {
-        printf(" entry [%d] : %s %s\n", i, service->mTextEntries[i].mKey, (char*)(service->mTextEntries[i].mData));
+        printf(" entry [%d] : %s %s\n", i, service->mTextEntries[i].mKey, (char *) (service->mTextEntries[i].mData));
     }
 
-    for (int i=0; i<(int)service->mSubTypeSize; i++)
+    for (int i = 0; i < (int) service->mSubTypeSize; i++)
     {
         printf(" type [%d] : %s\n", i, service->mSubTypes[i]);
     }
@@ -376,7 +377,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mInterface   = INET_NULL_INTERFACEID;
     service.mAddressType = Inet::kIPAddressType_Any;
     printf("DiscoveryImplPlatform::Advertise calling ChipMdnsPublishService\n");
-    error                = ChipMdnsPublishService(&service);
+    error = ChipMdnsPublishService(&service);
 
     return error;
 }

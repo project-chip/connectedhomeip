@@ -471,7 +471,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    const char * serviceType = params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
+    const char * serviceType =
+        params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode ? "_chipc" : "_chipd";
 
     FullQName operationalServiceName = AllocateQName(serviceType, "_udp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, serviceType, "_udp", "local");
@@ -557,9 +558,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
             if (!AddResponder<PtrResponder>(shortServiceName, operationalServerName)
-                    .SetReportAdditional(operationalServerName)
-                    .SetReportInServiceListing(true)
-                    .IsValid())
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
             {
                 ChipLogError(Discovery, "Failed to add short discriminator PTR record mDNS responder");
                 return CHIP_ERROR_NO_MEMORY;
@@ -571,9 +572,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
             if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
-                    .SetReportAdditional(operationalServerName)
-                    .SetReportInServiceListing(true)
-                    .IsValid())
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
             {
                 ChipLogError(Discovery, "Failed to add long discriminator PTR record mDNS responder");
                 return CHIP_ERROR_NO_MEMORY;
@@ -585,9 +586,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
             if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
-                    .SetReportAdditional(operationalServerName)
-                    .SetReportInServiceListing(true)
-                    .IsValid())
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
             {
                 ChipLogError(Discovery, "Failed to add commissioning mode PTR record mDNS responder");
                 return CHIP_ERROR_NO_MEMORY;
@@ -600,9 +601,9 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
             FullQName longServiceName = AllocateQName(nameBuffer, "_sub", serviceType, "_udp", "local");
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
             if (!AddResponder<PtrResponder>(longServiceName, operationalServerName)
-                    .SetReportAdditional(operationalServerName)
-                    .SetReportInServiceListing(true)
-                    .IsValid())
+                     .SetReportAdditional(operationalServerName)
+                     .SetReportInServiceListing(true)
+                     .IsValid())
             {
                 ChipLogError(Discovery, "Failed to add open window commissioning mode PTR record mDNS responder");
                 return CHIP_ERROR_NO_MEMORY;
@@ -711,7 +712,8 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
             sprintf(txtPairingInstr, "");
         }
 
-        return AllocateQName(txtDiscriminator, txtVidPid, txtCommissioningMode, txtOpenWindowCommissioningMode, txtDeviceType, txtDeviceName, txtRotatingDeviceId, txtPairingHint, txtPairingInstr);
+        return AllocateQName(txtDiscriminator, txtVidPid, txtCommissioningMode, txtOpenWindowCommissioningMode, txtDeviceType,
+                             txtDeviceName, txtRotatingDeviceId, txtPairingHint, txtPairingInstr);
     }
     else
     {

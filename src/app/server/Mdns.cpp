@@ -19,12 +19,12 @@
 
 #include <inttypes.h>
 
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>

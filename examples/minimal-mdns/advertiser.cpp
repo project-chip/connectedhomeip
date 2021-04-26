@@ -49,9 +49,9 @@ struct Options
     Optional<const char *> deviceName;
 
     // commisionable node params
-    uint8_t shortDiscriminator = 52;
-    uint16_t longDiscriminator = 840;
-    bool commissioningMode = false;
+    uint8_t shortDiscriminator       = 52;
+    uint16_t longDiscriminator       = 840;
+    bool commissioningMode           = false;
     bool commissioningModeOpenWindow = false;
     Optional<const char *> rotatingId;
     Optional<const char *> pairingInstr;
@@ -146,17 +146,17 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         return true;
     case kOptionOperationalFabricId:
         if (sscanf(aValue, "%" SCNx64, &gOptions.fabricId) != 1)
-         {
-             PrintArgError("%s: Invalid fabric id: %s\n", aProgram, aValue);
-             return false;
-         }
+        {
+            PrintArgError("%s: Invalid fabric id: %s\n", aProgram, aValue);
+            return false;
+        }
         return true;
     case kOptionOperationalNodeId:
         if (sscanf(aValue, "%" SCNx64, &gOptions.nodeId) != 1)
-         {
-             PrintArgError("%s: Invalid node id: %s\n", aProgram, aValue);
-             return false;
-         }
+        {
+            PrintArgError("%s: Invalid node id: %s\n", aProgram, aValue);
+            return false;
+        }
         return true;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -265,21 +265,21 @@ int main(int argc, char ** args)
     if (gOptions.advertisingMode == AdvertisingMode::kCommissionableNode)
     {
         printf("Advertise Commissionable Node\n");
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommissionAdvertisingParameters()
-                                                                      .EnableIpV4(gOptions.enableIpV4)
-                                                                      .SetPort(CHIP_PORT)
-                                                                      .SetShortDiscriminator(gOptions.shortDiscriminator)
-                                                                      .SetLongDiscrimininator(gOptions.longDiscriminator)
-                                                                      .SetMac(chip::ByteSpan(gOptions.mac, 6))
-                                                                      .SetVendorId(gOptions.vendorId)
-                                                                      .SetProductId(gOptions.productId)
-                                                                      .SetCommissioningMode(gOptions.commissioningMode, gOptions.commissioningModeOpenWindow)
-                                                                      .SetDeviceType(gOptions.deviceType)
-                                                                      .SetDeviceName(gOptions.deviceName)
-                                                                      .SetRotatingId(gOptions.rotatingId)
-                                                                      .SetPairingInstr(gOptions.pairingInstr)
-                                                                      .SetPairingHint(gOptions.pairingHint)
-                                                                      );
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
+            chip::Mdns::CommissionAdvertisingParameters()
+                .EnableIpV4(gOptions.enableIpV4)
+                .SetPort(CHIP_PORT)
+                .SetShortDiscriminator(gOptions.shortDiscriminator)
+                .SetLongDiscrimininator(gOptions.longDiscriminator)
+                .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                .SetVendorId(gOptions.vendorId)
+                .SetProductId(gOptions.productId)
+                .SetCommissioningMode(gOptions.commissioningMode, gOptions.commissioningModeOpenWindow)
+                .SetDeviceType(gOptions.deviceType)
+                .SetDeviceName(gOptions.deviceName)
+                .SetRotatingId(gOptions.rotatingId)
+                .SetPairingInstr(gOptions.pairingInstr)
+                .SetPairingHint(gOptions.pairingHint));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
     {
