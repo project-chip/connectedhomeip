@@ -9,9 +9,9 @@ chip_test_suite("tests") {
   output_name = "libSecureChannelTests"
 
   test_sources = [
+    "TestMessageCounterManager.cpp",
     "TestPASESession.cpp",
     "TestStatusReport.cpp",
-    "TestMessageCounterManager.cpp",
   ]
 
   public_deps = [
