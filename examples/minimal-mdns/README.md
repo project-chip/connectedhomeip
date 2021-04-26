@@ -62,7 +62,11 @@ Example runs:
 ```
 
 ```sh
-./out/minimal_mdns/mdns-advertiser -4 -m commisioning --vendor-id 123 --product-id 456
+./out/minimal_mdns/mdns-advertiser -4 -m commissioning-mode --vendor-id 123 --product-id 456
+```
+
+```sh
+./out/minimal_mdns/mdns-advertiser -4 -m commissioner --vendor-id 123 --product-id 456 --device-type 35
 ```
 
 see
