@@ -65,9 +65,7 @@ static_library("framework") {
 }
 
 chip_data_model("darwin_data_model") {
-  cluster_sources = [
-    "network-commissioning",
-  ]
+  cluster_sources = [ "network-commissioning" ]
 
   zap_pregenerated_dir = "gen"
 
