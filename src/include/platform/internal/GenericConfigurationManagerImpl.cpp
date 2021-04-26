@@ -1161,7 +1161,6 @@ void GenericConfigurationManagerImpl<ImplClass>::_LogDeviceConfig()
         }
         ChipLogProgress(DeviceLayer, "  Device Type: %" PRIu16 " (0x%" PRIX16 ")", deviceType, deviceType);
     }
-
 }
 
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.

@@ -19,12 +19,12 @@
 
 #include <inttypes.h>
 
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -117,7 +117,7 @@ CHIP_ERROR AdvertiseCommisioning()
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
     // TODO: this code assumes the device always boots into commissioning mode
-    // fix this once we are able to configure default boot behavior 
+    // fix this once we are able to configure default boot behavior
     // and when we can determine whether we have been commissioned yet
     bool notYetCommissioned = true;
     advertiseParameters.SetCommissioningMode(notYetCommissioned, false);

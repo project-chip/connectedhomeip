@@ -141,7 +141,7 @@ public:
 
     CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled, bool openWindow)
     {
-        mCommissioningModeEnabled = modeEnabled;
+        mCommissioningModeEnabled    = modeEnabled;
         mOpenWindowCommissioningMode = openWindow;
         return *this;
     }
@@ -191,10 +191,10 @@ public:
     CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
 
 private:
-    uint8_t mShortDiscriminator  = 0;
-    uint16_t mLongDiscriminator  = 0; // 12-bit according to spec
-    CommssionAdvertiseMode mMode = CommssionAdvertiseMode::kCommissionableNode;
-    bool mCommissioningModeEnabled = false;
+    uint8_t mShortDiscriminator       = 0;
+    uint16_t mLongDiscriminator       = 0; // 12-bit according to spec
+    CommssionAdvertiseMode mMode      = CommssionAdvertiseMode::kCommissionableNode;
+    bool mCommissioningModeEnabled    = false;
     bool mOpenWindowCommissioningMode = false;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
