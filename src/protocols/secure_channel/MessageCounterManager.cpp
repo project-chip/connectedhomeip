@@ -28,14 +28,14 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
-#include <protocols/message_counter/MessageCounterManager.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/Constants.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
-namespace message_counter {
+namespace secure_channel {
 
 CHIP_ERROR MessageCounterManager::Init(Messaging::ExchangeManager * exchangeMgr)
 {
@@ -443,5 +443,5 @@ exit:
     return;
 }
 
-} // namespace message_counter
+} // namespace secure_channel
 } // namespace chip

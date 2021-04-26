@@ -21,8 +21,8 @@ static_library("protocols") {
     "echo/Echo.h",
     "echo/EchoClient.cpp",
     "echo/EchoServer.cpp",
-    "message_counter/MessageCounterManager.cpp",
-    "message_counter/MessageCounterManager.h",
+    "secure_channel/MessageCounterManager.cpp",
+    "secure_channel/MessageCounterManager.h",
   ]
 
   cflags = [ "-Wconversion" ]

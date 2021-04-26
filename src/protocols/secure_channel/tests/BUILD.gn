@@ -11,12 +11,14 @@ chip_test_suite("tests") {
   test_sources = [
     "TestPASESession.cpp",
     "TestStatusReport.cpp",
+    "TestMessageCounterManager.cpp",
   ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/protocols/secure_channel",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",

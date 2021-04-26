@@ -27,7 +27,7 @@
 #include <core/CHIPCore.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
-#include <protocols/message_counter/MessageCounterManager.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
@@ -150,7 +150,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
-    message_counter::MessageCounterManager gMessageCounterManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
 
     CHIP_ERROR err;
 
@@ -183,7 +183,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
-    message_counter::MessageCounterManager gMessageCounterManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -272,7 +272,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
-    message_counter::MessageCounterManager gMessageCounterManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -351,7 +351,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
-    message_counter::MessageCounterManager gMessageCounterManager;
+    secure_channel::MessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
