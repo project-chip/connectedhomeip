@@ -64,7 +64,7 @@ int streamer_esp32_init(streamer_t * streamer)
     esp_vfs_dev_uart_use_driver(0);
     esp_console_config_t console_config = {
         .max_cmdline_length = 256,
-        .max_cmdline_args   = 8,
+        .max_cmdline_args   = 16,
     };
     ESP_ERROR_CHECK(esp_console_init(&console_config));
     linenoiseSetMultiLine(1);
