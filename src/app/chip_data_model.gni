@@ -18,14 +18,20 @@ import("${chip_root}/src/lib/core/core.gni")
 
 _app_root = get_path_info(".", "abspath")
 
+_zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
+
 # Defines a source_set for CHIP data model.
 #
 # Arguments:
 #  zap_pregenerated_dir
 #    Path to the ZAP "gen" dir.
 #
+#  zap_file
+#    Path to the ZAP input file.
+#
 #  cluster_sources
-#    Names of the clusters to compile.
+#    Names of the clusters directories to compile.
+#    Deprecated, specify zap_file instead.
 #
 #  use_default_client_callbacks
 #    Include CHIPClientCallbacks.cpp.
@@ -53,6 +59,7 @@ template("chip_data_model") {
                            [
                              "zap_pregenerated_dir",
                              "cluster_sources",
+                             "zap_file",
                              "use_default_client_callbacks",
                            ])
 
@@ -75,7 +82,6 @@ template("chip_data_model") {
       "${_app_root}/clusters/messaging-server/messaging-server.h",
       "${_app_root}/clusters/network-commissioning/network-commissioning.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
-      "${_app_root}/clusters/scenes-client/scenes-client.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
       "${_app_root}/clusters/temperature-measurement-server/temperature-measurement-server.h",
@@ -104,22 +110,32 @@ template("chip_data_model") {
     ]
 
     if (defined(invoker.cluster_sources)) {
-      foreach(cluster, invoker.cluster_sources) {
-        if (cluster == "door-lock-server") {
-          sources += [
-            "${_app_root}/clusters/${cluster}/door-lock-server-core.cpp",
-            "${_app_root}/clusters/${cluster}/door-lock-server-logging.cpp",
-            "${_app_root}/clusters/${cluster}/door-lock-server-schedule.cpp",
-            "${_app_root}/clusters/${cluster}/door-lock-server-user.cpp",
-          ]
-        } else if (cluster == "network-commissioning") {
-          sources += [
-            "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
-            "${_app_root}/clusters/${cluster}/${cluster}.cpp",
-          ]
-        } else {
-          sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
-        }
+      _cluster_sources = invoker.cluster_sources
+    } else if (defined(invoker.zap_file)) {
+      _zap_path = rebase_path(invoker.zap_file, root_build_dir)
+      _script_args = [ "--zap_file=" + _zap_path ]
+
+      _cluster_sources = exec_script(_zap_cluster_list_script,
+                                     _script_args,
+                                     "list lines",
+                                     [ invoker.zap_file ])
+    }
+
+    foreach(cluster, _cluster_sources) {
+      if (cluster == "door-lock-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/door-lock-server-core.cpp",
+          "${_app_root}/clusters/${cluster}/door-lock-server-logging.cpp",
+          "${_app_root}/clusters/${cluster}/door-lock-server-schedule.cpp",
+          "${_app_root}/clusters/${cluster}/door-lock-server-user.cpp",
+        ]
+      } else if (cluster == "network-commissioning") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+        ]
+      } else {
+        sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
     }
 
