@@ -39,6 +39,7 @@ target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
     ${APP_ROOT}/shell_common/cmd_ping.cpp    
+    ${APP_ROOT}/shell_common/cmd_ping_responder.cpp
     ${APP_ROOT}/shell_common/cmd_btp.cpp
     ${APP_ROOT}/standalone/main.cpp
 )

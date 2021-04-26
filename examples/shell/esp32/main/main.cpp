@@ -39,6 +39,7 @@ static void chip_shell_task(void * args)
     int ret = chip::Shell::streamer_init(chip::Shell::streamer_get());
     assert(ret == 0);
     cmd_ping_init();
+    cmd_ping_responder_init();
     while (true)
     {
         const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;
