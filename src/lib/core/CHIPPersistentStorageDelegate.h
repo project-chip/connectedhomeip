@@ -31,10 +31,13 @@ public:
     /**
      * @brief
      *   This is a synchronous Get API, where the value is returned via the output
-     *   buffer. This API should be used sparingly, since it may block for
-     *   some duration.
+     *   buffer.
      *
      *   This API can be used to retrieve a byte buffer value from the storage.
+     *   There is no implied data format and and data will be stored/fetched binary.
+     *   Caller is responsible to take care of any special formatting needs (e.g. byte
+     *   order, null terminators, consistency checks or versioning).
+     *
      *
      * @param[in]      key Key to lookup
      * @param[out]     buffer Value for the key
