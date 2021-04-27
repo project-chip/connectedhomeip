@@ -9,11 +9,13 @@ chip_test_suite("tests") {
   output_name = "libSecureChannelTests"
 
   test_sources = [
+    "TestCASESession.cpp",
     "TestPASESession.cpp",
     "TestStatusReport.cpp",
   ]
 
   public_deps = [
+    "${chip_root}/src/credentials/tests:cert_test_vectors",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging/tests:helpers",

@@ -27,7 +27,7 @@
 #include <channel/Channel.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/mdns/platform/Mdns.h>
-#include <transport/CASESession.h>
+#include <protocols/secure_channel/CASESession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSessionMgr.h>
 
