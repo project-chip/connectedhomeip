@@ -23,16 +23,6 @@
     ],
     "templates": [
         {
-            "path": "templates/chip/CHIPClusters.zapt",
-            "name": "C++ ZCL API Header",
-            "output": "src/controller/CHIPClusters.h"
-        },
-        {
-            "path": "templates/chip/CHIPClusters-src.zapt",
-            "name": "C++ ZCL API",
-            "output": "src/controller/CHIPClusters.cpp"
-        },
-        {
             "path": "templates/chip/chip-zcl-zpro-codec-api.zapt",
             "name": "CHIP ZCL API Header",
             "output": "src/app/chip-zcl-zpro-codec-api.h"
