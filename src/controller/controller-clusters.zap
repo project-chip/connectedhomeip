@@ -1,5 +1,5 @@
 {
-  "featureLevel": 26,
+  "featureLevel": 29,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -4210,7 +4210,7 @@
           "mfgCode": null,
           "define": "IAS_ZONE_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "ZoneStatusChangeNotification",
@@ -7562,14 +7562,18 @@
       "endpointTypeIndex": 0,
       "profileId": "0x0103",
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": null,
+      "deviceIdentifier": null
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 1,
       "profileId": "0x0103",
       "endpointId": 2,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": null,
+      "deviceIdentifier": null
     }
   ],
   "log": []
