@@ -234,8 +234,20 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     commandHandler.mpExchangeCtx->SetDelegate(&delegate);
 
     AddCommandDataElement(apSuite, apContext, &commandHandler, aNeedStatusCode, aIsEmptyResponse);
-    err = commandHandler.SendCommandResponse();
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    err = commandHandler.FinalizeCommandsMessage();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+    chip::System::PacketBufferTLVReader reader;
+    InvokeCommand::Parser invokeCommandParser;
+    reader.Init(std::move(commandHandler.mCommandMessageBuf));
+    err = reader.Next();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeCommandParser.Init(reader);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = invokeCommandParser.CheckSchemaValidity();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)
