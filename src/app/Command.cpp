@@ -161,10 +161,8 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
 
     if (!aIsStatus)
     {
-        err = commandDataElement.GetWriter()->StartContainer(
-                TLV::ContextTag(CommandDataElement::kCsTag_Data),
-                TLV::kTLVType_Structure,
-                mDataElementContainerType);
+        err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                                                             TLV::kTLVType_Structure, mDataElementContainerType);
     }
 exit:
     ChipLogFunctError(err);
