@@ -355,6 +355,157 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 
                 switch (clusterId)
                 {
+                case 0x001D:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // DeviceType
+                    {
+                        _DeviceType data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].type = emberAfGetInt32u(message, 0, messageLen);
+                            message += 4;
+                            CHECK_MESSAGE_LENGTH(4);
+                            data[i].revision = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                        }
+
+                        Callback::Callback<DescriptorDeviceListListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorDeviceListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0001: // CLUSTER_ID
+                    {
+                        chip::ClusterId data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                        }
+
+                        Callback::Callback<DescriptorServerListListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorServerListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0002: // CLUSTER_ID
+                    {
+                        chip::ClusterId data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                        }
+
+                        Callback::Callback<DescriptorClientListListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorClientListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0003: // ENDPOINT_ID
+                    {
+                        chip::EndpointId data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt8u(message, 0, messageLen);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                        }
+
+                        Callback::Callback<DescriptorPartsListListAttributeCallback> * cb =
+                            Callback::Callback<DescriptorPartsListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0xF004:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // GroupState
+                    {
+                        _GroupState data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].VendorGroupId = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].GroupKeySetIndex = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                        }
+
+                        Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> * cb =
+                            Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0001: // GroupKey
+                    {
+                        _GroupKey data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].GroupKeyRoot = emberAfGetString(message, 0, messageLen);
+                            message += 16;
+                            CHECK_MESSAGE_LENGTH(16);
+                            data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, messageLen);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].GroupKeySecurityPolicy = emberAfGetInt8u(message, 0, messageLen);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                        }
+
+                        Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> * cb =
+                            Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x003E:
+                    switch (attributeId)
+                    {
+                    case 0x0001: // FabricDescriptor
+                    {
+                        _FabricDescriptor data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].FabricId = emberAfGetInt64u(message, 0, messageLen);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].Label = emberAfGetString(message, 0, messageLen);
+                            message += 32;
+                            CHECK_MESSAGE_LENGTH(32);
+                            data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(8);
+                        }
+
+                        Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
+                            Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 }
                 break;
             }
@@ -1221,6 +1372,21 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Co
     return true;
 }
 
+bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
+                                                                             uint8_t * debugText)
+{
+    ChipLogProgress(Zcl, "CommissioningCompleteResponse:");
+    ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
+    ChipLogProgress(Zcl, "  debugText: %s", debugText);
+
+    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
+
+    Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
+        Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
                                                                            uint8_t * debugText)
 {
@@ -1454,6 +1620,19 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
+{
+    ChipLogProgress(Zcl, "GetFabricIdResponse:");
+    ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
+
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterGetFabricIdResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, FabricId);
     return true;
 }
 

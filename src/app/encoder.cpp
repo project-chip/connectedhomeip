@@ -109,7 +109,6 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | GeneralCommissioning                                                | 0x0030 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
-| IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
@@ -220,8 +219,6 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_REMOVE_ALL_GROUPS_COMMAND_ID (0x04)
 #define ZCL_REMOVE_GROUP_COMMAND_ID (0x03)
 #define ZCL_VIEW_GROUP_COMMAND_ID (0x01)
-
-#define IAS_ZONE_CLUSTER_ID 0x0500
 
 #define IDENTIFY_CLUSTER_ID 0x0003
 #define ZCL_IDENTIFY_COMMAND_ID (0x00)
@@ -2801,100 +2798,6 @@ PacketBufferHandle encodeGroupsClusterReadNameSupportAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGroupsClusterRevision", GROUPS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
-    COMMAND_FOOTER();
-}
-
-/*----------------------------------------------------------------------------*\
-| Cluster IasZone                                                     | 0x0500 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ZoneState                                                         | 0x0000 |
-| * ZoneType                                                          | 0x0001 |
-| * ZoneStatus                                                        | 0x0002 |
-| * IasCieAddress                                                     | 0x0010 |
-| * ZoneId                                                            | 0x0011 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-PacketBufferHandle encodeIasZoneClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("DiscoverIasZoneAttributes", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ZoneState
- */
-PacketBufferHandle encodeIasZoneClusterReadZoneStateAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadIasZoneZoneState", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ZoneType
- */
-PacketBufferHandle encodeIasZoneClusterReadZoneTypeAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadIasZoneZoneType", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ZoneStatus
- */
-PacketBufferHandle encodeIasZoneClusterReadZoneStatusAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadIasZoneZoneStatus", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute IasCieAddress
- */
-PacketBufferHandle encodeIasZoneClusterReadIasCieAddressAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadIasZoneIasCieAddress", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0010);
-    COMMAND_FOOTER();
-}
-
-PacketBufferHandle encodeIasZoneClusterWriteIasCieAddressAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
-                                                                   uint64_t iasCieAddress)
-{
-    COMMAND_HEADER("WriteIasZoneIasCieAddress", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand)
-        .Put8(seqNum)
-        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
-        .Put16(0x0010)
-        .Put8(240)
-        .Put64(static_cast<uint64_t>(iasCieAddress));
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ZoneId
- */
-PacketBufferHandle encodeIasZoneClusterReadZoneIdAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadIasZoneZoneId", IAS_ZONE_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0011);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ClusterRevision
- */
-PacketBufferHandle encodeIasZoneClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadIasZoneClusterRevision", IAS_ZONE_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
