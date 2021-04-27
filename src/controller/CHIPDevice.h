@@ -307,6 +307,7 @@ public:
 
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:
