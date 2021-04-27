@@ -111,8 +111,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    secure_channel::MessageCounterManager * messageCounterManager = nullptr;
-    Transport::AdminPairingInfo * admin                           = nullptr;
+    Transport::AdminPairingInfo * admin = nullptr;
 
     VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -155,8 +154,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
     mSessionMgr            = chip::Platform::New<SecureSessionMgr>();
     mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
-    messageCounterManager  = chip::Platform::New<secure_channel::MessageCounterManager>();
-    mMessageCounterManager = messageCounterManager;
+    mMessageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
@@ -180,7 +178,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->Init(mSessionMgr);
     SuccessOrExit(err);
 
-    err = messageCounterManager->Init(mExchangeMgr);
+    err = mMessageCounterManager->Init(mExchangeMgr);
     SuccessOrExit(err);
 
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
