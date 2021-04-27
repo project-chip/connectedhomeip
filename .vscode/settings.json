@@ -111,8 +111,7 @@
         "ratio": "cpp",
         "set": "cpp",
         "stack": "cpp",
-        "regex": "cpp",
-        "variant": "cpp"
+        "regex": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
