@@ -272,7 +272,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     bool controlOpComplete = false;
-    ChipLogProgress(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
+    ChipLogDetail(DeviceLayer, "HandlePlatformSpecificBLEEvent %d", apEvent->Type);
     switch (apEvent->Type)
     {
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
@@ -476,7 +476,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(value, len);
 
-    ChipLogProgress(DeviceLayer, "Indication received, conn = %p", conId);
+    ChipLogDetail(DeviceLayer, "Indication received, conn = %p", conId);
 
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
