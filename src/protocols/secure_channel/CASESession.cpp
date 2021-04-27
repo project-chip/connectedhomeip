@@ -1093,7 +1093,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // mExchangeCtxt can be nullptr if this is the first message (CASE_SigmaR1) received by CASESession
-    // via UnsolicitedMessageHandler. The exchance context is allocated by exchange manager and provided
+    // via UnsolicitedMessageHandler. The exchange context is allocated by exchange manager and provided
     // to the handler (CASESession object).
     if (mExchangeCtxt != nullptr)
     {
