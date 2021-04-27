@@ -120,6 +120,24 @@ struct CommissionerInitParams : public ControllerInitParams
 
 /**
  * @brief
+ * Used for make current OnSuccessCallback & OnFailureCallback works when interaction model landed, it will be removed
+ * in the future.
+ */
+class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate
+{
+public:
+    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
+                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
+                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
+
+    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+
+    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
+};
+
+/**
+ * @brief
  *   Controller applications can use this class to communicate with already paired CHIP devices. The
  *   application is required to provide access to the persistent storage, where the paired device information
  *   is stored. This object of this class can be initialized with the data from the storage (List of devices,
@@ -225,6 +243,7 @@ protected:
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
     PersistentStorageDelegate * mStorageDelegate;
+    DeviceControllerInteractionModelDelegate * mTempIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
