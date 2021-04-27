@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <memory>
 
+#include <platform/KeyValueStoreManager.h>
 #include <support/ThreadOperationalDataset.h>
 
 using chip::Controller::DeviceCommissioner;
@@ -78,47 +79,6 @@ CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArray
 
 exit:
     return err;
-}
-
-CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, size_t inStrLen, jstring & outString)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    jbyteArray charArray    = NULL;
-    jstring utf8Encoding    = NULL;
-    jclass java_lang_String = NULL;
-    jmethodID ctor          = NULL;
-
-    err = N2J_ByteArray(env, reinterpret_cast<const uint8_t *>(inStr), inStrLen, charArray);
-    SuccessOrExit(err);
-
-    utf8Encoding = env->NewStringUTF("UTF-8");
-    VerifyOrExit(utf8Encoding != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    java_lang_String = env->FindClass("java/lang/String");
-    VerifyOrExit(java_lang_String != NULL, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
-
-    ctor = env->GetMethodID(java_lang_String, "<init>", "([BLjava/lang/String;)V");
-    VerifyOrExit(ctor != NULL, err = CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-
-    outString = (jstring) env->NewObject(java_lang_String, ctor, charArray, utf8Encoding);
-    VerifyOrExit(outString != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-exit:
-    // error code propagated from here, so clear any possible
-    // exceptions that arose here
-    env->ExceptionClear();
-
-    if (utf8Encoding != NULL)
-        env->DeleteLocalRef(utf8Encoding);
-    if (charArray != NULL)
-        env->DeleteLocalRef(charArray);
-
-    return err;
-}
-
-CHIP_ERROR N2J_NewStringUTF(JNIEnv * env, const char * inStr, jstring & outString)
-{
-    return N2J_NewStringUTF(env, inStr, strlen(inStr), outString);
 }
 
 } // namespace
@@ -301,108 +261,27 @@ void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle 
 
 void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 
-CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * buffer, uint16_t & size)
+CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    jstring keyString       = NULL;
-    jstring valueString     = NULL;
-    const char * valueChars = nullptr;
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    jclass storageCls       = GetPersistentStorageClass();
-    jmethodID method        = GetJavaEnv()->GetStaticMethodID(storageCls, "getKeyValue", "(Ljava/lang/String;)Ljava/lang/String;");
+    ChipLogError(chipTool, "Getting key %s", key);
 
-    GetJavaEnv()->ExceptionClear();
+    size_t read_size = 0;
 
-    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
-    SuccessOrExit(err);
+    CHIP_ERROR err = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, value, size, &read_size);
 
-    valueString = (jstring) GetJavaEnv()->CallStaticObjectMethod(storageCls, method, keyString);
+    size = static_cast<uint16_t>(read_size);
 
-    if (valueString != NULL)
-    {
-        size_t stringLength = GetJavaEnv()->GetStringUTFLength(valueString);
-        if (stringLength > UINT16_MAX - 1)
-        {
-            err = CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
-        else
-        {
-            if (buffer != nullptr)
-            {
-                valueChars = GetJavaEnv()->GetStringUTFChars(valueString, 0);
-                memcpy(buffer, valueChars, std::min<size_t>(size, stringLength));
-                if (size < stringLength)
-                {
-                    err = CHIP_ERROR_NO_MEMORY;
-                }
-            }
-            else
-            {
-                err = CHIP_ERROR_NO_MEMORY;
-            }
-            size = stringLength;
-        }
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-exit:
-    GetJavaEnv()->ExceptionClear();
-    if (valueChars != nullptr)
-    {
-        GetJavaEnv()->ReleaseStringUTFChars(valueString, valueChars);
-    }
-    GetJavaEnv()->DeleteLocalRef(keyString);
-    GetJavaEnv()->DeleteLocalRef(valueString);
     return err;
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    jclass storageCls = GetPersistentStorageClass();
-    jmethodID method  = GetJavaEnv()->GetStaticMethodID(storageCls, "setKeyValue", "(Ljava/lang/String;Ljava/lang/String;)V");
-
-    GetJavaEnv()->ExceptionClear();
-
-    jstring keyString   = NULL;
-    jstring valueString = NULL;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-
-    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
-    SuccessOrExit(err);
-
-    err = N2J_NewStringUTF(GetJavaEnv(), static_cast<const char *>(value), size, valueString);
-    SuccessOrExit(err);
-
-    GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString, valueString);
-
-exit:
-    GetJavaEnv()->ExceptionClear();
-    GetJavaEnv()->DeleteLocalRef(keyString);
-    GetJavaEnv()->DeleteLocalRef(valueString);
-
-    return err;
+    ChipLogError(chipTool, "Setting key %s", key);
+    return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncDeleteKeyValue(const char * key)
 {
-    jclass storageCls = GetPersistentStorageClass();
-    jmethodID method  = GetJavaEnv()->GetStaticMethodID(storageCls, "deleteKeyValue", "(Ljava/lang/String;)V");
-
-    GetJavaEnv()->ExceptionClear();
-
-    jstring keyString = NULL;
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-
-    err = N2J_NewStringUTF(GetJavaEnv(), key, keyString);
-    SuccessOrExit(err);
-
-    GetJavaEnv()->CallStaticVoidMethod(storageCls, method, keyString);
-
-exit:
-    GetJavaEnv()->ExceptionClear();
-    GetJavaEnv()->DeleteLocalRef(keyString);
-
-    return err;
+    ChipLogError(chipTool, "Deleting key %s", key);
+    return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
 }
