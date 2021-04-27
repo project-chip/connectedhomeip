@@ -65,6 +65,28 @@ source_set("inet_config_header") {
   ]
 }
 
+if (chip_device_platform == "mbed") {
+  source_set("mbed_bsd_socket") {
+    public_configs = [ "${chip_root}/src:includes" ]
+
+    sources = [
+      "${chip_root}/src/platform/mbed/net/src/BSDSocket.cpp",
+      "${chip_root}/src/platform/mbed/net/src/common.cpp",
+      "${chip_root}/src/platform/mbed/net/src/net_dns.cpp",
+      "${chip_root}/src/platform/mbed/net/src/net_if.cpp",
+      "${chip_root}/src/platform/mbed/net/src/net_socket.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/eventfd.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/if.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/ifaddrs.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/inet.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/ioctl.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/netdb.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/select.cpp",
+      "${chip_root}/src/platform/mbed/posix/src/socket.cpp",
+    ]
+  }
+}
+
 static_library("inet") {
   output_name = "libInetLayer"
 
@@ -156,5 +178,9 @@ static_library("inet") {
       "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/luni/src/main/native",
       "${chip_root}/third_party/android/platform-libcore/android-platform-libcore/include",
     ]
+  }
+
+  if (chip_device_platform == "mbed") {
+    public_deps += [ ":mbed_bsd_socket" ]
   }
 }

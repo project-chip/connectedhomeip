@@ -33,6 +33,13 @@ config("includes") {
   ]
 
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
+
+  if (chip_device_platform == "mbed") {
+    include_dirs += [
+      "${chip_root}/src/platform/mbed/net/include",
+      "${chip_root}/src/platform/mbed/posix/include",
+    ]
+  }
 }
 
 if (chip_build_tests) {

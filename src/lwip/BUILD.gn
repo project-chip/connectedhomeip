@@ -30,7 +30,8 @@ if (lwip_platform == "") {
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
            lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
-           lwip_platform == "k32w" || lwip_platform == "qpg6100",
+           lwip_platform == "k32w" || lwip_platform == "qpg6100" ||
+           lwip_platform == "mbed",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -67,7 +68,7 @@ buildconfig_header("lwip_buildconfig") {
   }
 }
 
-if (current_os == "zephyr") {
+if (current_os == "zephyr" || current_os == "mbed") {
   group("lwip") {
   }
 } else if (lwip_platform == "external") {
@@ -82,7 +83,7 @@ if (current_os == "zephyr") {
   config("lwip_config") {
     include_dirs = [ lwip_platform ]
 
-    if (lwip_platform != "standalone") {
+    if (lwip_platform != "standalone" && lwip_platform != "mbed") {
       include_dirs += [ "freertos" ]
     }
   }

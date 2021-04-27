@@ -39,7 +39,7 @@ declare_args() {
 
   # Enable wifi support.
   chip_enable_wifi =
-      chip_device_platform == "linux" || chip_device_platform == "esp32"
+      chip_device_platform == "linux" || chip_device_platform == "esp32" || chip_device_platform == "mbed"
 
   # Enable ble support.
   chip_enable_ble = chip_config_network_layer_ble
@@ -75,6 +75,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   _chip_device_layer = "qpg6100"
 } else if (chip_device_platform == "k32w") {
   _chip_device_layer = "K32W"
+} else if (chip_device_platform == "mbed") {
+  _chip_device_layer = "mbed"
 }
 
 if (chip_device_platform != "external") {
@@ -113,5 +115,6 @@ assert(
         chip_device_platform == "esp32" || chip_device_platform == "external" ||
         chip_device_platform == "linux" ||
         chip_device_platform == "nrfconnect" ||
-        chip_device_platform == "k32w" || chip_device_platform == "qpg6100",
+        chip_device_platform == "k32w" || chip_device_platform == "qpg6100" ||
+        chip_device_platform == "mbed",
     "Please select a valid value for chip_device_platform")
