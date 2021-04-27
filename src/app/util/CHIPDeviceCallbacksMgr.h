@@ -49,6 +49,7 @@ public:
 
     CHIP_ERROR AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable * onSuccessCallback,
                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR CancelResponseCallback(NodeId nodeId, uint8_t sequenceNumber);
     CHIP_ERROR GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable ** onSuccessCallback,
                                    Callback::Cancelable ** onFailureCallback);
 

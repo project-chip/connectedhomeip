@@ -17,13 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("lock-common") {
-  cluster_sources = [
-    "basic",
-    "bindings",
-    "general-commissioning-server",
-    "network-commissioning",
-    "on-off-server",
-  ]
+  zap_file = "lock-app.zap"
 
   zap_pregenerated_dir = "gen"
 }
