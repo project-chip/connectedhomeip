@@ -57,9 +57,9 @@ public:
 
 int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apClusterInfoList)
 {
-    int length = 0;
+    int length           = 0;
     ClusterInfo * runner = apClusterInfoList;
-    while(runner != nullptr)
+    while (runner != nullptr)
     {
         runner = runner->mpNext;
         length++;
@@ -70,7 +70,7 @@ int TestInteractionModelEngine::GetClusterInfoListLength(ClusterInfo * apCluster
 void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo * clusterInfoList = nullptr;
     AttributePathParams attributePathParams1(1, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
@@ -91,7 +91,6 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
 
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(clusterInfoList);
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 0);
-
 }
 } // namespace app
 } // namespace chip

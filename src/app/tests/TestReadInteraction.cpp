@@ -93,7 +93,8 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err                            = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr/*apEventPathParamsList*/, 0/*aEventPathParamsListSize*/, nullptr/*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
+                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     GenerateReportData(apSuite, apContext, buf);
