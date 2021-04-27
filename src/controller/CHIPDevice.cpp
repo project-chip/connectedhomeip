@@ -399,6 +399,11 @@ void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccess
     mCallbacksMgr.AddResponseCallback(mDeviceId, seqNum, onSuccessCallback, onFailureCallback);
 }
 
+void Device::CancelResponseHandler(uint8_t seqNum)
+{
+    mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
+}
+
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
                               Callback::Cancelable * onReportCallback)
 {
