@@ -25,7 +25,6 @@
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <protocols/echo/Echo.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
@@ -38,54 +37,41 @@
 using namespace chip;
 using namespace Shell;
 using namespace Logging;
-using chip::Inet::IPAddress;
 
 namespace {
 
-class PingArguments
+Messaging::ExchangeContext * gExchangeCtx = nullptr;
+
+class SendArguments
 {
 public:
     void Reset()
     {
-        mMaxEchoCount       = 3;
-        mEchoInterval       = 1000;
-        mLastEchoTime       = 0;
-        mEchoCount          = 0;
-        mEchoRespCount      = 0;
-        mEchoReqSize        = 32;
-        mWaitingForEchoResp = false;
+        mProtocolId   = 0x0002;
+        mMessageType  = 1;
+        mLastSendTime = 0;
+        mPayloadSize  = 32;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         mUsingTCP = false;
 #endif
         mUsingCRMP = true;
-        mEchoPort  = CHIP_PORT;
+        mPort      = CHIP_PORT;
     }
 
-    uint64_t GetLastEchoTime() const { return mLastEchoTime; }
-    void SetLastEchoTime(uint64_t value) { mLastEchoTime = value; }
+    uint64_t GetLastSendTime() const { return mLastSendTime; }
+    void SetLastSendTime(uint64_t value) { mLastSendTime = value; }
 
-    uint64_t GetEchoCount() const { return mEchoCount; }
-    void SetEchoCount(uint64_t value) { mEchoCount = value; }
-    void IncrementEchoCount() { mEchoCount++; }
+    uint16_t GetProtocolId() const { return mProtocolId; }
+    void SetProtocolId(uint16_t value) { mProtocolId = value; }
 
-    uint64_t GetEchoRespCount() const { return mEchoRespCount; }
-    void SetEchoRespCount(uint64_t value) { mEchoRespCount = value; }
-    void IncrementEchoRespCount() { mEchoRespCount++; }
+    uint32_t GetPayloadSize() const { return mPayloadSize; }
+    void SetPayloadSize(uint32_t value) { mPayloadSize = value; }
 
-    uint32_t GetMaxEchoCount() const { return mMaxEchoCount; }
-    void SetMaxEchoCount(uint32_t id) { mMaxEchoCount = id; }
+    uint16_t GetPort() const { return mPort; }
+    void SetPort(uint16_t value) { mPort = value; }
 
-    uint32_t GetEchoInterval() const { return mEchoInterval; }
-    void SetEchoInterval(uint32_t value) { mEchoInterval = value; }
-
-    uint32_t GetEchoReqSize() const { return mEchoReqSize; }
-    void SetEchoReqSize(uint32_t value) { mEchoReqSize = value; }
-
-    uint16_t GetEchoPort() const { return mEchoPort; }
-    void SetEchoPort(uint16_t value) { mEchoPort = value; }
-
-    bool IsWaitingForEchoResp() const { return mWaitingForEchoResp; }
-    void SetWaitingForEchoResp(bool value) { mWaitingForEchoResp = value; }
+    uint8_t GetMessageType() const { return mMessageType; }
+    void SetMessageType(uint8_t type) { mMessageType = type; }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     bool IsUsingTCP() const { return mUsingTCP; }
@@ -96,66 +82,80 @@ public:
     void SetUsingCRMP(bool value) { mUsingCRMP = value; }
 
 private:
-    // The last time a echo request was attempted to be sent.
-    uint64_t mLastEchoTime;
+    // The last time a CHIP message was attempted to be sent.
+    uint64_t mLastSendTime;
 
-    // Count of the number of echo requests sent.
-    uint64_t mEchoCount;
-
-    // Count of the number of echo responses received.
-    uint64_t mEchoRespCount;
-
-    // The CHIP Echo request payload size in bytes.
-    uint32_t mEchoReqSize;
-
-    // Max value for the number of echo requests sent.
-    uint32_t mMaxEchoCount;
-
-    // The CHIP Echo interval time in milliseconds.
-    uint32_t mEchoInterval;
-
-    uint16_t mEchoPort;
-
-    // True, if the echo client is waiting for an echo response
-    // after sending an echo request, false otherwise.
-    bool mWaitingForEchoResp;
+    uint32_t mPayloadSize;
+    uint16_t mProtocolId;
+    uint16_t mPort;
+    uint8_t mMessageType;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     bool mUsingTCP;
 #endif
 
     bool mUsingCRMP;
-} gPingArguments;
+} gSendArguments;
 
-Protocols::Echo::EchoClient gEchoClient;
-
-bool EchoIntervalExpired(void)
+class MockAppDelegate : public Messaging::ExchangeDelegate
 {
-    uint64_t now = System::Timer::GetCurrentEpoch();
+public:
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle buffer) override
+    {
+        uint32_t respTime    = System::Timer::GetCurrentEpoch();
+        uint32_t transitTime = respTime - gSendArguments.GetLastSendTime();
+        streamer_t * sout    = streamer_get();
 
-    return (now >= gPingArguments.GetLastEchoTime() + gPingArguments.GetEchoInterval());
-}
+        streamer_printf(sout, "Response received: len=%u time=%.3fms\n", buffer->DataLength(),
+                        static_cast<double>(transitTime) / 1000);
 
-CHIP_ERROR SendEchoRequest(streamer_t * stream)
+        gExchangeCtx->Close();
+        gExchangeCtx = nullptr;
+    }
+
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
+    {
+        streamer_t * sout = streamer_get();
+        streamer_printf(sout, "No response received\n");
+
+        gExchangeCtx->Close();
+        gExchangeCtx = nullptr;
+    }
+} gMockAppDelegate;
+
+CHIP_ERROR SendMessage(streamer_t * stream)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Messaging::SendFlags sendFlags;
     System::PacketBufferHandle payloadBuf;
     char * requestData = nullptr;
+    uint32_t size      = 0;
 
-    uint32_t size = gPingArguments.GetEchoReqSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_MESSAGE_TOO_LONG);
+    // Discard any existing exchange context. Effectively we can only have one exchange with
+    // a single node at any one time.
+    if (gExchangeCtx != nullptr)
+    {
+        gExchangeCtx->Abort();
+        gExchangeCtx = nullptr;
+    }
+
+    // Create a new exchange context.
+    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
+    VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    size = gSendArguments.GetPayloadSize();
+    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
     VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    snprintf(requestData, size, "Echo Message %" PRIu64 "\n", gPingArguments.GetEchoCount());
-
+    snprintf(requestData, size, "CHIP Message");
     payloadBuf = MessagePacketBuffer::NewWithData(requestData, size);
     VerifyOrExit(!payloadBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
-    if (gPingArguments.IsUsingCRMP())
+    if (gSendArguments.IsUsingCRMP())
     {
         sendFlags.Set(Messaging::SendMessageFlags::kNone);
     }
@@ -164,17 +164,20 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
         sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
     }
 
-    gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
+    gExchangeCtx->SetResponseTimeout(kResponseTimeOut);
+    sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
 
-    streamer_printf(stream, "\nSend echo request message with payload size: %d bytes to Node: %" PRIu64 "\n", size,
-                    kTestDeviceNodeId);
+    gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
 
-    err = gEchoClient.SendEchoRequest(std::move(payloadBuf), sendFlags);
+    streamer_printf(stream, "\nSend CHIP message with payload size: %d bytes to Node: %" PRIu64 "\n", size, kTestDeviceNodeId);
 
-    if (err == CHIP_NO_ERROR)
+    err = gExchangeCtx->SendMessage(Protocols::Id(VendorId::Common, gSendArguments.GetProtocolId()),
+                                    gSendArguments.GetMessageType(), std::move(payloadBuf), sendFlags);
+
+    if (err != CHIP_NO_ERROR)
     {
-        gPingArguments.SetWaitingForEchoResp(true);
-        gPingArguments.IncrementEchoCount();
+        gExchangeCtx->Abort();
+        gExchangeCtx = nullptr;
     }
 
 exit:
@@ -185,7 +188,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        streamer_printf(stream, "Send echo request failed, err: %s\n", ErrorStr(err));
+        streamer_printf(stream, "Send CHIP message failed, err: %s\n", ErrorStr(err));
     }
 
     return err;
@@ -209,7 +212,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         streamer_printf(stream, "Establish secure session failed, err: %s\n", ErrorStr(err));
-        gPingArguments.SetLastEchoTime(System::Timer::GetCurrentEpoch());
+        gSendArguments.SetLastSendTime(System::Timer::GetCurrentEpoch());
     }
     else
     {
@@ -219,33 +222,17 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload)
-{
-    uint32_t respTime    = System::Timer::GetCurrentEpoch();
-    uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();
-    streamer_t * sout    = streamer_get();
-
-    gPingArguments.SetWaitingForEchoResp(false);
-    gPingArguments.IncrementEchoRespCount();
-
-    streamer_printf(sout, "Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gPingArguments.GetEchoRespCount(),
-                    gPingArguments.GetEchoCount(),
-                    static_cast<double>(gPingArguments.GetEchoRespCount()) * 100 / gPingArguments.GetEchoCount(),
-                    payload->DataLength(), static_cast<double>(transitTime) / 1000);
-}
-
-void StartPinging(streamer_t * stream, char * destination)
+void ProcessCommand(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Transport::AdminPairingTable admins;
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
-    uint32_t maxEchoCount                   = 0;
 
-    if (!IPAddress::FromString(destination, gDestAddr))
+    if (!Inet::IPAddress::FromString(destination, gDestAddr))
     {
-        streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
+        streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
@@ -255,19 +242,19 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer)
                                .SetAddressType(gDestAddr.Type())
-                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
+                               .SetListenPort(gSendArguments.GetPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
     err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
                                .SetAddressType(gDestAddr.Type())
-                               .SetListenPort(gPingArguments.GetEchoPort() + 1));
+                               .SetListenPort(gSendArguments.GetPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    if (gPingArguments.IsUsingTCP())
+    if (gSendArguments.IsUsingTCP())
     {
-        peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
+        peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
 
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
         SuccessOrExit(err);
@@ -278,7 +265,7 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
+        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
 
         err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
         SuccessOrExit(err);
@@ -287,44 +274,15 @@ void StartPinging(streamer_t * stream, char * destination)
         SuccessOrExit(err);
     }
 
-    // Start the CHIP connection to the CHIP echo responder.
+    // Start the CHIP connection to the CHIP server.
     err = EstablishSecureSession(stream, peerAddress);
     SuccessOrExit(err);
 
-    // TODO: temprary create a SecureSessionHandle from node id to unblock end-to-end test. Complete solution is tracked in PR:4451
-    err = gEchoClient.Init(&gExchangeManager, { kTestDeviceNodeId, 0, gAdminId });
+    err = SendMessage(stream);
     SuccessOrExit(err);
 
-    // Arrange to get a callback whenever an Echo Response is received.
-    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
-
-    maxEchoCount = gPingArguments.GetMaxEchoCount();
-
-    // Connection has been established. Now send the EchoRequests.
-    for (unsigned int i = 0; i < maxEchoCount; i++)
-    {
-        err = SendEchoRequest(stream);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            streamer_printf(stream, "Send request failed: %s\n", ErrorStr(err));
-            break;
-        }
-
-        // Wait for response until the Echo interval.
-        while (!EchoIntervalExpired())
-        {
-            // TODO:#5496: Use condition_varible to suspend the current thread and wake it up when response arrive.
-            sleep(1);
-        }
-
-        // Check if expected response was received.
-        if (gPingArguments.IsWaitingForEchoResp())
-        {
-            streamer_printf(stream, "No response received\n");
-            gPingArguments.SetWaitingForEchoResp(false);
-        }
-    }
+    // TODO:#5496: Use condition_varible to suspend the current thread and wake it up when response arrive.
+    sleep(2);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     gTCPManager.Disconnect(peerAddress);
@@ -332,20 +290,19 @@ void StartPinging(streamer_t * stream, char * destination)
 #endif
     gUDPManager.Close();
 
-    gEchoClient.Shutdown();
     gExchangeManager.Shutdown();
     gSessionManager.Shutdown();
 
 exit:
     if ((err != CHIP_NO_ERROR))
     {
-        streamer_printf(stream, "Ping failed with error: %s\n", ErrorStr(err));
+        streamer_printf(stream, "Send failed with error: %s\n", ErrorStr(err));
     }
 }
 
 void PrintUsage(streamer_t * stream)
 {
-    streamer_printf(stream, "Usage: ping [options] <destination>\n\nOptions:\n");
+    streamer_printf(stream, "Usage: send [options] <destination>\n\nOptions:\n");
 
     // Need to split the help info to prevent overflowing the streamer_printf
     // buffer (CONSOLE_DEFAULT_MAX_LINE 256)
@@ -354,20 +311,20 @@ void PrintUsage(streamer_t * stream)
     streamer_printf(stream, "  -u              use UDP (default)\n");
     streamer_printf(stream, "  -t              use TCP\n");
 #endif
-    streamer_printf(stream, "  -p  <port>      echo server port\n");
-    streamer_printf(stream, "  -i  <interval>  ping interval time in seconds\n");
-    streamer_printf(stream, "  -c  <count>     stop after <count> replies\n");
+    streamer_printf(stream, "  -P  <protocol>  protocol ID\n");
+    streamer_printf(stream, "  -T  <type>      message type\n");
+    streamer_printf(stream, "  -p  <port>      server port number\n");
     streamer_printf(stream, "  -r  <1|0>       enable or disable CRMP\n");
     streamer_printf(stream, "  -s  <size>      payload size in bytes\n");
 }
 
-int cmd_ping(int argc, char ** argv)
+int cmd_send(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
     int ret           = 0;
     int optIndex      = 0;
 
-    gPingArguments.Reset();
+    gSendArguments.Reset();
 
     while (optIndex < argc && argv[optIndex][0] == '-')
     {
@@ -378,32 +335,32 @@ int cmd_ping(int argc, char ** argv)
             return 0;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
         case 'u':
-            gPingArguments.SetUsingTCP(false);
+            gSendArguments.SetUsingTCP(false);
             break;
         case 't':
-            gPingArguments.SetUsingTCP(true);
+            gSendArguments.SetUsingTCP(true);
             break;
 #endif
-        case 'i':
+        case 'P':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
-                streamer_printf(sout, "Invalid argument specified for -i\n");
+                streamer_printf(sout, "Invalid argument specified for -P\n");
                 return -1;
             }
             else
             {
-                gPingArguments.SetEchoInterval(atol(argv[optIndex]) * 1000);
+                gSendArguments.SetProtocolId(atol(argv[optIndex]));
             }
             break;
-        case 'c':
+        case 'T':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
-                streamer_printf(sout, "Invalid argument specified for -c\n");
+                streamer_printf(sout, "Invalid argument specified for -T\n");
                 return -1;
             }
             else
             {
-                gPingArguments.SetMaxEchoCount(atol(argv[optIndex]));
+                gSendArguments.SetMessageType(atoi(argv[optIndex]));
             }
             break;
         case 'p':
@@ -414,7 +371,7 @@ int cmd_ping(int argc, char ** argv)
             }
             else
             {
-                gPingArguments.SetEchoPort(atol(argv[optIndex]));
+                gSendArguments.SetPort(atol(argv[optIndex]));
             }
             break;
         case 's':
@@ -425,7 +382,7 @@ int cmd_ping(int argc, char ** argv)
             }
             else
             {
-                gPingArguments.SetEchoReqSize(atol(argv[optIndex]));
+                gSendArguments.SetPayloadSize(atol(argv[optIndex]));
             }
             break;
         case 'r':
@@ -440,11 +397,11 @@ int cmd_ping(int argc, char ** argv)
 
                 if (arg == 0)
                 {
-                    gPingArguments.SetUsingCRMP(false);
+                    gSendArguments.SetUsingCRMP(false);
                 }
                 else if (arg == 1)
                 {
-                    gPingArguments.SetUsingCRMP(true);
+                    gSendArguments.SetUsingCRMP(true);
                 }
                 else
                 {
@@ -468,7 +425,7 @@ int cmd_ping(int argc, char ** argv)
     if (ret == 0)
     {
         streamer_printf(sout, "IP address: %s\n", argv[optIndex]);
-        StartPinging(sout, argv[optIndex]);
+        ProcessCommand(sout, argv[optIndex]);
     }
 
     return ret;
@@ -476,11 +433,11 @@ int cmd_ping(int argc, char ** argv)
 
 } // namespace
 
-static shell_command_t cmds_ping[] = {
-    { &cmd_ping, "ping", "Using Echo Protocol to measure packet loss across network paths" },
+static shell_command_t cmds_send[] = {
+    { &cmd_send, "send", "Send raw CHIP message" },
 };
 
-void cmd_ping_init()
+void cmd_send_init()
 {
-    shell_register(cmds_ping, ArraySize(cmds_ping));
+    shell_register(cmds_send, ArraySize(cmds_send));
 }
