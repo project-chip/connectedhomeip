@@ -44,6 +44,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <messaging/ExchangeContext.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -175,7 +176,15 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
+    if (params.imDelegate != nullptr)
+    {
+        err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
+    }
+    else
+    {
+        mTempIMDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
+        err             = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mTempIMDelegate);
+    }
     SuccessOrExit(err);
 
     mExchangeMgr->SetDelegate(this);
@@ -238,6 +247,12 @@ CHIP_ERROR DeviceController::Shutdown()
     {
         chip::Platform::Delete(mTransportMgr);
         mTransportMgr = nullptr;
+    }
+
+    if (mTempIMDelegate != nullptr)
+    {
+        chip::Platform::Delete(mTempIMDelegate);
+        mTempIMDelegate = nullptr;
     }
 
     mAdmins.ReleaseAdminId(mAdminId);
@@ -991,6 +1006,96 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
+    const app::CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+    const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
+    chip::CommandId aCommandId, uint8_t aCommandIndex)
+{
+    // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
+    static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
+    NodeId deviceId                           = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
+    app::CHIPDeviceCallbacksMgr * callbackMgr = &app::CHIPDeviceCallbacksMgr::GetInstance();
+
+    // Here we verify that the error code is not 0, since we may want to send more command to the device if we received success
+    // response.
+    VerifyOrReturnError(aProtocolCode != 0, CHIP_NO_ERROR);
+
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+
+    // The command response in IM is identified by the command sender pointer -- the response of the command will return to the same
+    // object used for send the command.
+    callbackMgr->GetResponseCallback(deviceId, 0, &onSuccessCallback, &onFailureCallback);
+
+    typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
+
+    // We cannot found the response of the command we just send.
+    VerifyOrReturnError(onSuccessCallback != nullptr && onFailureCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+    // Generally IM has more detailed errors than ember library, here we always use 1 temporary, the actual handling of the
+    // commands should implement full IMDelegate.
+    cb->mCall(cb->mContext, static_cast<uint8_t>(1));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const app::CommandSender * apCommandSender,
+                                                                          CHIP_ERROR aError)
+{
+    // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
+    static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
+    NodeId deviceId                           = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
+    app::CHIPDeviceCallbacksMgr * callbackMgr = &app::CHIPDeviceCallbacksMgr::GetInstance();
+
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+
+    // The command response in IM is identified by the command sender pointer -- the response of the command will return to the same
+    // object used for send the command.
+    callbackMgr->GetResponseCallback(deviceId, 0, &onSuccessCallback, &onFailureCallback);
+
+    typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
+
+    // We cannot found the response of the command we just send.
+    VerifyOrReturnError(onSuccessCallback != nullptr && onFailureCallback != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    Callback::Callback<DefaultFailureCallback> * cb = Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+    // Generally IM has more detailed errors than ember library, here we always use 1 temporary, the actual handling of the commands
+    // should implement full IMDelegate.
+    cb->mCall(cb->mContext, static_cast<uint8_t>(1));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
+{
+    // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
+    static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
+    NodeId deviceId                           = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
+    app::CHIPDeviceCallbacksMgr * callbackMgr = &app::CHIPDeviceCallbacksMgr::GetInstance();
+
+    Callback::Cancelable * onSuccessCallback = nullptr;
+    Callback::Cancelable * onFailureCallback = nullptr;
+
+    // The command response in IM is identified by the command sender pointer -- the response of the command will return to the same
+    // object used for send the command.
+    callbackMgr->GetResponseCallback(deviceId, 0, &onSuccessCallback, &onFailureCallback);
+
+    typedef void (*DefaultSuccessCallback)(void * context);
+
+    // We cannot found the response of the command we just send. We prpbably just processed the response of the response. So we
+    // don't consider it as an error.
+    VerifyOrReturnError(onSuccessCallback != nullptr && onFailureCallback != nullptr, CHIP_NO_ERROR);
+
+    // When we can get the callback, that means we did not process this command before, this should be caused by the response of the
+    // command is another command.
+    Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller
