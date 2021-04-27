@@ -1088,7 +1088,7 @@ exit:
 }
 
 CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle msg)
+                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg)
 {
     VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1134,7 +1134,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Pack
 void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                     System::PacketBufferHandle msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, std::move(msg));
+    CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, msg);
 
     if (err != CHIP_NO_ERROR)
     {
