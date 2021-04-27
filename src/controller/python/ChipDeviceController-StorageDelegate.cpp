@@ -21,6 +21,7 @@
 
 #include <lib/support/CodeUtils.h>
 
+// We use std::basic_string>char> to match inipp::Ini<char> in class definiation
 using String   = std::basic_string<char>;
 using Section  = std::map<String, String>;
 using Sections = std::map<String, Section>;
@@ -62,11 +63,11 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, ch
     std::string iniValue;
     size_t iniValueLength = 0;
 
-    auto section = mConfig.sections[kDefaultSectionName];
-    auto it      = section.find(key);
+    const auto & section = mConfig.sections[kDefaultSectionName];
+    auto it              = section.find(key);
     VerifyOrExit(it != section.end(), err = CHIP_ERROR_KEY_NOT_FOUND);
 
-    VerifyOrExit(inipp::extract(section[key], iniValue), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inipp::extract(it->second, iniValue), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     iniValueLength = iniValue.size();
     VerifyOrExit(iniValueLength <= static_cast<size_t>(size) - 1, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -80,19 +81,13 @@ exit:
 
 void PythonPersistentStorageDelegate::AsyncSetKeyValue(const char * key, const char * value)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
-    section[key] = std::string(value);
-
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[kDefaultSectionName][key] = std::string(value);
     CommitConfig();
 }
 
 void PythonPersistentStorageDelegate::AsyncDeleteKeyValue(const char * key)
 {
-    auto section = mConfig.sections[kDefaultSectionName];
-    section.erase(key);
-
-    mConfig.sections[kDefaultSectionName] = section;
+    mConfig.sections[kDefaultSectionName].erase(key);
     CommitConfig();
 }
 
