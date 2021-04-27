@@ -63,7 +63,7 @@ using namespace Messaging;
 
 // Wait at most 30 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
-// The session establishment fails if the response is not received with in timeout window.
+// The session establishment fails if the response is not received within timeout window.
 static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = 30000;
 
 CASESession::CASESession()
@@ -251,11 +251,11 @@ exit:
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
     VerifyOrReturn(ec != nullptr, ChipLogError(Inet, "CASESession::OnResponseTimeout was called by null exchange"));
-    VerifyOrReturn(mExchangeCtxt == nullptr || mExchangeCtxt == ec,
-                   ChipLogError(Inet, "CASESession::OnResponseTimeout exchange doesn't match"));
+    VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(Inet, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(Inet, "CASESession timed out while waiting for a response from the peer. Expected message type was %d",
                  mNextExpectedMsg);
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    Clear();
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
@@ -1087,25 +1087,33 @@ exit:
     Clear();
 }
 
-void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                    System::PacketBufferHandle msg)
+CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const PacketHeader & packetHeader,
+                                                const PayloadHeader & payloadHeader, System::PacketBufferHandle msg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(ec != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mExchangeCtxt == nullptr || mExchangeCtxt == ec, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(payloadHeader.HasMessageType(mNextExpectedMsg) ||
-                     payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_SigmaErr),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    if (mExchangeCtxt == nullptr)
+    // mExchangeCtxt can be nullptr if this is the first message (CASE_SigmaR1) received by CASESession
+    // via UnsolicitedMessageHandler. The exchance context is allocated by exchange manager and provided
+    // to the handler (CASESession object).
+    if (mExchangeCtxt != nullptr)
+    {
+        if (mExchangeCtxt != ec)
+        {
+            // Close the incoming exchange explicitly, as the cleanup code only closes mExchangeCtxt
+            ec->Close();
+            ReturnErrorOnFailure(CHIP_ERROR_INVALID_ARGUMENT);
+        }
+    }
+    else
     {
         mExchangeCtxt = ec;
         mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
     }
 
-    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
+    VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(payloadHeader.HasMessageType(mNextExpectedMsg) ||
+                            payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::CASE_SigmaErr),
+                        CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     if (packetHeader.GetSourceNodeId().HasValue())
     {
@@ -1115,10 +1123,26 @@ void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
         }
         else
         {
-            VerifyOrExit(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
-                         err = CHIP_ERROR_WRONG_NODE_ID);
+            VerifyOrReturnError(packetHeader.GetSourceNodeId().Value() == mConnectionState.GetPeerNodeId(),
+                                CHIP_ERROR_WRONG_NODE_ID);
         }
     }
+
+    return CHIP_NO_ERROR;
+}
+
+void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                    System::PacketBufferHandle msg)
+{
+    CHIP_ERROR err = ValidateReceivedMessage(ec, packetHeader, payloadHeader, std::move(msg));
+
+    if (err != CHIP_NO_ERROR)
+    {
+        Clear();
+        SuccessOrExit(err);
+    }
+
+    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
 
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
