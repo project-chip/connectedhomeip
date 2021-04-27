@@ -32,11 +32,14 @@ CHIP_ERROR ReportingCommand::Run(PersistentStorage & storage, NodeId localId, No
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::BasicCluster cluster;
+    chip::Controller::CommissionerInitParams initParams;
+
+    initParams.storageDelegate = &storage;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
-    err = mCommissioner.Init(localId, &storage);
+    err = mCommissioner.Init(localId, initParams);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
     err = mCommissioner.ServiceEvents();

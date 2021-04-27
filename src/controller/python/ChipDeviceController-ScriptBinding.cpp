@@ -128,8 +128,7 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
                                                        chip::NodeId localDeviceId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ControllerInitParams initParams{ .storageDelegate              = &sStorageDelegate,
-                                     .mDeviceAddressUpdateDelegate = &sDeviceAddressUpdateDelegate };
+    CommissionerInitParams initParams;
 
     *outDevCtrl = new chip::Controller::DeviceCommissioner();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
@@ -139,11 +138,15 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
         localDeviceId = kDefaultLocalDeviceId;
     }
 
+    initParams.storageDelegate              = &sStorageDelegate;
+    initParams.mDeviceAddressUpdateDelegate = &sDeviceAddressUpdateDelegate;
+    initParams.pairingDelegate              = &sPairingDelegate;
+
 #if CHIP_ENABLE_INTERACTION_MODEL
     initParams.imDelegate = &PythonInteractionModelDelegate::Instance();
 #endif
 
-    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams, &sPairingDelegate));
+    SuccessOrExit(err = (*outDevCtrl)->Init(localDeviceId, initParams));
     SuccessOrExit(err = (*outDevCtrl)->ServiceEvents());
 
 exit:

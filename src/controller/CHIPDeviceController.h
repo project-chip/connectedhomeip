@@ -125,6 +125,11 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 };
 
+struct CommissionerInitParams : public ControllerInitParams
+{
+    DevicePairingDelegate * pairingDelegate = nullptr;
+};
+
 /**
  * @brief
  *   Controller applications can use this class to communicate with already paired CHIP devices. The
@@ -145,15 +150,7 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    /**
-     * Init function to be used when there exists a device layer that takes care of initializing
-     * System::Layer and InetLayer.
-     */
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
-
-    // Note: Future modifications should be made to ControllerInitParams
-    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
     virtual CHIP_ERROR Shutdown();
 
@@ -319,15 +316,9 @@ public:
     ~DeviceCommissioner() {}
 
     /**
-     * Init function to be used when there exists a device layer that takes care of initializing
-     * System::Layer and InetLayer.
+     * Commisioner-specific initialization, includes parameters such as the pairing delegate.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate = nullptr);
-
-    // Note: Future modifications should be made to ControllerInitParams
-    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
-                    Inet::InetLayer * inetLayer = nullptr);
+    CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
     void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 

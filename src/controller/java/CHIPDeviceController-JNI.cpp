@@ -124,6 +124,15 @@ struct StackUnlockGuard
 chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
+#if CONFIG_NETWORK_LAYER_BLE
+
+chip::Ble::BleLayer * GetJNIBleLayer()
+{
+    return &sBleLayer;
+}
+
+#endif
+
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
