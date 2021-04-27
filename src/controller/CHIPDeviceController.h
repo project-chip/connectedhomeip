@@ -37,6 +37,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
@@ -247,7 +248,7 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
-    Transport::MessageCounterManagerInterface * mMessageCounterManager;
+    secure_channel::MessageCounterManager * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
     DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
