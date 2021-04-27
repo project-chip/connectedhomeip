@@ -337,7 +337,11 @@
             "type": "pickString",
             "id": "mbedTarget",
             "description": "What mbed target will be used?",
-            "options": ["NRF52840_DK", "DISCO_L475VG_IOT01A"],
+            "options": [
+                "NRF52840_DK",
+                "DISCO_L475VG_IOT01A",
+                "CY8CPROTO_062_4343W"
+            ],
             "default": "NRF52840_DK"
         },
         {

@@ -111,7 +111,19 @@
         "ratio": "cpp",
         "set": "cpp",
         "stack": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "mstd_iterator": "cpp",
+        "list": "cpp",
+        "span": "cpp",
+        "mstd_atomic": "cpp",
+        "mstd_cstddef": "cpp",
+        "mstd_functional": "cpp",
+        "mstd_memory": "cpp",
+        "mstd_mutex": "cpp",
+        "mstd_new": "cpp",
+        "mstd_type_traits": "cpp",
+        "mstd_utility": "cpp",
+        "mstd_tuple": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
@@ -156,5 +168,6 @@
     "clang-format.fallbackStyle": "WebKit",
     "files.trimFinalNewlines": true,
     "C_Cpp.default.cppStandard": "gnu++14",
-    "C_Cpp.default.cStandard": "gnu11"
+    "C_Cpp.default.cStandard": "gnu11",
+    "cmake.sourceDirectory": "${workspaceFolder}/examples/shell/mbed"
 }

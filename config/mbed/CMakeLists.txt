@@ -141,13 +141,6 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDSTORAGE_CFLAGS})
 mbed_get_target_common_compile_flags(CHIP_MBEDNETSOCKET_CFLAGS mbed-netsocket)
 list(APPEND CHIP_CFLAGS ${CHIP_MBEDNETSOCKET_CFLAGS})
 
-mbed_get_target_common_compile_flags(CHIP_MBEDLWIPSTACK_CFLAGS mbed-lwipstack)
-list(APPEND CHIP_CFLAGS ${CHIP_MBEDLWIPSTACK_CFLAGS})
-
-
-
-
-
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
@@ -156,6 +149,10 @@ if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
         list(APPEND CHIP_CFLAGS ${CHIP_CRYPTOCELL310_CFLAGS})
     endif()
 endif()
+
+list(APPEND CHIP_CFLAGS 
+    \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
+)
 
 set(SEPARATOR ",")
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
@@ -205,8 +202,8 @@ chip_gn_arg_string("chip_project_config_include"          "${CHIP_PROJECT_CONFIG
 chip_gn_arg_bool  ("is_debug"                             CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
-chip_gn_arg_bool  ("chip_with_lwip"                       CONFIG_CHIP_WITH_LWIP)
 chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
+chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_RENDEZVOUS)
 
 if (BOARD STREQUAL "native_posix")
     chip_gn_arg_string("target_cpu" "x86")
@@ -265,6 +262,12 @@ list(APPEND CHIP_DEFINES)
 
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
+    ${CHIP_ROOT}/src/platform/mbed/posix/include
+    ${CHIP_ROOT}/src/platform/mbed/net/include
+)
+
+list(APPEND CHIP_DEFINES 
+    __LINUX_ERRNO_EXTENSIONS__=1
 )
 
 target_include_directories(${APP_TARGET} PRIVATE 

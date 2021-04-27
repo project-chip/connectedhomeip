@@ -32,12 +32,8 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #include "netsocket/WiFiInterface.h"
+#include <inet/IPAddress.h>
 #include <support/logging/CHIPLogging.h>
-namespace chip {
-namespace Inet {
-class IPAddress;
-} // namespace Inet
-} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
@@ -79,6 +75,7 @@ private:
     bool _HaveServiceConnectivity(void);
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
+    void _ProcessInterfaceChange(nsapi_connection_status_t new_status);
     void OnInterfaceEvent(nsapi_event_t event, intptr_t data);
     WiFiStationMode _GetWiFiStationMode(void);
     CHIP_ERROR _SetWiFiStationMode(WiFiStationMode val);
@@ -92,6 +89,7 @@ private:
 
     CHIP_ERROR OnStationConnected();
     CHIP_ERROR OnStationDisconnected();
+    CHIP_ERROR OnStationConnecting();
     const char * status2str(nsapi_connection_status_t sec);
     ::chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
     // ===== Members for internal use by the following friends.
@@ -105,9 +103,11 @@ private:
     WiFiAPMode mWiFiAPMode;
     uint32_t mWiFiStationReconnectIntervalMS;
     uint32_t mWiFiAPIdleTimeoutMS;
-    bool mIsProvisioned;
     WiFiInterface * _interface;
     nsapi_security_t _security = NSAPI_SECURITY_WPA_WPA2;
+    Inet::IPAddress mIp4Address;
+    Inet::IPAddress mIp6Address;
+    bool mIsProvisioned : 1;
 };
 
 inline bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
