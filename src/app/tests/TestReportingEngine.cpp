@@ -59,7 +59,8 @@ namespace app {
 CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(aAttributePathParams.mClusterId == kTestClusterId && aAttributePathParams.mEndpointId == kTestEndpointId, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(aAttributePathParams.mClusterId == kTestClusterId && aAttributePathParams.mEndpointId == kTestEndpointId,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (aAttributePathParams.mFieldId == kRootFieldId || aAttributePathParams.mFieldId == kTestFieldId1)
     {

@@ -265,7 +265,7 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     }
 }
 
-CHIP_ERROR WriteSingleClusterData(AttributePathParams &aAttributePathParams, TLV::TLVReader & aReader)
+CHIP_ERROR WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader)
 {
     if (aAttributePathParams.mClusterId != kTestClusterId || aAttributePathParams.mEndpointId != kTestEndpointId)
     {

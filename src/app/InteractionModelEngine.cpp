@@ -254,24 +254,24 @@ DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aComman
         "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
 }
 
-CHIP_ERROR __attribute__((weak))
-ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
+CHIP_ERROR __attribute__((weak)) ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8 " ListIndex=%" PRIx8,
-            aAttributePathParams.mClusterId, aAttributePathParams.mNodeId, aAttributePathParams.mEndpointId, aAttributePathParams.mFieldId, aAttributePathParams.mListIndex);
+                  "Received Cluster Command: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8
+                  " ListIndex=%" PRIx8,
+                  aAttributePathParams.mClusterId, aAttributePathParams.mNodeId, aAttributePathParams.mEndpointId,
+                  aAttributePathParams.mFieldId, aAttributePathParams.mListIndex);
     ChipLogError(DataManagement,
                  "Default ReadSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR __attribute__((weak))
-WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader)
+CHIP_ERROR __attribute__((weak)) WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader)
 {
     ChipLogDetail(DataManagement,
-                  "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8, " ListIndex=%" PRIx8,
-            aAttributePathParams.mClusterId, aAttributePathParams.mNodeId, aAttributePathParams.mEndpointId, aAttributePathParams.mFieldId,
-            aAttributePathParams.mListIndex);
+                  "Received Cluster Attribute: Cluster=%" PRIx16 " NodeId=%" PRIx64 " Endpoint=%" PRIx8 " FieldId=%" PRIx8,
+                  " ListIndex=%" PRIx8, aAttributePathParams.mClusterId, aAttributePathParams.mNodeId,
+                  aAttributePathParams.mEndpointId, aAttributePathParams.mFieldId, aAttributePathParams.mListIndex);
     ChipLogError(DataManagement,
                  "Default WriteSingleClusterData is called, this should be replaced by actual dispatched for cluster");
     return CHIP_NO_ERROR;
