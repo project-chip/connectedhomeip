@@ -121,7 +121,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPath
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandPathParams);
+    err = PrepareCommand(apCommandPathParams, true);
     SuccessOrExit(err);
 
     statusElementBuilder =
@@ -131,7 +131,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPath
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
-    err = FinishCommand();
+    err = FinishCommand(true);
 
 exit:
     ChipLogFunctError(err);

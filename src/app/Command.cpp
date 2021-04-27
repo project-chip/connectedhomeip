@@ -144,7 +144,7 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -159,8 +159,13 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
         SuccessOrExit(err);
     }
 
-    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure,
-                                                         mDataElementContainerType);
+    if (!aIsStatus)
+    {
+        err = commandDataElement.GetWriter()->StartContainer(
+                TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                TLV::kTLVType_Structure,
+                mDataElementContainerType);
+    }
 exit:
     ChipLogFunctError(err);
     return err;
@@ -171,13 +176,16 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
     return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
 }
 
-CHIP_ERROR Command::FinishCommand()
+CHIP_ERROR Command::FinishCommand(bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    err                                            = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
-    SuccessOrExit(err);
+    if (!aIsStatus)
+    {
+        err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
+        SuccessOrExit(err);
+    }
     commandDataElement.EndOfCommandDataElement();
     err = commandDataElement.GetError();
     SuccessOrExit(err);
