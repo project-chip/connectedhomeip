@@ -121,16 +121,18 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
     NSString * keyString = [NSString stringWithUTF8String:key];
     NSString * valueString = [NSString stringWithUTF8String:base64Value.c_str()];
 
-    NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
+    dispatch_sync(mWorkQueue, ^{
+        NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
 
-    id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
-    if (strongDelegate && mQueue) {
-        dispatch_sync(mQueue, ^{
-            [strongDelegate CHIPSetKeyValue:keyString value:valueString];
-        });
-    } else {
-        [mDefaultPersistentStorage setObject:valueString forKey:keyString];
-    }
+        id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
+        if (strongDelegate && mQueue) {
+            dispatch_sync(mQueue, ^{
+                [strongDelegate CHIPSetKeyValue:keyString value:valueString];
+            });
+        } else {
+            [mDefaultPersistentStorage setObject:valueString forKey:keyString];
+        }
+    });
 
     // TODO: ideally the error from the dispatch should be returned
     // however we expect to replace the storage delegate with KVS so for now
