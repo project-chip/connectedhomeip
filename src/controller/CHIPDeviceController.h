@@ -35,6 +35,7 @@
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousSession.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
@@ -240,7 +241,7 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
-    Transport::MessageCounterManagerInterface * mMessageCounterManager;
+    secure_channel::MessageCounterManager * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
