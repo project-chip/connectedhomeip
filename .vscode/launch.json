@@ -84,357 +84,13 @@
                 }
             ]
         },
-        {
-            "name": "Shell Mbed Example Debug [remote]",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/examples/shell/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-shell-example",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}/examples/shell/mbed",
-            "environment": [],
-            "externalConsole": false,
-            "debugServerArgs": "",
-            "serverLaunchTimeout": 20000,
-            "filterStderr": true,
-            "filterStdout": false,
-            "serverStarted": "GDB\\ server\\ started",
-            "setupCommands": [
-                {
-                    "text": "-target-select remote host.docker.internal:3333",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-shell-example",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-            "logging": {
-                "moduleLoad": true,
-                "trace": true,
-                "engineLogging": true,
-                "programOutput": true,
-                "exceptions": true
-            },
-            "linux": {
-                "MIMode": "gdb",
-                "MIDebuggerPath": "arm-none-eabi-gdb"
-            }
-        },
-        {
-            "name": "Shell Mbed Example Debug [local: nrf52840]",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-shell-example",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}/examples/shell/mbed",
-            "environment": [],
-            "externalConsole": false,
-            "debugServerArgs": "",
-            "serverLaunchTimeout": 20000,
-            "filterStderr": true,
-            "filterStdout": false,
-            "serverStarted": "GDB\\ server\\ started",
-            "logging": {
-                "moduleLoad": true,
-                "trace": true,
-                "engineLogging": true,
-                "programOutput": true,
-                "exceptions": true
-            },
-            "setupCommands": [
-                {
-                    "text": "-target-select remote localhost:3333",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-shell-example",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-            "linux": {
-                "MIMode": "gdb",
-                "MIDebuggerPath": "arm-none-eabi-gdb",
-                "debugServerPath": "pyocd-gdbserver",
-                "debugServerArgs": "-t nrf52840 -O connect_mode=under-reset"
-            }
-        },
-        {
-            "name": "Shell Mbed Example Debug [local: stm32l475xg]",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-shell-example",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}/examples/shell/mbed",
-            "environment": [],
-            "externalConsole": false,
-            "debugServerArgs": "",
-            "serverLaunchTimeout": 20000,
-            "filterStderr": true,
-            "filterStdout": false,
-            "serverStarted": "GDB\\ server\\ started",
-            "logging": {
-                "moduleLoad": true,
-                "trace": true,
-                "engineLogging": true,
-                "programOutput": true,
-                "exceptions": true
-            },
-            "setupCommands": [
-                {
-                    "text": "-target-select remote localhost:3333",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/shell/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-shell-example",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-            "linux": {
-                "MIMode": "gdb",
-                "MIDebuggerPath": "arm-none-eabi-gdb",
-                "debugServerPath": "pyocd-gdbserver",
-                "debugServerArgs": "-t stm32l475xg -O connect_mode=under-reset -f 4000000"
-            }
-        },
-        {
-            "name": "Lock-app Mbed Example Debug [remote]",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/examples/lock-app/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-lock-app-example",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}/examples/lock-app/mbed",
-            "environment": [],
-            "externalConsole": false,
-            "debugServerArgs": "",
-            "serverLaunchTimeout": 20000,
-            "filterStderr": true,
-            "filterStdout": false,
-            "serverStarted": "GDB\\ server\\ started",
-            "setupCommands": [
-                {
-                    "text": "-target-select remote host.docker.internal:3333",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/lock-app/mbed/build-${input:mbedTarget}/${input:mbedProfile}/chip-mbed-lock-app-example",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-            "logging": {
-                "moduleLoad": true,
-                "trace": true,
-                "engineLogging": true,
-                "programOutput": true,
-                "exceptions": true
-            },
-            "linux": {
-                "MIMode": "gdb",
-                "MIDebuggerPath": "arm-none-eabi-gdb"
-            }
-        },
-        {
-            "name": "Lock-app Mbed Example Debug [local: nrf52840]",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/examples/lock-app/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-lock-app-example",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}/examples/lock-app/mbed",
-            "environment": [],
-            "externalConsole": false,
-            "debugServerArgs": "",
-            "serverLaunchTimeout": 20000,
-            "filterStderr": true,
-            "filterStdout": false,
-            "serverStarted": "GDB\\ server\\ started",
-            "logging": {
-                "moduleLoad": true,
-                "trace": true,
-                "engineLogging": true,
-                "programOutput": true,
-                "exceptions": true
-            },
-            "setupCommands": [
-                {
-                    "text": "-target-select remote localhost:3333",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/lock-app/mbed/build-NRF52840_DK/${input:mbedProfile}/chip-mbed-lock-app-example",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-            "linux": {
-                "MIMode": "gdb",
-                "MIDebuggerPath": "arm-none-eabi-gdb",
-                "debugServerPath": "pyocd-gdbserver",
-                "debugServerArgs": "-t nrf52840 -O connect_mode=under-reset"
-            }
-        },
-        {
-            "name": "Lock-app Mbed Example Debug [local: stm32l475xg]",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceRoot}/examples/lock-app/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-lock-app-example",
-            "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceRoot}/examples/lock-app/mbed",
-            "environment": [],
-            "externalConsole": false,
-            "debugServerArgs": "",
-            "serverLaunchTimeout": 20000,
-            "filterStderr": true,
-            "filterStdout": false,
-            "serverStarted": "GDB\\ server\\ started",
-            "logging": {
-                "moduleLoad": true,
-                "trace": true,
-                "engineLogging": true,
-                "programOutput": true,
-                "exceptions": true
-            },
-            "setupCommands": [
-                {
-                    "text": "-target-select remote localhost:3333",
-                    "description": "connect to target",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-file-exec-and-symbols ${workspaceRoot}/examples/lock-app/mbed/build-DISCO_L475VG_IOT01A/${input:mbedProfile}/chip-mbed-lock-app-example",
-                    "description": "load file",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor reset\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor halt\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-interpreter-exec console \"monitor arm semihosting enable\"",
-                    "ignoreFailures": false
-                },
-                {
-                    "text": "-target-download",
-                    "description": "flash target",
-                    "ignoreFailures": false
-                }
-            ],
-            "linux": {
-                "MIMode": "gdb",
-                "MIDebuggerPath": "arm-none-eabi-gdb",
-                "debugServerPath": "pyocd-gdbserver",
-                "debugServerArgs": "-t stm32l475xg -O connect_mode=under-reset -f 4000000"
-            }
-        },
 
         {
             "name": "Debug Mbed CY8CPROTO_062_4343W",
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example",
             "servertype": "openocd",
             "searchDir": [
                 "${workspaceRoot}/config/mbed/scripts",
@@ -445,7 +101,7 @@
                 "set mem inaccessible-by-default off",
                 "-enable-pretty-printing",
                 "set remotetimeout 15",
-                "monitor program {./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor program {./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex}",
                 "monitor reset run",
                 "monitor sleep 200",
                 "monitor psoc6 reset_halt sysresetreq"
@@ -469,7 +125,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example",
             "servertype": "external",
             "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
             "overrideLaunchCommands": [
@@ -477,7 +133,7 @@
                 "-enable-pretty-printing",
                 "set remotetimeout 15",
                 "monitor reset halt",
-                "load ./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "load ./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex",
                 "monitor reset run",
                 "monitor sleep 200",
                 "monitor psoc6 reset_halt sysresetreq"
@@ -499,7 +155,7 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example",
             "servertype": "openocd",
             "searchDir": [
                 "${workspaceRoot}/config/mbed/scripts",
@@ -508,7 +164,7 @@
             "configFiles": ["CY8CPROTO_062_4343W.tcl"],
             "overrideLaunchCommands": [
                 "monitor psoc6 sflash_restrictions 1",
-                "monitor program {./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor program {./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex}",
                 "monitor reset_config srst_only",
                 "monitor reset run",
                 "monitor psoc6.dap dpreg 0x04 0x00",
@@ -524,16 +180,94 @@
             "type": "cortex-debug",
             "request": "launch",
             "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
-            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
             "servertype": "external",
             "gdbTarget": "host.docker.internal:3334", //port 3333 for the CM0+, 3334 for the CM4
             "overrideLaunchCommands": [
                 "monitor psoc6 sflash_restrictions 1",
                 "monitor reset halt",
-                "load ./build-CY8CPROTO_062_4343W/${input:mbedProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "load ./build-CY8CPROTO_062_4343W/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
                 "monitor reset_config srst_only",
                 "monitor reset run",
                 "monitor psoc6.dap dpreg 0x04 0x00",
+                "quit"
+            ],
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed DISCO_L475VG_IOT01A",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["DISCO_L475VG_IOT01A.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "monitor program {./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex}"
+            ],
+            "overrideRestartCommands": ["monitor reset halt", "continue"],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed DISCO_L475VG_IOT01A [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3333",
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "load ./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-mbed-${input:mbedApp}-example.hex"
+            ],
+            "overrideRestartCommands": ["monitor reset halt", "continue"],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed DISCO_L475VG_IOT01A",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-DISCO_L475VG_IOT01A/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["DISCO_L475VG_IOT01A.tcl"],
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "monitor program {./build-DISCO_L475VG_IOT01A/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex}",
+                "monitor reset run",
+                "quit"
+            ],
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Flash Mbed DISCO_L475VG_IOT01A [remote]",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:mbedApp}/mbed",
+            "executable": "./build-DISCO_L475VG_IOT01A/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
+            "servertype": "external",
+            "gdbTarget": "host.docker.internal:3333",
+            "overrideLaunchCommands": [
+                "monitor reset halt",
+                "load ./build-DISCO_L475VG_IOT01A/${input:mbedFlashProfile}/chip-mbed-${input:mbedApp}-example.hex",
+                "monitor reset run",
                 "quit"
             ],
             "showDevDebugOutput": false // When set to true, displays output of GDB.
@@ -542,22 +276,22 @@
     "inputs": [
         {
             "type": "pickString",
-            "id": "mbedTarget",
-            "description": "What mbed target will be used?",
-            "options": ["NRF52840_DK", "DISCO_L475VG_IOT01A"],
-            "default": "NRF52840_DK"
-        },
-        {
-            "type": "pickString",
-            "id": "mbedProfile",
-            "description": "What mbed profile do you want to use?",
+            "id": "mbedDebugProfile",
+            "description": "What mbed profile do you want to debug?",
             "options": ["debug", "develop"],
             "default": "develop"
         },
         {
             "type": "pickString",
+            "id": "mbedFlashProfile",
+            "description": "What mbed profile do you want to flash?",
+            "options": ["release", "debug", "develop"],
+            "default": "develop"
+        },
+        {
+            "type": "pickString",
             "id": "mbedApp",
-            "description": "What mbed applciation do you want to use?",
+            "description": "What mbed application do you want to use?",
             "options": ["shell", "lock-app"],
             "default": "shell"
         }
