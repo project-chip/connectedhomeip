@@ -145,7 +145,6 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
-    "-Wno-unknown-warning-option",
     "-Wno-missing-field-initializers",
     "-Wno-unused-parameter",
   ]
@@ -158,6 +157,8 @@ config("disabled_warnings") {
       "-Wno-psabi",
       "-Wno-cast-function-type",
     ]
+  } else {
+    cflags += [ "-Wno-unknown-warning-option" ]
   }
 }
 
