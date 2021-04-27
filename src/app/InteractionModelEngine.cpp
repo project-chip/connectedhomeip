@@ -298,7 +298,7 @@ void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
     lastClusterInfo->ClearDirty();
     lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
     mpNextAvailableClusterInfo = aClusterInfo;
-    aClusterInfo = nullptr;
+    aClusterInfo               = nullptr;
 }
 
 CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfo, AttributePathParams & aAttributePathParams)
