@@ -34,7 +34,11 @@ RUN apt-get -fy install git vim emacs sudo \
     build-essential cmake cppcheck valgrind \
     wget curl telnet \
     docker.io \
-    iputils-ping net-tools
+    iputils-ping net-tools \
+    libncurses5
+
+RUN python3 -m pip install pyocd pyusb
+
 RUN groupadd -g $USER_GID $USERNAME
 RUN useradd -s /bin/bash -u $USER_UID -g $USER_GID -G docker -m $USERNAME
 RUN echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME
