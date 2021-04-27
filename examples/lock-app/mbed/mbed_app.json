@@ -1,0 +1,81 @@
+{
+    "macros": ["MBEDTLS_USER_CONFIG_FILE=\"chip_mbedtls_config.h\""],
+    "target_overrides": {
+        "*": {
+            "platform.stdio-baud-rate": 115200,
+            "lwip.ipv6-enabled": true,
+            "lwip.raw-socket-enabled": true,
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"YOUR_SSID\"",
+            "nsapi.default-wifi-password": "\"YOUR_PASSWORD\"",
+            "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
+            "mbed-trace.enable": false
+        },
+        "DISCO_L475VG_IOT01A": {
+            "target.components_add": ["wifi_ism43362", "BlueNRG_MS"],
+            "ism43362.provide-default": true,
+            "target.network-default-interface-type": "WIFI",
+            "target.macros_add": ["MBEDTLS_SHA1_C"],
+            "target.features_add": ["BLE"],
+            "target.extra_labels_add": ["CORDIO"],
+            "led-active-state": 1,
+            "lock-button": "USER_BUTTON",
+            "function-button": "NC"
+        },
+        "CY8CPROTO_062_4343W": {
+            "target.network-default-interface-type": "WIFI",
+            "target.macros_add": [
+                "MXCRYPTO_DISABLED",
+                "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
+                "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG"
+            ],
+            "led-active-state": 1,
+            "system-state-led": "LED1",
+            "lock-state-led": "P9_6",
+            "lock-button": "USER_BUTTON",
+            "function-button": "P9_7"
+        }
+    },
+    "config": {
+        "system-state-led": {
+            "help": "System status LED.",
+            "value": "LED1"
+        },
+        "lock-state-led": {
+            "help": "Lock status LED.",
+            "value": "LED2"
+        },
+        "actuator-movement-period-ms": {
+            "help": "Time it takes in ms for the simulated actuator to move from one state to another.",
+            "value": 2000
+        },
+        "led-active-state": {
+            "help": "GPIO output to turn the LED on.",
+            "value": 0
+        },
+        "lock-button": {
+            "help": "Lock botton pin.",
+            "value": "BUTTON2"
+        },
+        "function-button": {
+            "help": "Function button pin.",
+            "value": "BUTTON1"
+        },
+        "factory-reset-trigger-timeout": {
+            "help": "'function-button' press timeout to trigger a factory reset (in milliseconds).",
+            "value": 3000
+        },
+        "factory-reset-cancel-window-timeout": {
+            "help": "'function-button' press timeout to cancel a factory reset (in milliseconds). The total 'function-button' press time to have the factory reset actually initiated is equal to 'factory-reset-trigger-timeout' + 'factory-reset-cancel-window-timeout'.",
+            "value": 3000
+        },
+        "device-name": {
+            "help": "Name used for BLE advertising.",
+            "value": "\"CHIP-lock\""
+        },
+        "use-gatt-indication-ack-hack": {
+            "help": "Fake a TX transfer confirmation. Send a 'kCHIPoBLEIndicateConfirm' event as soon as data is sent, without waiting for the actual ACK from the GATT client. This hack has to stay until we provide a fix in the Mbed OS repo.",
+            "value": 1
+        }
+    }
+}
