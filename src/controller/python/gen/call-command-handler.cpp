@@ -42,6 +42,7 @@ EmberAfStatus emberAfLowPowerClusterClientCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfNetworkCommissioningClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfSwitchClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
@@ -122,6 +123,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_SCENES_CLUSTER_ID:
             result = emberAfScenesClusterClientCommandParse(cmd);
+            break;
+        case ZCL_SWITCH_CLUSTER_ID:
+            // No commands are enabled for cluster Switch
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             // No commands are enabled for cluster Temperature Measurement

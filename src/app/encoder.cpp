@@ -118,6 +118,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
+| Switch                                                              | 0x003B |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
 | WindowCovering                                                      | 0x0102 |
@@ -270,6 +271,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_REMOVE_SCENE_COMMAND_ID (0x02)
 #define ZCL_STORE_SCENE_COMMAND_ID (0x04)
 #define ZCL_VIEW_SCENE_COMMAND_ID (0x01)
+
+#define SWITCH_CLUSTER_ID 0x003B
 
 #define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
 
@@ -3963,6 +3966,70 @@ PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uint8_t seqNum, E
 PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadScenesClusterRevision", SCENES_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster Switch                                                      | 0x003B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * NumberOfPositions                                                 | 0x0000 |
+| * CurrentPosition                                                   | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeSwitchClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverSwitchAttributes", SWITCH_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NumberOfPositions
+ */
+PacketBufferHandle encodeSwitchClusterReadNumberOfPositionsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadSwitchNumberOfPositions", SWITCH_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CurrentPosition
+ */
+PacketBufferHandle encodeSwitchClusterReadCurrentPositionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadSwitchCurrentPosition", SWITCH_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeSwitchClusterConfigureCurrentPositionAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                        uint16_t minInterval, uint16_t maxInterval, uint8_t change)
+{
+    COMMAND_HEADER("ReportSwitchCurrentPosition", SWITCH_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0001)
+        .Put8(32)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    buf.Put8(static_cast<uint8_t>(change));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeSwitchClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadSwitchClusterRevision", SWITCH_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

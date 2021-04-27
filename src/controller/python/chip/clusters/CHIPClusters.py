@@ -450,6 +450,8 @@ class ChipClusters:
                     "sceneId": "int",
                 },
             },
+            "Switch": {
+            },
             "TemperatureMeasurement": {
             },
             "Thermostat": {
@@ -655,6 +657,11 @@ class ChipClusters:
                 "CurrentGroup",
                 "SceneValid",
                 "NameSupport",
+                "ClusterRevision",
+            ],
+            "Switch": [
+                "NumberOfPositions",
+                "CurrentPosition",
                 "ClusterRevision",
             ],
             "TemperatureMeasurement": [
@@ -1369,6 +1376,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Scenes_NameSupport(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSwitch_ReadAttributeNumberOfPositions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_NumberOfPositions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSwitch_ReadAttributeCurrentPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_CurrentPosition(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSwitch_ConfigureAttributeCurrentPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterSwitch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ConfigureAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -2098,6 +2113,19 @@ class ChipClusters:
         # Cluster Scenes ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster Switch
+        # Cluster Switch ReadAttribute NumberOfPositions
+        self._chipLib.chip_ime_ReadAttribute_Switch_NumberOfPositions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_NumberOfPositions.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute CurrentPosition
+        self._chipLib.chip_ime_ReadAttribute_Switch_CurrentPosition.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_CurrentPosition.restype = ctypes.c_uint32
+        # Cluster Switch ConfigureAttribute CurrentPosition
+        self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement
         # Cluster TemperatureMeasurement ReadAttribute MeasuredValue
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

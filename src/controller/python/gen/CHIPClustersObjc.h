@@ -583,6 +583,23 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Switch
+ *
+ */
+@interface CHIPSwitch : CHIPCluster
+
+- (void)readAttributeNumberOfPositions:(ResponseHandler)completionHandler;
+- (void)readAttributeCurrentPosition:(ResponseHandler)completionHandler;
+- (void)configureAttributeCurrentPosition:(uint16_t)minInterval
+                              maxInterval:(uint16_t)maxInterval
+                                   change:(uint8_t)change
+                        completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCurrentPosition:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Temperature Measurement
  *
  */

@@ -152,6 +152,14 @@ void emberAfOnOffClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfScenesClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Switch Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSwitchClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Temperature Measurement Cluster Init
  *
  * Cluster Init
@@ -1141,6 +1149,76 @@ EmberAfStatus emberAfScenesClusterClientPreAttributeChangedCallback(chip::Endpoi
  * @param endpoint  Endpoint that is being served
  */
 void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Switch Cluster client
+//
+
+/** @brief Switch Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfSwitchClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Switch Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfSwitchClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Switch Cluster Client Manufacturer Specific Attribute Changed
+ *
+ * Client Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfSwitchClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
+                                                                            uint16_t manufacturerCode);
+
+/** @brief Switch Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param type               The type of message sent
+ * @param indexOrDestination The destination or address to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfSwitchClusterClientMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                   EmberStatus status);
+
+/** @brief Switch Cluster Client Pre Attribute Changed
+ *
+ * client Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfSwitchClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
+                                                                    EmberAfAttributeType attributeType, uint8_t size,
+                                                                    uint8_t * value);
+
+/** @brief Switch Cluster Client Tick
+ *
+ * client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Temperature Measurement Cluster client

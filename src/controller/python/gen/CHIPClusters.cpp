@@ -3880,6 +3880,53 @@ CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * on
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// Switch Cluster Commands
+// Switch Cluster Attributes
+CHIP_ERROR SwitchCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeSwitchClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR SwitchCluster::ReadAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeSwitchClusterReadNumberOfPositionsAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR SwitchCluster::ReadAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeSwitchClusterReadCurrentPositionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR SwitchCluster::ConfigureAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                            uint16_t maxInterval, uint8_t change)
+{
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeSwitchClusterConfigureCurrentPositionAttribute(seqNum, mEndpoint, minInterval, maxInterval, change);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR SwitchCluster::ReportAttributeCurrentPosition(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(0x0001, onReportCallback);
+}
+
+CHIP_ERROR SwitchCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeSwitchClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // TemperatureMeasurement Cluster Commands
 // TemperatureMeasurement Cluster Attributes
 CHIP_ERROR TemperatureMeasurementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
