@@ -82,6 +82,23 @@
                 "path": ["${workspaceFolder}/out/debug/"],
                 "limitSymbolsToIncludedHeaders": true
             }
+        },
+        {
+            "name": "Mbed examples debug (GN)",
+            "cStandard": "c11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "/opt/mbed-os-toolchain/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/examples/shell/mbed/build-NRF52840_DK/"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "defines": [
+                "CHIP_DEVICE_LAYER_TARGET_MBED=1",
+                "CHIP_DEVICE_LAYER_TARGET=mbed"
+            ]
         }
     ],
     "version": 4
