@@ -1,0 +1,78 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - Mbed OS
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    mbedos:
+        strategy:
+            fail-fast: False
+            matrix:
+                EXAMPLE_APP:    [shell, lock-app]
+                EXAMPLE_TARGET: [DISCO_L475VG_IOT01A, NRF52840_DK]
+        
+        name: "${{matrix.EXAMPLE_APP}}: ${{matrix.EXAMPLE_TARGET}}"
+        
+        env:
+            BUILD_TYPE: mbedos
+            EXAMPLE_PROFILE: release
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build-mbed-os:latest
+            volumes:
+                - "/tmp/output_binaries:/tmp/output_binaries"
+            
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+
+            - name: Build example Shell App
+              run: scripts/examples/mbed_example.sh -a=${{matrix.EXAMPLE_APP}} -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
+
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build/
+                  cp examples/${{matrix.EXAMPLE_APP}}/mbed/build-${{matrix.EXAMPLE_TARGET}}/$EXAMPLE_PROFILE/chip-mbed-${{matrix.EXAMPLE_APP}}-example.hex \
+                     example_binaries/$BUILD_TYPE-build/${{matrix.EXAMPLE_APP}}_${{matrix.EXAMPLE_TARGET}}_$EXAMPLE_PROFILE.hex
+
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+
+            - name: Copy aside binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build/ /tmp/output_binaries/
+
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-${{matrix.EXAMPLE_APP}}-example-${{matrix.EXAMPLE_TARGET}}-${{ env.EXAMPLE_PROFILE}}-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build/${{matrix.EXAMPLE_APP}}_${{matrix.EXAMPLE_TARGET}}_${{ env.EXAMPLE_PROFILE }}.hex
