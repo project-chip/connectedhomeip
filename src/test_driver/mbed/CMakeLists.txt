@@ -54,6 +54,12 @@ if("BlueNRG_MS" IN_LIST MBED_TARGET_LABELS)
     )
 endif()
 
+if("WHD" IN_LIST MBED_TARGET_LABELS)
+    target_link_libraries(${APP_TARGET}
+        mbed-cy_psoc6_common_network mbed-emac mbed-cy_psoc6_whd
+    )
+endif()
+
 # As noted in the nrfconnect impl:
 #   TODO: this list is hard to maintain manually (and currently incomplete).
 #   An automated way that includes figuring out dependencies would be much better
@@ -64,7 +70,7 @@ set(CHIP_TESTS
     -lBleLayerTests
     -lChipCryptoTests
     # -lCoreTests
-    # -lInetLayerTests
+    -lInetLayerTests
     # -lMessagingLayerTests
     -lPlatformTests
     # # TODO: raw transport tests fail by running out of TCP/UDP endpoints
@@ -72,9 +78,9 @@ set(CHIP_TESTS
     -lRetransmitTests
     # -lSupportTests
     -lSystemLayerTests
-    # -lTransportLayerTests
-    #-lMinimalMdnsCoreTests
-    #-lMinimalMdnstests
+    -lTransportLayerTests
+   #-lMinimalMdnsCoreTests
+   # -lMinimalMdnstests
 )
 
 # Link the *whole-archives* to keep the static test objects.
@@ -83,9 +89,10 @@ target_link_options(${APP_TARGET} PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,-
 # Add test libs.
 target_link_libraries(${APP_TARGET}
 # TODO: Enable all the tests.
-        # InetTestHelpers
-        # NetworkTestHelpers
+        InetTestHelpers
+        NetworkTestHelpers
         nlunit-test
+        ChipCertTestVectors
 )
 
 target_link_libraries(${APP_TARGET} mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)

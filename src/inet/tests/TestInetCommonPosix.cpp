@@ -467,7 +467,7 @@ void ServiceEvents(struct ::timeval & aSleepTime)
         if (NetworkIsReady())
 #endif
         {
-            printf("CHIP node ready to service events; PID: %d; PPID: %d\n", getpid(), getppid());
+            printf("CHIP node ready to service events; PID: %d; PPID: %d\n", getpid(), getpid());
             fflush(stdout);
             printed = true;
         }
