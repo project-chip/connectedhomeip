@@ -328,6 +328,10 @@ public:
     void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
+    // This two functions are pretty tricky, it is used to bridge the response
+    void AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void CancelIMResponseHandler();
+
 private:
     enum class ConnectionState
     {

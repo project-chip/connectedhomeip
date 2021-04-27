@@ -44,6 +44,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <messaging/ExchangeContext.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -59,6 +60,8 @@
 #include <transport/raw/BLE.h>
 #endif
 
+#include <app/util/af-enums.h>
+
 #include <errno.h>
 #include <inttypes.h>
 #include <memory>
@@ -68,6 +71,14 @@
 
 using namespace chip::Inet;
 using namespace chip::System;
+
+// For some applications those does not implement IMDelegate, the DeviceControllerInteractionModelDelegate will dispatch the
+// response to IMDefaultResponseCallback CHIPClientCallbacks, for the applications those implemented IMDelegate, this function will
+// not be used.
+bool __attribute__((weak)) IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status)
+{
+    return false;
+}
 
 namespace chip {
 namespace Controller {
@@ -179,7 +190,15 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
+    if (params.imDelegate != nullptr)
+    {
+        err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
+    }
+    else
+    {
+        mDefaultIMDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
+        err                = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mDefaultIMDelegate);
+    }
     SuccessOrExit(err);
 
     mExchangeMgr->SetDelegate(this);
@@ -242,6 +261,12 @@ CHIP_ERROR DeviceController::Shutdown()
     {
         chip::Platform::Delete(mTransportMgr);
         mTransportMgr = nullptr;
+    }
+
+    if (mDefaultIMDelegate != nullptr)
+    {
+        chip::Platform::Delete(mDefaultIMDelegate);
+        mDefaultIMDelegate = nullptr;
     }
 
     mAdmins.ReleaseAdminId(mAdminId);
@@ -1069,6 +1094,62 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError)
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
+    const app::CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+    const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
+    chip::CommandId aCommandId, uint8_t aCommandIndex)
+{
+    // #6308, #6559: Invoking success Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current
+    // requirement of current callback framework that we should be able to send another command once ResponseCallback is called. By
+    // resolving #6308, the app can wait for the right event, and by #6559 the app can send command in a now command sender.
+    VerifyOrReturnError(aProtocolCode != 0, CHIP_NO_ERROR);
+
+    // Generally IM has more detailed errors than ember library, here we always use the, the actual handling of the
+    // commands should implement full IMDelegate.
+    // #6308 By implement app side IM delegate, we should be able to accept detailed error codes.
+    // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+    // instead of IM status code.
+    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProtocolError(const app::CommandSender * apCommandSender,
+                                                                                  uint8_t aCommandIndex)
+{
+    // Generally IM has more detailed errors than ember library, here we always use EMBER_ZCL_STATUS_FAILURE before #6308 is landed
+    // and the app can take care of these error codes, the actual handling of the commands should implement full IMDelegate.
+    // #6308: By implement app side IM delegate, we should be able to accept detailed error codes.
+    // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+    // instead of IM status code.
+    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const app::CommandSender * apCommandSender,
+                                                                          CHIP_ERROR aError)
+{
+    // Generally IM has more detailed errors than ember library, here we always use EMBER_ZCL_STATUS_FAILURE before #6308 is landed
+    // and the app can take care of these error codes, the actual handling of the commands should implement full IMDelegate.
+    // #6308: By implement app side IM delegate, we should be able to accept detailed error codes.
+    // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+    // instead of IM status code.
+    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_FAILURE);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
+{
+    // #6308, #6559: Invoking Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current requirement of
+    // current callback framework that we should be able to send another command once ResponseCallback is called.
+    // By resolving #6308, the app can wait for the right event, and by #6559 the app can send command in a now command sender.
+    IMDefaultResponseCallback(apCommandSender, EMBER_ZCL_STATUS_SUCCESS);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller
