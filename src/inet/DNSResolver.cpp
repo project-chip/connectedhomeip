@@ -37,7 +37,7 @@
 #include <lwip/init.h>
 #include <lwip/tcpip.h>
 
-#if LWIP_VERSION_MAJOR < 2
+#if LWIP_VERSION_MAJOR <= 2
 #define LWIP_DNS_FOUND_CALLBACK_TYPE dns_found_callback
 #endif // LWIP_VERSION_MAJOR < 2
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
