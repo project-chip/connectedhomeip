@@ -22,23 +22,22 @@
 
 @implementation CHIPOnboardingPayloadParser
 
-
 + (CHIPSetupPayload * __nullable)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
                                                            ofType:(CHIPOnboardingPayloadType)type
                                                             error:(NSError * __autoreleasing *)error
 {
-    CHIPSetupPayload *payload;
+    CHIPSetupPayload * payload;
     switch (type) {
-        case CHIPOnboardingPayloadTypeManualCode:
-            payload = [self setupPayloadForManualCodeOnboardingPayload:onboardingPayload error:error];
-            break;
-        case CHIPOnboardingPayloadTypeQRCode:
-        case CHIPOnboardingPayloadTypeTomatoEnhanced:
-        case CHIPOnboardingPayloadTypeNFC:
-            payload = [self setupPayloadForQRCodeOnboardingPayload:onboardingPayload error:error];
-            break;
-        default:
-            break;
+    case CHIPOnboardingPayloadTypeManualCode:
+        payload = [self setupPayloadForManualCodeOnboardingPayload:onboardingPayload error:error];
+        break;
+    case CHIPOnboardingPayloadTypeQRCode:
+    case CHIPOnboardingPayloadTypeTomatoEnhanced:
+    case CHIPOnboardingPayloadTypeNFC:
+        payload = [self setupPayloadForQRCodeOnboardingPayload:onboardingPayload error:error];
+        break;
+    default:
+        break;
     }
     return payload;
 }
@@ -46,14 +45,16 @@
 + (CHIPSetupPayload * __nullable)setupPayloadForQRCodeOnboardingPayload:(NSString *)onboardingPayload
                                                                   error:(NSError * __autoreleasing *)error
 {
-    CHIPQRCodeSetupPayloadParser *qrCodeParser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:onboardingPayload];
+    CHIPQRCodeSetupPayloadParser * qrCodeParser =
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:onboardingPayload];
     return [qrCodeParser populatePayload:error];
 }
 
 + (CHIPSetupPayload * __nullable)setupPayloadForManualCodeOnboardingPayload:(NSString *)onboardingPayload
                                                                       error:(NSError * __autoreleasing *)error
 {
-    CHIPManualSetupPayloadParser *manualParser = [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:onboardingPayload];
+    CHIPManualSetupPayloadParser * manualParser =
+        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:onboardingPayload];
     return [manualParser populatePayload:error];
 }
 @end
