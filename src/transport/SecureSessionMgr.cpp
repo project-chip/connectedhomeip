@@ -134,8 +134,6 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
     PacketHeader packetHeader;
     ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
 
-    VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen + packetHeader.EncodeSizeBytes(), CHIP_ERROR_MESSAGE_TOO_LONG);
-
     PayloadHeader payloadHeader;
     return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
