@@ -19,9 +19,7 @@ import("${chip_root}/src/app/chip_data_model.gni")
 chip_data_model("all-clusters-common") {
   zap_file = "all-clusters-app.zap"
 
-  deps = [
-    "${chip_root}/src/app/server",
-  ]
+  deps = [ "${chip_root}/src/app/server" ]
 
   zap_pregenerated_dir = "gen"
 }
