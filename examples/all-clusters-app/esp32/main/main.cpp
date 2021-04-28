@@ -67,9 +67,9 @@ using namespace ::chip::DeviceLayer;
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
-#define BUTTON_1_GPIO_NUM GPIO_NUM_39    // Left button on M5Stack
-#define BUTTON_2_GPIO_NUM GPIO_NUM_38    // Middle button on M5Stack
-#define BUTTON_3_GPIO_NUM GPIO_NUM_37    // Right button on M5Stack
+#define BUTTON_1_GPIO_NUM GPIO_NUM_39 // Left button on M5Stack
+#define BUTTON_2_GPIO_NUM GPIO_NUM_38 // Middle button on M5Stack
+#define BUTTON_3_GPIO_NUM GPIO_NUM_37 // Right button on M5Stack
 #define STATUS_LED_GPIO_NUM GPIO_NUM_MAX // No status LED on M5Stack
 
 #elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
@@ -79,6 +79,10 @@ using namespace ::chip::DeviceLayer;
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
+
+#elif CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 

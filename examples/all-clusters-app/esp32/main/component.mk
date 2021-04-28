@@ -19,7 +19,11 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-COMPONENT_DEPENDS := chip QRCode tft spidriver
+COMPONENT_DEPENDS := chip QRCode
+ifeq($(IDF_TARGET),'esp32')
+COMPONENT_DEPENDS += tft spidriver	
+endif 
+
 
 # The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/CMakeLists.txt
 COMPONENT_SRCDIRS :=                                                                \
