@@ -77,7 +77,7 @@ set(CHIP_TESTS
     # # -lRawTransportTests
     -lRetransmitTests
     # -lSupportTests
-    -lSystemLayerTests
+    # -lSystemLayerTests
     -lTransportLayerTests
    #-lMinimalMdnsCoreTests
    # -lMinimalMdnstests
