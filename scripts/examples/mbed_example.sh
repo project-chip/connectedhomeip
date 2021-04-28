@@ -21,12 +21,14 @@ CHIP_ROOT=$PWD
 cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
-SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK CY8CPROTO_062_4343W)
+SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A CY8CPROTO_062_4343W)
 SUPPORTED_APP=(shell lock-app)
 SUPPORTED_PROFILES=(release develop debug)
+SUPPORTED_COMMAND=(build flash build-flash)
 
+COMMAND=build
 APP=shell
-TARGET_BOARD=NRF52840_DK
+TARGET_BOARD=CY8CPROTO_062_4343W
 TOOLCHAIN=GCC_ARM
 PROFILE=release
 
@@ -48,11 +50,20 @@ for i in "$@"; do
         PROFILE="${i#*=}"
         shift
         ;;
+    -c=* | --command=*)
+        COMMAND="${i#*=}"
+        shift
+        ;;
     *)
         # unknown option
         ;;
     esac
 done
+
+if [[ ! " ${SUPPORTED_COMMAND[@]} " =~ " ${COMMAND} " ]]; then
+    echo "ERROR: Command $COMMAND not supported"
+    exit 1
+fi
 
 if [[ ! " ${SUPPORTED_TARGET_BOARD[@]} " =~ " ${TARGET_BOARD} " ]]; then
     echo "ERROR: Target $TARGET_BOARD not supported"
@@ -74,31 +85,54 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
     exit 1
 fi
 
-echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
-set -x
+set -e
 pwd
 
-# Build and config directory setup
+# Build directory setup
 BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
-MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
 
-# Override Mbed OS path to development directory
-MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
+if [[ "$COMMAND" == *"build"* ]]; then
+    echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
-# Add the Mbed OS driver for the ISM43362 Wi-Fi module
-WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
+    # Config directory setup
+    MBED_CONFIG_PATH="$APP"/mbed/cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
 
-# Create symlinks to submodules
-ln -sfTr $MBED_OS_PATH "${APP}/mbed/mbed-os"
-ln -sfTr $WIFI_ISM43362_PATH "${APP}/mbed/wifi-ism43362"
+    # Override Mbed OS path to development directory
+    MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
 
-# Generate config file for selected target, toolchain and hardware
-mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/
+    # Create symlinks to mbed-os submodule
+    ln -sfTr $MBED_OS_PATH "${APP}/mbed/mbed-os"
 
-# Create output directory and copy config file there.
-mkdir -p "$BUILD_DIRECTORY"
-cp -f "$MBED_CONFIG_PATH"/mbed_config.cmake "$BUILD_DIRECTORY"/mbed_config.cmake
+    if [ "$TARGET_BOARD" == "DISCO_L475VG_IOT01A" ]; then
+        # Add the Mbed OS driver for the ISM43362 Wi-Fi module
+        WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
 
-# Build application
-cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
-cmake --build "$BUILD_DIRECTORY"
+        # Create symlinks to WIFI-ISM43362 submodule
+        ln -sfTr $WIFI_ISM43362_PATH "${APP}/mbed/wifi-ism43362"
+    fi
+
+    # Generate config file for selected target, toolchain and hardware
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/
+
+    # Remove old artifacts to force linking
+    rm -rf "${BUILD_DIRECTORY}/chip-"*
+
+    # Create output directory and copy config file there.
+    mkdir -p "$BUILD_DIRECTORY"
+    cp -f "$MBED_CONFIG_PATH"/mbed_config.cmake "$BUILD_DIRECTORY"/mbed_config.cmake
+
+    # Build application
+    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
+    cmake --build "$BUILD_DIRECTORY"
+fi
+
+if [[ "$COMMAND" == *"flash"* ]]; then
+
+    echo "Flash $APP app to $TARGET_BOARD target [$TOOLCHAIN toolchain, $PROFILE profile]"
+
+    # Flash scripts path setup
+    MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
+
+    # Flash application
+    openocd -f $MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD.tcl -c "program $BUILD_DIRECTORY/chip-mbed-$APP-example verify reset exit"
+fi
