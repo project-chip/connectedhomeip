@@ -430,7 +430,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
 
-    // See operational-credentials.cpp for explanation as to why fabricId is being set to commissioner node id
+    // See operational-credentials-server.cpp for explanation as to why fabricId is being set to commissioner node id
     // This is temporary code until AddOptCert is implemented through which an admin will be correctly added with the correct fields.
     // TODO: Remove temporary code once AddOptCert is implemented
     if (packetHeader.GetSourceNodeId().HasValue())
