@@ -24,8 +24,10 @@
  *
  */
 
+#include "MockEvents.h"
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/integration/common.h>
 #include <core/CHIPCore.h>
@@ -123,7 +125,24 @@ namespace {
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
+LivenessEventGenerator gLivenessGenerator;
 
+uint8_t gDebugEventBuffer[2048];
+uint8_t gInfoEventBuffer[2048];
+uint8_t gCritEventBuffer[2048];
+chip::app::CircularEventBuffer gCircularEventBuffer[3];
+
+void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
+{
+    chip::app::LogStorageResources logStorageResources[] = {
+        { &gCritEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
+        { &gDebugEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+    };
+
+    chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+                                                      gCircularEventBuffer, logStorageResources);
+}
 } // namespace
 
 int main(int argc, char * argv[])
@@ -152,15 +171,20 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 
+    InitializeEventLogging(&gExchangeManager);
+
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
                                      chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
 
+    MockEventGenerator::GetInstance()->Init(&gExchangeManager, &gLivenessGenerator, 1000, true);
+
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
+    MockEventGenerator::GetInstance()->SetEventGeneratorStop();
 
     if (err != CHIP_NO_ERROR)
     {

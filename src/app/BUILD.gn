@@ -38,6 +38,7 @@ static_library("app") {
     "Command.h",
     "CommandHandler.cpp",
     "CommandSender.cpp",
+    "EventManagement.cpp",
     "InteractionModelEngine.cpp",
     "MessageDef/AttributeDataElement.cpp",
     "MessageDef/AttributeDataElement.h",
