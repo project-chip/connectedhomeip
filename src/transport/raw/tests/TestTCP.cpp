@@ -91,6 +91,11 @@ public:
     }
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override
     {
+        PacketHeader packetHeader;
+
+        CHIP_ERROR error = packetHeader.DecodeAndConsume(msgBuf);
+        NL_TEST_ASSERT(mSuite, error == CHIP_NO_ERROR);
+
         if (mCallback)
         {
             int err = mCallback(msgBuf->Start(), msgBuf->DataLength(), mReceiveHandlerCallCount, mCallbackData);
@@ -122,8 +127,11 @@ public:
         SetCallback([](const uint8_t * message, size_t length, int count, void * data) { return memcmp(message, data, length); },
                     const_cast<void *>(static_cast<const void *>(PAYLOAD)));
 
+        CHIP_ERROR err = header.EncodeBeforeData(buffer);
+        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+
         // Should be able to send a message to itself by just calling send.
-        CHIP_ERROR err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
+        err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
         if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
         {
             // TODO(#2698): the underlying system does not support IPV6. This early return

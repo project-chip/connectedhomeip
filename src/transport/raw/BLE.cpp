@@ -94,13 +94,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                                System::PacketBufferHandle msgBuf)
+CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
     ReturnErrorCodeIf(address.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
 
     if (mState == State::kConnected)
     {

@@ -147,7 +147,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     PeerConnectionState * state = nullptr;
     uint8_t * msgStart          = nullptr;
     uint16_t msgLen             = 0;
-    uint16_t headerSize         = 0;
     NodeId localNodeId          = mLocalNodeId;
 
     Transport::AdminPairingInfo * admin = nullptr;
@@ -184,13 +183,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         SuccessOrExit(err);
     }
 
+    err = packetHeader.EncodeBeforeData(msgBuf);
+    SuccessOrExit(err);
+
     // The start of buffer points to the beginning of the encrypted header, and the length of buffer
     // contains both the encrypted header and encrypted data.
     // Locally store the start and length of the retained buffer after accounting for the size of packet header.
-    headerSize = packetHeader.EncodeSizeBytes();
-
-    msgStart = static_cast<uint8_t *>(msgBuf->Start() - headerSize);
-    msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
+    msgStart = static_cast<uint8_t *>(msgBuf->Start());
+    msgLen   = static_cast<uint16_t>(msgBuf->DataLength());
 
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
@@ -207,12 +207,12 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (state->GetTransport() != nullptr)
     {
         ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
-        err = state->GetTransport()->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+        err = state->GetTransport()->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
     }
     else
     {
         ChipLogProgress(Inet, "Sending secure msg on generic transport");
-        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+        err = mTransportMgr->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
     }
     ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     SuccessOrExit(err);

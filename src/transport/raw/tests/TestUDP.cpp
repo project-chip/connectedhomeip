@@ -60,6 +60,11 @@ public:
 
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override
     {
+        PacketHeader packetHeader;
+
+        CHIP_ERROR err = packetHeader.DecodeAndConsume(msgBuf);
+        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
+
         size_t data_len = msgBuf->DataLength();
         int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
         NL_TEST_ASSERT(mSuite, compare == 0);
@@ -126,8 +131,11 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     PacketHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
+    err = header.EncodeBeforeData(buffer);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), std::move(buffer));
+    err = udp.SendMessage(Transport::PeerAddress::UDP(addr), std::move(buffer));
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return
