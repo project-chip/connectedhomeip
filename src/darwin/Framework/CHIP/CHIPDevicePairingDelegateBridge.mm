@@ -46,12 +46,6 @@ CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSes
     case chip::RendezvousSessionDelegate::Status::SecurePairingFailed:
         rv = kSecurePairingFailed;
         break;
-    case chip::RendezvousSessionDelegate::Status::NetworkProvisioningSuccess:
-        rv = kNetworkProvisioningSuccess;
-        break;
-    case chip::RendezvousSessionDelegate::Status::NetworkProvisioningFailed:
-        rv = kNetworkProvisioningFailed;
-        break;
     }
     return rv;
 }
@@ -69,24 +63,6 @@ void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDele
             });
         }
     }
-}
-
-void CHIPDevicePairingDelegateBridge::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
-{
-    NSLog(@"DevicePairingDelegate Requesting network credentials");
-}
-
-void CHIPDevicePairingDelegateBridge::SendWiFiCredentials(NSString * ssid, NSString * password) {}
-
-void CHIPDevicePairingDelegateBridge::SendThreadCredentials(NSData * threadDataSet)
-{
-    NSLog(@"Thread Provisioning is still a WIP, pairing will timeout...");
-}
-
-void CHIPDevicePairingDelegateBridge::OnOperationalCredentialsRequested(
-    const char * csr, size_t csr_length, chip::RendezvousDeviceCredentialsDelegate * callback)
-{
-    NSLog(@"DevicePairingDelegate Requesting operational credentials");
 }
 
 void CHIPDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)

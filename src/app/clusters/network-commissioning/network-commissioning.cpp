@@ -42,8 +42,6 @@
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#include <protocols/secure_channel/NetworkProvisioning.h>
-
 // Include DeviceNetworkProvisioningDelegateImpl for WiFi provisioning.
 // TODO: Enable wifi network should be done by ConnectivityManager. (Or other platform neutral interfaces)
 #if defined(CHIP_DEVICE_LAYER_TARGET)

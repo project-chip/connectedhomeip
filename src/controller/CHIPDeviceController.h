@@ -44,6 +44,10 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/BleLayer.h>
 #endif
@@ -88,25 +92,6 @@ public:
      * @param status Current status of pairing
      */
     virtual void OnStatusUpdate(RendezvousSessionDelegate::Status status) {}
-
-    /**
-     * @brief
-     *   Called when the network credentials are needed for the remote device
-     *
-     * @param callback Callback delegate that provisions the network credentials
-     */
-    virtual void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) = 0;
-
-    /**
-     * @brief
-     *   Called when the operational credentials are needed for the remote device
-     *
-     * @param csr Certificate signing request from the device
-     * @param csr_length The length of CSR
-     * @param callback Callback delegate that provisions the operational credentials
-     */
-    virtual void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                   RendezvousDeviceCredentialsDelegate * callback) = 0;
 
     /**
      * @brief

@@ -25,7 +25,6 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/NetworkProvisioning.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/BufferWriter.h>
@@ -65,10 +64,7 @@ class SecureSessionHandle;
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public SessionEstablishmentDelegate,
-                          public RendezvousSessionDelegate,
-                          public NetworkProvisioningDelegate,
-                          public TransportMgrDelegate
+class RendezvousSession : public SessionEstablishmentDelegate, public RendezvousSessionDelegate, public TransportMgrDelegate
 {
 public:
     RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
@@ -107,22 +103,9 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
 
-    //////////// NetworkProvisioningDelegate Implementation ///////////////
-    void OnNetworkProvisioningError(CHIP_ERROR error) override;
-    void OnNetworkProvisioningComplete() override;
-
     //////////// TransportMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                            System::PacketBufferHandle msgBuf) override;
-
-    /**
-     * @brief
-     *  Get the IP address assigned to the device during network provisioning
-     *  process.
-     *
-     * @return The IP address of the device
-     */
-    const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
     Transport::AdminId GetAdminId() const { return (mAdmin != nullptr) ? mAdmin->GetAdminId() : Transport::kUndefinedAdminId; }
 
@@ -138,7 +121,6 @@ private:
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
     PASESession mPairingSession;
-    NetworkProvisioning mNetworkProvision;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
     TransportMgrBase * mTransportMgr;
     uint16_t mNextKeyId                  = 0;
