@@ -266,14 +266,14 @@
             "id": "mbedDebugProfile",
             "description": "What mbed profile do you want to debug?",
             "options": ["debug", "develop"],
-            "default": "develop"
+            "default": "debug"
         },
         {
             "type": "pickString",
             "id": "mbedFlashProfile",
             "description": "What mbed profile do you want to flash?",
             "options": ["release", "debug", "develop"],
-            "default": "develop"
+            "default": "release"
         },
         {
             "type": "pickString",
