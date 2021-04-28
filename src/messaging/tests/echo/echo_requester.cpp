@@ -260,6 +260,9 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
+
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession();
     SuccessOrExit(err);

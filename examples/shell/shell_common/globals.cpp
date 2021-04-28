@@ -17,6 +17,7 @@
 
 #include <Globals.h>
 
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::SecureSessionMgr gSessionManager;
 chip::Inet::IPAddress gDestAddr;

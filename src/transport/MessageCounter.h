@@ -1,6 +1,5 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Google LLC.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,10 +47,10 @@ public:
 
     virtual ~MessageCounter() = 0;
 
-    virtual Type GetType()     = 0;
-    virtual void Reset()       = 0;
-    virtual uint32_t Value()   = 0; /** Get current value */
-    virtual uint32_t Advance() = 0; /** Advance the counter and get new value */
+    virtual Type GetType()       = 0;
+    virtual void Reset()         = 0;
+    virtual uint32_t Value()     = 0; /** Get current value */
+    virtual CHIP_ERROR Advance() = 0; /** Advance the counter and get new value */
 };
 
 inline MessageCounter::~MessageCounter() {}
@@ -67,7 +66,11 @@ public:
     { /* null op */
     }
     uint32_t Value() override { return value; }
-    uint32_t Advance() override { return ++value; }
+    CHIP_ERROR Advance() override
+    {
+        ++value;
+        return CHIP_NO_ERROR;
+    }
 
 private:
     uint32_t value;
@@ -85,7 +88,7 @@ public:
     { /* null op */
     }
     uint32_t Value() override { return persisted.GetValue(); }
-    uint32_t Advance() override { return static_cast<uint32_t>(persisted.Advance()); }
+    CHIP_ERROR Advance() override { return persisted.Advance(); }
 
 private:
 #if CONFIG_DEVICE_LAYER
@@ -97,7 +100,11 @@ private:
         CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch) { return CHIP_NO_ERROR; }
 
         uint32_t GetValue() { return value; }
-        uint32_t Advance() { return ++value; }
+        CHIP_ERROR Advance()
+        {
+            ++value;
+            return CHIP_NO_ERROR;
+        }
 
     private:
         uint32_t value;
@@ -108,15 +115,20 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    LocalSessionMessageCounter() : value(1) {}
+    LocalSessionMessageCounter() : value(kInitialValue) {}
     ~LocalSessionMessageCounter() override {}
 
     Type GetType() override { return Session; }
-    void Reset() override { value = 0; }
+    void Reset() override { value = kInitialValue; }
     uint32_t Value() override { return value; }
-    uint32_t Advance() override { return ++value; }
+    CHIP_ERROR Advance() override
+    {
+        ++value;
+        return CHIP_NO_ERROR;
+    }
 
 private:
+    static constexpr uint32_t kInitialValue = 1;
     uint32_t value;
 };
 

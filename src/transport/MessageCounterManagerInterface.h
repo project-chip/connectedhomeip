@@ -34,13 +34,6 @@ public:
     virtual CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) = 0;
 
     /**
-     * Called when sending a message but session message counter is not synced.  It will queue the message and start sync if the
-     * sync procedure is not started yet.
-     */
-    virtual CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
-                                                    PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) = 0;
-
-    /**
      * Called when have received a message but session message counter is not synced.  It will queue the message and start sync if
      * the sync procedure is not started yet.
      */

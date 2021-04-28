@@ -101,23 +101,8 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
 
     MessageCounter & peerCounter      = peerState->GetSessionMessageCounter().GetLocalMessageCounter();
     PeerMessageCounter & localCounter = localState->GetSessionMessageCounter().GetPeerMessageCounter();
-    NL_TEST_ASSERT(inSuite, localCounter.IsSyncCompleted());
+    NL_TEST_ASSERT(inSuite, localCounter.IsSynchronized());
     NL_TEST_ASSERT(inSuite, localCounter.GetCounter() == peerCounter.Value());
-}
-
-void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    PayloadHeader payloadHeader;
-    System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
-    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
-
-    CHIP_ERROR err = ctx.GetMessageCounterManager().AddToRetransmissionTable(
-        ctx.GetSessionLocalToPeer(), ctx.GetDestinationNodeId(), payloadHeader, std::move(buffer));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
@@ -168,7 +153,6 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("Test MessageCounterManager::MessageCounterSyncProcess", MessageCounterSyncProcess),
-    NL_TEST_DEF("Test MessageCounterManager::AddToRetransTable", CheckAddRetransTable),
     NL_TEST_DEF("Test MessageCounterManager::AddToReceiveTable", CheckAddToReceiveTable),
     NL_TEST_DEF("Test MessageCounterManager::ReceiveMessage", CheckReceiveMessage),
     NL_TEST_SENTINEL()

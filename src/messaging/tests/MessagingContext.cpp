@@ -71,13 +71,13 @@ void MessagingContext::PresetMessageCounter()
 
 SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
     return { GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() };
 }
 
 SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602
     return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
 }
 
