@@ -22,10 +22,9 @@
 
 namespace chip {
 
-CHIP_ERROR TransportMgrBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                                         System::PacketBufferHandle && msgBuf)
+CHIP_ERROR TransportMgrBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    return mTransport->SendMessage(header, address, std::move(msgBuf));
+    return mTransport->SendMessage(address, std::move(msgBuf));
 }
 
 void TransportMgrBase::Disconnect(const Transport::PeerAddress & address)
