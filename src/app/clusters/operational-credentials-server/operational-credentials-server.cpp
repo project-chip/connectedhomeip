@@ -99,14 +99,16 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
         uint16_t vendorId = pairing.GetVendorId();
 
         // Skip over uninitialized admins
-        if (nodeId != kUndefinedNodeId && fabricId != kUndefinedFabricId && vendorId != kUndefinedVendorId)
+        if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
-            if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
-            {
-                emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin with fabricId %" PRIX64 " in fabrics list", fabricId);
-                err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
-                break;
-            }
+            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Skipping over unitialized admin with fabricId %" PRIX64 
+                            ", nodeId %" PRIX64 " vendorId %" PRIX16, fabricId, nodeId, vendorId);
+            continue;
+        } else if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin with fabricId %" PRIX64 " in fabrics list", fabricId);
+            err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+            break;
         }
         fabricIndex ++;
     }
@@ -202,6 +204,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
     GetGlobalAdminPairingTable().ReleaseAdminId(adminId);
 
 exit:
+    writeAdminsIntoFabricsListAttribute();
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }

@@ -224,6 +224,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
+    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(), payloadHeader.GetProtocolID());
+
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
     {
