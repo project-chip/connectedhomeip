@@ -45,3 +45,7 @@ appdirs
 coloredlogs
 watchdog
 protobuf
+
+# mbed 
+mbed-tools
+prettytable==0.7.2
