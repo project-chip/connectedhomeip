@@ -145,8 +145,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
-    uint8_t * msgStart          = nullptr;
-    uint16_t msgLen             = 0;
     NodeId localNodeId          = mLocalNodeId;
 
     Transport::AdminPairingInfo * admin = nullptr;
@@ -186,12 +184,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     err = packetHeader.EncodeBeforeData(msgBuf);
     SuccessOrExit(err);
 
-    // The start of buffer points to the beginning of the encrypted header, and the length of buffer
-    // contains both the encrypted header and encrypted data.
-    // Locally store the start and length of the retained buffer after accounting for the size of packet header.
-    msgStart = static_cast<uint8_t *>(msgBuf->Start());
-    msgLen   = static_cast<uint16_t>(msgBuf->DataLength());
-
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
@@ -219,10 +211,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     if (bufferRetainSlot != nullptr)
     {
-        // Rewind the start and len of the buffer back to pre-send state for following possible retransmition.
-        encryptedMsg->SetStart(msgStart);
-        encryptedMsg->SetDataLength(msgLen);
-
         (*bufferRetainSlot) = std::move(encryptedMsg);
     }
 
