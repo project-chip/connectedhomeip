@@ -224,7 +224,7 @@ public:
      **/
     virtual CHIP_ERROR ECDH_derive_secret(const PK & remote_public_key, Secret & out_secret) const = 0;
 
-    virtual const PK & Pubkey() = 0;
+    virtual const PK & Pubkey() const = 0;
 };
 
 struct alignas(size_t) P256KeypairContext
@@ -240,22 +240,26 @@ public:
     P256Keypair() {}
     ~P256Keypair();
 
-    /** @brief Initialize the keypair.
+    /**
+     * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Initialize();
 
-    /** @brief Serialize the keypair.
+    /**
+     * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Serialize(P256SerializedKeypair & output);
 
-    /** @brief Deserialize the keypair.
+    /**
+     * @brief Deserialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
 
-    /** @brief Generate a new Certificate Signing Request (CSR).
+    /**
+     * @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
      *CSR.
@@ -294,7 +298,7 @@ public:
 
     /** @brief Return public key for the keypair.
      **/
-    const P256PublicKey & Pubkey() override { return mPublicKey; }
+    const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
 private:
     P256PublicKey mPublicKey;
@@ -350,6 +354,16 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  **/
 
 CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_buffer);
+
+/**
+ * @brief A function that implements SHA-1 hash
+ * @param data The data to hash
+ * @param data_length Length of the data
+ * @param out_buffer Pointer to buffer to write output into
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+
+CHIP_ERROR Hash_SHA1(const uint8_t * data, size_t data_length, uint8_t * out_buffer);
 
 /**
  * @brief A class that defines stream based implementation of SHA-256 hash
