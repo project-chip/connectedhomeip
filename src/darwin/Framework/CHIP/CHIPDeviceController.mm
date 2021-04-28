@@ -22,6 +22,7 @@
 #import "CHIPLogging.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "gen/CHIPClustersObjc.h"
+#import "CHIPSetupPayload.h"
 
 #include <platform/CHIPDeviceBuildConfig.h>
 
@@ -262,6 +263,27 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     });
 
     return success;
+}
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+ onboardingPayload:(NSString *)onboardingPayload
+onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
+             error:(NSError * __autoreleasing *)error
+{
+    BOOL didSucceed = NO;
+    CHIPSetupPayload *setupPayload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:onboardingPayload
+                                                                                            ofType:onboardingPayloadType
+                                                                                            error:error];
+    if (setupPayload)
+    {
+        uint16_t discriminator = setupPayload.discriminator.unsignedShortValue;
+        uint32_t setupPINCode = setupPayload.setUpPINCode.unsignedIntValue;
+        didSucceed = [self pairDevice:deviceID discriminator:discriminator setupPINCode:setupPINCode error:error];
+    } else
+    {
+        CHIP_LOG_ERROR("Failed to create CHIPSetupPayload for pairing with error %@", *error);
+    }
+    return didSucceed;
 }
 
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error

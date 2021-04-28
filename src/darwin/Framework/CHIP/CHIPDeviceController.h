@@ -19,6 +19,7 @@
 #define CHIP_DEVICE_CONTROLLER_H
 
 #import <Foundation/Foundation.h>
+#import "CHIPOnboardingPayloadParser.h"
 
 @class CHIPDevice;
 
@@ -35,16 +36,24 @@ NS_ASSUME_NONNULL_BEGIN
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
+
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
+
 - (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
                           address:(NSString *)address
                              port:(uint16_t)port
                             error:(NSError * __autoreleasing *)error;
+
+- (BOOL)pairDevice:(uint64_t)deviceID
+ onboardingPayload:(NSString *)onboardingPayload
+onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
+             error:(NSError * __autoreleasing *)error;
+
 - (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
 - (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
