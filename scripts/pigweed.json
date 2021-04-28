@@ -8,8 +8,8 @@
         "tags": ["version:1.9.0"]
     },
     {
-        "path": "infra/cmake/${os}-${arch=amd64}",
-        "tags": ["version:3.16.1"]
+        "path": "fuchsia/third_party/cmake/${os=linux,mac}-${arch=amd64}",
+        "tags": ["version:3.20.20210428-g857373c"]
     },
     {
         "_comment": "TODO(pwbug/93): Package Bazel for Windows.",
