@@ -104,8 +104,7 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
 
     //////////// TransportMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
 
     Transport::AdminId GetAdminId() const { return (mAdmin != nullptr) ? mAdmin->GetAdminId() : Transport::kUndefinedAdminId; }
 

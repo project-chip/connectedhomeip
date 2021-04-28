@@ -255,7 +255,14 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
 CHIP_ERROR ChannelContext::SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
                                                            System::PacketBufferHandle msgIn)
 {
-    return mExchangeManager->GetSessionMgr()->GetTransportManager()->SendMessage(header, peerAddress, std::move(msgIn));
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ReturnErrorOnFailure(header.EncodeBeforeData(msgIn));
+
+    err = mExchangeManager->GetSessionMgr()->GetTransportManager()->SendMessage(peerAddress, std::move(msgIn));
+    ReturnErrorOnFailure(err);
+
+    return err;
 }
 
 CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,

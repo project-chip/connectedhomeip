@@ -145,9 +145,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
-    uint8_t * msgStart          = nullptr;
-    uint16_t msgLen             = 0;
-    uint16_t headerSize         = 0;
     NodeId localNodeId          = mLocalNodeId;
 
     Transport::AdminPairingInfo * admin = nullptr;
@@ -184,18 +181,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         SuccessOrExit(err);
     }
 
-    // The start of buffer points to the beginning of the encrypted header, and the length of buffer
-    // contains both the encrypted header and encrypted data.
-    // Locally store the start and length of the retained buffer after accounting for the size of packet header.
-    headerSize = packetHeader.EncodeSizeBytes();
-
-    msgStart = static_cast<uint8_t *>(msgBuf->Start() - headerSize);
-    msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
+    err = packetHeader.EncodeBeforeData(msgBuf);
+    SuccessOrExit(err);
 
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        encryptedMsg = msgBuf.Retain();
+        encryptedMsg        = msgBuf.Retain();
+        (*bufferRetainSlot) = std::move(encryptedMsg);
     }
 
     ChipLogProgress(Inet,
@@ -207,24 +200,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (state->GetTransport() != nullptr)
     {
         ChipLogProgress(Inet, "Sending secure msg on connection specific transport");
-        err = state->GetTransport()->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+        err = state->GetTransport()->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
     }
     else
     {
         ChipLogProgress(Inet, "Sending secure msg on generic transport");
-        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+        err = mTransportMgr->SendMessage(state->GetPeerAddress(), std::move(msgBuf));
     }
     ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     SuccessOrExit(err);
-
-    if (bufferRetainSlot != nullptr)
-    {
-        // Rewind the start and len of the buffer back to pre-send state for following possible retransmition.
-        encryptedMsg->SetStart(msgStart);
-        encryptedMsg->SetDataLength(msgLen);
-
-        (*bufferRetainSlot) = std::move(encryptedMsg);
-    }
 
 exit:
     if (!msgBuf.IsNull())
@@ -331,17 +315,20 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
-void SecureSessionMgr::HandleGroupMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf)
+void SecureSessionMgr::HandleGroupMessageReceived(uint16_t keyId, System::PacketBufferHandle msgBuf)
 {
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(keyId, nullptr);
     VerifyOrReturn(state != nullptr, ChipLogError(Inet, "Failed to find the peer connection state"));
 
-    OnMessageReceived(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+    OnMessageReceived(state->GetPeerAddress(), std::move(msgBuf));
 }
 
-void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                         System::PacketBufferHandle msg)
+void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle msg)
 {
+    PacketHeader packetHeader;
+
+    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
@@ -400,9 +387,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         // Queue the message as needed for sync with destination node.
         if (mCB != nullptr)
         {
-            // We should encode the packetHeader into the buffer before storing the buffer into the queue.
-            // The encoded packetHeader needs to be peeled off during re-processing after the peer message
-            // counter is synced.
+            // We should encode the packetHeader into the buffer before storing the buffer into the queue since the
+            // stored buffer will be re-processed by OnMessageReceived after the peer message counter is synced.
             ReturnOnFailure(packetHeader.EncodeBeforeData(msg));
             err = mCB->QueueReceivedMessageAndSync(state, std::move(msg));
             VerifyOrReturn(err == CHIP_NO_ERROR);

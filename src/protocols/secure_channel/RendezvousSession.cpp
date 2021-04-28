@@ -176,9 +176,7 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
     }
 }
 
-void RendezvousSession::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                          System::PacketBufferHandle msgBuf)
-{}
+void RendezvousSession::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) {}
 
 CHIP_ERROR RendezvousSession::WaitForPairing(uint32_t setupPINCode)
 {
