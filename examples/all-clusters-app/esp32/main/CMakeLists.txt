@@ -17,12 +17,13 @@
 
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 # The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/component.mk
-idf_component_register(PRIV_INCLUDE_DIRS 
+set(PRIV_INCLUDE_DIRS_GROUPS 
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
-                      SRC_DIRS
+)
+set(SRC_DIRS_GROUPS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
@@ -53,7 +54,31 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ias-zone-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/relative-humidity-measurement-server"
                       #${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ias-zone-client
-                      PRIV_REQUIRES chip QRCode tft spidriver bt screen-framework)
+)
+
+if(${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM})
+set(PRIV_INCLUDE_DIRS_GROUPS ${PRIV_INCLUDE_DIRS_GROUPS}
+                             "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/screen-framework/include")
+set(PRIV_REQUIRES_GROUPS chip QRCode bt)
+endif()
+
+if(${CONFIG_DEVICE_TYPE_ESP32_DEVKITC})
+set(PRIV_INCLUDE_DIRS_GROUPS ${PRIV_INCLUDE_DIRS_GROUPS}
+                             "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/screen-framework/include")
+set(PRIV_REQUIRES_GROUPS chip QRCode bt)
+endif()
+
+if(${CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT})
+    set(PRIV_REQUIRES_GROUPS chip QRCode bt tft spidrier screen-framework)
+endif()
+
+if(${CONFIG_DEVICE_TYPE_M5STACK})
+    set(PRIV_REQUIRES_GROUPS chip QRCode bt tft spidrier screen-framework)
+endif()
+
+idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_GROUPS} 
+                       SRC_DIRS ${SRC_DIRS_GROUPS}
+                       PRIV_REQUIRES ${PRIV_REQUIRES_GROUPS})
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")

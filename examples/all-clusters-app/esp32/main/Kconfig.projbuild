@@ -35,6 +35,8 @@ menu "Demo"
             bool "ESP32-WROVER-KIT_V4.1"
         config DEVICE_TYPE_M5STACK
             bool "M5Stack"
+        config DEVICE_TYPE_ESP32_C3_DEVKITM
+            bool "EXP32C3-DevKitM"
     endchoice
 
     choice
@@ -71,6 +73,7 @@ menu "Demo"
         int
         range 0 5
         default 0 if DEVICE_TYPE_ESP32_DEVKITC
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 

@@ -1,8 +1,8 @@
 # CHIP All Clusters Example
 
-A prototype application that uses CHIP to setup WiFi on the ESP32 and runs an
-Echo Server. This example will evolve as more complex messaging is supported in
-CHIP.
+A prototype application that uses CHIP to setup WiFi on the ESP32&ESP32C3 and
+runs an Echo Server. This example will evolve as more complex messaging is
+supported in CHIP.
 
 ---
 
@@ -18,28 +18,30 @@ CHIP.
 
 ## Supported Devices
 
-The CHIP demo application is intended to work on two categories of ESP32
-devices: the
+The CHIP demo application is intended to work on two categories of ESP32 devices
+and one categories ESP32C3 device: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
-and the [M5Stack](http://m5stack.com). On the [M5Stack](http://m5stack.com) this
-example displays a CHIP QRCode with the device's Soft-AP SSID encoded in the TLV
-section.
+the [M5Stack](http://m5stack.com) and the
+[ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html).
+On the [M5Stack](http://m5stack.com) this example displays a CHIP QRCode with
+the device's Soft-AP SSID encoded in the TLV section.
 
 ## Building the Example Application
 
 Building the example application requires the use of the Espressif ESP32 IoT
-Development Framework and the xtensa-esp32-elf toolchain.
+Development Framework and the xtensa-esp32-elf toolchain for ESP32 or the
+riscv-esp32-elf toolchain for ESP32C3.
 
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout release/v4.3 branch
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout release/v4.3
           $ git submodule update --init
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
@@ -76,17 +78,27 @@ If packages are already installed then simply activate it.
 
 -   Configuration Options
 
+        To choose the module, run set-target
+
+          $ idf.py set-target esp32
+        or
+          $ idf.py set-target esp32c3
+
         To choose from the different configuration options, run menuconfig
 
           $ idf.py menuconfig
 
         Select ESP32 based `Device Type` through `Demo`->`Device Type`.
         The device types that are currently supported include `ESP32-DevKitC` (default),
-        `ESP32-WROVER-KIT_V4.1` and `M5Stack`
+        `ESP32-WROVER-KIT_V4.1`, `M5Stack` and `ESP32C3-DevKitM`
 
         If you are using `standalone chip-tool` to communicate with the ESP32, bypass the
         Rendezvous mode so that the device can communicate over an insecure channel.
         This can be done through `Demo`->`Rendezvous Mode`->`Bypass`
+
+        If you are using `ESP32C3-DevKitM` and need BLEAdvertising, please enable host based
+        privacy for random address through `Component config`->`Bluetooth`->'NimBLE Options'->
+        `enable host based privacy form random address`.
 
         To connect the ESP32 to your network, configure the Wi-Fi SSID and Passphrase through
         `Component config`->`CHIP Device Layer`->`WiFi Station Options`->`Default WiFi SSID` and

@@ -22,7 +22,8 @@
 PROJECT_NAME := chip-temperature-measurement-app
 
 EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
-                        $(PROJECT_PATH)/../../common/m5stack-tft/repo/components \
+                        $(PROJECT_PATH)/../../common/m5stack-tft/repo/components/tft \
+						$(PROJECT_PATH)/../../common/m5stack-tft/repo/components/spidriver \
                         $(PROJECT_PATH)/../../common/QRCode \
                         $(PROJECT_PATH)/../../common/screen-framework \
 

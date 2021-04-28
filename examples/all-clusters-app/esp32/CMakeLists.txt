@@ -22,11 +22,17 @@ include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 # The list of extra component dirs must be in sync with that in all-clusters-app/esp32/Makefile
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
-    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
+)
+if(${IDF_TARGET} STREQUAL "esp32")
+set(EXTRA_COMPONENT_DIRS
+    ${EXTRA_COMPONENT_DIRS}
+    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
+    "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
     "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework"
 )
+endif()
 
 project(chip-all-clusters-app)
-idf_build_set_property(CXX_COMPILE_OPTIONS "-std=c++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)

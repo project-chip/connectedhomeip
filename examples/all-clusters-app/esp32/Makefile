@@ -22,12 +22,14 @@
 PROJECT_NAME := chip-all-clusters-app
 
 # The list of extra component dirs must be in sync with that in all-clusters-app/esp32/CMakeLists.txt
-EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
-                        $(PROJECT_PATH)/../../common/m5stack-tft/repo/components \
-                        $(PROJECT_PATH)/../../common/QRCode \
-                        $(PROJECT_PATH)/../../common/screen-framework \
-
-CXXFLAGS += -std=c++14 -Os -DLWIP_IPV6_SCOPES=0
+EXTRA_COMPONENT_DIRS +=	$(PROJECT_PATH)/third_party/connectedhomeip/config/esp32/components \
+						$(PROJECT_PATH)/../../common/QRCode \
+ifeq($(IDF_TARGET),'esp32')
+EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/../../common/m5stack-tft/repo/components/tft \
+                        $(PROJECT_PATH)/../../common/m5stack-tft/repo/components/spidriver \
+						$(PROJECT_PATH)/../../common/screen-framework \
+endif
+CXXFLAGS += -std=gnu++14 -Os -DLWIP_IPV6_SCOPES=0
 CPPFLAGS += -Os -DLWIP_IPV6_SCOPES=0 -DCHIP_HAVE_CONFIG_H
 CFLAGS += -Os -DLWIP_IPV6_SCOPES=0
 

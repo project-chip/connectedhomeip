@@ -81,6 +81,10 @@ using namespace ::chip::DeviceLayer;
 
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
 
+#elif CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+
+#define STATUS_LED_GPIO_NUM GPIO_NUM_2
+
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
 #error "Unsupported device type selected"

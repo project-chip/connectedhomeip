@@ -19,7 +19,15 @@
 #
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
-COMPONENT_DEPENDS := chip QRCode tft spidriver
+COMPONENT_DEPENDS := chip QRCode
+
+ifdef $(CONFIG_DEVICE_TYPE_M5STACK)
+COMPONENT_DEPENDS += spidriver tft
+endif 
+
+ifdef $(CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT)
+COMPONENT_DEPENDS += spidriver tft
+endif 
 
 # The list of src and include dirs must be in sync with that in all-clusters-app/esp32/main/CMakeLists.txt
 COMPONENT_SRCDIRS :=                                                                \
@@ -66,7 +74,18 @@ COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/
                             $(PROJECT_PATH)/third_party/connectedhomeip/src/app/server                                 \
                             $(PROJECT_PATH)/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common  \
                             $(PROJECT_PATH)/third_party/connectedhomeip/third_party/nlio/repo/include                  \
-                            $(PROJECT_PATH)/third_party/connectedhomeip/src
+                            $(PROJECT_PATH)/third_party/connectedhomeip/src	 										   \
+
+ifdef $(CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM)
+COMPONENT_EXTRA_INCLUDES += $(PROJECT_PATH)/third_party/connectedhomeip/examples/common/screen-framework/include       \
+
+endif
+
+ifdef $(CONFIG_DEVICE_TYPE_ESP32_DEVKITC)
+COMPONENT_EXTRA_INCLUDES += $(PROJECT_PATH)/third_party/connectedhomeip/examples/common/screen-framework/include       \
+
+endif
+
 
 # So "gen/*" files are found by the src/app bits.
 COMPONENT_PRIV_INCLUDEDIRS := .
