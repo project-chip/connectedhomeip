@@ -336,12 +336,15 @@ void SecureSessionMgr::HandleGroupMessageReceived(const PacketHeader & packetHea
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
     VerifyOrReturn(state != nullptr, ChipLogError(Inet, "Failed to find the peer connection state"));
 
-    OnMessageReceived(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
+    OnMessageReceived(state->GetPeerAddress(), std::move(msgBuf));
 }
 
-void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                         System::PacketBufferHandle msg)
+void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle msg)
 {
+    PacketHeader packetHeader;
+
+    ReturnOnFailure(packetHeader.DecodeAndConsume(msg));
+
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
     {
         SecureMessageDispatch(packetHeader, peerAddress, std::move(msg));

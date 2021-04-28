@@ -112,8 +112,7 @@ public:
     void OnNetworkProvisioningComplete() override;
 
     //////////// TransportMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
 
     /**
      * @brief

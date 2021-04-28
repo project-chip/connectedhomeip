@@ -51,19 +51,17 @@ void TransportMgrBase::Close()
     mTransport        = nullptr;
 }
 
-void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBufferHandle msg)
+void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg)
 {
     if (mSecureSessionMgr != nullptr)
     {
-        mSecureSessionMgr->OnMessageReceived(packetHeader, peerAddress, std::move(msg));
+        mSecureSessionMgr->OnMessageReceived(peerAddress, std::move(msg));
     }
     else
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
         peerAddress.ToString(addrBuffer);
-        ChipLogError(Inet, "%s message from %s is dropped since no corresponding handler is set in TransportMgr.",
-                     packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? "Encrypted" : "Unencrypted", addrBuffer);
+        ChipLogError(Inet, "message from %s is dropped since no corresponding handler is set in TransportMgr.", addrBuffer);
     }
 }
 

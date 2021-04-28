@@ -369,10 +369,13 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     }
 }
 
-void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
 {
-    auto peer = header.GetSourceNodeId();
+    PacketHeader header;
+
+    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
+
+    Optional<NodeId> peer = header.GetSourceNodeId();
     if (!peer.HasValue())
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];

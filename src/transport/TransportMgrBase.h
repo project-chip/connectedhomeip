@@ -44,8 +44,7 @@ public:
 
     void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
 
-    void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                               System::PacketBufferHandle msg) override;
+    void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg) override;
 
 private:
     TransportMgrDelegate * mSecureSessionMgr = nullptr;
