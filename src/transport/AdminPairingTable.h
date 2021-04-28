@@ -24,16 +24,14 @@
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
+#include <app/util/basic-types.h>
 
 namespace chip {
 namespace Transport {
 
 typedef uint16_t AdminId;
-typedef uint64_t FabricId;
+static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
 
-static constexpr AdminId kUndefinedAdminId   = UINT16_MAX;
-// static constexpr FabricId kUndefinedFabricId = UINT64_MAX;
-static constexpr uint16_t kUndefinedVendorId = UINT16_MAX;
 // KVS store is sensitive to length of key strings, based on the underlying
 // platform. Keeping them short.
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
@@ -49,14 +47,27 @@ struct AccessControlList
     uint32_t placeholder;
 };
 
+// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using 
+// attribute store so no need for this Delegate API anymore
+// TODO: Reimplement AdminPairingTable to only have one backing store.
 class DLL_EXPORT AdminPairingTableDelegate
 {
 public:
     virtual ~AdminPairingTableDelegate() {}
+    /**
+    * Gets called when an admin is deleted from KVS store.
+    **/
+    virtual void OnAdminDeletedFromStorage(AdminId adminId) = 0;
 
-    virtual void OnAdminDeletedFromStorage(AdminId adminId);
-    virtual void OnAdminRetrievedFromStorage(AdminId adminId, FabricId fabricId, NodeId nodeId);
-    virtual void OnAdminPersistedToStorage(AdminId adminId, FabricId fabricId, NodeId nodeId);
+    /**
+    * Gets called when an admin is loaded into Admin Pairing Table from KVS store.
+    **/
+    virtual void OnAdminRetrievedFromStorage(AdminId adminId, FabricId fabricId, NodeId nodeId) = 0;
+
+    /**
+    * Gets called when an admin in Admin Pairing Table is persisted to KVS store.
+    **/
+    virtual void OnAdminPersistedToStorage(AdminId adminId, FabricId fabricId, NodeId nodeId) = 0;
 };
 
 /**

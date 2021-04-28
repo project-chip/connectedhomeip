@@ -25,16 +25,21 @@
 #include <transport/AdminPairingTable.h>
 
 namespace chip {
-namespace Transport {
 
-PersistentStorageDelegate * gStorage = nullptr;
-AdminPairingTableDelegate * gDelegate = nullptr;
+// TODO: Admin Pairing table should be backed by a single backing store (attribute store), remove delegate callbacks.
+namespace {
+    PersistentStorageDelegate * gStorage = nullptr;
+    Transport::AdminPairingTableDelegate * gDelegate = nullptr;
+} // anonymous namespace
+
+namespace Transport {
 
 CHIP_ERROR AdminPairingInfo::StoreIntoKVS()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (gStorage == nullptr)
     {
-        ChipLogError(Discovery, "Server storage delegate is nill, cannot store admin in KVS");
+        ChipLogError(Discovery, "Server storage delegate is null, cannot store admin in KVS");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -47,19 +52,24 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS()
     info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
-    if (gDelegate != nullptr)
+    err = gStorage->SyncSetKeyValue(key, &info, sizeof(info));
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue.");
+    } else if (gDelegate != nullptr)
+    {
+        ChipLogProgress(Discovery, "New admin (%d)  to KVS store, calling OnAdminPersistedToStorage.", info.mAdmin);
         gDelegate->OnAdminPersistedToStorage(mAdmin, mFabricId, mNodeId);
     }
    
-    return gStorage->SyncSetKeyValue(key, &info, sizeof(info));
+    return err;
 }
 
 CHIP_ERROR AdminPairingInfo::FetchFromKVS()
 {
     if (gStorage == nullptr)
     {
-        ChipLogError(Discovery, "Server storage delegate is nill, cannot fetch from KVS");
+        ChipLogError(Discovery, "Server storage delegate is null, cannot fetch from KVS");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     char key[KeySize()];
@@ -78,7 +88,8 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS()
 
     if (gDelegate != nullptr)
     {
-        gDelegate->OnAdminPersistedToStorage(id, mFabricId, mNodeId);
+        ChipLogProgress(Discovery, "New admin (%d) fetched from KVS store. Calling OnAdminRetrievedFromStorage.", info.mAdmin);
+        gDelegate->OnAdminRetrievedFromStorage(id, mFabricId, mNodeId);
     }
     
     return CHIP_NO_ERROR;
@@ -86,21 +97,26 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS()
 
 CHIP_ERROR AdminPairingInfo::DeleteFromKVS(AdminId id)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (gStorage == nullptr)
     {
-        ChipLogError(Discovery, "Server storage delegate is nill, cannot delete from KVS");
+        ChipLogError(Discovery, "Server storage delegate is null, cannot delete from KVS");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(id, key, sizeof(key)));
 
-    gStorage->AsyncDeleteKeyValue(key);
-    if (gDelegate != nullptr)
+    err = gStorage->SyncDeleteKeyValue(key);
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(Discovery, "Error occurred calling SyncDeleteKeyValue");
+    } else if (gDelegate != nullptr)
+    {
+        ChipLogProgress(Discovery, "Admin (%d) removed from  from KVS store, calling OnAdminDeletedFromStorage", id);
         gDelegate->OnAdminDeletedFromStorage(id);
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 constexpr size_t AdminPairingInfo::KeySize()
@@ -155,11 +171,11 @@ void AdminPairingTable::ReleaseAdminId(AdminId adminId)
 
 AdminPairingInfo * AdminPairingTable::FindAdmin(AdminId adminId)
 {
-    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    for (auto & state : mStates)
     {
-        if (mStates[i].IsInitialized() && mStates[i].GetAdminId() == adminId)
+        if (state.IsInitialized() && state.GetAdminId() == adminId)
         {
-            return &mStates[i];
+            return &state;
         }
     }
 
@@ -168,17 +184,19 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(AdminId adminId)
 
 AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId)
 {
-    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    uint32_t index = 0;
+    for (auto & state : mStates)
     {
-        if (mStates[i].IsInitialized())
+        if (state.IsInitialized())
         {
-            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu.", i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), fabricId);
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu.", index, state.GetFabricId(), state.GetNodeId(), fabricId);
         }
-        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId)
+        if (state.IsInitialized() && state.GetFabricId() == fabricId)
         {
             ChipLogProgress(Discovery, "Found a match!");
-            return &mStates[i];
+            return &state;
         }
+        index ++;
     }
 
     return nullptr;
@@ -186,17 +204,19 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId)
 
 AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId)
 {
-    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    uint32_t index = 0;
+    for (auto & state : mStates)
     {
-        if (mStates[i].IsInitialized())
+        if (state.IsInitialized())
         {
-            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu nodeId %llu.", i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), fabricId, nodeId);
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu to see if it matches fabricId %llu nodeId %llu.", index, state.GetFabricId(), state.GetNodeId(), fabricId, nodeId);
         }
-        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId && mStates[i].GetNodeId() == nodeId)
+        if (state.IsInitialized() && state.GetFabricId() == fabricId && state.GetNodeId() == nodeId)
         {
             ChipLogProgress(Discovery, "Found a match!");
-            return &mStates[i];
+            return &state;
         }
+        index ++;
     }
 
     return nullptr;
@@ -204,18 +224,20 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId
 
 AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId, uint16_t vendorId)
 {
-    for (size_t i = 0; i < CHIP_CONFIG_MAX_DEVICE_ADMINS; i++)
+    uint32_t index = 0;
+    for (auto & state : mStates)
     {
-        if (mStates[i].IsInitialized())
+        if (state.IsInitialized())
         {
             ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.", 
-                            i, mStates[i].GetFabricId(), mStates[i].GetNodeId(), mStates[i].GetVendorId(), fabricId, nodeId, vendorId);
+                            index, state.GetFabricId(), state.GetNodeId(), state.GetVendorId(), fabricId, nodeId, vendorId);
         }
-        if (mStates[i].IsInitialized() && mStates[i].GetFabricId() == fabricId && mStates[i].GetNodeId() == nodeId && mStates[i].GetVendorId() == vendorId)
+        if (state.IsInitialized() && state.GetFabricId() == fabricId && state.GetNodeId() == nodeId && state.GetVendorId() == vendorId)
         {
             ChipLogProgress(Discovery, "Found a match!");
-            return &mStates[i];
+            return &state;
         }
+        index ++;
     }
 
     return nullptr;

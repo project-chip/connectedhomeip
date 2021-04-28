@@ -101,6 +101,13 @@ class ServerStorageDelegate : public PersistentStorageDelegate
         return err;
     }
 
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        ChipLogProgress(AppServer, "Delete value in server storage");
+        CHIP_ERROR err = PersistedStorage::KeyValueStoreMgr().Delete(key);
+        return err;
+    }
+
     void AsyncDeleteKeyValue(const char * key) override 
     { 
         ChipLogProgress(AppServer, "Delete value in server storage.");
