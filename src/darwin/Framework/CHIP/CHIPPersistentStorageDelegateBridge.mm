@@ -144,7 +144,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
 CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * key)
 {
     NSString * keyString = [NSString stringWithUTF8String:key];
-    dispatch_async(mWorkQueue, ^{
+    dispatch_sync(mWorkQueue, ^{
         NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
