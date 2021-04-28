@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include <app/util/basic-types.h>
 #include <core/CHIPKeyIds.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/Constants.h>
@@ -38,8 +39,6 @@
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureMessageCodec.h>
 #include <transport/TransportMgr.h>
-#include <transport/AdminPairingTable.h>
-#include <app/util/basic-types.h>
 
 #include <inttypes.h>
 
@@ -398,8 +397,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     {
         VerifyOrExit(
             admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(Inet, "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
-                                packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
+            ChipLogError(
+                Inet,
+                "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
+                packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
     }
     ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
     mPeerConnections.MarkConnectionActive(state);
@@ -429,9 +430,9 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
-
     // See operational-credentials-server.cpp for explanation as to why fabricId is being set to commissioner node id
-    // This is temporary code until AddOptCert is implemented through which an admin will be correctly added with the correct fields.
+    // This is temporary code until AddOptCert is implemented through which an admin will be correctly added with the correct
+    // fields.
     // TODO: Remove temporary code once AddOptCert is implemented
     if (packetHeader.GetSourceNodeId().HasValue())
     {
@@ -451,7 +452,6 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             ChipLogProgress(Inet, "Setting nodeID %" PRIX64 " on admin.", admin->GetNodeId());
             modifiedAdmin = true;
         }
-
     }
 
     // TODO: Remove temporary code once AddOptCert is implemented

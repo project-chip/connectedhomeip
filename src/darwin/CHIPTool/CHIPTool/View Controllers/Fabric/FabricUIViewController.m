@@ -76,7 +76,7 @@
 
     // Get Fabric ID
     _getFabricIDLabel = [UILabel new];
-    NSNumber *fabricId = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey);
+    NSNumber * fabricId = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey);
     _getFabricIDLabel.text = [NSString stringWithFormat:@"FabricID: %@", fabricId];
     [_stackView addArrangedSubview:_getFabricIDLabel];
 

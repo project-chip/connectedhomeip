@@ -99,9 +99,8 @@ CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
     CHIPDeviceController * controller = InitializeCHIP();
 
     NSError * error;
-    CHIPDevice *device = [controller getPairedDevice:deviceId error:&error];
-    if (error.code != CHIPSuccess)
-    {
+    CHIPDevice * device = [controller getPairedDevice:deviceId error:&error];
+    if (error.code != CHIPSuccess) {
         NSLog(@"Got back error retrieve device with deviceId %llu", deviceId);
         return nil;
     }

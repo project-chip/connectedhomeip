@@ -21,14 +21,14 @@
  ***************************************************************************/
 
 #include <app/Command.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/core/PeerId.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <app/server/Server.h>
-#include <lib/core/PeerId.h>
 
 #include "gen/af-structs.h"
 #include "gen/attribute-id.h"
@@ -41,13 +41,15 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 
 /*
-* Temporary flow for fabric management until addOptCert + fabric index are implemented:
-* 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId
-*    and store commissioner nodeId in Admin Pairing table as FabricId (This is temporary until AddOptCert is implemented and Fabrics are implemented correctely)
-* 2) When pairing is complete, commissioner calls SetFabric to set the vendorId on the newly created fabric. The corresponding fabric is found by looking
-*    in admin pairing table and finding a fabric that has the matching commissioner node ID as fabricId + device nodeId as nodeId and an uninitialized vendorId.
-* 3) RemoveFabric uses the passed in fabricId, nodeId, vendorID to find matching entry and remove it from admin pairing table. Once fabricIndex is implemented, it should use that instead.
-*/
+ * Temporary flow for fabric management until addOptCert + fabric index are implemented:
+ * 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId
+ *    and store commissioner nodeId in Admin Pairing table as FabricId (This is temporary until AddOptCert is implemented and
+ * Fabrics are implemented correctely) 2) When pairing is complete, commissioner calls SetFabric to set the vendorId on the newly
+ * created fabric. The corresponding fabric is found by looking in admin pairing table and finding a fabric that has the matching
+ * commissioner node ID as fabricId + device nodeId as nodeId and an uninitialized vendorId. 3) RemoveFabric uses the passed in
+ * fabricId, nodeId, vendorID to find matching entry and remove it from admin pairing table. Once fabricIndex is implemented, it
+ * should use that instead.
+ */
 
 EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 {
@@ -72,16 +74,18 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
 
 EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, int32_t index)
 {
-    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     EmberAfFabricDescriptor fabricDescriptor;
     fabricDescriptor.FabricId = fabricId;
     fabricDescriptor.NodeId   = nodeId;
     fabricDescriptor.VendorId = vendorId;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Writing admin into attribute store at index %d: fabricId %" PRIX64
-                            ", nodeId %" PRIX64 " vendorId %" PRIX16, index, fabricId, nodeId, vendorId);
-    status =  writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG,
+                   "OpCreds: Writing admin into attribute store at index %d: fabricId %" PRIX64 ", nodeId %" PRIX64
+                   " vendorId %" PRIX16,
+                   index, fabricId, nodeId, vendorId);
+    status = writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
     return status;
 }
 
@@ -94,23 +98,27 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
     int32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
-        NodeId nodeId = pairing.GetNodeId();
+        NodeId nodeId     = pairing.GetNodeId();
         uint64_t fabricId = pairing.GetFabricId();
         uint16_t vendorId = pairing.GetVendorId();
 
         // Skip over uninitialized admins
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Skipping over unitialized admin with fabricId %" PRIX64
-                            ", nodeId %" PRIX64 " vendorId %" PRIX16, fabricId, nodeId, vendorId);
+            emberAfPrintln(EMBER_AF_PRINT_DEBUG,
+                           "OpCreds: Skipping over unitialized admin with fabricId %" PRIX64 ", nodeId %" PRIX64
+                           " vendorId %" PRIX16,
+                           fabricId, nodeId, vendorId);
             continue;
-        } else if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
+        }
+        else if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
         {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin with fabricId %" PRIX64 " in fabrics list", fabricId);
+            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to write admin with fabricId %" PRIX64 " in fabrics list",
+                           fabricId);
             err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
             break;
         }
-        fabricIndex ++;
+        fabricIndex++;
     }
 
     // Store the count of fabrics we just stored
@@ -125,12 +133,12 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
 }
 
 /*
-* Look at "Temporary flow for fabric management" comment above for current fabric management flow.
-* To retrieve the current admin, we retrieve the emberAfCurrentCommand()->source which should be set
-* to the commissioner node Id, which we are temporarily using as the fabricId.
-* We should also figure out how to retrieve the device nodeId and vendorId if we can so that we use multiple
-* fields to find the current admin. Once addOptCert and fabric index are implemented, remove all this and use fabricIndex.
-*/
+ * Look at "Temporary flow for fabric management" comment above for current fabric management flow.
+ * To retrieve the current admin, we retrieve the emberAfCurrentCommand()->source which should be set
+ * to the commissioner node Id, which we are temporarily using as the fabricId.
+ * We should also figure out how to retrieve the device nodeId and vendorId if we can so that we use multiple
+ * fields to find the current admin. Once addOptCert and fabric index are implemented, remove all this and use fabricIndex.
+ */
 
 AdminPairingInfo * retrieveCurrentAdmin()
 {
@@ -140,12 +148,12 @@ AdminPairingInfo * retrieveCurrentAdmin()
     return GetGlobalAdminPairingTable().FindAdmin(fabricId);
 }
 
-
 // TODO: The code currently has two sources of truths for admins, the pairing table + the attributes. There should only be one,
-// the attributes list. Currently the attributes are not persisted so we are keeping the admin pairing table to have the fabrics/admrins
-// be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and only that should be
-// modifed to perosst/read/write fabrics.
-// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove adminPairingTable logic.
+// the attributes list. Currently the attributes are not persisted so we are keeping the admin pairing table to have the
+// fabrics/admrins be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and
+// only that should be modifed to perosst/read/write fabrics.
+// TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove adminPairingTable
+// logic.
 class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
 {
 
@@ -159,16 +167,20 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     // Gets called when a fabric is loaded into the AdminPairingTable from KVS store.
     void OnAdminRetrievedFromStorage(AdminId adminId, FabricId fabricId, NodeId nodeId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin %" PRIX16 " was retrieved from storage. FabricId %" PRIX64
-                                            ", NodeId %" PRIX64 ", VendorId %" PRIX64, adminId, fabricId, nodeId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
+                       "OpCreds: Admin %" PRIX16 " was retrieved from storage. FabricId %" PRIX64 ", NodeId %" PRIX64
+                       ", VendorId %" PRIX64,
+                       adminId, fabricId, nodeId);
         writeAdminsIntoFabricsListAttribute();
     }
 
-     // Gets called when a fabric in AdminPairingTable is persisted to KVS store.
+    // Gets called when a fabric in AdminPairingTable is persisted to KVS store.
     void OnAdminPersistedToStorage(AdminId adminId, FabricId fabricId, NodeId nodeId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin %" PRIX16 " was persisted to storage. FabricId %" PRIX64
-                                            ", NodeId %" PRIX64 ", VendorId %" PRIX64, adminId, fabricId, nodeId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG,
+                       "OpCreds: Admin %" PRIX16 " was persisted to storage. FabricId %" PRIX64 ", NodeId %" PRIX64
+                       ", VendorId %" PRIX64,
+                       adminId, fabricId, nodeId);
         writeAdminsIntoFabricsListAttribute();
     }
 };
@@ -199,7 +211,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
 
     // Delete admin
     adminId = admin->GetAdminId();
-    err = AdminPairingInfo::DeleteFromKVS(adminId);
+    err     = AdminPairingInfo::DeleteFromKVS(adminId);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     GetGlobalAdminPairingTable().ReleaseAdminId(adminId);
 
@@ -214,7 +226,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: SetFabric with vendorId %d", VendorId);
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
     CHIP_ERROR err;
 
@@ -230,8 +242,9 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->source) as fabricId
     // until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                              ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y", emberAfCurrentCommand()->source);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
+                              ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
+                              emberAfCurrentCommand()->source);
     sendStatus = emberAfSendResponse();
 
 exit:
