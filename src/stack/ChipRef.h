@@ -27,9 +27,11 @@ namespace chip {
  *
  *   When CHIP_CONFIG_CHIP_IS_SINGLETON is true, this class has no overhead.
  */
-class ChipRef {
+class ChipRef
+{
 public:
-    Init(ChipRef & ref) {
+    Init(ChipRef & ref)
+    {
 #if !CHIP_CONFIG_CHIP_IS_SINGLETON
         mChip = ref.mChip;
 #endif // CHIP_CONFIG_CHIP_IS_SINGLETON
