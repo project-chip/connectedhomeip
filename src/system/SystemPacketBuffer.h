@@ -666,8 +666,6 @@ public:
      * a faulty state. (Some configurations may not actually perform any check.)
      *
      * @note  A null handle is not considered faulty.
-     *
-     *  @param[in] aPacket - the packet buffer handle to check.
      */
     void Check() const
     {
