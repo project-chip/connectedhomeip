@@ -268,8 +268,6 @@ int Initialize(void * aContext)
         return FAILURE;
     }
 
-    ctx->PresetMessageCounter();
-
     return SUCCESS;
 }
 

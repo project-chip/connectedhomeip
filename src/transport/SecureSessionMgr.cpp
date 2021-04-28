@@ -124,31 +124,9 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    PeerConnectionState * state = nullptr;
     PacketHeader unusedPacketHeader;
-
-    state = GetPeerConnectionState(session);
-    VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
-
-    if (!IsControlMessage(payloadHeader) && !state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
-    {
-        if (bufferRetainSlot != nullptr)
-        {
-            // If CRMP is enabled, skip queuing the message to avoid meltdown. (Check TCP meltdown for details)
-            // CRMP retrans table should be flushed after the sync is completed.
-            return mMessageCounterManager->StartSync(session, state);
-        }
-        else
-        {
-            return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
-                               EncryptionState::kPayloadIsUnencrypted);
-        }
-    }
-    else
-    {
-        return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
-                           EncryptionState::kPayloadIsUnencrypted);
-    }
+    return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
+                       EncryptionState::kPayloadIsUnencrypted);
 }
 
 CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
@@ -193,6 +171,13 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (IsControlMessage(payloadHeader))
     {
         packetHeader.SetSecureSessionControlMsg(true);
+    }
+
+    if (!IsControlMessage(payloadHeader))
+    {
+        // The peer counter should be already initialized during CASE session establishment
+        // It may not true for group messages. But this assert will quickly catch one's attention.
+        assert(state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized());
     }
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
@@ -287,6 +272,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 
     if (mCB != nullptr)
     {
+        state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
         mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
     }
 
