@@ -51,8 +51,6 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
-    "gen/CHIPClusters.cpp",
-    "gen/CHIPClusters.h",
     "gen/CHIPClustersObjc.h",
     "gen/CHIPClustersObjc.mm",
   ]

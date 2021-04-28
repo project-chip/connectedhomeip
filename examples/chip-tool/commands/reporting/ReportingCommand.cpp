@@ -20,7 +20,7 @@
 
 #include "../common/Commands.h"
 #include "gen/CHIPClientCallbacks.h"
-#include "gen/CHIPClusters.h"
+#include <controller/CHIPClusters.h>
 
 using namespace ::chip;
 

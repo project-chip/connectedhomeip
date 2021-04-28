@@ -1,6 +1,5 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
 // Prevent multiple inclusion
 #pragma once
 
@@ -11,11 +10,11 @@
 namespace chip {
 namespace Controller {
 
-{{#chip_client_clusters}}
+{{#chip_server_clusters}}
 constexpr ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4}};
-{{/chip_client_clusters}}
+{{/chip_server_clusters}}
 
-{{#chip_client_clusters}}
+{{#chip_server_clusters}}
 class DLL_EXPORT {{asCamelCased name false}}Cluster : public ClusterBase
 {
 public:
@@ -54,7 +53,6 @@ private:
     {{/chip_server_cluster_commands}}
 };
 
-{{/chip_client_clusters}}
+{{/chip_server_clusters}}
 } // namespace Controller
 } // namespace chip
-{{/if}}
