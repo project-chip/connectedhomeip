@@ -75,6 +75,7 @@ If packages are already installed then simply activate it.
         $ cd {path-to-connectedhomeip-examples}
 
 -   Configuration Options
+
         To choose the module, run set-target
         
           $ idf.py set-target esp32
