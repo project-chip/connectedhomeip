@@ -32,8 +32,13 @@ int mbed_getaddrinfo(const char * nodename, const char * servname, const struct 
     case AF_INET6:
         sHints.set_addr({ NSAPI_IPv6, 0 });
         break;
-    default:
-        return EAI_FAMILY;
+    }
+
+    result = new SocketAddress[MBED_CONF_NSAPI_DNS_ADDRESSES_LIMIT];
+    if (result == nullptr)
+    {
+        set_errno(ENOMEM);
+        return EAI_SYSTEM;
     }
 
     err = net->getaddrinfo(nodename, &sHints, &result);
