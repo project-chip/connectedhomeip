@@ -92,7 +92,7 @@ class MobileDeviceTests():
             self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, ENDPOINT_ID, GROUP_ID, {
                 "operationalDataset": bytes.fromhex(TEST_THREAD_NETWORK_DATASET_TLV),
                 "breadcrumb": 0,
-                "timeoutMs": 1000})
+                "timeoutMs": 1000}, blocking=True)
         except Exception as ex:
             self.logger.exception("Failed to send AddThreadNetwork command")
             return False
@@ -101,7 +101,7 @@ class MobileDeviceTests():
             self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, ENDPOINT_ID, GROUP_ID, {
                 "networkID": bytes.fromhex(TEST_THREAD_NETWORK_ID),
                 "breadcrumb": 0,
-                "timeoutMs": 1000})
+                "timeoutMs": 1000}, blocking=True)
         except Exception as ex:
             self.logger.exception("Failed to send EnableNetwork command")
             return False
@@ -110,12 +110,12 @@ class MobileDeviceTests():
     def TestOnOffCluster(self, nodeid: int):
         self.logger.info("Sending On/Off commands to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("OnOff", "On", nodeid, ENDPOINT_ID, GROUP_ID, {})
+            self.devCtrl.ZCLSend("OnOff", "On", nodeid, ENDPOINT_ID, GROUP_ID, {}, blocking=True)
         except Exception as ex:
             self.logger.exception("Failed to send On command")
             return False
         try:
-            self.devCtrl.ZCLSend("OnOff", "Off", nodeid, ENDPOINT_ID, GROUP_ID, {})
+            self.devCtrl.ZCLSend("OnOff", "Off", nodeid, ENDPOINT_ID, GROUP_ID, {}, blocking=True)
         except Exception as ex:
             self.logger.exception("Failed to send Off command")
             return False
