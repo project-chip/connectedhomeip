@@ -40,9 +40,9 @@ using namespace chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Transport;
 
-/* 
+/*
 * Temporary flow for fabric management until addOptCert + fabric index are implemented:
-* 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId 
+* 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId
 *    and store commissioner nodeId in Admin Pairing table as FabricId (This is temporary until AddOptCert is implemented and Fabrics are implemented correctely)
 * 2) When pairing is complete, commissioner calls SetFabric to set the vendorId on the newly created fabric. The corresponding fabric is found by looking
 *    in admin pairing table and finding a fabric that has the matching commissioner node ID as fabricId + device nodeId as nodeId and an uninitialized vendorId.
@@ -66,7 +66,7 @@ EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
     // Since the first 2 bytes of the attribute are used to store the number of elements, elements indexing starts
     // at 1. In order to hide this to the rest of the code of this file, the element index is incremented by 1 here.
     // This also allows calling writeAttribute() with no index arg to mean "write the length".
-    
+
     return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
 }
 
@@ -79,7 +79,7 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, i
     fabricDescriptor.NodeId   = nodeId;
     fabricDescriptor.VendorId = vendorId;
 
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Writing admin into attribute store at index %d: fabricId %" PRIX64 
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Writing admin into attribute store at index %d: fabricId %" PRIX64
                             ", nodeId %" PRIX64 " vendorId %" PRIX16, index, fabricId, nodeId, vendorId);
     status =  writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
     return status;
@@ -93,7 +93,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
     // Loop through admins
     int32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
-    { 
+    {
         NodeId nodeId = pairing.GetNodeId();
         uint64_t fabricId = pairing.GetFabricId();
         uint16_t vendorId = pairing.GetVendorId();
@@ -101,7 +101,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
         // Skip over uninitialized admins
         if (nodeId == kUndefinedNodeId || fabricId == kUndefinedFabricId || vendorId == kUndefinedVendorId)
         {
-            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Skipping over unitialized admin with fabricId %" PRIX64 
+            emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Skipping over unitialized admin with fabricId %" PRIX64
                             ", nodeId %" PRIX64 " vendorId %" PRIX16, fabricId, nodeId, vendorId);
             continue;
         } else if (writeFabric(fabricId, nodeId, vendorId, fabricIndex) != EMBER_ZCL_STATUS_SUCCESS)
@@ -125,8 +125,8 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
 }
 
 /*
-* Look at "Temporary flow for fabric management" comment above for current fabric management flow. 
-* To retrieve the current admin, we retrieve the emberAfCurrentCommand()->source which should be set 
+* Look at "Temporary flow for fabric management" comment above for current fabric management flow.
+* To retrieve the current admin, we retrieve the emberAfCurrentCommand()->source which should be set
 * to the commissioner node Id, which we are temporarily using as the fabricId.
 * We should also figure out how to retrieve the device nodeId and vendorId if we can so that we use multiple
 * fields to find the current admin. Once addOptCert and fabric index are implemented, remove all this and use fabricIndex.
@@ -141,9 +141,9 @@ AdminPairingInfo * retrieveCurrentAdmin()
 }
 
 
-// TODO: The code currently has two sources of truths for admins, the pairing table + the attributes. There should only be one, 
+// TODO: The code currently has two sources of truths for admins, the pairing table + the attributes. There should only be one,
 // the attributes list. Currently the attributes are not persisted so we are keeping the admin pairing table to have the fabrics/admrins
-// be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and only that should be 
+// be persisted. Once attributes are persisted, there should only be one sorce of truth, the attributes list and only that should be
 // modifed to perosst/read/write fabrics.
 // TODO: Once attributes are persisted, implement reading/writing/manipulation fabrics around that and remove adminPairingTable logic.
 class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
@@ -187,7 +187,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
                                                               chip::NodeId nodeId, uint16_t vendorId)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: RemoveFabric"); // TODO: Generate emberAfFabricClusterPrintln
-    
+
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     AdminPairingInfo * admin;
     AdminId adminId;
@@ -251,7 +251,7 @@ exit:
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
-    
+
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;

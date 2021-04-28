@@ -385,7 +385,7 @@
         }];
     }
 }
-    
+
 
 // MARK: CHIPDevicePairingDelegate
 - (void)onPairingComplete:(NSError *)error
@@ -400,7 +400,7 @@
             [self setVendorIDOnAccessory];
         });
     }
-    
+
 }
 
 // MARK: UI Helper methods

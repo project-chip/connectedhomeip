@@ -47,7 +47,7 @@ struct AccessControlList
     uint32_t placeholder;
 };
 
-// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using 
+// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using
 // attribute store so no need for this Delegate API anymore
 // TODO: Reimplement AdminPairingTable to only have one backing store.
 class DLL_EXPORT AdminPairingTableDelegate

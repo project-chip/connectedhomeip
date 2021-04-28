@@ -61,7 +61,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS()
         ChipLogProgress(Discovery, "New admin (%d)  to KVS store, calling OnAdminPersistedToStorage.", info.mAdmin);
         gDelegate->OnAdminPersistedToStorage(mAdmin, mFabricId, mNodeId);
     }
-   
+
     return err;
 }
 
@@ -91,7 +91,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS()
         ChipLogProgress(Discovery, "New admin (%d) fetched from KVS store. Calling OnAdminRetrievedFromStorage.", info.mAdmin);
         gDelegate->OnAdminRetrievedFromStorage(id, mFabricId, mNodeId);
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -229,7 +229,7 @@ AdminPairingInfo * AdminPairingTable::FindAdmin(FabricId fabricId, NodeId nodeId
     {
         if (state.IsInitialized())
         {
-            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.", 
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.",
                             index, state.GetFabricId(), state.GetNodeId(), state.GetVendorId(), fabricId, nodeId, vendorId);
         }
         if (state.IsInitialized() && state.GetFabricId() == fabricId && state.GetNodeId() == nodeId && state.GetVendorId() == vendorId)
