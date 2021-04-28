@@ -24,6 +24,8 @@
 #include <array>
 #include <bitset>
 
+#include <support/Span.h>
+
 namespace chip {
 namespace Transport {
 
@@ -32,29 +34,32 @@ class PeerMessageCounter
 public:
     static constexpr size_t kChallengeSize = 8;
 
-    PeerMessageCounter() : mStatus(Status::NotSync) {}
+    PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() {}
 
-    void Reset() { mStatus = Status::NotSync; }
+    void Reset() { mStatus = Status::NotSynced; }
 
-    bool IsSyncStarted() { return mStatus != Status::NotSync; }
     bool IsSynchronizing() { return mStatus == Status::SyncInProcess; }
-    bool IsSyncCompleted() { return mStatus == Status::Synced; }
+    bool IsSynchronized() { return mStatus == Status::Synced; }
 
-    void StartSync(std::array<uint8_t, kChallengeSize> challenge)
+    void SyncStarting(FixedByteSpan<kChallengeSize> challenge)
     {
         mStatus                   = Status::SyncInProcess;
-        mSyncInProcess.mChallenge = challenge;
+        mSyncInProcess.mChallenge = challenge.ToArray();
     }
 
-    void SyncFail() { Reset(); }
+    void SyncFailed() { Reset(); }
 
     CHIP_ERROR VerifyChallenge(uint32_t counter, std::array<uint8_t, kChallengeSize> challenge)
     {
         if (mStatus != Status::SyncInProcess)
+        {
             return CHIP_ERROR_INCORRECT_STATE;
+        }
         if (mSyncInProcess.mChallenge != challenge)
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
         mStatus             = Status::Synced;
         mSynced.mMaxCounter = counter;
@@ -66,15 +71,21 @@ public:
     CHIP_ERROR Verify(uint32_t counter) const
     {
         if (mStatus != Status::Synced)
+        {
             return CHIP_ERROR_INCORRECT_STATE;
+        }
 
         if (counter <= mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
                 return CHIP_ERROR_INVALID_ARGUMENT; // outside valid range
+            }
             if (mSynced.mWindow.test(offset))
+            {
                 return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, in window
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -107,7 +118,7 @@ public:
             {
                 mSynced.mWindow.reset();
             }
-            mSynced.mWindow.set(0, true);
+            mSynced.mWindow.set(0);
         }
     }
 
@@ -127,7 +138,7 @@ public:
 private:
     enum class Status
     {
-        NotSync,
+        NotSynced,
         SyncInProcess,
         Synced,
     } mStatus;

@@ -162,6 +162,9 @@ void InitializeChip(nlTestSuite * apSuite)
 
     err = chip::gExchangeManager.Init(&chip::gSessionManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = chip::gMessageCounterManager.Init(&chip::gExchangeManager);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
 /**

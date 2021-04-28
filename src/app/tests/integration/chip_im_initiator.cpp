@@ -308,6 +308,9 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
+
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &mockDelegate);
     SuccessOrExit(err);
 

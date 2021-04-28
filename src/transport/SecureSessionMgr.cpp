@@ -84,6 +84,8 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
     mAdmins                = admins;
     mMessageCounterManager = messageCounterManager;
 
+    mGlobalEncryptedMessageCounter.Init();
+
     ChipLogProgress(Inet, "local node id is 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(mLocalNodeId >> 32),
                     static_cast<uint32_t>(mLocalNodeId));
 
@@ -127,16 +129,18 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     state = GetPeerConnectionState(session);
     VerifyOrReturnError(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
 
-    if (!IsControlMessage(payloadHeader) && !state->GetSessionMessageCounter().GetPeerMessageCounter().IsSyncCompleted())
+    if (!IsControlMessage(payloadHeader) && !state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
     {
         if (bufferRetainSlot != nullptr)
         {
             // If CRMP is enabled, skip queuing the message to avoid meltdown. (Check TCP meltdown for details)
+            // CRMP retrans table should be flushed after the sync is completed.
             return mMessageCounterManager->StartSync(session, state);
         }
         else
         {
-            return mMessageCounterManager->QueueSendMessageAndStartSync(session, state, payloadHeader, std::move(msgBuf));
+            return SendMessage(session, payloadHeader, unusedPacketHeader, std::move(msgBuf), bufferRetainSlot,
+                               EncryptionState::kPayloadIsUnencrypted);
         }
     }
     else
@@ -415,9 +419,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         }
         else
         {
-            // TODO: "initial Session Establishment bootstrap" is under specified, use message counter sync protocol for both group
-            // and unicast messages
-            if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSyncCompleted())
+            if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
             {
                 // Queue and start message sync procedure
                 err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
@@ -432,15 +434,15 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                                  err);
                 }
 
-                return;
+                SuccessOrExit(err);
             }
 
             err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Inet, "Message counter verify failed, err = %d", err);
-                return;
             }
+            SuccessOrExit(err);
         }
     }
 
