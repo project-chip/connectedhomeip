@@ -98,26 +98,6 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
         }
         break;
 
-    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
-        ChipLogProgress(AppServer, "Device was assigned network credentials");
-        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Failed to start mDNS advertisement");
-        }
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnRendezvousStopped();
-        }
-        break;
-
-    case RendezvousSessionDelegate::NetworkProvisioningFailed:
-        ChipLogProgress(AppServer, "Failed in network provisioning");
-        if (mDelegate != nullptr)
-        {
-            mDelegate->OnRendezvousStopped();
-        }
-        break;
-
     default:
         break;
     };

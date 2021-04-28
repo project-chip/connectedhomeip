@@ -98,18 +98,6 @@ public class ChipDeviceController {
     completionListener.onSendMessageComplete(message);
   }
 
-  public void onNetworkCredentialsRequested() {
-    if (completionListener != null) {
-      completionListener.onNetworkCredentialsRequested();
-    }
-  }
-
-  public void onOperationalCredentialsRequested(byte[] csr) {
-    if (completionListener != null) {
-      completionListener.onOperationalCredentialsRequested(csr);
-    }
-  }
-
   public void onStatusUpdate(int status) {
     if (completionListener != null) {
       completionListener.onStatusUpdate(status);

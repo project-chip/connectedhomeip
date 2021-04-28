@@ -34,8 +34,6 @@ public:
     {
         SecurePairingSuccess = 0,
         SecurePairingFailed,
-        NetworkProvisioningSuccess,
-        NetworkProvisioningFailed,
     };
 
     virtual void OnRendezvousConnectionOpened() {}
@@ -46,15 +44,4 @@ public:
                                              System::PacketBufferHandle buffer){};
     virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
 };
-
-class DLL_EXPORT RendezvousDeviceCredentialsDelegate
-{
-public:
-    virtual ~RendezvousDeviceCredentialsDelegate() {}
-
-    virtual void SendNetworkCredentials(const char * ssid, const char * passwd) = 0;
-    virtual void SendThreadCredentials(ByteSpan threadDataset)                  = 0;
-    virtual void SendOperationalCredentials()                                   = 0;
-};
-
 } // namespace chip
