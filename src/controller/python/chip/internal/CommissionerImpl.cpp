@@ -64,7 +64,7 @@ private:
 class ScriptDevicePairingDelegate final : public chip::Controller::DevicePairingDelegate
 {
 public:
-    using OnPairingCompleteCallback                 = void (*)(CHIP_ERROR err);
+    using OnPairingCompleteCallback = void (*)(CHIP_ERROR err);
 
     ~ScriptDevicePairingDelegate() = default;
 
@@ -81,7 +81,7 @@ public:
     void SetPairingCompleteCallback(OnPairingCompleteCallback callback) { mPairingComplete = callback; }
 
 private:
-    OnPairingCompleteCallback mPairingComplete                                 = nullptr;
+    OnPairingCompleteCallback mPairingComplete = nullptr;
 };
 
 ServerStorageDelegate gServerStorage;
