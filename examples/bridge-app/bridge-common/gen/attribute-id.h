@@ -421,6 +421,15 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Switch
+
+// Client attributes
+
+// Server attributes
+#define ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID (0x0000)
+#define ZCL_CURRENT_POSITION_ATTRIBUTE_ID (0x0001)
+#define ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID (0x0002)
+
 // Attribute ids for cluster: Operational Credentials
 
 // Client attributes

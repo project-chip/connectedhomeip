@@ -45,6 +45,7 @@ constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
 constexpr ClusterId kScenesClusterId                      = 0x0005;
+constexpr ClusterId kSwitchClusterId                      = 0x003B;
 constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 constexpr ClusterId kThermostatClusterId                  = 0x0201;
 
@@ -720,6 +721,22 @@ private:
     static constexpr CommandId kRemoveSceneCommandId        = 0x02;
     static constexpr CommandId kStoreSceneCommandId         = 0x04;
     static constexpr CommandId kViewSceneCommandId          = 0x01;
+};
+
+class DLL_EXPORT SwitchCluster : public ClusterBase
+{
+public:
+    SwitchCluster() : ClusterBase(kSwitchClusterId) {}
+    ~SwitchCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ConfigureAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval, uint8_t change);
+    CHIP_ERROR ReportAttributeCurrentPosition(Callback::Cancelable * onReportCallback);
 };
 
 class DLL_EXPORT TemperatureMeasurementCluster : public ClusterBase
