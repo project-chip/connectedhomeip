@@ -120,9 +120,6 @@ public:
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
     {
         // Preset the MessageCounter
-        Transport::PeerConnectionState * state = mgr->GetPeerConnectionState(session);
-        state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
-
         if (NewConnectionHandlerCallCount == 0)
             mRemoteToLocalSession = session;
         if (NewConnectionHandlerCallCount == 1)

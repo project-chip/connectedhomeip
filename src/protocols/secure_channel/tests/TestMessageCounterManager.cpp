@@ -76,12 +76,13 @@ public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle msgBuf) override
     {
+        ++ReceiveHandlerCallCount;
         ec->Close();
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    nlTestSuite * mSuite = nullptr;
+    int ReceiveHandlerCallCount = 0;
 };
 
 void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
@@ -96,6 +97,7 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
     Transport::PeerConnectionState * localState = ctx.GetSecureSessionManager().GetPeerConnectionState(localSession);
     Transport::PeerConnectionState * peerState  = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
 
+    localState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
     err = ctx.GetMessageCounterManager().SendMsgCounterSyncReq(localSession, localState);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -105,43 +107,32 @@ void MessageCounterSyncProcess(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, localCounter.GetCounter() == peerCounter.Value());
 }
 
-void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
-    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
-
-    PacketHeader packetHeader;
-
-    CHIP_ERROR err = ctx.GetMessageCounterManager().AddToReceiveTable(
-        ctx.GetDestinationNodeId(), packetHeader, Transport::PeerAddress::UDP(ctx.GetAddress(), CHIP_PORT, INET_NULL_INTERFACEID),
-        std::move(buffer));
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-}
-
 void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
-    uint16_t payload_len = sizeof(PAYLOAD);
+    SecureSessionHandle peerSession            = ctx.GetSessionPeerToLocal();
+    Transport::PeerConnectionState * peerState = ctx.GetSecureSessionManager().GetPeerConnectionState(peerSession);
+    peerState->GetSessionMessageCounter().GetPeerMessageCounter().Reset();
 
-    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
-    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+    MockAppDelegate callback;
+    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(chip::Protocols::Echo::MsgType::EchoRequest, &callback);
 
-    PayloadHeader payloadHeader;
-    payloadHeader.SetExchangeID(0);
-    payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest);
+    uint16_t payload_len              = sizeof(PAYLOAD);
+    System::PacketBufferHandle msgBuf = MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
+    NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    err = ctx.GetSecureSessionManager().SendMessage(ctx.GetSessionLocalToPeer(), payloadHeader, std::move(buffer));
+    Messaging::ExchangeContext * ec = ctx.NewExchangeToPeer(nullptr);
+    NL_TEST_ASSERT(inSuite, ec != nullptr);
+
+    err = ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),
+                          Messaging::SendFlags{ Messaging::SendMessageFlags::kNoAutoRequestAck });
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, peerState->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized());
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 
-    // ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
-
-    // NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+    ec->Close();
 }
 
 // Test Suite
@@ -153,7 +144,6 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("Test MessageCounterManager::MessageCounterSyncProcess", MessageCounterSyncProcess),
-    NL_TEST_DEF("Test MessageCounterManager::AddToReceiveTable", CheckAddToReceiveTable),
     NL_TEST_DEF("Test MessageCounterManager::ReceiveMessage", CheckReceiveMessage),
     NL_TEST_SENTINEL()
 };
