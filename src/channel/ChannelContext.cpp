@@ -38,7 +38,7 @@ void ChannelContext::Start(const ChannelBuilder & builder)
 ExchangeContext * ChannelContext::NewExchange(ExchangeDelegate * delegate)
 {
     assert(GetState() == ChannelState::kReady);
-    return mExchangeManager->NewContext(mStateVars.mReady.mSession, delegate);
+    return mExchangeManager->NewContext(GetReadyVars().mSession, delegate);
 }
 
 bool ChannelContext::MatchNodeId(NodeId nodeId)
@@ -46,9 +46,9 @@ bool ChannelContext::MatchNodeId(NodeId nodeId)
     switch (mState)
     {
     case ChannelState::kPreparing:
-        return nodeId == mStateVars.mPreparing.mBuilder.GetPeerNodeId();
+        return nodeId == GetPrepareVars().mBuilder.GetPeerNodeId();
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(mStateVars.mReady.mSession);
+        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return nodeId == state->GetPeerNodeId();
@@ -63,7 +63,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
     switch (mState)
     {
     case ChannelState::kPreparing:
-        switch (mStateVars.mPreparing.mBuilder.GetTransportPreference())
+        switch (GetPrepareVars().mBuilder.GetTransportPreference())
         {
         case ChannelBuilder::TransportPreference::kPreferConnectionOriented:
         case ChannelBuilder::TransportPreference::kConnectionOriented:
@@ -73,7 +73,7 @@ bool ChannelContext::MatchTransport(Transport::Type transport)
         }
         return false;
     case ChannelState::kReady: {
-        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(mStateVars.mReady.mSession);
+        auto state = mExchangeManager->GetSessionMgr()->GetPeerConnectionState(GetReadyVars().mSession);
         if (state == nullptr)
             return false;
         return transport == state->GetPeerAddress().GetTransportType();
@@ -118,7 +118,7 @@ bool ChannelContext::MatchesBuilder(const ChannelBuilder & builder)
 
 bool ChannelContext::IsCasePairing()
 {
-    return mState == ChannelState::kPreparing && mStateVars.mPreparing.mState == PrepareState::kCasePairing;
+    return mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kCasePairing;
 }
 
 bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMgr * ssm)
@@ -126,19 +126,19 @@ bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMg
     switch (mState)
     {
     case ChannelState::kPreparing: {
-        switch (mStateVars.mPreparing.mState)
+        switch (GetPrepareVars().mState)
         {
         case PrepareState::kCasePairing: {
             auto state = ssm->GetPeerConnectionState(session);
-            return (state->GetPeerNodeId() == mStateVars.mPreparing.mBuilder.GetPeerNodeId() &&
-                    state->GetPeerKeyID() == mStateVars.mPreparing.mBuilder.GetPeerKeyID());
+            return (state->GetPeerNodeId() == GetPrepareVars().mBuilder.GetPeerNodeId() &&
+                    state->GetPeerKeyID() == GetPrepareVars().mBuilder.GetPeerKeyID());
         }
         default:
             return false;
         }
     }
     case ChannelState::kReady:
-        return mStateVars.mReady.mSession == session;
+        return GetReadyVars().mSession == session;
     default:
         return false;
     }
@@ -146,8 +146,10 @@ bool ChannelContext::MatchesSession(SecureSessionHandle session, SecureSessionMg
 
 void ChannelContext::EnterPreparingState(const ChannelBuilder & builder)
 {
-    mState                         = ChannelState::kPreparing;
-    mStateVars.mPreparing.mBuilder = builder;
+    mState = ChannelState::kPreparing;
+
+    mStateVars.Set<PrepareVars>();
+    GetPrepareVars().mBuilder = builder;
 
     EnterAddressResolve();
 }
@@ -157,14 +159,14 @@ void ChannelContext::ExitPreparingState() {}
 // Address resolve
 void ChannelContext::EnterAddressResolve()
 {
-    mStateVars.mPreparing.mState = PrepareState::kAddressResolving;
+    GetPrepareVars().mState = PrepareState::kAddressResolving;
 
     // Skip address resolve if the address is provided
     {
-        auto addr = mStateVars.mPreparing.mBuilder.GetForcePeerAddress();
+        auto addr = GetPrepareVars().mBuilder.GetForcePeerAddress();
         if (addr.HasValue())
         {
-            mStateVars.mPreparing.mAddress = addr.Value();
+            GetPrepareVars().mAddress = addr.Value();
             ExitAddressResolve();
             // Only CASE session is supported
             EnterCasePairingState();
@@ -174,10 +176,10 @@ void ChannelContext::EnterAddressResolve()
 
     // TODO: call mDNS Scanner::SubscribeNode after PR #4459 is ready
     // Scanner::RegisterScannerDelegate(this)
-    // Scanner::SubscribeNode(mStateVars.mPreparing.mBuilder.GetPeerNodeId())
+    // Scanner::SubscribeNode(GetPrepareVars().mBuilder.GetPeerNodeId())
 
     // The HandleNodeIdResolve may already have been called, recheck the state here before set up the timer
-    if (mState == ChannelState::kPreparing && mStateVars.mPreparing.mState == PrepareState::kAddressResolving)
+    if (mState == ChannelState::kPreparing && GetPrepareVars().mState == PrepareState::kAddressResolving)
     {
         System::Layer * layer = mExchangeManager->GetSessionMgr()->SystemLayer();
         layer->StartTimer(CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS, AddressResolveTimeout, this);
@@ -196,7 +198,7 @@ void ChannelContext::AddressResolveTimeout()
 {
     if (mState != ChannelState::kPreparing)
         return;
-    if (mStateVars.mPreparing.mState != PrepareState::kAddressResolving)
+    if (GetPrepareVars().mState != PrepareState::kAddressResolving)
         return;
 
     ExitAddressResolve();
@@ -219,7 +221,7 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
         return;
     }
     case ChannelState::kPreparing: {
-        switch (mStateVars.mPreparing.mState)
+        switch (GetPrepareVars().mState)
         {
         case PrepareState::kAddressResolving: {
             if (error != CHIP_NO_ERROR)
@@ -232,8 +234,8 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
 
             if (!address.mAddress.HasValue())
                 return;
-            mStateVars.mPreparing.mAddressType = address.mAddressType;
-            mStateVars.mPreparing.mAddress     = address.mAddress.Value();
+            GetPrepareVars().mAddressType = address.mAddressType;
+            GetPrepareVars().mAddress     = address.mAddress.Value();
             ExitAddressResolve();
             EnterCasePairingState();
             return;
@@ -253,17 +255,17 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
 
 void ChannelContext::EnterCasePairingState()
 {
-    mStateVars.mPreparing.mState              = PrepareState::kCasePairing;
-    mStateVars.mPreparing.mCasePairingSession = Platform::New<CASESession>();
+    auto & prepare = GetPrepareVars();
+    prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), mStateVars.mPreparing.mCasePairingSession);
+    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);
 
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
-    addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(mStateVars.mPreparing.mAddress);
-    CHIP_ERROR err = mStateVars.mPreparing.mCasePairingSession->EstablishSession(
-        addr, &mStateVars.mPreparing.mBuilder.GetOperationalCredentialSet(), mStateVars.mPreparing.mBuilder.GetPeerNodeId(),
+    addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
+    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(
+        addr, &prepare.mBuilder.GetOperationalCredentialSet(), prepare.mBuilder.GetPeerNodeId(),
         mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
@@ -275,14 +277,14 @@ void ChannelContext::EnterCasePairingState()
 
 void ChannelContext::ExitCasePairingState()
 {
-    Platform::Delete(mStateVars.mPreparing.mCasePairingSession);
+    Platform::Delete(GetPrepareVars().mCasePairingSession);
 }
 
 void ChannelContext::OnSessionEstablishmentError(CHIP_ERROR error)
 {
     if (mState != ChannelState::kPreparing)
         return;
-    switch (mStateVars.mPreparing.mState)
+    switch (GetPrepareVars().mState)
     {
     case PrepareState::kCasePairing:
         ExitCasePairingState();
@@ -298,11 +300,11 @@ void ChannelContext::OnSessionEstablished()
 {
     if (mState != ChannelState::kPreparing)
         return;
-    switch (mStateVars.mPreparing.mState)
+    switch (GetPrepareVars().mState)
     {
     case PrepareState::kCasePairing:
         ExitCasePairingState();
-        mStateVars.mPreparing.mState = PrepareState::kCasePairingDone;
+        GetPrepareVars().mState = PrepareState::kCasePairingDone;
         // TODO: current CASE paring session API doesn't show how to derive a secure session
         return;
     default:
@@ -314,7 +316,7 @@ void ChannelContext::OnNewConnection(SecureSessionHandle session)
 {
     if (mState != ChannelState::kPreparing)
         return;
-    if (mStateVars.mPreparing.mState != PrepareState::kCasePairingDone)
+    if (GetPrepareVars().mState != PrepareState::kCasePairingDone)
         return;
 
     ExitPreparingState();
@@ -324,8 +326,7 @@ void ChannelContext::OnNewConnection(SecureSessionHandle session)
 void ChannelContext::EnterReadyState(SecureSessionHandle session)
 {
     mState = ChannelState::kReady;
-
-    mStateVars.mReady.mSession = session;
+    mStateVars.Set<ReadyVars>(session);
     mChannelManager->NotifyChannelEvent(this, [](ChannelDelegate * delegate) { delegate->OnEstablished(); });
 }
 
@@ -344,7 +345,7 @@ void ChannelContext::ExitReadyState()
     // Currently SecureSessionManager doesn't provide an interface to close a session
 
     // TODO: call mDNS Scanner::UnubscribeNode after PR #4459 is ready
-    // Scanner::UnsubscribeNode(mStateVars.mPreparing.mBuilder.GetPeerNodeId())
+    // Scanner::UnsubscribeNode(GetPrepareVars().mBuilder.GetPeerNodeId())
 }
 
 void ChannelContext::EnterFailedState(CHIP_ERROR error)
