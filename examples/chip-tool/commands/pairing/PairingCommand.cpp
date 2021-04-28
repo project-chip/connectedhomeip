@@ -325,6 +325,7 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ReturnErrorOnFailure(mCommissioner.GetDevice(mRemoteId, &mDevice));
+    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
     return mCommissioner.UpdateDevice(mDevice, mFabricId);
 }
 
