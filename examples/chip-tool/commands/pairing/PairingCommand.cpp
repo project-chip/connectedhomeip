@@ -31,15 +31,16 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::ControllerInitParams params{
-        .storageDelegate              = &storage,
-        .mDeviceAddressUpdateDelegate = this,
-    };
+    chip::Controller::CommissionerInitParams params;
+
+    params.storageDelegate              = &storage;
+    params.mDeviceAddressUpdateDelegate = this;
+    params.pairingDelegate              = this;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
-    err = mCommissioner.Init(localId, params, this);
+    err = mCommissioner.Init(localId, params);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
     err = mCommissioner.ServiceEvents();
