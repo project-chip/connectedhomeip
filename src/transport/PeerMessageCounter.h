@@ -24,6 +24,8 @@
 #include <array>
 #include <bitset>
 
+#include <support/Span.h>
+
 namespace chip {
 namespace Transport {
 
@@ -32,31 +34,49 @@ class PeerMessageCounter
 public:
     static constexpr size_t kChallengeSize = 8;
 
-    PeerMessageCounter() : mStatus(Status::NotSync) {}
-    ~PeerMessageCounter() {}
+    PeerMessageCounter() : mStatus(Status::NotSynced) {}
+    ~PeerMessageCounter() { Reset(); }
 
-    void Reset() { mStatus = Status::NotSync; }
-
-    bool IsSyncStarted() { return mStatus != Status::NotSync; }
-    bool IsSynchronizing() { return mStatus == Status::SyncInProcess; }
-    bool IsSyncCompleted() { return mStatus == Status::Synced; }
-
-    void StartSync(std::array<uint8_t, kChallengeSize> challenge)
-    {
-        mStatus                   = Status::SyncInProcess;
-        mSyncInProcess.mChallenge = challenge;
+    void Reset() {
+        switch(mStatus) {
+            case Status::NotSynced:
+                break;
+            case Status::SyncInProcess:
+                mSyncInProcess.~SyncInProcess();
+                break;
+            case Status::Synced:
+                mSynced.~Synced();
+                break;
+        }
+        mStatus = Status::NotSynced;
     }
 
-    void SyncFail() { Reset(); }
+    bool IsSynchronizing() { return mStatus == Status::SyncInProcess; }
+    bool IsSynchronized() { return mStatus == Status::Synced; }
 
-    CHIP_ERROR VerifyChallenge(uint32_t counter, std::array<uint8_t, kChallengeSize> challenge)
+    void SyncStarting(FixedByteSpan<kChallengeSize> challenge)
+    {
+        assert(mStatus == Status::NotSynced);
+        mStatus = Status::SyncInProcess;
+        new (&mSyncInProcess) SyncInProcess();
+        mSyncInProcess.mChallenge = challenge.ToArray();
+    }
+
+    void SyncFailed() { Reset(); }
+
+    CHIP_ERROR VerifyChallenge(uint32_t counter, FixedByteSpan<kChallengeSize> challenge)
     {
         if (mStatus != Status::SyncInProcess)
+        {
             return CHIP_ERROR_INCORRECT_STATE;
-        if (mSyncInProcess.mChallenge != challenge)
+        }
+        if (mSyncInProcess.mChallenge != challenge.ToArray())
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
-        mStatus             = Status::Synced;
+        mStatus = Status::Synced;
+        new (&mSynced) Synced();
         mSynced.mMaxCounter = counter;
         mSynced.mWindow.set();         // set all bits, deny all packets with counter less than the given counter
         mSynced.mWindow.set(0, false); // expect next packet with counter equal to the given counter
@@ -66,15 +86,21 @@ public:
     CHIP_ERROR Verify(uint32_t counter) const
     {
         if (mStatus != Status::Synced)
+        {
             return CHIP_ERROR_INCORRECT_STATE;
+        }
 
         if (counter <= mSynced.mMaxCounter)
         {
             uint32_t offset = mSynced.mMaxCounter - counter;
             if (offset >= CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE)
+            {
                 return CHIP_ERROR_INVALID_ARGUMENT; // outside valid range
+            }
             if (mSynced.mWindow.test(offset))
+            {
                 return CHIP_ERROR_INVALID_ARGUMENT; // duplicated, in window
+            }
         }
 
         return CHIP_NO_ERROR;
@@ -82,7 +108,7 @@ public:
 
     /**
      * @brief
-     *    With the counter verified and the packet MAC is also verified by the secure key, we can trust the packet and adjust
+     *    With the counter verified and the packet MAC also verified by the secure key, we can trust the packet and adjust
      *    counter states.
      *
      * @pre Verify(counter) == CHIP_NO_ERROR
@@ -107,7 +133,7 @@ public:
             {
                 mSynced.mWindow.reset();
             }
-            mSynced.mWindow.set(0, true);
+            mSynced.mWindow.set(0);
         }
     }
 
@@ -115,7 +141,8 @@ public:
     void SetCounter(uint32_t value)
     {
         Reset();
-        mStatus             = Status::Synced;
+        mStatus = Status::Synced;
+        new (&mSynced) Synced();
         mSynced.mMaxCounter = value;
         mSynced.mWindow.set();
         mSynced.mWindow.set(0, false);
@@ -127,31 +154,35 @@ public:
 private:
     enum class Status
     {
-        NotSync,
-        SyncInProcess,
-        Synced,
+        NotSynced,     // No state associated
+        SyncInProcess, // mSyncInProcess will be active
+        Synced,        // mSynced will be active
     } mStatus;
 
+    struct SyncInProcess
+    {
+        std::array<uint8_t, kChallengeSize> mChallenge;
+    };
+
+    struct Synced
+    {
+        /*
+         *  Past <--                --> Future
+         *             MaxCounter
+         *                 |
+         *                 v
+         *  | <-- mWindow -->|
+         *  |[n]|  ...   |[0]|
+         */
+        uint32_t mMaxCounter; // The most recent counter we have seen
+        std::bitset<CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE> mWindow;
+    };
+
+    // We should use std::variant here when migrated to C++17
     union
     {
-        struct
-        {
-            std::array<uint8_t, kChallengeSize> mChallenge;
-        } mSyncInProcess;
-
-        struct
-        {
-            /*
-             *  Past <--                --> Future
-             *             MaxCounter
-             *                 |
-             *                 v
-             *  | <-- mWindow -->|
-             *  |[n]|  ...   |[0]|
-             */
-            uint32_t mMaxCounter; // The most recent counter we have seen
-            std::bitset<CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE> mWindow;
-        } mSynced;
+        SyncInProcess mSyncInProcess;
+        Synced mSynced;
     };
 };
 

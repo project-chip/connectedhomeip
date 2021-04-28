@@ -209,10 +209,12 @@ int Initialize(void * aContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    TestContext * ctx = reinterpret_cast<TestContext *>(aContext);
-    err               = ctx->Init(&sSuite, &gTransportMgr);
+    auto * ctx = reinterpret_cast<TestContext *>(aContext);
+    err        = ctx->Init(&sSuite, &gTransportMgr);
     if (err != CHIP_NO_ERROR)
+    {
         return FAILURE;
+    }
 
     ctx->PresetMessageCounter();
 

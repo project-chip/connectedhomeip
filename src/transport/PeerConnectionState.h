@@ -114,7 +114,6 @@ public:
         return mReceiverSecureSession.Decrypt(input, input_length, output, header, mac);
     }
 
-    /* GetSessionMessageCounter is only accessible by the MessageCounterManager */
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:

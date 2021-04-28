@@ -1293,17 +1293,6 @@
 #endif // CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
 
 /**
- *  @def CHIP_CONFIG_MCSP_RETRANS_TABLE_SIZE
- *
- *  @brief
- *    Size of the retrans table for message counter synchronization protocol
- *
- */
-#ifndef CHIP_CONFIG_MCSP_RETRANS_TABLE_SIZE
-#define CHIP_CONFIG_MCSP_RETRANS_TABLE_SIZE 4
-#endif // CHIP_CONFIG_MCSP_RETRANS_TABLE_SIZE
-
-/**
  *  @def CHIP_CONFIG_MCSP_RECEIVE_TABLE_SIZE
  *
  *  @brief
