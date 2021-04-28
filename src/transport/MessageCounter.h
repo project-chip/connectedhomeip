@@ -115,6 +115,7 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
+    static constexpr uint32_t kInitialValue = 1;
     LocalSessionMessageCounter() : value(kInitialValue) {}
     ~LocalSessionMessageCounter() override {}
 
@@ -128,7 +129,6 @@ public:
     }
 
 private:
-    static constexpr uint32_t kInitialValue = 1;
     uint32_t value;
 };
 

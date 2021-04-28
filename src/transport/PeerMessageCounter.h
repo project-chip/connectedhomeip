@@ -37,16 +37,18 @@ public:
     PeerMessageCounter() : mStatus(Status::NotSynced) {}
     ~PeerMessageCounter() { Reset(); }
 
-    void Reset() {
-        switch(mStatus) {
-            case Status::NotSynced:
-                break;
-            case Status::SyncInProcess:
-                mSyncInProcess.~SyncInProcess();
-                break;
-            case Status::Synced:
-                mSynced.~Synced();
-                break;
+    void Reset()
+    {
+        switch (mStatus)
+        {
+        case Status::NotSynced:
+            break;
+        case Status::SyncInProcess:
+            mSyncInProcess.~SyncInProcess();
+            break;
+        case Status::Synced:
+            mSynced.~Synced();
+            break;
         }
         mStatus = Status::NotSynced;
     }
@@ -78,8 +80,7 @@ public:
         mStatus = Status::Synced;
         new (&mSynced) Synced();
         mSynced.mMaxCounter = counter;
-        mSynced.mWindow.set();         // set all bits, deny all packets with counter less than the given counter
-        mSynced.mWindow.set(0, false); // expect next packet with counter equal to the given counter
+        mSynced.mWindow.reset(); // reset all bits, accept all packets in the window
         return CHIP_NO_ERROR;
     }
 
@@ -137,15 +138,13 @@ public:
         }
     }
 
-    /* Test-only */
     void SetCounter(uint32_t value)
     {
         Reset();
         mStatus = Status::Synced;
         new (&mSynced) Synced();
         mSynced.mMaxCounter = value;
-        mSynced.mWindow.set();
-        mSynced.mWindow.set(0, false);
+        mSynced.mWindow.reset();
     }
 
     /* Test-only */
