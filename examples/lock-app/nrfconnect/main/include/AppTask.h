@@ -58,6 +58,8 @@ private:
     static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
+    static int SoftwareUpdateConfirmationHandler(uint32_t offset, uint32_t size, void * arg);
+
     void StartTimer(uint32_t aTimeoutInMs);
 
     enum Function_t
@@ -71,6 +73,7 @@ private:
 
     Function_t mFunction;
     bool mFunctionTimerActive;
+    bool mSoftwareUpdateEnabled;
     static AppTask sAppTask;
 };
 
