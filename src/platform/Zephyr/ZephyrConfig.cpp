@@ -72,7 +72,9 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDeviceId         = C
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDeviceCert       = CONFIG_KEY(NAMESPACE_CONFIG "op-device-cert");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDeviceICACerts   = CONFIG_KEY(NAMESPACE_CONFIG "op-device-ca-certs");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_OperationalDevicePrivateKey = CONFIG_KEY(NAMESPACE_CONFIG "op-device-key");
-
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation          = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode                 = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb                  = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = { ZephyrConfig::kConfigKey_FabricId,
@@ -86,7 +88,10 @@ constexpr const char * sAllResettableConfigKeys[] = { ZephyrConfig::kConfigKey_F
                                                       ZephyrConfig::kConfigKey_OperationalDeviceId,
                                                       ZephyrConfig::kConfigKey_OperationalDeviceCert,
                                                       ZephyrConfig::kConfigKey_OperationalDeviceICACerts,
-                                                      ZephyrConfig::kConfigKey_OperationalDevicePrivateKey };
+                                                      ZephyrConfig::kConfigKey_OperationalDevicePrivateKey,
+                                                      ZephyrConfig::kConfigKey_RegulatoryLocation,
+                                                      ZephyrConfig::kConfigKey_CountryCode,
+                                                      ZephyrConfig::kConfigKey_Breadcrumb };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function
 struct ReadRequest

@@ -658,6 +658,42 @@ exit:
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetRegulatoryLocation(uint32_t & location)
+{
+    return Impl()->ReadConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreRegulatoryLocation(uint32_t location)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_RegulatoryLocation, location);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+{
+    return Impl()->ReadConfigValueStr(ImplClass::kConfigKey_CountryCode, buf, bufSize, codeLen);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreCountryCode(const char * code, size_t codeLen)
+{
+    return Impl()->WriteConfigValueStr(ImplClass::kConfigKey_CountryCode, code, codeLen);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetBreadcrumb(uint64_t & breadcrumb)
+{
+    return Impl()->ReadConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreBreadcrumb(uint64_t breadcrumb)
+{
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_Breadcrumb, breadcrumb);
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetServiceId(uint64_t & serviceId)
 {
     return Impl()->ReadConfigValue(ImplClass::kConfigKey_ServiceId, serviceId);

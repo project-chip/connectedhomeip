@@ -67,6 +67,9 @@ const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceId         = { k
 const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceCert       = { kConfigNamespace_ChipConfig, "op-device-cert" };
 const PosixConfig::Key PosixConfig::kConfigKey_OperationalDeviceICACerts   = { kConfigNamespace_ChipConfig, "op-device-ca-certs" };
 const PosixConfig::Key PosixConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
+const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const PosixConfig::Key PosixConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
+const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
