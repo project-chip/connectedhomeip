@@ -144,10 +144,6 @@ list(APPEND CHIP_CFLAGS ${CHIP_MBEDNETSOCKET_CFLAGS})
 if (CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
     mbed_get_target_common_compile_flags(CHIP_MBEDTLS_CFLAGS mbed-mbedtls)
     list(APPEND CHIP_CFLAGS ${CHIP_MBEDTLS_CFLAGS})
-    if (${MBED_TARGET} MATCHES "NRF52840_DK")
-        mbed_get_target_common_compile_flags(CHIP_CRYPTOCELL310_CFLAGS mbed-mbedtls-cryptocell310)
-        list(APPEND CHIP_CFLAGS ${CHIP_CRYPTOCELL310_CFLAGS})
-    endif()
 endif()
 
 list(APPEND CHIP_CFLAGS 
