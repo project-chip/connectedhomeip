@@ -29,6 +29,11 @@ enum class AttributePathFlags : uint8_t
     kListIndexValid = 0x02,
 };
 
+/**
+ *
+ * @brief This is used to record attribute path, and can pass attribute path info between IM and ember library.
+ *
+ */
 struct AttributePathParams
 {
     AttributePathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, FieldId aFieldId, ListIndex aListIndex,
@@ -65,11 +70,11 @@ struct AttributePathParams
         }
         return true;
     }
-    chip::NodeId mNodeId         = 0;
-    chip::EndpointId mEndpointId = 0;
-    chip::ClusterId mClusterId   = 0;
-    chip::FieldId mFieldId       = 0;
-    chip::ListIndex mListIndex   = 0;
+    NodeId mNodeId         = 0;
+    ClusterId mClusterId   = 0;
+    ListIndex mListIndex   = 0;
+    EndpointId mEndpointId = 0;
+    FieldId mFieldId       = 0;
     BitFlags<AttributePathFlags> mFlags;
 };
 } // namespace app

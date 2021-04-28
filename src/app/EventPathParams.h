@@ -22,6 +22,11 @@
 
 namespace chip {
 namespace app {
+/**
+ *
+ * @brief This is used to record IM event path, and can pass event path info between IM and ember library.
+ *
+ */
 struct EventPathParams
 {
     EventPathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aIsUrgent) :

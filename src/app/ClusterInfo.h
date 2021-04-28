@@ -23,6 +23,16 @@
 
 namespace chip {
 namespace app {
+
+/**
+ *
+ * @brief This is used to record the cluster's attribute path in server side read or subscription client interested in, for read interaction,
+ * read handler would mark those interested clusterInfo as dirty when receiving read request, then reporting engine would send out those
+ * dirty changes to client per interested clusterInfo, considering IM timed interaction, reporting engine would send out the dirty changes with delay.
+ * For subscription, in server side, if user modifies some of interested clusters, and those corresponding clusterInfo would be marked dirty,
+ * reporting engine would send them out.
+ *
+ */
 struct ClusterInfo
 {
     ClusterInfo(const AttributePathParams & aAttributePathParams, bool aDirty) :
