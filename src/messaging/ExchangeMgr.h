@@ -228,7 +228,7 @@ private:
     ReliableMessageMgr mReliableMessageMgr;
     MessageCounterSyncMgr mMessageCounterSyncMgr;
 
-    AdminId mAdminId = 0;
+    Transport::AdminId mAdminId = 0;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
