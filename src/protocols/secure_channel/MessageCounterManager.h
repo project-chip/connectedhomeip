@@ -37,7 +37,6 @@ public:
     static constexpr uint16_t kChallengeSize   = Transport::PeerMessageCounter::kChallengeSize;
     static constexpr uint16_t kCounterSize     = 4;
     static constexpr uint16_t kSyncRespMsgSize = kChallengeSize + kCounterSize;
-    static constexpr uint16_t kMacSize         = 16;
     static constexpr uint32_t kSyncTimeoutMs   = 500;
 
     MessageCounterManager() : mExchangeMgr(nullptr) {}
@@ -48,8 +47,6 @@ public:
 
     // Implement MessageCounterManagerInterface
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override;
-    CHIP_ERROR QueueSendMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
-                                            PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf) override;
     CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
                                                 const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle msgBuf) override;
@@ -69,26 +66,6 @@ public:
     CHIP_ERROR SendMsgCounterSyncReq(SecureSessionHandle session, Transport::PeerConnectionState * state);
 
     /**
-     *  Add a CHIP message into the cache table to queue the outgoing messages that trigger message counter synchronization protocol
-     *  for retransmission.
-     *
-     *  @param[in]    protocolId       The protocol identifier of the CHIP message to be sent.
-     *
-     *  @param[in]    msgType          The message type of the corresponding protocol.
-     *
-     *  @param[in]    sendFlags        Flags set by the application for the CHIP message being sent.
-     *
-     *  @param[in]    msgBuf           A handle to the packet buffer holding the CHIP message.
-     *
-     *  @param[in]    exchangeContext  A pointer to the exchange context object associated with the message being sent.
-     *
-     *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
-     *  @retval  #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR AddToRetransmissionTable(SecureSessionHandle session, NodeId peerNodeId, PayloadHeader & payloadHeader,
-                                        System::PacketBufferHandle msgBuf);
-
-    /**
      *  Add a CHIP message into the cache table to queue the incoming messages that trigger message counter synchronization
      * protocol for re-processing.
      *
@@ -102,27 +79,7 @@ public:
 
 private:
     /**
-     *  @class RetransTableEntry
-     *
-     *  @brief
-     *    This class is part of the CHIP Message Counter Synchronization Protocol and is used
-     *    to keep track of a CHIP messages to be transmitted to a destination node whose message
-     *    counter is unknown. The message would be retransmitted from this table after message
-     *    counter synchronization is completed.
-     *
-     */
-    struct RetransTableEntry
-    {
-        RetransTableEntry() : peerNodeId(kUndefinedNodeId) {}
-
-        NodeId peerNodeId;                 /**< The peerNodeId of the message. kUndefinedNodeId if is not in use. */
-        SecureSessionHandle session;       /**< The session to send the message. */
-        PayloadHeader payloadHeader;       /**< The payload header for the message. */
-        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
-    };
-
-    /**
-     *  @class RetransTableEntry
+     *  @class ReceiveTableEntry
      *
      *  @brief
      *    This class is part of the CHIP Message Counter Synchronization Protocol and is used
@@ -143,19 +100,12 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr; // [READ ONLY] Associated Exchange Manager object.
 
-    // MessageCounterManager cache table to queue the outging messages that trigger message counter synchronization protocol.
-    RetransTableEntry mRetransTable[CHIP_CONFIG_MCSP_RETRANS_TABLE_SIZE];
-
     // MessageCounterManager cache table to queue the incoming messages that trigger message counter synchronization protocol.
     ReceiveTableEntry mReceiveTable[CHIP_CONFIG_MCSP_RECEIVE_TABLE_SIZE];
 
-    void RetransPendingMessages(NodeId peerNodeId);
-
     void ProcessPendingMessages(NodeId peerNodeId);
 
-    CHIP_ERROR NewMsgCounterSyncExchange(SecureSessionHandle session, Messaging::ExchangeContext *& exchangeContext);
-
-    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, std::array<uint8_t, kChallengeSize> challenge);
+    CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
 
     void HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
                                  System::PacketBufferHandle msgBuf);

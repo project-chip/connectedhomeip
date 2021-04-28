@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <algorithm>
+#include <array>
 #include <cstdint>
 #include <cstdlib>
 
@@ -44,6 +46,30 @@ private:
     size_t mDataLen;
 };
 
+template <class T, size_t N>
+class FixedSpan
+{
+public:
+    constexpr FixedSpan() : mDataBuf(nullptr) {}
+    constexpr FixedSpan(const T * databuf) : mDataBuf(databuf) {}
+    constexpr explicit FixedSpan(const T (&databuf)[N]) : FixedSpan(databuf) {}
+
+    const T * data() const { return mDataBuf; }
+    size_t size() const { return N; }
+
+    std::array<T, N> ToArray()
+    {
+        std::array<T, N> result;
+        std::copy(mDataBuf, mDataBuf + N, std::begin(result));
+        return result;
+    }
+
+private:
+    const T * mDataBuf;
+};
+
 using ByteSpan = Span<uint8_t>;
+template <size_t N>
+using FixedByteSpan = FixedSpan<uint8_t, N>;
 
 } // namespace chip
