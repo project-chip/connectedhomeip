@@ -154,7 +154,7 @@ python-dateutil==2.8.1
     #   pykwalify
 python-engineio==4.2.0
     # via python-socketio
-python-socketio==5.3.0
+python-socketio<5
     # via flask-socketio
 pytz==2021.1
     # via pandas

@@ -957,6 +957,16 @@ public:
      */
     CHIP_ERROR Put(uint64_t tag, int64_t v, bool preserveSize);
 
+#if defined(__riscv) && defined(ESP_PLATFORM)
+    /**
+     * @overload CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
+     * for riscv_toolchain uint32_t is unsigned long int and int32_t is long int
+     */
+    CHIP_ERROR Put(uint64_t tag, int v);
+
+    CHIP_ERROR Put(uint64_t tag, unsigned int v);
+#endif
+
     /**
      * Encodes a TLV unsigned integer value.
      *

@@ -29,13 +29,14 @@ The `chip-build` Docker container and VSCode devcontainer has these components
 pre-installed, so you can skip this step. To install these components manually,
 follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.2 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.3 tag](https://github.com/espressif/esp-idf/releases/v4.3)
 
           $ mkdir -p ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.2
+          $ git checkout v4.3
           $ git submodule update --init
           $ export IDF_PATH=${HOME}/tools/esp-idf
           $ ./install.sh
