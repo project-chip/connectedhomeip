@@ -27,6 +27,7 @@
 #include <channel/Channel.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/mdns/platform/Mdns.h>
+#include <lib/support/Variant.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <transport/PeerConnectionState.h>
 #include <transport/SecureSessionMgr.h>
@@ -129,25 +130,28 @@ private:
         kCasePairingDone,
     };
 
-    union StateVars
+    // mPreparing is pretty big, consider move it outside
+    struct PrepareVars
     {
-        StateVars() {}
+        static constexpr const size_t VariantId = 1;
+        PrepareState mState;
+        Inet::IPAddressType mAddressType;
+        Inet::IPAddress mAddress;
+        CASESession * mCasePairingSession;
+        ChannelBuilder mBuilder;
+    };
 
-        // mPreparing is pretty big, consider move it outside
-        struct PrepareVars
-        {
-            PrepareState mState;
-            Inet::IPAddressType mAddressType;
-            Inet::IPAddress mAddress;
-            CASESession * mCasePairingSession;
-            ChannelBuilder mBuilder;
-        } mPreparing;
+    struct ReadyVars
+    {
+        static constexpr const size_t VariantId = 2;
+        ReadyVars(SecureSessionHandle session) : mSession(session) {}
+        const SecureSessionHandle mSession;
+    };
 
-        struct ReadyVars
-        {
-            SecureSessionHandle mSession;
-        } mReady;
-    } mStateVars;
+    Variant<PrepareVars, ReadyVars> mStateVars;
+
+    PrepareVars & GetPrepareVars() { return mStateVars.Get<PrepareVars>(); }
+    ReadyVars & GetReadyVars() { return mStateVars.Get<ReadyVars>(); }
 
     // State machine functions
     void EnterPreparingState(const ChannelBuilder & builder);
