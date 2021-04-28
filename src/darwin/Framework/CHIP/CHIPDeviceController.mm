@@ -152,12 +152,13 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
             }
         }
 
-        chip::Controller::ControllerInitParams params {
-            .storageDelegate = _persistentStorageDelegateBridge,
-            .mDeviceAddressUpdateDelegate = _pairingDelegateBridge,
-        };
+        chip::Controller::CommissionerInitParams params;
 
-        errorCode = _cppCommissioner->Init(_localDeviceId, params, _pairingDelegateBridge);
+        params.storageDelegate = _persistentStorageDelegateBridge;
+        params.mDeviceAddressUpdateDelegate = _pairingDelegateBridge;
+        params.pairingDelegate = _pairingDelegateBridge;
+
+        errorCode = _cppCommissioner->Init(_localDeviceId, params);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;
         }

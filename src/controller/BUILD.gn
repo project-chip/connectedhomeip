@@ -21,8 +21,6 @@ static_library("controller") {
     "${chip_root}/src/app/util/CHIPDeviceCallbacksMgr.cpp",
     "CHIPCluster.cpp",
     "CHIPCluster.h",
-    "CHIPClusters.cpp",
-    "CHIPClusters.h",
     "CHIPDevice.cpp",
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",

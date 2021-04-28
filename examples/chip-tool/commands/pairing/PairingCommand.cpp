@@ -31,12 +31,16 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::ControllerInitParams params{
-        .storageDelegate              = &storage,
-        .mDeviceAddressUpdateDelegate = this,
-    };
+    chip::Controller::CommissionerInitParams params;
 
-    err = mCommissioner.Init(localId, params, this);
+    params.storageDelegate              = &storage;
+    params.mDeviceAddressUpdateDelegate = this;
+    params.pairingDelegate              = this;
+
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+
+    err = mCommissioner.Init(localId, params);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
     err = mCommissioner.ServiceEvents();
@@ -70,6 +74,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
+    case PairingMode::OnNetwork:
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
@@ -321,6 +326,7 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 CHIP_ERROR PairingCommand::UpdateNetworkAddress()
 {
     ReturnErrorOnFailure(mCommissioner.GetDevice(mRemoteId, &mDevice));
+    ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", mRemoteId, mFabricId);
     return mCommissioner.UpdateDevice(mDevice, mFabricId);
 }
 

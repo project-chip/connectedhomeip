@@ -103,13 +103,6 @@ DeviceController::DeviceController()
     mListenPort               = CHIP_PORT;
 }
 
-CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
-                                  Inet::InetLayer * inetLayer)
-{
-    return Init(localDeviceId,
-                ControllerInitParams{ .storageDelegate = storageDelegate, .systemLayer = systemLayer, .inetLayer = inetLayer });
-}
-
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -634,16 +627,7 @@ DeviceCommissioner::DeviceCommissioner()
     mPairedDevicesUpdated = false;
 }
 
-CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
-                                    DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
-                                    Inet::InetLayer * inetLayer)
-{
-    return Init(localDeviceId,
-                ControllerInitParams{ .storageDelegate = storageDelegate, .systemLayer = systemLayer, .inetLayer = inetLayer },
-                pairingDelegate);
-}
-
-CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate)
+CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
 
@@ -653,7 +637,7 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, ControllerInitParams p
         mNextKeyId = 0;
     }
 
-    mPairingDelegate = pairingDelegate;
+    mPairingDelegate = params.pairingDelegate;
     return CHIP_NO_ERROR;
 }
 

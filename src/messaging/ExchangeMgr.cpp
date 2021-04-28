@@ -299,8 +299,8 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
-                        ec->GetDelegate());
+        ChipLogDetail(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
+                      ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 

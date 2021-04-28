@@ -30,7 +30,9 @@ public:
     /////////// DiscoverCommand Interface /////////
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
+        ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(nullptr));
         ReturnErrorOnFailure(chip::Mdns::Resolver::Instance().SetResolverDelegate(this));
+        ChipLogProgress(chipTool, "Mdns: Searching for NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
         return chip::Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(remoteId).SetFabricId(fabricId),
                                                               chip::Inet::kIPAddressType_Any);
     }
@@ -61,6 +63,7 @@ public:
     {
         ChipDevice * device;
         ReturnErrorOnFailure(mCommissioner.GetDevice(remoteId, &device));
+        ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " FabricId: %" PRIx64 " ...", remoteId, fabricId);
         return mCommissioner.UpdateDevice(device, fabricId);
     }
 

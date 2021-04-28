@@ -46,6 +46,7 @@ int main()
     cmd_btp_init();
     cmd_otcli_init();
     cmd_ping_init();
+    cmd_send_init();
 
     shell_task(nullptr);
     return 0;

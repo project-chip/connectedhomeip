@@ -28,12 +28,14 @@ struct ClusterInfo
     ClusterInfo(const AttributePathParams & aAttributePathParams, bool aDirty) :
         mAttributePathParams(aAttributePathParams), mDirty(aDirty)
     {}
+    ClusterInfo() {}
     bool IsDirty() { return mDirty; }
     void SetDirty() { mDirty = true; }
     void ClearDirty() { mDirty = false; }
     bool IsSamePath(const ClusterInfo & other) const { return other.mAttributePathParams.IsSamePath(mAttributePathParams); }
     AttributePathParams mAttributePathParams;
-    bool mDirty = false;
+    bool mDirty          = false;
+    ClusterInfo * mpNext = nullptr;
 };
 } // namespace app
 } // namespace chip

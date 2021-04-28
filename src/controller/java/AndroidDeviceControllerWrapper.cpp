@@ -26,6 +26,8 @@
 
 using chip::Controller::DeviceCommissioner;
 
+extern chip::Ble::BleLayer * GetJNIBleLayer();
+
 namespace {
 
 bool FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
@@ -147,7 +149,16 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
-    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, wrapper.get(), wrapper.get(), systemLayer, inetLayer);
+
+    chip::Controller::CommissionerInitParams initParams;
+
+    initParams.storageDelegate = wrapper.get();
+    initParams.pairingDelegate = wrapper.get();
+    initParams.systemLayer     = systemLayer;
+    initParams.inetLayer       = inetLayer;
+    initParams.bleLayer        = GetJNIBleLayer();
+
+    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {

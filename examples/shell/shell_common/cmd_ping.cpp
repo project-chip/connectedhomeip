@@ -33,17 +33,12 @@
 #include <transport/raw/UDP.h>
 
 #include <ChipShellCollection.h>
+#include <Globals.h>
 
 using namespace chip;
 using namespace Shell;
 using namespace Logging;
 using chip::Inet::IPAddress;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
-#endif
-constexpr size_t kMaxPayloadSize = 1280;
 
 namespace {
 
@@ -132,19 +127,7 @@ private:
     bool mUsingCRMP;
 } gPingArguments;
 
-constexpr Transport::AdminId gAdminId = 0;
-
 Protocols::Echo::EchoClient gEchoClient;
-
-TransportMgr<Transport::UDP> gUDPManager;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-#endif
-
-Messaging::ExchangeManager gExchangeManager;
-SecureSessionMgr gSessionManager;
-IPAddress gDestAddr;
 
 bool EchoIntervalExpired(void)
 {
@@ -426,7 +409,7 @@ int cmd_ping(int argc, char ** argv)
         case 'p':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
-                streamer_printf(sout, "Invalid argument specified for -c\n");
+                streamer_printf(sout, "Invalid argument specified for -p\n");
                 return -1;
             }
             else
