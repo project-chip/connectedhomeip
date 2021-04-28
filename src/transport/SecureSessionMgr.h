@@ -317,12 +317,10 @@ protected:
      * @brief
      *   Handle received secure message. Implements TransportMgrDelegate
      *
-     * @param header    the received message header
      * @param source    the source address of the package
      * @param msgBuf    the buffer of (encrypted) payload
      */
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
 
 private:
     /**

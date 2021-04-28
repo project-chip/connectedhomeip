@@ -48,7 +48,7 @@ public:
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
-        HandleMessageReceived(header, address, std::move(msgBuf));
+        HandleMessageReceived(address, std::move(msgBuf));
 
         return CHIP_NO_ERROR;
     }

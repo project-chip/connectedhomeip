@@ -65,7 +65,7 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        HandleMessageReceived(header, address, std::move(msgBuf));
+        HandleMessageReceived(address, std::move(msgBuf));
         return CHIP_NO_ERROR;
     }
 
@@ -82,9 +82,7 @@ public:
     {
         System::PacketBufferHandle recvdMsg = msgBuf.CloneData();
 
-        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
-
-        HandleMessageReceived(header, address, std::move(recvdMsg));
+        HandleMessageReceived(address, std::move(recvdMsg));
         return CHIP_NO_ERROR;
     }
 

@@ -360,10 +360,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
         message->SetDataLength(messageSize);
     }
 
-    PacketHeader header;
-    ReturnErrorOnFailure(header.DecodeAndConsume(message));
-
-    HandleMessageReceived(header, peerAddress, std::move(message));
+    HandleMessageReceived(peerAddress, std::move(message));
     return CHIP_NO_ERROR;
 }
 

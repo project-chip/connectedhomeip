@@ -163,16 +163,7 @@ void BLEBase::OnBleConnectionError(BLE_ERROR err)
 
 void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle buffer)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    PacketHeader header;
-    if ((err = header.DecodeAndConsume(buffer)) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Inet, "Failed to receive BLE message: %s", ErrorStr(err));
-        return;
-    }
-
-    HandleMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
+    HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
 }
 
 void BLEBase::OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)

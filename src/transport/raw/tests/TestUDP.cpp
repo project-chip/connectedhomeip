@@ -58,13 +58,8 @@ public:
     MockTransportMgrDelegate(nlTestSuite * inSuite) : mSuite(inSuite) {}
     ~MockTransportMgrDelegate() override {}
 
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override
     {
-        NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
-        NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, header.GetMessageId() == kMessageId);
-
         size_t data_len = msgBuf->DataLength();
         int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
         NL_TEST_ASSERT(mSuite, compare == 0);

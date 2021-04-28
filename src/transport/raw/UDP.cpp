@@ -109,13 +109,8 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHan
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort);
 
-    PacketHeader header;
-    err = header.DecodeAndConsume(buffer);
-    SuccessOrExit(err);
+    udp->HandleMessageReceived(peerAddress, std::move(buffer));
 
-    udp->HandleMessageReceived(header, peerAddress, std::move(buffer));
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));

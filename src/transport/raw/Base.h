@@ -37,8 +37,7 @@ class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle msg) = 0;
+    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg) = 0;
 };
 
 /**
@@ -88,9 +87,9 @@ protected:
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle && buffer)
+    void HandleMessageReceived(const PeerAddress & source, System::PacketBufferHandle && buffer)
     {
-        mDelegate->HandleMessageReceived(header, source, std::move(buffer));
+        mDelegate->HandleMessageReceived(source, std::move(buffer));
     }
 
     RawTransportDelegate * mDelegate;
