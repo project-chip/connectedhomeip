@@ -69,7 +69,7 @@ set(CHIP_TESTS
     -lASN1Tests
     -lBleLayerTests
     -lChipCryptoTests
-    # -lCoreTests
+    -lCoreTests
     -lInetLayerTests
     # -lMessagingLayerTests
     -lPlatformTests
