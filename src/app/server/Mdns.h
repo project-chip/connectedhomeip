@@ -33,7 +33,7 @@ CHIP_ERROR AdvertiseCommisioning();
 /// (Re-)starts the minmdns server
 void StartServer();
 
-CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
+CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
 } // namespace Mdns
 } // namespace app

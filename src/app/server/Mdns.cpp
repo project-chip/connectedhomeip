@@ -113,13 +113,10 @@ CHIP_ERROR AdvertiseOperational()
 /// Set MDNS commisioning advertisement
 CHIP_ERROR AdvertiseCommisioning()
 {
-
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
-    // TODO: this code assumes the device always boots into commissioning mode
-    // fix this once we are able to configure default boot behavior
-    // and when we can determine whether we have been commissioned yet
-    bool notYetCommissioned = true;
+    // TODO: device can re-enter commissioning mode after being fully provisioned
+    bool notYetCommissioned = !DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
     advertiseParameters.SetCommissioningMode(notYetCommissioned, false);
 
     uint8_t mac[8];
@@ -172,8 +169,7 @@ CHIP_ERROR AdvertiseCommisioning()
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-    size_t rotatingDeviceIdHexBufferSize = 0;
-    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
+    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
@@ -255,18 +251,20 @@ void StartServer()
 }
 
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize)
+CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize  = 0;
-    uint16_t lifetimeCounter = 0;
+    size_t serialNumberSize                = 0;
+    uint16_t lifetimeCounter               = 0;
+    size_t rotatingDeviceIdValueOutputSize = 0;
+
     SuccessOrExit(error =
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
     SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
                       lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                      rotatingDeviceIdHexBufferSize));
+                      rotatingDeviceIdValueOutputSize));
 exit:
     return error;
 }

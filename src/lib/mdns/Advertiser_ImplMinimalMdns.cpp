@@ -35,6 +35,7 @@
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING
+#define DETAIL_LOGGING
 
 namespace chip {
 namespace Mdns {
@@ -304,8 +305,8 @@ private:
 
     static constexpr size_t kMaxEndPoints           = 30;
     static constexpr size_t kMaxRecords             = 16;
-    static constexpr size_t kMaxAllocatedResponders = 16;
-    static constexpr size_t kMaxAllocatedQNameData  = 8;
+    static constexpr size_t kMaxAllocatedResponders = 32;
+    static constexpr size_t kMaxAllocatedQNameData  = 16;
 
     Server<kMaxEndPoints> mServer;
     QueryResponder<kMaxRecords> mQueryResponder;
@@ -462,6 +463,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & params)
 {
+    // TODO: should we be clearing here?
     Clear();
 
     // TODO: need to detect colisions here
@@ -644,7 +646,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     }
     else
     {
-        sprintf(txtDeviceType, "");
+        txtDeviceType[0] = '\0';
     }
 
     char txtDeviceName[64];
@@ -654,7 +656,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     }
     else
     {
-        sprintf(txtDeviceName, "");
+        txtDeviceName[0] = '\0';
     }
 
     // the following sub types only apply to commissionable node advertisements
@@ -679,17 +681,17 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         }
         else
         {
-            sprintf(txtOpenWindowCommissioningMode, "");
+            txtOpenWindowCommissioningMode[0] = '\0';
         }
 
         char txtRotatingDeviceId[128];
         if (params.GetRotatingId().HasValue())
         {
-            sprintf(txtPairingHint, "RI=%s", params.GetRotatingId().Value());
+            sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId().Value());
         }
         else
         {
-            sprintf(txtPairingHint, "");
+            txtRotatingDeviceId[0] = '\0';
         }
 
         char txtPairingHint[32];
@@ -699,7 +701,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         }
         else
         {
-            sprintf(txtPairingHint, "");
+            txtPairingHint[0] = '\0';
         }
 
         char txtPairingInstr[256];
@@ -709,7 +711,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         }
         else
         {
-            sprintf(txtPairingInstr, "");
+            txtPairingInstr[0] = '\0';
         }
 
         return AllocateQName(txtDiscriminator, txtVidPid, txtCommissioningMode, txtOpenWindowCommissioningMode, txtDeviceType,
