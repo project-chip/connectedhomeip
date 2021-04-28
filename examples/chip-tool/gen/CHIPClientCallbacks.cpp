@@ -490,9 +490,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].Label = emberAfGetString(message, 0, messageLen);
-                            message += 32;
-                            CHECK_MESSAGE_LENGTH(32);
                             data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
                             message += 8;
                             CHECK_MESSAGE_LENGTH(8);
@@ -1852,15 +1849,15 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
 {
-    ChipLogProgress(Zcl, "GetFabricIdResponse:");
+    ChipLogProgress(Zcl, "SetFabricResponse:");
     ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterGetFabricIdResponseCallback");
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
 
-    Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, FabricId);
     return true;
 }

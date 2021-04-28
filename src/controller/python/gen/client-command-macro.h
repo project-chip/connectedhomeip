@@ -2197,25 +2197,25 @@
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
-/** @brief Command description for GetFabricId
+/** @brief Command description for SetFabric
  *
- * Command: GetFabricId
+ * Command: SetFabric
+ * @param VendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterGetFabricId() emberAfFillExternalBuffer(mask,                                                                \
+    CredentialsClusterSetFabric(VendorId) emberAfFillExternalBuffer(mask,                                                          \
                                                                                                                                    \
-                                                              ZCL_GET_FABRIC_ID_COMMAND_ID, "", );
+                                                                    ZCL_SET_FABRIC_COMMAND_ID, "u", VendorId);
 
-/** @brief Command description for GetFabricIdResponse
+/** @brief Command description for SetFabricResponse
  *
- * Command: GetFabricIdResponse
+ * Command: SetFabricResponse
  * @param FabricId FABRIC_ID
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterGetFabricIdResponse(FabricId)                                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    CredentialsClusterSetFabricResponse(FabricId) emberAfFillExternalBuffer(mask,                                                  \
                                                                                                                                    \
-                                  ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID, "u", FabricId);
+                                                                            ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
 
 /** @brief Command description for UpdateFabricLabel
  *

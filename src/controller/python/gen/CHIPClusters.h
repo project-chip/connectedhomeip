@@ -817,9 +817,9 @@ public:
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR GetFabricId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId);
+    CHIP_ERROR SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId);
     CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                  chip::ByteSpan label);
 
@@ -829,8 +829,8 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
-    static constexpr CommandId kGetFabricIdCommandId       = 0x00;
     static constexpr CommandId kRemoveFabricCommandId      = 0x0A;
+    static constexpr CommandId kSetFabricCommandId         = 0x00;
     static constexpr CommandId kUpdateFabricLabelCommandId = 0x09;
 };
 

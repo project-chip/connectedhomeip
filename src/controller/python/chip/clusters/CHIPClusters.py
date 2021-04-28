@@ -481,11 +481,12 @@ class ChipClusters:
                 },
             },
             "OperationalCredentials": {
-                "GetFabricId": {
-                },
                 "RemoveFabric": {
                     "fabricId": "int",
                     "nodeId": "int",
+                    "vendorId": "int",
+                },
+                "SetFabric": {
                     "vendorId": "int",
                 },
                 "UpdateFabricLabel": {
@@ -1251,13 +1252,13 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
                 device, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandGetFabricId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_GetFabricId(
-                device, ZCLendpoint, ZCLgroupid
-        )
     def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: int, nodeId: int, vendorId: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(
                 device, ZCLendpoint, ZCLgroupid, fabricId, nodeId, vendorId
+        )
+    def ClusterOperationalCredentials_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric(
+                device, ZCLendpoint, ZCLgroupid, vendorId
         )
     def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, label: bytes):
         label = label.encode("utf-8") + b'\x00'
@@ -2404,12 +2405,12 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
-        # Cluster OperationalCredentials Command GetFabricId
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_GetFabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_GetFabricId.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command RemoveFabric
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.restype = ctypes.c_uint32
+        # Cluster OperationalCredentials Command SetFabric
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command UpdateFabricLabel
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.restype = ctypes.c_uint32

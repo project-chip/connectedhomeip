@@ -2561,12 +2561,6 @@ bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj);
 bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
 
 /**
- * @brief Operational Credentials Cluster GetFabricId Command callback
- */
-
-bool emberAfOperationalCredentialsClusterGetFabricIdCallback(chip::app::Command * commandObj);
-
-/**
  * @brief Operational Credentials Cluster RemoveFabric Command callback
  * @param fabricId
  * @param nodeId
@@ -2575,6 +2569,13 @@ bool emberAfOperationalCredentialsClusterGetFabricIdCallback(chip::app::Command 
 
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command * commandObj, chip::FabricId FabricId,
                                                               chip::NodeId NodeId, uint16_t VendorId);
+
+/**
+ * @brief Operational Credentials Cluster SetFabric Command callback
+ * @param vendorId
+ */
+
+bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * commandObj, uint16_t VendorId);
 
 /**
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback

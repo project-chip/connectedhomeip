@@ -1037,8 +1037,8 @@
             { 0x0031, 0x10, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetLastNetworkCommissioningResult */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
-            { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetFabricId */                                                 \
-            { 0x003E, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* GetFabricIdResponse */                                         \
+            { 0x003E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* SetFabric */                                                   \
+            { 0x003E, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* SetFabricResponse */                                           \
             { 0x003E, 0x09, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* UpdateFabricLabel */                                           \
             { 0x003E, 0x0A, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* RemoveFabric */                                                \
                                                                                                                                    \

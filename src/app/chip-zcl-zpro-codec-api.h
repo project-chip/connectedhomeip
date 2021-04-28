@@ -2361,8 +2361,8 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * GetFabricId                                                       |   0x00 |
 | * RemoveFabric                                                      |   0x0A |
+| * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -2372,19 +2372,19 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 
 /**
  * @brief
- *    Encode an GetFabricId command for Operational Credentials server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeOperationalCredentialsClusterGetFabricIdCommand(uint8_t seqNum,
-                                                                                       chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
  *    Encode an RemoveFabric command for Operational Credentials server into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeOperationalCredentialsClusterRemoveFabricCommand(uint8_t seqNum,
                                                                                         chip::EndpointId destinationEndpoint,
                                                                                         chip::FabricId fabricId,
                                                                                         chip::NodeId nodeId, uint16_t vendorId);
+
+/**
+ * @brief
+ *    Encode an SetFabric command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterSetFabricCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t vendorId);
 
 /**
  * @brief

@@ -2032,11 +2032,11 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
                                                                          uint8_t * debugText);
 
 /**
- * @brief Operational Credentials Cluster GetFabricIdResponse Command callback
+ * @brief Operational Credentials Cluster SetFabricResponse Command callback
  * @param fabricId
  */
 
-bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId);
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId);
 
 /**
  * @brief Scenes Cluster AddSceneResponse Command callback

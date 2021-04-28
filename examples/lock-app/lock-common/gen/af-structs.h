@@ -217,7 +217,6 @@ typedef struct _FabricDescriptor
 {
     chip::FabricId FabricId;
     uint16_t VendorId;
-    uint8_t * Label;
     chip::NodeId NodeId;
 } EmberAfFabricDescriptor;
 

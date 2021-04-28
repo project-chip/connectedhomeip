@@ -692,11 +692,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
-- (void)getFabricId:(ResponseHandler)completionHandler;
 - (void)removeFabric:(uint64_t)fabricId
                nodeId:(uint64_t)nodeId
              vendorId:(uint16_t)vendorId
     completionHandler:(ResponseHandler)completionHandler;
+- (void)setFabric:(uint16_t)vendorId completionHandler:(ResponseHandler)completionHandler;
 - (void)updateFabricLabel:(NSString *)label completionHandler:(ResponseHandler)completionHandler;
 
 - (void)readAttributeFabricsList:(ResponseHandler)completionHandler;
