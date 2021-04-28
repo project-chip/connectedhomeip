@@ -103,8 +103,9 @@ CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
     if (error.code != CHIPSuccess)
     {
         NSLog(@"Got back error retrieve device with deviceId %llu", deviceId);
+        return nil;
     }
-    return error ? nil : device;
+    return device;
 }
 
 void CHIPUnpairDeviceWithID(uint64_t deviceId)

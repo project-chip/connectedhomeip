@@ -45,8 +45,8 @@ using namespace ::chip::Transport;
 * 1) When Commissioner pairs with CHIP device, store device nodeId in Admin Pairing table as NodeId 
 *    and store commissioner nodeId in Admin Pairing table as FabricId (This is temporary until AddOptCert is implemented and Fabrics are implemented correctely)
 * 2) When pairing is complete, commissioner calls SetFabric to set the vendorId on the newly created fabric. The corresponding fabric is found by looking
-*    in admin pairing table and finding a fabric that has the matching commissioner node ID as fabricId + device nodeId as nodeId and an uninitiated vendorId.
-* 3) RemoveFabric uses the passed in fabricId, nodeId, vendorID to find matching entry and remove it from admin pairing table. Once fabricIndex is implemented, it should be use that instead.
+*    in admin pairing table and finding a fabric that has the matching commissioner node ID as fabricId + device nodeId as nodeId and an uninitialized vendorId.
+* 3) RemoveFabric uses the passed in fabricId, nodeId, vendorID to find matching entry and remove it from admin pairing table. Once fabricIndex is implemented, it should use that instead.
 */
 
 EmberAfStatus writeFabricAttribute(uint8_t * buffer, int32_t index = -1)
@@ -108,6 +108,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
                 break;
             }
         }
+        fabricIndex ++;
     }
 
     // Store the count of fabrics we just stored
@@ -122,9 +123,9 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute(void)
 }
 
 /*
-* Look at "Temporary flow for fabric management" for current fabric management flow. 
+* Look at "Temporary flow for fabric management" comment above for current fabric management flow. 
 * To retrieve the current admin, we retrieve the emberAfCurrentCommand()->source which should be set 
-* to the commissioner node Id, which we are temporarily using ad the fabricId.
+* to the commissioner node Id, which we are temporarily using as the fabricId.
 * We should also figure out how to retrieve the device nodeId and vendorId if we can so that we use multiple
 * fields to find the current admin. Once addOptCert and fabric index are implemented, remove all this and use fabricIndex.
 */
