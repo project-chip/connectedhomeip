@@ -42,7 +42,7 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, vo
         size = 0;
     }
 
-    uint16_t neededSize = val->second.size() + 1;
+    uint16_t neededSize = val->second.size();
     if (size == 0)
     {
         size = neededSize;
