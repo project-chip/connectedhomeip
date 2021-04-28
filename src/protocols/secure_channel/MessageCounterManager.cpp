@@ -210,7 +210,8 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
     exchangeContext->SetResponseTimeout(kSyncTimeoutMs);
 
     // Send the message counter synchronization request in a Secure Channel Protocol::MsgCounterSyncReq message.
-    SuccessOrExit(err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, std::move(msgBuf), sendFlags));
+    SuccessOrExit(
+        err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncReq, std::move(msgBuf), sendFlags));
 
 exit:
     if (err != CHIP_NO_ERROR)

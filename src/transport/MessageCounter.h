@@ -48,9 +48,9 @@ public:
 
     virtual ~MessageCounter() = 0;
 
-    virtual Type GetType()     = 0;
-    virtual void Reset()       = 0;
-    virtual uint32_t Value()   = 0; /** Get current value */
+    virtual Type GetType()       = 0;
+    virtual void Reset()         = 0;
+    virtual uint32_t Value()     = 0; /** Get current value */
     virtual CHIP_ERROR Advance() = 0; /** Advance the counter and get new value */
 };
 
@@ -67,7 +67,8 @@ public:
     { /* null op */
     }
     uint32_t Value() override { return value; }
-    CHIP_ERROR Advance() override {
+    CHIP_ERROR Advance() override
+    {
         ++value;
         return CHIP_NO_ERROR;
     }
@@ -100,7 +101,8 @@ private:
         CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch) { return CHIP_NO_ERROR; }
 
         uint32_t GetValue() { return value; }
-        CHIP_ERROR Advance() override {
+        CHIP_ERROR Advance() override
+        {
             ++value;
             return CHIP_NO_ERROR;
         }
@@ -120,7 +122,8 @@ public:
     Type GetType() override { return Session; }
     void Reset() override { value = kInitialValue; }
     uint32_t Value() override { return value; }
-    CHIP_ERROR Advance() override {
+    CHIP_ERROR Advance() override
+    {
         ++value;
         return CHIP_NO_ERROR;
     }
