@@ -113,6 +113,9 @@ int main(int argc, char * argv[])
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
+
     if (!disableEcho)
     {
         err = gEchoServer.Init(&gExchangeManager);

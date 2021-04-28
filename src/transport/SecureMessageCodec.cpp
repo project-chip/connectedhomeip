@@ -76,7 +76,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
 
     ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %u", msgId);
 
-    counter.Advance();
+    ReturnErrorOnFailure(counter.Advance());
     return CHIP_NO_ERROR;
 }
 
