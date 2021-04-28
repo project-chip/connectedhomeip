@@ -38,7 +38,6 @@
 | GeneralCommissioning                                                | 0x0030 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
-| IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
@@ -47,6 +46,7 @@
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
+| Switch                                                              | 0x003B |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
 | WindowCovering                                                      | 0x0102 |
@@ -1609,71 +1609,6 @@ chip::System::PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute
                                                                                  chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster IasZone                                                     | 0x0500 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ZoneState                                                         | 0x0000 |
-| * ZoneType                                                          | 0x0001 |
-| * ZoneStatus                                                        | 0x0002 |
-| * IasCieAddress                                                     | 0x0010 |
-| * ZoneId                                                            | 0x0011 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/**
- * @brief
- *    Encode a IAS Zone server discover command into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the zone state attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneStateAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the zone type attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneTypeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the zone status attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneStatusAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the IAS CIE address attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadIasCieAddressAttribute(uint8_t seqNum,
-                                                                                chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server write command for the IAS CIE address attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle
-encodeIasZoneClusterWriteIasCieAddressAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint64_t iasCieAddress);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the Zone ID attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the cluster revision attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                  chip::EndpointId destinationEndpoint);
-
-/*----------------------------------------------------------------------------*\
 | Cluster Identify                                                    | 0x0003 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2302,6 +2237,53 @@ chip::System::PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uin
  *    Encode a Scenes server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Switch                                                      | 0x003B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * NumberOfPositions                                                 | 0x0000 |
+| * CurrentPosition                                                   | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Switch server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Switch server read command for the number of positions attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterReadNumberOfPositionsAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Switch server read command for the current position attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterReadCurrentPositionAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Switch server configure report command for the current position attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterConfigureCurrentPositionAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint,
+                                                                                      uint16_t minInterval, uint16_t maxInterval,
+                                                                                      uint8_t change);
+
+/**
+ * @brief
+ *    Encode a Switch server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                  chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\

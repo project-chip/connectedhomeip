@@ -294,8 +294,6 @@ class ChipClusters:
                     "groupId": "int",
                 },
             },
-            "IasZone": {
-            },
             "Identify": {
                 "Identify": {
                     "identifyTime": "int",
@@ -449,6 +447,8 @@ class ChipClusters:
                     "groupId": "int",
                     "sceneId": "int",
                 },
+            },
+            "Switch": {
             },
             "TemperatureMeasurement": {
             },
@@ -610,14 +610,6 @@ class ChipClusters:
                 "NameSupport",
                 "ClusterRevision",
             ],
-            "IasZone": [
-                "ZoneState",
-                "ZoneType",
-                "ZoneStatus",
-                "IasCieAddress",
-                "ZoneId",
-                "ClusterRevision",
-            ],
             "Identify": [
                 "IdentifyTime",
                 "ClusterRevision",
@@ -655,6 +647,11 @@ class ChipClusters:
                 "CurrentGroup",
                 "SceneValid",
                 "NameSupport",
+                "ClusterRevision",
+            ],
+            "Switch": [
+                "NumberOfPositions",
+                "CurrentPosition",
                 "ClusterRevision",
             ],
             "TemperatureMeasurement": [
@@ -1305,18 +1302,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Groups_NameSupport(device, ZCLendpoint, ZCLgroupid)
     def ClusterGroups_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterIasZone_ReadAttributeZoneState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneState(device, ZCLendpoint, ZCLgroupid)
-    def ClusterIasZone_ReadAttributeZoneType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneType(device, ZCLendpoint, ZCLgroupid)
-    def ClusterIasZone_ReadAttributeZoneStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneStatus(device, ZCLendpoint, ZCLgroupid)
-    def ClusterIasZone_ReadAttributeIasCieAddress(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_IasZone_IasCieAddress(device, ZCLendpoint, ZCLgroupid)
-    def ClusterIasZone_ReadAttributeZoneId(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneId(device, ZCLendpoint, ZCLgroupid)
-    def ClusterIasZone_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_IasZone_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_ReadAttributeIdentifyTime(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime(device, ZCLendpoint, ZCLgroupid)
     def ClusterIdentify_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1369,6 +1354,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Scenes_NameSupport(device, ZCLendpoint, ZCLgroupid)
     def ClusterScenes_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSwitch_ReadAttributeNumberOfPositions(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_NumberOfPositions(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSwitch_ReadAttributeCurrentPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_CurrentPosition(device, ZCLendpoint, ZCLgroupid)
+    def ClusterSwitch_ConfigureAttributeCurrentPosition(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
+        return self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition(device, ZCLendpoint, minInterval, maxInterval, change)
+    def ClusterSwitch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ConfigureAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, minInterval: int, maxInterval: int, change: int):
@@ -1894,25 +1887,6 @@ class ChipClusters:
         # Cluster Groups ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision.restype = ctypes.c_uint32
-        # Cluster IasZone
-        # Cluster IasZone ReadAttribute ZoneState
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneState.restype = ctypes.c_uint32
-        # Cluster IasZone ReadAttribute ZoneType
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneType.restype = ctypes.c_uint32
-        # Cluster IasZone ReadAttribute ZoneStatus
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneStatus.restype = ctypes.c_uint32
-        # Cluster IasZone ReadAttribute IasCieAddress
-        self._chipLib.chip_ime_ReadAttribute_IasZone_IasCieAddress.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_IasZone_IasCieAddress.restype = ctypes.c_uint32
-        # Cluster IasZone ReadAttribute ZoneId
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ZoneId.restype = ctypes.c_uint32
-        # Cluster IasZone ReadAttribute ClusterRevision
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_IasZone_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Identify
         # Cluster Identify Command Identify
         self._chipLib.chip_ime_AppendCommand_Identify_Identify.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
@@ -2098,6 +2072,19 @@ class ChipClusters:
         # Cluster Scenes ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Scenes_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster Switch
+        # Cluster Switch ReadAttribute NumberOfPositions
+        self._chipLib.chip_ime_ReadAttribute_Switch_NumberOfPositions.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_NumberOfPositions.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute CurrentPosition
+        self._chipLib.chip_ime_ReadAttribute_Switch_CurrentPosition.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_CurrentPosition.restype = ctypes.c_uint32
+        # Cluster Switch ConfigureAttribute CurrentPosition
+        self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition.restype = ctypes.c_uint32
+        # Cluster Switch ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.restype = ctypes.c_uint32
         # Cluster TemperatureMeasurement
         # Cluster TemperatureMeasurement ReadAttribute MeasuredValue
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_MeasuredValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

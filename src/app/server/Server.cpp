@@ -492,6 +492,11 @@ void InitServer(AppDelegate * delegate)
     InitDataModelHandler();
     gCallbacks.SetDelegate(delegate);
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
+    SuccessOrExit(err);
+#endif
+
     err = gRendezvousServer.Init(delegate, &gServerStorage);
     SuccessOrExit(err);
 

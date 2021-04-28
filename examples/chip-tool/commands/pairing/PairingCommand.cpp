@@ -37,6 +37,9 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
     params.mDeviceAddressUpdateDelegate = this;
     params.pairingDelegate              = this;
 
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
+
     err = mCommissioner.Init(localId, params);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
 
@@ -71,6 +74,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
+    case PairingMode::OnNetwork:
     case PairingMode::SoftAP:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;

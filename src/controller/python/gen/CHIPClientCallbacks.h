@@ -72,6 +72,8 @@ typedef void (*DoorLockClusterSetYeardayScheduleResponseCallback)(void * context
 typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context);
 typedef void (*DoorLockClusterUnlockWithTimeoutResponseCallback)(void * context);
 typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, uint8_t * debugText);
+typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
+                                                                                 uint8_t * debugText);
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
                                                                                uint8_t * debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint16_t groupId);
@@ -92,6 +94,7 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
+typedef void (*OperationalCredentialsClusterGetFabricIdResponseCallback)(void * context, chip::FabricId FabricId);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
                                                                 uint8_t sceneCount,
@@ -104,3 +107,10 @@ typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint16_t 
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 // List specific responses
+typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16_t count, _DeviceType * entries);
+typedef void (*DescriptorServerListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
+typedef void (*DescriptorClientListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
+typedef void (*DescriptorPartsListListAttributeCallback)(void * context, uint16_t count, chip::EndpointId * entries);
+typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, uint16_t count, _GroupState * entries);
+typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);
+typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);

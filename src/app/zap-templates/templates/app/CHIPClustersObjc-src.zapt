@@ -6,11 +6,11 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
+#import "gen/CHIPClusters.h"
 #import "gen/CHIPClustersObjc.h"
 #import "gen/CHIPClientCallbacks.h"
 #import "app/util/af.h"
 
-#include <controller/CHIPClusters.h>
 #include <lib/support/Span.h>
 
 using namespace ::chip;
@@ -466,6 +466,11 @@ private:
     if (self = [super init]) {
         Controller::ClusterBase * cppCluster = [self getCluster];
         if (cppCluster == nullptr)
+        {
+            return nil;
+        }
+
+        if (device == nullptr)
         {
             return nil;
         }

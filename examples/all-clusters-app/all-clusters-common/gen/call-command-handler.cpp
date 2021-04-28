@@ -48,6 +48,7 @@ EmberAfStatus emberAfOtaSoftwareUpdateServerClusterServerCommandParse(EmberAfClu
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfSwitchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThermostatClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
@@ -153,6 +154,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_SCENES_CLUSTER_ID:
             result = emberAfScenesClusterServerCommandParse(cmd);
+            break;
+        case ZCL_SWITCH_CLUSTER_ID:
+            // No commands are enabled for cluster Switch
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             // No commands are enabled for cluster Temperature Measurement

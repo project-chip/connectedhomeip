@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E1F24982636F84000FA0EA9 /* CHIPClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E1F24962636F84000FA0EA9 /* CHIPClusters.h */; };
+		1E1F24992636F84000FA0EA9 /* CHIPClusters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E1F24972636F84000FA0EA9 /* CHIPClusters.cpp */; };
 		1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */; };
 		1EC4CE3A25CC263E00D7304F /* reporting.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3825CC263E00D7304F /* reporting.cpp */; };
 		1EC4CE3B25CC263E00D7304F /* reporting-default-configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE3925CC263E00D7304F /* reporting-default-configuration.cpp */; };
@@ -68,6 +70,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1E1F24962636F84000FA0EA9 /* CHIPClusters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClusters.h; path = gen/CHIPClusters.h; sourceTree = "<group>"; };
+		1E1F24972636F84000FA0EA9 /* CHIPClusters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClusters.cpp; path = gen/CHIPClusters.cpp; sourceTree = "<group>"; };
 		1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "gen/attribute-size.cpp"; sourceTree = "<group>"; };
 		1EC4CE3825CC263E00D7304F /* reporting.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = reporting.cpp; path = ../../../app/reporting/reporting.cpp; sourceTree = "<group>"; };
 		1EC4CE3925CC263E00D7304F /* reporting-default-configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "reporting-default-configuration.cpp"; path = "../../../app/reporting/reporting-default-configuration.cpp"; sourceTree = "<group>"; };
@@ -171,6 +175,8 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
+				1E1F24972636F84000FA0EA9 /* CHIPClusters.cpp */,
+				1E1F24962636F84000FA0EA9 /* CHIPClusters.h */,
 				1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */,
 				1EC4CE6325CC276600D7304F /* CHIPClustersObjc.h */,
 				1EC4CE5A25CC26E900D7304F /* call-command-handler.cpp */,
@@ -268,6 +274,7 @@
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
 				1EC4CE6425CC276600D7304F /* CHIPClustersObjc.h in Headers */,
 				2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */,
+				1E1F24982636F84000FA0EA9 /* CHIPClusters.h in Headers */,
 				2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */,
 				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */,
@@ -404,6 +411,7 @@
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
 				1EC4CE3A25CC263E00D7304F /* reporting.cpp in Sources */,
 				1EC4CE5325CC267700D7304F /* chip-message-send.cpp in Sources */,
+				1E1F24992636F84000FA0EA9 /* CHIPClusters.cpp in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
 				1EC4CE5F25CC26E900D7304F /* callback-stub.cpp in Sources */,
 				1EC4CE4B25CC267700D7304F /* binding-table.cpp in Sources */,
