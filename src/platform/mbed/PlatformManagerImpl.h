@@ -25,7 +25,17 @@
 #include "events/EventQueue.h"
 #include "rtos/Mutex.h"
 #include "rtos/Thread.h"
+
+#ifdef TARGET_MCU_STM32L4
+// [ MBED HACK ]
+// We have to undefine |SUCCESS| here to prevent compilation error due to
+// conflict with |ErrorStatus| enum type values defined in CMSIS/stm32l4xx.h
+// which is included by mstd_atormic header.
+// This problem is only related for when tests are build and nlunit-test.h is used.
+#undef SUCCESS
+#endif
 #include <mstd_atomic>
+
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
 #include <sys/select.h>
