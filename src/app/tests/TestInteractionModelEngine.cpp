@@ -45,9 +45,9 @@ namespace {
 static chip::System::Layer gSystemLayer;
 static chip::SecureSessionMgr gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
-static chip::TransportMgr <chip::Transport::UDP> gTransportManager;
+static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 static const chip::Transport::AdminId gAdminId = 0;
-}
+} // namespace
 
 namespace chip {
 namespace app {

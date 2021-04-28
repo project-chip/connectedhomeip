@@ -36,7 +36,7 @@ struct AttributePathParams
         mNodeId(aNodeId),
         mEndpointId(aEndpointId), mClusterId(aClusterId), mFieldId(aFieldId), mListIndex(aListIndex), mFlags(aFlags)
     {}
-    AttributePathParams(){}
+    AttributePathParams() {}
     bool IsSamePath(const AttributePathParams & other) const
     {
         if (other.mNodeId != mNodeId || other.mEndpointId != mEndpointId || other.mClusterId != mClusterId)
