@@ -30,6 +30,7 @@ enum LogModule
     kLogModule_Crypto,
     kLogModule_Controller,
     kLogModule_Alarm,
+    kLogModule_SecureChannel,
     kLogModule_BDX,
     kLogModule_DataManagement,
     kLogModule_DeviceControl,

@@ -65,6 +65,16 @@ public:
      */
     virtual uint16_t GetLocalKeyId() = 0;
 
+    /**
+     * @brief
+     *   Get the value of peer session counter which is synced during session establishment
+     */
+    virtual uint32_t GetPeerCounter()
+    {
+        // This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
+        return LocalSessionMessageCounter::kInitialValue;
+    }
+
     virtual const char * GetI2RSessionInfo() const = 0;
 
     virtual const char * GetR2ISessionInfo() const = 0;

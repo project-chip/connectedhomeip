@@ -31,6 +31,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -45,6 +46,7 @@ namespace {
 static chip::System::Layer gSystemLayer;
 static chip::SecureSessionMgr gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
+static chip::secure_channel::MessageCounterManager gMessageCounterManager;
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 static const chip::Transport::AdminId gAdminId = 0;
 } // namespace
@@ -113,10 +115,13 @@ void InitializeChip(nlTestSuite * apSuite)
 
     gSystemLayer.Init(nullptr);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
