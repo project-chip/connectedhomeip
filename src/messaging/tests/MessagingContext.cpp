@@ -55,18 +55,6 @@ CHIP_ERROR MessagingContext::Shutdown()
     return IOContext::Shutdown();
 }
 
-void MessagingContext::PresetMessageCounter()
-{
-    SecureSessionHandle localSession            = GetSessionLocalToPeer();
-    SecureSessionHandle peerSession             = GetSessionPeerToLocal();
-    Transport::PeerConnectionState * localState = GetSecureSessionManager().GetPeerConnectionState(localSession);
-    Transport::PeerConnectionState * peerState  = GetSecureSessionManager().GetPeerConnectionState(peerSession);
-    peerState->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(
-        localState->GetSessionMessageCounter().GetLocalMessageCounter().Value());
-    localState->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(
-        peerState->GetSessionMessageCounter().GetLocalMessageCounter().Value());
-}
-
 SecureSessionHandle MessagingContext::GetSessionLocalToPeer()
 {
     // TODO: temporarily create a SecureSessionHandle from node id, will be fixed in PR 3602

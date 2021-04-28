@@ -110,7 +110,7 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     }
     else
     {
-        ChipLogError(ExchangeManager, "Timed out! Failed to clear message counter synchronization status.");
+        ChipLogError(SecureChannel, "Timed out! Failed to clear message counter synchronization status.");
     }
 
     // Close the exchange if MsgCounterSyncRsp is not received before kSyncTimeoutMs.
@@ -143,7 +143,7 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Pac
 
     if (!added)
     {
-        ChipLogError(ExchangeManager, "MCSP ReceiveTable Already Full");
+        ChipLogError(SecureChannel, "MCSP ReceiveTable Already Full");
         err = CHIP_ERROR_NO_MEMORY;
     }
 
@@ -217,7 +217,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         state->GetSessionMessageCounter().GetPeerMessageCounter().SyncFailed();
-        ChipLogError(ExchangeManager, "Failed to send message counter synchronization request with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to send message counter synchronization request with error:%s", ErrorStr(err));
     }
 
     return err;
@@ -263,7 +263,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "Failed to send message counter synchronization response with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to send message counter synchronization response with error:%s", ErrorStr(err));
     }
 
     return err;
@@ -277,7 +277,7 @@ void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext *
     uint8_t * req = msgBuf->Start();
     size_t reqlen = msgBuf->DataLength();
 
-    ChipLogDetail(ExchangeManager, "Received MsgCounterSyncReq request");
+    ChipLogDetail(SecureChannel, "Received MsgCounterSyncReq request");
 
     VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(req != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
@@ -289,7 +289,7 @@ void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext *
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "Failed to handle MsgCounterSyncReq message with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncReq message with error:%s", ErrorStr(err));
     }
 
     exchangeContext->Close();
@@ -308,7 +308,7 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     const uint8_t * resp = msgBuf->Start();
     size_t resplen       = msgBuf->DataLength();
 
-    ChipLogDetail(ExchangeManager, "Received MsgCounterSyncResp response");
+    ChipLogDetail(SecureChannel, "Received MsgCounterSyncResp response");
 
     // Find an active connection to the specified peer node
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSessionHandle());
@@ -324,7 +324,8 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     VerifyOrExit(syncCounter != 0, err = CHIP_ERROR_READ_FAILED);
 
     // Verify that the response field matches the expected Challenge field for the exchange.
-    err = state->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter, FixedByteSpan<kChallengeSize>(resp));
+    err =
+        state->GetSessionMessageCounter().GetPeerMessageCounter().VerifyChallenge(syncCounter, FixedByteSpan<kChallengeSize>(resp));
     SuccessOrExit(err);
 
     VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -337,7 +338,7 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(ExchangeManager, "Failed to handle MsgCounterSyncResp message with error:%s", ErrorStr(err));
+        ChipLogError(SecureChannel, "Failed to handle MsgCounterSyncResp message with error:%s", ErrorStr(err));
     }
 
     exchangeContext->Close();

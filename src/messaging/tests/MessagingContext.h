@@ -47,9 +47,6 @@ public:
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
 
-    // Set message count to skip message counter sync process.
-    void PresetMessageCounter();
-
     static Inet::IPAddress GetAddress()
     {
         Inet::IPAddress addr;

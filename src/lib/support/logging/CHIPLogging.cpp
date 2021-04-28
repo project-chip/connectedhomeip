@@ -67,6 +67,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "CR\0"  // Crypto
                                   "CTL"   // Controller
                                   "AL\0"  // Alarm
+                                  "SC\0"  // SecureChannel
                                   "BDX"   // BulkDataTransfer
                                   "DMG"   // DataManagement
                                   "DC\0"  // DeviceControl
