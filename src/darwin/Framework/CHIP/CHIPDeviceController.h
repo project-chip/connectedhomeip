@@ -35,6 +35,12 @@ NS_ASSUME_NONNULL_BEGIN
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDevice:(uint64_t)deviceID
+           address:(NSString *)address
+              port:(uint16_t)port
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error;
 - (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
                           address:(NSString *)address
                              port:(uint16_t)port
