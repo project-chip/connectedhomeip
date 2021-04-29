@@ -319,9 +319,9 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
-void SecureSessionMgr::HandleGroupMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf)
+void SecureSessionMgr::HandleGroupMessageReceived(uint16_t keyId, System::PacketBufferHandle msgBuf)
 {
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(packetHeader.GetEncryptionKeyID(), nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(keyId, nullptr);
     VerifyOrReturn(state != nullptr, ChipLogError(Inet, "Failed to find the peer connection state"));
 
     OnMessageReceived(state->GetPeerAddress(), std::move(msgBuf));
@@ -391,9 +391,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         // Queue the message as needed for sync with destination node.
         if (mCB != nullptr)
         {
-            // We should encode the packetHeader into the buffer before storing the buffer into the queue.
-            // The encoded packetHeader needs to be peeled off during re-processing after the peer message
-            // counter is synced.
+            // We should encode the packetHeader into the buffer before storing the buffer into the queue since the
+            // stored buffer will be re-processed by OnMessageReceived after the peer message counter is synced.
             ReturnOnFailure(packetHeader.EncodeBeforeData(msg));
             err = mCB->QueueReceivedMessageAndSync(state, std::move(msg));
             VerifyOrReturn(err == CHIP_NO_ERROR);
