@@ -188,7 +188,7 @@ public:
     virtual ~ECPKeypair() {}
 
     /** @brief Generate a new Certificate Signing Request (CSR).
-     * @param csr Newly generated CSR
+     * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
      *CSR.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
@@ -256,7 +256,7 @@ public:
     virtual CHIP_ERROR Deserialize(P256SerializedKeypair & input);
 
     /** @brief Generate a new Certificate Signing Request (CSR).
-     * @param csr Newly generated CSR
+     * @param csr Newly generated CSR in DER format
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated
      *CSR.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise

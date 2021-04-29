@@ -707,8 +707,10 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    size_t length    = csr_length;
+
+    int result = 0;
+
+    size_t out_length;
 
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
@@ -732,9 +734,21 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
 
-    result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    csr_length = strlen(Uint8::to_const_char(out_csr));
+    result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, CryptoRNG, nullptr);
+    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
+
+    out_length = (size_t) result;
+    VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
+
+    if (csr_length != out_length)
+    {
+        // mbedTLS API writes the CSR at the end of the provided buffer.
+        // Let's move it to the start of the buffer.
+        size_t offset = csr_length - out_length;
+        memmove(out_csr, &out_csr[offset], out_length);
+    }
+
+    csr_length = out_length;
 
 exit:
     keypair = nullptr;
