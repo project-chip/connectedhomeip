@@ -149,7 +149,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     // Get a JNI environment object.
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(env);
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(sJVM, env);
 
     ChipLogProgress(Controller, "Loading Java class references.");
 
