@@ -60,31 +60,6 @@
 
 using namespace chip;
 
-//------------------------------------------------------------------------------
-// Plugin private function prototypes
-static void checkForReportingConfig(void);
-
-//------------------------------------------------------------------------------
-// Global variables
-/*
-// The default configuration to be used if no reporting has been set up
-static EmberAfPluginReportingEntry defaultConfiguration = {
-  EMBER_ZCL_REPORTING_DIRECTION_REPORTED, //direction
-  0, //endpoint, which will be set on a per-use basis
-  ZCL_OCCUPANCY_SENSING_CLUSTER_ID, //clusterId
-  ZCL_OCCUPANCY_ATTRIBUTE_ID, //attributeId
-  CLUSTER_MASK_SERVER, //mask
-  EMBER_AF_NULL_MANUFACTURER_CODE, //manufacturerCode
-  .data.reported = {
-    1, //minInterval
-    EMBER_AF_PLUGIN_OCCUPANCY_SENSOR_SERVER_DEFAULT_OCCUPANCY_MAX_REPORT_PERIOD_S, //maxInterval
-    1 //reportableChange
-  }
-};
-*/
-//------------------------------------------------------------------------------
-// Plugin consumed callback implementations
-
 //******************************************************************************
 // Plugin init function
 //******************************************************************************
@@ -92,7 +67,6 @@ void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint)
 {
     HalOccupancySensorType deviceType;
 
-    checkForReportingConfig();
     deviceType = halOccupancyGetSensorType(endpoint);
 
     emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_SENSOR_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
@@ -142,56 +116,6 @@ void halOccupancyStateChangedCallback(EndpointId endpoint, HalOccupancyState occ
 
     emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                           (uint8_t *) &occupancyState, ZCL_BITMAP8_ATTRIBUTE_TYPE);
-    // emberAfPluginOccupancySensorServerOccupancyStateChangedCallback(
-    //   endpoint, occupancyState);
-}
-
-void emberAfPluginOccupancySensorServerStackStatusCallback(EndpointId endpoint, EmberStatus status)
-{
-    // On network connect, verify that a reporting entry is set up for the
-    // occupancy sensor
-    if (status == EMBER_NETWORK_UP)
-    {
-        checkForReportingConfig();
-    }
-}
-
-//------------------------------------------------------------------------------
-// Plugin private functions
-
-static void checkForReportingConfig(void)
-{
-#ifdef EMBER_AF_PLUGIN_REPORTING
-    // uint16_t i;
-    // EmberAfPluginReportingEntry entry;
-    // uint8_t endpoint;
-    // bool existingEntry = false;
-
-    // // On initialization, cycle through the reporting table to determine if a
-    // // reporting table entry has been created for the occupancy state attribute
-    // for (i = 0; i < emAfPluginReportingNumEntries(); i++) {
-    //   emAfPluginReportingGetEntry(i, &entry);
-    //   if ((entry.clusterId == ZCL_OCCUPANCY_SENSING_CLUSTER_ID)
-    //       && (entry.attributeId == ZCL_OCCUPANCY_ATTRIBUTE_ID)
-    //       && (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-    //       && (entry.manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE)) {
-    //     existingEntry = true;
-    //   }
-    // }
-
-    // // If no entry is found for the occupancy sensor, a default reporting
-    // // configuration should be created using the plugin defined options.  This
-    // // needs to be done for all endpoints that support an occupancy sensor server.
-    // if (!existingEntry) {
-    //   for (i = 0; i < emberAfEndpointCount(); i++) {
-    //     endpoint = emberAfEndpointFromIndex(i);
-    //     defaultConfiguration.endpoint = endpoint;
-    //     if (emberAfContainsServer(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID)) {
-    //       emAfPluginReportingAppendEntry(&defaultConfiguration);
-    //     }
-    //   }
-    // }
-#endif
 }
 
 void emberAfPluginOccupancyClusterServerPostInitCallback(EndpointId endpoint) {}
