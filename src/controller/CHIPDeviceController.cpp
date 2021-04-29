@@ -868,6 +868,7 @@ void DeviceCommissioner::FreeRendezvousSession()
     if (mRendezvousSession != nullptr)
     {
         mNextKeyId = mRendezvousSession->GetNextKeyId();
+        PersistNextKeyId();
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
@@ -964,7 +965,13 @@ void DeviceCommissioner::PersistDeviceList()
             }
             chip::Platform::MemoryFree(serialized);
         }
+    }
+}
 
+void DeviceCommissioner::PersistNextKeyId()
+{
+    if (mStorageDelegate != nullptr)
+    {
         // TODO: Consider storing value in binary representation instead of converting to string
         char keyIDStr[kMaxKeyIDStringSize];
         snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
