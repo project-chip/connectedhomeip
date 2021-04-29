@@ -170,10 +170,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
             // Reprocess message.
             secureSessionMgr->OnMessageReceived(entry.packetHeader, entry.peerAddress, std::move(entry.msgBuf));
 
-            // Explicitly free any buffer owned by this handle.  The
-            // HandleGroupMessageReceived() call should really handle this, but
-            // just in case it messes up we don't want to get confused about
-            // whether the entry is in use.
+            // Explicitly free any buffer owned by this handle.
             entry.msgBuf     = nullptr;
             entry.peerNodeId = kUndefinedNodeId;
         }
