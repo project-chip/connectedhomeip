@@ -801,7 +801,9 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
 
         eventBuffer->RemoveEvent(numEventsToDrop);
         eventBuffer->mFirstEventSystemTimestamp.mValue += context.mDeltaTime;
-        ChipLogProgress(EventLogging, "Dropped events from buffer with priority %d due to overflow: { event priority_level: %d, count: %d };", eventBuffer->mPriority, imp, numEventsToDrop);
+        ChipLogProgress(EventLogging,
+                        "Dropped events from buffer with priority %d due to overflow: { event priority_level: %d, count: %d };",
+                        eventBuffer->mPriority, imp, numEventsToDrop);
         ctx->mSpaceNeededForEvent = 0;
     }
     else
