@@ -191,6 +191,8 @@ pw_python_action("python") {
     "chip",
     "--build_number",
     "0.0",
+    "--repo_dir",
+    rebase_path("${chip_root}", root_build_dir),
     "--build_dir",
     rebase_path("${target_gen_dir}/${target_name}.py_build", root_build_dir),
     "--dist_dir",

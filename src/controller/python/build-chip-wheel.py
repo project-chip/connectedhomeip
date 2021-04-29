@@ -29,13 +29,17 @@ from wheel.bdist_wheel import bdist_wheel
 import argparse
 import json
 import os
+import sys
 import platform
 import shutil
+import time
+import subprocess
 
 
 parser = argparse.ArgumentParser(description='build the pip package for chip using chip components generated during the build and python source code')
 parser.add_argument('--package_name', default='chip', help='configure the python package name')
 parser.add_argument('--build_number', default='0.0', help='configure the chip build number')
+parser.add_argument('--repo_dir', default='', help='directory of CHIP checkout')
 parser.add_argument('--build_dir', help='directory to build in')
 parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
@@ -66,12 +70,17 @@ curDir = os.curdir
 manifestFile = os.path.abspath(args.manifest)
 buildDir = os.path.abspath(args.build_dir)
 distDir = os.path.abspath(args.dist_dir)
+repoDir = (os.path.abspath(args.repo_dir) if args.repo_dir != '' else '')
 
 # Use a temporary directory within the build directory to assemble the components
 # for the installable package.
 tmpDir = os.path.join(buildDir, 'chip-wheel-components')
 
 manifest = json.load(open(manifestFile, 'r'))
+
+commitId = '0000000000000000000000000000000000000000'
+branch = ''
+gitDescribe = ''
 
 try:
 
@@ -87,6 +96,34 @@ try:
     # Switch to the temporary directory. (Foolishly, setuptools relies on the current directory
     # for many of its features.)
     os.chdir(tmpDir)
+
+    # Get current commit id, only when caller provides a valid repo checkout directory.
+    if repoDir != '':
+        try:
+            commitId = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repoDir).decode("utf-8").strip()
+            branch = subprocess.check_output(['git', 'branch', '--show-current'], cwd=repoDir).decode("utf-8").strip()
+            gitDescribe = subprocess.check_output(['git', 'describe', '--dirty', '--always'], cwd=repoDir).decode("utf-8").strip()
+        except subprocess.CalledProcessError:
+            # We failed to get the commit if and branch of this CHIP checkout, maybe this checkout is not a git repo.
+            # Leaving commit id and branch empty.
+            sys.stderr.write("Cannot get git version info, continue without version info")
+
+    # Create a file for the version number.
+    os.makedirs(os.path.join(tmpDir, 'chip', 'version'))
+    with open(os.path.join(tmpDir, 'chip', 'version', '__init__.py'), 'w') as fp:
+        fp.write(
+'''
+__all__ = [ 'Info' ]
+
+def Info():
+    return {}
+'''.format(repr({
+        'version': ('{}-g{}'.format(chipPackageVer, gitDescribe) if gitDescribe != '' else chipPackageVer),
+        'git_describe': gitDescribe,
+        'git_commit_id': commitId,
+        'branch': branch,
+        'build_timestamp': int(time.time()),
+    })))
 
     manifestBase = os.path.dirname(manifestFile)
     for entry in manifest['files']:
@@ -139,6 +176,7 @@ try:
             'chip.clusters',
             'chip.tlv',
             'chip.setup_payload',
+            "chip.version",
     ]
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing

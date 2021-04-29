@@ -2,6 +2,7 @@
 
 from chip import ChipDeviceCtrl
 from chip import exceptions
+from chip import version as ChipVersion
 from optparse import OptionParser, OptionValueError
 import threading
 import os
@@ -143,6 +144,8 @@ def main():
     )
 
     (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
+
+    logger.info("Version Info: {}".format(ChipVersion.Info()))
 
     timeoutTicker = TestTimeout(options.testTimeout)
     timeoutTicker.start()

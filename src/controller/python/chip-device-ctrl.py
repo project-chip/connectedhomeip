@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipDeviceCtrl
 from chip import exceptions
+from chip import version as chipversion
 import sys
 import os
 import platform
@@ -37,6 +38,8 @@ import base64
 import textwrap
 import string
 import re
+import datetime
+import pprint
 from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
@@ -185,6 +188,8 @@ class DeviceMgrCmd(Cmd):
 
         "set-pairing-wifi-credential",
         "set-pairing-thread-credential",
+
+        "version",
     ]
 
     def parseline(self, line):
@@ -590,6 +595,14 @@ class DeviceMgrCmd(Cmd):
                 print(readline.get_history_item(n))
         except ImportError:
             pass
+    
+    def do_version(self, line):
+        """
+        version
+
+        Show version info of chip-device-ctrl
+        """
+        pprint.PrettyPrinter(indent=2).pprint(chipversion.Info())
 
     def do_h(self, line):
         self.do_history(line)
@@ -648,6 +661,10 @@ def main():
     if len(remainingArgs) != 0:
         print("Unexpected argument: %s" % remainingArgs[0])
         sys.exit(-1)
+
+    chipVersionInfo = chipversion.Info()
+    print("chip-device-ctrl {}".format(chipVersionInfo.get("version", "<unknown version>")))
+    print("Build Date: {}".format(datetime.datetime.fromtimestamp(chipVersionInfo.get("build_timestamp", 0)).isoformat()))
 
     adapterId = None
     if sys.platform.startswith("linux"):
