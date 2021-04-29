@@ -389,10 +389,12 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         {
             if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
             {
+                err = packetHeader.EncodeBeforeData(msg);
+                SuccessOrExit(err);
+
                 // Queue and start message sync procedure
                 err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
-                    { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, packetHeader, peerAddress,
-                    std::move(msg));
+                    { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress, std::move(msg));
 
                 if (err != CHIP_NO_ERROR)
                 {
