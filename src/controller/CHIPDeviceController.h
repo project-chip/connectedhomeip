@@ -407,6 +407,8 @@ private:
 
     void PersistDeviceList();
 
+    void PersistNextKeyId();
+
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
