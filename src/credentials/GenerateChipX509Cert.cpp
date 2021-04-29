@@ -161,6 +161,7 @@ static CHIP_ERROR EncodeIsCAExtension(bool isCA, ASN1Writer & writer)
                 // cA BOOLEAN
                 if (isCA)
                 {
+                    // Encode the boolean only if isCA is true
                     ASN1_ENCODE_BOOLEAN(isCA);
                 }
             }
