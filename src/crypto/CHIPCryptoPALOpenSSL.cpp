@@ -1078,9 +1078,6 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     EC_KEY * ec_key = to_EC_KEY(&mKeypair);
 
-    BIO * bioMem   = nullptr;
-    BUF_MEM * bptr = nullptr;
-
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
 
     result = X509_REQ_set_version(x509_req, 0);
@@ -1101,22 +1098,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     result = X509_REQ_sign(x509_req, evp_pkey, EVP_sha256());
     VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
 
-    bioMem = BIO_new(BIO_s_mem());
-    VerifyOrExit(bioMem != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    result = PEM_write_bio_X509_REQ(bioMem, x509_req);
-    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
-
-    BIO_get_mem_ptr(bioMem, &bptr);
-    {
-        size_t input_length = csr_length;
-        csr_length          = bptr->length;
-        VerifyOrExit(bptr->length <= input_length, error = CHIP_ERROR_BUFFER_TOO_SMALL);
-        VerifyOrExit(CanCastTo<int>(bptr->length), error = CHIP_ERROR_INTERNAL);
-        memset(out_csr, 0, input_length);
-    }
-
-    BIO_read(bioMem, out_csr, static_cast<int>(bptr->length));
+    csr_length = static_cast<size_t>(i2d_X509_REQ(x509_req, &out_csr));
 
 exit:
     ec_key = nullptr;
@@ -1125,12 +1107,6 @@ exit:
     {
         EVP_PKEY_free(evp_pkey);
         evp_pkey = nullptr;
-    }
-
-    if (bioMem != nullptr)
-    {
-        BIO_free(bioMem);
-        bioMem = nullptr;
     }
 
     X509_REQ_free(x509_req);
