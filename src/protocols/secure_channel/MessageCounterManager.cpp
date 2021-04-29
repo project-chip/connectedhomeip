@@ -71,12 +71,11 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
 
 CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSessionHandle session,
                                                                    Transport::PeerConnectionState * state,
-                                                                   const PacketHeader & packetHeader,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    System::PacketBufferHandle msgBuf)
 {
     // Queue the message to be reprocessed when sync completes.
-    ReturnErrorOnFailure(AddToReceiveTable(state->GetPeerNodeId(), packetHeader, peerAddress, std::move(msgBuf)));
+    ReturnErrorOnFailure(AddToReceiveTable(state->GetPeerNodeId(), peerAddress, std::move(msgBuf)));
     ReturnErrorOnFailure(StartSync(session, state));
 
     // After the message that triggers message counter synchronization is stored, and a message counter
@@ -120,8 +119,8 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     }
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const PacketHeader & packetHeader,
-                                                    const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
+                                                    System::PacketBufferHandle msgBuf)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -131,11 +130,10 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Pac
         // Entries are in use if they have a message buffer.
         if (entry.peerNodeId == kUndefinedNodeId)
         {
-            entry.peerNodeId   = peerNodeId;
-            entry.packetHeader = packetHeader;
-            entry.peerAddress  = peerAddress;
-            entry.msgBuf       = std::move(msgBuf);
-            added              = true;
+            entry.peerNodeId  = peerNodeId;
+            entry.peerAddress = peerAddress;
+            entry.msgBuf      = std::move(msgBuf);
+            added             = true;
 
             break;
         }
@@ -168,7 +166,7 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
         if (entry.peerNodeId == peerNodeId)
         {
             // Reprocess message.
-            secureSessionMgr->OnMessageReceived(entry.packetHeader, entry.peerAddress, std::move(entry.msgBuf));
+            secureSessionMgr->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));
 
             // Explicitly free any buffer owned by this handle.
             entry.msgBuf     = nullptr;
