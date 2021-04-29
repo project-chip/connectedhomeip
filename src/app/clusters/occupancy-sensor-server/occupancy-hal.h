@@ -17,7 +17,6 @@
 
 #pragma once
 
-//#include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
 // enum used to track the type of occupancy sensor being implemented
@@ -33,7 +32,6 @@ typedef enum
 {
     HAL_OCCUPANCY_STATE_UNOCCUPIED = 0x00,
     HAL_OCCUPANCY_STATE_OCCUPIED   = 0x01,
-
 } HalOccupancyState;
 
 /** @brief Initializes the occupancy sensor, along with any hardware

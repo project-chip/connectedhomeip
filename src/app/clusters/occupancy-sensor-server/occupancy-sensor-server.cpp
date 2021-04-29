@@ -121,7 +121,7 @@ void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint)
         break;
     }
     emberAfWriteAttribute(endpoint, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_ID,
-                          CLUSTER_MASK_SERVER, (uint8_t *) &deviceTypeBitmap, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+                          CLUSTER_MASK_SERVER, &deviceTypeBitmap, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 
     emberAfPluginOccupancyClusterServerPostInitCallback(endpoint);
 }
