@@ -119,7 +119,8 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     }
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf)
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
+                                                    System::PacketBufferHandle msgBuf)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -129,10 +130,10 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Tra
         // Entries are in use if they have a message buffer.
         if (entry.peerNodeId == kUndefinedNodeId)
         {
-            entry.peerNodeId   = peerNodeId;
-            entry.peerAddress  = peerAddress;
-            entry.msgBuf       = std::move(msgBuf);
-            added              = true;
+            entry.peerNodeId  = peerNodeId;
+            entry.peerAddress = peerAddress;
+            entry.msgBuf      = std::move(msgBuf);
+            added             = true;
 
             break;
         }

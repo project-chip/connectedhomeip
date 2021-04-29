@@ -48,7 +48,8 @@ public:
     // Implement MessageCounterManagerInterface
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override;
     CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
-                                                const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf) override;
+                                                const Transport::PeerAddress & peerAddress,
+                                                System::PacketBufferHandle msgBuf) override;
 
     /**
      * Send peer message counter synchronization request.
