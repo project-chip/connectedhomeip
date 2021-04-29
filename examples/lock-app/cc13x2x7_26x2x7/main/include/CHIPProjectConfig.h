@@ -142,6 +142,13 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
+ *
+ * Enable the OpenThread SRP client to allow for CHIP device discovery.
+ */
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
+
+/**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE
  *
  * For a development build, set the default importance of events to be logged as Debug.
