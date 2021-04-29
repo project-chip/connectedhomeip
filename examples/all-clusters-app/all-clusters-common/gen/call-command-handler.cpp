@@ -47,6 +47,7 @@ EmberAfStatus emberAfOtaSoftwareUpdateClientClusterServerCommandParse(EmberAfClu
 EmberAfStatus emberAfOtaSoftwareUpdateServerClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfPumpConfigurationAndControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfSwitchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -151,6 +152,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
             result = emberAfOperationalCredentialsClusterServerCommandParse(cmd);
+            break;
+        case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
+            // No commands are enabled for cluster Pump Configuration and Control
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_SCENES_CLUSTER_ID:
             result = emberAfScenesClusterServerCommandParse(cmd);
