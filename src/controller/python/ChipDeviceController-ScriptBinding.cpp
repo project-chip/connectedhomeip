@@ -92,12 +92,6 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
 
 // Pairing Delegate
 CHIP_ERROR
-pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
-                                                     const char * password);
-CHIP_ERROR
-pychip_ScriptDevicePairingDelegate_SetThreadCredential(chip::Controller::DeviceCommissioner * devCtrl, int channel, int panId,
-                                                       const char * masterKey);
-CHIP_ERROR
 pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback(chip::Controller::DeviceCommissioner * devCtrl,
                                                           chip::Controller::DevicePairingDelegate_OnPairingCompleteFunct callback);
 
@@ -227,41 +221,6 @@ CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissione
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
     return devCtrl->PairDevice(nodeid, params);
-}
-
-CHIP_ERROR
-pychip_ScriptDevicePairingDelegate_SetWifiCredential(chip::Controller::DeviceCommissioner * devCtrl, const char * ssid,
-                                                     const char * password)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    (void) devCtrl;
-
-    VerifyOrExit(ssid != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(password != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    sPairingDelegate.SetWifiCredential(ssid, password);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR
-pychip_ScriptDevicePairingDelegate_SetThreadCredential(chip::Controller::DeviceCommissioner * devCtrl, int channel, int panId,
-                                                       const char * masterKeyStr)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t masterKey[chip::Thread::kSizeMasterKey];
-    (void) devCtrl;
-
-    VerifyOrExit(strlen(masterKeyStr) == 2 * chip::Thread::kSizeMasterKey, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (size_t i = 0; i < chip::Thread::kSizeMasterKey; i++)
-        VerifyOrExit(sscanf(&masterKeyStr[2 * i], "%2hhx", &masterKey[i]) == 1, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    sPairingDelegate.SetThreadCredential(channel, panId, masterKey);
-
-exit:
-    return err;
 }
 
 CHIP_ERROR

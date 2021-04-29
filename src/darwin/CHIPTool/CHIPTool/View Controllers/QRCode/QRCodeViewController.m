@@ -599,10 +599,6 @@
     }
 }
 
-- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
-{
-}
-
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
 {
     if (decimalString) {

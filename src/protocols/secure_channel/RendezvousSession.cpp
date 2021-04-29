@@ -149,10 +149,6 @@ void RendezvousSession::Cleanup()
     }
 }
 
-void RendezvousSession::OnNetworkProvisioningError(CHIP_ERROR err) {}
-
-void RendezvousSession::OnNetworkProvisioningComplete() {}
-
 void RendezvousSession::OnRendezvousConnectionOpened()
 {
     if (!mParams.IsController())
