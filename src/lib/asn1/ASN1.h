@@ -186,6 +186,7 @@ public:
     ASN1_ERROR EndEncapsulatedType(void);
     ASN1_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen);
     ASN1_ERROR PutValue(uint8_t cls, uint32_t tag, bool isConstructed, chip::TLV::TLVReader & val);
+    ASN1_ERROR PutRaw(const uint8_t * val, uint16_t valLen);
 
 private:
     uint8_t * mBuf;

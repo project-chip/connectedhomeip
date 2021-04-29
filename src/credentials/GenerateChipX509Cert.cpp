@@ -56,8 +56,7 @@ enum IsCACert
     kNotCACert,
 };
 
-// For CHIP 64-bit DN attribute the string representation is 16 uppercase hex characters.
-static constexpr uint8_t kChipDNAttributeLen = 16;
+static constexpr uint8_t kSHA1_Hash_Langth = 20;
 
 static CHIP_ERROR EncodeSubjectPublicKeyInfo(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
 {
@@ -94,7 +93,7 @@ static CHIP_ERROR EncodeAuthorityKeyIdentifierExtension(const Crypto::P256Public
         {
             ASN1_START_SEQUENCE
             {
-                uint8_t keyid[20];
+                uint8_t keyid[kSHA1_Hash_Langth];
                 ReturnErrorOnFailure(Crypto::Hash_SHA1(pubkey, pubkey.Length(), keyid));
 
                 ReturnErrorOnFailure(
@@ -122,7 +121,7 @@ static CHIP_ERROR EncodeSubjectKeyIdentifierExtension(const Crypto::P256PublicKe
 
         ASN1_START_OCTET_STRING_ENCAPSULATED
         {
-            uint8_t keyid[20];
+            uint8_t keyid[kSHA1_Hash_Langth];
             ReturnErrorOnFailure(Crypto::Hash_SHA1(pubkey, pubkey.Length(), keyid));
 
             ReturnErrorOnFailure(writer.PutOctetString(keyid, static_cast<uint8_t>(sizeof(keyid))));
@@ -276,7 +275,7 @@ static CHIP_ERROR EncodeChipDNs(ChipDNParams * params, uint8_t numParams, ASN1Wr
         {
             ASN1_START_SET
             {
-                uint8_t chipAttrStr[kChipDNAttributeLen + 1];
+                uint8_t chipAttrStr[kChip64bitAttrUTF8Length + 1];
                 snprintf(reinterpret_cast<char *>(chipAttrStr), sizeof(chipAttrStr), "%016" PRIX64, params[i].Value);
 
                 ASN1_START_SEQUENCE
@@ -318,22 +317,7 @@ static CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signatur
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ASN1_START_BIT_STRING_ENCAPSULATED
-    {
-        ASN1_START_SEQUENCE
-        {
-            const uint8_t * signatureBuf = signature;
-            uint16_t rLength             = (uint16_t) signature.Length() / 2;
-
-            // r INTEGER
-            ReturnErrorOnFailure(writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, signatureBuf, rLength));
-
-            // s INTEGER
-            ReturnErrorOnFailure(
-                writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, &signatureBuf[rLength], rLength));
-        }
-        ASN1_END_SEQUENCE;
-    }
+    ASN1_START_BIT_STRING_ENCAPSULATED { writer.PutRaw(signature, (uint16_t) signature.Length()); }
     ASN1_END_ENCAPSULATED;
 
 exit:

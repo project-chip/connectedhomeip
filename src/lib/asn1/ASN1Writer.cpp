@@ -382,6 +382,17 @@ ASN1_ERROR ASN1Writer::EndEncapsulatedType()
     return WriteDeferredLength();
 }
 
+ASN1_ERROR ASN1Writer::PutRaw(const uint8_t * val, uint16_t valLen)
+{
+    // Do nothing for a null writer.
+    VerifyOrReturnError(mBuf != nullptr, ASN1_NO_ERROR);
+
+    memmove(mWritePoint, val, valLen);
+    mWritePoint += valLen;
+
+    return ASN1_NO_ERROR;
+}
+
 ASN1_ERROR ASN1Writer::PutValue(uint8_t cls, uint32_t tag, bool isConstructed, const uint8_t * val, uint16_t valLen)
 {
     // Do nothing for a null writer.
