@@ -192,18 +192,15 @@ exit:
 
 CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
+    int result = 0;
 
     // zero data length hash is supported.
-
-    VerifyOrExit(out_buffer != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     result = mbedtls_sha1_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer));
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 Hash_SHA256_stream::Hash_SHA256_stream(void) {}

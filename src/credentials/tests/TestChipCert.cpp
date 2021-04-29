@@ -661,7 +661,7 @@ static void TestChipCert_GenerateRootCert(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCertBuf, outCertLen, certData) == CHIP_NO_ERROR);
 
     // Test that root cert cannot be provided a node ID
-    root_params.mHasNodeID = true;
+    root_params.HasNodeID = true;
     NL_TEST_ASSERT(inSuite,
                    NewRootX509Cert(root_params, keypair, signed_cert, sizeof(signed_cert), signed_len) ==
                        CHIP_ERROR_INVALID_ARGUMENT);
@@ -720,7 +720,7 @@ static void TestChipCert_GenerateICACert(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCertBuf, outCertLen, certData) == CHIP_NO_ERROR);
 
     // Test that ICA cert cannot be provided a node ID
-    ica_params.mHasNodeID = true;
+    ica_params.HasNodeID = true;
     NL_TEST_ASSERT(inSuite,
                    NewICAX509Cert(ica_params, 4321, ica_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert), signed_len) ==
                        CHIP_ERROR_INVALID_ARGUMENT);
@@ -745,8 +745,8 @@ static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, noc_keypair.Initialize() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   NewNodeOperationalX509Cert(noc_params, true, noc_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert),
-                                              signed_len) == CHIP_NO_ERROR);
+                   NewNodeOperationalX509Cert(noc_params, kIssuerIsRootCA, noc_keypair.Pubkey(), keypair, signed_cert,
+                                              sizeof(signed_cert), signed_len) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    ConvertX509CertToChipCert(signed_cert, signed_len, outCertBuf, sizeof(outCertBuf), outCertLen) == CHIP_NO_ERROR);
@@ -754,17 +754,17 @@ static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, DecodeChipCert(outCertBuf, outCertLen, certData) == CHIP_NO_ERROR);
 
     // Test that NOC cert must be provided a node ID
-    noc_params.mHasNodeID = false;
+    noc_params.HasNodeID = false;
     NL_TEST_ASSERT(inSuite,
-                   NewNodeOperationalX509Cert(noc_params, true, noc_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert),
-                                              signed_len) == CHIP_ERROR_INVALID_ARGUMENT);
+                   NewNodeOperationalX509Cert(noc_params, kIssuerIsRootCA, noc_keypair.Pubkey(), keypair, signed_cert,
+                                              sizeof(signed_cert), signed_len) == CHIP_ERROR_INVALID_ARGUMENT);
 
     // Test that NOC cert must be provided a fabric ID
-    noc_params.mHasNodeID   = true;
-    noc_params.mHasFabricID = false;
+    noc_params.HasNodeID   = true;
+    noc_params.HasFabricID = false;
     NL_TEST_ASSERT(inSuite,
-                   NewNodeOperationalX509Cert(noc_params, true, noc_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert),
-                                              signed_len) == CHIP_ERROR_INVALID_ARGUMENT);
+                   NewNodeOperationalX509Cert(noc_params, kIssuerIsRootCA, noc_keypair.Pubkey(), keypair, signed_cert,
+                                              sizeof(signed_cert), signed_len) == CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 static void TestChipCert_GenerateNOCICA(nlTestSuite * inSuite, void * inContext)
@@ -786,8 +786,8 @@ static void TestChipCert_GenerateNOCICA(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, noc_keypair.Initialize() == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
-                   NewNodeOperationalX509Cert(noc_params, false, noc_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert),
-                                              signed_len) == CHIP_NO_ERROR);
+                   NewNodeOperationalX509Cert(noc_params, kIssuerIsIntermediateCA, noc_keypair.Pubkey(), keypair, signed_cert,
+                                              sizeof(signed_cert), signed_len) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    ConvertX509CertToChipCert(signed_cert, signed_len, outCertBuf, sizeof(outCertBuf), outCertLen) == CHIP_NO_ERROR);

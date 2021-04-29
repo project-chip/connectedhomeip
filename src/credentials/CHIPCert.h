@@ -658,14 +658,20 @@ CHIP_ERROR GenerateSignedX509CertFromChipCert(const uint8_t * chipCert, uint32_t
 
 struct X509CertRequestParams
 {
-    int64_t mSerialNumber;
-    uint64_t mIssuer;
-    uint32_t mValidityStart;
-    uint32_t mValidityEnd;
-    bool mHasFabricID;
-    uint64_t mFabricID;
-    bool mHasNodeID;
-    uint64_t mNodeID;
+    int64_t SerialNumber;
+    uint64_t Issuer;
+    uint32_t ValidityStart;
+    uint32_t ValidityEnd;
+    bool HasFabricID;
+    uint64_t FabricID;
+    bool HasNodeID;
+    uint64_t NodeID;
+};
+
+enum CertificateIssuerLevel
+{
+    kIssuerIsRootCA,
+    kIssuerIsIntermediateCA,
 };
 
 /**
@@ -679,7 +685,7 @@ struct X509CertRequestParams
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewRootX509Cert(X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf,
+CHIP_ERROR NewRootX509Cert(const X509CertRequestParams & requestParams, Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf,
                            uint32_t x509CertBufSize, uint32_t & x509CertLen);
 
 /**
@@ -695,15 +701,15 @@ CHIP_ERROR NewRootX509Cert(X509CertRequestParams & requestParams, Crypto::P256Ke
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewICAX509Cert(X509CertRequestParams & requestParams, uint64_t subject, const Crypto::P256PublicKey & subjectPubkey,
-                          Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf, uint32_t x509CertBufSize,
-                          uint32_t & x509CertLen);
+CHIP_ERROR NewICAX509Cert(const X509CertRequestParams & requestParams, uint64_t subject,
+                          const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf,
+                          uint32_t x509CertBufSize, uint32_t & x509CertLen);
 
 /**
  * @brief Generate a new X.509 DER encoded Node operational certificate
  *
  * @param requestParams   Certificate request parameters.
- * @param rootCASigner    Indicates if the signer is a root CA or an intermediate CA
+ * @param issuerLevel     Indicates if the issuer is a root CA or an intermediate CA
  * @param subjectPubkey   The public key of subject
  * @param issuerKeypair   The certificate signing key
  * @param x509CertBuf     Buffer to store signed certificate in X.509 DER format.
@@ -712,7 +718,7 @@ CHIP_ERROR NewICAX509Cert(X509CertRequestParams & requestParams, uint64_t subjec
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR NewNodeOperationalX509Cert(X509CertRequestParams & requestParams, bool rootCASigner,
+CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel,
                                       const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
                                       uint8_t * x509CertBuf, uint32_t x509CertBufSize, uint32_t & x509CertLen);
 
