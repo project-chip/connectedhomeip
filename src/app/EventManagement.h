@@ -194,8 +194,8 @@ struct LogStorageResources
                  // Must not be nullptr.  Must be large enough to accommodate the largest event emitted by the system.
     size_t mBufferSize = 0; //< The size, in bytes, of the `mBuffer`.
     chip::Platform::PersistedStorage::Key * mCounterKey =
-        nullptr; // Name of the key naming persistent counter for events of this priority.  When NULL, the persistent
-                 // counters will not be used for this priority level.
+        nullptr;                // Name of the key naming persistent counter for events of this priority.  When NULL, the persistent
+                                // counters will not be used for this priority level.
     uint32_t mCounterEpoch = 0; // The interval used in incrementing persistent counters.  When 0, the persistent counters will not
                                 // be used for this priority level.
     chip::PersistedCounter * mpCounterStorage =
