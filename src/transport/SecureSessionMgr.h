@@ -230,16 +230,6 @@ public:
 
     /**
      * @brief
-     *   Called when a cached group message that was waiting for message counter
-     *   sync shold be reprocessed.
-     *
-     * @param keyId         The encryption Key ID of the message buffer
-     * @param msgBuf        The received message
-     */
-    void HandleGroupMessageReceived(uint16_t keyId, System::PacketBufferHandle msgBuf);
-
-    /**
-     * @brief
      *   Set local node ID
      *
      * @param nodeId    Node id for the current node
