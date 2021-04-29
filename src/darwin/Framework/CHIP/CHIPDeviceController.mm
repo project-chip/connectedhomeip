@@ -26,16 +26,15 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <platform/PlatformManager.h>
 #include <support/CHIPMem.h>
 
-static const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.controller.workqueue";
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
-static NSString * const kErrorNetworkDispatchQueueInit = @"Init failure while initializing a dispatch queue for the network events";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
@@ -74,10 +73,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     if (self = [super init]) {
         CHIP_ERROR errorCode = CHIP_NO_ERROR;
 
-        _chipWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
-        if ([self checkForStartError:(_chipWorkQueue != nil) logMsg:kErrorNetworkDispatchQueueInit]) {
-            return nil;
-        }
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
 
         errorCode = chip::Platform::MemoryInit();
         if ([self checkForInitError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorMemoryInit]) {
