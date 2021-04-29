@@ -38,7 +38,6 @@ public:
      * the sync procedure is not started yet.
      */
     virtual CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
-                                                        const PacketHeader & packetHeader,
                                                         const Transport::PeerAddress & peerAddress,
                                                         System::PacketBufferHandle msgBuf) = 0;
 };
