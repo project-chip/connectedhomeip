@@ -333,14 +333,6 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
-void SecureSessionMgr::HandleGroupMessageReceived(uint16_t keyId, System::PacketBufferHandle msgBuf)
-{
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(keyId, nullptr);
-    VerifyOrReturn(state != nullptr, ChipLogError(Inet, "Failed to find the peer connection state"));
-
-    OnMessageReceived(state->GetPeerAddress(), std::move(msgBuf));
-}
-
 void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle msg)
 {
     PacketHeader packetHeader;
