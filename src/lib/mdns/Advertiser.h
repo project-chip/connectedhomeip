@@ -58,17 +58,17 @@ public:
     bool IsIPv4Enabled() const { return mEnableIPv4; }
     Derived & SetMac(chip::ByteSpan mac)
     {
-        mMac = chip::ByteSpan(mMacStorage, std::min(mac.size(), kMaxMacSize));
-        memcpy(mMacStorage, mac.data(), mMac.size());
+        mMacLength = std::min(mac.size(), kMaxMacSize);
+        memcpy(mMacStorage, mac.data(), mMacLength);
         return *reinterpret_cast<Derived *>(this);
     }
-    const chip::ByteSpan GetMac() const { return mMac; }
+    const chip::ByteSpan GetMac() const { return chip::ByteSpan(mMacStorage, mMacLength); }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
     bool mEnableIPv4                 = true;
     uint8_t mMacStorage[kMaxMacSize] = {};
-    chip::ByteSpan mMac              = chip::ByteSpan(mMacStorage, kMaxMacSize);
+    size_t mMacLength                = 0;
 }; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node
