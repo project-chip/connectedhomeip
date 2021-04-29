@@ -415,13 +415,11 @@ static CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, C
     ASN1_START_SEQUENCE
     {
         ReturnErrorOnFailure(EncodeTBSCert(requestParams, issuerLevel, subject, subjectPubkey, issuerKeypair.Pubkey(), writer));
-        SuccessOrExit(err);
 
         ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
         ASN1_END_SEQUENCE;
 
-        err = EncodeChipECDSASignature(signature, writer);
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(EncodeChipECDSASignature(signature, writer));
     }
     ASN1_END_SEQUENCE;
 
