@@ -980,6 +980,17 @@ static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
+
+    P256PublicKey pubkey;
+    NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pubkey.Length() == kP256_PublicKey_Length);
+    NL_TEST_ASSERT(inSuite, memcmp(pubkey, keypair.Pubkey(), pubkey.Length()) == 0);
+
+    // Let's corrupt the CSR buffer and make sure it fails to verify
+    csr[length - 2] = csr[length - 2] + 1;
+    csr[length - 1] = csr[length - 1] + 1;
+
+    NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
 }
 
 static void TestKeypair_Serialize(nlTestSuite * inSuite, void * inContext)

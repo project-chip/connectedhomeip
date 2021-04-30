@@ -342,6 +342,15 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
                            size_t iv_length, uint8_t * plaintext);
 
 /**
+ * @brief Verify the Certificate Signing Request (CSR). If successfully verified, it outputs the public key from the CSR.
+ * @param csr CSR in DER format
+ * @param csr_length The length of the CSR
+ * @param pubkey The public key from the verified CSR
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr, size_t csr_length, P256PublicKey & pubkey);
+
+/**
  * @brief A function that implements SHA-256 hash
  * @param data The data to hash
  * @param data_length Length of the data
