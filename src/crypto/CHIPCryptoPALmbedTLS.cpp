@@ -767,6 +767,7 @@ exit:
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
 {
+#if defined(MBEDTLS_X509_CSR_PARSE_C)
     CHIP_ERROR error   = CHIP_NO_ERROR;
     size_t pubkey_size = 0;
 
@@ -804,6 +805,10 @@ exit:
     mbedtls_x509_csr_free(&csr);
     _log_mbedTLS_error(result);
     return error;
+#else
+    ChipLogError(Crypto, "MBEDTLS_X509_CSR_PARSE_C is not enabled. CSR cannot be parsed");
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 typedef struct Spake2p_Context
