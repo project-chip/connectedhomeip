@@ -324,7 +324,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     SuccessOrExit(err);
 
     eventDataElementBuilder.PriorityLevel(static_cast<uint8_t>(apContext->mPriority));
-    
+
     // TODO: need to add utc and systen system check here
     deltatime = apOptions->mTimestamp.mValue - apContext->mCurrentSystemTime.mValue;
     eventDataElementBuilder.DeltaSystemTimestamp(deltatime);
