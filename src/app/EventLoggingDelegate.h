@@ -31,8 +31,11 @@
 namespace chip {
 namespace app {
 /**
- * @brief
- *   This class provides a delegate to write events
+ * An EventLoggingDelegate is used to fill event log data with cluster-specific information.
+ *
+ * Allows application to append any type of TLV data as part of an event log entry. Events
+ * have a standard header applicable to all events and this class provides the
+ * ability to add additional data past such standard header.
  */
 class EventLoggingDelegate
 {
@@ -60,12 +63,7 @@ public:
      *
      *  @retval other           An appropriate error signaling to the
      *                          caller that the serialization of event
-     *                          data could not be completed. Errors from
-     *                          calls to the aWriter should be propagated
-     *                          without remapping. If the function
-     *                          returns any type of error, the event
-     *                          generation is aborted, and the event is not
-     *                          written to the log.
+     *                          data could not be completed.
      *
      */
     virtual CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter) = 0;
