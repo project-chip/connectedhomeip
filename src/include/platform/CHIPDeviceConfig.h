@@ -1048,22 +1048,50 @@
 // -------------------- Device DNS-SD Advertising Configuration --------------------
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
+ *
+ * Enable or disable including device type in commissionable node discovery.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 1
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_TYPE
  *
  * Type of device using the CHIP Device Type Identifier.
+ *
+ * Examples:
+ * 0xFFFF = 65535 = Invalid Device Type
+ * 0x0051 = 81 = Smart Plug
+ * 0x0022 = 34 = Speaker
+ * 0x0023 = 35 = Video Player
+ *
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_TYPE
-#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 81 // 81 = 0x0051 Smart Plug
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 65535 // 65535 = Invalid Device Type
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME
+ *
+ * Enable or disable including device name in commissionable node discovery.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 1
 #endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_NAME
  *
  * Name of device.
- * TODO: this should move to configuration.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_NAME
-#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Kitchen Plug"
+#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Kitchen"
 #endif
 
 /**
@@ -1078,7 +1106,9 @@
  * 8 - Press Reset for N seconds (see pairing instruction for value of N)
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT
-#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT (1 | 1 >> 5 | 1 >> 8)
+#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT                                                                                    \
+    (1 << CHIP_COMMISSIONING_HINT_INDEX_POWER_CYCLE | 1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_MANUAL |                              \
+     1 << CHIP_COMMISSIONING_HINT_INDEX_PRESS_RESET_SECONDS)
 #endif
 
 /**
@@ -1103,7 +1133,8 @@
  * 5 - See Device Manual
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT
-#define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT (1 >> 2 | 1 >> 8)
+#define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT                                                                                  \
+    (1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_ADMINISTRATOR_UX | 1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_MANUAL)
 #endif
 
 /**

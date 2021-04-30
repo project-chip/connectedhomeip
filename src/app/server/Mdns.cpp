@@ -19,12 +19,12 @@
 
 #include <inttypes.h>
 
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -116,8 +116,12 @@ CHIP_ERROR AdvertiseCommisioning()
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
     // TODO: device can re-enter commissioning mode after being fully provisioned
+    // (additionalPairing == true)
     bool notYetCommissioned = !DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
-    advertiseParameters.SetCommissioningMode(notYetCommissioned, false);
+    bool additionalPairing  = false;
+    advertiseParameters.SetCommissioningMode(notYetCommissioned, additionalPairing);
+
+    char pairingInst[129];
 
     uint8_t mac[8];
     advertiseParameters.SetMac(FillMAC(mac));
@@ -148,21 +152,15 @@ CHIP_ERROR AdvertiseCommisioning()
     }
     advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
 
-    if (DeviceLayer::ConfigurationMgr().GetDeviceType(value) != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Discovery, "DNS-SD Device Type not set");
-    }
-    else
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
+        DeviceLayer::ConfigurationMgr().GetDeviceType(value) == CHIP_NO_ERROR)
     {
         advertiseParameters.SetDeviceType(chip::Optional<uint16_t>::Value(value));
     }
 
     char deviceName[129];
-    if (DeviceLayer::ConfigurationMgr().GetDeviceName(deviceName, sizeof(deviceName)) != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(Discovery, "DNS-SD Device Name not set");
-    }
-    else
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
+        DeviceLayer::ConfigurationMgr().GetDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
     {
         advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
     }
@@ -173,7 +171,6 @@ CHIP_ERROR AdvertiseCommisioning()
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    // TODO: check if commissioned yet, and if commissioned, use secondary
     if (notYetCommissioned)
     {
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
@@ -185,7 +182,6 @@ CHIP_ERROR AdvertiseCommisioning()
             advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
         }
 
-        char pairingInst[129];
         if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
         {
             ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
@@ -206,7 +202,6 @@ CHIP_ERROR AdvertiseCommisioning()
             advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
         }
 
-        char pairingInst[129];
         if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
         {
             ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");

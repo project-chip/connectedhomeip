@@ -24,6 +24,10 @@
 #include <lib/mdns/platform/Mdns.h>
 #include <platform/CHIPDeviceConfig.h>
 
+// Enable detailed mDNS logging for publish
+#undef DETAIL_LOGGING
+// #define DETAIL_LOGGING
+
 namespace chip {
 namespace Mdns {
 
@@ -65,7 +69,9 @@ private:
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
     CHIP_ERROR SetupHostname(chip::ByteSpan macOrEui64);
+#ifdef DETAIL_LOGGING
     static void PrintEntries(const MdnsService * service);
+#endif
 
     OperationalAdvertisingParameters mOperationalAdvertisingParams;
     bool mIsOperationalPublishing = false;

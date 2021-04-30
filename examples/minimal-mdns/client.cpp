@@ -42,7 +42,7 @@ struct Options
 {
     bool enableIpV4           = false;
     bool unicastAnswers       = true;
-    uint32_t runtimeMs        = 5000;
+    uint32_t runtimeMs        = 500;
     uint16_t querySendPort    = 5353;
     uint16_t listenPort       = 5388;
     const char * query        = "_services._dns-sd._udp.local";
@@ -318,7 +318,8 @@ int main(int argc, char ** args)
 
         if (mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
         {
-            printf("Server failed to listen on all interfaces ... continuing\n");
+            printf("Server failed to listen on all interfaces\n");
+            return 1;
         }
     }
 

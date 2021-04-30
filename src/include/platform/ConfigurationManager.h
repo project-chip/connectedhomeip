@@ -141,7 +141,9 @@ public:
 
     void LogDeviceConfig();
 
+    bool IsCommissionableDeviceTypeEnabled();
     CHIP_ERROR GetDeviceType(uint16_t & deviceType);
+    bool IsCommissionableDeviceNameEnabled();
     CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint);
     CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize);
@@ -600,11 +602,27 @@ inline void ConfigurationManager::LogDeviceConfig()
 }
 
 /**
+ * True if device type in DNS-SD advertisement is enabled
+ */
+inline bool ConfigurationManager::IsCommissionableDeviceTypeEnabled()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
+}
+
+/**
  * Device type id.
  */
 inline CHIP_ERROR ConfigurationManager::GetDeviceType(uint16_t & deviceType)
 {
     return static_cast<ImplClass *>(this)->_GetDeviceType(deviceType);
+}
+
+/**
+ * True if device name in DNS-SD advertisement is enabled
+ */
+inline bool ConfigurationManager::IsCommissionableDeviceNameEnabled()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
 }
 
 /**

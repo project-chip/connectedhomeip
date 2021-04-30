@@ -197,7 +197,6 @@ template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen)
 {
     CHIP_ERROR err;
-    printf("GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber\n");
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
@@ -888,6 +887,18 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
         // when functionalities will be implemented.
         true;
 #endif // CHIP_BYPASS_RENDEZVOUS
+}
+
+template <class ImplClass>
+bool GenericConfigurationManagerImpl<ImplClass>::_IsCommissionableDeviceTypeEnabled()
+{
+    return CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE == 1;
+}
+
+template <class ImplClass>
+bool GenericConfigurationManagerImpl<ImplClass>::_IsCommissionableDeviceNameEnabled()
+{
+    return CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME == 1;
 }
 
 template <class ImplClass>

@@ -283,10 +283,13 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     service.mAddressType   = Inet::kIPAddressType_Any;
     error                  = ChipMdnsPublishService(&service);
 
+#ifdef DETAIL_LOGGING
     PrintEntries(&service);
     return error;
+#endif
 }
 
+#ifdef DETAIL_LOGGING
 void DiscoveryImplPlatform::PrintEntries(const MdnsService * service)
 {
     printf("printEntries port=%d, mTextEntrySize=%d, mSubTypeSize=%d\n", (int) (service->mPort), (int) (service->mTextEntrySize),
@@ -301,6 +304,7 @@ void DiscoveryImplPlatform::PrintEntries(const MdnsService * service)
         printf(" type [%d] : %s\n", i, service->mSubTypes[i]);
     }
 }
+#endif
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
@@ -376,8 +380,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
 
     service.mInterface   = INET_NULL_INTERFACEID;
     service.mAddressType = Inet::kIPAddressType_Any;
-    printf("DiscoveryImplPlatform::Advertise calling ChipMdnsPublishService\n");
-    error = ChipMdnsPublishService(&service);
+    error                = ChipMdnsPublishService(&service);
 
     return error;
 }

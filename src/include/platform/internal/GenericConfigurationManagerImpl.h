@@ -116,7 +116,9 @@ public:
     CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize);
     CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize);
     CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
+    bool _IsCommissionableDeviceTypeEnabled();
     CHIP_ERROR _GetDeviceType(uint16_t & deviceType);
+    bool _IsCommissionableDeviceNameEnabled();
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _GetInitialPairingHint(uint16_t & pairingHint);
     CHIP_ERROR _GetInitialPairingInstruction(char * buf, size_t bufSize);
