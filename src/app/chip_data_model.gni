@@ -61,6 +61,7 @@ template("chip_data_model") {
                              "cluster_sources",
                              "zap_file",
                              "use_default_client_callbacks",
+                             "is_server",
                            ])
 
     if (!defined(sources)) {
@@ -169,6 +170,10 @@ template("chip_data_model") {
       "${chip_root}/src/lib/support",
       "${chip_root}/src/protocols/secure_channel",
     ]
+
+    if (defined(invoker.is_server)) {
+      public_deps += [ "${chip_root}/src/app/server" ]
+    }
 
     if (!defined(public_configs)) {
       public_configs = []

@@ -40,7 +40,7 @@
 #endif
 
 #include <app/InteractionModelEngine.h>
-#include <app/server/DataModelHandler.h>
+#include <app/util/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -196,7 +196,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    InitDataModelHandler();
+    InitDataModelHandler(mExchangeMgr);
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;

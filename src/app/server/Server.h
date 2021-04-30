@@ -64,10 +64,6 @@ enum class PairingWindowAdvertisement
     kBle,
     kMdns,
 };
-
-SecureSessionMgr & SessionManager();
-Messaging::ExchangeManager & ExchangeManager();
-
 } // namespace chip
 
 /**

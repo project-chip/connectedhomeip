@@ -31,8 +31,6 @@
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    InitDataModelHandler();
-
     Commands commands;
     registerCommandsDiscover(commands);
     registerCommandsPayload(commands);

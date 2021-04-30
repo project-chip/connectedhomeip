@@ -20,10 +20,10 @@
 #include <app/server/Server.h>
 
 #include <app/InteractionModelEngine.h>
-#include <app/server/DataModelHandler.h>
 #include <app/server/EchoHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/StorablePeerConnection.h>
+#include <app/util/DataModelHandler.h>
 
 #include <ble/BLEEndPoint.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -407,16 +407,6 @@ SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
-SecureSessionMgr & chip::SessionManager()
-{
-    return gSessions;
-}
-
-Messaging::ExchangeManager & chip::ExchangeManager()
-{
-    return gExchangeMgr;
-}
-
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
@@ -489,7 +479,7 @@ void InitServer(AppDelegate * delegate)
 
     chip::Platform::MemoryInit();
 
-    InitDataModelHandler();
+    InitDataModelHandler(&gExchangeMgr);
     gCallbacks.SetDelegate(delegate);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN

@@ -100,6 +100,9 @@ EmberAfClusterCommand curCmd;
 // to NULL when the function exits.
 EmberAfClusterCommand * emAfCurrentCommand;
 
+// A pointer to the global exchange manager
+chip::Messaging::ExchangeManager * emAfExchangeMgr = nullptr;
+
 // DEPRECATED.
 uint8_t emberAfIncomingZclSequenceNumber = 0xFF;
 
@@ -266,12 +269,14 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
 // ****************************************
 // Initialize Clusters
 // ****************************************
-void emberAfInit(void)
+void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 {
     uint8_t i;
 #ifdef EMBER_AF_ENABLE_STATISTICS
     afNumPktsSent = 0;
 #endif
+
+    emAfExchangeMgr = exchangeMgr;
 
     for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
     {
@@ -1239,4 +1244,9 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         // as case 0 to make MISRA happy.
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
+}
+
+chip::Messaging::ExchangeManager * chip::ExchangeManager()
+{
+    return emAfExchangeMgr;
 }

@@ -31,7 +31,10 @@ source_set("app-main") {
     defines = [ "PW_RPC_ENABLED" ]
   }
 
-  public_deps = [ "${chip_root}/src/lib" ]
+  public_deps = [
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
+  ]
 
   public_configs = [ ":app-main-config" ]
 }
