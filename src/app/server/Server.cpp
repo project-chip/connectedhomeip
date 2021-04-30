@@ -412,11 +412,6 @@ SecureSessionMgr & chip::SessionManager()
     return gSessions;
 }
 
-Messaging::ExchangeManager & chip::ExchangeManager()
-{
-    return gExchangeMgr;
-}
-
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
@@ -489,7 +484,7 @@ void InitServer(AppDelegate * delegate)
 
     chip::Platform::MemoryInit();
 
-    InitDataModelHandler();
+    InitDataModelHandler(&gExchangeMgr);
     gCallbacks.SetDelegate(delegate);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN

@@ -196,7 +196,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    InitDataModelHandler();
+    InitDataModelHandler(mExchangeMgr);
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;

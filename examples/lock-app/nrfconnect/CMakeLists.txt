@@ -68,6 +68,12 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
+               ${CHIP_ROOT}/src/app/server/Mdns.cpp
+               ${CHIP_ROOT}/src/app/server/OnboardingCodeUtils.cpp
+               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/server/Server.cpp
+               ${CHIP_ROOT}/src/app/server/StoragePeerConnection.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp

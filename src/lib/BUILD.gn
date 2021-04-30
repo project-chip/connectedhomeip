@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   chip_build_shell_lib = false
@@ -43,10 +42,6 @@ static_library("lib") {
 
   if (chip_build_shell_lib) {
     public_deps += [ "${chip_root}/src/lib/shell" ]
-  }
-
-  if (chip_device_platform != "none") {
-    public_deps += [ "${chip_root}/src/app/server" ]
   }
 
   cflags = [ "-Wconversion" ]

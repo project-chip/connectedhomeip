@@ -66,7 +66,6 @@ enum class PairingWindowAdvertisement
 };
 
 SecureSessionMgr & SessionManager();
-Messaging::ExchangeManager & ExchangeManager();
 
 } // namespace chip
 

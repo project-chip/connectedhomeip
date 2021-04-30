@@ -48,8 +48,6 @@ CHIP_ERROR ReportingCommand::Run(PersistentStorage & storage, NodeId localId, No
     err = mCommissioner.GetDevice(remoteId, &mDevice);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
-    mDevice->SetDelegate(this);
-
     AddReportCallbacks(mEndPointId);
 
     cluster.Associate(mDevice, mEndPointId);
@@ -63,15 +61,4 @@ exit:
     mCommissioner.ServiceEventSignal();
     mCommissioner.Shutdown();
     return err;
-}
-
-void ReportingCommand::OnMessage(PacketBufferHandle buffer)
-{
-    ChipLogDetail(chipTool, "%" PRIu64 ": Received %zu bytes", mDevice->GetDeviceId(), buffer->DataLength());
-    HandleDataModelMessage(mDevice->GetDeviceId(), std::move(buffer));
-}
-
-void ReportingCommand::OnStatusChange(void)
-{
-    ChipLogDetail(chipTool, "DeviceStatusDelegate::OnStatusChange");
 }

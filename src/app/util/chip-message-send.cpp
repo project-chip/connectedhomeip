@@ -50,7 +50,7 @@ class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 };
 
 extern SecureSessionMgr & SessionManager();
-extern Messaging::ExchangeManager & ExchangeManager();
+extern Messaging::ExchangeManager * ExchangeManager();
 } // namespace chip
 
 EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
@@ -88,8 +88,14 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    // TODO: temprary create a handle from node id, will be fix in PR 3602
-    Messaging::ExchangeContext * exchange = ExchangeManager().NewContext({ destination, Transport::kAnyKeyId, 0 }, nullptr);
+    // TODO: temporary create a handle from node id, will be fix in PR 3602
+    Messaging::ExchangeManager * exchangeMgr = ExchangeManager();
+    if (exchangeMgr == nullptr)
+    {
+        return EMBER_DELIVERY_FAILED;
+    }
+
+    Messaging::ExchangeContext * exchange = exchangeMgr->NewContext({ destination, Transport::kAnyKeyId, 0 }, nullptr);
     if (exchange == nullptr)
     {
         return EMBER_DELIVERY_FAILED;
