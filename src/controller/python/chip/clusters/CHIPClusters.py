@@ -40,26 +40,26 @@ class ChipClusters:
         return {
             "AccountLogin": {
                 "GetSetupPIN": {
-                    "tempAccountIdentifier": "bytes",
+                    "tempAccountIdentifier": "str",
                 },
                 "Login": {
-                    "tempAccountIdentifier": "bytes",
-                    "setupPIN": "bytes",
+                    "tempAccountIdentifier": "str",
+                    "setupPIN": "str",
                 },
             },
             "ApplicationBasic": {
             },
             "ApplicationLauncher": {
                 "LaunchApp": {
-                    "data": "bytes",
+                    "data": "str",
                     "catalogVendorId": "int",
-                    "applicationId": "bytes",
+                    "applicationId": "str",
                 },
             },
             "AudioOutput": {
                 "RenameOutput": {
                     "index": "int",
-                    "name": "bytes",
+                    "name": "str",
                 },
                 "SelectOutput": {
                     "index": "int",
@@ -188,11 +188,11 @@ class ChipClusters:
             "ContentLaunch": {
                 "LaunchContent": {
                     "autoPlay": "int",
-                    "data": "bytes",
+                    "data": "str",
                 },
                 "LaunchURL": {
-                    "contentURL": "bytes",
-                    "displayString": "bytes",
+                    "contentURL": "str",
+                    "displayString": "str",
                 },
             },
             "Descriptor": {
@@ -243,7 +243,7 @@ class ChipClusters:
                     "userId": "int",
                 },
                 "LockDoor": {
-                    "pin": "bytes",
+                    "pin": "str",
                 },
                 "SetHolidaySchedule": {
                     "scheduleId": "int",
@@ -255,13 +255,13 @@ class ChipClusters:
                     "userId": "int",
                     "userStatus": "int",
                     "userType": "int",
-                    "pin": "bytes",
+                    "pin": "str",
                 },
                 "SetRfid": {
                     "userId": "int",
                     "userStatus": "int",
                     "userType": "int",
-                    "id": "bytes",
+                    "id": "str",
                 },
                 "SetUserType": {
                     "userId": "int",
@@ -283,11 +283,11 @@ class ChipClusters:
                     "localEndTime": "int",
                 },
                 "UnlockDoor": {
-                    "pin": "bytes",
+                    "pin": "str",
                 },
                 "UnlockWithTimeout": {
                     "timeoutInSeconds": "int",
-                    "pin": "bytes",
+                    "pin": "str",
                 },
             },
             "GeneralCommissioning": {
@@ -300,7 +300,7 @@ class ChipClusters:
                 },
                 "SetRegulatoryConfig": {
                     "location": "int",
-                    "countryCode": "bytes",
+                    "countryCode": "str",
                     "breadcrumb": "int",
                     "timeoutMs": "int",
                 },
@@ -310,11 +310,11 @@ class ChipClusters:
             "Groups": {
                 "AddGroup": {
                     "groupId": "int",
-                    "groupName": "bytes",
+                    "groupName": "str",
                 },
                 "AddGroupIfIdentifying": {
                     "groupId": "int",
-                    "groupName": "bytes",
+                    "groupName": "str",
                 },
                 "GetGroupMembership": {
                     "groupCount": "int",
@@ -390,7 +390,7 @@ class ChipClusters:
                 },
                 "RenameInput": {
                     "index": "int",
-                    "name": "bytes",
+                    "name": "str",
                 },
                 "SelectInput": {
                     "index": "int",
@@ -489,7 +489,7 @@ class ChipClusters:
                     "vendorId": "int",
                 },
                 "UpdateFabricLabel": {
-                    "label": "bytes",
+                    "label": "str",
                 },
             },
             "PumpConfigurationAndControl": {
@@ -499,7 +499,7 @@ class ChipClusters:
                     "groupId": "int",
                     "sceneId": "int",
                     "transitionTime": "int",
-                    "sceneName": "bytes",
+                    "sceneName": "str",
                     "clusterId": "int",
                     "length": "int",
                     "value": "int",
@@ -532,7 +532,7 @@ class ChipClusters:
             },
             "TvChannel": {
                 "ChangeChannel": {
-                    "match": "bytes",
+                    "match": "str",
                 },
                 "ChangeChannelByNumber": {
                     "majorNumber": "int",
@@ -545,7 +545,7 @@ class ChipClusters:
             "TargetNavigator": {
                 "NavigateTarget": {
                     "target": "int",
-                    "data": "bytes",
+                    "data": "str",
                 },
             },
             "TemperatureMeasurement": {
