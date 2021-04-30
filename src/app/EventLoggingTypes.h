@@ -146,19 +146,24 @@ struct Timestamp
 class EventOptions
 {
 public:
-    EventOptions(void) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(false) {}
+    enum class Type
+    {
+        kUrgent = 0,
+        kNotUrgent,
+    };
+    EventOptions(void) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
-    EventOptions(bool aUrgent) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aUrgent) {}
+    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kInvalid), mpEventSchema(nullptr), mUrgent(aType) {}
 
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(false) {}
+    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
-    EventOptions(Timestamp aTimestamp, bool aUrgent) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(aUrgent) {}
+    EventOptions(Timestamp aTimestamp, Type aUrgent) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(aUrgent) {}
     Timestamp mTimestamp = Timestamp::Type::kInvalid;
 
     EventSchema * mpEventSchema = nullptr; /**< A pointer to the schema of the cluster instance.*/
 
-    bool mUrgent =
-        false; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be flushed. */
+    Type mUrgent = Type::kNotUrgent; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be
+                                        flushed. */
 };
 
 /**
@@ -169,18 +174,16 @@ struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
         mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber),
-        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC),
-        mFirstUtc(true), mFirst(true)
+        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;
     PriorityLevel mPriority          = PriorityLevel::Invalid;
     EventNumber mStartingEventNumber = 0;
     Timestamp mCurrentSystemTime;
-    chip::EventNumber mCurrentEventNumber = 0;
+    EventNumber mCurrentEventNumber = 0;
     Timestamp mCurrentUTCTime;
-    bool mFirstUtc = true;
-    bool mFirst    = true;
+    bool mFirst = true;
 };
-} // namespace app
-} // namespace chip
+}
+}
