@@ -18,8 +18,8 @@
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import <Foundation/Foundation.h>
 #import "CHIPOnboardingPayloadParser.h"
+#import <Foundation/Foundation.h>
 
 @class CHIPDevice;
 
@@ -50,9 +50,9 @@ NS_ASSUME_NONNULL_BEGIN
                             error:(NSError * __autoreleasing *)error;
 
 - (BOOL)pairDevice:(uint64_t)deviceID
- onboardingPayload:(NSString *)onboardingPayload
-onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
-             error:(NSError * __autoreleasing *)error;
+        onboardingPayload:(NSString *)onboardingPayload
+    onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
+                    error:(NSError * __autoreleasing *)error;
 
 - (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;

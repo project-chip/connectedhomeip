@@ -19,8 +19,8 @@
  */
 // module headers
 #import "CHIPManualSetupPayloadParser.h"
-#import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPOnboardingPayloadParser.h"
+#import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPSetupPayload.h"
 
 // additional includes
@@ -37,8 +37,10 @@
 
 - (void)testOnboardingPayloadParser_Manual_NoError
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015" ofType:CHIPOnboardingPayloadTypeManualCode error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeManualCode
+                                                                                         error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -54,8 +56,10 @@
 
 - (void)testOnboardingPayloadParser_Manual_WrongType
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015" ofType:CHIPOnboardingPayloadTypeQRCode error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                         error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, CHIPErrorCodeInvalidArgument);
@@ -63,8 +67,10 @@
 
 - (void)testOnboardingPayloadParser_Admin_NoError
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015" ofType:CHIPOnboardingPayloadTypeAdmin error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeAdmin
+                                                                                         error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -80,8 +86,10 @@
 
 - (void)testOnboardingPayloadParser_Admin_WrongType
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015" ofType:CHIPOnboardingPayloadTypeQRCode error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                         error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, CHIPErrorCodeInvalidArgument);
@@ -89,8 +97,10 @@
 
 - (void)testOnboardingPayloadParser_QRCode_NoError
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L900000" ofType:CHIPOnboardingPayloadTypeQRCode error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L900000"
+                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                         error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -106,8 +116,10 @@
 
 - (void)testOnboardingPayloadParser_QRCode_WrongType
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L900000" ofType:CHIPOnboardingPayloadTypeAdmin error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L900000"
+                                                                                        ofType:CHIPOnboardingPayloadTypeAdmin
+                                                                                         error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, CHIPErrorCodeIntegrityCheckFailed);
@@ -115,8 +127,11 @@
 
 - (void)testOnboardingPayloadParser_NFC_NoError
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3" ofType:CHIPOnboardingPayloadTypeNFC error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload =
+        [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"
+                                                               ofType:CHIPOnboardingPayloadTypeNFC
+                                                                error:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
@@ -132,8 +147,11 @@
 
 - (void)testOnboardingPayloadParser_NFC_WrongType
 {
-    NSError *error;
-    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3" ofType:CHIPOnboardingPayloadTypeManualCode error:&error];
+    NSError * error;
+    CHIPSetupPayload * payload =
+        [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"
+                                                               ofType:CHIPOnboardingPayloadTypeManualCode
+                                                                error:&error];
 
     XCTAssertNil(payload);
     XCTAssertEqual(error.code, CHIPErrorCodeIntegrityCheckFailed);
