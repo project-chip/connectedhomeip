@@ -185,23 +185,22 @@ static void CheckLogEventBasics(nlTestSuite * apSuite, void * apContext)
 
     InitializeEventLogging();
     options.mpEventSchema = &schema;
-    options.mUrgent       = true;
 
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, &options, eid1);
+    err = logMgmt.LogEvent(&testEventGenerator, options, eid1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     CheckLogState(apSuite, logMgmt, 1);
 
     usleep(10000);
     testEventGenerator.SetStatus(1);
-    err = logMgmt.LogEvent(&testEventGenerator, &options, eid2);
+    err = logMgmt.LogEvent(&testEventGenerator, options, eid2);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     CheckLogState(apSuite, logMgmt, 2);
 
     usleep(10000);
     testEventGenerator.SetStatus(0);
-    err = logMgmt.LogEvent(&testEventGenerator, &options, eid3);
+    err = logMgmt.LogEvent(&testEventGenerator, options, eid3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     CheckLogState(apSuite, logMgmt, 3);
 

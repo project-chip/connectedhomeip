@@ -35,14 +35,14 @@
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
-constexpr size_t kEventSizeRezerve = 196;
+constexpr size_t kMaxEventSizeRezerve = 512;
 
 namespace chip {
 namespace app {
 
 /**
  * @brief
- *   Internal event buffer, built around the chip::TLV::CHIPCircularTLVBuffer
+ *   Internal event buffer, built around the TLV::CHIPCircularTLVBuffer
  */
 
 class CircularEventBuffer : public TLV::CHIPCircularTLVBuffer
@@ -51,18 +51,6 @@ public:
     /**
      * @brief
      *   A constructor for the CircularEventBuffer (internal API).
-     *
-     * @param[in] apBuffer       The actual storage to use for event storage.
-     *
-     * @param[in] aBufferLength The length of the \c apBuffer in bytes.
-     *
-     * @param[in] apPrev         The pointer to CircularEventBuffer storing
-     *                           events of lesser priority.
-     *
-     * @param[in] apNext         The pointer to CircularEventBuffer storing
-     *                           events of greater priority.
-     *
-     * @return CircularEventBuffer
      */
     CircularEventBuffer();
 
@@ -99,9 +87,9 @@ public:
      *   Allocate a new event Number based on the event priority, and advance the counter
      *   if we have one.
      *
-     * @return chip::EventNumber Event Number for this priority.
+     * @return EventNumber Event Number for this priority.
      */
-    chip::EventNumber VendEventNumber();
+    EventNumber VendEventNumber();
 
     /**
      * @brief
@@ -109,7 +97,7 @@ public:
      *
      *   @param[in]   aNumEvents   the number of the event.
      */
-    void RemoveEvent(uint16_t aNumEvents);
+    void RemoveEvent(EventNumber aNumEvents);
 
     /**
      * @brief
@@ -118,7 +106,7 @@ public:
      * @param aEventTimestamp The event timestamp.
      *
      */
-    void AddEvent(Timestamp aEventTimestamp);
+    void UpdateFirstLastEventTime(Timestamp aEventTimestamp);
 
     PriorityLevel GetPriorityLevel() { return mPriority; }
 
@@ -138,17 +126,17 @@ private:
         PriorityLevel::Invalid; //< The buffer is the final bucket for events of this priority.  Events of lesser priority are
     //< dropped when they get bumped out of this buffer
 
-    chip::EventNumber mFirstEventNumber = 0; //< First event Number stored in the logging subsystem for this priority
-    chip::EventNumber mLastEventNumber  = 0; //< Last event Number vended for this priority
+    EventNumber mFirstEventNumber = 0; //< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber  = 0; //< Last event Number vended for this priority
 
     Timestamp mFirstEventSystemTimestamp; //< The timestamp of the first event in this buffer
     Timestamp mLastEventSystemTimestamp;  //< The timestamp of the last event in this buffer
 
     // The counter we're going to actually use.
-    chip::MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
+    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
 
     // The backup counter to use if no counter is provided for us.
-    chip::MonotonicallyIncreasingCounter mNonPersistedCounter;
+    MonotonicallyIncreasingCounter mNonPersistedCounter;
 };
 
 class CircularEventReader;
@@ -159,7 +147,7 @@ class CircularEventReader;
  *   if nothing left there update its CircularEventBuffer until the buffer with data has been found,
  *   the tlv reader will have a pointer to this impl.
  */
-class CircularEventBufferWrapper : public chip::TLV::CHIPCircularTLVBuffer
+class CircularEventBufferWrapper : public TLV::CHIPCircularTLVBuffer
 {
 public:
     CircularEventBufferWrapper() : CHIPCircularTLVBuffer(nullptr, 0), mpCurrent(nullptr){};
@@ -189,19 +177,28 @@ enum class EventManagementStates
 
 struct LogStorageResources
 {
-    void * mpBuffer =
+    //TODO: Update CHIPCircularTLVBuffer with size_t for buffer size, then use ByteSpan
+    uint8_t * mpBuffer =
         nullptr; // Buffer to be used as a storage at the particular priority level and shared with more important events.
                  // Must not be nullptr.  Must be large enough to accommodate the largest event emitted by the system.
-    size_t mBufferSize = 0; //< The size, in bytes, of the `mBuffer`.
-    chip::Platform::PersistedStorage::Key * mCounterKey =
+    uint32_t mBufferSize = 0; //< The size, in bytes, of the `mBuffer`.
+    Platform::PersistedStorage::Key * mCounterKey =
         nullptr;                // Name of the key naming persistent counter for events of this priority.  When NULL, the persistent
                                 // counters will not be used for this priority level.
     uint32_t mCounterEpoch = 0; // The interval used in incrementing persistent counters.  When 0, the persistent counters will not
                                 // be used for this priority level.
-    chip::PersistedCounter * mpCounterStorage =
+    PersistedCounter * mpCounterStorage =
         nullptr; // application provided storage for persistent counter for this priority level.
     PriorityLevel mPriority =
         PriorityLevel::Invalid; // Log priority level associated with the resources provided in this structure.
+    PersistedCounter * InitializeCounter() const
+    {
+        if (mpCounterStorage != nullptr && mCounterKey != nullptr && mCounterEpoch != 0)
+        {
+            return (mpCounterStorage->Init(*mCounterKey, mCounterEpoch) != CHIP_NO_ERROR) ?  mpCounterStorage : nullptr;
+        }
+        return nullptr;
+    }
 };
 
 /**
@@ -286,7 +283,7 @@ public:
      *   Log an event via a EventLoggingDelegate, with options.
      *
      * The EventLoggingDelegate writes the event metadata and calls the `apDelegate`
-     * with an chip::TLV::TLVWriter reference so that the user code can emit
+     * with an TLV::TLVWriter reference so that the user code can emit
      * the event data directly into the event log.  This form of event
      * logging minimizes memory consumption, as event data is serialized
      * directly into the target buffer.  The event data MUST contain
@@ -310,14 +307,14 @@ public:
      *
      * @param[in] apDelegate The EventLoggingDelegate to serialize the event data
      *
-     * @param[in] apOptions    The options for the event metadata.
+     * @param[in] aEventOptions    The options for the event metadata.
      *
      * @param[out] aEventNumber The event Number if the event was written to the
      *                         log, 0 otherwise.
      *
      * @return CHIP_ERROR  CHIP Error Code
      */
-    CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber & aEventNumber);
+    CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber);
 
     /**
      * @brief
@@ -340,16 +337,16 @@ public:
      * @return                 #CHIP_NO_ERROR Unconditionally.
      */
     CHIP_ERROR GetEventReader(chip::TLV::TLVReader & aReader, PriorityLevel aPriority,
-                              chip::app::CircularEventBufferWrapper * apBufWrapper);
+                              app::CircularEventBufferWrapper * apBufWrapper);
 
     /**
      * @brief
      *   A function to retrieve events of specified priority since a specified event ID.
      *
-     * Given a chip::TLV::TLVWriter, an priority type, and an event ID, the
+     * Given a TLV::TLVWriter, an priority type, and an event ID, the
      * function will fetch events of specified priority since the
      * specified event.  The function will continue fetching events until
-     * it runs out of space in the chip::TLV::TLVWriter or in the log. The function
+     * it runs out of space in the TLV::TLVWriter or in the log. The function
      * will terminate the event writing on event boundary.
      *
      * @param[in] aWriter     The writer to use for event storage
@@ -374,7 +371,7 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority, chip::EventNumber & aEventNumber);
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber & aEventNumber);
 
     /**
      * @brief
@@ -402,14 +399,12 @@ public:
      * may also be taken into account depending on the offload strategy.
      *
      *
-     * @param aFlushRequested A boolean value indicating whether the flush
-     *                       should be scheduled regardless of internal
-     *                       buffer management policy.
+     * @param aUrgent  indiate whether the flush should be scheduled if it is urgent
      *
      * @retval #CHIP_ERROR_INCORRECT_STATE EventManagement module was not initialized fully.
      * @retval #CHIP_NO_ERROR              On success.
      */
-    CHIP_ERROR ScheduleFlushIfNeeded(bool aFlushRequested);
+    CHIP_ERROR ScheduleFlushIfNeeded(EventOptions::Type aUrgent);
 
     /**
      * @brief
@@ -417,9 +412,9 @@ public:
      *
      * @param aPriority Priority level
      *
-     * @return chip::EventNumber most recently vended event Number for that event priority
+     * @return EventNumber most recently vended event Number for that event priority
      */
-    chip::EventNumber GetLastEventNumber(PriorityLevel aPriority);
+    EventNumber GetLastEventNumber(PriorityLevel aPriority);
 
     /**
      * @brief
@@ -427,17 +422,19 @@ public:
      *
      * @param aPriority Priority level
      *
-     * @return chip::EventNumber First currently stored event Number for that event priority
+     * @return EventNumber First currently stored event Number for that event priority
      */
-    chip::EventNumber GetFirstEventNumber(PriorityLevel aPriority);
+    EventNumber GetFirstEventNumber(PriorityLevel aPriority);
 
+private:
+    CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, uint32_t & requiredSize);
     /**
      * @brief Helper function for writing event header and data according to event
      *   logging protocol.
      *
      * @param[inout] apContext   EventLoadOutContext, initialized with stateful
      *                          information for the buffer. State is updated
-     *                          and preserved by BlitEvent using this context.
+     *                          and preserved by ConstructEvent using this context.
      *
      * @param[in] apDelegate The EventLoggingDelegate to serialize the event data
      *
@@ -445,22 +442,10 @@ public:
      *                          relevant to this event.
      *
      */
-    CHIP_ERROR BlitEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
+    CHIP_ERROR ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
 
-    /**
-     * @brief Helper function to skip writing an event corresponding to an allocated
-     *   event id.
-     *
-     * @param[inout] apContext   EventLoadOutContext, initialized with stateful
-     *                          information for the buffer. State is updated
-     *                          and preserved by BlitEvent using this context.
-     *
-     */
-    void SkipEvent(EventLoadOutContext * apContext);
-
-private:
     // Internal function to log event
-    CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, chip::EventNumber & aEventNumber);
+    CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber);
 
     /**
      * @brief copy the event outright to next buffer with higher priority
@@ -477,7 +462,7 @@ private:
      * @param[in] aRequiredSpace  require space
      *
      */
-    CHIP_ERROR EnsureSpace(size_t aRequiredSpace);
+    CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
 
     /**
      * @brief
@@ -495,7 +480,7 @@ private:
      * @retval #CHIP_ERROR_BUFFER_TOO_SMALL Function could not write a
      *                                       portion of the event to the TLVWriter.
      */
-    static CHIP_ERROR CopyEventsSince(const chip::TLV::TLVReader & aReader, size_t aDepth, void * apContext);
+    static CHIP_ERROR CopyEventsSince(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
     /**
      * @brief Internal iterator function used to scan and filter though event logs
@@ -503,28 +488,28 @@ private:
      * The function is used to scan through the event log to find events matching the spec in the supplied context.
      * Particularly, it would check against mStartingEventNumber, and skip fetched event.
      */
-    static CHIP_ERROR EventIterator(const chip::TLV::TLVReader & aReader, size_t aDepth, void * apContext);
+    static CHIP_ERROR EventIterator(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
     /**
      * @brief Internal iterator function used to fetch event into EventEnvelopeContext, then EventIterator would filter event
      * based upon EventEnvelopeContext
      *
      */
-    static CHIP_ERROR FetchEventParameters(const chip::TLV::TLVReader & aReader, size_t aDepth, void * apContext);
+    static CHIP_ERROR FetchEventParameters(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
     /**
      * @brief Internal iterator function used to scan and filter though event logs
      * First event gets a timestamp, subsequent ones get a delta T
      * First event in the sequence gets a event number neatly packaged
      */
-    static CHIP_ERROR CopyAndAdjustDeltaTime(const chip::TLV::TLVReader & aReader, size_t aDepth, void * apContext);
+    static CHIP_ERROR CopyAndAdjustDeltaTime(const TLV::TLVReader & aReader, size_t aDepth, void * apContext);
 
     /**
      * @brief checking if the tail's event can be moved to higher priority, if not, dropped, if yes, note how much space it
      * requires, and return.
      */
-    static CHIP_ERROR EvictEvent(chip::TLV::CHIPCircularTLVBuffer & aBuffer, void * apAppData, chip::TLV::TLVReader & aReader);
-    static CHIP_ERROR AlwaysFail(chip::TLV::CHIPCircularTLVBuffer & aBuffer, void * apAppData, chip::TLV::TLVReader & aReader)
+    static CHIP_ERROR EvictEvent(chip::TLV::CHIPCircularTLVBuffer & aBuffer, void * apAppData, TLV::TLVReader & aReader);
+    static CHIP_ERROR AlwaysFail(chip::TLV::CHIPCircularTLVBuffer & aBuffer, void * apAppData, TLV::TLVReader & aReader)
     {
         return CHIP_ERROR_NO_MEMORY;
     };
@@ -532,7 +517,7 @@ private:
     /**
      * @brief copy event from circular buffer to target buffer for report
      */
-    static CHIP_ERROR CopyEvent(const chip::TLV::TLVReader & aReader, chip::TLV::TLVWriter & aWriter,
+    static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter,
                                 EventLoadOutContext * apContext);
 
     /**
