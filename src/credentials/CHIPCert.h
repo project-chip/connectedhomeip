@@ -260,7 +260,6 @@ public:
      **/
     bool IsEmpty() const { return RDNCount() == 0; }
 
-protected:
     ChipRDN rdn[CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES];
 
     uint8_t RDNCount() const;

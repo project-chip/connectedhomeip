@@ -106,6 +106,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
+        "${chip_root}/src/tools/chip-cert",
       ]
       if (chip_enable_python_modules) {
         deps += [ "${chip_root}/src/controller/python" ]
