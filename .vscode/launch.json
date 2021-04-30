@@ -258,6 +258,59 @@
                 "quit"
             ],
             "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed Unit Tests DISCO_L475VG_IOT01A",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "executable": "./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-tests",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["DISCO_L475VG_IOT01A.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor reset halt",
+                "monitor program {./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-tests.hex}"
+            ],
+            "overrideRestartCommands": ["monitor reset halt", "continue"],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
+        },
+
+        {
+            "name": "Debug Mbed Unit Tests CY8CPROTO_062_4343W",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "executable": "./build-CY8CPROTO_062_4343W/${input:mbedDebugProfile}/chip-tests",
+            "servertype": "openocd",
+            "searchDir": [
+                "${workspaceRoot}/config/mbed/scripts",
+                "${env:OPENOCD_PATH/scripts}"
+            ],
+            "configFiles": ["CY8CPROTO_062_4343W.tcl"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "monitor program {./build-DISCO_L475VG_IOT01A/${input:mbedDebugProfile}/chip-tests.hex}",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "numberOfProcessors": 2,
+            "targetProcessor": 1, // Set to 0 for the CM0+, set to 1 for the CM4
+            "overrideRestartCommands": [
+                "monitor reset init",
+                "monitor reset run",
+                "monitor sleep 200",
+                "monitor psoc6 reset_halt sysresetreq"
+            ],
+            "runToMain": true, // if true, program will halt at main. Not used for a restart
+            "showDevDebugOutput": false // When set to true, displays output of GDB.
         }
     ],
     "inputs": [
