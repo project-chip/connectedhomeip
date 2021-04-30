@@ -6,10 +6,10 @@ FROM connectedhomeip/chip-build:${VERSION}
 # doesn't work with JDK 11.
 RUN set -x \
     && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    openjdk-8-jdk=8u292-b10-0ubuntu1~20.04 \
-    rsync=3.1.3-8 \
-    swig=4.0.1-5build1 \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    openjdk-8-jdk \
+    rsync \
+    swig \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
