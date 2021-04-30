@@ -33,19 +33,19 @@ DeviceControlServer DeviceControlServer::sInstance;
 CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DeviceControlServer::CommissioningComplete()
 {
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)
