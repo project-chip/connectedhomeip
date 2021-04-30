@@ -18,8 +18,8 @@
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import <Foundation/Foundation.h>
 #import <CHIP/CHIPOnboardingPayloadParser.h>
+#import <Foundation/Foundation.h>
 
 @class CHIPDevice;
 
