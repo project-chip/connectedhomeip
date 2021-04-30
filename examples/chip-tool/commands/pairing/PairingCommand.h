@@ -143,5 +143,5 @@ private:
     ChipDeviceCommissioner mCommissioner;
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
-    chip::EndpointId mEndpointId = 0;
+    chip::EndpointId mEndpointId = 1;
 };
