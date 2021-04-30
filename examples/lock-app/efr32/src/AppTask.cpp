@@ -28,7 +28,6 @@
 #include "gen/cluster-id.h"
 #include "lcd.h"
 #include "qrcodegen.h"
-#include <app/server/DataModelHandler.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>

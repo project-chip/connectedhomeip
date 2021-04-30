@@ -22,7 +22,6 @@
 
 #include "AppConfig.h"
 #include "LightingManager.h"
-#include <app/server/DataModelHandler.h>
 
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
