@@ -17,6 +17,12 @@
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
+
+set(is_debug true CACHE BOOL "Optimization variable")
+if(NOT is_debug)
+    set(SDKCONFIG_DEFAULTS "sdkconfig.optimize.defaults")
+endif()
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
 # The list of extra component dirs must be in sync with that in temperature-measurement-app/esp32/Makefile
