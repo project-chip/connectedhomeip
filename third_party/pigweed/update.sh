@@ -8,7 +8,7 @@ git checkout origin/master
 
 # Copy the CIPD manifest but change the Python line so we don't use CIPD
 # Python on Linux.
-cat pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json | \
+cat pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json |
     perl -pe 's[(infra/3pp/tools/cpython3/\$\{os)\}][$1=mac}];' > \
         ../../../scripts/pigweed.json
 
