@@ -656,6 +656,7 @@ CHIP_ERROR ConvertChipCertToX509Cert(const uint8_t * chipCert, uint32_t chipCert
 CHIP_ERROR GenerateSignedX509CertFromChipCert(const uint8_t * chipCert, uint32_t chipCertLen, Crypto::P256Keypair & keypair,
                                               uint8_t * x509CertBuf, uint32_t x509CertBufSize, uint32_t & x509CertLen);
 
+// TODO: Add support for Authentication Tag Attribute
 struct X509CertRequestParams
 {
     int64_t SerialNumber;

@@ -317,7 +317,7 @@ static CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signatur
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ASN1_START_BIT_STRING_ENCAPSULATED { writer.PutRaw(signature, (uint16_t) signature.Length()); }
+    ASN1_START_BIT_STRING_ENCAPSULATED { writer.PutConstructedType(signature, (uint16_t) signature.Length()); }
     ASN1_END_ENCAPSULATED;
 
 exit:
