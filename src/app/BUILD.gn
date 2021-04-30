@@ -20,6 +20,17 @@ declare_args() {
   # Enable strict schema checks.
   chip_enable_schema_check =
       is_debug && (current_os == "linux" || current_os == "mac")
+
+  # Mutex implementation: posix, freertos.
+  chip_im_config_critical_section = ""
+}
+
+if (chip_im_config_critical_section == "") {
+  if (current_os != "freertos") {
+    chip_im_config_critical_section = "posix"
+  } else {
+    chip_im_config_critical_section = "rtos"
+  }
 }
 
 config("app_config") {
@@ -95,6 +106,14 @@ static_library("app") {
     "reporting/Engine.cpp",
     "reporting/Engine.h",
   ]
+
+  if (chip_im_config_critical_section == "posix") {
+    sources += [ "CriticalSectionImplPthread.cpp" ]
+  } else if (chip_im_config_critical_section == "rtos") {
+    sources += [ "CriticalSectionImplRtos.cpp" ]
+  } else {
+    assert(false, "Unknown IM critical section implementation.")
+  }
 
   public_deps = [
     "${chip_root}/src/lib/support",
