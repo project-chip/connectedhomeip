@@ -973,15 +973,15 @@ static void TestP256_Keygen(nlTestSuite * inSuite, void * inContext)
 
 static void TestCSR_Gen(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t csr[kMAX_CSR_Length];
+    static uint8_t csr[kMAX_CSR_Length];
     size_t length = sizeof(csr);
 
-    P256Keypair keypair;
+    static P256Keypair keypair;
     NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, keypair.NewCertificateSigningRequest(csr, length) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, length > 0);
 
-    P256PublicKey pubkey;
+    static P256PublicKey pubkey;
     CHIP_ERROR err = VerifyCertificateSigningRequest(csr, length, pubkey);
     if (err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
