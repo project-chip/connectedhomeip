@@ -22,9 +22,9 @@
 
 @implementation CHIPOnboardingPayloadParser
 
-+ (CHIPSetupPayload * __nullable)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
-                                                           ofType:(CHIPOnboardingPayloadType)type
-                                                            error:(NSError * __autoreleasing *)error
++ (nullable CHIPSetupPayload *)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
+                                                         ofType:(CHIPOnboardingPayloadType)type
+                                                          error:(NSError * __autoreleasing *)error
 {
     CHIPSetupPayload * payload;
     switch (type) {
@@ -42,16 +42,16 @@
     return payload;
 }
 
-+ (CHIPSetupPayload * __nullable)setupPayloadForQRCodeOnboardingPayload:(NSString *)onboardingPayload
-                                                                  error:(NSError * __autoreleasing *)error
++ (nullable CHIPSetupPayload *)setupPayloadForQRCodeOnboardingPayload:(NSString *)onboardingPayload
+                                                                error:(NSError * __autoreleasing *)error
 {
     CHIPQRCodeSetupPayloadParser * qrCodeParser =
         [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:onboardingPayload];
     return [qrCodeParser populatePayload:error];
 }
 
-+ (CHIPSetupPayload * __nullable)setupPayloadForManualCodeOnboardingPayload:(NSString *)onboardingPayload
-                                                                      error:(NSError * __autoreleasing *)error
++ (nullable CHIPSetupPayload *)setupPayloadForManualCodeOnboardingPayload:(NSString *)onboardingPayload
+                                                                    error:(NSError * __autoreleasing *)error
 {
     CHIPManualSetupPayloadParser * manualParser =
         [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:onboardingPayload];

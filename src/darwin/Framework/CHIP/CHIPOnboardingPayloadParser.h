@@ -30,9 +30,9 @@ typedef NS_ENUM(NSUInteger, CHIPOnboardingPayloadType) {
 
 @interface CHIPOnboardingPayloadParser : NSObject
 
-+ (CHIPSetupPayload * __nullable)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
-                                                           ofType:(CHIPOnboardingPayloadType)type
-                                                            error:(NSError * __autoreleasing *)error;
++ (nullable CHIPSetupPayload *)setupPayloadForOnboardingPayload:(NSString *)onboardingPayload
+                                                         ofType:(CHIPOnboardingPayloadType)type
+                                                          error:(NSError * __autoreleasing *)error;
 
 @end
 
