@@ -289,6 +289,24 @@
                     "${workspaceFolder}/examples/${input:mbedApp}/mbed/build"
                 ]
             }
+        },
+        {
+            "label": "Run Mbed Unit Tests",
+            "type": "shell",
+            "command": "scripts/tests/mbed_tests.sh",
+            "args": [
+                "-c=${input:mbedCommand}",
+                "-b=${input:mbedTarget}",
+                "-p=${input:mbedProfile}"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/src/test_driver/mbed/build"
+                ]
+            }
         }
     ],
     "inputs": [
@@ -319,13 +337,6 @@
             "description": "What mbed profile do you want to use?",
             "options": ["develop", "release", "debug"],
             "default": "develop"
-        },
-        {
-            "type": "pickString",
-            "id": "testsBuildMode",
-            "description": "Do you want to build, flash or both?",
-            "options": ["build", "build_flash", "flash_only"],
-            "default": "build"
         }
     ]
 }

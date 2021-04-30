@@ -23,12 +23,12 @@ cd "$CHIP_ROOT/src/test_driver/mbed/"
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(DISCO_L475VG_IOT01A NRF52840_DK CY8CPROTO_062_4343W)
 SUPPORTED_PROFILES=(release develop debug)
-SUPPORTED_MODES=(build build_flash flash_only)
+SUPPORTED_COMMAND=(build flash build-flash)
 
 TARGET_BOARD=DISCO_L475VG_IOT01A
 TOOLCHAIN=GCC_ARM
 PROFILE=develop
-MODE=build
+COMMAND=build
 
 for i in "$@"; do
     case $i in
@@ -44,8 +44,8 @@ for i in "$@"; do
         PROFILE="${i#*=}"
         shift
         ;;
-    -m=* | --mode=*)
-        MODE="${i#*=}"
+    -c=* | --command=*)
+        COMMAND="${i#*=}"
         shift
         ;;
     *)
@@ -69,8 +69,8 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
     exit 1
 fi
 
-if [[ ! " ${SUPPORTED_MODES[@]} " =~ " ${MODE} " ]]; then
-    echo "ERROR: Mode $MODE not supported"
+if [[ ! " ${SUPPORTED_COMMAND[@]} " =~ " ${COMMAND} " ]]; then
+    echo "ERROR: Command $COMMAND not supported"
     exit 1
 fi
 
@@ -79,40 +79,48 @@ BUILD_DIRECTORY="build-$TARGET_BOARD/$PROFILE/"
 set -e # Exit immediately if a command exits with a non-zero status.
 # set -x # Print commands and their arguments as they are executed.
 
-if [[ "${MODE}" == *"build"* ]]; then
-    # Create symlinks to submodules.
-    ln -sfTr "$CHIP_ROOT/third_party/mbed-os/repo" "mbed-os"
-    ln -sfTr "$CHIP_ROOT/third_party/wifi-ism43362/repo" "wifi-ism43362"
+if [[ "$COMMAND" == *"build"* ]]; then
+    echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
-    # Create a target specific build dir.
-    mkdir -p "$BUILD_DIRECTORY"
+    # Config directory setup
+    MBED_CONFIG_PATH=./cmake_build/"$TARGET_BOARD"/develop/"$TOOLCHAIN"/
+
+    # Override Mbed OS path to development directory
+    MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
+
+    # Create symlinks to mbed-os submodule
+    ln -sfTr $MBED_OS_PATH "mbed-os"
+
+    if [ "$TARGET_BOARD" == "DISCO_L475VG_IOT01A" ]; then
+        # Add the Mbed OS driver for the ISM43362 Wi-Fi module
+        WIFI_ISM43362_PATH="$CHIP_ROOT"/third_party/wifi-ism43362/repo
+
+        # Create symlinks to WIFI-ISM43362 submodule
+        ln -sfTr $WIFI_ISM43362_PATH "wifi-ism43362"
+    fi
+
+    # Generate config file for selected target, toolchain and hardware
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD"
 
     # Remove old artifacts to force linking
-    rm -rf "${BUILD_DIRECTORY}/chip-tests"*
+    rm -rf "${BUILD_DIRECTORY}/chip-"*
 
-    # Generate a config file for selected toolchain and target.
-    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD"
-    cp -f "cmake_build/$TARGET_BOARD/develop/$TOOLCHAIN/mbed_config.cmake" "$BUILD_DIRECTORY"
+    # Create output directory and copy config file there.
+    mkdir -p "$BUILD_DIRECTORY"
+    cp -f "$MBED_CONFIG_PATH"/mbed_config.cmake "$BUILD_DIRECTORY"/mbed_config.cmake
 
-    # Build.
-    cmake -S "./" -B "$BUILD_DIRECTORY" -G Ninja -D CMAKE_BUILD_TYPE="$PROFILE"
+    # Build application
+    cmake -S "./" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE"
     cmake --build "$BUILD_DIRECTORY"
 fi
 
-if [[ "${MODE}" == *"flash"* ]]; then
-    case $TARGET_BOARD in
-    NRF52840_DK)
-        PYOCD_TARGET=nrf52840
-        ;;
-    DISCO_L475VG_IOT01A)
-        PYOCD_TARGET=stm32l475xg
-        PYOCD_TARGET_ARGS="--frequency 4M"
-        ;;
-    *)
-        # unknown option
-        ;;
-    esac
+if [[ "$COMMAND" == *"flash"* ]]; then
 
-    # Flash the target.
-    pyocd flash -t "$PYOCD_TARGET" -O connect_mode=under-reset $PYOCD_TARGET_ARGS "$BUILD_DIRECTORY/chip-tests.hex"
+    echo "Flash Unit Tests app to $TARGET_BOARD target [$TOOLCHAIN toolchain, $PROFILE profile]"
+
+    # Flash scripts path setup
+    MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
+
+    # Flash application
+    openocd -f $MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD.tcl -c "program $BUILD_DIRECTORY/chip-tests verify reset exit"
 fi
