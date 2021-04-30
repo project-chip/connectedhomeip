@@ -73,7 +73,7 @@ EventManagement & EventManagement::GetInstance(void)
 struct ReclaimEventCtx
 {
     CircularEventBuffer * mpEventBuffer = nullptr;
-    size_t mSpaceNeededForMovedEvent         = 0;
+    size_t mSpaceNeededForMovedEvent    = 0;
 };
 
 /**
@@ -99,8 +99,8 @@ struct EventEnvelopeContext
     size_t mNumFieldsToRead =
         2 /* PriorityLevel and DeltaSystemTimestamp are there if that is not first event when putting events in report*/;
     Timestamp mDeltaSystemTime = Timestamp::UTC(0);
-    Timestamp mDeltaUtc = Timestamp::System(0);
-    PriorityLevel mPriority = PriorityLevel::First;
+    Timestamp mDeltaUtc        = Timestamp::System(0);
+    PriorityLevel mPriority    = PriorityLevel::First;
 };
 
 EventManagement::EventManagement(Messaging::ExchangeManager * apExchangeMgr, int aNumBuffers,
@@ -133,7 +133,7 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int a
         current->mProcessEvictedElement = AlwaysFail;
         current->mAppData               = nullptr;
         current->mPriority              = apLogStorageResources[bufferIndex].mPriority;
-        current->mpEventNumberCounter = apLogStorageResources[bufferIndex].InitializeCounter();
+        current->mpEventNumberCounter   = apLogStorageResources[bufferIndex].InitializeCounter();
 
         if (current->mpEventNumberCounter == nullptr)
         {
@@ -199,7 +199,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
 
         if (requiredSpace > eventBuffer->AvailableDataLength())
         {
-            ctx.mpEventBuffer        = eventBuffer;
+            ctx.mpEventBuffer             = eventBuffer;
             ctx.mSpaceNeededForMovedEvent = 0;
 
             eventBuffer->mProcessEvictedElement = EvictEvent;
@@ -268,13 +268,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate,
-                                           const EventOptions * apOptions, uint32_t & requiredSize)
+CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions,
+                                               uint32_t & requiredSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
-    EventLoadOutContext ctxt = EventLoadOutContext(writer, apOptions->mpEventSchema->mPriority,
-                                               GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventNumber);
+    EventLoadOutContext ctxt       = EventLoadOutContext(writer, apOptions->mpEventSchema->mPriority,
+                                                   GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventNumber);
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(kMaxEventSizeRezerve);
     if (buf.IsNull())
     {
@@ -284,7 +284,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 
     ctxt.mCurrentEventNumber = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventNumber;
     ctxt.mCurrentSystemTime  = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->mLastEventSystemTimestamp;
-    err = ConstructEvent(&ctxt, apDelegate, apOptions);
+    err                      = ConstructEvent(&ctxt, apDelegate, apOptions);
     if (CHIP_NO_ERROR == err)
     {
         requiredSize = writer.GetLengthWritten();
@@ -293,7 +293,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 }
 
 CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
-                                      const EventOptions * apOptions)
+                                           const EventOptions * apOptions)
 {
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -311,7 +311,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
     eventDataElementBuilder.Init(&(apContext->mWriter));
     eventPathBuilder = eventDataElementBuilder.CreateEventPathBuilder();
-    err = eventPathBuilder.GetError();
+    err              = eventPathBuilder.GetError();
     SuccessOrExit(err);
 
     // TODO: Revisit NodeId since the the encoding spec and the IM seem to disagree on how this stuff works
@@ -485,11 +485,11 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
 {
     CircularTLVWriter writer;
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint32_t requestSize             = 0;
+    uint32_t requestSize           = 0;
     aEventNumber                   = 0;
     CircularEventBuffer checkpoint = *mpEventBuffer;
-    CircularEventBuffer * buffer = nullptr;
-    EventLoadOutContext ctxt = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
+    CircularEventBuffer * buffer   = nullptr;
+    EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mpEventSchema->mPriority,
                                                    GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->mLastEventNumber);
     Timestamp timestamp(Timestamp::Type::kSystem, System::Timer::GetCurrentEpoch());
     EventOptions opts = EventOptions(timestamp);
@@ -772,7 +772,7 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
     {
         // event is not getting dropped. Note how much space it requires, and return.
         ctx->mSpaceNeededForMovedEvent = aReader.GetLengthRead();
-        err                       = CHIP_END_OF_TLV;
+        err                            = CHIP_END_OF_TLV;
     }
 
 exit:

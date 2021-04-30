@@ -177,7 +177,7 @@ enum class EventManagementStates
 
 struct LogStorageResources
 {
-    //TODO: Update CHIPCircularTLVBuffer with size_t for buffer size, then use ByteSpan
+    // TODO: Update CHIPCircularTLVBuffer with size_t for buffer size, then use ByteSpan
     uint8_t * mpBuffer =
         nullptr; // Buffer to be used as a storage at the particular priority level and shared with more important events.
                  // Must not be nullptr.  Must be large enough to accommodate the largest event emitted by the system.
@@ -187,15 +187,14 @@ struct LogStorageResources
                                 // counters will not be used for this priority level.
     uint32_t mCounterEpoch = 0; // The interval used in incrementing persistent counters.  When 0, the persistent counters will not
                                 // be used for this priority level.
-    PersistedCounter * mpCounterStorage =
-        nullptr; // application provided storage for persistent counter for this priority level.
+    PersistedCounter * mpCounterStorage = nullptr; // application provided storage for persistent counter for this priority level.
     PriorityLevel mPriority =
         PriorityLevel::Invalid; // Log priority level associated with the resources provided in this structure.
     PersistedCounter * InitializeCounter() const
     {
         if (mpCounterStorage != nullptr && mCounterKey != nullptr && mCounterEpoch != 0)
         {
-            return (mpCounterStorage->Init(*mCounterKey, mCounterEpoch) != CHIP_NO_ERROR) ?  mpCounterStorage : nullptr;
+            return (mpCounterStorage->Init(*mCounterKey, mCounterEpoch) != CHIP_NO_ERROR) ? mpCounterStorage : nullptr;
         }
         return nullptr;
     }
@@ -517,8 +516,7 @@ private:
     /**
      * @brief copy event from circular buffer to target buffer for report
      */
-    static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter,
-                                EventLoadOutContext * apContext);
+    static CHIP_ERROR CopyEvent(const TLV::TLVReader & aReader, TLV::TLVWriter & aWriter, EventLoadOutContext * apContext);
 
     /**
      * @brief

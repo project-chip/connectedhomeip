@@ -162,8 +162,8 @@ public:
 
     EventSchema * mpEventSchema = nullptr; /**< A pointer to the schema of the cluster instance.*/
 
-    Type mUrgent =
-        Type::kNotUrgent; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be flushed. */
+    Type mUrgent = Type::kNotUrgent; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be
+                                        flushed. */
 };
 
 /**
@@ -174,8 +174,7 @@ struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
         mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber),
-        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC),
-        mFirst(true)
+        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kUTC), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;
@@ -184,7 +183,7 @@ struct EventLoadOutContext
     Timestamp mCurrentSystemTime;
     chip::EventNumber mCurrentEventNumber = 0;
     Timestamp mCurrentUTCTime;
-    bool mFirst    = true;
+    bool mFirst = true;
 };
 } // namespace app
 } // namespace chip
