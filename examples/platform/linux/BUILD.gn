@@ -32,8 +32,8 @@ source_set("app-main") {
   }
 
   public_deps = [
-    "${chip_root}/src/lib",
     "${chip_root}/src/app/server",
+    "${chip_root}/src/lib",
   ]
 
   public_configs = [ ":app-main-config" ]
