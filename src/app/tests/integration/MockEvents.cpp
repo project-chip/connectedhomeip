@@ -120,8 +120,7 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
     chip::app::EventOptions options;
     mStatus               = static_cast<int32_t>(aStatus);
     options.mpEventSchema = &schema;
-    options.mUrgent       = true;
-    logManager.LogEvent(this, &options, number);
+    logManager.LogEvent(this, options, number);
     return number;
 }
 
