@@ -113,8 +113,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                             const SendFlags & sendFlags, Transport::PeerConnectionState * state)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    bool reliableTransmissionRequested = true;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
@@ -123,6 +122,8 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
     Retain();
+
+    bool reliableTransmissionRequested = true;
 
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
     if (state && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
