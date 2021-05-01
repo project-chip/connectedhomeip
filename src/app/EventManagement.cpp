@@ -22,11 +22,11 @@
 #include <core/CHIPEventLoggingConfig.h>
 #include <core/CHIPTLVUtilities.hpp>
 #include <inttypes.h>
+#include <mutex>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
-#include <mutex>
 
 using namespace chip::TLV;
 
@@ -42,8 +42,8 @@ void CriticalSectionExit()
 {
     eventLocker.unlock();
 }
-}
-}
+} // namespace Platform
+} // namespace chip
 
 namespace chip {
 namespace app {
