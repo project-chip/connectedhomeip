@@ -50,7 +50,7 @@ public:
     Cancelable * mNext;
     Cancelable * mPrev;
 
-    void * mInfoPtr;
+    void * mInfoPtr = nullptr;
     uint64_t mInfoScalar;
 
     /**

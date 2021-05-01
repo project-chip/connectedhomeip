@@ -29,6 +29,7 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPError.h>
+#include <support/CHIPPlatformMemory.h>
 #include <support/DLLUtil.h>
 
 namespace chip {
@@ -69,6 +70,7 @@ private:
         if (CHIP_NO_ERROR == err)
         {
             ca->Cancel();
+            CHIPPlatformMemoryFree(ca->mInfoPtr);
             queue.Dequeue(ca);
         }
 
@@ -81,7 +83,7 @@ private:
         Callback::Cancelable * ca = &queue;
         while (ca != nullptr && ca->mNext != &queue)
         {
-            if (*reinterpret_cast<T *>(&ca->mNext->mInfoPtr) == info)
+            if (*reinterpret_cast<T *>(ca->mNext->mInfoPtr) == info)
             {
                 *callback = ca->mNext;
                 return CHIP_NO_ERROR;
