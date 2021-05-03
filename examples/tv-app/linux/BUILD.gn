@@ -30,6 +30,7 @@ executable("chip-tv-app") {
     "include/audio-output/AudioOutputManager.cpp",
     "include/audio-output/AudioOutputManager.h",
     "include/cluster-init.cpp",
+    "include/cluster-change-attribute.cpp",
     "include/content-launcher/ContentLauncherManager.cpp",
     "include/content-launcher/ContentLauncherManager.h",
     "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
