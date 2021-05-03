@@ -418,6 +418,14 @@ typedef int (*entropy_source)(void * data, uint8_t * output, size_t len, size_t 
  **/
 CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t threshold);
 
+
+
+class PBKDF2_sha256
+{
+public:
+    PBKDF2_sha256();
+    virtual ~PBKDF2_sha256();
+
 /** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
  * @param password password used for key derivation
  * @param plen length of buffer containing password
@@ -428,8 +436,11 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
  * @param output output buffer where the key will be written
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
+virtual CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
                          uint32_t key_length, uint8_t * output);
+};
+
+
 
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as

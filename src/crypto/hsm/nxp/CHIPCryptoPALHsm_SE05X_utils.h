@@ -43,6 +43,7 @@ extern ex_sss_boot_ctx_t gex_sss_chip_ctx;
 enum keyid_values
 {
     kKeyId_NotInitialized = 0,
+	kKeyId_pbkdf2_sha256_hmac_keyid = 0xBCBCBCBC,
 };
 
 // Enable the below macro to make spake HSM imlementation reentrant.
@@ -70,7 +71,7 @@ extern "C" {
 void se05x_sessionOpen(void);
 
 /* Delete key in se05x */
-void se05x_delete_key(int keyid);
+void se05x_delete_key(uint32_t keyid);
 
 /* Set key in se05x */
 CHIP_ERROR se05x_set_key(int keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart, sss_cipher_type_t cipherType);

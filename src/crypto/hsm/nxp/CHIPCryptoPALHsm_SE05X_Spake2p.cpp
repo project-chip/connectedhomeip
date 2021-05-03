@@ -116,7 +116,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     smstatus = Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, list, &listlen);
     for (i = 0; i < listlen; i += 4)
     {
-        uint32_t cryptoObjectId = list[i + 1] | (list[i + 0] << 8);
+        uint32_t cryptoObjectId = (uint32_t)(list[i + 1] | (list[i + 0] << 8));
         if (cryptoObjectId == spakeObjectId)
         {
             create_crypto_obj = 0;
