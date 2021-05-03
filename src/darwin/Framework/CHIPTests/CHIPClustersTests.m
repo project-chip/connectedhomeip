@@ -27,7 +27,8 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-const uint16_t kTimeoutInMs = 10;
+const uint16_t kPairingTimeoutInSeconds = 10;
+const uint16_t kTimeoutInSeconds = 3;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -75,6 +76,12 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
 @implementation CHIPClustersTests
 
+- (void)setUp
+{
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+}
+
 - (void)testInitStack
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
@@ -100,7 +107,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                      error:&error];
     XCTAssertEqual(error.code, 0);
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 }
 
 - (void)testShutdownStack
@@ -131,7 +138,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterBasicMfgSpecificPingCommand
 {
@@ -148,7 +155,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterDoorLockClearAllPinsCommand
 {
@@ -165,7 +172,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterDoorLockClearAllRfidsCommand
 {
@@ -182,7 +189,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterGeneralCommissioningCommissioningCompleteCommand
 {
@@ -199,7 +206,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterGroupsRemoveAllGroupsCommand
 {
@@ -216,7 +223,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterIdentifyIdentifyQueryCommand
 {
@@ -233,7 +240,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterLevelControlStopWithOnOffCommand
 {
@@ -250,7 +257,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterLowPowerSleepCommand
 {
@@ -267,7 +274,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterOnOffOffCommand
 {
@@ -284,7 +291,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterOnOffOnCommand
 {
@@ -301,7 +308,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterOnOffToggleCommand
 {
@@ -318,7 +325,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterOperationalCredentialsGetFabricIdCommand
 {
@@ -335,7 +342,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterThermostatClearWeeklyScheduleCommand
 {
@@ -352,7 +359,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterThermostatGetRelayStatusLogCommand
 {
@@ -369,7 +376,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeVendorName
@@ -387,7 +394,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeVendorId
@@ -405,7 +412,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeApplicationName
@@ -423,7 +430,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeProductId
@@ -441,7 +448,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeApplicationId
@@ -459,7 +466,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeCatalogVendorId
@@ -477,7 +484,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeApplicationSatus
@@ -495,7 +502,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterApplicationBasicReadAttributeClusterRevision
@@ -513,7 +520,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBarrierControlReadAttributeBarrierMovingState
@@ -531,7 +538,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBarrierControlReadAttributeBarrierSafetyStatus
@@ -549,7 +556,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBarrierControlReadAttributeBarrierCapabilities
@@ -567,7 +574,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBarrierControlReadAttributeBarrierPosition
@@ -585,7 +592,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBarrierControlReadAttributeClusterRevision
@@ -603,7 +610,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeInteractionModelVersion
@@ -621,7 +628,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeVendorName
@@ -639,7 +646,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeVendorID
@@ -657,7 +664,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeProductName
@@ -675,7 +682,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeProductID
@@ -693,7 +700,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeUserLabel
@@ -711,7 +718,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicWriteAttributeUserLabel
@@ -731,7 +738,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                        [expectation fulfill];
                    }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterBasicReadAttributeLocation
 {
@@ -748,7 +755,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicWriteAttributeLocation
@@ -768,7 +775,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                       [expectation fulfill];
                   }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterBasicReadAttributeHardwareVersion
 {
@@ -785,7 +792,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeHardwareVersionString
@@ -803,7 +810,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeSoftwareVersion
@@ -821,7 +828,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeSoftwareVersionString
@@ -839,7 +846,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeManufacturingDate
@@ -857,7 +864,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributePartNumber
@@ -875,7 +882,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeProductURL
@@ -893,7 +900,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeProductLabel
@@ -911,7 +918,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeSerialNumber
@@ -929,7 +936,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicReadAttributeLocalConfigDisabled
@@ -947,7 +954,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBasicWriteAttributeLocalConfigDisabled
@@ -967,7 +974,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                  [expectation fulfill];
                              }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterBasicReadAttributeClusterRevision
 {
@@ -984,7 +991,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterBindingReadAttributeClusterRevision
@@ -1002,7 +1009,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeCurrentHue
@@ -1020,7 +1027,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeCurrentSaturation
@@ -1038,7 +1045,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeRemainingTime
@@ -1056,7 +1063,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeCurrentX
@@ -1074,7 +1081,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeCurrentY
@@ -1092,7 +1099,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeDriftCompensation
@@ -1110,7 +1117,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeCompensationText
@@ -1128,7 +1135,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorTemperature
@@ -1146,7 +1153,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorMode
@@ -1164,7 +1171,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorControlOptions
@@ -1182,7 +1189,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorControlOptions
@@ -1202,7 +1209,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                  [expectation fulfill];
                              }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeNumberOfPrimaries
 {
@@ -1219,7 +1226,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary1X
@@ -1237,7 +1244,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary1Y
@@ -1255,7 +1262,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary1Intensity
@@ -1273,7 +1280,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary2X
@@ -1291,7 +1298,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary2Y
@@ -1309,7 +1316,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary2Intensity
@@ -1327,7 +1334,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary3X
@@ -1345,7 +1352,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary3Y
@@ -1363,7 +1370,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary3Intensity
@@ -1381,7 +1388,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary4X
@@ -1399,7 +1406,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary4Y
@@ -1417,7 +1424,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary4Intensity
@@ -1435,7 +1442,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary5X
@@ -1453,7 +1460,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary5Y
@@ -1471,7 +1478,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary5Intensity
@@ -1489,7 +1496,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary6X
@@ -1507,7 +1514,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary6Y
@@ -1525,7 +1532,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributePrimary6Intensity
@@ -1543,7 +1550,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeWhitePointX
@@ -1561,7 +1568,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeWhitePointX
@@ -1581,7 +1588,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                          [expectation fulfill];
                      }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeWhitePointY
 {
@@ -1598,7 +1605,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeWhitePointY
@@ -1618,7 +1625,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                          [expectation fulfill];
                      }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointRX
 {
@@ -1635,7 +1642,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointRX
@@ -1655,7 +1662,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointRY
 {
@@ -1672,7 +1679,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointRY
@@ -1692,7 +1699,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointRIntensity
 {
@@ -1709,7 +1716,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointRIntensity
@@ -1729,7 +1736,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                   [expectation fulfill];
                               }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointGX
 {
@@ -1746,7 +1753,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointGX
@@ -1766,7 +1773,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointGY
 {
@@ -1783,7 +1790,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointGY
@@ -1803,7 +1810,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointGIntensity
 {
@@ -1820,7 +1827,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointGIntensity
@@ -1840,7 +1847,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                   [expectation fulfill];
                               }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointBX
 {
@@ -1857,7 +1864,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointBX
@@ -1877,7 +1884,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointBY
 {
@@ -1894,7 +1901,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointBY
@@ -1914,7 +1921,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeColorPointBIntensity
 {
@@ -1931,7 +1938,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeColorPointBIntensity
@@ -1951,7 +1958,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                   [expectation fulfill];
                               }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeEnhancedCurrentHue
 {
@@ -1968,7 +1975,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeEnhancedColorMode
@@ -1986,7 +1993,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorLoopActive
@@ -2004,7 +2011,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorLoopDirection
@@ -2022,7 +2029,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorLoopTime
@@ -2040,7 +2047,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorCapabilities
@@ -2058,7 +2065,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorTempPhysicalMin
@@ -2076,7 +2083,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeColorTempPhysicalMax
@@ -2094,7 +2101,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeCoupleColorTempToLevelMinMireds
@@ -2112,7 +2119,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlReadAttributeStartUpColorTemperatureMireds
@@ -2130,7 +2137,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterColorControlWriteAttributeStartUpColorTemperatureMireds
@@ -2150,7 +2157,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                            [expectation fulfill];
                                        }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterColorControlReadAttributeClusterRevision
 {
@@ -2167,7 +2174,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDescriptorReadAttributeDeviceList
@@ -2185,7 +2192,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDescriptorReadAttributeServerList
@@ -2203,7 +2210,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDescriptorReadAttributeClientList
@@ -2221,7 +2228,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDescriptorReadAttributePartsList
@@ -2239,7 +2246,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDescriptorReadAttributeClusterRevision
@@ -2257,7 +2264,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDoorLockReadAttributeLockState
@@ -2275,7 +2282,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDoorLockReadAttributeLockType
@@ -2293,7 +2300,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDoorLockReadAttributeActuatorEnabled
@@ -2311,7 +2318,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterDoorLockReadAttributeClusterRevision
@@ -2329,7 +2336,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGeneralCommissioningReadAttributeFabricId
@@ -2347,7 +2354,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGeneralCommissioningReadAttributeBreadcrumb
@@ -2365,7 +2372,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGeneralCommissioningWriteAttributeBreadcrumb
@@ -2385,7 +2392,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                         [expectation fulfill];
                     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterGeneralCommissioningReadAttributeClusterRevision
 {
@@ -2402,7 +2409,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGroupKeyManagementReadAttributeGroups
@@ -2420,7 +2427,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGroupKeyManagementReadAttributeGroupKeys
@@ -2438,7 +2445,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGroupKeyManagementReadAttributeClusterRevision
@@ -2456,7 +2463,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGroupsReadAttributeNameSupport
@@ -2474,7 +2481,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterGroupsReadAttributeClusterRevision
@@ -2492,7 +2499,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterIdentifyReadAttributeIdentifyTime
@@ -2510,7 +2517,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterIdentifyWriteAttributeIdentifyTime
@@ -2530,7 +2537,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                           [expectation fulfill];
                       }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterIdentifyReadAttributeClusterRevision
 {
@@ -2547,7 +2554,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterLevelControlReadAttributeCurrentLevel
@@ -2565,7 +2572,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterLevelControlReadAttributeClusterRevision
@@ -2583,7 +2590,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterLowPowerReadAttributeClusterRevision
@@ -2601,7 +2608,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterNetworkCommissioningReadAttributeClusterRevision
@@ -2619,7 +2626,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterOnOffReadAttributeOnOff
@@ -2637,7 +2644,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterOnOffReadAttributeClusterRevision
@@ -2655,7 +2662,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterOperationalCredentialsReadAttributeFabricsList
@@ -2673,7 +2680,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterOperationalCredentialsReadAttributeClusterRevision
@@ -2691,7 +2698,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeMaxPressure
@@ -2711,7 +2718,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeMaxSpeed
@@ -2731,7 +2738,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeMaxFlow
@@ -2751,7 +2758,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeEffectiveOperationMode
@@ -2772,7 +2779,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeEffectiveControlMode
@@ -2793,7 +2800,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeCapacity
@@ -2813,7 +2820,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeOperationMode
@@ -2833,7 +2840,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterPumpConfigurationAndControlWriteAttributeOperationMode
@@ -2855,7 +2862,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                            [expectation fulfill];
                        }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeClusterRevision
 {
@@ -2874,7 +2881,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterScenesReadAttributeSceneCount
@@ -2892,7 +2899,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterScenesReadAttributeCurrentScene
@@ -2910,7 +2917,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterScenesReadAttributeCurrentGroup
@@ -2928,7 +2935,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterScenesReadAttributeSceneValid
@@ -2946,7 +2953,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterScenesReadAttributeNameSupport
@@ -2964,7 +2971,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterScenesReadAttributeClusterRevision
@@ -2982,7 +2989,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterSwitchReadAttributeNumberOfPositions
@@ -3000,7 +3007,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterSwitchReadAttributeCurrentPosition
@@ -3018,7 +3025,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterSwitchReadAttributeClusterRevision
@@ -3036,7 +3043,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTemperatureMeasurementReadAttributeMeasuredValue
@@ -3054,7 +3061,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTemperatureMeasurementReadAttributeMinMeasuredValue
@@ -3072,7 +3079,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTemperatureMeasurementReadAttributeMaxMeasuredValue
@@ -3090,7 +3097,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterTemperatureMeasurementReadAttributeClusterRevision
@@ -3108,7 +3115,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterThermostatReadAttributeLocalTemperature
@@ -3126,7 +3133,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterThermostatReadAttributeOccupiedCoolingSetpoint
@@ -3144,7 +3151,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterThermostatWriteAttributeOccupiedCoolingSetpoint
@@ -3164,7 +3171,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                      [expectation fulfill];
                                  }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterThermostatReadAttributeOccupiedHeatingSetpoint
 {
@@ -3181,7 +3188,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterThermostatWriteAttributeOccupiedHeatingSetpoint
@@ -3201,7 +3208,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                      [expectation fulfill];
                                  }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterThermostatReadAttributeControlSequenceOfOperation
 {
@@ -3218,7 +3225,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterThermostatWriteAttributeControlSequenceOfOperation
@@ -3238,7 +3245,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                                         [expectation fulfill];
                                     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterThermostatReadAttributeSystemMode
 {
@@ -3255,7 +3262,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 - (void)testSendClusterThermostatWriteAttributeSystemMode
@@ -3275,7 +3282,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                         [expectation fulfill];
                     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterThermostatReadAttributeClusterRevision
 {
@@ -3292,7 +3299,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 @end

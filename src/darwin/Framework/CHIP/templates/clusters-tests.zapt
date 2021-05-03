@@ -27,7 +27,8 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-const uint16_t kTimeoutInMs = 10;
+const uint16_t kPairingTimeoutInSeconds = 10;
+const uint16_t kTimeoutInSeconds = 3;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -75,6 +76,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
 @implementation CHIPClustersTests
 
+- (void)setUp {
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+}
+
 - (void)testInitStack
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
@@ -100,7 +106,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                      error:&error];
     XCTAssertEqual(error.code, 0);
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 }
 
 - (void)testShutdownStack
@@ -134,7 +140,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 {{/unless}}
 {{/chip_server_cluster_commands}}
@@ -157,7 +163,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 {{#if (isWritableAttribute)}}
@@ -177,7 +183,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}
