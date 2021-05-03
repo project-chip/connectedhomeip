@@ -33,6 +33,7 @@
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
@@ -79,11 +80,19 @@ struct ControllerDeviceInitParams
 #endif
 };
 
-class DLL_EXPORT Device
+class DLL_EXPORT Device : public Messaging::ExchangeDelegate
 {
 public:
     ~Device()
     {
+        if (mExchangeMgr)
+        {
+            // Ensure that any exchange contexts we have open get closed now,
+            // because we don't want them to call back in to us after this
+            // point.
+            mExchangeMgr->CloseAllContextsForDelegate(this);
+        }
+
         if (mCommandSender != nullptr)
         {
             mCommandSender->Shutdown();
@@ -237,13 +246,21 @@ public:
      *   device. The message ownership is transferred to the function, and it is expected
      *   to release the message buffer before returning.
      *
-     * @param[in] exchange      The exchange context the message was received on.
+     * @param[in] exchange      The exchange context the message was received
+     *                          on.  The Device guarantees that it will call
+     *                          Close() on exchange when it's done processing
+     *                          the message.
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
     void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle msgBuf);
+                           System::PacketBufferHandle msgBuf) override;
+
+    /**
+     * @brief ExchangeDelegate implementation of OnResponseTimeout.
+     */
+    void OnResponseTimeout(Messaging::ExchangeContext * exchange) override;
 
     /**
      * @brief
