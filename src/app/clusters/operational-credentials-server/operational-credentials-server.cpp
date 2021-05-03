@@ -147,7 +147,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
 
 AdminPairingInfo * retrieveCurrentAdmin()
 {
-    uint64_t fabricId = emberAfCurrentCommand()->source;
+    uint64_t fabricId = emberAfCurrentCommand()->SourceNodeId();
     // TODO: Figure out how to get device node id so we can do FindAdminForNode(fabricId, nodeId)...
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId  %" PRIX64 ".", fabricId);
     return GetGlobalAdminPairingTable().FindAdminForNode(fabricId);
@@ -244,11 +244,11 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
     err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
-    // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->source) as fabricId
+    // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->SourceNodeId()) as fabricId
     // until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
                               ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
-                              emberAfCurrentCommand()->source);
+                              emberAfCurrentCommand()->SourceNodeId());
     sendStatus = emberAfSendResponse();
 
 exit:

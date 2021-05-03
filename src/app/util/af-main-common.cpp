@@ -670,6 +670,10 @@ EmberStatus emAfSend(EmberOutgoingMessageType type, MessageSendDestination desti
         // No implementation yet.
         status = EMBER_ERR_FATAL;
         break;
+    case EMBER_OUTGOING_VIA_EXCHANGE:
+        status =
+            chipSendUnicast(destination.mExchangeContext->GetSecureSession().GetPeerNodeId(), apsFrame, messageLength, message);
+        break;
     default:
         status = EMBER_BAD_ARGUMENT;
         break;

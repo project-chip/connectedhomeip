@@ -391,7 +391,7 @@ public:
         }
         else
         {
-            HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
+            HandleDataModelMessage(exchangeContext, std::move(buffer));
         }
 
     exit:

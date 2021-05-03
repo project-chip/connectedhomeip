@@ -626,7 +626,8 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
                 entry.clusterId == cmd->apsFrame->clusterId && entry.attributeId == attributeId && entry.mask == mask &&
                 entry.manufacturerCode == cmd->mfgCode &&
                 (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED ||
-                 (entry.data.received.source == cmd->source && entry.data.received.endpoint == cmd->apsFrame->sourceEndpoint)))
+                 (entry.data.received.source == cmd->SourceNodeId() &&
+                  entry.data.received.endpoint == cmd->apsFrame->sourceEndpoint)))
             {
                 found = true;
                 break;
@@ -990,7 +991,7 @@ static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cm
         }
         if (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_RECEIVED && entry.endpoint == cmd->apsFrame->destinationEndpoint &&
             entry.clusterId == cmd->apsFrame->clusterId && entry.attributeId == attributeId && entry.mask == mask &&
-            entry.manufacturerCode == cmd->mfgCode && entry.data.received.source == cmd->source &&
+            entry.manufacturerCode == cmd->mfgCode && entry.data.received.source == cmd->SourceNodeId() &&
             entry.data.received.endpoint == cmd->apsFrame->sourceEndpoint)
         {
             initialize = false;
@@ -1015,7 +1016,7 @@ static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cm
         entry.attributeId            = attributeId;
         entry.mask                   = mask;
         entry.manufacturerCode       = cmd->mfgCode;
-        entry.data.received.source   = cmd->source;
+        entry.data.received.source   = cmd->SourceNodeId();
         entry.data.received.endpoint = cmd->apsFrame->sourceEndpoint;
     }
 
