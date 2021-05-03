@@ -82,8 +82,9 @@ private:
     }
     NdefUriRecord_t;
 
-    static eAppNtagError AppNtagInitEepromSmartPoster(void);
     static bool AppNtagEepromWrite(uint8_t originalSize);
+    static bool IsNtagConfigured(eAppNtagError *pNtagError, const char * payload);
+    static eAppNtagError AppNtagWrite(const char * payload);
     static eAppNtagError AppNtagEepromUnlockThenWrite(uint8_t originalSize);
     static eAppNtagError AppNtagLockWriteAccess(void);
     static eAppNtagError AppNtagUnlockWriteAccess(void);

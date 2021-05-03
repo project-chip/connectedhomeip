@@ -453,18 +453,6 @@ void AppTask::BleHandler(AppEvent * aEvent)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         K32W_LOG("Stopped BLE Advertising!");
-
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-        if (!NFCMgr().IsTagEmulationStarted())
-        {
-            K32W_LOG("NFC Tag emulation is already stopped");
-        }
-        else
-        {
-            NFCMgr().StopTagEmulation();
-            K32W_LOG("Stopped NFC Tag Emulation!");
-        }
-#endif
     }
     else
     {

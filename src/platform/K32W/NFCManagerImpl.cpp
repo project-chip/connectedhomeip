@@ -60,7 +60,7 @@ CHIP_ERROR NFCManagerImpl::_StartTagEmulation(const char * payload, size_t paylo
     }
 
     /* write the NDEF structure to the NTAG EEPROM */
-    if (AppNtagInitEepromSmartPoster() != E_APP_NTAG_NO_ERROR)
+    if (AppNtagWrite(payload) != E_APP_NTAG_NO_ERROR)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -92,12 +92,48 @@ CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
     return CHIP_NO_ERROR;
 }
 
-NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagInitEepromSmartPoster(void)
+bool NFCManagerImpl::IsNtagConfigured(eAppNtagError *pNtagError, const char * payload)
+{
+    uint32_t addrToRead = NTAG_I2C_BLOCK_SIZE;
+    uint8_t eepromDataBuf[NDEF_URI_ID_MAX_LENGTH + TERMINATOR_TLV_LEN] = {0};
+    uint16_t ndefUriRecordSize = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
+    uint8_t ndefUriLen = sInstance.ndefUriRecord.payloadLen - sizeof(sInstance.ndefUriRecord.uriIdCode);
+
+    if (NTAG_ReadBytes(sInstance.ntagDriverHandleInstance, addrToRead, eepromDataBuf, 2))
+    {
+        *pNtagError = E_APP_NTAG_READ_ERROR;
+        return FALSE;
+    }
+
+    /* see also http://apps4android.org/nfc-specifications/NFCForum-TS-Type-2-Tag_1.1.pdf, chapter 2.3 */
+    if(eepromDataBuf[0] != 0x03 || eepromDataBuf[1] != ndefUriRecordSize)
+    {
+    	return FALSE;
+    }
+
+    /* read the NdefUriRecord from the EEPROM */
+    addrToRead += 2;
+    if (NTAG_ReadBytes(sInstance.ntagDriverHandleInstance, addrToRead, eepromDataBuf, ndefUriRecordSize))
+    {
+        *pNtagError = E_APP_NTAG_READ_ERROR;
+        return FALSE;
+    }
+
+    /* verify if the ndefUriRecord is the same as the one flashed in the the EEPROM:
+     * If it is, then the NTAG is already configured.
+     */
+    return (payload &&
+    		!memcmp(sInstance.ndefUriRecord.uriIdData, payload, ndefUriLen) &&
+			!memcmp((uint8_t *) &(sInstance.ndefUriRecord), eepromDataBuf, ndefUriRecordSize));
+}
+
+NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagWrite(const char * payload)
 {
     eAppNtagError ntagErr = E_APP_NTAG_NO_ERROR;
     uint8_t byte0         = 0;
     uint8_t i             = 0;
     bool_t i2cAddrFound   = FALSE;
+    bool_t isConfigured = FALSE;
 
     do
     {
@@ -136,7 +172,16 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagInitEepromSmartPoster(void)
             }
         }
 
-        ntagErr = AppNtagEepromUnlockThenWrite(0);
+        isConfigured = IsNtagConfigured(&ntagErr, payload);
+        if (ntagErr != E_APP_NTAG_NO_ERROR)
+        {
+            break;
+        }
+
+        if (!isConfigured)
+        {
+            ntagErr = AppNtagEepromUnlockThenWrite(0);
+        }
 
     } while (0);
 
@@ -204,15 +249,14 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagEepromUnlockThenWrite(uint8
             break;
         }
 
-        /* Write the smart poster value */
+        /* Write the NDEF URI */
         if (!AppNtagEepromWrite(originalSize))
         {
             ntagErr = E_APP_NTAG_WRITE_ERROR;
-            break;
         }
 
         /* Lock write access */
-        ntagErr = AppNtagLockWriteAccess();
+        AppNtagLockWriteAccess();
     } while (0);
 
     return ntagErr;
