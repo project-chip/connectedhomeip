@@ -35,6 +35,7 @@
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
 #include <mbedtls/pkcs5.h>
+#include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
 #include <mbedtls/x509_csr.h>
 
@@ -187,6 +188,19 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t *
 
 exit:
     return error;
+}
+
+CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
+{
+    int result = 0;
+
+    // zero data length hash is supported.
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_sha1_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer));
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
 }
 
 Hash_SHA256_stream::Hash_SHA256_stream(void) {}
