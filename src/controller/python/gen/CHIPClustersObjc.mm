@@ -2622,10 +2622,9 @@ public:
                 values[i] = [[NSDictionary alloc]
                     initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
                     [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex], @"GroupKeyIndex",
-                    [NSData dataWithBytes:entries[i].GroupKeyRoot + 1u length:emberAfStringLength(entries[i].GroupKeyRoot)],
-                    @"GroupKeyRoot", [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime],
-                    @"GroupKeyEpochStartTime", [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy],
-                    @"GroupKeySecurityPolicy", nil];
+                    [NSData dataWithBytes:entries[i].GroupKeyRoot.data() length:entries[i].GroupKeyRoot.size()], @"GroupKeyRoot",
+                    [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime], @"GroupKeyEpochStartTime",
+                    [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy], @"GroupKeySecurityPolicy", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -2664,8 +2663,8 @@ public:
                 values[i] =
                     [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
                                           @"FabricId", [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
-                                          [NSData dataWithBytes:entries[i].Label + 1u length:emberAfStringLength(entries[i].Label)],
-                                          @"Label", [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId", nil];
+                                          [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()], @"Label",
+                                          [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];

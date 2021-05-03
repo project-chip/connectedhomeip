@@ -23,6 +23,7 @@
 #include "enums.h"
 #include <app/util/basic-types.h>
 #include <stdint.h>
+#include <support/Span.h>
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
@@ -201,7 +202,7 @@ typedef struct _EventLogPayload
     uint8_t logId;
     uint16_t eventId;
     uint32_t eventTime;
-    uint8_t * eventData;
+    chip::ByteSpan eventData;
 } EmberAfEventLogPayload;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
@@ -217,7 +218,7 @@ typedef struct _FabricDescriptor
 {
     chip::FabricId FabricId;
     uint16_t VendorId;
-    uint8_t * Label;
+    chip::ByteSpan Label;
     chip::NodeId NodeId;
 } EmberAfFabricDescriptor;
 
@@ -237,8 +238,8 @@ typedef struct _GpTranslationTableUpdateTranslation
     uint16_t profile;
     uint16_t cluster;
     uint8_t zigbeeCommandId;
-    uint8_t * zigbeeCommandPayload;
-    uint8_t * additionalInfoBlock;
+    chip::ByteSpan zigbeeCommandPayload;
+    chip::ByteSpan additionalInfoBlock;
 } EmberAfGpTranslationTableUpdateTranslation;
 
 // Struct for GroupInformationRecord
@@ -253,7 +254,7 @@ typedef struct _GroupKey
 {
     uint16_t VendorId;
     uint16_t GroupKeyIndex;
-    uint8_t * GroupKeyRoot;
+    chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
 } EmberAfGroupKey;
@@ -487,20 +488,20 @@ typedef struct _SpecialDay
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    uint8_t * DiscoveryResponse;
+    chip::ByteSpan DiscoveryResponse;
 } EmberAfThreadInterfaceScanResult;
 
 // Struct for TierLabelsPayload
 typedef struct _TierLabelsPayload
 {
     uint8_t tierId;
-    uint8_t * tierLabel;
+    chip::ByteSpan tierLabel;
 } EmberAfTierLabelsPayload;
 
 // Struct for TopUpPayload
 typedef struct _TopUpPayload
 {
-    uint8_t * topUpCode;
+    chip::ByteSpan topUpCode;
     int32_t topUpAmount;
     uint32_t topUpTime;
 } EmberAfTopUpPayload;
@@ -539,8 +540,8 @@ typedef struct _TvChannelLineupInfo
 typedef struct _WiFiInterfaceScanResult
 {
     uint8_t Security;
-    uint8_t * SSID;
-    uint8_t * BSSID;
+    chip::ByteSpan SSID;
+    chip::ByteSpan BSSID;
     uint8_t Channel;
     uint32_t FrequencyBand;
 } EmberAfWiFiInterfaceScanResult;
