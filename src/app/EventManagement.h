@@ -28,18 +28,19 @@
 
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
+#include <app/MessageDef/EventDataElement.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCircularTLVBuffer.h>
 #include <messaging/ExchangeMgr.h>
 #include <support/PersistedCounter.h>
-#include <app/MessageDef/EventDataElement.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
 namespace chip {
 namespace app {
 constexpr size_t kMaxEventSizeReserve = 512;
-constexpr uint16_t kRequiredEventField = (1 << EventDataElement::kCsTag_PriorityLevel) | (1 << EventDataElement::kCsTag_DeltaSystemTimestamp);
+constexpr uint16_t kRequiredEventField =
+    (1 << EventDataElement::kCsTag_PriorityLevel) | (1 << EventDataElement::kCsTag_DeltaSystemTimestamp);
 
 /**
  * @brief
@@ -155,9 +156,9 @@ private:
     // The backup counter to use if no counter is provided for us.
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
-    size_t mRequiredSpaceForEvicted = 0; //< Required space for previous buffer to evict event to new buffer
-    EventNumber mFirstEventNumber    = 0; //< First event Number stored in the logging subsystem for this priority
-    EventNumber mLastEventNumber     = 0; //< Last event Number vended for this priority
+    size_t mRequiredSpaceForEvicted = 0;  //< Required space for previous buffer to evict event to new buffer
+    EventNumber mFirstEventNumber   = 0;  //< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber    = 0;  //< Last event Number vended for this priority
     Timestamp mFirstEventSystemTimestamp; //< The timestamp of the first event in this buffer
     Timestamp mLastEventSystemTimestamp;  //< The timestamp of the last event in this buffer
 };

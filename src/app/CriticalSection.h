@@ -21,12 +21,8 @@
 namespace chip {
 namespace Platform {
 // TODO: Add locker support for different platform
-void CriticalSectionEnter()
-{
-}
+void CriticalSectionEnter() {}
 
-void CriticalSectionExit()
-{
-}
+void CriticalSectionExit() {}
 } // namespace Platform
 } // namespace chip

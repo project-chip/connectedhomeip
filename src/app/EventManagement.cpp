@@ -136,13 +136,13 @@ CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer
 {
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
     CircularEventBuffer * nextBuffer = apEventBuffer->GetNextCircularEventBuffer();
     if (nextBuffer == nullptr)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    CircularEventBuffer backup       = *nextBuffer;
+    CircularEventBuffer backup = *nextBuffer;
 
     // Set up the next buffer s.t. it fails if needs to evict an element
     nextBuffer->mProcessEvictedElement = AlwaysFail;
@@ -201,7 +201,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
             if (err != CHIP_NO_ERROR)
             {
                 VerifyOrExit(ctx.mSpaceNeededForMovedEvent != 0, /* no-op, return err */);
-                VerifyOrExit(eventBuffer->GetNextCircularEventBuffer() != nullptr, err = CHIP_ERROR_INCORRECT_STATE );
+                VerifyOrExit(eventBuffer->GetNextCircularEventBuffer() != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
                 if (ctx.mSpaceNeededForMovedEvent <= eventBuffer->GetNextCircularEventBuffer()->AvailableDataLength())
                 {
                     // we can copy the event outright.  copy event and
@@ -228,7 +228,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
                 // space requirements for the event in the current
                 // buffer and make that space in the next buffer.
                 eventBuffer->SetRequiredSpaceforEvicted(requiredSpace);
-                eventBuffer                            = eventBuffer->GetNextCircularEventBuffer();
+                eventBuffer = eventBuffer->GetNextCircularEventBuffer();
 
                 // Sanity check: return error  here on null event buffer.  If
                 // eventBuffer->mpNext were null, then the `EvictBuffer`
@@ -240,7 +240,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
         }
         else
         {
-            //this branch is only taken when we go back in the buffer chain since we have free/spare enough space in next buffer,
+            // this branch is only taken when we go back in the buffer chain since we have free/spare enough space in next buffer,
             // and need to retry to copy event from current buffer to next buffer, and free space for current buffer
             if (eventBuffer == mpEventBuffer)
                 break;
@@ -273,9 +273,9 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
     }
     writer.Init(std::move(buf));
 
-    ctxt.mCurrentEventNumber = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventNumber();
-    ctxt.mCurrentSystemTime.mValue  = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventSystemTimestamp();
-    err                      = ConstructEvent(&ctxt, apDelegate, apOptions);
+    ctxt.mCurrentEventNumber       = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventNumber();
+    ctxt.mCurrentSystemTime.mValue = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventSystemTimestamp();
+    err                            = ConstructEvent(&ctxt, apDelegate, apOptions);
     if (CHIP_NO_ERROR == err)
     {
         requiredSize = writer.GetLengthWritten();
@@ -412,7 +412,7 @@ CircularEventBuffer * EventManagement::GetPriorityBuffer(PriorityLevel aPriority
     {
         buf = buf->GetNextCircularEventBuffer();
         assert(buf != nullptr);
-        //code guarantees that every PriorityLevel has a buffer destination.
+        // code guarantees that every PriorityLevel has a buffer destination.
     }
     return buf;
 }
@@ -496,7 +496,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
         opts.mTimestamp = aEventOptions.mTimestamp;
     }
 
-    if (GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetFirstEventSystemTimestamp()== 0)
+    if (GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->GetFirstEventSystemTimestamp() == 0)
     {
         GetPriorityBuffer(aEventOptions.mpEventSchema->mPriority)->UpdateFirstLastEventTime(opts.mTimestamp);
     }
@@ -504,8 +504,8 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     opts.mUrgent       = aEventOptions.mUrgent;
     opts.mpEventSchema = aEventOptions.mpEventSchema;
 
-    ctxt.mCurrentEventNumber = GetPriorityBuffer(opts.mpEventSchema->mPriority)->GetLastEventNumber();
-    ctxt.mCurrentSystemTime.mValue  = GetPriorityBuffer(opts.mpEventSchema->mPriority)->GetLastEventSystemTimestamp();
+    ctxt.mCurrentEventNumber       = GetPriorityBuffer(opts.mpEventSchema->mPriority)->GetLastEventNumber();
+    ctxt.mCurrentSystemTime.mValue = GetPriorityBuffer(opts.mpEventSchema->mPriority)->GetLastEventSystemTimestamp();
 
     err = CalculateEventSize(apDelegate, &opts, requestSize);
     SuccessOrExit(err);
@@ -531,7 +531,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
         {
             buffer = buffer->GetNextCircularEventBuffer();
             assert(buffer != nullptr);
-            //code guarantees that every PriorityLevel has a buffer destination.
+            // code guarantees that every PriorityLevel has a buffer destination.
         }
     }
 
@@ -567,7 +567,7 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     TLVReader reader;
     TLVType containerType;
     CopyAndAdjustDeltaTimeContext context(&aWriter, apContext);
-    CHIP_ERROR err     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     reader.Init(aReader);
     err = reader.EnterContainer(containerType);
@@ -596,7 +596,7 @@ exit:
 
 CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDepth, EventLoadOutContext * apEventLoadOutContext)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVReader innerReader;
     TLVType tlvType;
     EventEnvelopeContext event;
@@ -670,9 +670,9 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, PriorityLevel 
         buf = buf->GetNextCircularEventBuffer();
     }
 
-    context.mCurrentSystemTime.mValue  = buf->GetFirstEventSystemTimestamp();
-    context.mCurrentEventNumber = buf->GetFirstEventNumber();
-    err                         = GetEventReader(reader, aPriority, &bufWrapper);
+    context.mCurrentSystemTime.mValue = buf->GetFirstEventSystemTimestamp();
+    context.mCurrentEventNumber       = buf->GetFirstEventNumber();
+    err                               = GetEventReader(reader, aPriority, &bufWrapper);
     SuccessOrExit(err);
 
     err = TLV::Utilities::Iterate(reader, CopyEventsSince, &context, recurse);
@@ -791,14 +791,14 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
     CHIPCircularTLVBuffer::Init(apBuffer, aBufferLength);
-    mpPrev            = apPrev;
-    mpNext            = apNext;
-    mPriority         = aPriorityLevel;
-    mFirstEventNumber = 1;
-    mLastEventNumber  = 0;
+    mpPrev                     = apPrev;
+    mpNext                     = apNext;
+    mPriority                  = aPriorityLevel;
+    mFirstEventNumber          = 1;
+    mLastEventNumber           = 0;
     mFirstEventSystemTimestamp = Timestamp::System(0);
-    mLastEventSystemTimestamp = Timestamp::System(0);
-    mpEventNumberCounter = nullptr;
+    mLastEventSystemTimestamp  = Timestamp::System(0);
+    mpEventNumberCounter       = nullptr;
 }
 
 bool CircularEventBuffer::IsFinalDestinationForPriority(PriorityLevel aPriority) const

@@ -89,7 +89,8 @@ enum class PriorityLevel : uint8_t
 struct EventSchema
 {
     EventSchema(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, PriorityLevel aPriority) :
-        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mPriority(aPriority){}
+        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mPriority(aPriority)
+    {}
     NodeId mNodeId          = 0;
     EndpointId mEndpointId  = 0;
     ClusterId mClusterId    = 0;
