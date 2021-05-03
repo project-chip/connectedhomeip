@@ -34,9 +34,9 @@ using namespace chip::TLV;
 #endif
 namespace chip {
 namespace Platform {
-//TODO: Add locker support for different platform
+// TODO: Add locker support for different platform
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
-    std::mutex PTHREAD_MUTEX_INITIALIZER;
+std::mutex PTHREAD_MUTEX_INITIALIZER;
 #endif
 void CriticalSectionEnter()
 {
@@ -102,7 +102,7 @@ struct CopyAndAdjustDeltaTimeContext
 {
     CopyAndAdjustDeltaTimeContext(TLVWriter * aWriter, EventLoadOutContext * inContext) : mpWriter(aWriter), mpContext(inContext) {}
 
-    TLV::TLVWriter * mpWriter = nullptr;
+    TLV::TLVWriter * mpWriter       = nullptr;
     EventLoadOutContext * mpContext = nullptr;
 };
 
@@ -144,7 +144,8 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, int a
         next = (bufferIndex < aNumBuffers - 1) ? &apCircularEventBuffer[bufferIndex + 1] : nullptr;
 
         current = &apCircularEventBuffer[bufferIndex];
-        current->Init(apLogStorageResources[bufferIndex].mpBuffer, apLogStorageResources[bufferIndex].mBufferSize, prev, next, apLogStorageResources[bufferIndex].mPriority);
+        current->Init(apLogStorageResources[bufferIndex].mpBuffer, apLogStorageResources[bufferIndex].mBufferSize, prev, next,
+                      apLogStorageResources[bufferIndex].mPriority);
 
         prev = current;
 
@@ -163,9 +164,9 @@ CHIP_ERROR EventManagement::CopyToNextBuffer(CircularEventBuffer * apEventBuffer
     CircularTLVWriter writer;
     CircularTLVReader reader;
     CircularEventBuffer * nextBuffer = apEventBuffer->GetNextCircularEventBuffer();
-    CircularEventBuffer backup   = *nextBuffer;
+    CircularEventBuffer backup       = *nextBuffer;
 
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Set up the next buffer s.t. it fails if needs to evict an element
     nextBuffer->mProcessEvictedElement = AlwaysFail;
@@ -250,7 +251,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
                 // space requirements for the event in the current
                 // buffer and make that space in the next buffer.
                 eventBuffer->mRequiredSpacedForEvicted = requiredSpace;
-                eventBuffer           = eventBuffer->GetNextCircularEventBuffer();
+                eventBuffer                            = eventBuffer->GetNextCircularEventBuffer();
 
                 // Sanity check: return error  here on null event buffer.  If
                 // eventBuffer->mpNext were null, then the `EvictBuffer`
@@ -342,8 +343,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     err = eventDataElementBuilder.GetError();
     SuccessOrExit(err);
 
-    err = apContext->mWriter.StartContainer(ContextTag(EventDataElement::kCsTag_Data), TLV::kTLVType_Structure,
-                                            dataContainerType);
+    err = apContext->mWriter.StartContainer(ContextTag(EventDataElement::kCsTag_Data), TLV::kTLVType_Structure, dataContainerType);
     SuccessOrExit(err);
     // Callback to write the EventData
     err = apDelegate->WriteEvent(apContext->mWriter);
@@ -466,16 +466,14 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
     {
         if (ctx->mpContext->mFirst)
         {
-            err = ctx->mpWriter->Put(TLV::ContextTag(EventDataElement::kCsTag_Number),
-                                     ctx->mpContext->mCurrentEventNumber);
+            err = ctx->mpWriter->Put(TLV::ContextTag(EventDataElement::kCsTag_Number), ctx->mpContext->mCurrentEventNumber);
         }
     }
 
     return err;
 }
 
-CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions,
-                                     EventNumber & aEventNumber)
+CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Platform::CriticalSectionEnter();
@@ -630,7 +628,8 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     if (event.mPriority == apEventLoadOutContext->mPriority)
     {
         apEventLoadOutContext->mCurrentSystemTime.mValue += event.mDeltaSystemTime.mValue;
-        VerifyOrExit(apEventLoadOutContext->mCurrentEventNumber < apEventLoadOutContext->mStartingEventNumber, err = CHIP_EVENT_ID_FOUND);
+        VerifyOrExit(apEventLoadOutContext->mCurrentEventNumber < apEventLoadOutContext->mStartingEventNumber,
+                     err = CHIP_EVENT_ID_FOUND);
         apEventLoadOutContext->mCurrentEventNumber++;
     }
 
@@ -696,8 +695,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aPriority,
-                                           CircularEventBufferWrapper * apBufWrapper)
+CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aPriority, CircularEventBufferWrapper * apBufWrapper)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CircularEventReader reader;
@@ -794,7 +792,6 @@ CHIP_ERROR EventManagement::ScheduleFlushIfNeeded(EventOptions::Type aUrgent)
     return CHIP_NO_ERROR;
 }
 
-
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
@@ -807,7 +804,6 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
     mFirstEventSystemTimestamp.Init(Timestamp::Type::kSystem, 0);
     mLastEventSystemTimestamp.Init(Timestamp::Type::kSystem, 0);
     mpEventNumberCounter = nullptr;
-
 }
 
 bool CircularEventBuffer::IsFinalDestinationForPriority(PriorityLevel aPriority) const
@@ -840,7 +836,8 @@ void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
     reader.Init(*apBufWrapper, apBufWrapper->mpCurrent->DataLength());
     TLVReader::Init(reader);
     mMaxLen = apBufWrapper->mpCurrent->DataLength();
-    for (prev = apBufWrapper->mpCurrent->GetPreviousCircularEventBuffer(); prev != nullptr; prev = prev->GetPreviousCircularEventBuffer())
+    for (prev = apBufWrapper->mpCurrent->GetPreviousCircularEventBuffer(); prev != nullptr;
+         prev = prev->GetPreviousCircularEventBuffer())
     {
         CircularEventBufferWrapper bufWrapper;
         bufWrapper.mpCurrent = prev;

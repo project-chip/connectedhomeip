@@ -52,7 +52,7 @@ public:
      * @brief
      *   A constructor for the CircularEventBuffer (internal API).
      */
-    CircularEventBuffer(): CHIPCircularTLVBuffer(nullptr, 0) {};
+    CircularEventBuffer() : CHIPCircularTLVBuffer(nullptr, 0){};
 
     /**
      * @brief
@@ -70,7 +70,8 @@ public:
      *
      * @param[in] apNext         CircularEventBuffer prioty level
      */
-    void Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev, CircularEventBuffer * apNext, PriorityLevel aPriorityLevel);
+    void Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev, CircularEventBuffer * apNext,
+              PriorityLevel aPriorityLevel);
 
     /**
      * @brief
@@ -118,7 +119,7 @@ public:
             return;
         }
         mpEventNumberCounter = apEventNumberCounter;
-        mFirstEventNumber = mpEventNumberCounter->GetValue();
+        mFirstEventNumber    = mpEventNumberCounter->GetValue();
     }
 
     PriorityLevel GetPriorityLevel() { return mPriority; }
@@ -129,8 +130,8 @@ public:
     virtual ~CircularEventBuffer() = default;
 
     size_t mRequiredSpacedForEvicted = 0; //< Required space for previous buffer to evict event to new buffer
-    EventNumber mFirstEventNumber = 0; //< First event Number stored in the logging subsystem for this priority
-    EventNumber mLastEventNumber  = 0; //< Last event Number vended for this priority
+    EventNumber mFirstEventNumber    = 0; //< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber     = 0; //< Last event Number vended for this priority
     Timestamp mFirstEventSystemTimestamp; //< The timestamp of the first event in this buffer
     Timestamp mLastEventSystemTimestamp;  //< The timestamp of the last event in this buffer
 

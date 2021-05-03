@@ -185,5 +185,5 @@ struct EventLoadOutContext
     Timestamp mCurrentUTCTime;
     bool mFirst = true;
 };
-}
-}
+} // namespace app
+} // namespace chip

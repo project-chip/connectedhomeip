@@ -119,7 +119,8 @@ void PrintEventLog()
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }
 
-static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents, chip::app::PriorityLevel aPriority)
+static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aLogMgmt, size_t expectedNumEvents,
+                          chip::app::PriorityLevel aPriority)
 {
     CHIP_ERROR err;
     chip::TLV::TLVReader reader;
@@ -273,12 +274,8 @@ static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apCon
  *   Test Suite. It lists all the test functions.
  */
 
-const nlTest sTests[] =
-        {
-                NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
-                NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent),
-                NL_TEST_SENTINEL()
-        };
+const nlTest sTests[] = { NL_TEST_DEF("CheckLogEventWithEvictToNextBuffer", CheckLogEventWithEvictToNextBuffer),
+                          NL_TEST_DEF("CheckLogEventWithDiscardLowEvent", CheckLogEventWithDiscardLowEvent), NL_TEST_SENTINEL() };
 } // namespace
 
 int TestEventLogging()
