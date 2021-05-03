@@ -1239,13 +1239,35 @@ typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::Endpoin
  */
 typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 
+namespace chip {
+/**
+ * @brief a type that represents where we are trying to send a message.  This
+ *        must always be paired with an EmberOutgoingMessageType that identifies
+ *        which arm of the union is in use.
+ */
+union MessageSendDestination
+{
+    explicit constexpr MessageSendDestination(uint8_t aBindingIndex) : mBindingIndex(aBindingIndex) {}
+    explicit constexpr MessageSendDestination(NodeId aNodeId) : mNodeId(aNodeId) {}
+    explicit constexpr MessageSendDestination(GroupId aGroupId) : mGroupId(aGroupId) {}
+
+    // Used when the type is EMBER_OUTGOING_VIA_BINDING
+    uint8_t mBindingIndex;
+    // Used when the type is EMBER_OUTGOING_DIRECT
+    NodeId mNodeId;
+    // Used when the type is EMBER_OUTGOING_MULTICAST or
+    // EMBER_OUTGOING_MULTICAST_WITH_ALIAS
+    GroupId mGroupId;
+};
+} // namespace chip
+
 /**
  * @brief Type for referring to the message sent callback function.
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t msgLen, uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
+                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1257,7 +1279,7 @@ typedef struct
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    uint64_t indexOrDestination;
+    chip::MessageSendDestination destination;
     uint16_t messageLength;
     EmberOutgoingMessageType type;
     bool broadcast;

@@ -189,11 +189,11 @@ void emberAfClusterDefaultResponseWithMfgCodeCallback(chip::EndpointId endpoint,
                                                       EmberAfStatus status, uint8_t clientServerMask, uint16_t manufacturerCode);
 
 // Calls the message sent callback for a specific cluster, and wraps emberAfClusterMessageSentWithMfgCodeCallback
-void emberAfClusterMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
-                                       uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfClusterMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
+                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 // Calls the message sent callback for a specific cluster.
-void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status,
                                                   uint16_t manufacturerCode);
 

@@ -762,7 +762,7 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination,
                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                     EmberStatus status)
 {
