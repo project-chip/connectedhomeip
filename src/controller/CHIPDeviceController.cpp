@@ -422,7 +422,7 @@ void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
-    mActiveDevices[index].OnMessageReceived(packetHeader, payloadHeader, std::move(msgBuf));
+    mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
 
 exit:
     ec->Close();
