@@ -165,7 +165,7 @@ Example:
 $ diffsyms.py --demangle ${IMAGE1} ${IMAGE2}
                                                                                          symbol   a   b
 chip::Inet::InetLayer::NewUDPEndPoint(chip::Inet::UDPEndPoint**)                                196 194
-chip::Transport::BLE::Init(chip::RendezvousSessionDelegate*, chip::RendezvousParameters const&)  80 100
+chip::Transport::BLE::Init(chip::PairingSessionDelegate*, chip::RendezvousParameters const&)  80 100
 ```
 
 ### block.py

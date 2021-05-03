@@ -184,7 +184,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
 
     chip::Platform::Delete(session);
 
-    server.GetRendezvousSession()->SetNextKeyId(nextSessionKeyId);
+    server.SetNextKeyId(nextSessionKeyId);
     return CHIP_NO_ERROR;
 }
 
@@ -429,7 +429,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
 
     if (resetAdmins == ResetAdmins::kYes)
     {
-        uint16_t nextKeyId = gRendezvousServer.GetRendezvousSession()->GetNextKeyId();
+        uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
         gNextAvailableAdminId = 0;

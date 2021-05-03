@@ -36,21 +36,21 @@ void CHIPDevicePairingDelegateBridge::setDelegate(id<CHIPDevicePairingDelegate> 
     }
 }
 
-CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::RendezvousSessionDelegate::Status status)
+CHIPPairingStatus CHIPDevicePairingDelegateBridge::MapStatus(chip::PairingSessionDelegate::Status status)
 {
     CHIPPairingStatus rv = kUnknownStatus;
     switch (status) {
-    case chip::RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case chip::PairingSessionDelegate::Status::SecurePairingSuccess:
         rv = kSecurePairingSuccess;
         break;
-    case chip::RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case chip::PairingSessionDelegate::Status::SecurePairingFailed:
         rv = kSecurePairingFailed;
         break;
     }
     return rv;
 }
 
-void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)
+void CHIPDevicePairingDelegateBridge::OnStatusUpdate(chip::PairingSessionDelegate::Status status)
 {
     NSLog(@"DevicePairingDelegate status updated: %d", status);
 

@@ -26,7 +26,7 @@
 #pragma once
 
 #include <controller/CHIPDeviceController.h>
-#include <transport/RendezvousSessionDelegate.h>
+#include <transport/PairingSessionDelegate.h>
 
 namespace chip {
 namespace Controller {

@@ -25,10 +25,10 @@
 
 namespace chip {
 
-class RendezvousSessionDelegate
+class PairingSessionDelegate
 {
 public:
-    virtual ~RendezvousSessionDelegate() {}
+    virtual ~PairingSessionDelegate() {}
 
     enum Status : uint8_t
     {

@@ -108,14 +108,14 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return mCommissioner.UnpairDevice(remoteId);
 }
 
-void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
+void PairingCommand::OnStatusUpdate(PairingSessionDelegate::Status status)
 {
     switch (status)
     {
-    case RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case PairingSessionDelegate::Status::SecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         break;
-    case RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case PairingSessionDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
     }

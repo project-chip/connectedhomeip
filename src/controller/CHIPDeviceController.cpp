@@ -635,10 +635,10 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 DeviceCommissioner::DeviceCommissioner()
 {
     mPairingDelegate      = nullptr;
-    mRendezvousSession    = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
     mPairedDevicesUpdated = false;
 }
+
 CHIP_ERROR DeviceCommissioner::LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -686,6 +686,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     Device * device                    = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
+    Messaging::ExchangeContext * exchangeCtxt = nullptr;
+
     Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
 
     VerifyOrExit(remoteDeviceId != kAnyNodeId && remoteDeviceId != kUndefinedNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -721,13 +723,11 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
-    mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
-    VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mRendezvousSession->SetNextKeyId(mNextKeyId);
-    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mExchangeMgr,
-                                   mTransportMgr, mSessionMgr, admin);
+    mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
+
+    err = mPairingSession.MessageDispatch().Init(mTransportMgr);
     SuccessOrExit(err);
+    mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, admin->GetAdminId());
 
@@ -753,7 +753,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    mRendezvousSession->OnRendezvousConnectionOpened();
+    exchangeCtxt = mExchangeMgr->NewContext(SecureSessionHandle(), &mPairingSession);
+    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    err = mPairingSession.Pair(params.GetPeerAddress(), params.GetSetupPINCode(), mNextKeyId++, exchangeCtxt, this);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -801,7 +804,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     device->Serialize(serialized);
 
-    OnRendezvousComplete();
+    OnSessionEstablished();
 
 exit:
     if (testSecurePairingSecret != nullptr)
@@ -865,17 +868,14 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
 void DeviceCommissioner::FreeRendezvousSession()
 {
-    if (mRendezvousSession != nullptr)
-    {
-        mNextKeyId = mRendezvousSession->GetNextKeyId();
-        PersistNextKeyId();
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    PersistNextKeyId();
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
+    mRendezvousAdvDelegate.StopAdvertisement();
+    mRendezvousAdvDelegate.RendezvousComplete();
+
     FreeRendezvousSession();
 
     // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.
@@ -897,54 +897,52 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
     }
 }
 
-void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
+void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
+    mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnStatusUpdate(PairingSessionDelegate::SecurePairingFailed);
+    }
+
     RendezvousCleanup(err);
 }
 
-void DeviceCommissioner::OnRendezvousComplete()
+void DeviceCommissioner::OnSessionEstablished()
 {
-    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices, OnRendezvousError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
+    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
+
+    //    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
+
+    CHIP_ERROR err =
+        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
+                                SecureSessionMgr::PairingDirection::kInitiator, mAdminId, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        OnSessionEstablishmentError(err);
+        return;
+    }
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
+    mPairingSession.ToSerializable(device->GetPairing());
+    mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
     PersistDevice(device);
 
-    RendezvousCleanup(CHIP_NO_ERROR);
-}
-
-void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
-{
-    Device * device = nullptr;
-    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
-    {
-        ExitNow();
-    }
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    switch (status)
-    {
-    case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-        break;
-
-    case RendezvousSessionDelegate::SecurePairingFailed:
-        ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-        break;
-
-    default:
-        break;
-    };
-exit:
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnStatusUpdate(status);
+        mPairingDelegate->OnStatusUpdate(PairingSessionDelegate::SecurePairingSuccess);
     }
+
+    RendezvousCleanup(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::PersistDeviceList()
