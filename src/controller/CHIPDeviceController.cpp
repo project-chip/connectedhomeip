@@ -413,6 +413,7 @@ void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const 
                                          const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     uint16_t index;
+    bool needClose = true;
 
     VerifyOrExit(mState == State::Initialized, ChipLogError(Controller, "OnMessageReceived was called in incorrect state"));
 
@@ -422,10 +423,14 @@ void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const 
     index = FindDeviceIndex(packetHeader.GetSourceNodeId().Value());
     VerifyOrExit(index < kNumMaxActiveDevices, ChipLogError(Controller, "OnMessageReceived was called for unknown device object"));
 
+    needClose = false; // Device will handle it
     mActiveDevices[index].OnMessageReceived(ec, packetHeader, payloadHeader, std::move(msgBuf));
 
 exit:
-    ec->Close();
+    if (needClose)
+    {
+        ec->Close();
+    }
 }
 
 void DeviceController::OnResponseTimeout(Messaging::ExchangeContext * ec)
