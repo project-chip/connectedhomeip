@@ -421,8 +421,8 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 class PBKDF2_sha256
 {
 public:
-    PBKDF2_sha256();
-    virtual ~PBKDF2_sha256();
+    PBKDF2_sha256() {}
+    virtual ~PBKDF2_sha256() {}
 
     /** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
      * @param password password used for key derivation

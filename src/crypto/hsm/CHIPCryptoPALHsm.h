@@ -121,13 +121,18 @@ private:
 class PBKDF2_sha256HSM : public PBKDF2_sha256
 {
 public:
-    uint32_t keyid;
 
     PBKDF2_sha256HSM();
     ~PBKDF2_sha256HSM();
 
     virtual CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
                                      unsigned int iteration_count, uint32_t key_length, uint8_t * output) override;
+
+    void SetKeyId(uint32_t id) { keyid = id; }
+
+    uint32_t GetKeyId(void) { return keyid; }
+private:
+    uint32_t keyid;
 };
 
 #endif //#if ENABLE_HSM_PBKDF2_SHA256
