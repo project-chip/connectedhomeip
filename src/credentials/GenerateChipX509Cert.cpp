@@ -336,6 +336,8 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, Certificat
     uint8_t numDNs = 1;
     bool isCA      = true;
 
+    VerifyOrReturnError(requestParams.SerialNumber > 0, CHIP_ERROR_INVALID_ARGUMENT);
+
     ASN1_START_SEQUENCE
     {
         // version [0] EXPLICIT Version DEFAULT v1

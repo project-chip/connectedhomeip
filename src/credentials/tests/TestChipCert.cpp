@@ -665,6 +665,13 @@ static void TestChipCert_GenerateRootCert(nlTestSuite * inSuite, void * inContex
     NL_TEST_ASSERT(inSuite,
                    NewRootX509Cert(root_params, keypair, signed_cert, sizeof(signed_cert), signed_len) ==
                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test that serial number cannot be negative
+    root_params.HasNodeID    = false;
+    root_params.SerialNumber = -1;
+    NL_TEST_ASSERT(inSuite,
+                   NewRootX509Cert(root_params, keypair, signed_cert, sizeof(signed_cert), signed_len) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 static void TestChipCert_GenerateRootFabCert(nlTestSuite * inSuite, void * inContext)
@@ -724,6 +731,13 @@ static void TestChipCert_GenerateICACert(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite,
                    NewICAX509Cert(ica_params, 4321, ica_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert), signed_len) ==
                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test that serial number cannot be negative
+    ica_params.HasNodeID    = false;
+    ica_params.SerialNumber = -1;
+    NL_TEST_ASSERT(inSuite,
+                   NewICAX509Cert(ica_params, 4321, ica_keypair.Pubkey(), keypair, signed_cert, sizeof(signed_cert), signed_len) ==
+                       CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext)
@@ -762,6 +776,14 @@ static void TestChipCert_GenerateNOCRoot(nlTestSuite * inSuite, void * inContext
     // Test that NOC cert must be provided a fabric ID
     noc_params.HasNodeID   = true;
     noc_params.HasFabricID = false;
+    NL_TEST_ASSERT(inSuite,
+                   NewNodeOperationalX509Cert(noc_params, kIssuerIsRootCA, noc_keypair.Pubkey(), keypair, signed_cert,
+                                              sizeof(signed_cert), signed_len) == CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Test that serial number cannot be negative
+    noc_params.HasNodeID    = true;
+    noc_params.HasFabricID  = true;
+    noc_params.SerialNumber = -1;
     NL_TEST_ASSERT(inSuite,
                    NewNodeOperationalX509Cert(noc_params, kIssuerIsRootCA, noc_keypair.Pubkey(), keypair, signed_cert,
                                               sizeof(signed_cert), signed_len) == CHIP_ERROR_INVALID_ARGUMENT);
