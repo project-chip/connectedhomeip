@@ -26,11 +26,11 @@ declare_args() {
 }
 
 if (chip_im_config_critical_section == "") {
-if (current_os != "freertos") {
-  chip_im_config_critical_section = "posix"
-} else {
-  chip_im_config_critical_section = "rtos"
-}
+  if (current_os != "freertos") {
+    chip_im_config_critical_section = "posix"
+  } else {
+    chip_im_config_critical_section = "rtos"
+  }
 }
 
 config("app_config") {
@@ -108,13 +108,9 @@ static_library("app") {
   ]
 
   if (chip_im_config_critical_section == "posix") {
-    sources += [
-      "CriticalSectionImplPthread.cpp",
-    ]
+    sources += [ "CriticalSectionImplPthread.cpp" ]
   } else if (chip_mdns == "rtos") {
-    sources += [
-      "CriticalSectionImplRtos.cpp",
-    ]
+    sources += [ "CriticalSectionImplRtos.cpp" ]
   } else {
     assert(false, "Unknown IM critical section implementation.")
   }
