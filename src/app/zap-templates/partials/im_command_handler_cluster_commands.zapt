@@ -80,8 +80,7 @@ if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && {{zcl_comman
 {
 {{/if}}
 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(apCommandObj{{#zcl_command_arguments}}, {{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
-return;
+wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(apCommandObj{{#zcl_command_arguments}}, {{#if (isCharString type)}}const_cast<uint8_t*>({{asSymbol label}}){{else}}{{asSymbol label}}{{/if}}{{/zcl_command_arguments}});
 {{#if (zcl_command_arguments_count this.id)}}
 }
 {{/if}}
