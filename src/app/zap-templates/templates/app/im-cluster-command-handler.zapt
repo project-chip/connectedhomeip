@@ -37,6 +37,7 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
     uint32_t validArgumentCount = 0;
     uint32_t expectArgumentCount = 0;
     uint32_t currentDecodeTagId = 0;
+    bool wasHandled = false;
     {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
     {{else}}
     {{/if}}
@@ -57,7 +58,12 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
         {{/all_user_cluster_commands}}
         default: {
             // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
+            chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                       0, // GroupId
+                                                       ZCL_{{asDelimitedMacro define}}_ID,
+                                                       aCommandId,
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+            apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
                             Protocols::SecureChannel::kProtocolCodeGeneralFailure);
             ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_{{asDelimitedMacro define}}_ID);
             return;
@@ -65,11 +71,16 @@ void Dispatch{{asCamelCased side false}}Command(app::Command * apCommandObj, Com
         }
     }
 
-    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount == validArgumentCount)
+    if (CHIP_NO_ERROR != TLVError || CHIP_NO_ERROR != TLVUnpackError || expectArgumentCount != validArgumentCount || !wasHandled)
     {
-      apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
+      chip::app::CommandPathParams returnStatusParam = { aEndpointId,
+                                                       0, // GroupId
+                                                       ZCL_{{asDelimitedMacro define}}_ID,
+                                                       aCommandId,
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+      apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kBadRequest, Protocols::SecureChannel::Id,
                       Protocols::SecureChannel::kProtocolCodeGeneralFailure);
-      ChipLogProgress(Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32, {{zcl_command_arguments_count this.id}}, validArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
+      ChipLogProgress(Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32 " (last decoded tag = %" PRIu32, validArgumentCount, expectArgumentCount, TLVError, TLVUnpackError, currentDecodeTagId);
     }
 }
 
@@ -92,16 +103,20 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     {
     {{#all_user_clusters}}
     {{#if (user_cluster_has_enabled_command name side)}}
-    {{#unless (isClient side) }}
     case ZCL_{{asDelimitedMacro define}}_ID :
         clusters::{{asCamelCased name false}}::Dispatch{{asCamelCased side false}}Command(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
-    {{/unless}}
     {{/if}}
     {{/all_user_clusters}}
     default:
         // Unrecognized cluster ID, error status will apply.
-        apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
+        chip::app::CommandPathParams returnStatusParam = { aEndPointId,
+                                                       0, // GroupId
+                                                       aClusterId,
+                                                       aCommandId,
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+        apCommandObj->AddStatusCode(&returnStatusParam, Protocols::SecureChannel::GeneralStatusCode::kNotFound, Protocols::SecureChannel::Id,
                             Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;

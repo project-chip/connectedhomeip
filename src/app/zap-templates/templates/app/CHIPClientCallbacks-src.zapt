@@ -787,7 +787,7 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
     {{/if}}
     {{/zcl_command_arguments}}
 
-    GET_RESPONSE_CALLBACKS("{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback");
 
     {{#zcl_command_arguments}}
     {{#if (isStrEqual label "status")}}
