@@ -258,7 +258,6 @@ CHIP_ERROR ChannelContext::SendSessionEstablishmentMessage(const PacketHeader & 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ReturnErrorOnFailure(header.EncodeBeforeData(msgIn));
-    ReturnErrorOnFailure(err);
 
     err = mExchangeManager->GetSessionMgr()->GetTransportManager()->SendMessage(peerAddress, std::move(msgIn));
     ReturnErrorOnFailure(err);
