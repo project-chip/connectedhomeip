@@ -121,7 +121,6 @@ private:
 class PBKDF2_sha256HSM : public PBKDF2_sha256
 {
 public:
-
     PBKDF2_sha256HSM();
     ~PBKDF2_sha256HSM();
 
@@ -130,7 +129,8 @@ public:
 
     void SetKeyId(uint32_t id) { keyid = id; }
 
-    uint32_t GetKeyId(void) { return keyid; }
+    uint32_t GetKeyId() { return keyid; }
+
 private:
     uint32_t keyid;
 };
