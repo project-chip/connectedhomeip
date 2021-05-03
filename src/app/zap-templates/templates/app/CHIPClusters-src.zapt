@@ -20,8 +20,6 @@ namespace Controller {
 CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onSuccessCallback;
-    (void) onFailureCallback;
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -41,6 +39,9 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 {{/chip_server_cluster_command_arguments}}
 
     ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    // Note: This is a temporary solution before we fully support IM on application side, this line should be removed in the future.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
 
     return mDevice->SendCommands();
 }
