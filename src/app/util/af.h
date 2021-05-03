@@ -1279,32 +1279,33 @@ EmberStatus emberAfSendMulticastWithCallback(chip::GroupId multicastId, EmberAps
 /**
  * @brief Sends broadcast.
  */
-EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
+// EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends broadcast with attached message sent callback.
  */
-EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                             uint8_t * message, EmberAfMessageSentFunction callback);
+// EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+//                                             uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends broadcast with alias with attached message sent callback.
  */
-EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
-                                                      EmberAfMessageSentFunction callback);
+// EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+//                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
+//                                                      EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
                                uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
+                                           EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
+                                           EmberAfMessageSentFunction callback);
 
 /**
  * @brief Unicasts the message to each remote node in the binding table that
