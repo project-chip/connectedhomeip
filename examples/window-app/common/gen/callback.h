@@ -88,13 +88,13 @@ void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallb
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfWindowCoveringClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfWindowCoveringClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                            EmberStatus status);
 
@@ -412,13 +412,13 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * be handled by the application framework.
  *
  * @param type   Ver.: always
- * @param indexOrDestination   Ver.: always
+ * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
+bool emberAfMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change

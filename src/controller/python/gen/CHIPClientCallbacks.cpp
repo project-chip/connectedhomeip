@@ -61,7 +61,7 @@ using namespace ::chip;
 #define GET_RESPONSE_CALLBACKS(name)                                                                                               \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
     Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
-    NodeId sourceId                          = emberAfCurrentCommand()->source;                                                    \
+    NodeId sourceId                          = emberAfCurrentCommand()->SourceNodeId();                                            \
     uint8_t sequenceNumber                   = emberAfCurrentCommand()->seqNum;                                                    \
     CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback);             \
                                                                                                                                    \
@@ -2087,7 +2087,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
     ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
 
-    NodeId sourceId = emberAfCurrentCommand()->source;
+    NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
     ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
 
     EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
