@@ -423,7 +423,7 @@ public:
                 {{#chip_attribute_list_entryTypes}}
                     {{#if (isString type)}}
                     {{#if (isOctetString type)}}
-                    [NSData dataWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}})],
+                    [NSData dataWithBytes:entries[i].{{name}}.data() length:entries[i].{{name}}.size()],
                     {{else}}
                     [[NSString alloc] initWithBytes:entries[i].{{name}}+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i].{{name}}) encoding:NSUTF8StringEncoding],
                     {{/if}}
@@ -434,7 +434,15 @@ public:
                 {{/chip_attribute_list_entryTypes}}
                 nil];
                 {{else}}
+                {{#if (isString type)}}
+                {{#if (isOctetString type)}}
+                values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+                {{else}}
+                values[i] = [[NSString alloc] initWithBytes:entries[i]+{{asReadTypeLength type}} length:emberAf{{asReadType type}}Length(entries[i]) encoding:NSUTF8StringEncoding];
+                {{/if}}
+                {{else}}
                 values[i] = [NSNumber numberWith{{asObjectiveCNumberType label type}}:entries[i]];
+                {{/if}}
                 {{/if}}
             }
 
