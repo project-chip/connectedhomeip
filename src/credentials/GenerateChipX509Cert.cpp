@@ -44,6 +44,8 @@ namespace Credentials {
 using namespace chip::ASN1;
 using namespace chip::Protocols;
 
+namespace {
+
 struct ChipDNParams
 {
     OID AttrOID;
@@ -56,9 +58,9 @@ enum IsCACert
     kNotCACert,
 };
 
-static constexpr uint8_t kSHA1_Hash_Langth = 20;
+constexpr uint8_t kSHA1_Hash_Langth = 20;
 
-static CHIP_ERROR EncodeSubjectPublicKeyInfo(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
+CHIP_ERROR EncodeSubjectPublicKeyInfo(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -79,7 +81,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeAuthorityKeyIdentifierExtension(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
+CHIP_ERROR EncodeAuthorityKeyIdentifierExtension(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -109,7 +111,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeSubjectKeyIdentifierExtension(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
+CHIP_ERROR EncodeSubjectKeyIdentifierExtension(const Crypto::P256PublicKey & pubkey, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -134,7 +136,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeKeyUsageExtension(uint16_t keyUsageBits, ASN1Writer & writer)
+CHIP_ERROR EncodeKeyUsageExtension(uint16_t keyUsageBits, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -155,7 +157,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeIsCAExtension(IsCACert isCA, ASN1Writer & writer)
+CHIP_ERROR EncodeIsCAExtension(IsCACert isCA, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -189,7 +191,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeCASpecificExtensions(ASN1Writer & writer)
+CHIP_ERROR EncodeCASpecificExtensions(ASN1Writer & writer)
 {
     ReturnErrorOnFailure(EncodeIsCAExtension(kCACert, writer));
 
@@ -200,7 +202,7 @@ static CHIP_ERROR EncodeCASpecificExtensions(ASN1Writer & writer)
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
+CHIP_ERROR EncodeNOCSpecificExtensions(ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -235,8 +237,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const Crypto::P256PublicKey & AKI,
-                                   ASN1Writer & writer)
+CHIP_ERROR EncodeExtensions(bool isCA, const Crypto::P256PublicKey & SKI, const Crypto::P256PublicKey & AKI, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -265,7 +266,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeChipDNs(ChipDNParams * params, uint8_t numParams, ASN1Writer & writer)
+CHIP_ERROR EncodeChipDNs(ChipDNParams * params, uint8_t numParams, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -294,7 +295,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeValidity(uint32_t validityStart, uint32_t validityEnd, ASN1Writer & writer)
+CHIP_ERROR EncodeValidity(uint32_t validityStart, uint32_t validityEnd, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1UniversalTime asn1Time;
@@ -313,7 +314,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signature, ASN1Writer & writer)
+CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signature, ASN1Writer & writer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -323,6 +324,8 @@ static CHIP_ERROR EncodeChipECDSASignature(Crypto::P256ECDSASignature & signatur
 exit:
     return err;
 }
+
+} // namespace
 
 CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel, uint64_t subject,
                          const Crypto::P256PublicKey & subjectPubkey, const Crypto::P256PublicKey & issuerPubkey,
@@ -396,9 +399,9 @@ exit:
     return err;
 }
 
-static CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel, uint64_t subject,
-                                  const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair,
-                                  uint8_t * x509CertBuf, uint32_t x509CertBufSize, uint32_t & x509CertLen)
+CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, CertificateIssuerLevel issuerLevel, uint64_t subject,
+                           const Crypto::P256PublicKey & subjectPubkey, Crypto::P256Keypair & issuerKeypair, uint8_t * x509CertBuf,
+                           uint32_t x509CertBufSize, uint32_t & x509CertLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ASN1Writer writer;
