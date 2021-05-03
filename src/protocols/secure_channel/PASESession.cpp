@@ -200,7 +200,7 @@ CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkd
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setUpPINCode);
 
     return mPBKDF.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt, saltLen, pbkdf2IterCount,
-                         sizeof(PASEVerifier), &verifier[0][0]);
+                                sizeof(PASEVerifier), &verifier[0][0]);
 }
 
 CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN)

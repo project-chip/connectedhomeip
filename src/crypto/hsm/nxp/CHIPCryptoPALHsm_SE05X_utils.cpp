@@ -187,7 +187,8 @@ CHIP_ERROR se05x_set_key(int keyid, const uint8_t * key, size_t keylen, sss_key_
     status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&keyObject, (uint32_t)keyid, keyPart, cipherType, keyBufLen, kKeyObject_Mode_Persistent);
+    status =
+        sss_key_object_allocate_handle(&keyObject, (uint32_t) keyid, keyPart, cipherType, keyBufLen, kKeyObject_Mode_Persistent);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, keyBuf, keyBufLen, bitlen, NULL, 0);

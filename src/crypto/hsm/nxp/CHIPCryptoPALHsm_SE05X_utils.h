@@ -42,8 +42,8 @@ extern ex_sss_boot_ctx_t gex_sss_chip_ctx;
 /* SE predefined keyid values */
 enum keyid_values
 {
-    kKeyId_NotInitialized = 0,
-	kKeyId_pbkdf2_sha256_hmac_keyid = 0xBCBCBCBC,
+    kKeyId_NotInitialized           = 0,
+    kKeyId_pbkdf2_sha256_hmac_keyid = 0xBCBCBCBC,
 };
 
 // Enable the below macro to make spake HSM imlementation reentrant.

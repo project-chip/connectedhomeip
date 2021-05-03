@@ -65,7 +65,6 @@ public:
 using Test_P256Keypair                  = P256Keypair;
 #endif
 
-
 #ifdef ENABLE_HSM_SPAKE
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
 #else
@@ -75,7 +74,7 @@ using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 #ifdef ENABLE_HSM_PBKDF2
 using TestPBKDF2_sha256 = PBKDF2_sha256HSM;
 #else
-using TestPBKDF2_sha256 = PBKDF2_sha256;
+using TestPBKDF2_sha256                 = PBKDF2_sha256;
 #endif
 
 static uint32_t gs_test_entropy_source_called = 0;
@@ -953,7 +952,7 @@ static void TestPBKDF2_SHA256_TestVectors(nlTestSuite * inSuite, void * inContex
             NL_TEST_ASSERT(inSuite, out_key);
 
             CHIP_ERROR err = pbkdf1.pbkdf2_sha256(vector->password, vector->plen, vector->salt, vector->slen, vector->iter,
-                                           vector->key_len, out_key.Get());
+                                                  vector->key_len, out_key.Get());
             NL_TEST_ASSERT(inSuite, err == vector->result);
 
             if (vector->result == CHIP_NO_ERROR)

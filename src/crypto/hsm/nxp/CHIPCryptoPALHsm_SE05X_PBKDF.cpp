@@ -30,16 +30,21 @@
 namespace chip {
 namespace Crypto {
 
-PBKDF2_sha256HSM::PBKDF2_sha256HSM() { keyid = kKeyId_pbkdf2_sha256_hmac_keyid; }
+PBKDF2_sha256HSM::PBKDF2_sha256HSM()
+{
+    keyid = kKeyId_pbkdf2_sha256_hmac_keyid;
+}
 PBKDF2_sha256HSM::~PBKDF2_sha256HSM() {}
 
-CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
-                         uint32_t key_length, uint8_t * output)
+CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                           unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
-    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
-    smStatus_t smStatus = SM_NOT_OK;
-    sss_status_t status = kStatus_SSS_Fail;
-    sss_object_t hmacKeyObj = {0,};
+    CHIP_ERROR error        = CHIP_ERROR_INTERNAL;
+    smStatus_t smStatus     = SM_NOT_OK;
+    sss_status_t status     = kStatus_SSS_Fail;
+    sss_object_t hmacKeyObj = {
+        0,
+    };
 
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -58,8 +63,8 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
     status = sss_key_object_init(&hmacKeyObj, &gex_sss_chip_ctx.ks);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
-    status = sss_key_object_allocate_handle(&hmacKeyObj, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC,
-        sizeof(password), kKeyObject_Mode_Transient);
+    status = sss_key_object_allocate_handle(&hmacKeyObj, keyid, kSSS_KeyPart_Default, kSSS_CipherType_HMAC, sizeof(password),
+                                            kKeyObject_Mode_Transient);
     VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &hmacKeyObj, password, plen, plen * 8, NULL, 0);
@@ -67,15 +72,8 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
 
     VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
 
-    smStatus = Se05x_API_PBKDF2(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx,
-        keyid,
-        kSE05x_Pbkdf2_HMAC_SHA256,
-        salt,
-        slen,
-        (uint16_t)iteration_count,
-        (uint16_t)key_length,
-        output,
-        (size_t*)&key_length);
+    smStatus = Se05x_API_PBKDF2(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, kSE05x_Pbkdf2_HMAC_SHA256, salt,
+                                slen, (uint16_t) iteration_count, (uint16_t) key_length, output, (size_t *) &key_length);
     VerifyOrExit(smStatus == SM_OK, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
@@ -85,7 +83,6 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
 exit:
     return error;
 }
-
 
 } // namespace Crypto
 } // namespace chip
