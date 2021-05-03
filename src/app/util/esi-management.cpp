@@ -256,12 +256,12 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
     // The source ESI is not in the ESI table.
     if (esiEntry == NULL)
     {
-        emberAfDebugPrintln("source ESI 0x%x not found in table", cmd->source);
+        emberAfDebugPrintln("source ESI 0x%x not found in table", cmd->SourceNodeId());
         // We add the ESI to the table.
         esiEntry = emberAfPluginEsiManagementGetFreeEntry();
         if (esiEntry != NULL)
         {
-            esiEntry->nodeId       = cmd->source;
+            esiEntry->nodeId       = cmd->SourceNodeId();
             esiEntry->networkIndex = cmd->networkIndex;
             esiEntry->endpoint     = cmd->apsFrame->sourceEndpoint;
             esiEntry->age          = 0;
@@ -276,10 +276,10 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
     {
         // Check that the short ID is still the one we stored in the ESI table.
         // If not, update it.
-        if (esiEntry->nodeId != cmd->source)
+        if (esiEntry->nodeId != cmd->SourceNodeId())
         {
             emberAfDebugPrintln("ESI short ID changed, updating it");
-            esiEntry->nodeId = cmd->source;
+            esiEntry->nodeId = cmd->SourceNodeId();
         }
     }
 

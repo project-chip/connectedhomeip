@@ -152,11 +152,11 @@ void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
 void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           chip::NodeId source, InterPanHeader * interPanHeader);
+                           chip::Messaging::ExchangeContext * source, InterPanHeader * interPanHeader);
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, chip::NodeId source, InterPanHeader * interPanHeader,
-                                     EmberAfClusterCommand * returnCmd);
+                                     uint16_t messageLength, chip::Messaging::ExchangeContext * source,
+                                     InterPanHeader * interPanHeader, EmberAfClusterCommand * returnCmd);
 
 /**
  * Retrieves the difference between the two passed values.

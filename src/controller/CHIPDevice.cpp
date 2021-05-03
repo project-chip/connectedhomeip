@@ -276,7 +276,8 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
+                               const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -286,7 +287,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         }
         else
         {
-            HandleDataModelMessage(mDeviceId, std::move(msgBuf));
+            HandleDataModelMessage(exchange, std::move(msgBuf));
         }
     }
 }
