@@ -118,14 +118,11 @@ struct ReliableMessageProtocolConfig
 {
     uint32_t mInitialRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of the first sent message. */
     uint32_t mActiveRetransTimeoutTick;  /**< Configurable timeout in msec for retransmission of all subsequent messages. */
-    uint16_t mAckPiggybackTimeoutTick;   /**< Configurable timeout in msec for transmission of a solitary Ack message. */
-    uint8_t mMaxRetrans;                 /**< Configurable max value for retransmissions in the ExchangeContext. */
 };
 
 const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = {
     CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-    CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-    CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK, CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+    CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 };
 
 // clang-format on

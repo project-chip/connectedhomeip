@@ -47,13 +47,6 @@ using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
 
-// Maximum length of application data that can be encrypted as one block.
-// The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
-// This limit would need additional reviews once we have formalized Secure Transport header.
-//
-// TODO: this should be checked within the transport message sending instead of the session management layer.
-static const size_t kMax_SecureSDU_Length = 1024;
-
 uint32_t EncryptedPacketBufferHandle::GetMsgId() const
 {
     PacketHeader header;
@@ -136,7 +129,6 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
     PacketHeader packetHeader;
@@ -169,7 +161,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msgBuf->HasChainedBuffer(), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Find an active connection to the specified peer node
     state = GetPeerConnectionState(session);

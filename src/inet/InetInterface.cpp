@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -573,26 +573,23 @@ InterfaceId InterfaceIterator::GetInterfaceId(void)
  */
 INET_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
-    INET_ERROR err = INET_ERROR_NOT_IMPLEMENTED;
-
-    VerifyOrExit(HasCurrent(), err = INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(HasCurrent(), INET_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    VerifyOrExit(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, err = INET_ERROR_NO_MEMORY);
+    VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, INET_ERROR_NO_MEMORY);
     strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
-    err = INET_NO_ERROR;
+    return INET_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    err = ::chip::Inet::GetInterfaceName(mCurrentId, nameBuf, nameBufSize);
+    return ::chip::Inet::GetInterfaceName(mCurrentId, nameBuf, nameBufSize);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    err = ::chip::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
+    return ::chip::Inet::GetInterfaceName(mCurNetif, nameBuf, nameBufSize);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-exit:
-    return err;
+    return INET_ERROR_NOT_IMPLEMENTED;
 }
 
 /**
@@ -1005,22 +1002,19 @@ InterfaceId InterfaceAddressIterator::GetInterfaceId()
  */
 INET_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
 {
-    INET_ERROR err = INET_ERROR_NOT_IMPLEMENTED;
-
-    VerifyOrExit(HasCurrent(), err = INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(HasCurrent(), INET_ERROR_INCORRECT_STATE);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-    VerifyOrExit(strlen(mCurAddr->ifa_name) < nameBufSize, err = INET_ERROR_NO_MEMORY);
+    VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, INET_ERROR_NO_MEMORY);
     strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
-    err = INET_NO_ERROR;
+    return INET_NO_ERROR;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    err = mIntfIter.GetInterfaceName(nameBuf, nameBufSize);
+    return mIntfIter.GetInterfaceName(nameBuf, nameBufSize);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-exit:
-    return err;
+    return INET_ERROR_NOT_IMPLEMENTED;
 }
 
 /**

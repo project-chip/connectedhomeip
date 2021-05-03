@@ -39,6 +39,12 @@
 
 extern ex_sss_boot_ctx_t gex_sss_chip_ctx;
 
+/* SE predefined keyid values */
+enum keyid_values
+{
+    kKeyId_NotInitialized = 0,
+};
+
 // Enable the below macro to make spake HSM imlementation reentrant.
 #define ENABLE_REENTRANCY 0
 

@@ -33,6 +33,7 @@ public:
     CHIP_ERROR Init();
 
     CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
+    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Start(inetLayer, port); }
 
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
@@ -47,7 +48,7 @@ public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
 
     /// Requests resolution of a node ID to its address
-    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
 
     static DiscoveryImplPlatform & GetInstance();
 

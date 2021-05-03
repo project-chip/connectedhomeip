@@ -98,6 +98,12 @@
 // Definitions for cluster: Network Commissioning
 #define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
 
+// Definitions for cluster: Switch
+#define ZCL_SWITCH_CLUSTER_ID (0x003B)
+
+// Definitions for cluster: Operational Credentials
+#define ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID (0x003E)
+
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
 

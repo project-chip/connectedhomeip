@@ -48,17 +48,6 @@ using namespace chip::ASN1;
 using namespace chip::TLV;
 using namespace chip::Protocols;
 
-inline bool IsCertificateExtensionTag(uint64_t tag)
-{
-    if (IsContextTag(tag))
-    {
-        uint32_t tagNum = TagNumFromTag(tag);
-        return (tagNum >= kCertificateExtensionTagsStart && tagNum <= kCertificateExtensionTagsEnd);
-    }
-
-    return false;
-}
-
 static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipDN & dn)
 {
     CHIP_ERROR err;
@@ -522,85 +511,123 @@ exit:
     return err;
 }
 
+static CHIP_ERROR DecodeConvertFutureExtension(TLVReader & tlvReader, ASN1Writer & writer, ChipCertificateData & certData)
+{
+    CHIP_ERROR err;
+    const uint8_t * extensionSequence;
+    uint32_t extensionSequenceLen;
+    ASN1Reader reader;
+
+    VerifyOrExit(tlvReader.GetTag() == ContextTag(kTag_FutureExtension), err = CHIP_ERROR_INVALID_TLV_TAG);
+    VerifyOrExit(tlvReader.GetType() == kTLVType_ByteString, err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+    err = tlvReader.GetDataPtr(extensionSequence);
+    SuccessOrExit(err);
+
+    extensionSequenceLen = tlvReader.GetLength();
+
+    reader.Init(extensionSequence, extensionSequenceLen);
+
+    // Extension ::= SEQUENCE
+    ASN1_PARSE_ENTER_SEQUENCE
+    {
+        OID extensionOID;
+        bool critical = false;
+
+        ASN1_PARSE_OBJECT_ID(extensionOID);
+
+        VerifyOrExit(extensionOID == kOID_Unknown, err = ASN1_ERROR_UNSUPPORTED_ENCODING);
+
+        // critical BOOLEAN DEFAULT FALSE,
+        ASN1_PARSE_ANY;
+        if (reader.GetClass() == kASN1TagClass_Universal && reader.GetTag() == kASN1UniversalTag_Boolean)
+        {
+            ASN1_GET_BOOLEAN(critical);
+
+            if (critical)
+            {
+                certData.mCertFlags.Set(CertFlags::kExtPresent_FutureIsCritical);
+            }
+
+            ASN1_PARSE_ANY;
+        }
+    }
+    ASN1_EXIT_SEQUENCE;
+
+    VerifyOrExit(extensionSequenceLen <= UINT16_MAX, err = ASN1_ERROR_INVALID_ENCODING);
+
+    // FutureExtension SEQUENCE
+    err = writer.PutConstructedType(extensionSequence, static_cast<uint16_t>(extensionSequenceLen));
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
 static CHIP_ERROR DecodeConvertExtension(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
     uint64_t extensionTagNum = TagNumFromTag(reader.GetTag());
     OID extensionOID;
 
-    if (extensionTagNum == kTag_AuthorityKeyIdentifier)
+    if (extensionTagNum == kTag_FutureExtension)
     {
-        extensionOID = kOID_Extension_AuthorityKeyIdentifier;
-    }
-    else if (extensionTagNum == kTag_SubjectKeyIdentifier)
-    {
-        extensionOID = kOID_Extension_SubjectKeyIdentifier;
-    }
-    else if (extensionTagNum == kTag_KeyUsage)
-    {
-        extensionOID = kOID_Extension_KeyUsage;
-    }
-    else if (extensionTagNum == kTag_BasicConstraints)
-    {
-        extensionOID = kOID_Extension_BasicConstraints;
-    }
-    else if (extensionTagNum == kTag_ExtendedKeyUsage)
-    {
-        extensionOID = kOID_Extension_ExtendedKeyUsage;
+        err = DecodeConvertFutureExtension(reader, writer, certData);
+        SuccessOrExit(err);
     }
     else
     {
-        ExitNow(err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-    }
-
-    // Extension ::= SEQUENCE
-    ASN1_START_SEQUENCE
-    {
-        // extnID OBJECT IDENTIFIER,
-        ASN1_ENCODE_OBJECT_ID(extensionOID);
-
-        // BasicConstraints, KeyUsage and ExtKeyUsage extensions MUST be marked as critical.
-        if (extensionTagNum == kTag_KeyUsage || extensionTagNum == kTag_BasicConstraints ||
-            extensionTagNum == kTag_ExtendedKeyUsage)
+        // Extension ::= SEQUENCE
+        ASN1_START_SEQUENCE
         {
-            ASN1_ENCODE_BOOLEAN(true);
-        }
+            extensionOID = GetOID(kOIDCategory_Extension, static_cast<uint8_t>(extensionTagNum));
 
-        // extnValue OCTET STRING
-        //           -- contains the DER encoding of an ASN.1 value
-        //           -- corresponding to the extension type identified
-        //           -- by extnID
-        ASN1_START_OCTET_STRING_ENCAPSULATED
-        {
-            if (extensionTagNum == kTag_AuthorityKeyIdentifier)
+            // extnID OBJECT IDENTIFIER,
+            ASN1_ENCODE_OBJECT_ID(extensionOID);
+
+            // BasicConstraints, KeyUsage and ExtKeyUsage extensions MUST be marked as critical.
+            if (extensionTagNum == kTag_KeyUsage || extensionTagNum == kTag_BasicConstraints ||
+                extensionTagNum == kTag_ExtendedKeyUsage)
             {
-                err = DecodeConvertAuthorityKeyIdentifierExtension(reader, writer, certData);
+                ASN1_ENCODE_BOOLEAN(true);
             }
-            else if (extensionTagNum == kTag_SubjectKeyIdentifier)
+
+            // extnValue OCTET STRING
+            //           -- contains the DER encoding of an ASN.1 value
+            //           -- corresponding to the extension type identified
+            //           -- by extnID
+            ASN1_START_OCTET_STRING_ENCAPSULATED
             {
-                err = DecodeConvertSubjectKeyIdentifierExtension(reader, writer, certData);
+                if (extensionTagNum == kTag_AuthorityKeyIdentifier)
+                {
+                    err = DecodeConvertAuthorityKeyIdentifierExtension(reader, writer, certData);
+                }
+                else if (extensionTagNum == kTag_SubjectKeyIdentifier)
+                {
+                    err = DecodeConvertSubjectKeyIdentifierExtension(reader, writer, certData);
+                }
+                else if (extensionTagNum == kTag_KeyUsage)
+                {
+                    err = DecodeConvertKeyUsageExtension(reader, writer, certData);
+                }
+                else if (extensionTagNum == kTag_BasicConstraints)
+                {
+                    err = DecodeConvertBasicConstraintsExtension(reader, writer, certData);
+                }
+                else if (extensionTagNum == kTag_ExtendedKeyUsage)
+                {
+                    err = DecodeConvertExtendedKeyUsageExtension(reader, writer, certData);
+                }
+                else
+                {
+                    err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
+                }
+                SuccessOrExit(err);
             }
-            else if (extensionTagNum == kTag_KeyUsage)
-            {
-                err = DecodeConvertKeyUsageExtension(reader, writer, certData);
-            }
-            else if (extensionTagNum == kTag_BasicConstraints)
-            {
-                err = DecodeConvertBasicConstraintsExtension(reader, writer, certData);
-            }
-            else if (extensionTagNum == kTag_ExtendedKeyUsage)
-            {
-                err = DecodeConvertExtendedKeyUsageExtension(reader, writer, certData);
-            }
-            else
-            {
-                err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
-            }
-            SuccessOrExit(err);
+            ASN1_END_ENCAPSULATED;
         }
-        ASN1_END_ENCAPSULATED;
+        ASN1_END_SEQUENCE;
     }
-    ASN1_END_SEQUENCE;
 
 exit:
     return err;
@@ -609,7 +636,13 @@ exit:
 static CHIP_ERROR DecodeConvertExtensions(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
+    TLVType outerContainer;
+
+    err = reader.Next(kTLVType_List, ContextTag(kTag_Extensions));
+    SuccessOrExit(err);
+
+    err = reader.EnterContainer(outerContainer);
+    SuccessOrExit(err);
 
     // extensions [3] EXPLICIT Extensions OPTIONAL
     ASN1_START_CONSTRUCTED(kASN1TagClass_ContextSpecific, 3)
@@ -617,24 +650,22 @@ static CHIP_ERROR DecodeConvertExtensions(TLVReader & reader, ASN1Writer & write
         // Extensions ::= SEQUENCE SIZE (1..MAX) OF Extension
         ASN1_START_SEQUENCE
         {
-            while (true)
+            // Read certificate extension in the List.
+            while ((err = reader.Next()) == CHIP_NO_ERROR)
             {
                 err = DecodeConvertExtension(reader, writer, certData);
                 SuccessOrExit(err);
-
-                // Break the loop if the next certificate element is NOT an extension.
-                err = reader.Next();
-                SuccessOrExit(err);
-                tag = reader.GetTag();
-                if (!IsCertificateExtensionTag(tag))
-                {
-                    break;
-                }
             }
         }
         ASN1_END_SEQUENCE;
     }
     ASN1_END_CONSTRUCTED;
+
+    err = reader.VerifyEndOfContainer();
+    SuccessOrExit(err);
+
+    err = reader.ExitContainer(outerContainer);
+    SuccessOrExit(err);
 
 exit:
     return err;
@@ -646,9 +677,8 @@ CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certDa
     TLVType containerType;
     uint32_t len;
 
-    // Verify the tag and type
-    VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrExit(reader.GetTag() == ContextTag(kTag_ECDSASignature), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    err = reader.Next(kTLVType_Structure, ContextTag(kTag_ECDSASignature));
+    SuccessOrExit(err);
 
     err = reader.EnterContainer(containerType);
     SuccessOrExit(err);
@@ -737,7 +767,6 @@ exit:
 CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
-    uint64_t tag;
 
     // tbsCertificate TBSCertificate,
     // TBSCertificate ::= SEQUENCE
@@ -801,15 +830,9 @@ CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCer
         err = DecodeConvertSubjectPublicKeyInfo(reader, writer, certData);
         SuccessOrExit(err);
 
-        // If the next element is a certificate extension...
-        err = reader.Next();
+        // certificate extensions
+        err = DecodeConvertExtensions(reader, writer, certData);
         SuccessOrExit(err);
-        tag = reader.GetTag();
-        if (IsCertificateExtensionTag(tag))
-        {
-            err = DecodeConvertExtensions(reader, writer, certData);
-            SuccessOrExit(err);
-        }
     }
     ASN1_END_SEQUENCE;
 

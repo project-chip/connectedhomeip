@@ -141,7 +141,7 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
 2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
 2021-01-19 02:27:27,257 ChipBLEMgr   INFO
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
@@ -160,7 +160,7 @@ chip-device-ctrl > set-pairing-wifi-credential TestAP TestPassword
 4.  Connect to device using setup pin code
 
 ```
-chip-device-ctrl > connect -ble 1383 12345678
+chip-device-ctrl > connect -ble 1383 20202021
 ```
 
 ## Thread provisioning
@@ -200,13 +200,43 @@ chip-device-ctrl
 2. Connect to device using setup pin code
 
 ```
-chip-device-ctrl > connect -ip <Device IP Address> 12345678
+chip-device-ctrl > connect -ip <Device IP Address> 20202021
 ```
 
 ## Commands
 
 **`[L]`** = Linux only / **`[D]`** = Deprecated / **`[W]`** = WIP / **`[T]`** =
 For testing
+
+### `setup-payload parse-manual <manual-pairing-code>`
+
+Print the commissioning information encoded in the Manual Pairing Code.
+
+```
+chip-device-ctrl > setup-payload parse-manual 35767807533
+Version: 0
+VendorID: 0
+ProductID: 0
+RequiresCustomFlow: 0
+RendezvousInformation: 0
+Discriminator: 3840
+SetUpPINCode: 20202021
+```
+
+### `setup-payload parse-qr <qr-code>`
+
+Print the commissioning information encoded in the QR Code payload.
+
+```
+chip-device-ctrl > setup-payload parse-qr "VP:vendorpayload%CH:H34.GHY00 0C9SS0"
+Version: 0
+VendorID: 9050
+ProductID: 20043
+RequiresCustomFlow: 0
+RendezvousInformation: 2 [BLE]
+Discriminator: 3840
+SetUpPINCode: 20202021
+```
 
 ### **`[L]`** `ble-adapter-print`
 
@@ -243,7 +273,7 @@ chip-device-ctrl > ble-scan
 2021-01-19 02:27:25,151 ChipBLEMgr   INFO     Discriminator   = 1383
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Vendor Id       = 9050
 2021-01-19 02:27:25,152 ChipBLEMgr   INFO     Product Id      = 65279
-2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000feaf-0000-1000-8000-00805f9b34fb
+2021-01-19 02:27:25,155 ChipBLEMgr   INFO     Adv UUID        = 0000fff6-0000-1000-8000-00805f9b34fb
 2021-01-19 02:27:25,156 ChipBLEMgr   INFO     Adv Data        = 0067055a23fffe
 2021-01-19 02:27:27,257 ChipBLEMgr   INFO
 2021-01-19 02:27:34,213 ChipBLEMgr   INFO     scanning stopped
@@ -270,10 +300,6 @@ does not match the spec and will be removed later. The nodeid will not be
 persisted by controller / device.
 
 If no nodeid given, a random node id will be used.
-
-### **`[D]`** `set-pairing-wifi-credential <ssid> <password>`
-
-Set WiFi credential for **_deprecated_** network provisioning precedure.
 
 ### **`[W]`** `zcl`
 
@@ -333,11 +359,13 @@ example, `networkId=hex:0123456789abcdef` (for
 `[0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef]`), `ssid=str:Test` (for
 `['T', 'e', 's', 't', 0x00]`).
 
-## Example Commissioning flow over IP
+## Example Commissioning flow over
 
 -   Assuming your WiFi ssid is `TESTSSID`, and your WiFi password is `P455W4RD`.
 
--   Assuming your Thread network has the following operational dataset:
+-   Assuming your Thread network has the following operational dataset (the
+    extended pan id of this network is `577c1f5384d9e909`, thus the network id
+    for this network is also `577c1f5384d9e909`):
 
     ```
     0e 08 0000000000010000
@@ -354,13 +382,23 @@ example, `networkId=hex:0123456789abcdef` (for
 
 -   Assuming your device is on the same network, with IP address 192.168.0.1
 
--   The setup pincode is 12345678
+-   The setup pincode is 20202021
 
 -   You set the temporary node id to 4546
 
-```
-chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
-```
+-   The discriminator of the device is 2333
+
+> Establish PASE session over BLE
+>
+> ```
+> chip-device-ctrl > connect -ble 2333 20202021 4546
+> ```
+
+> Establish PASE session over IP
+>
+> ```
+> chip-device-ctrl > connect -ip 192.168.0.1 20202021 4546
+> ```
 
 > Skip this part if your device does not support WiFi.
 >
@@ -375,5 +413,11 @@ chip-device-ctrl > connect -ip 192.168.0.1 12345678 4546
 > ```
 > chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 4546 1 0 operationalDataset=hex:0e080000000000010000000300001435060004001fffe00208577c1f5384d9e9090708fdca4e253816ae9d0510bb53ac7bf2133f0f686759ad9969255c030f4f70656e5468726561642d31343937010214970410420111ea791a892d28e3160f20eea3960c030000ff breadcrumb=0 timeoutMs=1000
 >
-> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkId=hex:0123456789abcdef breadcrumb=0 timeoutMs=1000
+> chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 4546 1 0 networkID=hex:577c1f5384d9e909 breadcrumb=0 timeoutMs=1000
+> ```
+
+> If you are using BLE connection, release BLE connection
+>
+> ```
+> chip-device-ctrl > close-ble
 > ```

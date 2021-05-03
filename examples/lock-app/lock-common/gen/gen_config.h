@@ -30,6 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
@@ -39,6 +40,11 @@
 #define ZCL_USING_BASIC_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_BASIC_SERVER
 #define EMBER_AF_PLUGIN_BASIC
+
+// Use this macro to check if the server side of the General Commissioning cluster is included
+#define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING_SERVER
+#define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER

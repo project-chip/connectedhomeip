@@ -21,10 +21,10 @@
 #pragma once
 
 // Global cluster attribute ids
+#define ZCL_FEATURE_MAP_CLIENT_ATTRIBUTE_ID (0xFFFC)
+#define ZCL_FEATURE_MAP_SERVER_ATTRIBUTE_ID (0xFFFC)
 #define ZCL_CLUSTER_REVISION_CLIENT_ATTRIBUTE_ID (0xFFFD)
 #define ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID (0xFFFD)
-#define ZCL_REPORTING_STATUS_CLIENT_ATTRIBUTE_ID (0xFFFE)
-#define ZCL_REPORTING_STATUS_SERVER_ATTRIBUTE_ID (0xFFFE)
 
 // Attribute ids for cluster: Power Configuration
 
@@ -420,6 +420,22 @@
 // Client attributes
 
 // Server attributes
+
+// Attribute ids for cluster: Switch
+
+// Client attributes
+
+// Server attributes
+#define ZCL_NUMBER_OF_POSITIONS_ATTRIBUTE_ID (0x0000)
+#define ZCL_CURRENT_POSITION_ATTRIBUTE_ID (0x0001)
+#define ZCL_MULTI_PRESS_MAX_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: Operational Credentials
+
+// Client attributes
+
+// Server attributes
+#define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Shade Configuration
 
@@ -1151,7 +1167,14 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_CURRENT_STATE_ATTRIBUTE_ID (0x0000)
+#define ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID (0x0000)
+#define ZCL_MEDIA_PLAYBACK_START_TIME_ATTRIBUTE_ID (0x0001)
+#define ZCL_MEDIA_PLAYBACK_DURATION_ATTRIBUTE_ID (0x0002)
+#define ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT_ATTRIBUTE_ID (0x0003)
+#define ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_ATTRIBUTE_ID (0x0004)
+#define ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID (0x0005)
+#define ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END_ATTRIBUTE_ID (0x0006)
+#define ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START_ATTRIBUTE_ID (0x0007)
 
 // Attribute ids for cluster: Media Input
 
@@ -1178,6 +1201,8 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID (0x0000)
+#define ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_TYPES_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Audio Output
 
@@ -1193,7 +1218,8 @@
 
 // Server attributes
 #define ZCL_APPLICATION_LAUNCHER_LIST_ATTRIBUTE_ID (0x0000)
-#define ZCL_APPLICATION_LAUNCHER_CURRENT_APP_ATTRIBUTE_ID (0x0001)
+#define ZCL_APPLICATION_LAUNCHER_CURRENT_APP_CATALOG_VENDOR_ID_ATTRIBUTE_ID (0x0001)
+#define ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Application Basic
 

@@ -36,8 +36,6 @@
 
 namespace chip {
 
-constexpr uint16_t kMsgCounterChallengeSize = 8; // The size of the message counter synchronization request message.
-
 namespace Messaging {
 
 class ExchangeManager;
@@ -56,7 +54,8 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -71,23 +70,6 @@ public:
      *  @return Returns 'true' if it is the initiator, else 'false'.
      */
     bool IsInitiator() const;
-
-    /**
-     *  Determine whether a response is expected for messages sent over
-     *  this exchange.
-     *
-     *  @return Returns 'true' if response expected, else 'false'.
-     */
-    bool IsResponseExpected() const;
-
-    /**
-     *  Set whether a response is expected on this exchange.
-     *
-     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
-     *                                  (false) a response is expected on this
-     *                                  exchange.
-     */
-    void SetResponseExpected(bool inResponseExpected);
 
     /**
      *  Send a CHIP message on this exchange.
@@ -144,11 +126,10 @@ public:
 
     ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
-    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+    ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
     ExchangeMessageDispatch * GetMessageDispatch();
 
@@ -170,9 +151,9 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetChallenge(const uint8_t * value) { memcpy(&mChallenge[0], value, kMsgCounterChallengeSize); }
+    void SetAppState(void * state) { mAppState = state; }
 
-    const uint8_t * GetChallenge() const { return mChallenge; }
+    void * GetAppState() const { return mAppState; }
 
     SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
 
@@ -184,34 +165,41 @@ public:
     void Close();
     void Abort();
 
+    void SetResponseTimeout(Timeout timeout);
+
+private:
+    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    ExchangeDelegateBase * mDelegate = nullptr;
+    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeACL * mExchangeACL       = nullptr;
+    void * mAppState                 = nullptr;
+
+    SecureSessionHandle mSecureSession; // The connection state
+    uint16_t mExchangeId;               // Assigned exchange ID.
+
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                             ExchangeDelegateBase * delegate);
     void Free();
     void Reset();
 
-    void SetResponseTimeout(Timeout timeout);
+    /**
+     *  Determine whether a response is currently expected for a message that was sent over
+     *  this exchange.  While this is true, attempts to send other messages that expect a response
+     *  will fail.
+     *
+     *  @return Returns 'true' if response expected, else 'false'.
+     */
+    bool IsResponseExpected() const;
 
-private:
-    enum class ExFlagValues : uint16_t
-    {
-        kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
-        kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
-    };
-
-    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ReliableMessageContext mReliableMessageContext;
-    ExchangeDelegateBase * mDelegate = nullptr;
-    ExchangeManager * mExchangeMgr   = nullptr;
-    ExchangeACL * mExchangeACL       = nullptr;
-
-    SecureSessionHandle mSecureSession; // The connection state
-    uint16_t mExchangeId;               // Assigned exchange ID.
-
-    // [TODO: #4711]: this field need to be moved to appState object which implement 'exchange-specific' contextual
-    // actions with a delegate pattern.
-    uint8_t mChallenge[kMsgCounterChallengeSize]; // Challenge number to identify the sychronization request cryptographically.
-
-    BitFlags<ExFlagValues> mFlags; // Internal state flags
+    /**
+     *  Track whether we are now expecting a response to a message sent via this exchange (because that
+     *  message had the kExpectResponse flag set in its sendFlags).
+     *
+     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
+     *                                  (false) a response is currently expected on this
+     *                                  exchange.
+     */
+    void SetResponseExpected(bool inResponseExpected);
 
     /**
      *  Search for an existing exchange that the message applies to.

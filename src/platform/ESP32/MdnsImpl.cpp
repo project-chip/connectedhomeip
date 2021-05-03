@@ -108,6 +108,11 @@ CHIP_ERROR ChipMdnsStopPublish()
     return mdns_service_remove_all() == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
+CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*/, chip::Inet::IPAddressType addressType,
                           chip::Inet::InterfaceId /*interface*/, MdnsBrowseCallback /*callback*/, void * /*context*/)
 {

@@ -39,6 +39,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ThreadOperationalDataset.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
@@ -114,29 +115,23 @@ void PublishService()
 
 void StartDefaultThreadNetwork(void)
 {
-    // Set default thread network Info and enable/start thread
-
-    chip::DeviceLayer::Internal::DeviceNetworkInfo deviceNetworkInfo;
-    memset(&deviceNetworkInfo, 0, sizeof(deviceNetworkInfo));
-    const char * networkName                                                     = "OpenThread";
-    const uint8_t masterKey[chip::DeviceLayer::Internal::kThreadMasterKeyLength] = {
+    chip::Thread::OperationalDataset dataset{};
+    constexpr uint8_t masterkey[] = {
         0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
     };
-    const uint8_t threadMeshPrefix[chip::DeviceLayer::Internal::kThreadMeshPrefixLength] = { 0xfd, 0xde, 0xad, 0x00,
-                                                                                             0xbe, 0xef, 0x00, 0x00 };
+    constexpr uint8_t meshLocalPrefix[] = { 0xfd, 0xde, 0xad, 0x00, 0xbe, 0xef, 0x00, 0x00 };
+    constexpr uint8_t xpanid[]          = { 0xDE, 0xAD, 0x00, 0xBE, 0xEF, 0x00, 0xCA, 0xFE };
+    constexpr uint16_t panid            = 0x1234;
+    constexpr uint16_t channel          = 11;
 
-    const uint8_t extendedPanId[chip::DeviceLayer::Internal::kThreadExtendedPANIdLength] = { 0xDE, 0xAD, 0x00, 0xBE,
-                                                                                             0xEF, 0x00, 0xCA, 0xFE };
-    memcpy(deviceNetworkInfo.ThreadNetworkName, networkName, strlen(networkName));
-    memcpy(deviceNetworkInfo.ThreadExtendedPANId, extendedPanId, sizeof(extendedPanId));
-    deviceNetworkInfo.FieldPresent.ThreadExtendedPANId = true;
-    memcpy(deviceNetworkInfo.ThreadMasterKey, masterKey, sizeof(masterKey));
-    deviceNetworkInfo.FieldPresent.ThreadMeshPrefix = true;
-    memcpy(deviceNetworkInfo.ThreadMeshPrefix, threadMeshPrefix, sizeof(threadMeshPrefix));
-    deviceNetworkInfo.ThreadPANId   = 0x1234;
-    deviceNetworkInfo.ThreadChannel = 11;
+    dataset.SetChannel(channel);
+    dataset.SetExtendedPanId(xpanid);
+    dataset.SetMasterKey(masterkey);
+    dataset.SetMeshLocalPrefix(meshLocalPrefix);
+    dataset.SetNetworkName("OpenThread");
+    dataset.SetPanId(panid);
 
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false);
-    chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(deviceNetworkInfo);
+    chip::DeviceLayer::ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 }

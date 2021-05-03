@@ -26,15 +26,12 @@
 
 #include <array>
 
-#include <messaging/Channel.h>
-#include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
-#include <support/Pool.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -54,6 +51,8 @@ static constexpr int16_t kAnyMessageType = -1;
  */
 class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate, public TransportMgrDelegate
 {
+    friend class ExchangeContext;
+
 public:
     ExchangeManager();
     ExchangeManager(const ExchangeManager &) = delete;
@@ -177,24 +176,6 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
-    // Channel public APIs
-    ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
-
-    // Internal APIs used for channel
-    void ReleaseChannelContext(ChannelContext * channel) { mChannelContexts.ReleaseObject(channel); }
-
-    void ReleaseChannelHandle(ChannelContextHandleAssociation * association) { mChannelHandles.ReleaseObject(association); }
-
-    template <typename Event>
-    void NotifyChannelEvent(ChannelContext * channel, Event event)
-    {
-        mChannelHandles.ForEachActiveObject([&](ChannelContextHandleAssociation * association) {
-            if (association->mChannelContext == channel)
-                event(association->mChannelDelegate);
-            return true;
-        });
-    }
-
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
@@ -253,8 +234,6 @@ private:
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
-    BitMapObjectPool<ChannelContext, CHIP_CONFIG_MAX_ACTIVE_CHANNELS> mChannelContexts;
-    BitMapObjectPool<ChannelContextHandleAssociation, CHIP_CONFIG_MAX_CHANNEL_HANDLES> mChannelHandles;
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                                    ExchangeDelegateBase * delegate);

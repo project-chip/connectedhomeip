@@ -16,17 +16,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/target_types.gni")
 
-config("cpp17") {
-  cflags_cc = [ "-std=gnu++17" ]
-  cflags_c = [ "-std=gnu11" ]
-  cflags_objc = [ "-std=gnu11" ]
-  cflags_objcc = [ "-std=gnu++17" ]
-}
-
-config("std_cpp17") {
-  configs = [ ":cpp17" ]
-}
-
 static_library("pw_rpc") {
   output_name = "libPwRpc"
 

@@ -38,14 +38,14 @@
 {
     NSError * error;
     CHIPManualSetupPayloadParser * parser =
-        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"000003949100001000011"];
+        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"636108753500001000015"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 1234);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertTrue(payload.requiresCustomFlow);
@@ -67,7 +67,7 @@
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:B20800G.0G8G000"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"CH:J5L900CK70WWI0000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNil(payload);
@@ -78,7 +78,7 @@
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008000"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"CH:R5L90UV200A3L900000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -96,8 +96,8 @@
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc]
+        initWithBase38Representation:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);

@@ -115,6 +115,9 @@ public:
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param exchangeCtxt     The exchange context to send and receive messages with the peer
+     *                         Note: It's expected that the caller of this API hands over the
+     *                         ownership of the exchangeCtxt to PASESession object. PASESession
+     *                         will close the exchange on (successful/failed) handshake completion.
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
@@ -200,9 +203,32 @@ public:
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
     //// ExchangeDelegate Implementation ////
+    /**
+     * @brief
+     *   This function is the called by exchange context or exchange manager when it receives
+     *   a CHIP message corresponding to the context, or registered unsolicited message handler.
+     *
+     *   Note: If the function is called by unsolicited message handler, the ownership of the
+     *         provide exchange context is handed over to PASE Session object. The PASE Session
+     *         object ensures that the exchange will be closed on completion of the handshake.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     *  @param[in]    packetHeader  A reference to the PacketHeader object.
+     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
+     *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
+     */
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
+
+    /**
+     * @brief
+     *   This function is the protocol callback to invoke when the timeout for the receipt
+     *   of a response message has expired.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+
     Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
                                                             SecureSessionMgr * sessionMgr) override
     {

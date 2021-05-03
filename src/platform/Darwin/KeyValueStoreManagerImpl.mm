@@ -202,7 +202,7 @@ namespace DeviceLayer {
             }
 
             if (value != nullptr) {
-                memcpy(value, item.value.bytes, std::min(item.value.length, value_size));
+                memcpy(value, item.value.bytes, std::min<size_t>((item.value.length), value_size));
             }
 
             return CHIP_NO_ERROR;

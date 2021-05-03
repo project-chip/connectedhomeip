@@ -38,6 +38,7 @@ chip_test_suite("tests") {
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",
     "TestStringBuilder.cpp",
+    "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
   ]
   sources = []

@@ -268,6 +268,17 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_04, sGenTBSHashFlag,  sNullLoadFlag       },
                                                                          { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
                                                                          { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_05, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+        {  0,   0,    CTNS,   CHIP_NO_ERROR,                  0,    2, { { TestCert::kNode02_06, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
+
+        // Failure due to presence of "critical" future-extension in the kNode02_07 node certificate.
+        {  0,   0,    CTNS,   CHIP_ERROR_CERT_USAGE_NOT_ALLOWED, 0, 2, { { TestCert::kNode02_07, sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kICA02,     sGenTBSHashFlag,  sNullLoadFlag       },
+                                                                         { TestCert::kRoot02,    sTrustAnchorFlag, sNullLoadFlag       } } },
 
         // Validation with two copies of root certificate, one trusted, one untrusted.
         {  2,   0,    CTNS,   CHIP_NO_ERROR,                  2,    1, { { TestCert::kRoot01,    sNullDecodeFlag,  sNullLoadFlag       },

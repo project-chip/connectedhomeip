@@ -74,7 +74,8 @@ public:
     INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr);
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
-    INET_ERROR Listen();
+    INET_ERROR Listen(IPEndPointBasis::OnMessageReceivedFunct onMessageReceived,
+                      IPEndPointBasis::OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
     INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
@@ -107,7 +108,6 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO();
     void HandlePendingIO();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };

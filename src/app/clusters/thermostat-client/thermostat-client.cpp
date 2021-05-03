@@ -17,6 +17,7 @@
 
 #include <app/util/af.h>
 
+#include <app/Command.h>
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
@@ -30,13 +31,14 @@ void emberAfThermostatClusterClientInitCallback(void)
 {
     // TODO
 }
-bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(uint8_t, uint8_t, uint8_t, uint8_t *)
+bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(app::Command * commandObj, uint8_t, uint8_t, uint8_t, uint8_t *)
 {
     // TODO
     return false;
 }
 
-bool emberAfThermostatClusterRelayStatusLogCallback(uint16_t, uint16_t, int16_t, uint8_t, int16_t, uint16_t)
+bool emberAfThermostatClusterRelayStatusLogCallback(app::Command * commandObj, uint16_t, uint16_t, int16_t, uint8_t, int16_t,
+                                                    uint16_t)
 {
     // TODO
     return false;

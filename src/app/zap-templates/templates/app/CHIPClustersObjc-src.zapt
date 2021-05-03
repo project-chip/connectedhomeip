@@ -6,12 +6,13 @@
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
+#import "gen/CHIPClusters.h"
 #import "gen/CHIPClustersObjc.h"
 #import "gen/CHIPClientCallbacks.h"
 #import "app/util/af.h"
 
-#include <controller/CHIPClusters.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 
@@ -457,6 +458,7 @@ private:
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@property (readonly, nonatomic) dispatch_queue_t chipWorkQueue;
 - (Controller::ClusterBase *)getCluster;
 @end
 
@@ -470,8 +472,19 @@ private:
             return nil;
         }
 
+        if (device == nullptr)
+        {
+            return nil;
+        }
+
         CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
         if (err != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+        if (_chipWorkQueue == nil)
+        {
             return nil;
         }
 
@@ -524,7 +537,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asCamelCased label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asCamelCased label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(){{#chip_server_cluster_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan((const uint8_t*){{asCamelCased label}}.bytes, {{asCamelCased label}}.length){{else if (isCharString type)}}chip::ByteSpan((const uint8_t*)[{{asCamelCased label}} dataUsingEncoding:NSUTF8StringEncoding].bytes, [{{asCamelCased label}} lengthOfBytesUsingEncoding:NSUTF8StringEncoding]){{else}}{{asCamelCased label}}{{/if}}{{/chip_server_cluster_command_arguments}});
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -553,7 +570,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -577,14 +598,18 @@ private:
         return;
     }
 
-    {{#if (isOctetString type)}}
-    CHIP_ERROR err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
-    {{else if (isCharString type)}}
-    NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-    CHIP_ERROR err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
-    {{else}}
-    CHIP_ERROR err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), value);
-    {{/if}}
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        {{#if (isOctetString type)}}
+        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)value.bytes, value.length));
+        {{else if (isCharString type)}}
+        NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
+        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t*)data.bytes, data.length));
+        {{else}}
+        err = self.cppCluster.WriteAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), value);
+        {{/if}}
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -610,7 +635,11 @@ private:
     }
 
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -626,7 +655,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);

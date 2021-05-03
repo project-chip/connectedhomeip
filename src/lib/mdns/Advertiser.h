@@ -22,6 +22,7 @@
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <core/PeerId.h>
 #include <inet/InetLayer.h>
 #include <lib/support/Span.h>
 
@@ -57,17 +58,17 @@ public:
     bool IsIPv4Enabled() const { return mEnableIPv4; }
     Derived & SetMac(chip::ByteSpan mac)
     {
-        mMac = chip::ByteSpan(mMacStorage, std::min(mac.size(), kMaxMacSize));
-        memcpy(mMacStorage, mac.data(), mMac.size());
+        mMacLength = std::min(mac.size(), kMaxMacSize);
+        memcpy(mMacStorage, mac.data(), mMacLength);
         return *reinterpret_cast<Derived *>(this);
     }
-    const chip::ByteSpan GetMac() const { return mMac; }
+    const chip::ByteSpan GetMac() const { return chip::ByteSpan(mMacStorage, mMacLength); }
 
 private:
     uint16_t mPort                   = CHIP_PORT;
     bool mEnableIPv4                 = true;
     uint8_t mMacStorage[kMaxMacSize] = {};
-    chip::ByteSpan mMac              = chip::ByteSpan(mMacStorage, kMaxMacSize);
+    size_t mMacLength                = 0;
 }; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node
@@ -75,19 +76,12 @@ private:
 class OperationalAdvertisingParameters : public BaseAdvertisingParams<OperationalAdvertisingParameters>
 {
 public:
-    OperationalAdvertisingParameters & SetFabricId(uint64_t fabricId)
+    OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
-        mFabricId = fabricId;
+        mPeerId = peerId;
         return *this;
     }
-    uint64_t GetFabricId() const { return mFabricId; }
-
-    OperationalAdvertisingParameters & SetNodeId(uint64_t nodeId)
-    {
-        mNodeId = nodeId;
-        return *this;
-    }
-    uint64_t GetNodeId() const { return mNodeId; }
+    PeerId GetPeerId() const { return mPeerId; }
 
     OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
     {
@@ -102,8 +96,7 @@ public:
     }
 
 private:
-    uint64_t mFabricId                = 0;
-    uint64_t mNodeId                  = 0;
+    PeerId mPeerId;
     uint32_t mCrmpRetryIntervalIdle   = 0;
     uint32_t mCrmpRetryIntervalActive = 0;
 };

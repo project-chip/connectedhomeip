@@ -22,8 +22,6 @@ static_library("transport") {
   sources = [
     "AdminPairingTable.cpp",
     "AdminPairingTable.h",
-    "CASESession.cpp",
-    "CASESession.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
     "RendezvousSessionDelegate.h",
@@ -38,13 +36,6 @@ static_library("transport") {
     "TransportMgrBase.cpp",
     "TransportMgrBase.h",
   ]
-
-  if (chip_config_network_layer_ble) {
-    sources += [
-      "BLE.cpp",
-      "BLE.h",
-    ]
-  }
 
   cflags = [ "-Wconversion" ]
 

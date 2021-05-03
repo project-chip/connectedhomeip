@@ -28,27 +28,78 @@
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
+| AccountLogin                                                        | 0x050E |
 | ApplicationBasic                                                    | 0x050D |
+| ApplicationLauncher                                                 | 0x050C |
+| AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
+| ContentLaunch                                                       | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
-| IasZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
+| KeypadInput                                                         | 0x0509 |
 | LevelControl                                                        | 0x0008 |
 | LowPower                                                            | 0x0508 |
+| MediaInput                                                          | 0x0507 |
+| MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
+| OperationalCredentials                                              | 0x003E |
+| PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
+| Switch                                                              | 0x003B |
+| TvChannel                                                           | 0x0504 |
+| TargetNavigator                                                     | 0x0505 |
 | TemperatureMeasurement                                              | 0x0402 |
 | Thermostat                                                          | 0x0201 |
+| WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster AccountLogin                                                | 0x050E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetSetupPIN                                                       |   0x00 |
+| * Login                                                             |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an GetSetupPIN command for Account Login server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAccountLoginClusterGetSetupPINCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             chip::ByteSpan tempAccountIdentifier);
+
+/**
+ * @brief
+ *    Encode an Login command for Account Login server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAccountLoginClusterLoginCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                       chip::ByteSpan tempAccountIdentifier,
+                                                                       chip::ByteSpan setupPIN);
+
+/**
+ * @brief
+ *    Encode a Account Login server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAccountLoginClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Account Login server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAccountLoginClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster ApplicationBasic                                            | 0x050D |
@@ -128,6 +179,94 @@ chip::System::PacketBufferHandle encodeApplicationBasicClusterReadApplicationSat
  */
 chip::System::PacketBufferHandle encodeApplicationBasicClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                            chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster ApplicationLauncher                                         | 0x050C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * LaunchApp                                                         |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ApplicationLauncherList                                           | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an LaunchApp command for Application Launcher server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationLauncherClusterLaunchAppCommand(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint,
+                                                                                  chip::ByteSpan data, uint16_t catalogVendorId,
+                                                                                  chip::ByteSpan applicationId);
+
+/**
+ * @brief
+ *    Encode a Application Launcher server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationLauncherClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Launcher server read command for the application launcher list attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeApplicationLauncherClusterReadApplicationLauncherListAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Application Launcher server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeApplicationLauncherClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster AudioOutput                                                 | 0x050B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * RenameOutput                                                      |   0x01 |
+| * SelectOutput                                                      |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * AudioOutputList                                                   | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an RenameOutput command for Audio Output server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAudioOutputClusterRenameOutputCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint8_t index, chip::ByteSpan name);
+
+/**
+ * @brief
+ *    Encode an SelectOutput command for Audio Output server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAudioOutputClusterSelectOutputCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint8_t index);
+
+/**
+ * @brief
+ *    Encode a Audio Output server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAudioOutputClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Audio Output server read command for the audio output list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAudioOutputClusterReadAudioOutputListAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Audio Output server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeAudioOutputClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
@@ -219,6 +358,12 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | * HardwareVersionString                                             | 0x0008 |
 | * SoftwareVersion                                                   | 0x0009 |
 | * SoftwareVersionString                                             | 0x000A |
+| * ManufacturingDate                                                 | 0x000B |
+| * PartNumber                                                        | 0x000C |
+| * ProductURL                                                        | 0x000D |
+| * ProductLabel                                                      | 0x000E |
+| * SerialNumber                                                      | 0x000F |
+| * LocalConfigDisabled                                               | 0x0010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -318,6 +463,52 @@ chip::System::PacketBufferHandle encodeBasicClusterReadSoftwareVersionAttribute(
  */
 chip::System::PacketBufferHandle encodeBasicClusterReadSoftwareVersionStringAttribute(uint8_t seqNum,
                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ManufacturingDate attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadManufacturingDateAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the PartNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadPartNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ProductURL attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadProductURLAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the ProductLabel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadProductLabelAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the SerialNumber attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadSerialNumberAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server read command for the LocalConfigDisabled attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterReadLocalConfigDisabledAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Basic server write command for the LocalConfigDisabled attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint,
+                                                                                     uint8_t localConfigDisabled);
 
 /**
  * @brief
@@ -1066,6 +1257,62 @@ chip::System::PacketBufferHandle encodeColorControlClusterReadClusterRevisionAtt
                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster ContentLaunch                                               | 0x050A |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * LaunchContent                                                     |   0x00 |
+| * LaunchURL                                                         |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * AcceptsHeaderList                                                 | 0x0000 |
+| * SupportedStreamingTypes                                           | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an LaunchContent command for Content Launch server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeContentLaunchClusterLaunchContentCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint,
+                                                                                uint8_t autoPlay, chip::ByteSpan data);
+
+/**
+ * @brief
+ *    Encode an LaunchURL command for Content Launch server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeContentLaunchClusterLaunchURLCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                            chip::ByteSpan contentURL,
+                                                                            chip::ByteSpan displayString);
+
+/**
+ * @brief
+ *    Encode a Content Launch server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Content Launch server read command for the accepts header list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Content Launch server read command for the supported streaming types attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeContentLaunchClusterReadSupportedStreamingTypesAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Content Launch server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeContentLaunchClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster Descriptor                                                  | 0x001D |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1368,9 +1615,9 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribu
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ArmFailSafe                                                       |   0x02 |
-| * CommissioningComplete                                             |   0x06 |
-| * SetFabric                                                         |   0x00 |
+| * ArmFailSafe                                                       |   0x00 |
+| * CommissioningComplete                                             |   0x04 |
+| * SetRegulatoryConfig                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * FabricId                                                          | 0x0000 |
@@ -1396,11 +1643,11 @@ encodeGeneralCommissioningClusterCommissioningCompleteCommand(uint8_t seqNum, ch
 
 /**
  * @brief
- *    Encode an SetFabric command for General Commissioning server into buffer including the APS frame
+ *    Encode an SetRegulatoryConfig command for General Commissioning server into buffer including the APS frame
  */
 chip::System::PacketBufferHandle
-encodeGeneralCommissioningClusterSetFabricCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan fabricId,
-                                                  chip::ByteSpan fabricSecret, uint64_t breadcrumb, uint32_t timeoutMs);
+encodeGeneralCommissioningClusterSetRegulatoryConfigCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint8_t location,
+                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
  * @brief
@@ -1555,71 +1802,6 @@ chip::System::PacketBufferHandle encodeGroupsClusterReadClusterRevisionAttribute
                                                                                  chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
-| Cluster IasZone                                                     | 0x0500 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ZoneState                                                         | 0x0000 |
-| * ZoneType                                                          | 0x0001 |
-| * ZoneStatus                                                        | 0x0002 |
-| * IasCieAddress                                                     | 0x0010 |
-| * ZoneId                                                            | 0x0011 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/**
- * @brief
- *    Encode a IAS Zone server discover command into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the zone state attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneStateAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the zone type attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneTypeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the zone status attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneStatusAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the IAS CIE address attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadIasCieAddressAttribute(uint8_t seqNum,
-                                                                                chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server write command for the IAS CIE address attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle
-encodeIasZoneClusterWriteIasCieAddressAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint64_t iasCieAddress);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the Zone ID attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadZoneIdAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief
- *    Encode a IAS Zone server read command for the cluster revision attribute into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encodeIasZoneClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                  chip::EndpointId destinationEndpoint);
-
-/*----------------------------------------------------------------------------*\
 | Cluster Identify                                                    | 0x0003 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -1670,6 +1852,36 @@ encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t seqNum, chip::EndpointId
  */
 chip::System::PacketBufferHandle encodeIdentifyClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                    chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster KeypadInput                                                 | 0x0509 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SendKey                                                           |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an SendKey command for Keypad Input server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeKeypadInputClusterSendKeyCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                        uint8_t keyCode);
+
+/**
+ * @brief
+ *    Encode a Keypad Input server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeKeypadInputClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Keypad Input server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeKeypadInputClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster LevelControl                                                | 0x0008 |
@@ -1807,6 +2019,175 @@ chip::System::PacketBufferHandle encodeLowPowerClusterDiscoverAttributes(uint8_t
  */
 chip::System::PacketBufferHandle encodeLowPowerClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                    chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster MediaInput                                                  | 0x0507 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * HideInputStatus                                                   |   0x02 |
+| * RenameInput                                                       |   0x03 |
+| * SelectInput                                                       |   0x00 |
+| * ShowInputStatus                                                   |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MediaInputList                                                    | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an HideInputStatus command for Media Input server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterHideInputStatusCommand(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an RenameInput command for Media Input server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterRenameInputCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           uint8_t index, chip::ByteSpan name);
+
+/**
+ * @brief
+ *    Encode an SelectInput command for Media Input server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterSelectInputCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                           uint8_t index);
+
+/**
+ * @brief
+ *    Encode an ShowInputStatus command for Media Input server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterShowInputStatusCommand(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Input server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Input server read command for the media input list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterReadMediaInputListAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Input server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaInputClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster MediaPlayback                                               | 0x0506 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * MediaFastForward                                                  |   0x07 |
+| * MediaNext                                                         |   0x05 |
+| * MediaPause                                                        |   0x01 |
+| * MediaPlay                                                         |   0x00 |
+| * MediaPrevious                                                     |   0x04 |
+| * MediaRewind                                                       |   0x06 |
+| * MediaSkipBackward                                                 |   0x09 |
+| * MediaSkipForward                                                  |   0x08 |
+| * MediaSkipSeek                                                     |   0x0A |
+| * MediaStartOver                                                    |   0x03 |
+| * MediaStop                                                         |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an MediaFastForward command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaFastForwardCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaNext command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaNextCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaPause command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaPauseCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaPlay command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaPlayCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaPrevious command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaPreviousCommand(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaRewind command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaRewindCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaSkipBackward command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaSkipBackwardCommand(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint,
+                                                                                    uint64_t deltaPositionMilliseconds);
+
+/**
+ * @brief
+ *    Encode an MediaSkipForward command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaSkipForwardCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint,
+                                                                                   uint64_t deltaPositionMilliseconds);
+
+/**
+ * @brief
+ *    Encode an MediaSkipSeek command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeMediaPlaybackClusterMediaSkipSeekCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint64_t position);
+
+/**
+ * @brief
+ *    Encode an MediaStartOver command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaStartOverCommand(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an MediaStop command for Media Playback server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterMediaStopCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Playback server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Media Playback server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeMediaPlaybackClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster NetworkCommissioning                                        | 0x0031 |
@@ -1977,6 +2358,165 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
                                                                                 chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
+| Cluster OperationalCredentials                                      | 0x003E |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * GetFabricId                                                       |   0x00 |
+| * RemoveFabric                                                      |   0x0A |
+| * UpdateFabricLabel                                                 |   0x09 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FabricsList                                                       | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an GetFabricId command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterGetFabricIdCommand(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an RemoveFabric command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterRemoveFabricCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        chip::FabricId fabricId,
+                                                                                        chip::NodeId nodeId, uint16_t vendorId);
+
+/**
+ * @brief
+ *    Encode an UpdateFabricLabel command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterUpdateFabricLabelCommand(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint,
+                                                                                             chip::ByteSpan label);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                       chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the fabrics list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterReadFabricsListAttribute(uint8_t seqNum,
+                                                                                             chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Operational Credentials server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster PumpConfigurationAndControl                                 | 0x0200 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * MaxPressure                                                       | 0x0000 |
+| * MaxSpeed                                                          | 0x0001 |
+| * MaxFlow                                                           | 0x0002 |
+| * EffectiveOperationMode                                            | 0x0011 |
+| * EffectiveControlMode                                              | 0x0012 |
+| * Capacity                                                          | 0x0013 |
+| * OperationMode                                                     | 0x0020 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePumpConfigurationAndControlClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the max pressure attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadMaxPressureAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the max speed attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadMaxSpeedAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the max flow attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodePumpConfigurationAndControlClusterReadMaxFlowAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the effective operation mode attribute into buffer including
+ * the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadEffectiveOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the effective control mode attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadEffectiveControlModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the capacity attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadCapacityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server configure report command for the capacity attribute into buffer including the
+ * APS frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterConfigureCapacityAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                   uint16_t minInterval, uint16_t maxInterval, int16_t change);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the operation mode attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server write command for the operation mode attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterWriteOperationModeAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                    uint8_t operationMode);
+
+/**
+ * @brief
+ *    Encode a Pump Configuration and Control server read command for the cluster revision attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodePumpConfigurationAndControlClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2090,6 +2630,164 @@ chip::System::PacketBufferHandle encodeScenesClusterReadNameSupportAttribute(uin
  */
 chip::System::PacketBufferHandle encodeScenesClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                  chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster Switch                                                      | 0x003B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * NumberOfPositions                                                 | 0x0000 |
+| * CurrentPosition                                                   | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Switch server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Switch server read command for the number of positions attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterReadNumberOfPositionsAttribute(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Switch server read command for the current position attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterReadCurrentPositionAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Switch server configure report command for the current position attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterConfigureCurrentPositionAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint,
+                                                                                      uint16_t minInterval, uint16_t maxInterval,
+                                                                                      uint8_t change);
+
+/**
+ * @brief
+ *    Encode a Switch server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeSwitchClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                 chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster TvChannel                                                   | 0x0504 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeChannel                                                     |   0x00 |
+| * ChangeChannelByNumber                                             |   0x01 |
+| * SkipChannel                                                       |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TvChannelList                                                     | 0x0000 |
+| * TvChannelLineup                                                   | 0x0001 |
+| * CurrentTvChannel                                                  | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ChangeChannel command for TV Channel server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterChangeChannelCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                            chip::ByteSpan match);
+
+/**
+ * @brief
+ *    Encode an ChangeChannelByNumber command for TV Channel server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterChangeChannelByNumberCommand(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint,
+                                                                                    uint16_t majorNumber, uint16_t minorNumber);
+
+/**
+ * @brief
+ *    Encode an SkipChannel command for TV Channel server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterSkipChannelCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                          uint16_t count);
+
+/**
+ * @brief
+ *    Encode a TV Channel server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a TV Channel server read command for the tv channel list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterReadTvChannelListAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a TV Channel server read command for the tv channel lineup attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterReadTvChannelLineupAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a TV Channel server read command for the current tv channel attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterReadCurrentTvChannelAttribute(uint8_t seqNum,
+                                                                                     chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a TV Channel server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTvChannelClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster TargetNavigator                                             | 0x0505 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * NavigateTarget                                                    |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TargetNavigatorList                                               | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an NavigateTarget command for Target Navigator server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTargetNavigatorClusterNavigateTargetCommand(uint8_t seqNum,
+                                                                                   chip::EndpointId destinationEndpoint,
+                                                                                   uint8_t target, chip::ByteSpan data);
+
+/**
+ * @brief
+ *    Encode a Target Navigator server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTargetNavigatorClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Target Navigator server read command for the target navigator list attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTargetNavigatorClusterReadTargetNavigatorListAttribute(uint8_t seqNum,
+                                                                                              chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Target Navigator server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTargetNavigatorClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                          chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster TemperatureMeasurement                                      | 0x0402 |
@@ -2292,6 +2990,36 @@ encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, chip::EndpointId
  */
 chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster WakeOnLan                                                   | 0x0503 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * WakeOnLanMacAddress                                               | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a Wake on LAN server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWakeOnLanClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Wake on LAN server read command for the wake on lan mac address attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWakeOnLanClusterReadWakeOnLanMacAddressAttribute(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Wake on LAN server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeWakeOnLanClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                    chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster WindowCovering                                              | 0x0102 |

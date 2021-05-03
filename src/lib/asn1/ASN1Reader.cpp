@@ -77,6 +77,16 @@ ASN1_ERROR ASN1Reader::ExitConstructedType()
     return ExitContainer();
 }
 
+ASN1_ERROR ASN1Reader::GetConstructedType(const uint8_t *& val, uint32_t & valLen)
+{
+    if (!Constructed)
+        return ASN1_ERROR_INVALID_STATE;
+
+    val    = mElemStart;
+    valLen = mHeadLen + ValueLen;
+
+    return ASN1_NO_ERROR;
+}
 ASN1_ERROR ASN1Reader::EnterEncapsulatedType()
 {
     if (Class != kASN1TagClass_Universal || (Tag != kASN1UniversalTag_OctetString && Tag != kASN1UniversalTag_BitString))

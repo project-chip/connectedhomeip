@@ -1078,16 +1078,6 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
     return INET_NO_ERROR;
 }
 
-SocketEvents IPEndPointBasis::PrepareIO()
-{
-    SocketEvents res;
-
-    if (mState == kState_Listening && OnMessageReceived != nullptr)
-        res.SetRead();
-
-    return res;
-}
-
 void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 {
     INET_ERROR lStatus = INET_NO_ERROR;

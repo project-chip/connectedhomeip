@@ -28,9 +28,6 @@
 #include <transport/TransportMgr.h>
 
 namespace chip {
-namespace Transport {
-class BLE;
-}
 
 class SessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
@@ -39,17 +36,16 @@ public:
 
     virtual ~SessionEstablishmentExchangeDispatch() {}
 
-    CHIP_ERROR Init(Transport::BLE * transport, TransportMgrBase * transportMgr)
+    CHIP_ERROR Init(TransportMgrBase * transportMgr)
     {
-        ReturnErrorCodeIf(transport == nullptr && transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mBLETransport = transport;
+        ReturnErrorCodeIf(transportMgr == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         mTransportMgr = transportMgr;
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                  const Transport::PeerAddress & peerAddress,
-                                 Messaging::ReliableMessageContext & reliableMessageContext) override;
+                                 Messaging::ReliableMessageContext * reliableMessageContext) override;
 
     const Transport::PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
@@ -63,13 +59,11 @@ protected:
 
     bool IsTransportReliable() override
     {
-        // If we are not using BLE as the transport, the underlying transport is UDP based.
-        // (return true only if BLE is being used as the transport)
-        return (mTransportMgr == nullptr);
+        // If the underlying transport is not UDP.
+        return (mPeerAddress.GetTransportType() != Transport::Type::kUdp);
     }
 
 private:
-    Transport::BLE * mBLETransport   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
     Transport::PeerAddress mPeerAddress;
 };

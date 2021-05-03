@@ -21,8 +21,6 @@ config("server_config") {
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
-
-  include_dirs = [ "." ]
 }
 
 static_library("server") {

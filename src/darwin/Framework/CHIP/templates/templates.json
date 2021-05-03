@@ -1,0 +1,20 @@
+{
+    "name": "Framework templates",
+    "version": "chip-v1",
+    "helpers": [
+        "../../../../../src/app/zap-templates/partials/helper.js",
+        "../../../../../src/app/zap-templates/common/StringHelper.js",
+        "../../../../../src/app/zap-templates/templates/app/helper.js",
+        "../../../../../src/app/zap-templates/templates/chip/helper.js",
+        "helper.js"
+    ],
+    "override": "../../../../../src/app/zap-templates/common/override.js",
+    "partials": [],
+    "templates": [
+        {
+            "path": "clusters-tests.zapt",
+            "name": "Cluster Tests",
+            "output": "src/darwin/Framework/CHIPTests/CHIPClustersTests.m"
+        }
+    ]
+}

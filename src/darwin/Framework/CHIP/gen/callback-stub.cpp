@@ -74,11 +74,23 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
+    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+        emberAfOperationalCredentialsClusterInitCallback(endpoint);
+        break;
+    case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
+        emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
+        break;
     case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
         break;
+    case ZCL_SWITCH_CLUSTER_ID:
+        emberAfSwitchClusterInitCallback(endpoint);
+        break;
     case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
+        break;
+    case ZCL_THERMOSTAT_CLUSTER_ID:
+        emberAfThermostatClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -161,12 +173,32 @@ void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

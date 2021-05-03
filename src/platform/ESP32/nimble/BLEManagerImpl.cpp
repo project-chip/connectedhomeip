@@ -68,9 +68,9 @@ struct ESP32ChipServiceData
 };
 
 const ble_uuid128_t UUID_CHIPoBLEService = {
-    BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 }
+    BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 }
 };
-const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFEAF };
+const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
     BLE_UUID_TYPE_128, { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
@@ -546,13 +546,15 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = MapBLEError(ble_gap_adv_stop());
-            if (err != CHIP_NO_ERROR)
+            if (ble_gap_adv_active())
             {
-                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
-                ExitNow();
+                err = MapBLEError(ble_gap_adv_stop());
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+                    ExitNow();
+                }
             }
-
             // mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
             // Transition to the not Advertising state...
@@ -562,11 +564,6 @@ void BLEManagerImpl::DriveBLEState(void)
                 mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-                // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
                 // Post a CHIPoBLEAdvertisingChange(Stopped) event.
                 {
@@ -1084,13 +1081,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 
     adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-
-    // Inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    {
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 

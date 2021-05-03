@@ -29,13 +29,6 @@
 #include <support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 
-// Maximum length of application data that can be encrypted as one block.
-// The limit is derived from IPv6 MTU (1280 bytes) - expected header overheads.
-// This limit would need additional reviews once we have formalized Secure Transport header.
-//
-// TODO: this should be checked within the transport message sending instead of the session management layer.
-static const size_t kMax_SecureSDU_Length = 1024;
-
 namespace chip {
 
 using System::PacketBuffer;
@@ -48,7 +41,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
     uint32_t msgId = state->GetSendMessageIndex();
 

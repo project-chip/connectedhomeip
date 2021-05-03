@@ -20,14 +20,17 @@
 #include <cstdint>
 
 #include <core/CHIPError.h>
+#include <core/PeerId.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
+#include <inet/InetLayer.h>
 
 namespace chip {
 namespace Mdns {
 
 struct ResolvedNodeData
 {
+    PeerId mPeerId;
     Inet::InterfaceId mInterfaceId;
     Inet::IPAddress mAddress;
     uint16_t mPort;
@@ -40,10 +43,10 @@ public:
     virtual ~ResolverDelegate() = default;
 
     /// Called when a requested CHIP node ID has been successfully resolved
-    virtual void OnNodeIdResolved(uint64_t nodeId, const ResolvedNodeData & nodeData) = 0;
+    virtual void OnNodeIdResolved(const ResolvedNodeData & nodeData) = 0;
 
     /// Called when a CHIP node ID resolution has failed
-    virtual void OnNodeIdResolutionFailed(uint64_t nodeId, CHIP_ERROR error) = 0;
+    virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
 };
 
 /// Interface for resolving CHIP services
@@ -52,11 +55,17 @@ class Resolver
 public:
     virtual ~Resolver() {}
 
+    /// Ensures that the resolver is started.
+    /// Must be called before any ResolveNodeId calls.
+    ///
+    /// Unsual name to allow base MDNS classes to implement both Advertiser and Resolver interfaces.
+    virtual CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+
     /// Registers a resolver delegate if none has been registered before
     virtual CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) = 0;
 
     /// Requests resolution of a node ID to its address
-    virtual CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();

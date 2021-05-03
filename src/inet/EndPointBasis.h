@@ -95,7 +95,8 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     int mSocket;             /**< Encapsulated socket descriptor. */
     IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-    SocketEvents mPendingIO; /**< Socket event masks */
+    SocketEvents mPendingIO; /**< Socket event masks (read/write/error) currently available */
+    SocketEvents mRequestIO; /**< Socket event masks (read/write) to wait for */
 #endif                       // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

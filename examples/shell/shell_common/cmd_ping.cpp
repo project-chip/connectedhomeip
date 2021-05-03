@@ -20,7 +20,7 @@
 #include <stdlib.h>
 
 #include <lib/core/CHIPCore.h>
-#include <lib/shell/shell.h>
+#include <lib/shell/shell_core.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeMgr.h>
@@ -33,16 +33,12 @@
 #include <transport/raw/UDP.h>
 
 #include <ChipShellCollection.h>
+#include <Globals.h>
 
 using namespace chip;
 using namespace Shell;
 using namespace Logging;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-constexpr size_t kMaxTcpActiveConnectionCount = 4;
-constexpr size_t kMaxTcpPendingPackets        = 4;
-#endif
-constexpr size_t kMaxPayloadSize = 1280;
+using chip::Inet::IPAddress;
 
 namespace {
 
@@ -131,19 +127,7 @@ private:
     bool mUsingCRMP;
 } gPingArguments;
 
-constexpr Transport::AdminId gAdminId = 0;
-
 Protocols::Echo::EchoClient gEchoClient;
-
-TransportMgr<Transport::UDP> gUDPManager;
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
-#endif
-
-Messaging::ExchangeManager gExchangeManager;
-SecureSessionMgr gSessionManager;
-Inet::IPAddress gDestAddr;
 
 bool EchoIntervalExpired(void)
 {
@@ -161,7 +145,7 @@ CHIP_ERROR SendEchoRequest(streamer_t * stream)
     char * requestData = nullptr;
 
     uint32_t size = gPingArguments.GetEchoReqSize();
-    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(size <= kMaxPayloadSize, err = CHIP_ERROR_MESSAGE_TOO_LONG);
 
     requestData = static_cast<char *>(chip::Platform::MemoryAlloc(size));
     VerifyOrExit(requestData != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -259,7 +243,7 @@ void StartPinging(streamer_t * stream, char * destination)
     Transport::AdminPairingInfo * adminInfo = nullptr;
     uint32_t maxEchoCount                   = 0;
 
-    if (!Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -425,7 +409,7 @@ int cmd_ping(int argc, char ** argv)
         case 'p':
             if (++optIndex >= argc || argv[optIndex][0] == '-')
             {
-                streamer_printf(sout, "Invalid argument specified for -c\n");
+                streamer_printf(sout, "Invalid argument specified for -p\n");
                 return -1;
             }
             else

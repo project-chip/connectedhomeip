@@ -72,8 +72,6 @@ protected:
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
     void _ProcessThreadActivity();
-    void _OnCHIPoBLEAdvertisingStart();
-    void _OnCHIPoBLEAdvertisingStop();
 
     //} // namespace Internal
 

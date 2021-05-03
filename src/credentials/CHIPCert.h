@@ -62,16 +62,16 @@ enum
     kTag_PublicKeyAlgorithm      = 7,  /**< [ unsigned int ] Identifies the algorithm with which the public key can be used. */
     kTag_EllipticCurveIdentifier = 8,  /**< [ unsigned int ] For EC certs, identifies the elliptic curve used. */
     kTag_EllipticCurvePublicKey  = 9,  /**< [ byte string ] The elliptic curve public key, in X9.62 encoded format. */
-    kTag_ECDSASignature          = 10, /**< [ structure ] The ECDSA signature for the certificate. */
-    // ---- Tags identifying certificate extensions (tag numbers 128 - 255) ----
-    kCertificateExtensionTagsStart = 128,
-    kTag_BasicConstraints          = 128, /**< [ structure ] Identifies whether the subject of the certificate is a CA. */
-    kTag_KeyUsage                  = 129, /**< [ unsigned int ] Bits identifying key usage, per RFC5280. */
-    kTag_ExtendedKeyUsage          = 130, /**< [ array ] Array of enumerated values giving the purposes for which
-                                             the public key can be used, per RFC5280. */
-    kTag_SubjectKeyIdentifier    = 131,   /**< [ byte string ] Identifier of the certificate's public key. */
-    kTag_AuthorityKeyIdentifier  = 132,   /**< [ byte string ] Identifier of the public key used to sign the certificate. */
-    kCertificateExtensionTagsEnd = 255,
+    kTag_Extensions              = 10, /**< [ list ] Certificate extensions. */
+    kTag_ECDSASignature          = 11, /**< [ structure ] The ECDSA signature for the certificate. */
+
+    // ---- Context-specific Tags for certificate extensions ----
+    kTag_BasicConstraints       = 1, /**< [ structure ] Identifies whether the subject of the certificate is a CA. */
+    kTag_KeyUsage               = 2, /**< [ unsigned int ] Bits identifying key usage, per RFC5280. */
+    kTag_ExtendedKeyUsage       = 3, /**< [ array ] Enumerated values giving the purposes for which the public key can be used. */
+    kTag_SubjectKeyIdentifier   = 4, /**< [ byte string ] Identifier of the certificate's public key. */
+    kTag_AuthorityKeyIdentifier = 5, /**< [ byte string ] Identifier of the public key used to sign the certificate. */
+    kTag_FutureExtension        = 6, /**< [ byte string ] Arbitrary extention. DER encoded SEQUENCE as in X.509 form. */
 
     // ---- Context-specific Tags for ECDSASignature Structure ----
     kTag_ECDSASignature_r = 1, /**< [ byte string ] ECDSA r value, in ASN.1 integer encoding. */
@@ -146,10 +146,11 @@ enum class CertFlags : uint16_t
     kExtPresent_ExtendedKeyUsage = 0x0004, /**< Extended key usage extension is present in the certificate. */
     kExtPresent_SubjectKeyId     = 0x0008, /**< Subject key identifier extension is present in the certificate. */
     kExtPresent_AuthKeyId        = 0x0010, /**< Authority key identifier extension is present in the certificate. */
-    kPathLenConstraintPresent    = 0x0020, /**< Path length constraint is present in the certificate. */
-    kIsCA                        = 0x0040, /**< Indicates that certificate is a CA certificate. */
-    kIsTrustAnchor               = 0x0080, /**< Indicates that certificate is a trust anchor. */
-    kTBSHashPresent              = 0x0100, /**< Indicates that TBS hash of the certificate was generated and stored. */
+    kExtPresent_FutureIsCritical = 0x0020, /**< Future extension marked as critical is present in the certificate. */
+    kPathLenConstraintPresent    = 0x0040, /**< Path length constraint is present in the certificate. */
+    kIsCA                        = 0x0080, /**< Indicates that certificate is a CA certificate. */
+    kIsTrustAnchor               = 0x0100, /**< Indicates that certificate is a trust anchor. */
+    kTBSHashPresent              = 0x0200, /**< Indicates that TBS hash of the certificate was generated and stored. */
 };
 
 /** CHIP Certificate Decode Flags

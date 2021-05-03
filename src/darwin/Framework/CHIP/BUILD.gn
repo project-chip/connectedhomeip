@@ -17,7 +17,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("darwin_config") {
-  include_dirs = [ ".." ]
+  include_dirs = [
+    ".",
+    "..",
+  ]
 
   cflags = [
     "-Wconversion",
@@ -48,6 +51,10 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
+    "gen/CHIPClusters.cpp",
+    "gen/CHIPClusters.h",
+    "gen/CHIPClustersObjc.h",
+    "gen/CHIPClustersObjc.mm",
   ]
 
   public_deps = [
@@ -60,13 +67,13 @@ static_library("framework") {
 }
 
 chip_data_model("darwin_data_model") {
-  cluster_sources = [ "media-playback-client" ]
+  zap_file = "chip-tool.zap"
 
   zap_pregenerated_dir = "gen"
 
-  public_configs = [ ":darwin_config" ]
-
   use_default_client_callbacks = true
+
+  public_configs = [ ":darwin_config" ]
 }
 
 group("CHIP") {

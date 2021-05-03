@@ -24,8 +24,6 @@
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 
-#include <transport/BLE.h>
-
 namespace chip {
 
 using namespace Messaging;
@@ -34,15 +32,8 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
                                                                  System::PacketBufferHandle && message,
                                                                  EncryptedPacketBufferHandle * retainedMessage)
 {
-    ChipLogProgress(Ble, "SessionEstablishmentExchangeDispatch::SendMessageImpl mBLETransport %p, mTransportMgr %p", mBLETransport,
-                    mTransportMgr);
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
-    if (mBLETransport != nullptr && mPeerAddress.GetTransportType() == Transport::Type::kBle)
-    {
-        ChipLogProgress(Ble, "Sending message using BLE transport");
-        return mBLETransport->SendMessage(PacketHeader(), Transport::PeerAddress::BLE(), std::move(message));
-    }
-    else if (mTransportMgr != nullptr)
+    if (mTransportMgr != nullptr)
     {
         return mTransportMgr->SendMessage(PacketHeader(), mPeerAddress, std::move(message));
     }
@@ -52,12 +43,10 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
 
 CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const PayloadHeader & payloadHeader, uint32_t messageId,
                                                                    const Transport::PeerAddress & peerAddress,
-                                                                   ReliableMessageContext & reliableMessageContext)
+                                                                   ReliableMessageContext * reliableMessageContext)
 {
-    ReturnErrorOnFailure(ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext));
     mPeerAddress = peerAddress;
-
-    return CHIP_NO_ERROR;
+    return ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext);
 }
 
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)
