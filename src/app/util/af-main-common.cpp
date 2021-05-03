@@ -283,16 +283,9 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
     emAfApplyDisableDefaultResponse(&message[0]);
     emAfApplyRetryOverride(&apsFrame->options);
 
-    if (messageLength <= emberAfMaximumApsPayloadLength(type, indexOrDestination, apsFrame))
+    if (messageLength <= EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH)
     {
         status = emAfSend(type, indexOrDestination, apsFrame, (uint8_t) messageLength, message, &messageTag, alias, sequence);
-#ifdef EMBER_AF_PLUGIN_FRAGMENTATION
-    }
-    else if (!broadcast)
-    {
-        status = emAfFragmentationSendUnicast(type, indexOrDestination, apsFrame, message, messageLength, &messageTag);
-        emberAfDebugPrintln("%pstart:len=%d.", "Fragmentation:", messageLength);
-#endif
     }
     else
     {
