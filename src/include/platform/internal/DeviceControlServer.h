@@ -38,11 +38,10 @@ public:
     CHIP_ERROR CommissioningComplete();
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb);
 
+    static DeviceControlServer & DeviceControlSvr();
+
 private:
     // ===== Members for internal use by the following friends.
-
-    friend DeviceControlServer & DeviceControlSvr(void);
-
     static DeviceControlServer sInstance;
 
     // ===== Private members reserved for use by this class only.
@@ -55,14 +54,6 @@ private:
     DeviceControlServer(const DeviceControlServer &&) = delete;
     DeviceControlServer & operator=(const DeviceControlServer &) = delete;
 };
-
-/**
- * Returns a reference to the DeviceControlServer singleton object.
- */
-inline DeviceControlServer & DeviceControlSvr(void)
-{
-    return DeviceControlServer::sInstance;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer

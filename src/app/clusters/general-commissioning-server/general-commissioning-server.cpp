@@ -32,7 +32,7 @@ using namespace chip;
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
                                                            uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
+    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
     return true;
@@ -40,7 +40,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * 
 
 bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::Command * commandObj)
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlSvr().CommissioningComplete();
+    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
     return true;
@@ -49,7 +49,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
                                                                    uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlSvr().SetRegulatoryConfig(
+    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().SetRegulatoryConfig(
         location, reinterpret_cast<const char *>(countryCode), breadcrumb);
 
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);

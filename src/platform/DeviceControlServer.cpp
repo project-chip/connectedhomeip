@@ -30,6 +30,11 @@ namespace Internal {
 
 DeviceControlServer DeviceControlServer::sInstance;
 
+DeviceControlServer & DeviceControlServer::DeviceControlSvr()
+{
+    return sInstance;
+}
+
 CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
 {
     // TODO
