@@ -687,44 +687,44 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestCluster : CHIPCluster
 
-- (void)test:(ResponseHandler)completionHandler;
-- (void)testNotHandled:(ResponseHandler)completionHandler;
-- (void)testSpecific:(ResponseHandler)completionHandler;
+- (void)test:(ResponseHandler)responseHandler;
+- (void)testNotHandled:(ResponseHandler)responseHandler;
+- (void)testSpecific:(ResponseHandler)responseHandler;
 
-- (void)readAttributeBoolean:(ResponseHandler)completionHandler;
-- (void)writeAttributeBoolean:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeBitmap8:(ResponseHandler)completionHandler;
-- (void)writeAttributeBitmap8:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeBitmap16:(ResponseHandler)completionHandler;
-- (void)writeAttributeBitmap16:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeBitmap32:(ResponseHandler)completionHandler;
-- (void)writeAttributeBitmap32:(uint32_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeBitmap64:(ResponseHandler)completionHandler;
-- (void)writeAttributeBitmap64:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt8u:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt8u:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt16u:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt16u:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt32u:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt32u:(uint32_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt64u:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt64u:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt8s:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt8s:(int8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt16s:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt16s:(int16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt32s:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt32s:(int32_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeInt64s:(ResponseHandler)completionHandler;
-- (void)writeAttributeInt64s:(int64_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeEnum8:(ResponseHandler)completionHandler;
-- (void)writeAttributeEnum8:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeEnum16:(ResponseHandler)completionHandler;
-- (void)writeAttributeEnum16:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeOctetString:(ResponseHandler)completionHandler;
-- (void)writeAttributeOctetString:(NSData *)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeListInt8u:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+- (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBooleanWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBitmap16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBitmap32WithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeBitmap64WithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt8uWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt16uWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt32uWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt64uWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt8sWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt16sWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt32sWithValue:(int32_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeInt64sWithValue:(int64_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEnum8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeEnum16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
 

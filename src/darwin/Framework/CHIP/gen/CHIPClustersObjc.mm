@@ -9617,18 +9617,18 @@ private:
     return &_cppCluster;
 }
 
-- (void)test:(ResponseHandler)completionHandler
+- (void)test:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9640,21 +9640,21 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)testNotHandled:(ResponseHandler)completionHandler
+- (void)testNotHandled:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9666,22 +9666,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)testSpecific:(ResponseHandler)completionHandler
+- (void)testSpecific:(ResponseHandler)responseHandler
 {
     CHIPTestClusterClusterTestSpecificResponseCallbackBridge * onSuccess
-        = new CHIPTestClusterClusterTestSpecificResponseCallbackBridge(completionHandler, [self callbackQueue]);
+        = new CHIPTestClusterClusterTestSpecificResponseCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9693,23 +9693,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeBoolean:(ResponseHandler)completionHandler
+- (void)readAttributeBooleanWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPBooleanAttributeCallbackBridge * onSuccess
-        = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPBooleanAttributeCallbackBridge * onSuccess = new CHIPBooleanAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9721,22 +9720,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeBoolean:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeBooleanWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9748,22 +9747,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeBitmap8:(ResponseHandler)completionHandler
+- (void)readAttributeBitmap8WithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9775,22 +9774,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeBitmap8:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeBitmap8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9802,22 +9801,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeBitmap16:(ResponseHandler)completionHandler
+- (void)readAttributeBitmap16WithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9829,22 +9828,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeBitmap16:(uint16_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeBitmap16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9856,22 +9855,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeBitmap32:(ResponseHandler)completionHandler
+- (void)readAttributeBitmap32WithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt32uAttributeCallbackBridge * onSuccess = new CHIPInt32uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt32uAttributeCallbackBridge * onSuccess = new CHIPInt32uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9883,22 +9882,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeBitmap32:(uint32_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeBitmap32WithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9910,22 +9909,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeBitmap64:(ResponseHandler)completionHandler
+- (void)readAttributeBitmap64WithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt64uAttributeCallbackBridge * onSuccess = new CHIPInt64uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt64uAttributeCallbackBridge * onSuccess = new CHIPInt64uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9937,22 +9936,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeBitmap64:(uint64_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeBitmap64WithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9964,22 +9963,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt8u:(ResponseHandler)completionHandler
+- (void)readAttributeInt8uWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -9991,22 +9990,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt8u:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt8uWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10018,22 +10017,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt16u:(ResponseHandler)completionHandler
+- (void)readAttributeInt16uWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10045,22 +10044,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt16u:(uint16_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt16uWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10072,22 +10071,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt32u:(ResponseHandler)completionHandler
+- (void)readAttributeInt32uWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt32uAttributeCallbackBridge * onSuccess = new CHIPInt32uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt32uAttributeCallbackBridge * onSuccess = new CHIPInt32uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10099,22 +10098,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt32u:(uint32_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt32uWithValue:(uint32_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10126,22 +10125,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt64u:(ResponseHandler)completionHandler
+- (void)readAttributeInt64uWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt64uAttributeCallbackBridge * onSuccess = new CHIPInt64uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt64uAttributeCallbackBridge * onSuccess = new CHIPInt64uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10153,22 +10152,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt64u:(uint64_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt64uWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10180,22 +10179,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt8s:(ResponseHandler)completionHandler
+- (void)readAttributeInt8sWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt8sAttributeCallbackBridge * onSuccess = new CHIPInt8sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt8sAttributeCallbackBridge * onSuccess = new CHIPInt8sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10207,22 +10206,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt8s:(int8_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt8sWithValue:(int8_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10234,22 +10233,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt16s:(ResponseHandler)completionHandler
+- (void)readAttributeInt16sWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10261,22 +10260,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt16s:(int16_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt16sWithValue:(int16_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10288,22 +10287,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt32s:(ResponseHandler)completionHandler
+- (void)readAttributeInt32sWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt32sAttributeCallbackBridge * onSuccess = new CHIPInt32sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt32sAttributeCallbackBridge * onSuccess = new CHIPInt32sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10315,22 +10314,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt32s:(int32_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt32sWithValue:(int32_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10342,22 +10341,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeInt64s:(ResponseHandler)completionHandler
+- (void)readAttributeInt64sWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt64sAttributeCallbackBridge * onSuccess = new CHIPInt64sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt64sAttributeCallbackBridge * onSuccess = new CHIPInt64sAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10369,22 +10368,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeInt64s:(int64_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeInt64sWithValue:(int64_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10396,22 +10395,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeEnum8:(ResponseHandler)completionHandler
+- (void)readAttributeEnum8WithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10423,22 +10422,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeEnum8:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeEnum8WithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10450,22 +10449,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeEnum16:(ResponseHandler)completionHandler
+- (void)readAttributeEnum16WithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10477,22 +10476,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeEnum16:(uint16_t)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeEnum16WithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10504,23 +10503,23 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeOctetString:(ResponseHandler)completionHandler
+- (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler
 {
     CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], true);
+        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10532,22 +10531,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)writeAttributeOctetString:(NSData *)value completionHandler:(ResponseHandler)completionHandler
+- (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler
 {
-    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10560,23 +10559,23 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeListInt8u:(ResponseHandler)completionHandler
+- (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler
 {
     CHIPTestClusterListInt8uAttributeCallbackBridge * onSuccess
-        = new CHIPTestClusterListInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+        = new CHIPTestClusterListInt8uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10588,22 +10587,22 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
-    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onFailure) {
         delete onSuccess;
-        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
     }
 
@@ -10615,7 +10614,7 @@ private:
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
-        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
 
