@@ -21,10 +21,10 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
-#include <app/util/basic-types.h>
 
 namespace chip {
 namespace Transport {
@@ -134,18 +134,18 @@ class DLL_EXPORT AdminPairingTableDelegate
 public:
     virtual ~AdminPairingTableDelegate() {}
     /**
-    * Gets called when an admin is deleted from KVS store.
-    **/
+     * Gets called when an admin is deleted from KVS store.
+     **/
     virtual void OnAdminDeletedFromStorage(AdminId adminId) = 0;
 
     /**
-    * Gets called when an admin is loaded into Admin Pairing Table from KVS store.
-    **/
+     * Gets called when an admin is loaded into Admin Pairing Table from KVS store.
+     **/
     virtual void OnAdminRetrievedFromStorage(AdminPairingInfo * adminInfo) = 0;
 
     /**
-    * Gets called when an admin in Admin Pairing Table is persisted to KVS store.
-    **/
+     * Gets called when an admin in Admin Pairing Table is persisted to KVS store.
+     **/
     virtual void OnAdminPersistedToStorage(AdminPairingInfo * adminInfo) = 0;
 };
 
@@ -220,7 +220,6 @@ private:
 class DLL_EXPORT AdminPairingTable
 {
 public:
-
     CHIP_ERROR Store(AdminId id);
     CHIP_ERROR LoadFromStorage(AdminId id);
     CHIP_ERROR Delete(AdminId id);
@@ -233,7 +232,8 @@ public:
 
     AdminPairingInfo * FindAdminWithId(AdminId adminId);
 
-    AdminPairingInfo * FindAdminForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId, uint16_t vendorId = kUndefinedVendorId);
+    AdminPairingInfo * FindAdminForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId,
+                                        uint16_t vendorId = kUndefinedVendorId);
 
     void Reset();
 

@@ -142,11 +142,11 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
         // Recreate the binding if one exists in persistent storage. Else skip to the next ID
         if (adminPairings.LoadFromStorage(id) == CHIP_NO_ERROR)
         {
-            AdminPairingInfo *admin = adminPairings.FindAdminWithId(id);
+            AdminPairingInfo * admin = adminPairings.FindAdminWithId(id);
             if (admin != nullptr)
             {
                 ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
-                            static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+                                static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
             }
         }
     }

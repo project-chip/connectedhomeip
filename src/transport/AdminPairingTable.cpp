@@ -36,8 +36,8 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     ReturnErrorOnFailure(GenerateKey(mAdmin, key, sizeof(key)));
 
     StorableAdminPairingInfo info;
-    info.mNodeId = Encoding::LittleEndian::HostSwap64(mNodeId);
-    info.mAdmin  = Encoding::LittleEndian::HostSwap16(mAdmin);
+    info.mNodeId   = Encoding::LittleEndian::HostSwap64(mNodeId);
+    info.mAdmin    = Encoding::LittleEndian::HostSwap16(mAdmin);
     info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
@@ -154,18 +154,19 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
     {
         if (state.IsInitialized())
         {
-            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.",
+            ChipLogProgress(Discovery,
+                            "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu "
+                            "nodeId %llu vendorId %d.",
                             index, state.GetFabricId(), state.GetNodeId(), state.GetVendorId(), fabricId, nodeId, vendorId);
         }
-        if (state.IsInitialized() &&
-            state.GetFabricId() == fabricId &&
+        if (state.IsInitialized() && state.GetFabricId() == fabricId &&
             (nodeId == kUndefinedNodeId || state.GetNodeId() == nodeId) &&
             (vendorId == kUndefinedVendorId || state.GetVendorId() == vendorId))
         {
             ChipLogProgress(Discovery, "Found a match!");
             return &state;
         }
-        index ++;
+        index++;
     }
 
     return nullptr;
@@ -181,7 +182,7 @@ void AdminPairingTable::Reset()
 
 CHIP_ERROR AdminPairingTable::Store(AdminId id)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     AdminPairingInfo * admin = nullptr;
 
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -201,16 +202,16 @@ exit:
 
 CHIP_ERROR AdminPairingTable::LoadFromStorage(AdminId id)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     AdminPairingInfo * admin = nullptr;
-    bool didCreateAdmin = false;
+    bool didCreateAdmin      = false;
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     admin = FindAdminWithId(id);
     if (admin == nullptr)
     {
-       admin = AssignAdminId(id);
-       didCreateAdmin = true;
+        admin          = AssignAdminId(id);
+        didCreateAdmin = true;
     }
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     err = admin->FetchFromKVS(mStorage);
@@ -219,7 +220,9 @@ exit:
     if (err != CHIP_NO_ERROR && didCreateAdmin)
     {
         ReleaseAdminId(id);
-    } else if (err == CHIP_NO_ERROR && mDelegate != nullptr) {
+    }
+    else if (err == CHIP_NO_ERROR && mDelegate != nullptr)
+    {
         ChipLogProgress(Discovery, "Admin (%d) loaded from storage. Calling OnAdminRetrievedFromStorage.", id);
         mDelegate->OnAdminRetrievedFromStorage(admin);
     }
@@ -229,13 +232,13 @@ exit:
 CHIP_ERROR AdminPairingTable::Delete(AdminId id)
 {
     AdminPairingInfo * admin = nullptr;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    bool adminIsInitialized = false;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    bool adminIsInitialized  = false;
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    admin = FindAdminWithId(id);
+    admin              = FindAdminWithId(id);
     adminIsInitialized = admin != nullptr && admin->IsInitialized();
-    err = AdminPairingInfo::DeleteFromKVS(mStorage, id); //Delete from storage regardless
+    err = AdminPairingInfo::DeleteFromKVS(mStorage, id); // Delete from storage regardless
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -253,7 +256,7 @@ exit:
 CHIP_ERROR AdminPairingTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mStorage  = storage;
+    mStorage = storage;
     ChipLogProgress(Discovery, "Init admin pairing table with server storage.");
     return CHIP_NO_ERROR;
 }
@@ -261,7 +264,7 @@ CHIP_ERROR AdminPairingTable::Init(PersistentStorageDelegate * storage)
 CHIP_ERROR AdminPairingTable::SetAdminPairingDelegate(AdminPairingTableDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDelegate  = delegate;
+    mDelegate = delegate;
     ChipLogProgress(Discovery, "Set the admin pairing table delegate");
     return CHIP_NO_ERROR;
 }
