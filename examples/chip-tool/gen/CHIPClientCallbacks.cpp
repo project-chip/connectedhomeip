@@ -458,7 +458,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].GroupKeyRoot = emberAfGetString(message, 0, messageLen);
+                            data[i].GroupKeyRoot = chip::ByteSpan(message, 16);
                             message += 16;
                             CHECK_MESSAGE_LENGTH(16);
                             data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, messageLen);
@@ -490,7 +490,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].Label = emberAfGetString(message, 0, messageLen);
+                            data[i].Label = chip::ByteSpan(message, 32);
                             message += 32;
                             CHECK_MESSAGE_LENGTH(32);
                             data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
