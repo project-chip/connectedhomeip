@@ -92,11 +92,11 @@ CHIP_ERROR NFCManagerImpl::_StopTagEmulation()
     return CHIP_NO_ERROR;
 }
 
-bool NFCManagerImpl::IsNtagConfigured(eAppNtagError *pNtagError, const char * payload)
+bool NFCManagerImpl::IsNtagConfigured(eAppNtagError * pNtagError, const char * payload)
 {
-    uint32_t addrToRead = NTAG_I2C_BLOCK_SIZE;
-    uint8_t eepromDataBuf[NDEF_URI_ID_MAX_LENGTH + TERMINATOR_TLV_LEN] = {0};
-    uint16_t ndefUriRecordSize = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
+    uint32_t addrToRead                                                = NTAG_I2C_BLOCK_SIZE;
+    uint8_t eepromDataBuf[NDEF_URI_ID_MAX_LENGTH + TERMINATOR_TLV_LEN] = { 0 };
+    uint16_t ndefUriRecordSize                                         = AppNdefUriRecordGetSize(sInstance.ndefUriRecord);
     uint8_t ndefUriLen = sInstance.ndefUriRecord.payloadLen - sizeof(sInstance.ndefUriRecord.uriIdCode);
 
     if (NTAG_ReadBytes(sInstance.ntagDriverHandleInstance, addrToRead, eepromDataBuf, 2))
@@ -106,9 +106,9 @@ bool NFCManagerImpl::IsNtagConfigured(eAppNtagError *pNtagError, const char * pa
     }
 
     /* see also http://apps4android.org/nfc-specifications/NFCForum-TS-Type-2-Tag_1.1.pdf, chapter 2.3 */
-    if(eepromDataBuf[0] != 0x03 || eepromDataBuf[1] != ndefUriRecordSize)
+    if (eepromDataBuf[0] != 0x03 || eepromDataBuf[1] != ndefUriRecordSize)
     {
-    	return FALSE;
+        return FALSE;
     }
 
     /* read the NdefUriRecord from the EEPROM */
@@ -122,9 +122,8 @@ bool NFCManagerImpl::IsNtagConfigured(eAppNtagError *pNtagError, const char * pa
     /* verify if the ndefUriRecord is the same as the one flashed in the the EEPROM:
      * If it is, then the NTAG is already configured.
      */
-    return (payload &&
-    		!memcmp(sInstance.ndefUriRecord.uriIdData, payload, ndefUriLen) &&
-			!memcmp((uint8_t *) &(sInstance.ndefUriRecord), eepromDataBuf, ndefUriRecordSize));
+    return (payload && !memcmp(sInstance.ndefUriRecord.uriIdData, payload, ndefUriLen) &&
+            !memcmp((uint8_t *) &(sInstance.ndefUriRecord), eepromDataBuf, ndefUriRecordSize));
 }
 
 NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagWrite(const char * payload)
@@ -133,7 +132,7 @@ NFCManagerImpl::eAppNtagError NFCManagerImpl::AppNtagWrite(const char * payload)
     uint8_t byte0         = 0;
     uint8_t i             = 0;
     bool_t i2cAddrFound   = FALSE;
-    bool_t isConfigured = FALSE;
+    bool_t isConfigured   = FALSE;
 
     do
     {
