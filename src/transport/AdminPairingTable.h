@@ -112,7 +112,7 @@ private:
     static constexpr size_t KeySize();
 
     static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
-    
+
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
@@ -126,7 +126,7 @@ private:
     };
 };
 
-// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using 
+// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using
 // attribute store so no need for this Delegate API anymore
 // TODO: Reimplement AdminPairingTable to only have one backing store.
 class DLL_EXPORT AdminPairingTableDelegate

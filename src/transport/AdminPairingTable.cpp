@@ -46,7 +46,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     {
         ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue.");
     }
-   
+
     return err;
 }
 
@@ -65,7 +65,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     mFabricId  = Encoding::LittleEndian::HostSwap64(info.mFabricId);
     mVendorId  = Encoding::LittleEndian::HostSwap16(info.mVendorId);
     ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -154,11 +154,11 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
     {
         if (state.IsInitialized())
         {
-            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.", 
+            ChipLogProgress(Discovery, "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu nodeId %llu vendorId %d.",
                             index, state.GetFabricId(), state.GetNodeId(), state.GetVendorId(), fabricId, nodeId, vendorId);
         }
-        if (state.IsInitialized() && 
-            state.GetFabricId() == fabricId && 
+        if (state.IsInitialized() &&
+            state.GetFabricId() == fabricId &&
             (nodeId == kUndefinedNodeId || state.GetNodeId() == nodeId) &&
             (vendorId == kUndefinedVendorId || state.GetVendorId() == vendorId))
         {
@@ -191,21 +191,21 @@ CHIP_ERROR AdminPairingTable::Store(AdminId id)
 
     err = admin->StoreIntoKVS(mStorage);
 exit:
-    if (err == CHIP_NO_ERROR && mDelegate != nullptr) 
+    if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
         ChipLogProgress(Discovery, "Admin (%d) persisted to storage. Calling OnAdminPersistedToStorage.", id);
         mDelegate->OnAdminPersistedToStorage(admin);
     }
     return err;
 }
- 
+
 CHIP_ERROR AdminPairingTable::LoadFromStorage(AdminId id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdminPairingInfo * admin = nullptr;
     bool didCreateAdmin = false;
     VerifyOrExit(mStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    
+
     admin = FindAdminWithId(id);
     if (admin == nullptr)
     {
@@ -214,7 +214,7 @@ CHIP_ERROR AdminPairingTable::LoadFromStorage(AdminId id)
     }
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     err = admin->FetchFromKVS(mStorage);
-    
+
 exit:
     if (err != CHIP_NO_ERROR && didCreateAdmin)
     {
@@ -241,7 +241,7 @@ exit:
     if (err == CHIP_NO_ERROR)
     {
         ReleaseAdminId(id);
-        if (mDelegate != nullptr && adminIsInitialized) 
+        if (mDelegate != nullptr && adminIsInitialized)
         {
             ChipLogProgress(Discovery, "Admin (%d) deleted. Calling OnAdminDeletedFromStorage.", id);
             mDelegate->OnAdminDeletedFromStorage(id);

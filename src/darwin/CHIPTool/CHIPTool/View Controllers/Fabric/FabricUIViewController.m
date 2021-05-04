@@ -79,7 +79,7 @@
     NSNumber *fabricId = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey);
     _getFabricIDLabel.text = [NSString stringWithFormat:@"FabricID: %@", fabricId];
     [_stackView addArrangedSubview:_getFabricIDLabel];
-    
+
     _getFabricIDLabel.translatesAutoresizingMaskIntoConstraints = false;
     [_getFabricIDLabel.leadingAnchor constraintEqualToAnchor:_stackView.leadingAnchor].active = YES;
     [_getFabricIDLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;

@@ -396,7 +396,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     {
         VerifyOrExit(
             admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(Inet, "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding", 
+            ChipLogError(Inet, "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
                                 packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
     }
     ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
@@ -449,7 +449,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             ChipLogProgress(Inet, "Setting nodeID %" PRIX64 " on admin.", admin->GetNodeId());
             modifiedAdmin = true;
         }
-        
+
     }
 
     // TODO: Remove temporary code once AddOptCert is implemented
