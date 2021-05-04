@@ -35,11 +35,10 @@
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
-#include <protocols/secure_channel/RendezvousSession.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -85,13 +84,19 @@ class DLL_EXPORT DevicePairingDelegate
 public:
     virtual ~DevicePairingDelegate() {}
 
+    enum Status : uint8_t
+    {
+        SecurePairingSuccess = 0,
+        SecurePairingFailed,
+    };
+
     /**
      * @brief
      *   Called when the pairing reaches a certain stage.
      *
      * @param status Current status of pairing
      */
-    virtual void OnStatusUpdate(RendezvousSessionDelegate::Status status) {}
+    virtual void OnStatusUpdate(DevicePairingDelegate::Status status) {}
 
     /**
      * @brief
@@ -294,7 +299,7 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController, public RendezvousSessionDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
 {
 public:
     DeviceCommissioner();
@@ -348,10 +353,9 @@ public:
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
-    //////////// RendezvousSessionDelegate Implementation ///////////////
-    void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousComplete() override;
-    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
 
     void RendezvousCleanup(CHIP_ERROR status);
 
@@ -370,7 +374,6 @@ public:
 
 private:
     DevicePairingDelegate * mPairingDelegate;
-    RendezvousSession * mRendezvousSession;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
        contains the device object that's tracking the state of the device that's being paired.
@@ -403,6 +406,8 @@ private:
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
     uint16_t mNextKeyId = 0;
+
+    PASESession mPairingSession;
 };
 
 } // namespace Controller
