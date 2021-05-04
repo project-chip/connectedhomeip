@@ -65,6 +65,10 @@ public:
         CHIP_ERROR err = packetHeader.DecodeAndConsume(msgBuf);
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
+        NL_TEST_ASSERT(mSuite, packetHeader.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
+        NL_TEST_ASSERT(mSuite, packetHeader.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
+        NL_TEST_ASSERT(mSuite, packetHeader.GetMessageId() == kMessageId);
+
         size_t data_len = msgBuf->DataLength();
         int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
         NL_TEST_ASSERT(mSuite, compare == 0);
