@@ -35,7 +35,50 @@ struct ResolvedNodeData
     Inet::IPAddress mAddress;
     uint16_t mPort;
 };
+struct CommissionableNodeData
+{
+    // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
+    static constexpr int kMaxIPAddresses = 5;
+    // Largest host name is 64-bits in hex.
+    static constexpr int kHostNameSize = 16;
 
+    char hostName[kHostNameSize + 1];
+    uint16_t longDiscriminator;
+    uint16_t vendorId;
+    uint16_t productId;
+    int numIPs;
+    Inet::IPAddress ipAddress[kMaxIPAddresses];
+    void Reset()
+    {
+        memset(hostName, 0, kHostNameSize + 1);
+        longDiscriminator = 0;
+        vendorId          = 0;
+        productId         = 0;
+        numIPs            = 0;
+        for (int i = 0; i < kMaxIPAddresses; ++i)
+        {
+            ipAddress[i] = chip::Inet::IPAddress::Any;
+        }
+    }
+    CommissionableNodeData() { Reset(); }
+    bool IsHost(const char * host) const { return strncmp(host, hostName, kHostNameSize) == 0; }
+    bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
+}; // namespace Mdns
+
+enum class CommissionableNodeFilterType
+{
+    NONE,
+    SHORT,
+    LONG,
+    VENDOR,
+};
+struct CommissionableNodeFilter
+{
+    CommissionableNodeFilterType type;
+    uint16_t code;
+    CommissionableNodeFilter() : type(CommissionableNodeFilterType::NONE), code(0) {}
+    CommissionableNodeFilter(CommissionableNodeFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
+};
 /// Groups callbacks for CHIP service resolution requests
 class ResolverDelegate
 {
@@ -47,6 +90,9 @@ public:
 
     /// Called when a CHIP node ID resolution has failed
     virtual void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
+
+    // Called when a CHIP Node in commissioning mode is found
+    virtual void OnCommissionableNodeFound(const CommissionableNodeData & nodeData) = 0;
 };
 
 /// Interface for resolving CHIP services
@@ -66,6 +112,9 @@ public:
 
     /// Requests resolution of a node ID to its address
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
+
+    // Finds all nodes with the given filter that are currently in commissioning mode.
+    virtual CHIP_ERROR FindCommissionableNodes(CommissionableNodeFilter filter = CommissionableNodeFilter()) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();

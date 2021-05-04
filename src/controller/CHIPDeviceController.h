@@ -32,10 +32,10 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPDiscovery.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
+#include <mdns/Resolver.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/RendezvousSession.h>
@@ -228,6 +228,10 @@ protected:
     PersistentStorageDelegate * mStorageDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    static constexpr uint16_t kMdnsPort                        = 5353;
+    // TODO(cecille): Make this configuarable.
+    static constexpr int kMaxCommissionableNodes = 10;
+    Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
     Inet::InetLayer * mInetLayer;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -265,6 +269,7 @@ private:
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
@@ -393,14 +398,13 @@ public:
     /**
      * @brief
      *   Returns information about discovered devices.
-     * @return const DnsSdInfo* info about the selected device. May be nullptr if no information has been returned yet.
+     * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
-    const DnsSdInfo* GetDiscoveredDevice(int idx);
+    const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
 
 private:
     DevicePairingDelegate * mPairingDelegate;
     RendezvousSession * mRendezvousSession;
-    DeviceDiscovery discoveryAgent;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
        contains the device object that's tracking the state of the device that's being paired.

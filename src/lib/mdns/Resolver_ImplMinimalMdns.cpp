@@ -17,12 +17,15 @@
 
 #include "Resolver.h"
 
+#include <limits>
+
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
 #include <mdns/minimal/Parser.h>
 #include <mdns/minimal/QueryBuilder.h>
 #include <mdns/minimal/RecordData.h>
+#include <mdns/minimal/core/FlatAllocatedQName.h>
 
 #include <support/logging/CHIPLogging.h>
 
@@ -35,6 +38,97 @@ namespace chip {
 namespace Mdns {
 namespace {
 
+enum class DiscoveryType
+{
+    UNKNOWN,
+    OPERATIONAL,
+    COMMISSIONABLE_NODE,
+};
+
+class TxtRecordDelegateImpl : public mdns::Minimal::TxtRecordDelegate
+{
+public:
+    TxtRecordDelegateImpl(CommissionableNodeData * nodeData) : mNodeData(nodeData) {}
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value);
+
+private:
+    CommissionableNodeData * mNodeData;
+};
+
+bool IsKey(const mdns::Minimal::BytesRange key, const char * desired)
+{
+    size_t len = strlen(desired);
+    if (key.Size() != len)
+    {
+        return false;
+    }
+    const char * keychars = reinterpret_cast<const char *>(key.Start());
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (keychars[i] != desired[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+uint16_t MakeU16(const mdns::Minimal::BytesRange & val)
+{
+    uint32_t u32          = 0;
+    const uint16_t errval = 0xFFFF;
+    for (size_t i = 0; i < val.Size(); ++i)
+    {
+        char c = static_cast<char>(val.Start()[i]);
+        if (c < '0' || c > '9')
+        {
+            return errval;
+        }
+        u32 = u32 * 10;
+        u32 += val.Start()[i] - static_cast<uint8_t>('0');
+        if (u32 > std::numeric_limits<uint16_t>::max())
+        {
+            return errval;
+        }
+    }
+    return static_cast<uint16_t>(u32);
+}
+
+void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
+{
+    if (mNodeData == nullptr)
+    {
+        return;
+    }
+
+    if (IsKey(name, "D"))
+    {
+        mNodeData->longDiscriminator = MakeU16(value);
+    }
+    else if (IsKey(name, "VP"))
+    {
+        // Fist value is the vendor id, second (after the +) is the product.
+        size_t plussign = value.Size();
+        for (size_t i = 0; i < value.Size(); ++i)
+        {
+            if (static_cast<char>(value.Start()[i]) == '+')
+            {
+                plussign = i;
+                break;
+            }
+        }
+        if (plussign > 0)
+        {
+            mNodeData->vendorId = MakeU16(mdns::Minimal::BytesRange(value.Start(), value.Start() + plussign));
+        }
+        if (plussign < value.Size() - 1)
+        {
+            mNodeData->productId = MakeU16(mdns::Minimal::BytesRange(value.Start() + plussign + 1, value.End()));
+        }
+    }
+    // TODO(cecille): Add the new stuff from 0.7 part 2.
+}
+
 constexpr size_t kMdnsMaxPacketSize = 1024;
 constexpr uint16_t kMdnsPort        = 5353;
 
@@ -43,8 +137,10 @@ using namespace mdns::Minimal;
 class PacketDataReporter : public ParserDelegate
 {
 public:
-    PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, const BytesRange & packet) :
-        mDelegate(delegate), mPacketRange(packet)
+    PacketDataReporter(ResolverDelegate * delegate, chip::Inet::InterfaceId interfaceId, DiscoveryType discoveryType,
+                       const BytesRange & packet) :
+        mDelegate(delegate),
+        mDiscoveryType(discoveryType), mPacketRange(packet)
     {
         mNodeData.mInterfaceId = interfaceId;
     }
@@ -54,18 +150,26 @@ public:
     void OnHeader(ConstHeaderRef & header) override;
     void OnQuery(const QueryData & data) override;
     void OnResource(ResourceType type, const ResourceData & data) override;
+    // Called after ParsePacket is complete to send final notifications to the delegate.
+    // Used to ensure all the available IP addresses are attached before completion.
+    void OnComplete();
 
 private:
     ResolverDelegate * mDelegate = nullptr;
+    DiscoveryType mDiscoveryType;
     ResolvedNodeData mNodeData;
+    CommissionableNodeData mCommissionableNodeData;
     BytesRange mPacketRange;
 
     bool mValid       = false;
     bool mHasNodePort = false;
     bool mHasIP       = false;
 
-    void OnSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
-    void OnIPAddress(const chip::Inet::IPAddress & addr);
+    void OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
+    void OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv);
+
+    void OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr);
+    void OnOperationalIPAddress(const chip::Inet::IPAddress & addr);
 };
 
 void PacketDataReporter::OnQuery(const QueryData & data)
@@ -87,9 +191,8 @@ void PacketDataReporter::OnHeader(ConstHeaderRef & header)
     }
 }
 
-void PacketDataReporter::OnSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
+void PacketDataReporter::OnOperationalSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
 {
-
     if (!name.Next())
     {
 #ifdef MINMDNS_RESOLVER_OVERLY_VERBOSE
@@ -132,7 +235,18 @@ void PacketDataReporter::OnSrvRecord(SerializedQNameIterator name, const SrvReco
     }
 }
 
-void PacketDataReporter::OnIPAddress(const chip::Inet::IPAddress & addr)
+void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator name, const SrvRecord & srv)
+{
+    // Host name is the first part of the qname
+    mdns::Minimal::SerializedQNameIterator it = srv.GetName();
+    if (!it.Next())
+    {
+        return;
+    }
+    strncpy(mCommissionableNodeData.hostName, it.Value(), mCommissionableNodeData.kHostNameSize);
+}
+
+void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
 {
     // TODO: should validate that the IP address we receive belongs to the
     // server associated with the SRV record.
@@ -149,6 +263,11 @@ void PacketDataReporter::OnIPAddress(const chip::Inet::IPAddress & addr)
     }
 }
 
+void PacketDataReporter::OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr)
+{
+    mCommissionableNodeData.ipAddress[mCommissionableNodeData.numIPs++] = addr;
+}
+
 void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data)
 {
     if (!mValid)
@@ -161,25 +280,34 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
     ///    - Can extract: fabricid, nodeid, port
     ///    - References ServerName
     /// - Additional records tied to ServerName contain A/AAAA records for IP address data
-
-    if (data.GetType() == QType::SRV)
+    switch (data.GetType())
     {
+    case QType::SRV: {
         SrvRecord srv;
-
         if (!srv.Parse(data.GetData(), mPacketRange))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse SRV record");
             mHasNodePort = false;
         }
-        else
+        else if (mDiscoveryType == DiscoveryType::OPERATIONAL)
         {
-            OnSrvRecord(data.GetName(), srv);
+            OnOperationalSrvRecord(data.GetName(), srv);
         }
+        else if (mDiscoveryType == DiscoveryType::COMMISSIONABLE_NODE)
+        {
+            OnCommissionableNodeSrvRecord(data.GetName(), srv);
+        }
+        break;
     }
-    else if (data.GetType() == QType::A)
-    {
-        chip::Inet::IPAddress addr;
-
+    case QType::TXT:
+        if (mDiscoveryType == DiscoveryType::COMMISSIONABLE_NODE)
+        {
+            TxtRecordDelegateImpl textRecordDelegate(&mCommissionableNodeData);
+            ParseTxtRecord(data.GetData(), &textRecordDelegate);
+        }
+        break;
+    case QType::A: {
+        Inet::IPAddress addr;
         if (!ParseARecord(data.GetData(), &addr))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse A record");
@@ -187,13 +315,19 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         }
         else
         {
-            OnIPAddress(addr);
+            if (mDiscoveryType == DiscoveryType::OPERATIONAL)
+            {
+                OnOperationalIPAddress(addr);
+            }
+            else if (mDiscoveryType == DiscoveryType::COMMISSIONABLE_NODE)
+            {
+                OnCommissionableNodeIPAddress(addr);
+            }
         }
+        break;
     }
-    else if (data.GetType() == QType::AAAA)
-    {
-        chip::Inet::IPAddress addr;
-
+    case QType::AAAA: {
+        Inet::IPAddress addr;
         if (!ParseAAAARecord(data.GetData(), &addr))
         {
             ChipLogError(Discovery, "Packet data reporter failed to parse A record");
@@ -201,8 +335,27 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         }
         else
         {
-            OnIPAddress(addr);
+            if (mDiscoveryType == DiscoveryType::OPERATIONAL)
+            {
+                OnOperationalIPAddress(addr);
+            }
+            else if (mDiscoveryType == DiscoveryType::COMMISSIONABLE_NODE)
+            {
+                OnCommissionableNodeIPAddress(addr);
+            }
         }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void PacketDataReporter::OnComplete()
+{
+    if (mDiscoveryType == DiscoveryType::COMMISSIONABLE_NODE && mCommissionableNodeData.IsValid())
+    {
+        mDelegate->OnCommissionableNodeFound(mCommissionableNodeData);
     }
 }
 
@@ -218,9 +371,26 @@ public:
     CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
+    CHIP_ERROR FindCommissionableNodes(CommissionableNodeFilter filter = CommissionableNodeFilter()) override;
 
 private:
     ResolverDelegate * mDelegate = nullptr;
+    DiscoveryType mDiscoveryType = DiscoveryType::UNKNOWN;
+
+    CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type);
+    CHIP_ERROR BrowseNodes(DiscoveryType type, CommissionableNodeFilter subtype);
+    template <typename... Args>
+    mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
+    {
+        size_t requiredSize = mdns::Minimal::FlatAllocatedQName::RequiredStorageSize(parts...);
+        if (requiredSize > kMaxQnameSize)
+        {
+            return mdns::Minimal::FullQName();
+        }
+        return mdns::Minimal::FlatAllocatedQName::Build(qnameStorage, parts...);
+    }
+    static constexpr int kMaxQnameSize = 100;
+    char qnameStorage[kMaxQnameSize];
 };
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -230,11 +400,15 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
         return;
     }
 
-    PacketDataReporter reporter(mDelegate, info->Interface, data);
+    PacketDataReporter reporter(mDelegate, info->Interface, mDiscoveryType, data);
 
     if (!ParsePacket(data, &reporter))
     {
         ChipLogError(Discovery, "Failed to parse received mDNS packet");
+    }
+    else
+    {
+        reporter.OnComplete();
     }
 }
 
@@ -256,8 +430,84 @@ CHIP_ERROR MinMdnsResolver::SetResolverDelegate(ResolverDelegate * delegate)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type)
+{
+
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
+    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    QueryBuilder builder(std::move(buffer));
+    builder.Header().SetMessageId(0);
+
+    mdns::Minimal::Query query(qname);
+    query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
+    // TODO(cecille): Not sure why unicast response isn't working - fix.
+    query.SetAnswerViaUnicast(false);
+
+    builder.AddQuery(query);
+
+    ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
+
+    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+}
+
+CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(CommissionableNodeFilter filter)
+{
+    return BrowseNodes(DiscoveryType::COMMISSIONABLE_NODE, filter);
+}
+
+// TODO(cecille): Extend filter and use this for Resolve
+CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, CommissionableNodeFilter filter)
+{
+    mDiscoveryType    = type;
+    char subtypeStr[] = "_Xdddddd";
+
+    mdns::Minimal::FullQName qname;
+
+    switch (filter.type)
+    {
+    case CommissionableNodeFilterType::SHORT:
+        snprintf(subtypeStr, strlen(subtypeStr), "_S%03u", filter.code);
+        break;
+    case CommissionableNodeFilterType::LONG:
+        snprintf(subtypeStr, strlen(subtypeStr), "_L%04u", filter.code);
+        break;
+    case CommissionableNodeFilterType::VENDOR:
+        snprintf(subtypeStr, strlen(subtypeStr), "_V%03u", filter.code);
+        break;
+    case CommissionableNodeFilterType::NONE:
+        break;
+    }
+
+    switch (type)
+    {
+    case DiscoveryType::OPERATIONAL:
+        qname = CheckAndAllocateQName("_chip", "_tcp", "local");
+        break;
+    case DiscoveryType::COMMISSIONABLE_NODE:
+        if (filter.type == CommissionableNodeFilterType::NONE)
+        {
+            qname = CheckAndAllocateQName("_chipc", "_udp", "local");
+        }
+        else
+        {
+            qname = CheckAndAllocateQName(subtypeStr, "_sub", "_chipc", "_udp", "local");
+        }
+        break;
+    case DiscoveryType::UNKNOWN:
+        break;
+    }
+    if (!qname.nameCount)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    return SendQuery(qname, mdns::Minimal::QType::ANY);
+}
+
 CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
 {
+    mDiscoveryType                    = DiscoveryType::OPERATIONAL;
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kMdnsMaxPacketSize);
     ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 

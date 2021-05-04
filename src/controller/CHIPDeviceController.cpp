@@ -195,6 +195,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
         mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
     }
+    Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     InitDataModelHandler(mExchangeMgr);
@@ -624,6 +625,20 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
+
+void DeviceController::OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData)
+{
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        bool sameRecord = strncmp(mCommissionableNodes[i].hostName, nodeData.hostName, nodeData.kHostNameSize) == 0;
+        if (sameRecord || !mCommissionableNodes[i].IsValid())
+        {
+            mCommissionableNodes[i] = nodeData;
+            return;
+        }
+    }
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
@@ -662,8 +677,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     {
         mNextKeyId = 0;
     }
-    discoveryAgent.SetInetLayer(mInetLayer);
-
     mPairingDelegate = params.pairingDelegate;
     return CHIP_NO_ERROR;
 }
@@ -1018,47 +1031,58 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 
 CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
 {
-    discoveryAgent.FindAvailableDevices(DiscoveryType::COMMISSIONING);
-    return CHIP_NO_ERROR;
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    return Mdns::Resolver::Instance().FindCommissionableNodes();
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
 {
-    discoveryAgent.FindAvailableDevicesLongDiscriminator(DiscoveryType::COMMISSIONING, long_discriminator);
-    return CHIP_NO_ERROR;
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::LONG, long_discriminator);
+    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 void DeviceCommissioner::PrintDiscoveredDevices()
 {
-    for (int i = 0; i < 10; ++i)
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
     {
-        const DnsSdInfo * dnsSdInfo = discoveryAgent.GetDiscoveredDevice(i);
-        if (dnsSdInfo == nullptr)
+        if (!mCommissionableNodes[i].IsValid())
         {
-            break;
+            continue;
         }
         printf("Device %d\n", i);
-        printf("\tInstance name:\t\t%s\n", dnsSdInfo->instanceName);
-        printf("\tHost name:\t\t%s\n", dnsSdInfo->hostName);
-        printf("\tLong discriminator:\t%u\n", dnsSdInfo->longDiscriminator);
-        printf("\tVendor ID:\t\t%u\n", dnsSdInfo->vendorId);
-        printf("\tProduct ID:\t\t%u\n", dnsSdInfo->productId);
-        for (int j = 0; j < DnsSdInfo::kNumIpAddresses; ++j)
+        printf("\tHost name:\t\t%s\n", mCommissionableNodes[i].hostName);
+        printf("\tLong discriminator:\t%u\n", mCommissionableNodes[i].longDiscriminator);
+        printf("\tVendor ID:\t\t%u\n", mCommissionableNodes[i].vendorId);
+        printf("\tProduct ID:\t\t%u\n", mCommissionableNodes[i].productId);
+        for (int j = 0; j < mCommissionableNodes[i].numIPs; ++j)
         {
-            if (dnsSdInfo->ipAddress[j].Type() == Inet::kIPAddressType_Any)
-            {
-                break;
-            }
             char buf[50];
-            dnsSdInfo->ipAddress[j].ToString(buf);
+            mCommissionableNodes[i].ipAddress[j].ToString(buf);
             printf("\tAddress %d:\t\t%s\n", j, buf);
         }
     }
+#endif
 }
 
-const DnsSdInfo * DeviceCommissioner::GetDiscoveredDevice(int idx)
+const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
-    return discoveryAgent.GetDiscoveredDevice(idx);
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    if (mCommissionableNodes[idx].IsValid())
+    {
+        return &mCommissionableNodes[idx];
+    }
+    return nullptr;
+#else
+    return nullptr;
+#endif
 }
 
 } // namespace Controller
