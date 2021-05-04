@@ -913,7 +913,9 @@ void DeviceCommissioner::OnSessionEstablished()
 {
     VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
-    //    mPairingSession.PeerConnection().SetPeerNodeId(mParams.GetRemoteNodeId().ValueOr(kUndefinedNodeId));
+    Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
 
     CHIP_ERROR err =
         mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
@@ -925,8 +927,6 @@ void DeviceCommissioner::OnSessionEstablished()
         OnSessionEstablishmentError(err);
         return;
     }
-
-    Device * device = &mActiveDevices[mDeviceBeingPaired];
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
     mPairingSession.ToSerializable(device->GetPairing());
