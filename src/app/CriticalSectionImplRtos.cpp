@@ -16,21 +16,21 @@
  *    limitations under the License.
  */
 
+#include "CriticalSection.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "CriticalSection.h"
 
 namespace chip {
 namespace Platform {
 void CriticalSectionEnter()
 {
-    //TODO: Add freertos lock, it seems in EFR32, it needs portENTER_CRITICAL, in ESP32, it needs portENTER_CRITICAL(mux)
-    //taskENTER_CRITICAL();
+    // TODO: Add freertos lock, it seems in EFR32, it needs portENTER_CRITICAL, in ESP32, it needs portENTER_CRITICAL(mux)
+    // taskENTER_CRITICAL();
 }
 
 void CriticalSectionExit()
 {
-    //taskEXIT_CRITICAL();
+    // taskEXIT_CRITICAL();
 }
 } // namespace Platform
 } // namespace chip
