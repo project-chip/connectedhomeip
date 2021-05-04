@@ -123,42 +123,12 @@ BaseType_t GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::SignalThreadActivi
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::OnJoinerTimer(TimerHandle_t xTimer)
-{
-    GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
-        static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(pvTimerGetTimerID(xTimer));
-
-    ChipLogDetail(DeviceLayer, "Thread joiner timer running");
-
-    if (xTaskGetTickCount() > self->mJoinerExpire || self->Impl()->IsThreadProvisioned())
-    {
-        ChipLogDetail(DeviceLayer, "Thread joiner timer stopped");
-
-        VerifyOrDie(pdPASS == xTimerStop(xTimer, portMAX_DELAY) && pdPASS == xTimerDelete(xTimer, portMAX_DELAY));
-    }
-    else if (!self->mJoinerStartPending)
-    {
-        ChipLogDetail(DeviceLayer, "Request Thread joiner start");
-
-        self->mJoinerStartPending = true;
-        self->Impl()->SignalThreadActivityPending();
-    }
-}
-
-template <class ImplClass>
 void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * arg)
 {
     GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
         static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(arg);
 
     ChipLogDetail(DeviceLayer, "Thread task running");
-
-    // Try starting joiner within 15m.
-    self->mJoinerExpire = xTaskGetTickCount() + pdMS_TO_TICKS(15 * 60 * 1000);
-
-    TimerHandle_t joinerTimer = xTimerCreate("JoinerTimer", pdMS_TO_TICKS(10000), pdTRUE, self, &OnJoinerTimer);
-    VerifyOrDie(joinerTimer != NULL);
-    VerifyOrDie(pdPASS == xTimerStart(joinerTimer, portMAX_DELAY));
 
     while (true)
     {
@@ -167,12 +137,6 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
         self->Impl()->UnlockThreadStack();
 
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-        if (self->mJoinerStartPending)
-        {
-            self->mJoinerStartPending = false;
-            self->Impl()->JoinerStart();
-        }
     }
 }
 
