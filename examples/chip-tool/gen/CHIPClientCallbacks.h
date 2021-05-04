@@ -125,6 +125,7 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t * data);
+typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
 typedef void (*ThermostatClusterCurrentWeeklyScheduleCallback)(void * context, uint8_t numberOfTransitionsForSequence,
                                                                uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
                                                                /* TYPE WARNING: array array defaults to */ uint8_t * payload);
@@ -140,3 +141,4 @@ typedef void (*DescriptorPartsListListAttributeCallback)(void * context, uint16_
 typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, uint16_t count, _GroupState * entries);
 typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
+typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);

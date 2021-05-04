@@ -828,6 +828,53 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Test Cluster
+ *
+ */
+@interface CHIPTestCluster : CHIPCluster
+
+- (void)test:(ResponseHandler)completionHandler;
+- (void)testNotHandled:(ResponseHandler)completionHandler;
+- (void)testSpecific:(ResponseHandler)completionHandler;
+
+- (void)readAttributeBoolean:(ResponseHandler)completionHandler;
+- (void)writeAttributeBoolean:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeBitmap8:(ResponseHandler)completionHandler;
+- (void)writeAttributeBitmap8:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeBitmap16:(ResponseHandler)completionHandler;
+- (void)writeAttributeBitmap16:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeBitmap32:(ResponseHandler)completionHandler;
+- (void)writeAttributeBitmap32:(uint32_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeBitmap64:(ResponseHandler)completionHandler;
+- (void)writeAttributeBitmap64:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt8u:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt8u:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt16u:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt16u:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt32u:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt32u:(uint32_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt64u:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt64u:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt8s:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt8s:(int8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt16s:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt16s:(int16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt32s:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt32s:(int32_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeInt64s:(ResponseHandler)completionHandler;
+- (void)writeAttributeInt64s:(int64_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeEnum8:(ResponseHandler)completionHandler;
+- (void)writeAttributeEnum8:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeEnum16:(ResponseHandler)completionHandler;
+- (void)writeAttributeEnum16:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeOctetString:(ResponseHandler)completionHandler;
+- (void)writeAttributeOctetString:(NSData *)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeListInt8u:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Thermostat
  *
  */

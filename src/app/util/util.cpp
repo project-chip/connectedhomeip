@@ -145,6 +145,9 @@ void emberAfPluginDoorLockServerInitCallback(void);
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 void emberAfPluginDescriptorServerInitCallback(void);
 #endif
+#ifdef ZCL_USING_TEST_CLUSTER_SERVER
+void emberAfPluginTestClusterServerInitCallback(void);
+#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -308,6 +311,9 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 #endif
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
     emberAfPluginDescriptorServerInitCallback();
+#endif
+#ifdef ZCL_USING_TEST_CLUSTER_SERVER
+    emberAfPluginTestClusterServerInitCallback();
 #endif
 
     emAfCallInits();

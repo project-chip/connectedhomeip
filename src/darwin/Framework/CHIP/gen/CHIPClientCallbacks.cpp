@@ -506,6 +506,26 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x050F:
+                    switch (attributeId)
+                    {
+                    case 0x001A: // INT8U
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt8u(message, 0, messageLen);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                        }
+
+                        Callback::Callback<TestClusterListInt8uListAttributeCallback> * cb =
+                            Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 }
                 break;
             }
@@ -1782,6 +1802,19 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandO
     Callback::Callback<ScenesClusterViewSceneResponseCallback> * cb =
         Callback::Callback<ScenesClusterViewSceneResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * commandObj, uint8_t returnValue)
+{
+    ChipLogProgress(Zcl, "TestSpecificResponse:");
+    ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
+
+    GET_RESPONSE_CALLBACKS("TestClusterClusterTestSpecificResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, returnValue);
     return true;
 }
 
