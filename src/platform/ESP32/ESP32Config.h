@@ -75,6 +75,9 @@ public:
     static const Key kConfigKey_OperationalDeviceICACerts;
     static const Key kConfigKey_OperationalDevicePrivateKey;
     static const Key kConfigKey_SetupDiscriminator;
+    static const Key kConfigKey_RegulatoryLocation;
+    static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_Breadcrumb;
 
     static const char kGroupKeyNamePrefix[];
 
