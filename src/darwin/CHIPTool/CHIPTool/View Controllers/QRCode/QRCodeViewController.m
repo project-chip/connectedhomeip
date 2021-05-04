@@ -531,9 +531,9 @@
                  credentials:credentials
                   breadcrumb:breadcrumb
                    timeoutMs:timeoutMs
-           responseHandler:^(NSError * error, NSDictionary * values) {
-               [weakSelf onAddNetworkResponse:error isWiFi:YES];
-           }];
+             responseHandler:^(NSError * error, NSDictionary * values) {
+                 [weakSelf onAddNetworkResponse:error isWiFi:YES];
+             }];
 }
 
 - (void)addThreadNetwork:(NSData *)threadDataSet
@@ -548,9 +548,9 @@
     [_cluster addThreadNetwork:threadDataSet
                     breadcrumb:breadcrumb
                      timeoutMs:timeoutMs
-             responseHandler:^(NSError * error, NSDictionary * values) {
-                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
-             }];
+               responseHandler:^(NSError * error, NSDictionary * values) {
+                   [weakSelf onAddNetworkResponse:error isWiFi:NO];
+               }];
 }
 
 - (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi
@@ -575,9 +575,9 @@
     [_cluster enableNetwork:networkId
                  breadcrumb:breadcrumb
                   timeoutMs:timeoutMs
-          responseHandler:^(NSError * err, NSDictionary * values) {
-              [weakSelf onEnableNetworkResponse:err];
-          }];
+            responseHandler:^(NSError * err, NSDictionary * values) {
+                [weakSelf onEnableNetworkResponse:err];
+            }];
 }
 
 - (void)onEnableNetworkResponse:(NSError *)error

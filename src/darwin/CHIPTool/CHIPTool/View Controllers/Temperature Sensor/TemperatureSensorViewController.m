@@ -183,15 +183,15 @@
     NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
         @(deltaInFahrenheit));
 
-    [self.cluster
-        configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                            maxInterval:maxIntervalSeconds
-                                 change:deltaInFahrenheit
-                      responseHandler:^(NSError * error, NSDictionary * values) {
-                          if (error == nil)
-                              return;
-                          NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
-                      }];
+    [self.cluster configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
+                                                     maxInterval:maxIntervalSeconds
+                                                          change:deltaInFahrenheit
+                                                 responseHandler:^(NSError * error, NSDictionary * values) {
+                                                     if (error == nil)
+                                                         return;
+                                                     NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
+                                                         [error description]);
+                                                 }];
 
     [self.cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
         if (error != nil)
