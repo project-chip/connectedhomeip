@@ -85,8 +85,9 @@ mbed::DigitalOut led2(LED2, 1);
 mbed::DigitalOut led3(LED3, 1);
 #endif
 
-struct ConnectionInfo
+class ConnectionInfo
 {
+public:
     struct ConnStatus
     {
         ble::connection_handle_t connHandle;
