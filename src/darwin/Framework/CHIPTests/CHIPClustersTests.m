@@ -745,11 +745,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     NSString * value = @"Test";
     [cluster writeAttributeUserLabelWithValue:value
-                            completionHandler:^(NSError * err, NSDictionary * values) {
-                                NSLog(@"Basic UserLabel Error: %@", err);
-                                XCTAssertEqual(err.code, 0);
-                                [expectation fulfill];
-                            }];
+                              responseHandler:^(NSError * err, NSDictionary * values) {
+                                  NSLog(@"Basic UserLabel Error: %@", err);
+                                  XCTAssertEqual(err.code, 0);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -782,11 +782,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     NSString * value = @"Test";
     [cluster writeAttributeLocationWithValue:value
-                           completionHandler:^(NSError * err, NSDictionary * values) {
-                               NSLog(@"Basic Location Error: %@", err);
-                               XCTAssertEqual(err.code, 0);
-                               [expectation fulfill];
-                           }];
+                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                 NSLog(@"Basic Location Error: %@", err);
+                                 XCTAssertEqual(err.code, 0);
+                                 [expectation fulfill];
+                             }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -983,11 +983,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeLocalConfigDisabledWithValue:value
-                                      completionHandler:^(NSError * err, NSDictionary * values) {
-                                          NSLog(@"Basic LocalConfigDisabled Error: %@", err);
-                                          XCTAssertEqual(err.code, 0);
-                                          [expectation fulfill];
-                                      }];
+                                        responseHandler:^(NSError * err, NSDictionary * values) {
+                                            NSLog(@"Basic LocalConfigDisabled Error: %@", err);
+                                            XCTAssertEqual(err.code, 0);
+                                            [expectation fulfill];
+                                        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1224,11 +1224,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeColorControlOptionsWithValue:value
-                                      completionHandler:^(NSError * err, NSDictionary * values) {
-                                          NSLog(@"ColorControl ColorControlOptions Error: %@", err);
-                                          XCTAssertEqual(err.code, 0);
-                                          [expectation fulfill];
-                                      }];
+                                        responseHandler:^(NSError * err, NSDictionary * values) {
+                                            NSLog(@"ColorControl ColorControlOptions Error: %@", err);
+                                            XCTAssertEqual(err.code, 0);
+                                            [expectation fulfill];
+                                        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1610,11 +1610,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeWhitePointXWithValue:value
-                              completionHandler:^(NSError * err, NSDictionary * values) {
-                                  NSLog(@"ColorControl WhitePointX Error: %@", err);
-                                  XCTAssertEqual(err.code, 0);
-                                  [expectation fulfill];
-                              }];
+                                responseHandler:^(NSError * err, NSDictionary * values) {
+                                    NSLog(@"ColorControl WhitePointX Error: %@", err);
+                                    XCTAssertEqual(err.code, 0);
+                                    [expectation fulfill];
+                                }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1647,11 +1647,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeWhitePointYWithValue:value
-                              completionHandler:^(NSError * err, NSDictionary * values) {
-                                  NSLog(@"ColorControl WhitePointY Error: %@", err);
-                                  XCTAssertEqual(err.code, 0);
-                                  [expectation fulfill];
-                              }];
+                                responseHandler:^(NSError * err, NSDictionary * values) {
+                                    NSLog(@"ColorControl WhitePointY Error: %@", err);
+                                    XCTAssertEqual(err.code, 0);
+                                    [expectation fulfill];
+                                }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1684,11 +1684,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeColorPointRXWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"ColorControl ColorPointRX Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"ColorControl ColorPointRX Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1721,11 +1721,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeColorPointRYWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"ColorControl ColorPointRY Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"ColorControl ColorPointRY Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1759,11 +1759,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeColorPointRIntensityWithValue:value
-                                       completionHandler:^(NSError * err, NSDictionary * values) {
-                                           NSLog(@"ColorControl ColorPointRIntensity Error: %@", err);
-                                           XCTAssertEqual(err.code, 0);
-                                           [expectation fulfill];
-                                       }];
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"ColorControl ColorPointRIntensity Error: %@", err);
+                                             XCTAssertEqual(err.code, 0);
+                                             [expectation fulfill];
+                                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1796,11 +1796,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeColorPointGXWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"ColorControl ColorPointGX Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"ColorControl ColorPointGX Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1833,11 +1833,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeColorPointGYWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"ColorControl ColorPointGY Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"ColorControl ColorPointGY Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1871,11 +1871,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeColorPointGIntensityWithValue:value
-                                       completionHandler:^(NSError * err, NSDictionary * values) {
-                                           NSLog(@"ColorControl ColorPointGIntensity Error: %@", err);
-                                           XCTAssertEqual(err.code, 0);
-                                           [expectation fulfill];
-                                       }];
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"ColorControl ColorPointGIntensity Error: %@", err);
+                                             XCTAssertEqual(err.code, 0);
+                                             [expectation fulfill];
+                                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1908,11 +1908,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeColorPointBXWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"ColorControl ColorPointBX Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"ColorControl ColorPointBX Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1945,11 +1945,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeColorPointBYWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"ColorControl ColorPointBY Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"ColorControl ColorPointBY Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1983,11 +1983,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeColorPointBIntensityWithValue:value
-                                       completionHandler:^(NSError * err, NSDictionary * values) {
-                                           NSLog(@"ColorControl ColorPointBIntensity Error: %@", err);
-                                           XCTAssertEqual(err.code, 0);
-                                           [expectation fulfill];
-                                       }];
+                                         responseHandler:^(NSError * err, NSDictionary * values) {
+                                             NSLog(@"ColorControl ColorPointBIntensity Error: %@", err);
+                                             XCTAssertEqual(err.code, 0);
+                                             [expectation fulfill];
+                                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2193,11 +2193,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeStartUpColorTemperatureMiredsWithValue:value
-                                                completionHandler:^(NSError * err, NSDictionary * values) {
-                                                    NSLog(@"ColorControl StartUpColorTemperatureMireds Error: %@", err);
-                                                    XCTAssertEqual(err.code, 0);
-                                                    [expectation fulfill];
-                                                }];
+                                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                                      NSLog(@"ColorControl StartUpColorTemperatureMireds Error: %@", err);
+                                                      XCTAssertEqual(err.code, 0);
+                                                      [expectation fulfill];
+                                                  }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2432,11 +2432,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint64_t value = 0x0000000000000000;
     [cluster writeAttributeBreadcrumbWithValue:value
-                             completionHandler:^(NSError * err, NSDictionary * values) {
-                                 NSLog(@"GeneralCommissioning Breadcrumb Error: %@", err);
-                                 XCTAssertEqual(err.code, 0);
-                                 [expectation fulfill];
-                             }];
+                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                   NSLog(@"GeneralCommissioning Breadcrumb Error: %@", err);
+                                   XCTAssertEqual(err.code, 0);
+                                   [expectation fulfill];
+                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2580,11 +2580,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint16_t value = 0x0000;
     [cluster writeAttributeIdentifyTimeWithValue:value
-                               completionHandler:^(NSError * err, NSDictionary * values) {
-                                   NSLog(@"Identify IdentifyTime Error: %@", err);
-                                   XCTAssertEqual(err.code, 0);
-                                   [expectation fulfill];
-                               }];
+                                 responseHandler:^(NSError * err, NSDictionary * values) {
+                                     NSLog(@"Identify IdentifyTime Error: %@", err);
+                                     XCTAssertEqual(err.code, 0);
+                                     [expectation fulfill];
+                                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2915,11 +2915,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeOperationModeWithValue:value
-                                completionHandler:^(NSError * err, NSDictionary * values) {
-                                    NSLog(@"PumpConfigurationAndControl OperationMode Error: %@", err);
-                                    XCTAssertEqual(err.code, 0);
-                                    [expectation fulfill];
-                                }];
+                                  responseHandler:^(NSError * err, NSDictionary * values) {
+                                      NSLog(@"PumpConfigurationAndControl OperationMode Error: %@", err);
+                                      XCTAssertEqual(err.code, 0);
+                                      [expectation fulfill];
+                                  }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3231,11 +3231,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     int16_t value = 0;
     [cluster writeAttributeOccupiedCoolingSetpointWithValue:value
-                                          completionHandler:^(NSError * err, NSDictionary * values) {
-                                              NSLog(@"Thermostat OccupiedCoolingSetpoint Error: %@", err);
-                                              XCTAssertEqual(err.code, 0);
-                                              [expectation fulfill];
-                                          }];
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Thermostat OccupiedCoolingSetpoint Error: %@", err);
+                                                XCTAssertEqual(err.code, 0);
+                                                [expectation fulfill];
+                                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3269,11 +3269,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     int16_t value = 0;
     [cluster writeAttributeOccupiedHeatingSetpointWithValue:value
-                                          completionHandler:^(NSError * err, NSDictionary * values) {
-                                              NSLog(@"Thermostat OccupiedHeatingSetpoint Error: %@", err);
-                                              XCTAssertEqual(err.code, 0);
-                                              [expectation fulfill];
-                                          }];
+                                            responseHandler:^(NSError * err, NSDictionary * values) {
+                                                NSLog(@"Thermostat OccupiedHeatingSetpoint Error: %@", err);
+                                                XCTAssertEqual(err.code, 0);
+                                                [expectation fulfill];
+                                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3308,11 +3308,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeControlSequenceOfOperationWithValue:value
-                                             completionHandler:^(NSError * err, NSDictionary * values) {
-                                                 NSLog(@"Thermostat ControlSequenceOfOperation Error: %@", err);
-                                                 XCTAssertEqual(err.code, 0);
-                                                 [expectation fulfill];
-                                             }];
+                                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                                   NSLog(@"Thermostat ControlSequenceOfOperation Error: %@", err);
+                                                   XCTAssertEqual(err.code, 0);
+                                                   [expectation fulfill];
+                                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -3345,11 +3345,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     uint8_t value = 0x00;
     [cluster writeAttributeSystemModeWithValue:value
-                             completionHandler:^(NSError * err, NSDictionary * values) {
-                                 NSLog(@"Thermostat SystemMode Error: %@", err);
-                                 XCTAssertEqual(err.code, 0);
-                                 [expectation fulfill];
-                             }];
+                               responseHandler:^(NSError * err, NSDictionary * values) {
+                                   NSLog(@"Thermostat SystemMode Error: %@", err);
+                                   XCTAssertEqual(err.code, 0);
+                                   [expectation fulfill];
+                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
