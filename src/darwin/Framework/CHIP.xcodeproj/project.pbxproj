@@ -46,6 +46,8 @@
 		991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 991DC0872475F47D00C13860 /* CHIPDeviceController.mm */; };
 		991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 991DC08A247704DC00C13860 /* CHIPLogging.h */; };
 		B20252972459E34F00F97062 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* CHIP.framework */; };
+		B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B289D41F2639C0D300D4E314 /* CHIPOnboardingPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */ = {isa = PBXBuildFile; fileRef = B289D4202639C0D300D4E314 /* CHIPOnboardingPayloadParser.m */; };
 		B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A8245B0B5C003C5B48 /* CHIP.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */ = {isa = PBXBuildFile; fileRef = B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */ = {isa = PBXBuildFile; fileRef = B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */; };
@@ -112,6 +114,8 @@
 		B20252912459E34F00F97062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B20252962459E34F00F97062 /* CHIPTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CHIPTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B202529D2459E34F00F97062 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B289D41F2639C0D300D4E314 /* CHIPOnboardingPayloadParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPOnboardingPayloadParser.h; sourceTree = "<group>"; };
+		B289D4202639C0D300D4E314 /* CHIPOnboardingPayloadParser.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPOnboardingPayloadParser.m; sourceTree = "<group>"; };
 		B2E0D7A8245B0B5C003C5B48 /* CHIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIP.h; sourceTree = "<group>"; };
 		B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPManualSetupPayloadParser.h; sourceTree = "<group>"; };
 		B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPError.mm; sourceTree = "<group>"; };
@@ -224,6 +228,8 @@
 				B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */,
 				B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */,
 				991DC08A247704DC00C13860 /* CHIPLogging.h */,
+				B289D41F2639C0D300D4E314 /* CHIPOnboardingPayloadParser.h */,
+				B289D4202639C0D300D4E314 /* CHIPOnboardingPayloadParser.m */,
 				B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */,
 				B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */,
 				B2E0D7AC245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h */,
@@ -264,6 +270,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */,
+				B289D4212639C0D300D4E314 /* CHIPOnboardingPayloadParser.h in Headers */,
 				2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */,
 				2C222AD0255C620600E446B9 /* CHIPDevice.h in Headers */,
 				991DC0842475F45400C13860 /* CHIPDeviceController.h in Headers */,
@@ -422,6 +429,7 @@
 				1EC4CE5D25CC26E900D7304F /* CHIPClustersObjc.mm in Sources */,
 				1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
+				B289D4222639C0D300D4E314 /* CHIPOnboardingPayloadParser.m in Sources */,
 				1EC4CE5E25CC26E900D7304F /* call-command-handler.cpp in Sources */,
 				1EC4CE3B25CC263E00D7304F /* reporting-default-configuration.cpp in Sources */,
 				1EC4CE4F25CC267700D7304F /* process-cluster-message.cpp in Sources */,

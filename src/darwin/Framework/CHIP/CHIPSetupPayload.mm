@@ -49,7 +49,7 @@
         _requiresCustomFlow = setupPayload.requiresCustomFlow == 1;
         _rendezvousInformation = [self valueOf:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
-        _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
+        _setUpPINCode = [NSNumber numberWithUnsignedInt:setupPayload.setUpPINCode];
 
         [self getSerialNumber:setupPayload];
     }
