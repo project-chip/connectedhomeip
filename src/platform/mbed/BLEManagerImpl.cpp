@@ -64,7 +64,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 namespace {
-const UUID ShortUUID_CHIPoBLEService(0xFEAF);
+const UUID ShortUUID_CHIPoBLEService(0xFFF6);
 // RX = BleLayer::CHIP_BLE_CHAR_1_ID
 const UUID LongUUID_CHIPoBLEChar_RX("18EE2EF5-263D-4559-959F-4F9C429F9D11");
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
