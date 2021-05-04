@@ -120,13 +120,15 @@ private:
     struct SrpClient
     {
         static constexpr uint8_t kServiceId           = 0x5d;
-        static constexpr uint8_t kMaxServicesNumber   = 3;
-        static constexpr uint8_t kMaxInstanceNameSize = 64;
-        static constexpr uint8_t kMaxNameSize         = 16;
+        static constexpr uint8_t kMaxServicesNumber   = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
+        static constexpr uint8_t kMaxInstanceNameSize = chip::Mdns::kMdnsNameMaxSize;
+        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeMaxSize + chip::Mdns::kMdnsProtocolTextMaxSize + 1;
         static constexpr uint8_t kMaxHostNameSize     = 32;
-        static constexpr uint8_t kMaxTxtEntriesNumber = 4;
-        static constexpr uint8_t kMaxTxtValueSize     = 255;
-        static constexpr uint8_t kMaxTxtKeySize       = 16;
+        // Thread only supports operational discovery currently, increase when commissionable discovery would get added
+        // see GH issue:#5351
+        static constexpr uint8_t kMaxTxtEntriesNumber = 2;     // Based on operational discovery - 2 records required
+        static constexpr uint8_t kMaxTxtValueSize     = 16;    // Based on operational discovery - 32-bit numbers filled in
+        static constexpr uint8_t kMaxTxtKeySize       = 3 + 1; // Based on operational discovery - CRI/CRA
 
         struct Service
         {
