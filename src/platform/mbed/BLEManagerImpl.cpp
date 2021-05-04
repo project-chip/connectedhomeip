@@ -156,13 +156,14 @@ struct ConnectionInfo
     uint16_t getMTU(ble::connection_handle_t conn_handle) const { return getStatus(conn_handle).attMtuSize; }
 
 private:
-    const int kMaxConnections = BLE_LAYER_NUM_BLE_ENDPOINTS;
+    const size_t kMaxConnections = BLE_LAYER_NUM_BLE_ENDPOINTS;
     ConnStatus mConnStates[BLE_LAYER_NUM_BLE_ENDPOINTS];
     const ble::connection_handle_t kInvalidHandle = 0xf00d;
 };
 
 static ConnectionInfo sConnectionInfo;
 
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::Gap::EventHandler
 {
     void onScanRequestReceived(const ble::ScanRequestEvent & event)
@@ -329,6 +330,7 @@ class GapEventHandler : private mbed::NonCopyable<GapEventHandler>, public ble::
     void onPrivacyEnabled() { ChipLogDetail(DeviceLayer, "GAP %s", __FUNCTION__); }
 };
 
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 struct CHIPService : public ble::GattServer::EventHandler
 {
     CHIPService() {}
@@ -480,9 +482,9 @@ struct CHIPService : public ble::GattServer::EventHandler
         }
     }
 
-    const ble::attribute_handle_t getTxHandle() const { return mTxHandle; }
-    const ble::attribute_handle_t getTxCCCDHandle() const { return mTxCCCDHandle; }
-    const ble::attribute_handle_t getRxHandle() const { return mRxHandle; }
+    ble::attribute_handle_t getTxHandle() const { return mTxHandle; }
+    ble::attribute_handle_t getTxCCCDHandle() const { return mTxCCCDHandle; }
+    ble::attribute_handle_t getRxHandle() const { return mRxHandle; }
 
     GattCharacteristic * mCHIPoBLEChar_RX = nullptr;
     GattCharacteristic * mCHIPoBLEChar_TX = nullptr;
@@ -491,6 +493,7 @@ struct CHIPService : public ble::GattServer::EventHandler
     ble::attribute_handle_t mTxHandle     = 0;
 };
 
+#pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
 class SecurityManagerEventHandler : private mbed::NonCopyable<SecurityManagerEventHandler>,
                                     public ble::SecurityManager::EventHandler
 {

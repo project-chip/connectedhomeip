@@ -265,7 +265,7 @@ CHIP_ERROR MbedConfig::ConstructCounterKey(Key id, char * buf, size_t bufSize)
     {
         return CHIP_ERROR_INTERNAL;
     }
-    else if (length > (bufSize - 1))
+    else if ((size_t) length > (bufSize - 1))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }

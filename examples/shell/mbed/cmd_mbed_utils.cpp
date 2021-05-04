@@ -259,16 +259,16 @@ int cmd_network_interface(int argc, char ** argv)
             streamer_printf(sout, "ERROR: get interface name failed\r\n");
             ExitNow(error = CHIP_ERROR_INTERNAL;);
         }
-        printf("     interface id: %d, interface name: %s, interface state: %s\n", intId, intName,
-               intIterator.IsUp() ? "UP" : "DOWN");
+        streamer_printf(sout, "     interface id: %d, interface name: %s, interface state: %s\n", intId, intName,
+                        intIterator.IsUp() ? "UP" : "DOWN");
         if (addrIterator.HasCurrent())
         {
             addr = addrIterator.GetAddress();
             addrIterator.GetAddressWithPrefix(addrWithPrefix);
             char addrStr[80];
             addrWithPrefix.IPAddr.ToString(addrStr, sizeof(addrStr));
-            printf("     interface address: %s/%d, %s broadcast addr\n", addrStr, addrWithPrefix.Length,
-                   addrIterator.HasBroadcastAddress() ? "has" : "no");
+            streamer_printf(sout, "     interface address: %s/%d, %s broadcast addr\n", addrStr, addrWithPrefix.Length,
+                            addrIterator.HasBroadcastAddress() ? "has" : "no");
             addrIterator.Next();
         }
 
@@ -622,16 +622,16 @@ int cmd_socket_bsd(int argc, char ** argv)
     const char hostname[] = "ifconfig.io";
     SocketAddress address;
     /* get the host address */
-    printf("\nResolve hostname %s\r\n", hostname);
+    streamer_printf(sout, "\nResolve hostname %s\r\n", hostname);
     WiFiInterface * _net = WiFiInterface::get_default_instance();
     int result           = _net->gethostbyname(hostname, &address);
     if (result != 0)
     {
-        printf("Error! gethostbyname(%s) returned: %d\r\n", hostname, result);
+        streamer_printf(sout, "Error! gethostbyname(%s) returned: %d\r\n", hostname, result);
         return false;
     }
 
-    printf("%s address is %s\r\n", hostname, (address.get_ip_address() ? address.get_ip_address() : "None"));
+    streamer_printf(sout, "%s address is %s\r\n", hostname, (address.get_ip_address() ? address.get_ip_address() : "None"));
     address.set_port(htons(80));
     sockaddr addrs;
     convert_mbed_addr_to_bsd(&addrs, &address);
@@ -649,7 +649,7 @@ int cmd_socket_bsd(int argc, char ** argv)
     nsapi_size_t bytes_to_send       = strlen(buff);
     nsapi_size_or_error_t bytes_sent = 0;
 
-    printf("\r\nSending message: \r\n%s", buff);
+    streamer_printf(sout, "\r\nSending message: \r\n%s", buff);
 
     while (bytes_to_send)
     {
@@ -657,18 +657,18 @@ int cmd_socket_bsd(int argc, char ** argv)
         bytes_sent = mbed_send(fd, buff + bytes_sent, bytes_to_send, 0);
         if (bytes_sent < 0)
         {
-            printf("Error! _socket.send() returned: %d\r\n", bytes_sent);
+            streamer_printf(sout, "Error! _socket.send() returned: %d\r\n", bytes_sent);
             return false;
         }
         else
         {
-            printf("sent %d bytes\r\n", bytes_sent);
+            streamer_printf(sout, "sent %d bytes\r\n", bytes_sent);
         }
 
         bytes_to_send -= bytes_sent;
     }
 
-    printf("Complete message sent\r\n");
+    streamer_printf(sout, "Complete message sent\r\n");
 
     char buf[100];
     int remaining_bytes = 100;
@@ -680,7 +680,7 @@ int cmd_socket_bsd(int argc, char ** argv)
         res = mbed_recv(fd, buf + received_bytes, remaining_bytes, 0);
         if (res < 0)
         {
-            printf("Error! _socket.recv() returned: %d\r\n", res);
+            streamer_printf(sout, "Error! _socket.recv() returned: %d\r\n", res);
             return false;
         }
 
@@ -688,9 +688,8 @@ int cmd_socket_bsd(int argc, char ** argv)
         remaining_bytes -= res;
     }
 
-    printf("received %d bytes:\r\n%.*s\r\n\r\n", received_bytes, strstr(buf, "\n") - buf, buf);
+    streamer_printf(sout, "received %d bytes:\r\n%.*s\r\n\r\n", received_bytes, strstr(buf, "\n") - buf, buf);
 
-exit:
     return error;
 }
 

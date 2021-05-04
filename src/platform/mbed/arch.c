@@ -49,6 +49,7 @@ uint64_t __atomic_exchange_8(volatile void * ptr, uint64_t val, int memorder)
 
 // Note: Weak version not supported in library, the weak parameter is simply dropped.
 // see https://gcc.gnu.org/wiki/Atomic/GCCMM/LIbrary
+#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"
 bool __atomic_compare_exchange_8(volatile void * ptr, void * expected, unsigned long long desired, int success_memorder,
                                  int failure_memorder)
 {

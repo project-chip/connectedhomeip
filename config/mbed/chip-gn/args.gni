@@ -35,5 +35,3 @@ chip_custom_build_cflags = [
 
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
-
-treat_warnings_as_errors = false

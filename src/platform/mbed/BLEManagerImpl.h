@@ -101,7 +101,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
         kFlag_UseCustomDeviceName      = 0x0040, /**< The application has configured a custom BLE device name. */
     };
 
-    enum
+    enum : size_t
     {
         kMaxConnections      = BLE_LAYER_NUM_BLE_ENDPOINTS,
         kMaxDeviceNameLength = 16,

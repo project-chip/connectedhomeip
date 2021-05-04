@@ -43,11 +43,14 @@ int mbed_getaddrinfo(const char * nodename, const char * servname, const struct 
         {
         case NSAPI_ERROR_DNS_FAILURE:
             ret = EAI_FAIL;
+            break;
         case NSAPI_ERROR_NO_MEMORY:
             ret = EAI_MEMORY;
+            break;
         default:
             set_errno(EINVAL);
             ret = EAI_SYSTEM;
+            break;
         }
     }
     else if (err == 0)

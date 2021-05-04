@@ -276,7 +276,7 @@ static char * inet_ntop4(const void * src, char * dst, size_t size)
     uint8_t * buf = (uint8_t *) src;
 
     l = snprintf(tmp, sizeof(tmp), "%u.%u.%u.%u", buf[0], buf[1], buf[2], buf[3]);
-    if (l <= 0 || l >= size)
+    if (l <= 0 || (size_t) l >= size)
     {
         set_errno(ENOSPC);
         return (NULL);
@@ -604,7 +604,7 @@ int mbed_inet_pton(sa_family_t family, const char * src, void * dst)
 
 static bool isBroadcast(SocketAddress ip, SocketAddress netmask)
 {
-    unsigned int bytesNumber = 0;
+    size_t bytesNumber = 0;
     uint8_t *ip_bytes, *netmask_bytes;
     uint8_t mask, netmask_neg;
 
@@ -620,7 +620,7 @@ static bool isBroadcast(SocketAddress ip, SocketAddress netmask)
     ip_bytes      = (uint8_t *) ip.get_ip_bytes();
     netmask_bytes = (uint8_t *) netmask.get_ip_bytes();
 
-    for (int index = 0; index < bytesNumber; ++index)
+    for (size_t index = 0; index < bytesNumber; ++index)
     {
         netmask_neg = ~(*netmask_bytes);
         mask        = *ip_bytes & netmask_neg;
