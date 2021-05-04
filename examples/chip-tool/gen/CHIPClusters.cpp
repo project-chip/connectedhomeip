@@ -4511,32 +4511,6 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 }
 
 // OperationalCredentials Cluster Commands
-CHIP_ERROR OperationalCredentialsCluster::GetFabricId(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-#if CHIP_ENABLE_INTERACTION_MODEL
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onSuccessCallback;
-    (void) onFailureCallback;
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetFabricIdCommandId,
-                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
-
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
-
-    // Command takes no arguments.
-
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
-
-    return mDevice->SendCommands();
-#else
-    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand = encodeOperationalCredentialsClusterGetFabricIdCommand(seqNum, mEndpoint);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-#endif
-}
-
 CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, chip::FabricId fabricId,
                                                        chip::NodeId nodeId, uint16_t vendorId)
@@ -4568,6 +4542,35 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
     uint8_t seqNum = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand =
         encodeOperationalCredentialsClusterRemoveFabricCommand(seqNum, mEndpoint, fabricId, nodeId, vendorId);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR OperationalCredentialsCluster::SetFabric(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint16_t vendorId)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // vendorId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOperationalCredentialsClusterSetFabricCommand(seqNum, mEndpoint, vendorId);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 #endif
 }
