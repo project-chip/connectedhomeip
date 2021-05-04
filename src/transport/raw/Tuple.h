@@ -181,7 +181,7 @@ private:
      * @tparam N the index of the underlying transport to run SendMessage throug.
      *
      * @param address where to send the message
-     * @param msgBuf the data to send.
+     * @param msgBuf the message to send.  Includes all CHIP message fields except optional length.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR SendMessageImpl(const PeerAddress & address, System::PacketBufferHandle && msgBuf)

@@ -130,7 +130,7 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
+    // Advancing the start to encrypted header, since SendMessage will attach the packet header on top of it.
     PacketHeader packetHeader;
     ReturnErrorOnFailure(packetHeader.DecodeAndConsume(msgBuf));
 
