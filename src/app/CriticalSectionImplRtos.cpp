@@ -32,5 +32,5 @@ void CriticalSectionExit()
 {
     // taskEXIT_CRITICAL();
 }
-}
-}
+} // namespace app
+} // namespace chip

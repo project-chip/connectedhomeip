@@ -24,5 +24,5 @@ void CriticalSectionEnter();
 
 void CriticalSectionExit();
 
-}
-}
+} // namespace app
+} // namespace chip

@@ -35,5 +35,5 @@ void CriticalSectionExit()
     int err = pthread_mutex_unlock(&eventLocker);
     assert(err == 0);
 }
-}
-}
+} // namespace app
+} // namespace chip
