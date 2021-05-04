@@ -82,6 +82,9 @@ const MbedConfig::Key MbedConfig::kConfigKey_OperationalDeviceId         = { CON
 const MbedConfig::Key MbedConfig::kConfigKey_OperationalDeviceCert       = { CONFIG_KEY("op-device-cert") };
 const MbedConfig::Key MbedConfig::kConfigKey_OperationalDeviceICACerts   = { CONFIG_KEY("op-device-ca-certs") };
 const MbedConfig::Key MbedConfig::kConfigKey_OperationalDevicePrivateKey = { CONFIG_KEY("op-device-key") };
+const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation          = { CONFIG_KEY("regulatory-location") };
+const MbedConfig::Key MbedConfig::kConfigKey_CountryCode                 = { CONFIG_KEY("country-code") };
+const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb                  = { CONFIG_KEY("breadcrumb") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
 {
