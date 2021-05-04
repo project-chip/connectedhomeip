@@ -41,7 +41,7 @@ public:
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     // DevicePairingDelegate implementation
-    void OnStatusUpdate(chip::DevicePairingDelegate::Status status) override;
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 
