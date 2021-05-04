@@ -18,12 +18,8 @@
 
 namespace chip {
 namespace app {
-void CriticalSectionEnter()
-{
-}
+void CriticalSectionEnter() {}
 
-void CriticalSectionExit()
-{
-}
+void CriticalSectionExit() {}
 } // namespace app
 } // namespace chip
