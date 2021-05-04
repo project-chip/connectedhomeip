@@ -45,13 +45,18 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
     return CHIP_NO_ERROR;
 }
 
+void TransportMgrBase::Close()
+{
+    mSecureSessionMgr = nullptr;
+    mTransport        = nullptr;
+}
+
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                              System::PacketBufferHandle msg)
 {
-    TransportMgrDelegate * handler = packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? mSecureSessionMgr : mRendezvous;
-    if (handler != nullptr)
+    if (mSecureSessionMgr != nullptr)
     {
-        handler->OnMessageReceived(packetHeader, peerAddress, std::move(msg));
+        mSecureSessionMgr->OnMessageReceived(packetHeader, peerAddress, std::move(msg));
     }
     else
     {

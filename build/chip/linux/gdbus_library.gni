@@ -29,10 +29,10 @@ template("gdbus_library") {
   assert(defined(invoker.dbus_out_dir), "Please specify dbus_out_dir")
 
   dbus_out_dir = invoker.dbus_out_dir
-  dbus_gen_dir = "${root_gen_dir}/${dbus_out_dir}"
+  dbus_gen_dir = "${root_gen_dir}/include/${dbus_out_dir}"
 
   config("${library_name}_config") {
-    include_dirs = [ root_gen_dir ]
+    include_dirs = [ "${root_gen_dir}/include" ]
   }
 
   dbus_sources = []

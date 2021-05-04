@@ -22,7 +22,7 @@
  */
 
 #include "QRCodeSetupPayloadParser.h"
-#include "Base41.h"
+#include "Base38.h"
 
 #include <math.h>
 #include <memory>
@@ -355,10 +355,10 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
     size_t indexToReadFrom = 0;
     uint64_t dest;
 
-    std::string payload = extractPayload(mBase41Representation);
+    std::string payload = extractPayload(mBase38Representation);
     VerifyOrExit(payload.length() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = base41Decode(payload, buf);
+    err = base38Decode(payload, buf);
     SuccessOrExit(err);
 
     err = readBits(buf, indexToReadFrom, dest, kVersionFieldLengthInBits);
@@ -383,7 +383,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.rendezvousInformation = static_cast<RendezvousInformationFlags>(dest);
+    outPayload.rendezvousInformation = RendezvousInformationFlags(static_cast<RendezvousInformationFlag>(dest));
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
     SuccessOrExit(err);

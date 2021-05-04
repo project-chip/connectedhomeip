@@ -67,7 +67,7 @@ private:
     {
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 0,
-        kFunction_StartThread    = 1,
+        kFunction_StartBleAdv    = 1,
         kFunction_FactoryReset   = 2,
 
         kFunction_Invalid

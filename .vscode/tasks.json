@@ -81,7 +81,7 @@
         {
             "label": "Build Shell",
             "type": "shell",
-            "command": "scripts/examples/gn_build_example.sh examples/shell out/shell",
+            "command": "scripts/examples/gn_build_example.sh examples/shell/standalone out/shell",
             "group": "build",
             "problemMatcher": {
                 "base": "$gcc",

@@ -17,16 +17,21 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 
 #include <core/CHIPError.h>
 #include <core/Optional.h>
+#include <core/PeerId.h>
 #include <inet/InetLayer.h>
+#include <lib/support/Span.h>
 
 namespace chip {
 namespace Mdns {
 
 static constexpr uint16_t kMdnsPort = 5353;
+// Need 8 bytes to fit a thread mac.
+static constexpr size_t kMaxMacSize = 8;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -51,34 +56,49 @@ public:
         return *reinterpret_cast<Derived *>(this);
     }
     bool IsIPv4Enabled() const { return mEnableIPv4; }
+    Derived & SetMac(chip::ByteSpan mac)
+    {
+        mMacLength = std::min(mac.size(), kMaxMacSize);
+        memcpy(mMacStorage, mac.data(), mMacLength);
+        return *reinterpret_cast<Derived *>(this);
+    }
+    const chip::ByteSpan GetMac() const { return chip::ByteSpan(mMacStorage, mMacLength); }
 
 private:
-    uint16_t mPort   = CHIP_PORT;
-    bool mEnableIPv4 = true;
-};
+    uint16_t mPort                   = CHIP_PORT;
+    bool mEnableIPv4                 = true;
+    uint8_t mMacStorage[kMaxMacSize] = {};
+    size_t mMacLength                = 0;
+}; // namespace Mdns
 
 /// Defines parameters required for advertising a CHIP node
 /// over mDNS as an 'operationally ready' node.
 class OperationalAdvertisingParameters : public BaseAdvertisingParams<OperationalAdvertisingParameters>
 {
 public:
-    OperationalAdvertisingParameters & SetFabricId(uint64_t fabricId)
+    OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
-        mFabricId = fabricId;
+        mPeerId = peerId;
         return *this;
     }
-    uint64_t GetFabricId() const { return mFabricId; }
+    PeerId GetPeerId() const { return mPeerId; }
 
-    OperationalAdvertisingParameters & SetNodeId(uint64_t nodeId)
+    OperationalAdvertisingParameters & SetCRMPRetryIntervals(uint32_t intervalIdle, uint32_t intervalActive)
     {
-        mNodeId = nodeId;
+        mCrmpRetryIntervalIdle   = intervalIdle;
+        mCrmpRetryIntervalActive = intervalActive;
         return *this;
     }
-    uint64_t GetNodeId() const { return mNodeId; }
+    void GetCRMPRetryIntervals(uint32_t & intervalIdle, uint32_t & intervalActive) const
+    {
+        intervalIdle   = mCrmpRetryIntervalIdle;
+        intervalActive = mCrmpRetryIntervalActive;
+    }
 
 private:
-    uint64_t mFabricId = 0;
-    uint64_t mNodeId   = 0;
+    PeerId mPeerId;
+    uint32_t mCrmpRetryIntervalIdle   = 0;
+    uint32_t mCrmpRetryIntervalActive = 0;
 };
 
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>

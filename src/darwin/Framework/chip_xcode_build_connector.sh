@@ -87,7 +87,6 @@ done
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="mbedtls"'
-    'chip_logging_style="darwin"'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_ble_project_config_include=""'

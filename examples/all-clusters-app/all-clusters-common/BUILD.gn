@@ -14,59 +14,11 @@
 
 import("//build_overrides/chip.gni")
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-  ]
-}
+import("${chip_root}/src/app/chip_data_model.gni")
 
-source_set("all-clusters-common") {
-  sources = [
-    "${chip_root}/src/app/clusters/barrier-control-server/barrier-control-server.cpp",
-    "${chip_root}/src/app/clusters/basic/basic.cpp",
-    "${chip_root}/src/app/clusters/bindings/bindings.cpp",
-    "${chip_root}/src/app/clusters/color-control-server/color-control-server.cpp",
-    "${chip_root}/src/app/clusters/content-launch-server/content-launch-server.cpp",
-    "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-core.cpp",
-    "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-logging.cpp",
-    "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-schedule.cpp",
-    "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-user.cpp",
-    "${chip_root}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp",
-    "${chip_root}/src/app/clusters/groups-server/groups-server.cpp",
-    "${chip_root}/src/app/clusters/ias-zone-server/ias-zone-server.cpp",
-    "${chip_root}/src/app/clusters/identify/identify.cpp",
-    "${chip_root}/src/app/clusters/level-control/level-control.cpp",
-    "${chip_root}/src/app/clusters/low-power-server/low-power-server.cpp",
-    "${chip_root}/src/app/clusters/media-playback-server/media-playback-server.cpp",
-    "${chip_root}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp",
-    "${chip_root}/src/app/clusters/network-commissioning/network-commissioning.cpp",
-    "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
-    "${chip_root}/src/app/clusters/scenes/scenes.cpp",
-    "${chip_root}/src/app/clusters/temperature-measurement-server/temperature-measurement-server.cpp",
-    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
-    "${chip_root}/src/app/reporting/reporting.cpp",
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
-    "${chip_root}/src/app/util/af-event.cpp",
-    "${chip_root}/src/app/util/af-main-common.cpp",
-    "${chip_root}/src/app/util/attribute-size.cpp",
-    "${chip_root}/src/app/util/attribute-storage.cpp",
-    "${chip_root}/src/app/util/attribute-table.cpp",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/chip-message-send.cpp",
-    "${chip_root}/src/app/util/client-api.cpp",
-    "${chip_root}/src/app/util/ember-print.cpp",
-    "${chip_root}/src/app/util/message.cpp",
-    "${chip_root}/src/app/util/process-cluster-message.cpp",
-    "${chip_root}/src/app/util/process-global-message.cpp",
-    "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.cpp",
-    "gen/callback-stub.cpp",
-  ]
+chip_data_model("all-clusters-common") {
+  zap_file = "all-clusters-app.zap"
 
-  cflags = [ "-Wconversion" ]
-
-  deps = [ "${chip_root}/src/lib" ]
-
-  public_configs = [ ":includes" ]
+  zap_pregenerated_dir = "gen"
+  is_server = true
 }

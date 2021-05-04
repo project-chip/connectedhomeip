@@ -18,15 +18,6 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/app/server",
-  ]
-}
-
 executable("chip-bridge-app") {
   sources = [
     "LightingManager.cpp",
@@ -35,12 +26,14 @@ executable("chip-bridge-app") {
     "main.cpp",
   ]
 
-  public_configs = [ ":includes" ]
-
   deps = [
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/src/lib",
   ]
+
+  cflags = [ "-Wconversion" ]
+
+  include_dirs = [ "include" ]
 
   output_dir = root_out_dir
 }

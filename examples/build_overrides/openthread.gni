@@ -13,5 +13,6 @@
 # limitations under the License.
 
 declare_args() {
+  # Root directory for openthread.
   openthread_root = "//third_party/connectedhomeip/third_party/openthread/repo"
 }

@@ -43,9 +43,9 @@ template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    CHIP_ERROR err   = CHIP_NO_ERROR;
     mThreadStackLock = xSemaphoreCreateMutex();
+
     if (mThreadStackLock == NULL)
     {
         ChipLogError(DeviceLayer, "Failed to create Thread stack lock");
@@ -61,18 +61,25 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::_StartThreadTask(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    BaseType_t res;
+    if (mThreadTask != NULL)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    mThreadTask = xTaskCreateStatic(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME, ArraySize(mThreadStack), this,
+                                    CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, mThreadStack, &mThreadTaskStruct);
 
-    VerifyOrExit(mThreadTask == NULL, err = CHIP_ERROR_INCORRECT_STATE);
+#else
+    xTaskCreate(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
+                CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this, CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY,
+                &mThreadTask);
+#endif
 
-    res = xTaskCreate(ThreadTaskMain, CHIP_DEVICE_CONFIG_THREAD_TASK_NAME,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t), this,
-                      CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY, NULL);
-    VerifyOrExit(res == pdPASS, err = CHIP_ERROR_NO_MEMORY);
-
-exit:
-    return err;
+    if (mThreadTask == NULL)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -144,11 +151,7 @@ void GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::ThreadTaskMain(void * ar
     GenericThreadStackManagerImpl_FreeRTOS<ImplClass> * self =
         static_cast<GenericThreadStackManagerImpl_FreeRTOS<ImplClass> *>(arg);
 
-    VerifyOrDie(self->mThreadTask == NULL);
-
     ChipLogDetail(DeviceLayer, "Thread task running");
-
-    self->mThreadTask = xTaskGetCurrentTaskHandle();
 
     // Try starting joiner within 15m.
     self->mJoinerExpire = xTaskGetTickCount() + pdMS_TO_TICKS(15 * 60 * 1000);

@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "debug-printing.h"
+#include <app/util/af.h>
+#include <app/util/debug-printing.h>
 
 #include <platform/CHIPDeviceConfig.h>
 #include <support/CodeUtils.h>
@@ -85,5 +86,5 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 
 void emberAfPrintString(int category, const uint8_t * string)
 {
-    emberAfPrint(category, "%s", string);
+    emberAfPrint(category, "%.*s", emberAfStringLength(string), string + 1);
 }

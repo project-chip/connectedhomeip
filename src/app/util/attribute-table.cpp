@@ -43,12 +43,12 @@
 
 // this file contains all the common includes for clusters in the zcl-util
 
-#include "attribute-storage.h"
+#include <app/util/attribute-storage.h>
 
 // for pulling in defines dealing with EITHER server or client
-#include "af-main.h"
 #include "app/util/common.h"
 #include "gen/callback.h"
+#include <app/util/af-main.h>
 
 #include <app/reporting/reporting.h>
 
@@ -357,7 +357,7 @@ void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, ClusterId clu
     status = emAfReadAttribute(endpoint, clusterId, attrId, mask, manufacturerCode, data, ATTRIBUTE_LARGEST, &dataType);
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
-        dataLen = emberAfAttributeValueSize(dataType, data);
+        dataLen = emberAfAttributeValueSize(clusterId, attrId, dataType, data);
         if ((readLength - 4) < dataLen)
         { // Not enough space for attribute.
             return;
@@ -428,7 +428,7 @@ EmberAfStatus emberAfAppendAttributeReportFields(EndpointId endpoint, ClusterId 
         goto kickout;
     }
 
-    size = emberAfAttributeValueSize(type, data);
+    size = emberAfAttributeValueSize(clusterId, attributeId, type, data);
     if (bufLen16 - *bufIndex < 3 || size > bufLen16 - (*bufIndex + 3))
     {
         status = EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;

@@ -28,8 +28,6 @@ jobs:
                 type: [main, clang, mbedtls]
         env:
             BUILD_TYPE: ${{ matrix.type }}
-            BUILD_IMAGE: chip-build-openssl
-            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 

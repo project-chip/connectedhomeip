@@ -18,6 +18,7 @@
 #import "RootViewController.h"
 #import "BindingsViewController.h"
 #import "EchoViewController.h"
+#import "FabricUIViewController.h"
 #import "MultiAdminViewController.h"
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
@@ -42,7 +43,7 @@
     [self.view addSubview:self.tableView];
     self.options = @[
         @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration",
-        @"Enable Pairing", @"Unpair Devices"
+        @"Enable Pairing", @"Unpair Devices", @"Fabric Management"
     ];
 }
 
@@ -92,9 +93,18 @@
     case 7:
         [self pushUnpairDevices];
         break;
+    case 8:
+        [self pushFabric];
+        break;
     default:
         break;
     }
+}
+
+- (void)pushFabric
+{
+    FabricUIViewController * controller = [FabricUIViewController new];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)pushBindings

@@ -32,14 +32,20 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
+
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#include <transport/raw/BLE.h>
+#endif
 
 namespace chip {
 namespace Controller {
@@ -48,12 +54,29 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
+constexpr size_t kMaxBlePendingPackets = 1;
+
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
                                         ,
                                         Transport::UDP /* IPv4 */
 #endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                        ,
+                                        Transport::BLE<kMaxBlePendingPackets> /* BLE */
+#endif
                                         >;
+
+struct ControllerDeviceInitParams
+{
+    DeviceTransportMgr * transportMgr        = nullptr;
+    SecureSessionMgr * sessionMgr            = nullptr;
+    Messaging::ExchangeManager * exchangeMgr = nullptr;
+    Inet::InetLayer * inetLayer              = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * bleLayer = nullptr;
+#endif
+};
 
 class DLL_EXPORT Device
 {
@@ -89,11 +112,13 @@ public:
      * @brief
      *   Send the provided message to the device
      *
-     * @param[in] message   The message to be sent.
+     * @param[in] protocolId  The protocol identifier of the CHIP message to be sent.
+     * @param[in] msgType     The message type of the message to be sent.  Must be a valid message type for protocolId.
+     * @param[in] message     The message payload to be sent.
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -101,21 +126,6 @@ public:
      */
     CHIP_ERROR SendCommands();
 
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     */
-    void InitCommandSender()
-    {
-        if (mCommandSender != nullptr)
-        {
-            mCommandSender->Shutdown();
-            mCommandSender = nullptr;
-        }
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
-#endif
-    }
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
@@ -140,20 +150,25 @@ public:
      *   that of this device object. If these objects are freed, while the device object is
      *   still using them, it can lead to unknown behavior and crashes.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, Transport::AdminId admin)
     {
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
+        mTransportMgr   = params.transportMgr;
+        mSessionManager = params.sessionMgr;
+        mExchangeMgr    = params.exchangeMgr;
+        mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
+#if CONFIG_NETWORK_LAYER_BLE
+        mBleLayer = params.bleLayer;
+#endif
+
+#if CHIP_ENABLE_INTERACTION_MODEL
+        InitCommandSender();
+#endif
     }
 
     /**
@@ -167,30 +182,20 @@ public:
      *   uninitialzed/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] params       Wrapper object for transport manager etc.
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] peerAddress  The location of the peer. MUST be of type Transport::Type::kUdp
      * @param[in] admin        Local administrator that's initializing this device object
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, const Transport::PeerAddress & peerAddress, Transport::AdminId admin)
+    void Init(ControllerDeviceInitParams params, uint16_t listenPort, NodeId deviceId, const Transport::PeerAddress & peerAddress,
+              Transport::AdminId admin)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort, admin);
+        Init(params, mListenPort, admin);
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
-        if (peerAddress.GetTransportType() != Transport::Type::kUdp)
-        {
-            ChipLogError(Controller, "Invalid peer address received in chip device initialization. Expected a UDP address.");
-            chipDie();
-        }
-        else
-        {
-            mDeviceUdpAddress = peerAddress;
-        }
+        mDeviceAddress = peerAddress;
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -212,9 +217,8 @@ public:
      *   Called when a new pairing is being established
      *
      * @param session A handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr);
+    void OnNewConnection(SecureSessionHandle session);
 
     /**
      * @brief
@@ -223,9 +227,8 @@ public:
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
-     * @param mgr     A pointer to the SecureSessionMgr
      */
-    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr);
+    void OnConnectionExpired(SecureSessionHandle session);
 
     /**
      * @brief
@@ -235,12 +238,9 @@ public:
      *
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] session       A handle to the secure session
      * @param[in] msgBuf        The message buffer
-     * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
@@ -292,18 +292,22 @@ public:
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
         mInetLayer      = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+        mBleLayer = nullptr;
+#endif
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceUdpAddress.SetIPAddress(deviceAddr); }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:
@@ -322,15 +326,18 @@ private:
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
-    /** Address used to communicate with the device. MUST be Type::kUDP
-     *  in the current implementation.
+    /** Address used to communicate with the device.
      */
-    Transport::PeerAddress mDeviceUdpAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+    Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Inet::InetLayer * mInetLayer = nullptr;
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
 
     PASESessionSerializable mPairing;
 
@@ -339,6 +346,8 @@ private:
     SecureSessionMgr * mSessionManager = nullptr;
 
     DeviceTransportMgr * mTransportMgr = nullptr;
+
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
     app::CommandSender * mCommandSender = nullptr;
 
@@ -368,7 +377,12 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message, PayloadHeader & payloadHeader);
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     *   It's safe to call InitCommandSender multiple times, but only one will be available.
+     */
+    void InitCommandSender();
 
     uint16_t mListenPort;
 
@@ -423,6 +437,7 @@ typedef struct SerializableDevice
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
     uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    uint8_t mDeviceTransport;
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/InteractionModelDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLVDebug.hpp>
@@ -95,8 +96,11 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle aPayload);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
+    bool IsReportable() const { return mState == HandlerState::Reportable; }
 
     virtual ~ReadHandler() = default;
+
+    ClusterInfo * GetCluterInfolist() { return mpClusterInfoList; };
 
 private:
     enum class HandlerState
@@ -107,7 +111,7 @@ private:
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle aPayload);
-
+    CHIP_ERROR ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser);
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
@@ -124,6 +128,7 @@ private:
 
     // Current Handler state
     HandlerState mState;
+    ClusterInfo * mpClusterInfoList = nullptr;
 };
 } // namespace app
 } // namespace chip

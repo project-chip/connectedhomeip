@@ -25,11 +25,13 @@ project_dir = "./.."
 executable("chip-shell") {
   sources = [ "main.cpp" ]
 
-  public_deps = [
+  deps = [
     "${chip_root}/src/lib/shell",
     "${chip_root}/src/platform",
     "${project_dir}/shell_common:shell_common",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   output_dir = root_out_dir
 }

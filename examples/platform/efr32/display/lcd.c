@@ -64,6 +64,27 @@ void initLCD(void)
     }
 }
 
+/* This function is necessary because currently glib.h cannot be used within a C++ context. */
+void * LCDContext()
+{
+    return (void *) &glibContext;
+}
+
+int LCD_clear(void * pContext)
+{
+    return GLIB_clear((GLIB_Context_t *) pContext);
+}
+
+int LCD_drawPixel(void * pContext, int32_t x, int32_t y)
+{
+    return GLIB_drawPixel((GLIB_Context_t *) pContext, x, y);
+}
+
+int LCD_update(void)
+{
+    return DMD_updateDisplay();
+}
+
 void LCDWriteQRCode(uint8_t * str)
 {
     if (!qrcodegen_encodeText((const char *) str, workBuffer, qrCode, qrcodegen_Ecc_LOW, QR_CODE_VERSION, QR_CODE_VERSION,

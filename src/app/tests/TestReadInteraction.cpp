@@ -31,11 +31,11 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
@@ -93,7 +93,8 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err                            = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr, 0);
+    err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
+                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -112,6 +113,9 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequest::Builder readRequestBuilder;
+
+    err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readHandler.Init(nullptr);
 
     GenerateReportData(apSuite, apContext, reportDatabuf);
@@ -173,12 +177,12 @@ const nlTest sTests[] =
 
 } // namespace
 
-int TestEventLogging()
+int TestReadInteraction()
 {
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "InteractionMessage",
+        "TestReadInteraction",
         &sTests[0],
         nullptr,
         nullptr
@@ -192,4 +196,4 @@ int TestEventLogging()
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestEventLogging)
+CHIP_REGISTER_TEST_SUITE(TestReadInteraction)

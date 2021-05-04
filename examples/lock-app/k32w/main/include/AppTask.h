@@ -56,6 +56,7 @@ private:
     static void KBD_Callback(uint8_t events);
     static void HandleKeyboard(void);
     static void JoinHandler(AppEvent * aEvent);
+    static void BleHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
     static void ResetActionEventHandler(AppEvent * aEvent);
     static void InstallEventHandler(AppEvent * aEvent);

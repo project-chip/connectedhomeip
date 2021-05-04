@@ -36,9 +36,12 @@
 #include <AppTask.h>
 
 #include "AppConfig.h"
-#include "DataModelHandler.h"
-#include "Server.h"
 #include "init_efrPlatform.h"
+#include <app/server/Server.h>
+
+#ifdef HEAP_MONITORING
+#include "MemMonitoring.h"
+#endif
 
 #if DISPLAY_ENABLED
 #include "lcd.h"
@@ -99,12 +102,15 @@ int main(void)
     int ret = CHIP_ERROR_MAX;
 
     init_efrPlatform();
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
 #endif
 
-    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+#ifdef HEAP_MONITORING
+    MemMonitoring::startHeapMonitoring();
+#endif
 
     // Initialize mbedtls threading support on EFR32
     THREADING_setup();
@@ -162,7 +168,6 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
-
     EFR32_LOG("Starting App Task");
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)

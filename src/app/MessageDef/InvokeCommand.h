@@ -23,14 +23,11 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_INVOKE_COMMAND_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_INVOKE_COMMAND_H
-
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 #include "Builder.h"
 #include "CommandDataElement.h"
@@ -57,6 +54,7 @@ public:
      */
     CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -71,6 +69,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
+#endif
 
     /**
      *  @brief Get a TLVReader for the CommandList. Next() must be called before accessing them.
@@ -122,5 +121,3 @@ private:
 }; // namespace InvokeCommand
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_INVOKE_COMMAND_H

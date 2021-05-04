@@ -26,7 +26,7 @@
 
 #pragma once
 
-#include "basic-types.h"
+#include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPError.h>
 #include <support/DLLUtil.h>
@@ -49,6 +49,7 @@ public:
 
     CHIP_ERROR AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable * onSuccessCallback,
                                    Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR CancelResponseCallback(NodeId nodeId, uint8_t sequenceNumber);
     CHIP_ERROR GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable ** onSuccessCallback,
                                    Callback::Cancelable ** onFailureCallback);
 
@@ -68,6 +69,7 @@ private:
         if (CHIP_NO_ERROR == err)
         {
             ca->Cancel();
+            queue.Dequeue(ca);
         }
 
         return err;

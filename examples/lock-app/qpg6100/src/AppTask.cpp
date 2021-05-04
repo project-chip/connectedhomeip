@@ -23,13 +23,13 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 
-#include "Server.h"
-#include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include "Service.h"
 
@@ -85,7 +85,7 @@ int AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -105,7 +105,7 @@ int AppTask::Init()
     UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     return err;
 }

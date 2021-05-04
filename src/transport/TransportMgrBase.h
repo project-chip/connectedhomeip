@@ -38,18 +38,17 @@ public:
     CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                            System::PacketBufferHandle && msgBuf);
 
+    void Close();
+
     void Disconnect(const Transport::PeerAddress & address);
 
     void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
-
-    void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr) { mRendezvous = rendezvousSessionMgr; }
 
     void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                System::PacketBufferHandle msg) override;
 
 private:
     TransportMgrDelegate * mSecureSessionMgr = nullptr;
-    TransportMgrDelegate * mRendezvous       = nullptr;
     Transport::Base * mTransport             = nullptr;
 };
 

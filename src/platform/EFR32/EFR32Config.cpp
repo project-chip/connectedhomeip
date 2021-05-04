@@ -67,6 +67,7 @@ namespace Internal {
 
 static nvm3_Handle_t handle;
 static SemaphoreHandle_t nvm3_Sem;
+static StaticSemaphore_t nvm3_SemStruct;
 
 // Declare NVM3 data area and cache.
 
@@ -79,7 +80,7 @@ CHIP_ERROR EFR32Config::Init()
 {
     CHIP_ERROR err;
 
-    nvm3_Sem = xSemaphoreCreateBinary();
+    nvm3_Sem = xSemaphoreCreateBinaryStatic(&nvm3_SemStruct);
 
     if (nvm3_Sem == NULL)
     {

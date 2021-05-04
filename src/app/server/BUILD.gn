@@ -18,15 +18,9 @@ import("${chip_root}/src/app/common_flags.gni")
 config("server_config") {
   defines = []
 
-  if (chip_app_use_interaction_model) {
-    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
-  }
-
   if (chip_app_use_echo) {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
-
-  include_dirs = [ "." ]
 }
 
 static_library("server") {
@@ -43,6 +37,8 @@ static_library("server") {
     "RendezvousServer.h",
     "Server.cpp",
     "Server.h",
+    "StorablePeerConnection.cpp",
+    "StorablePeerConnection.h",
   ]
 
   public_configs = [ ":server_config" ]

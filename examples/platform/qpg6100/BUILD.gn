@@ -28,5 +28,6 @@ source_set("openthread_core_config_qpg6100_chip_examples") {
     "${chip_root}/third_party/openthread/platforms/qpg6100:openthread_core_config_qpg6100",
     "${qpg6100_sdk_build_root}:qpg6100_sdk",
   ]
+
   public_configs = [ ":chip_examples_project_config" ]
 }

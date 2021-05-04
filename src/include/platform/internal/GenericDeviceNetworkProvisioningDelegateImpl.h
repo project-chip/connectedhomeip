@@ -32,7 +32,7 @@ class GenericDeviceNetworkProvisioningDelegateImpl : public DeviceNetworkProvisi
 {
 public:
     CHIP_ERROR ProvisionWiFi(const char * ssid, const char * passwd) override;
-    CHIP_ERROR ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
+    CHIP_ERROR ProvisionThread(ByteSpan threadData) override;
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -45,8 +45,7 @@ inline CHIP_ERROR GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::Provi
 }
 
 template <class ImplClass>
-inline CHIP_ERROR
-GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+inline CHIP_ERROR GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionThread(ByteSpan threadData)
 {
     return Impl()->_ProvisionThreadNetwork(threadData);
 }

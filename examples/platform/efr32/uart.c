@@ -179,7 +179,13 @@ void uartConsoleInit(void)
         .portLocationTx = BSP_SERIAL_APP_TX_LOC,
         .portLocationRx = BSP_SERIAL_APP_RX_LOC,
 #elif defined(_USART_ROUTE_MASK)
-        portLocation = BSP_SERIAL_APP_PORT,
+#error This configuration is not supported
+#elif defined(_GPIO_USART_ROUTEEN_MASK)
+        .txPort  = BSP_SERIAL_APP_TX_PORT, /* USART Tx port number */
+        .rxPort  = BSP_SERIAL_APP_RX_PORT, /* USART Rx port number */
+        .txPin   = BSP_SERIAL_APP_TX_PIN,  /* USART Tx pin number */
+        .rxPin   = BSP_SERIAL_APP_RX_PIN,  /* USART Rx pin number */
+        .uartNum = 0,                      /* UART instance number */
 #endif
 #if defined(USART_CTRL_MVDIS)
         .mvdis = false,

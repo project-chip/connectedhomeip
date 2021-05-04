@@ -43,7 +43,11 @@ namespace Transport {
  * will keep the same TCP channel.
  *
  */
-enum class Type
+
+/**
+ * Here we specified Type to be uint8_t, so the PeerAddress can be serialized easily.
+ */
+enum class Type : uint8_t
 {
     kUndefined,
     kUdp,

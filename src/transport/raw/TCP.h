@@ -158,6 +158,11 @@ public:
      */
     CHIP_ERROR Init(TcpListenParameters & params);
 
+    /**
+     * Close the open endpoint without destroying the object
+     */
+    void Close() override;
+
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override;
 
     void Disconnect(const PeerAddress & address) override;

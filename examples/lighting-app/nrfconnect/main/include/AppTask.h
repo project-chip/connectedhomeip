@@ -38,7 +38,7 @@ public:
     void UpdateClusterState();
 
 private:
-    friend class chip::rpc::LightingService;
+    friend class chip::rpc::Button;
     friend AppTask & GetAppTask(void);
 
     int Init();
@@ -62,10 +62,6 @@ private:
     static void TimerEventHandler(k_timer * timer);
 
     void StartTimer(uint32_t aTimeoutInMs);
-
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
-    int StartNFCTag();
-#endif
 
     enum Function_t
     {

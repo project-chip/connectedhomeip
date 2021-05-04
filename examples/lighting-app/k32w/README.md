@@ -58,8 +58,9 @@ devices.
 ### Bluetooth LE Advertising
 
 In this example, to commission the device onto a Project CHIP network, it must
-be discoverable over Bluetooth LE. Bluetooth LE advertising is started
-automatically when the device is powered up.
+be discoverable over Bluetooth LE. For security reasons, you must start
+Bluetooth LE advertising manually after powering up the device by pressing
+Button USERINTERFACE.
 
 ### Bluetooth LE Rendezvous
 
@@ -121,6 +122,9 @@ a Border Router. Default parameters for a Thread network are hard-coded and are
 being used if this button is pressed.
 
 The remaining two LEDs (D1/D2) and button (SW1) are unused.
+
+Directly on the development board, **Button USERINTERFACE** can be used for
+enabling Bluetooth LE advertising for a predefined period of time.
 
 <a name="building"></a>
 

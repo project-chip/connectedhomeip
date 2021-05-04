@@ -23,16 +23,13 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_LIST_BUILDER_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_LIST_BUILDER_H
-
 #include "Builder.h"
 #include "Parser.h"
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -66,5 +63,3 @@ public:
 
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_LIST_BUILDER_H

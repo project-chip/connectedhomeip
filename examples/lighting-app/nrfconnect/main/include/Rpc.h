@@ -23,7 +23,7 @@
 namespace chip {
 namespace rpc {
 
-class LightingService;
+class Button;
 
 void RunRpcService(void *, void *, void *);
 

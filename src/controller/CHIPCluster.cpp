@@ -52,18 +52,19 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!payload.IsNull(), err = CHIP_ERROR_INTERNAL);
 
-    err = mDevice->SendMessage(std::move(payload));
-    SuccessOrExit(err);
-
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
         mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
     }
 
+    err = mDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(payload));
+    SuccessOrExit(err);
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in sending cluster command. Err %d", err);
+        mDevice->CancelResponseHandler(seqNum);
     }
 
     return err;

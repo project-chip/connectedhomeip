@@ -43,6 +43,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Account Login
+ *
+ */
+@interface CHIPAccountLogin : CHIPCluster
+
+- (void)getSetupPIN:(NSString *)tempAccountIdentifier completionHandler:(ResponseHandler)completionHandler;
+- (void)login:(NSString *)tempAccountIdentifier setupPIN:(NSString *)setupPIN completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Application Basic
  *
  */
@@ -55,6 +68,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeApplicationId:(ResponseHandler)completionHandler;
 - (void)readAttributeCatalogVendorId:(ResponseHandler)completionHandler;
 - (void)readAttributeApplicationSatus:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Application Launcher
+ *
+ */
+@interface CHIPApplicationLauncher : CHIPCluster
+
+- (void)launchApp:(NSString *)data
+      catalogVendorId:(uint16_t)catalogVendorId
+        applicationId:(NSString *)applicationId
+    completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeApplicationLauncherList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Audio Output
+ *
+ */
+@interface CHIPAudioOutput : CHIPCluster
+
+- (void)renameOutput:(uint8_t)index name:(NSString *)name completionHandler:(ResponseHandler)completionHandler;
+- (void)selectOutput:(uint8_t)index completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeAudioOutputList:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -97,6 +140,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeHardwareVersionString:(ResponseHandler)completionHandler;
 - (void)readAttributeSoftwareVersion:(ResponseHandler)completionHandler;
 - (void)readAttributeSoftwareVersionString:(ResponseHandler)completionHandler;
+- (void)readAttributeManufacturingDate:(ResponseHandler)completionHandler;
+- (void)readAttributePartNumber:(ResponseHandler)completionHandler;
+- (void)readAttributeProductURL:(ResponseHandler)completionHandler;
+- (void)readAttributeProductLabel:(ResponseHandler)completionHandler;
+- (void)readAttributeSerialNumber:(ResponseHandler)completionHandler;
+- (void)readAttributeLocalConfigDisabled:(ResponseHandler)completionHandler;
+- (void)writeAttributeLocalConfigDisabled:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -301,6 +351,37 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Content Launch
+ *
+ */
+@interface CHIPContentLaunch : CHIPCluster
+
+- (void)launchContent:(uint8_t)autoPlay data:(NSString *)data completionHandler:(ResponseHandler)completionHandler;
+- (void)launchURL:(NSString *)contentURL
+        displayString:(NSString *)displayString
+    completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeAcceptsHeaderList:(ResponseHandler)completionHandler;
+- (void)readAttributeSupportedStreamingTypes:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Descriptor
+ *
+ */
+@interface CHIPDescriptor : CHIPCluster
+
+- (void)readAttributeDeviceList:(ResponseHandler)completionHandler;
+- (void)readAttributeServerList:(ResponseHandler)completionHandler;
+- (void)readAttributeClientList:(ResponseHandler)completionHandler;
+- (void)readAttributePartsList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Door Lock
  *
  */
@@ -375,15 +456,27 @@ NS_ASSUME_NONNULL_BEGIN
             timeoutMs:(uint32_t)timeoutMs
     completionHandler:(ResponseHandler)completionHandler;
 - (void)commissioningComplete:(ResponseHandler)completionHandler;
-- (void)setFabric:(NSData *)fabricId
-         fabricSecret:(NSData *)fabricSecret
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler;
+- (void)setRegulatoryConfig:(uint8_t)location
+                countryCode:(NSString *)countryCode
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler;
 
 - (void)readAttributeFabricId:(ResponseHandler)completionHandler;
 - (void)readAttributeBreadcrumb:(ResponseHandler)completionHandler;
 - (void)writeAttributeBreadcrumb:(uint64_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Group Key Management
+ *
+ */
+@interface CHIPGroupKeyManagement : CHIPCluster
+
+- (void)readAttributeGroups:(ResponseHandler)completionHandler;
+- (void)readAttributeGroupKeys:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -419,6 +512,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
 - (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Keypad Input
+ *
+ */
+@interface CHIPKeypadInput : CHIPCluster
+
+- (void)sendKey:(uint8_t)keyCode completionHandler:(ResponseHandler)completionHandler;
+
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -479,6 +584,90 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Media Input
+ *
+ */
+@interface CHIPMediaInput : CHIPCluster
+
+- (void)hideInputStatus:(ResponseHandler)completionHandler;
+- (void)renameInput:(uint8_t)index name:(NSString *)name completionHandler:(ResponseHandler)completionHandler;
+- (void)selectInput:(uint8_t)index completionHandler:(ResponseHandler)completionHandler;
+- (void)showInputStatus:(ResponseHandler)completionHandler;
+
+- (void)readAttributeMediaInputList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Media Playback
+ *
+ */
+@interface CHIPMediaPlayback : CHIPCluster
+
+- (void)mediaFastForward:(ResponseHandler)completionHandler;
+- (void)mediaNext:(ResponseHandler)completionHandler;
+- (void)mediaPause:(ResponseHandler)completionHandler;
+- (void)mediaPlay:(ResponseHandler)completionHandler;
+- (void)mediaPrevious:(ResponseHandler)completionHandler;
+- (void)mediaRewind:(ResponseHandler)completionHandler;
+- (void)mediaSkipBackward:(uint64_t)deltaPositionMilliseconds completionHandler:(ResponseHandler)completionHandler;
+- (void)mediaSkipForward:(uint64_t)deltaPositionMilliseconds completionHandler:(ResponseHandler)completionHandler;
+- (void)mediaSkipSeek:(uint64_t)position completionHandler:(ResponseHandler)completionHandler;
+- (void)mediaStartOver:(ResponseHandler)completionHandler;
+- (void)mediaStop:(ResponseHandler)completionHandler;
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Network Commissioning
+ *
+ */
+@interface CHIPNetworkCommissioning : CHIPCluster
+
+- (void)addThreadNetwork:(NSData *)operationalDataset
+              breadcrumb:(uint64_t)breadcrumb
+               timeoutMs:(uint32_t)timeoutMs
+       completionHandler:(ResponseHandler)completionHandler;
+- (void)addWiFiNetwork:(NSData *)ssid
+           credentials:(NSData *)credentials
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler;
+- (void)disableNetwork:(NSData *)networkID
+            breadcrumb:(uint64_t)breadcrumb
+             timeoutMs:(uint32_t)timeoutMs
+     completionHandler:(ResponseHandler)completionHandler;
+- (void)enableNetwork:(NSData *)networkID
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)getLastNetworkCommissioningResult:(uint32_t)timeoutMs completionHandler:(ResponseHandler)completionHandler;
+- (void)removeNetwork:(NSData *)networkID
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)scanNetworks:(NSData *)ssid
+           breadcrumb:(uint64_t)breadcrumb
+            timeoutMs:(uint32_t)timeoutMs
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)updateThreadNetwork:(NSData *)operationalDataset
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler;
+- (void)updateWiFiNetwork:(NSData *)ssid
+              credentials:(NSData *)credentials
+               breadcrumb:(uint64_t)breadcrumb
+                timeoutMs:(uint32_t)timeoutMs
+        completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster On/off
  *
  */
@@ -493,6 +682,47 @@ NS_ASSUME_NONNULL_BEGIN
                     maxInterval:(uint16_t)maxInterval
               completionHandler:(ResponseHandler)completionHandler;
 - (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Operational Credentials
+ *
+ */
+@interface CHIPOperationalCredentials : CHIPCluster
+
+- (void)getFabricId:(ResponseHandler)completionHandler;
+- (void)removeFabric:(uint64_t)fabricId
+               nodeId:(uint64_t)nodeId
+             vendorId:(uint16_t)vendorId
+    completionHandler:(ResponseHandler)completionHandler;
+- (void)updateFabricLabel:(NSString *)label completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeFabricsList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Pump Configuration and Control
+ *
+ */
+@interface CHIPPumpConfigurationAndControl : CHIPCluster
+
+- (void)readAttributeMaxPressure:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxFlow:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler;
+- (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler;
+- (void)readAttributeCapacity:(ResponseHandler)completionHandler;
+- (void)configureAttributeCapacity:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(int16_t)change
+                 completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCapacity:(ResponseHandler)reportHandler;
+- (void)readAttributeOperationMode:(ResponseHandler)completionHandler;
+- (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end
@@ -531,6 +761,55 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Switch
+ *
+ */
+@interface CHIPSwitch : CHIPCluster
+
+- (void)readAttributeNumberOfPositions:(ResponseHandler)completionHandler;
+- (void)readAttributeCurrentPosition:(ResponseHandler)completionHandler;
+- (void)configureAttributeCurrentPosition:(uint16_t)minInterval
+                              maxInterval:(uint16_t)maxInterval
+                                   change:(uint8_t)change
+                        completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeCurrentPosition:(ResponseHandler)reportHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster TV Channel
+ *
+ */
+@interface CHIPTvChannel : CHIPCluster
+
+- (void)changeChannel:(NSString *)match completionHandler:(ResponseHandler)completionHandler;
+- (void)changeChannelByNumber:(uint16_t)majorNumber
+                  minorNumber:(uint16_t)minorNumber
+            completionHandler:(ResponseHandler)completionHandler;
+- (void)skipChannel:(uint16_t)count completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeTvChannelList:(ResponseHandler)completionHandler;
+- (void)readAttributeTvChannelLineup:(ResponseHandler)completionHandler;
+- (void)readAttributeCurrentTvChannel:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Target Navigator
+ *
+ */
+@interface CHIPTargetNavigator : CHIPCluster
+
+- (void)navigateTarget:(uint8_t)target data:(NSString *)data completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeTargetNavigatorList:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
  * Cluster Temperature Measurement
  *
  */
@@ -544,6 +823,53 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeMeasuredValue:(ResponseHandler)reportHandler;
 - (void)readAttributeMinMeasuredValue:(ResponseHandler)completionHandler;
 - (void)readAttributeMaxMeasuredValue:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Thermostat
+ *
+ */
+@interface CHIPThermostat : CHIPCluster
+
+- (void)clearWeeklySchedule:(ResponseHandler)completionHandler;
+- (void)getRelayStatusLog:(ResponseHandler)completionHandler;
+- (void)getWeeklySchedule:(uint8_t)daysToReturn
+             modeToReturn:(uint8_t)modeToReturn
+        completionHandler:(ResponseHandler)completionHandler;
+- (void)setWeeklySchedule:(uint8_t)numberOfTransitionsForSequence
+     dayOfWeekForSequence:(uint8_t)dayOfWeekForSequence
+          modeForSequence:(uint8_t)modeForSequence
+                  payload:(uint8_t)payload
+        completionHandler:(ResponseHandler)completionHandler;
+- (void)setpointRaiseLower:(uint8_t)mode amount:(int8_t)amount completionHandler:(ResponseHandler)completionHandler;
+
+- (void)readAttributeLocalTemperature:(ResponseHandler)completionHandler;
+- (void)configureAttributeLocalTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(int16_t)change
+                         completionHandler:(ResponseHandler)completionHandler;
+- (void)reportAttributeLocalTemperature:(ResponseHandler)reportHandler;
+- (void)readAttributeOccupiedCoolingSetpoint:(ResponseHandler)completionHandler;
+- (void)writeAttributeOccupiedCoolingSetpoint:(int16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeOccupiedHeatingSetpoint:(ResponseHandler)completionHandler;
+- (void)writeAttributeOccupiedHeatingSetpoint:(int16_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeControlSequenceOfOperation:(ResponseHandler)completionHandler;
+- (void)writeAttributeControlSequenceOfOperation:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeSystemMode:(ResponseHandler)completionHandler;
+- (void)writeAttributeSystemMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+
+@end
+
+/**
+ * Cluster Wake on LAN
+ *
+ */
+@interface CHIPWakeOnLan : CHIPCluster
+
+- (void)readAttributeWakeOnLanMacAddress:(ResponseHandler)completionHandler;
 - (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
 
 @end

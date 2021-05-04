@@ -17,5 +17,5 @@ import("$dir_pw_build/python.gni")
 
 pw_python_package("happy") {
   setup = [ "repo/setup.py" ]
-  lint = false
+  static_analysis = []
 }

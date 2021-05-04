@@ -162,7 +162,7 @@ public final class AndroidChipStack {
               return;
             }
 
-            if (desc.getValue() == BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) {
+            if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
               handleSubscribeComplete(
                   connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
@@ -302,7 +302,7 @@ public final class AndroidChipStack {
 
     BluetoothGattDescriptor descriptor =
         subscribeChar.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
-    descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
     if (!bluetoothGatt.writeDescriptor(descriptor)) {
       Log.e(TAG, "writeDescriptor failed");
       return false;

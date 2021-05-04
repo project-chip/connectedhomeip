@@ -111,7 +111,6 @@ public:
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSecureSessionMgr(this);
-        mTransportMgrBase.SetRendezvousSession(this);
         mTransportMgrBase.Init(&tcp);
 
         mReceiveHandlerCallCount = 0;

@@ -42,7 +42,7 @@
 #pragma once
 
 //#include PLATFORM_HEADER
-#include "af.h"
+#include <app/util/af.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #include "gen/att-storage.h"
@@ -94,7 +94,7 @@ bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, chip::
                               uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount);
 
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write);
+                                       uint8_t * buffer, uint16_t readLength, bool write, int32_t index = -1);
 
 bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
 bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord);

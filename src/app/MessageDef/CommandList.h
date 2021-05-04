@@ -23,18 +23,15 @@
 
 #pragma once
 
-#ifndef _CHIP_INTERACTION_MODEL_MESSAGE_DEF_COMMAND_LIST_H
-#define _CHIP_INTERACTION_MODEL_MESSAGE_DEF_COMMAND_LIST_H
-
 #include "CommandDataElement.h"
 #include "ListBuilder.h"
 #include "ListParser.h"
 
+#include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <util/basic-types.h>
 
 namespace chip {
 namespace app {
@@ -42,6 +39,7 @@ namespace CommandList {
 class Parser : public ListParser
 {
 public:
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -56,6 +54,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR CheckSchemaValidity() const;
+#endif
 };
 
 class Builder : public ListBuilder
@@ -64,9 +63,14 @@ public:
     /**
      *  @brief Initialize a CommandDataElement::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataList::Builder
+     *  @return A reference to CommandDataElement::Builder
      */
     CommandDataElement::Builder & CreateCommandDataElementBuilder();
+
+    /**
+     *  @return A reference to CommandDataElement::Builder
+     */
+    CommandDataElement::Builder & GetCommandDataElementBuilder() { return mCommandDataElementBuilder; };
 
     /**
      *  @brief Mark the end of this CommandList
@@ -81,5 +85,3 @@ private:
 }; // namespace CommandList
 }; // namespace app
 }; // namespace chip
-
-#endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_COMMAND_LIST_H

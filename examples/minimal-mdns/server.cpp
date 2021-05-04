@@ -86,7 +86,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "instance-name", kArgumentRequired, kOptionInstanceName },
-    nullptr,
+    {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",

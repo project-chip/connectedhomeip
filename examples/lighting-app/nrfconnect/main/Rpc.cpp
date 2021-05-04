@@ -22,7 +22,9 @@
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
 
-#include "main/pigweed_lighting.rpc.pb.h"
+#include "button_service/button_service.rpc.pb.h"
+#include "device_service/device_service.rpc.pb.h"
+#include "lighting_service/lighting_service.rpc.pb.h"
 #include "pw_hdlc/rpc_channel.h"
 #include "pw_hdlc/rpc_packets.h"
 #include "pw_rpc/server.h"
@@ -39,19 +41,63 @@ LOG_MODULE_DECLARE(app);
 namespace chip {
 namespace rpc {
 
-class LightingService final : public generated::LightingService<LightingService>
+class Lighting final : public generated::Lighting<Lighting>
 {
 public:
-    pw::Status ButtonEvent(ServerContext & ctx, const chip_rpc_Button & request, chip_rpc_Empty & response)
+    pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
-        GetAppTask().ButtonEventHandler(request.action << request.idx /* button_state */, 1 << request.idx /* has_changed */);
+        LightingMgr().InitiateAction(request.on ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
+                                     AppEvent::kEventType_Button, 0, NULL);
+        return pw::OkStatus();
+    }
+
+    pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
+    {
+        response.on = LightingMgr().IsTurnedOn();
+        return pw::OkStatus();
+    }
+};
+
+class Button final : public generated::Button<Button>
+{
+public:
+    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    {
+        GetAppTask().ButtonEventHandler(request.pushed << request.idx /* button_state */, 1 << request.idx /* has_changed */);
+        return pw::OkStatus();
+    }
+};
+
+class Device final : public generated::Device<Device>
+{
+public:
+    pw::Status FactoryReset(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+        // TODO: Clear data from KVS
+        DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+        return pw::OkStatus();
+    }
+    pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+        NVIC_SystemReset();
+        // WILL NOT RETURN
+        return pw::OkStatus();
+    }
+    pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    {
+        // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
+        return pw::Status::Unimplemented();
+    }
+    pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
+    {
+        response.vendor_id        = 1234;
+        response.product_id       = 5678;
+        response.software_version = 0;
         return pw::OkStatus();
     }
 };
 
 namespace {
-
-using std::byte;
 
 constexpr size_t kRpcTaskSize = 4096;
 constexpr int kRpcPriority    = 5;
@@ -59,11 +105,15 @@ constexpr int kRpcPriority    = 5;
 K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);
 struct k_thread rpc_thread_data;
 
-chip::rpc::LightingService lighting_service;
+chip::rpc::Button button_service;
+chip::rpc::Lighting lighting_service;
+chip::rpc::Device device_service;
 
 void RegisterServices(pw::rpc::Server & server)
 {
     server.RegisterService(lighting_service);
+    server.RegisterService(button_service);
+    server.RegisterService(device_service);
 }
 
 } // namespace

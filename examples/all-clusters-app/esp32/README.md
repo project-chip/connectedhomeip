@@ -132,7 +132,7 @@ There are two ways to use the Echo Server running on the device.
 2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
-          $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf.py flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
 3.  The device should boot up and connect to your network. When that happens you
     will see a log like this in the monitor.
@@ -152,7 +152,7 @@ There are two ways to use the Echo Server running on the device.
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
-          $ idf make erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf.py erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
 
 ### Use the ESP32's Network
 

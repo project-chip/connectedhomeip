@@ -61,14 +61,18 @@ public:
         kMaxFirmwareRevisionLength = 32,
     };
 
+    CHIP_ERROR GetVendorName(char * buf, size_t bufSize);
     CHIP_ERROR GetVendorId(uint16_t & vendorId);
+    CHIP_ERROR GetProductName(char * buf, size_t bufSize);
     CHIP_ERROR GetProductId(uint16_t & productId);
+    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize);
     CHIP_ERROR GetProductRevision(uint16_t & productRev);
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
-    CHIP_ERROR GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen);
+    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize);
+    CHIP_ERROR GetFirmwareRevision(uint32_t & firmwareRev);
     CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
                                     uint8_t & second);
     CHIP_ERROR GetDeviceId(uint64_t & deviceId);
@@ -89,6 +93,9 @@ public:
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter);
 #endif
+    CHIP_ERROR GetRegulatoryLocation(uint32_t & location);
+    CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen);
+    CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb);
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen);
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf);
     CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf);
@@ -112,6 +119,9 @@ public:
     CHIP_ERROR ClearServiceProvisioningData();
     CHIP_ERROR StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen);
     CHIP_ERROR StorePairedAccountId(const char * accountId, size_t accountIdLen);
+    CHIP_ERROR StoreRegulatoryLocation(uint32_t location);
+    CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen);
+    CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb);
 
     CHIP_ERROR GetQRCodeString(char * buf, size_t bufSize);
 
@@ -207,6 +217,14 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
+ * Name of the vendor that produced the device.
+ */
+inline CHIP_ERROR ConfigurationManager::GetVendorName(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetVendorName(buf, bufSize);
+}
+
+/**
  * Id of the vendor that produced the device.
  */
 inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
@@ -215,11 +233,27 @@ inline CHIP_ERROR ConfigurationManager::GetVendorId(uint16_t & vendorId)
 }
 
 /**
+ * Name of the product assigned by the vendor.
+ */
+inline CHIP_ERROR ConfigurationManager::GetProductName(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetProductName(buf, bufSize);
+}
+
+/**
  * Device product id assigned by the vendor.
  */
 inline CHIP_ERROR ConfigurationManager::GetProductId(uint16_t & productId)
 {
     return static_cast<ImplClass *>(this)->_GetProductId(productId);
+}
+
+/**
+ * Product revision string assigned by the vendor.
+ */
+inline CHIP_ERROR ConfigurationManager::GetProductRevisionString(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetProductRevisionString(buf, bufSize);
 }
 
 /**
@@ -250,9 +284,14 @@ inline CHIP_ERROR ConfigurationManager::GetManufacturingDate(uint16_t & year, ui
     return static_cast<ImplClass *>(this)->_GetManufacturingDate(year, month, dayOfMonth);
 }
 
-inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen)
+inline CHIP_ERROR ConfigurationManager::GetFirmwareRevisionString(char * buf, size_t bufSize)
 {
-    return static_cast<ImplClass *>(this)->_GetFirmwareRevision(buf, bufSize, outLen);
+    return static_cast<ImplClass *>(this)->_GetFirmwareRevisionString(buf, bufSize);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetFirmwareRevision(uint32_t & firmwareRev)
+{
+    return static_cast<ImplClass *>(this)->_GetFirmwareRevision(firmwareRev);
 }
 
 inline CHIP_ERROR ConfigurationManager::GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour,
@@ -337,6 +376,21 @@ inline CHIP_ERROR ConfigurationManager::GetLifetimeCounter(uint16_t & lifetimeCo
     return static_cast<ImplClass *>(this)->_GetLifetimeCounter(lifetimeCounter);
 }
 #endif
+
+inline CHIP_ERROR ConfigurationManager::GetRegulatoryLocation(uint32_t & location)
+{
+    return static_cast<ImplClass *>(this)->_GetRegulatoryLocation(location);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)
+{
+    return static_cast<ImplClass *>(this)->_GetCountryCode(buf, bufSize, codeLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetBreadcrumb(uint64_t & breadcrumb)
+{
+    return static_cast<ImplClass *>(this)->_GetBreadcrumb(breadcrumb);
+}
 
 inline CHIP_ERROR ConfigurationManager::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
@@ -428,6 +482,21 @@ inline CHIP_ERROR ConfigurationManager::StoreServiceProvisioningData(uint64_t se
 {
     return static_cast<ImplClass *>(this)->_StoreServiceProvisioningData(serviceId, serviceConfig, serviceConfigLen, accountId,
                                                                          accountIdLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreRegulatoryLocation(uint32_t location)
+{
+    return static_cast<ImplClass *>(this)->_StoreRegulatoryLocation(location);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreCountryCode(const char * code, size_t codeLen)
+{
+    return static_cast<ImplClass *>(this)->_StoreCountryCode(code, codeLen);
+}
+
+inline CHIP_ERROR ConfigurationManager::StoreBreadcrumb(uint64_t breadcrumb)
+{
+    return static_cast<ImplClass *>(this)->_StoreBreadcrumb(breadcrumb);
 }
 
 inline CHIP_ERROR ConfigurationManager::ClearServiceProvisioningData()

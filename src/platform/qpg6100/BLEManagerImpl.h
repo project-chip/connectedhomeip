@@ -25,7 +25,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "FreeRTOS.h"
 #include "qvCHIP.h"
+#include "timers.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -93,7 +95,9 @@ private:
         kFastAdvertisingEnabled   = 0x0004, /**< The application has enabled fast advertising. */
         kAdvertising              = 0x0008, /**< The system is currently CHIPoBLE advertising. */
         kAdvertisingRefreshNeeded = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
-        kDeviceNameSet            = 0x0020,
+        kDeviceNameSet            = 0x0020, /**< The device name has been set. */
+        kRestartAdvertising = 0x0040, /**< The advertising will be restarted when stop advertising confirmation is received and this
+                                            flag is set*/
     };
 
     enum
@@ -135,6 +139,9 @@ private:
 
     /* Handlers for stack events */
     static void _handleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void CancelBleAdvTimeoutTimer(void);
+    static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
 };
 
 /**

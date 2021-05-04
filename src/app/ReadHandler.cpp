@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPath.h>
 #include <app/ReadHandler.h>
+#include <app/reporting/Engine.h>
 
 namespace chip {
 namespace app {
@@ -34,11 +35,11 @@ CHIP_ERROR ReadHandler::Init(InteractionModelDelegate * apDelegate)
     // Error if already initialized.
     VerifyOrExit(apDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     mpExchangeCtx     = nullptr;
     mpDelegate        = apDelegate;
     mSuppressResponse = true;
     mGetToAllEvents   = true;
+    mpClusterInfoList = nullptr;
     MoveToState(HandlerState::Initialized);
 
 exit:
@@ -48,6 +49,7 @@ exit:
 
 void ReadHandler::Shutdown()
 {
+    InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpClusterInfoList);
     ClearExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
     mpDelegate = nullptr;
@@ -91,10 +93,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
-    SuccessOrExit(err);
-
-    // Todo: Once status report support is added, we would shutdown only when there is error or when this is last chunk of report
 exit:
+    ChipLogFunctError(err);
     Shutdown();
     return err;
 }
@@ -106,6 +106,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
 
     ReadRequest::Parser readRequestParser;
     EventPathList::Parser eventPathListParser;
+    AttributePathList::Parser attributePathListParser;
     TLV::TLVReader eventPathListReader;
 
     reader.Init(std::move(aPayload));
@@ -116,8 +117,21 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
     err = readRequestParser.Init(reader);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = readRequestParser.CheckSchemaValidity();
     SuccessOrExit(err);
+#endif
+
+    err = readRequestParser.GetAttributePathList(&attributePathListParser);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else
+    {
+        SuccessOrExit(err);
+        ProcessAttributePathList(attributePathListParser);
+    }
 
     err = readRequestParser.GetEventPathList(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
@@ -141,6 +155,47 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle aPayload)
         }
     }
 
+    // if we have exhausted this container
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+    MoveToState(HandlerState::Reportable);
+
+    err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
+CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathList::Parser & aAttributePathListParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aAttributePathListParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        AttributePathParams attributePathParams;
+        AttributePath::Parser path;
+        err = path.Init(reader);
+        SuccessOrExit(err);
+        err = path.GetNodeId(&(attributePathParams.mNodeId));
+        SuccessOrExit(err);
+        err = path.GetEndpointId(&(attributePathParams.mEndpointId));
+        SuccessOrExit(err);
+        err = path.GetClusterId(&(attributePathParams.mClusterId));
+        SuccessOrExit(err);
+        err = path.GetFieldId(&(attributePathParams.mFieldId));
+        SuccessOrExit(err);
+        err = InteractionModelEngine::GetInstance()->PushFront(mpClusterInfoList, attributePathParams);
+        SuccessOrExit(err);
+        mpClusterInfoList->SetDirty();
+    }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {

@@ -21,9 +21,9 @@ config("qrcode-common_config") {
 static_library("QRCode") {
   output_name = "libqrcode-common"
 
-  output_dir = "${root_out_dir}/lib"
-
   sources = [ "repo/c/qrcodegen.c" ]
 
   public_configs = [ ":qrcode-common_config" ]
+
+  output_dir = "${root_out_dir}/lib"
 }

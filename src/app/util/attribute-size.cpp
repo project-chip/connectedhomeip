@@ -39,9 +39,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 
 #include "gen/attribute-type.h"
+
+using namespace chip;
 
 static const uint8_t attributeSizes[] = {
 #include "gen/attribute-size.h"
@@ -60,7 +62,7 @@ uint8_t emberAfGetDataSize(uint8_t dataType)
     return 0;
 }
 
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer)
+uint16_t emberAfAttributeValueSize(ClusterId clusterId, AttributeId attrId, EmberAfAttributeType dataType, const uint8_t * buffer)
 {
     // If the dataType is a string or long string, refer to the buffer for the
     // string's length prefix; size is string length plus number of prefix bytes.
@@ -85,6 +87,13 @@ uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t 
                 // size is long string length plus 2-byte length prefix
                 dataSize = static_cast<uint16_t>(emberAfLongStringLength(buffer) + 2u);
             }
+        }
+    }
+    else if (emberAfIsThisDataTypeAListType(dataType))
+    {
+        if (buffer != 0)
+        {
+            dataSize = emberAfAttributeValueListSize(clusterId, attrId, buffer);
         }
     }
     else

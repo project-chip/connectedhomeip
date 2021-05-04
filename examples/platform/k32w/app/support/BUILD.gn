@@ -17,16 +17,37 @@ import("//build_overrides/k32w_sdk.gni")
 
 config("support_config") {
   include_dirs = [ "../../.." ]
+
+  # Link options that provides replace dynamic memory operations in standard
+  # library with the FreeRTOS malloc in platform code.
+  ldflags = [
+    # memory allocation -- these must be re-entrant and do locking
+    "-Wl,--wrap=malloc",
+    "-Wl,--wrap=free",
+    "-Wl,--wrap=realloc",
+    "-Wl,--wrap=calloc",
+    "-Wl,--wrap=MemoryAlloc",
+
+    # Wrap these in case internal newlib call them (e.g. strdup will)
+    # directly call _malloc_r)
+    "-Wl,--wrap=_malloc_r",
+    "-Wl,--wrap=_realloc_r",
+    "-Wl,--wrap=_free_r",
+    "-Wl,--wrap=_calloc_r",
+  ]
 }
 
 source_set("freertos_mbedtls_utils") {
   sources = [
     "FreeRtosMbedtlsUtils.c",
     "FreeRtosMbedtlsUtils.h",
+    "Memconfig.cpp",
   ]
 
   #TODO: not sure this is required, maybe we should make this dependant on mbedtls
   public_deps = [ "${k32w_sdk_build_root}:k32w_sdk" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_configs = [ ":support_config" ]
 }

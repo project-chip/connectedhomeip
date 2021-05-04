@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,13 +62,8 @@ public:
     template <typename... Args>
     CHIP_ERROR Init(Args &&... transportInitArgs)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
-        SuccessOrExit(err);
-        err = TransportMgrBase::Init(&mTransport);
-    exit:
-        return err;
+        ReturnErrorOnFailure(mTransport.Init(this, std::forward<Args>(transportInitArgs)...));
+        return TransportMgrBase::Init(&mTransport);
     }
 
     template <typename... Args>
@@ -76,6 +71,12 @@ public:
     {
         return mTransport.Init(this, std::forward<Args>(transportInitArgs)...);
     }
+
+    void Close()
+    {
+        TransportMgrBase::Close();
+        mTransport.Close();
+    };
 
 private:
     Transport::Tuple<TransportTypes...> mTransport;

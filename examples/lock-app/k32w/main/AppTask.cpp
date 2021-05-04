@@ -18,17 +18,18 @@
  */
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "Server.h"
 #include "support/ErrorStr.h"
+#include <app/server/Server.h>
 
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <support/ThreadOperationalDataset.h>
 
-#include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
+#include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -80,7 +81,7 @@ int AppTask::Init()
     InitServer();
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     TMR_Init();
 
@@ -127,8 +128,7 @@ int AppTask::Init()
 
     // Print the current software version
     char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
-    size_t currentFirmwareRevLen;
-    err = ConfigurationMgr().GetFirmwareRevision(currentFirmwareRev, sizeof(currentFirmwareRev), currentFirmwareRevLen);
+    err = ConfigurationMgr().GetFirmwareRevisionString(currentFirmwareRev, sizeof(currentFirmwareRev));
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
@@ -216,7 +216,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LOCK_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -237,6 +237,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     else if (pin_no == JOIN_BUTTON)
     {
         button_event.Handler = JoinHandler;
+    }
+    else if (pin_no == BLE_BUTTON)
+    {
+        button_event.Handler = BleHandler;
     }
 
     sAppTask.PostEvent(&button_event);
@@ -274,6 +278,9 @@ void AppTask::HandleKeyboard(void)
             break;
         case gKBD_EventPB3_c:
             ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
+            break;
+        case gKBD_EventPB4_c:
+            ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
             break;
         default:
             break;
@@ -394,48 +401,23 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
 
 void AppTask::ThreadStart()
 {
-    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
+    chip::Thread::OperationalDataset dataset{};
 
-    memset(networkInfo.ThreadNetworkName, 0, chip::DeviceLayer::Internal::kMaxThreadNetworkNameLength + 1);
-    memcpy(networkInfo.ThreadNetworkName, "OpenThread", 10);
+    constexpr uint8_t xpanid[]    = { 0xde, 0xad, 0x00, 0xbe, 0xef, 0x00, 0xca, 0xfe };
+    constexpr uint8_t masterkey[] = {
+        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
+    };
+    constexpr uint16_t panid   = 0xabcd;
+    constexpr uint16_t channel = 15;
 
-    networkInfo.ThreadExtendedPANId[0] = 0xde;
-    networkInfo.ThreadExtendedPANId[1] = 0xad;
-    networkInfo.ThreadExtendedPANId[2] = 0x00;
-    networkInfo.ThreadExtendedPANId[3] = 0xbe;
-    networkInfo.ThreadExtendedPANId[4] = 0xef;
-    networkInfo.ThreadExtendedPANId[5] = 0x00;
-    networkInfo.ThreadExtendedPANId[6] = 0xca;
-    networkInfo.ThreadExtendedPANId[7] = 0xfe;
-
-    networkInfo.ThreadMasterKey[0]  = 0x00;
-    networkInfo.ThreadMasterKey[1]  = 0x11;
-    networkInfo.ThreadMasterKey[2]  = 0x22;
-    networkInfo.ThreadMasterKey[3]  = 0x33;
-    networkInfo.ThreadMasterKey[4]  = 0x44;
-    networkInfo.ThreadMasterKey[5]  = 0x55;
-    networkInfo.ThreadMasterKey[6]  = 0x66;
-    networkInfo.ThreadMasterKey[7]  = 0x77;
-    networkInfo.ThreadMasterKey[8]  = 0x88;
-    networkInfo.ThreadMasterKey[9]  = 0x99;
-    networkInfo.ThreadMasterKey[10] = 0xAA;
-    networkInfo.ThreadMasterKey[11] = 0xBB;
-    networkInfo.ThreadMasterKey[12] = 0xCC;
-    networkInfo.ThreadMasterKey[13] = 0xDD;
-    networkInfo.ThreadMasterKey[14] = 0xEE;
-    networkInfo.ThreadMasterKey[15] = 0xFF;
-
-    networkInfo.ThreadPANId   = 0xabcd;
-    networkInfo.ThreadChannel = 15;
-
-    networkInfo.FieldPresent.ThreadExtendedPANId = true;
-    networkInfo.FieldPresent.ThreadMeshPrefix    = false;
-    networkInfo.FieldPresent.ThreadPSKc          = false;
-    networkInfo.NetworkId                        = 0;
-    networkInfo.FieldPresent.NetworkId           = true;
+    dataset.SetNetworkName("OpenThread");
+    dataset.SetExtendedPanId(xpanid);
+    dataset.SetMasterKey(masterkey);
+    dataset.SetPanId(panid);
+    dataset.SetChannel(channel);
 
     ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(networkInfo);
+    ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
     ThreadStackMgr().SetThreadEnabled(true);
 }
 
@@ -454,6 +436,37 @@ void AppTask::JoinHandler(AppEvent * aEvent)
      * In a future PR, these parameters will be sent via BLE.
      */
     ThreadStart();
+}
+
+void AppTask::BleHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != BLE_BUTTON)
+        return;
+
+    if (sAppTask.mFunction != kFunction_NoneSelected)
+    {
+        K32W_LOG("Another function is scheduled. Could not toggle BLE state!");
+        return;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        K32W_LOG("Stopped BLE Advertising!");
+    }
+    else
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+
+        if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+        {
+            K32W_LOG("Started BLE Advertising!");
+        }
+        else
+        {
+            K32W_LOG("OpenDefaultPairingWindow() failed");
+        }
+    }
 }
 
 void AppTask::CancelTimer()

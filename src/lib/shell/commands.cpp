@@ -22,7 +22,7 @@
 
 #include "CHIPVersion.h"
 
-#include "shell.h"
+#include "shell_core.h"
 #include <support/CodeUtils.h>
 
 #include <assert.h>

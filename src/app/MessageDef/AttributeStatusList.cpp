@@ -53,7 +53,7 @@ AttributeStatusList::Builder & AttributeStatusList::Builder::EndOfAttributeStatu
     EndOfContainer();
     return *this;
 }
-
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err                  = CHIP_NO_ERROR;
@@ -108,5 +108,6 @@ exit:
 
     return err;
 }
+#endif
 }; // namespace app
 }; // namespace chip

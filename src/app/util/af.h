@@ -51,7 +51,7 @@
 #pragma once
 
 #ifndef CONFIGURATION_HEADER
-#define CONFIGURATION_HEADER "config.h"
+#define CONFIGURATION_HEADER <app/util/config.h>
 #endif
 #include CONFIGURATION_HEADER
 
@@ -66,11 +66,11 @@
 #include "stack/include/error.h"
 #endif // EZSP_HOST
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
-#include "client-api.h"
-#include "debug-printing.h"
-#include "ember-print.h"
+#include <app/util/client-api.h>
+#include <app/util/debug-printing.h>
+#include <app/util/ember-print.h>
 
 /** @name Attribute Storage */
 // @{
@@ -570,12 +570,46 @@ uint8_t emberAfStringLength(const uint8_t * buffer);
 uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
+ * @brief Function that copies (part of) a ZCL typed list into a buffer. The index parameter
+ * may indicate a specific member of the list, or the list length, or the whole list if it
+ * is equal to -1.
+ *
+ * Individual elements may be accessed by an index of type 16-bit unsigned integer.
+ * Elements are numbered from 1 upwards. The element with index 0 is always of type
+ * uint16, and holds the number of elements contained in the list, which may be zero.
+ * If the zeroth element contains 0xffff, the list is a non value and is considered
+ * undefined.
+ *
+ * When writing, dest points to the list to write to, src points to the value to write, and index is the index to write at.
+ *
+ * When reading (i.e write is false), dest is the location to read into, src points to the list, and index is the index to read
+ * from.
+ *
+ * When reading or writing if the index leads to read or write outside of the
+ * allocated size for the list, this function will return 0.
+ *
+ * @return The number of bytes copied
+ */
+uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
+                         int32_t index);
+
+/*
  * @brief Function that determines the size of a zigbee Cluster Library
  * attribute value (where the attribute could be non-string, string, or long
  * string). For strings, the size includes the length of the string plus the
  * number of the string's length prefix byte(s).
  */
-uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t * buffer);
+uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
+                                   const uint8_t * buffer);
+
+/*
+ * @brief Function that determines the size of a zigbee Cluster Library
+ * attribute List[T] where T could be of any type.
+ * The size is expressed in bytes, and includes the used length consumed
+ * by list entries plus the 2 bytes used to represent the number of actual
+ * entries in the list.
+ */
+uint16_t emberAfAttributeValueListSize(chip::ClusterId clusterId, chip::AttributeId attributeId, const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -645,6 +679,9 @@ bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
 /** @brief Returns true if the given attribute type is a long string. */
 bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
 
+/** @brief Returns true if a given ZCL data type is a list type. */
+bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
+
 /**
  * @brief The mask applied by ::emberAfNextSequence when generating ZCL
  * sequence numbers.
@@ -695,7 +732,7 @@ int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool si
  */
 void emberAfGetEui64(EmberEUI64 returnEui64);
 
-#ifdef EZSP_HOST
+#if (BIGENDIAN_CPU) || defined(EZSP_HOST)
 // Normally this is provided by the stack code, but on the host
 // it is provided by the application code.
 void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
@@ -1436,24 +1473,6 @@ EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
  * @brief emberAfSendImmediateDefaultResponse with attached message sent callback.
  */
 EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Returns the maximum size of the payload that the Application
- * Support sub-layer will accept for the given message type, destination, and
- * APS frame.
- *
- * The size depends on multiple factors, including the security level in use
- * and additional information added to the message to support the various
- * options.
- *
- * @param type The outgoing message type.
- * @param indexOrDestination Depending on the message type, this is either the
- *  EmberNodeId of the destination, an index into the address table, an index
- *  into the binding table, the multicast identifier, or a broadcast address.
- * @param apsFrame The APS frame for the message.
- * @return The maximum APS payload length for the given message.
- */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.

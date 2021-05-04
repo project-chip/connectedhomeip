@@ -67,12 +67,14 @@ struct BrowseContext : public GenericContext
 struct ResolveContext : public GenericContext
 {
     MdnsResolveCallback callback;
+    char name[kMdnsNameMaxSize + 1];
 
-    ResolveContext(void * cbContext, MdnsResolveCallback cb)
+    ResolveContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName)
     {
         type     = ContextType::Resolve;
         context  = cbContext;
         callback = cb;
+        strncpy(name, cbContextName, sizeof(name));
     }
 };
 
@@ -80,14 +82,16 @@ struct GetAddrInfoContext : public GenericContext
 {
     MdnsResolveCallback callback;
     std::vector<TextEntry> textEntries;
+    char name[kMdnsNameMaxSize + 1];
     uint16_t port;
 
-    GetAddrInfoContext(void * cbContext, MdnsResolveCallback cb, uint16_t cbContextPort)
+    GetAddrInfoContext(void * cbContext, MdnsResolveCallback cb, const char * cbContextName, uint16_t cbContextPort)
     {
         type     = ContextType::GetAddrInfo;
         context  = cbContext;
         callback = cb;
         port     = cbContextPort;
+        strncpy(name, cbContextName, sizeof(name));
     }
 };
 

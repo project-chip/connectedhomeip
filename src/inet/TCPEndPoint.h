@@ -673,7 +673,6 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO();
     void HandlePendingIO();
     void ReceiveData();
     void HandleIncomingConnection();

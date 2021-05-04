@@ -90,6 +90,8 @@ public:
 
     void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
 
+    void Close() override { return CloseImpl<0>(); }
+
     /**
      * Initialization method that forwards arguments for initialization to each of the underlying
      * transports.
@@ -150,6 +152,25 @@ private:
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     void DisconnectImpl(const PeerAddress & address)
+    {}
+
+    /**
+     * Recursive disconnect implementation iterating through transport members.
+     *
+     * @tparam N the index of the underlying transport to send close to
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    void CloseImpl()
+    {
+        std::get<N>(mTransports).Close();
+        CloseImpl<N + 1>();
+    }
+
+    /**
+     * CloseImpl template for out of range N.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    void CloseImpl()
     {}
 
     /**

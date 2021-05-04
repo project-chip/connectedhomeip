@@ -19,6 +19,8 @@
 #include <controller/CHIPDeviceController.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <support/CodeUtils.h>
+#include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "ChipThreadWork.h"
@@ -62,35 +64,9 @@ private:
 class ScriptDevicePairingDelegate final : public chip::Controller::DevicePairingDelegate
 {
 public:
-    using OnNetworkCredentialsRequestedCallback     = void (*)();
-    using OnOperationalCredentialsRequestedCallback = void (*)(const char * csr, size_t length);
-    using OnPairingCompleteCallback                 = void (*)(CHIP_ERROR err);
+    using OnPairingCompleteCallback = void (*)(CHIP_ERROR err);
 
     ~ScriptDevicePairingDelegate() = default;
-
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override
-    {
-        mCredentialsDelegate = callback;
-        if (mNetworkCredentialsRequested == nullptr)
-        {
-            ChipLogError(Controller, "Callback for network credentials is not defined.");
-            return;
-        }
-        mNetworkCredentialsRequested();
-    }
-
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override
-    {
-        mCredentialsDelegate = callback;
-        if (mOperationalCredentialsRequested == nullptr)
-        {
-            ChipLogError(Controller, "Callback for operational credentials is not defined.");
-            return;
-        }
-
-        mOperationalCredentialsRequested(csr, csr_length);
-    }
 
     void OnPairingComplete(CHIP_ERROR error) override
     {
@@ -102,103 +78,16 @@ public:
         mPairingComplete(error);
     }
 
-    void SetNetworkCredentialsRequestedCallback(OnNetworkCredentialsRequestedCallback callback)
-    {
-        mNetworkCredentialsRequested = callback;
-    }
-
-    void SetOperatioonalCredentialsRequestedCallback(OnOperationalCredentialsRequestedCallback callback)
-    {
-        mOperationalCredentialsRequested = callback;
-    }
-
     void SetPairingCompleteCallback(OnPairingCompleteCallback callback) { mPairingComplete = callback; }
 
-    void SetWifiCredentials(const char * ssid, const char * password)
-    {
-        if (mCredentialsDelegate == nullptr)
-        {
-            ChipLogError(Controller, "Wifi credentials received before delegate available.");
-            return;
-        }
-
-        mCredentialsDelegate->SendNetworkCredentials(ssid, password);
-    }
-
-    void SetThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
-    {
-        if (mCredentialsDelegate == nullptr)
-        {
-            ChipLogError(Controller, "Thread credentials received before delegate available.");
-            return;
-        }
-
-        mCredentialsDelegate->SendThreadCredentials(threadData);
-    }
-
 private:
-    OnNetworkCredentialsRequestedCallback mNetworkCredentialsRequested         = nullptr;
-    OnOperationalCredentialsRequestedCallback mOperationalCredentialsRequested = nullptr;
-    OnPairingCompleteCallback mPairingComplete                                 = nullptr;
-
-    /// Delegate is set during request callbacks
-    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
+    OnPairingCompleteCallback mPairingComplete = nullptr;
 };
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 
 } // namespace
-
-extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * ssid, const char * password)
-{
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetWifiCredentials(ssid, password); });
-}
-
-extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
-{
-
-    // Openthread is OPAQUE by the spec, however current CHIP stack does not have any
-    // validation/support for opaque blobs. As a result, we try to do some
-    // pre-validation here
-
-    // TODO: there should be uniform 'BLOBL' support within the thread stack
-    if (length != sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo))
-    {
-        ChipLogError(Controller, "Received invalid thread credential blob. Expected size %u and got %u bytes instead",
-                     sizeof(chip::DeviceLayer::Internal::DeviceNetworkInfo), length);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    // unsure about alignment so copy into a properly aligned item
-    chip::DeviceLayer::Internal::DeviceNetworkInfo threadInfo;
-    memcpy(&threadInfo, data, sizeof(threadInfo));
-
-    // TODO: figure out a proper way to validate this or remove validation once
-    // thread credentials are assumed opaque throughout
-    if ((threadInfo.ThreadChannel != chip::DeviceLayer::Internal::kThreadChannel_NotSpecified) &&
-        ((threadInfo.ThreadChannel < 11) || (threadInfo.ThreadChannel > 26)))
-    {
-        ChipLogError(Controller, "Failed to validate thread info: channel %d is not valid", threadInfo.ThreadChannel);
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(threadInfo); });
-
-    return CHIP_NO_ERROR;
-}
-
-extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(
-    ScriptDevicePairingDelegate::OnNetworkCredentialsRequestedCallback callback)
-{
-    gPairingDelegate.SetNetworkCredentialsRequestedCallback(callback);
-}
-
-extern "C" void pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback(
-    ScriptDevicePairingDelegate::OnOperationalCredentialsRequestedCallback callback)
-{
-    gPairingDelegate.SetOperatioonalCredentialsRequestedCallback(callback);
-}
 
 extern "C" void
 pychip_internal_PairingDelegate_SetPairingCompleteCallback(ScriptDevicePairingDelegate::OnPairingCompleteCallback callback)
@@ -216,8 +105,14 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
-        err = result->Init(localDeviceId, &gServerStorage, &gPairingDelegate, &chip::DeviceLayer::SystemLayer,
-                           &chip::DeviceLayer::InetLayer);
+        chip::Controller::CommissionerInitParams params;
+
+        params.storageDelegate = &gServerStorage;
+        params.systemLayer     = &chip::DeviceLayer::SystemLayer;
+        params.inetLayer       = &chip::DeviceLayer::InetLayer;
+        params.pairingDelegate = &gPairingDelegate;
+
+        err = result->Init(localDeviceId, params);
     });
 
     if (err != CHIP_NO_ERROR)

@@ -15,19 +15,21 @@
  *    limitations under the License.
  */
 
-#include "Mdns.h"
+#include <app/server/Mdns.h>
 
 #include <inttypes.h>
 
 #include <core/Optional.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <protocols/secure_channel/PASESession.h>
+#include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
 
-#include "Server.h"
+#include <app/server/Server.h>
 
 namespace chip {
 namespace app {
@@ -38,13 +40,6 @@ namespace {
 NodeId GetCurrentNodeId()
 {
     // TODO: once operational credentials are implemented, node ID should be read from them
-    if (!DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
-    {
-        ChipLogError(Discovery, "Device not fully provisioned. Node ID unknown.");
-        return chip::kTestDeviceNodeId;
-    }
-
-    // Admin pairings should have been persisted and should be loadable
 
     // TODO: once multi-admin is decided, figure out if a single node id
     // is sufficient or if we need multi-node-id advertisement. Existing
@@ -54,13 +49,36 @@ NodeId GetCurrentNodeId()
     auto pairing = GetGlobalAdminPairingTable().cbegin();
     if (pairing != GetGlobalAdminPairingTable().cend())
     {
-        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX64 ", node %" PRIX64, pairing->GetAdminId(),
-                        pairing->GetNodeId());
+        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX16 ", node 0x%08" PRIx32 "%08" PRIx32,
+                        pairing->GetAdminId(), static_cast<uint32_t>(pairing->GetNodeId() >> 32),
+                        static_cast<uint32_t>(pairing->GetNodeId()));
         return pairing->GetNodeId();
     }
 
     ChipLogError(Discovery, "Failed to find a valid admin pairing. Node ID unknown");
     return chip::kTestDeviceNodeId;
+}
+
+// Requires an 8-byte mac to accommodate thread.
+chip::ByteSpan FillMAC(uint8_t (&mac)[8])
+{
+    memset(mac, 0, 8);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    if (chip::DeviceLayer::ThreadStackMgr().GetFactoryAssignedEUI64(mac) == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Using Thread MAC for hostname.");
+        return chip::ByteSpan(mac, 8);
+    }
+#endif
+    if (DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac) == CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Discovery, "Using wifi MAC for hostname");
+        return chip::ByteSpan(mac, 6);
+    }
+    ChipLogError(Discovery, "Wifi mac not known. Using a default.");
+    uint8_t temp[6] = { 0xEE, 0xAA, 0xBA, 0xDA, 0xBA, 0xD0 };
+    memcpy(mac, temp, 6);
+    return chip::ByteSpan(mac, 6);
 }
 
 } // namespace
@@ -76,24 +94,33 @@ CHIP_ERROR AdvertiseOperational()
         fabricId = 5544332211;
     }
 
-    const auto advertiseParameters = chip::Mdns::OperationalAdvertisingParameters()
-                                         .SetFabricId(fabricId)
-                                         .SetNodeId(GetCurrentNodeId())
-                                         .SetPort(CHIP_PORT)
-                                         .EnableIpV4(true);
+    uint8_t mac[8];
+
+    const auto advertiseParameters =
+        chip::Mdns::OperationalAdvertisingParameters()
+            .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
+            .SetMac(FillMAC(mac))
+            .SetPort(CHIP_PORT)
+            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
+            .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
-    ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-
-    return mdnsAdvertiser.Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    ChipLogProgress(Discovery, "Advertise operational node 0x%08" PRIx32 "%08" PRIx32 "-0x%08" PRIx32 "%08" PRIx32,
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetFabricId() >> 32),
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetFabricId()),
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetNodeId() >> 32),
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetNodeId()));
+    return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// Set MDNS commisioning advertisement
-CHIP_ERROR AdvertiseCommisioning()
+CHIP_ERROR AdvertiseCommisionable()
 {
-
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+
+    uint8_t mac[8];
+    advertiseParameters.SetMac(FillMAC(mac));
 
     uint16_t value;
     if (DeviceLayer::ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
@@ -123,14 +150,16 @@ CHIP_ERROR AdvertiseCommisioning()
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
-    ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
-
-    return mdnsAdvertiser.Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
+    return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// (Re-)starts the minmdns server
 void StartServer()
 {
+    ChipLogProgress(Discovery, "Start dns-sd server");
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
     // TODO: advertise this only when really operational once we support both
@@ -145,7 +174,7 @@ void StartServer()
 // so configuraton should be added to enable commissioning advertising based on supported
 // Rendezvous methods.
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        err = app::Mdns::AdvertiseCommisioning();
+        err = app::Mdns::AdvertiseCommisionable();
 #endif
     }
 

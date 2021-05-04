@@ -33,6 +33,7 @@ public:
     CHIP_ERROR Init();
 
     CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
+    CHIP_ERROR StartResolver(Inet::InetLayer * inetLayer, uint16_t port) override { return Start(inetLayer, port); }
 
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
@@ -47,7 +48,7 @@ public:
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
 
     /// Requests resolution of a node ID to its address
-    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
 
     static DiscoveryImplPlatform & GetInstance();
 
@@ -59,12 +60,12 @@ private:
 
     CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
     CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR SetupHostname();
 
     static void HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error);
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
+    CHIP_ERROR SetupHostname(chip::ByteSpan macOrEui64);
 
     OperationalAdvertisingParameters mOperationalAdvertisingParams;
     bool mIsOperationalPublishing = false;

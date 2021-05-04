@@ -86,11 +86,23 @@
 // Definitions for cluster: Basic
 #define ZCL_BASIC_CLUSTER_ID (0x0028)
 
+// Definitions for cluster: OTA Software Update Server
+#define ZCL_OTA_SERVER_CLUSTER_ID (0x0029)
+
+// Definitions for cluster: OTA Software Update Client
+#define ZCL_OTA_CLIENT_CLUSTER_ID (0x002A)
+
 // Definitions for cluster: General Commissioning
 #define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
 
 // Definitions for cluster: Network Commissioning
 #define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
+
+// Definitions for cluster: Switch
+#define ZCL_SWITCH_CLUSTER_ID (0x003B)
+
+// Definitions for cluster: Operational Credentials
+#define ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID (0x003E)
 
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
@@ -245,17 +257,41 @@
 // Definitions for cluster: IAS WD
 #define ZCL_IAS_WD_CLUSTER_ID (0x0502)
 
+// Definitions for cluster: Wake on LAN
+#define ZCL_WAKE_ON_LAN_CLUSTER_ID (0x0503)
+
+// Definitions for cluster: TV Channel
+#define ZCL_TV_CHANNEL_CLUSTER_ID (0x0504)
+
+// Definitions for cluster: Target Navigator
+#define ZCL_TARGET_NAVIGATOR_CLUSTER_ID (0x0505)
+
 // Definitions for cluster: Media Playback
 #define ZCL_MEDIA_PLAYBACK_CLUSTER_ID (0x0506)
+
+// Definitions for cluster: Media Input
+#define ZCL_MEDIA_INPUT_CLUSTER_ID (0x0507)
 
 // Definitions for cluster: Low Power
 #define ZCL_LOW_POWER_CLUSTER_ID (0x0508)
 
+// Definitions for cluster: Keypad Input
+#define ZCL_KEYPAD_INPUT_CLUSTER_ID (0x0509)
+
 // Definitions for cluster: Content Launch
 #define ZCL_CONTENT_LAUNCH_CLUSTER_ID (0x050A)
 
+// Definitions for cluster: Audio Output
+#define ZCL_AUDIO_OUTPUT_CLUSTER_ID (0x050B)
+
+// Definitions for cluster: Application Launcher
+#define ZCL_APPLICATION_LAUNCHER_CLUSTER_ID (0x050C)
+
 // Definitions for cluster: Application Basic
 #define ZCL_APPLICATION_BASIC_CLUSTER_ID (0x050D)
+
+// Definitions for cluster: Account Login
+#define ZCL_ACCOUNT_LOGIN_CLUSTER_ID (0x050E)
 
 // Definitions for cluster: Generic Tunnel
 #define ZCL_GENERIC_TUNNEL_CLUSTER_ID (0x0600)

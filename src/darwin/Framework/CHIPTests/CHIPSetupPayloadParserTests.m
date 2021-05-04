@@ -19,6 +19,7 @@
  */
 // module headers
 #import "CHIPManualSetupPayloadParser.h"
+#import "CHIPOnboardingPayloadParser.h"
 #import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPSetupPayload.h"
 
@@ -34,18 +35,140 @@
 
 @implementation CHIPSetupPayloadParserTests
 
+- (void)testOnboardingPayloadParser_Manual_NoError
+{
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeManualCode
+                                                                                         error:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertTrue(payload.requiresCustomFlow);
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationNone);
+}
+
+- (void)testOnboardingPayloadParser_Manual_WrongType
+{
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                         error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidArgument);
+}
+
+- (void)testOnboardingPayloadParser_Admin_NoError
+{
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeAdmin
+                                                                                         error:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertTrue(payload.requiresCustomFlow);
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 0);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationNone);
+}
+
+- (void)testOnboardingPayloadParser_Admin_WrongType
+{
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"636108753500001000015"
+                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                         error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, CHIPErrorCodeInvalidArgument);
+}
+
+- (void)testOnboardingPayloadParser_QRCode_NoError
+{
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L900000"
+                                                                                        ofType:CHIPOnboardingPayloadTypeQRCode
+                                                                                         error:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertFalse(payload.requiresCustomFlow);
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
+}
+
+- (void)testOnboardingPayloadParser_QRCode_WrongType
+{
+    NSError * error;
+    CHIPSetupPayload * payload = [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L900000"
+                                                                                        ofType:CHIPOnboardingPayloadTypeAdmin
+                                                                                         error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, CHIPErrorCodeIntegrityCheckFailed);
+}
+
+- (void)testOnboardingPayloadParser_NFC_NoError
+{
+    NSError * error;
+    CHIPSetupPayload * payload =
+        [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"
+                                                               ofType:CHIPOnboardingPayloadTypeNFC
+                                                                error:&error];
+
+    XCTAssertNotNil(payload);
+    XCTAssertNil(error);
+
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 128);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 2048);
+    XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
+    XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
+    XCTAssertFalse(payload.requiresCustomFlow);
+    XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
+}
+
+- (void)testOnboardingPayloadParser_NFC_WrongType
+{
+    NSError * error;
+    CHIPSetupPayload * payload =
+        [CHIPOnboardingPayloadParser setupPayloadForOnboardingPayload:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"
+                                                               ofType:CHIPOnboardingPayloadTypeManualCode
+                                                                error:&error];
+
+    XCTAssertNil(payload);
+    XCTAssertEqual(error.code, CHIPErrorCodeIntegrityCheckFailed);
+}
+
 - (void)testManualParser
 {
     NSError * error;
     CHIPManualSetupPayloadParser * parser =
-        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"000003949100001000011"];
+        [[CHIPManualSetupPayloadParser alloc] initWithDecimalStringRepresentation:@"636108753500001000015"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
-    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 1);
-    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 1234);
+    XCTAssertEqual(payload.discriminator.unsignedIntegerValue, 2560);
+    XCTAssertEqual(payload.setUpPINCode.unsignedIntegerValue, 123456780);
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 1);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertTrue(payload.requiresCustomFlow);
@@ -67,7 +190,7 @@
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:B20800G.0G8G000"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"CH:J5L900CK70WWI0000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNil(payload);
@@ -78,7 +201,7 @@
 {
     NSError * error;
     CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008000"];
+        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:@"CH:R5L90UV200A3L900000"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -90,14 +213,14 @@
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertFalse(payload.requiresCustomFlow);
     XCTAssertEqual(payload.version.unsignedIntegerValue, 5);
-    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationWiFi);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
 }
 
 - (void)testQRCodeParserWithOptionalData
 {
     NSError * error;
-    CHIPQRCodeSetupPayloadParser * parser =
-        [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:@"CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc]
+        initWithBase38Representation:@"CH:R5L90UV200A3L90A33P0GQ670.QT52B.E23O6DE044U1077U.3"];
     CHIPSetupPayload * payload = [parser populatePayload:&error];
 
     XCTAssertNotNil(payload);
@@ -109,7 +232,7 @@
     XCTAssertEqual(payload.vendorID.unsignedIntegerValue, 12);
     XCTAssertEqual(payload.productID.unsignedIntegerValue, 1);
     XCTAssertFalse(payload.requiresCustomFlow);
-    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationWiFi);
+    XCTAssertEqual(payload.rendezvousInformation, kRendezvousInformationSoftAP);
     XCTAssertTrue([payload.serialNumber isEqualToString:@"1"]);
 
     NSArray<CHIPOptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];

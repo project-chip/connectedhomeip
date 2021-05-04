@@ -52,6 +52,8 @@ jobs:
               run: scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK
               run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840
+            - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
+              run: scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
             - name: Build example nRF Connect SDK Shell on nRF52840 DK
               run: scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840
             - name: Build example nRF Connect SDK Pigweed on nRF52840 DK

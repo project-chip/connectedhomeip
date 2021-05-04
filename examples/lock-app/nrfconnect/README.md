@@ -340,7 +340,7 @@ page.
 To flash the application to the device, use the west tool and run the following
 command from the example directory:
 
-        $ west flash
+        $ west flash --erase
 
 If you have multiple development kits connected, west will prompt you to pick
 the correct one.

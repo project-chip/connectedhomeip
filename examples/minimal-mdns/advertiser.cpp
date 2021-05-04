@@ -24,6 +24,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
+#include <support/Span.h>
 
 using namespace chip;
 
@@ -54,6 +55,7 @@ struct Options
     // operational params
     uint64_t fabricId = 12345;
     uint64_t nodeId   = 6789;
+    uint8_t mac[6]    = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 
 } gOptions;
 
@@ -118,10 +120,18 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gOptions.pairingHint = Optional<uint8_t>::Value(static_cast<uint8_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
-        gOptions.fabricId = atoll(aValue);
+        if (sscanf(aValue, "%" SCNx64, &gOptions.fabricId) != 1)
+        {
+            PrintArgError("%s: Invalid fabric id: %s\n", aProgram, aValue);
+            return false;
+        }
         return true;
     case kOptionOperationalNodeId:
-        gOptions.nodeId = atoll(aValue);
+        if (sscanf(aValue, "%" SCNx64, &gOptions.nodeId) != 1)
+        {
+            PrintArgError("%s: Invalid node id: %s\n", aProgram, aValue);
+            return false;
+        }
         return true;
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -142,9 +152,9 @@ OptionDef cmdLineOptionsDef[] = {
     { "pairing-instruction", kArgumentRequired, kOptionCommisioningPairingInstr },
     { "pairing-hint", kArgumentRequired, kOptionCommisioningPairingHint },
 
-    { "fabrid-id", kArgumentRequired, kOptionOperationalFabricId },
+    { "fabric-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
-    nullptr,
+    {},
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
@@ -171,7 +181,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Commisionable pairing instruction.\n"
                              "  --pairing-hint <value>\n"
                              "        Commisionable pairing hint.\n"
-                             "  --fabrid-id <value>\n"
+                             "  --fabric-id <value>\n"
                              "  -f <value>\n"
                              "        Operational fabric id.\n"
                              "  --node-id <value>\n"
@@ -219,16 +229,18 @@ int main(int argc, char ** args)
                                                                       .SetPort(CHIP_PORT)
                                                                       .SetShortDiscriminator(gOptions.shortDiscriminator)
                                                                       .SetLongDiscrimininator(gOptions.longDiscriminator)
+                                                                      .SetMac(chip::ByteSpan(gOptions.mac, 6))
                                                                       .SetVendorId(gOptions.vendorId)
                                                                       .SetProductId(gOptions.productId));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::OperationalAdvertisingParameters()
-                                                                      .EnableIpV4(gOptions.enableIpV4)
-                                                                      .SetPort(CHIP_PORT)
-                                                                      .SetFabricId(gOptions.fabricId)
-                                                                      .SetNodeId(gOptions.nodeId));
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
+            chip::Mdns::OperationalAdvertisingParameters()
+                .EnableIpV4(gOptions.enableIpV4)
+                .SetPort(CHIP_PORT)
+                .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                .SetPeerId(PeerId().SetFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
     {

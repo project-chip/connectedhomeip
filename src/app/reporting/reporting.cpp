@@ -39,7 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "reporting.h"
+#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -204,7 +204,8 @@ void emberAfPluginReportingTickEventHandler(void)
     // reportSize needs to be able to fit a sum of dataSize and some other stuff
     // without overflowing.
     uint32_t reportSize;
-    uint8_t index, currentPayloadMaxLength = 0, smallestPayloadMaxLength = 0;
+    uint8_t index;
+    uint16_t currentPayloadMaxLength = 0, smallestPayloadMaxLength = 0;
 
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
     {
@@ -245,7 +246,7 @@ void emberAfPluginReportingTickEventHandler(void)
         }
 
         // find size of current report
-        dataSize   = emberAfAttributeValueSize(dataType, readData);
+        dataSize   = emberAfAttributeValueSize(entry.clusterId, entry.attributeId, dataType, readData);
         reportSize = static_cast<uint32_t>(sizeof(entry.attributeId) + sizeof(dataType) + dataSize);
 
         // If we have already started a report for a different attribute or
@@ -292,8 +293,7 @@ void emberAfPluginReportingTickEventHandler(void)
                 if (status == (EmberAfStatus) EMBER_SUCCESS && bindingEntry.local == entry.endpoint &&
                     bindingEntry.clusterId == entry.clusterId)
                 {
-                    currentPayloadMaxLength =
-                        emberAfMaximumApsPayloadLength(bindingEntry.type, bindingEntry.networkIndex, apsFrame);
+                    currentPayloadMaxLength = EMBER_AF_RESPONSE_BUFFER_LEN;
                     if (currentPayloadMaxLength < smallestPayloadMaxLength)
                     {
                         smallestPayloadMaxLength = currentPayloadMaxLength;

@@ -81,7 +81,7 @@ public:
     /**
      * Close the open endpoint without destroying the object
      */
-    virtual void Close(){};
+    virtual void Close() {}
 
 protected:
     /**

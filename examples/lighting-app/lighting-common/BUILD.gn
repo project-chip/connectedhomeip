@@ -13,64 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("${chip_root}/examples/lighting-app/lighting-common/lighting.gni")
-import("${chip_root}/src/app/common_flags.gni")
-import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 
-if (enable_pw_rpc) {
+if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
+  import("$dir_pw_build/python.gni")
   import("$dir_pw_protobuf_compiler/proto.gni")
-}
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-  ]
-}
-
-if (enable_pw_rpc) {
   pw_proto_library("lighting_service") {
-    sources = [ "lighting_service/pigweed_lighting.proto" ]
-    inputs = [ "lighting_service/pigweed_lighting.options" ]
+    sources = [ "lighting_service/lighting_service.proto" ]
+    deps = [ "$dir_pw_protobuf:common_protos" ]
   }
 }
 
-source_set("lighting-common") {
-  sources = [
-    "${chip_root}/src/app/clusters/bindings/bindings.cpp",
-    "${chip_root}/src/app/clusters/level-control/level-control.cpp",
-    "${chip_root}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp",
-    "${chip_root}/src/app/clusters/network-commissioning/network-commissioning.cpp",
-    "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
-    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
-    "${chip_root}/src/app/reporting/reporting.cpp",
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
-    "${chip_root}/src/app/util/af-event.cpp",
-    "${chip_root}/src/app/util/af-main-common.cpp",
-    "${chip_root}/src/app/util/attribute-size.cpp",
-    "${chip_root}/src/app/util/attribute-storage.cpp",
-    "${chip_root}/src/app/util/attribute-table.cpp",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/chip-message-send.cpp",
-    "${chip_root}/src/app/util/client-api.cpp",
-    "${chip_root}/src/app/util/ember-print.cpp",
-    "${chip_root}/src/app/util/message.cpp",
-    "${chip_root}/src/app/util/process-cluster-message.cpp",
-    "${chip_root}/src/app/util/process-global-message.cpp",
-    "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.cpp",
-    "gen/callback-stub.cpp",
-  ]
+chip_data_model("lighting-common") {
+  zap_file = "lighting-app.zap"
 
-  if (chip_app_use_interaction_model) {
-    sources += [
-      "${chip_root}/src/app/util/ember-compatibility-functions.cpp",
-      "gen/IMClusterCommandHandler.cpp",
-    ]
-  }
-
-  deps = [ "${chip_root}/src/lib" ]
-
-  public_configs = [ ":includes" ]
+  zap_pregenerated_dir = "gen"
+  is_server = true
 }

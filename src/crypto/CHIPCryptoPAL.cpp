@@ -179,7 +179,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p::ComputeRoundOne(uint8_t * out, size_t * out_len)
+CHIP_ERROR Spake2p::ComputeRoundOne(const uint8_t * pab, size_t pab_len, uint8_t * out, size_t * out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     void * MN        = nullptr; // Choose M if a prover, N if a verifier

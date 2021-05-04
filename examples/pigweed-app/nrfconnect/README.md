@@ -296,17 +296,16 @@ nRF52840 Dongle.
 ### Flashing on the nRF52840 DK
 
 To flash the application to the device, use the west tool and run the following
-commands, with the _example-dir_ directory name updated for your configuration:
+command from the example directory:
 
-        $ cd example-dir
-        $ west flash
+        $ west flash --erase
 
 If you have multiple nRF52840 development kits connected, west will prompt you
 to pick the correct one.
 
-To debug the application on target, run the following commands:
+To debug the application on target, run the following command from the example
+directory:
 
-        $ cd example-dir
         $ west debug
 
 <a name="nrf52840dongle_flashing"></a>

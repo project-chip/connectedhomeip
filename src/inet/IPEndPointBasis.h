@@ -93,9 +93,6 @@ public:
     typedef void (*OnMessageReceivedFunct)(IPEndPointBasis * endPoint, chip::System::PacketBufferHandle msg,
                                            const IPPacketInfo * pktInfo);
 
-    /** The endpoint's message reception event handling function delegate. */
-    OnMessageReceivedFunct OnMessageReceived;
-
     /**
      * @brief   Type of reception error event handling function.
      *
@@ -109,15 +106,18 @@ public:
      */
     typedef void (*OnReceiveErrorFunct)(IPEndPointBasis * endPoint, INET_ERROR err, const IPPacketInfo * pktInfo);
 
-    /** The endpoint's receive error event handling function delegate. */
-    OnReceiveErrorFunct OnReceiveError;
-
     INET_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback);
     INET_ERROR JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
     INET_ERROR LeaveMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress);
 
 protected:
     void Init(InetLayer * aInetLayer);
+
+    /** The endpoint's message reception event handling function delegate. */
+    OnMessageReceivedFunct OnMessageReceived;
+
+    /** The endpoint's receive error event handling function delegate. */
+    OnReceiveErrorFunct OnReceiveError;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
@@ -138,7 +138,6 @@ protected:
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
-    SocketEvents PrepareIO();
     void HandlePendingIO(uint16_t aPort);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -165,6 +164,18 @@ protected:
     INET_ERROR ReleaseConnection();
     void ReleaseAll();
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+public:
+    using JoinMulticastGroupHandler  = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
+    using LeaveMulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
+    static void SetJoinMulticastGroupHandler(JoinMulticastGroupHandler handler) { sJoinMulticastGroupHandler = handler; }
+    static void SetLeaveMulticastGroupHandler(LeaveMulticastGroupHandler handler) { sLeaveMulticastGroupHandler = handler; }
+
+private:
+    static JoinMulticastGroupHandler sJoinMulticastGroupHandler;
+    static LeaveMulticastGroupHandler sLeaveMulticastGroupHandler;
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
 private:
     IPEndPointBasis()                        = delete;

@@ -78,7 +78,8 @@ void ReadClient::MoveToState(const ClientState aTargetState)
 }
 
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
-                                       size_t aEventPathParamsListSize)
+                                       size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
+                                       size_t aAttributePathParamsListSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
@@ -103,6 +104,33 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
         if (aEventPathParamsListSize != 0 && apEventPathParamsList != nullptr)
         {
             // TODO: fill to construct event paths
+        }
+
+        if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
+        {
+            AttributePathList::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
+            SuccessOrExit(attributePathListBuilder.GetError());
+            for (size_t index = 0; index < aAttributePathParamsListSize; index++)
+            {
+                AttributePath::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePathBuilder();
+                attributePathBuilder.NodeId(apAttributePathParamsList[index].mNodeId)
+                    .EndpointId(apAttributePathParamsList[index].mEndpointId)
+                    .ClusterId(apAttributePathParamsList[index].mClusterId);
+                if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kFieldIdValid)
+                {
+                    attributePathBuilder.FieldId(apAttributePathParamsList[index].mFieldId);
+                }
+                else if (apAttributePathParamsList[index].mFlags == AttributePathFlags::kListIndexValid)
+                {
+                    attributePathBuilder.ListIndex(apAttributePathParamsList[index].mListIndex);
+                }
+                else
+                {
+                    err = CHIP_ERROR_INVALID_ARGUMENT;
+                    ExitNow();
+                }
+                SuccessOrExit(attributePathBuilder.GetError());
+            }
         }
         request.EndOfReadRequest();
         SuccessOrExit(request.GetError());
@@ -136,12 +164,21 @@ void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContex
 
 exit:
     ChipLogFunctError(err);
-    if (err != CHIP_NO_ERROR && mpDelegate != nullptr)
-    {
-        mpDelegate->ReportError(this, err);
-    }
+
     ClearExistingExchangeContext();
     MoveToState(ClientState::Initialized);
+    if (mpDelegate != nullptr)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            mpDelegate->ReportError(this, err);
+        }
+        else
+        {
+            mpDelegate->ReportProcessed(this);
+        }
+    }
+
     return;
 }
 
@@ -161,10 +198,12 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportData::Parser report;
 
-    bool isEventListPresent  = false;
-    bool suppressResponse    = false;
-    bool moreChunkedMessages = false;
-
+    bool isEventListPresent         = false;
+    bool isAttributeDataListPresent = false;
+    bool suppressResponse           = false;
+    bool moreChunkedMessages        = false;
+    EventList::Parser eventList;
+    AttributeDataList::Parser attributeDataList;
     System::PacketBufferTLVReader reader;
 
     reader.Init(std::move(aPayload));
@@ -173,8 +212,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     err = report.Init(reader);
     SuccessOrExit(err);
 
+#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
     err = report.CheckSchemaValidity();
     SuccessOrExit(err);
+#endif
 
     err = report.GetSuppressResponse(&suppressResponse);
     if (CHIP_END_OF_TLV == err)
@@ -190,38 +231,41 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle aPayload)
     }
     SuccessOrExit(err);
 
+    err                = report.GetEventDataList(&eventList);
+    isEventListPresent = (err == CHIP_NO_ERROR);
+    if (err == CHIP_END_OF_TLV)
     {
-        EventList::Parser eventList;
+        err = CHIP_NO_ERROR;
+    }
+    SuccessOrExit(err);
 
-        err = report.GetEventDataList(&eventList);
-        if (CHIP_NO_ERROR == err)
-        {
-            isEventListPresent = true;
-        }
-        else if (CHIP_END_OF_TLV == err)
-        {
-            isEventListPresent = false;
-            err                = CHIP_NO_ERROR;
-        }
+    if (isEventListPresent && nullptr != mpDelegate)
+    {
+        chip::TLV::TLVReader eventListReader;
+        eventList.GetReader(&eventListReader);
+        err = mpDelegate->EventStreamReceived(mpExchangeCtx, &eventListReader);
         SuccessOrExit(err);
+    }
 
-        if (isEventListPresent && nullptr != mpDelegate && !moreChunkedMessages)
-        {
-            chip::TLV::TLVReader eventListReader;
-            eventList.GetReader(&eventListReader);
-            err = mpDelegate->EventStreamReceived(mpExchangeCtx, &eventListReader);
-            SuccessOrExit(err);
-        }
+    err                        = report.GetAttributeDataList(&attributeDataList);
+    isAttributeDataListPresent = (err == CHIP_NO_ERROR);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    SuccessOrExit(err);
+    if (isAttributeDataListPresent && nullptr != mpDelegate && !moreChunkedMessages)
+    {
+        chip::TLV::TLVReader attributeDataListReader;
+        attributeDataList.GetReader(&attributeDataListReader);
+        err = ProcessAttributeDataList(attributeDataListReader);
+        SuccessOrExit(err);
     }
 
     if (!suppressResponse)
     {
         // TODO: Add status report support and correspond handler in ReadHandler, particular for situation when there
         // are multiple reports
-    }
-    if (nullptr != mpDelegate && !moreChunkedMessages)
-    {
-        err = mpDelegate->ReportProcessed(this);
     }
 
 exit:
@@ -239,6 +283,60 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     {
         mpDelegate->ReportError(this, CHIP_ERROR_TIMEOUT);
     }
+}
+
+CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while (CHIP_NO_ERROR == (err = aAttributeDataListReader.Next()))
+    {
+        chip::TLV::TLVReader dataReader;
+        AttributeDataElement::Parser element;
+        AttributePath::Parser attributePathParser;
+        AttributePathParams attributePathParams;
+        TLV::TLVReader reader = aAttributeDataListReader;
+        err                   = element.Init(reader);
+        SuccessOrExit(err);
+
+        err = element.GetAttributePath(&attributePathParser);
+        SuccessOrExit(err);
+
+        err = attributePathParser.GetNodeId(&(attributePathParams.mNodeId));
+        SuccessOrExit(err);
+
+        err = attributePathParser.GetEndpointId(&(attributePathParams.mEndpointId));
+        SuccessOrExit(err);
+
+        err = attributePathParser.GetClusterId(&(attributePathParams.mClusterId));
+        SuccessOrExit(err);
+
+        err = attributePathParser.GetFieldId(&(attributePathParams.mFieldId));
+        if (CHIP_NO_ERROR == err)
+        {
+            attributePathParams.mFlags = AttributePathFlags::kFieldIdValid;
+        }
+        else if (CHIP_END_OF_TLV == err)
+        {
+            err = attributePathParser.GetListIndex(&(attributePathParams.mListIndex));
+            SuccessOrExit(err);
+            attributePathParams.mFlags = AttributePathFlags::kListIndexValid;
+        }
+        SuccessOrExit(err);
+
+        err = element.GetData(&dataReader);
+        SuccessOrExit(err);
+        err = WriteSingleClusterData(attributePathParams, dataReader);
+        SuccessOrExit(err);
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
+exit:
+    ChipLogFunctError(err);
+    return err;
 }
 }; // namespace app
 }; // namespace chip

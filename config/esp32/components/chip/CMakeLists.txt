@@ -29,8 +29,13 @@ if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 endif()
 
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
+if (CONFIG_ENABLE_CHIP_SHELL)
+    list(APPEND CHIP_REQURIE_COMPONENTS console)
+endif()
+
 idf_component_register(SRCS chip.c chip.cpp
-                       PRIV_REQUIRES freertos lwip bt mdns mbedtls)
+                       PRIV_REQUIRES ${CHIP_REQURIE_COMPONENTS})
 
 # Prepare initial args file (lacking compile flags)
 # This will be saved as args.gn.in
@@ -40,10 +45,19 @@ macro(chip_gn_arg_append arg val)
     string(APPEND chip_gn_args "${arg} = ${val}\n")
 endmacro()
 
+macro(chip_gn_arg_bool arg boolean)
+    if (${boolean})
+        string(APPEND chip_gn_args "${arg} = true\n")
+    else()
+        string(APPEND chip_gn_args "${arg} = false\n")
+    endif()
+endmacro()
+
 chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
+chip_gn_arg_bool("is_debug"                is_debug)
 
 if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
@@ -52,6 +66,15 @@ if(CONFIG_ENABLE_PW_RPC)
     chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
 endif()
+
+if (NOT CONFIG_USE_MINIMAL_MDNS)
+    chip_gn_arg_append("chip_mdns"                          "\"platform\"")
+endif()
+
+if (CONFIG_ENABLE_CHIP_SHELL)
+    chip_gn_arg_append("chip_build_shell_lib"                   "true")
+endif()
+
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -100,14 +123,20 @@ endif()
 
 set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 
+set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
+
+if(CONFIG_ENABLE_PW_RPC)
+    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+endif()
+
 externalproject_add(
     chip_gn
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
-    BUILD_COMMAND           ninja
+    BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
-    BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
+    BUILD_BYPRODUCTS        ${chip_libraries}
     WORKING_DIRECTORY       ${CMAKE_CURRENT_LIST_DIR}
     DEPENDS                 args_gn
     BUILD_ALWAYS            1
@@ -122,31 +151,33 @@ target_include_directories(${COMPONENT_LIB} PRIVATE
 
 target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/src/platform/ESP32"
-    "${CHIP_ROOT}/src/include/"
+    "${CHIP_ROOT}/src/include"
     "${CHIP_ROOT}/src/lib"
-    "${CHIP_ROOT}/src/"
-    "${CHIP_ROOT}/src/system"
+    "${CHIP_ROOT}/src"
     "${CHIP_ROOT}/third_party/nlassert/repo/include"
+    "${CHIP_ROOT}/third_party/nlio/repo/include"
     "${CMAKE_CURRENT_BINARY_DIR}/src/include"
     "${CMAKE_CURRENT_BINARY_DIR}/include"
-    "${CMAKE_CURRENT_BINARY_DIR}/gen/third_party/connectedhomeip/src/app/include"
     "${CMAKE_CURRENT_BINARY_DIR}/gen/include"
 )
 
 idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
-
-set(chip_libraries "-lCHIP")
-
-if(CONFIG_ENABLE_PW_RPC)
-    list(APPEND chip_libraries "-lPwRpc")
-endif()
 
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
 endif()
 
-target_link_libraries(${COMPONENT_LIB} INTERFACE "-L${CMAKE_CURRENT_BINARY_DIR}/lib")
+if (CONFIG_ENABLE_CHIP_SHELL)
+    idf_component_get_property(console_lib console COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${console_lib}>)
+endif()
+
+if(NOT CONFIG_USE_MINIMAL_MDNS)
+    idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
+endif()
+
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
                                                 ${chip_libraries}
                                                 $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}> 

@@ -108,6 +108,11 @@ union PeerSockAddr
 };
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+IPEndPointBasis::JoinMulticastGroupHandler IPEndPointBasis::sJoinMulticastGroupHandler;
+IPEndPointBasis::LeaveMulticastGroupHandler IPEndPointBasis::sLeaveMulticastGroupHandler;
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if INET_CONFIG_ENABLE_IPV4
 #define LWIP_IPV4_ADDR_T ip4_addr_t
@@ -496,6 +501,13 @@ INET_ERROR IPEndPointBasis::JoinMulticastGroup(InterfaceId aInterfaceId, const I
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case kIPAddressType_IPv6: {
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+        if (sJoinMulticastGroupHandler != nullptr)
+        {
+            return sJoinMulticastGroupHandler(aInterfaceId, aAddress);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #ifdef HAVE_IPV6_MULTICAST
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_joingroup_netif);
@@ -581,6 +593,13 @@ INET_ERROR IPEndPointBasis::LeaveMulticastGroup(InterfaceId aInterfaceId, const 
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case kIPAddressType_IPv6: {
+#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+        if (sLeaveMulticastGroupHandler != nullptr)
+        {
+            return sLeaveMulticastGroupHandler(aInterfaceId, aAddress);
+        }
+#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_IPV6_MLD && LWIP_IPV6_ND && LWIP_IPV6
         lRetval = LwIPIPv6JoinLeaveMulticastGroup(aInterfaceId, aAddress, mld6_leavegroup_netif);
@@ -1057,16 +1076,6 @@ INET_ERROR IPEndPointBasis::GetSocket(IPAddressType aAddressType, int aType, int
     }
 
     return INET_NO_ERROR;
-}
-
-SocketEvents IPEndPointBasis::PrepareIO()
-{
-    SocketEvents res;
-
-    if (mState == kState_Listening && OnMessageReceived != nullptr)
-        res.SetRead();
-
-    return res;
 }
 
 void IPEndPointBasis::HandlePendingIO(uint16_t aPort)

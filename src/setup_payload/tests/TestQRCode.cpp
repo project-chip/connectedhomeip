@@ -38,22 +38,28 @@ void TestRendezvousFlags(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload inPayload = GetDefaultPayload();
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kNone;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kNone);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kBLE;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kThread;
+    inPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kEthernet;
+    inPayload.rendezvousInformation =
+        RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 
-    inPayload.rendezvousInformation = RendezvousInformationFlags::kAllMask;
+    inPayload.rendezvousInformation =
+        RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kOnNetwork);
+    NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation = RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
     NL_TEST_ASSERT(inSuite, CheckWriteRead(inPayload));
 }
 
@@ -65,63 +71,74 @@ void TestPayloadByteArrayRep(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, CompareBinary(payload, expected));
 }
 
-void TestPayloadBase41Rep(nlTestSuite * inSuite, void * inContext)
+void TestPayloadBase38Rep(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
     string result;
-    CHIP_ERROR err  = generator.payloadBase41Representation(result);
+    CHIP_ERROR err  = generator.payloadBase38Representation(result);
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
-    string expected = "CH:J20800G008008000";
+    string expected = "CH:R5L90UV200A3L900000";
     NL_TEST_ASSERT(inSuite, result == expected);
 }
 
-void TestBase41(nlTestSuite * inSuite, void * inContext)
+void TestBase38(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t input[] = { 10, 10, 10 };
 
     // basic stuff
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 0).empty());
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 1) == "A");
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "SL1");
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1A");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 0).empty());
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 1) == "A0");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 2) == "OT10");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "-N.B0");
 
     // test single odd byte corner conditions
     input[2] = 0;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL10");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "OT100");
     input[2] = 40;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL1.");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "Y6V91");
     input[2] = 41;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL101");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "KL0B1");
     input[2] = 255;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 3) == "SL196");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "Q-M08");
 
     // testing optimized encoding
-    // verify that we can't optimize a low value, need 3 chars
+    // verify that we can't optimize a low value using less characters
+    // for 1 byte we need always 2 characters
+    input[0] = 35;
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 1) == "Z0");
+    // for 2 bytes we need always 4 characters
     input[0] = 255;
     input[1] = 0;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "960");
-    // smallest optimized encoding, 256
-    input[0] = 256 % 256;
-    input[1] = 256 / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "A6");
-    // largest optimizated encoding value
-    input[0] = ((kRadix * kRadix) - 1) % 256;
-    input[1] = ((kRadix * kRadix) - 1) / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "..");
-    // can't optimize
-    input[0] = ((kRadix * kRadix)) % 256;
-    input[1] = ((kRadix * kRadix)) / 256;
-    NL_TEST_ASSERT(inSuite, base41Encode(input, 2) == "001");
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 2) == "R600");
+    // for 3 bytes we need always 5 characters
+    input[0] = 46;
+    input[1] = 0;
+    input[2] = 0;
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "81000");
+
+    // verify maximal available values for each chunk size to check selecting proper characters number
+    // for 1 byte we need 2 characters
+    input[0] = 255;
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 1) == "R6");
+    // for 2 bytes we need 4 characters
+    input[0] = 255;
+    input[1] = 255;
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 2) == "NE71");
+    // for 3 bytes we need 5 characters
+    input[0] = 255;
+    input[1] = 255;
+    input[2] = 255;
+    NL_TEST_ASSERT(inSuite, base38Encode(input, 3) == "PLS18");
 
     // fun with strings
-    NL_TEST_ASSERT(inSuite, base41Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1) == "GHF.KGL+48-G5LGK35");
+    NL_TEST_ASSERT(inSuite, base38Encode((uint8_t *) "Hello World!", sizeof("Hello World!") - 1) == "KKHF3W2S013OPM3EJX11");
 
     vector<uint8_t> decoded = vector<uint8_t>();
-    NL_TEST_ASSERT(inSuite, base41Decode("GHF.KGL+48-G5LGK35", decoded) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, base38Decode("KKHF3W2S013OPM3EJX11", decoded) == CHIP_NO_ERROR);
 
     string hello_world;
     for (uint8_t b : decoded)
@@ -131,45 +148,46 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, hello_world == "Hello World!");
 
     // short input
-    NL_TEST_ASSERT(inSuite, base41Decode("A0", decoded) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, decoded.size() == 1);
-
-    // empty == empty
-    NL_TEST_ASSERT(inSuite, base41Decode("", decoded) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, decoded.empty());
-
-    // single base41 means one byte of output
-    NL_TEST_ASSERT(inSuite, base41Decode("A", decoded) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, base38Decode("A0", decoded) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, decoded.size() == 1);
     NL_TEST_ASSERT(inSuite, decoded[0] == 10);
 
+    // empty == empty
+    NL_TEST_ASSERT(inSuite, base38Decode("", decoded) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, decoded.empty());
+
     // outside valid chars
-    NL_TEST_ASSERT(inSuite, base41Decode("0\001", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("\0010", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("[0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("0[", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("0\001", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("\0010", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("[0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("0[", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // BOGUS chars
-    NL_TEST_ASSERT(inSuite, base41Decode("!0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("\"0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("#0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("&0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("'0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("(0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode(")0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode(",0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode(";0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("<0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("=0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode(">0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
-    NL_TEST_ASSERT(inSuite, base41Decode("@0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode(" 0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("!0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("\"0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("#0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("$0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("%0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("&0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("'0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("(0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode(")0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("*0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("+0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode(",0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode(";0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("<0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("=0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode(">0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
+    NL_TEST_ASSERT(inSuite, base38Decode("@0", decoded) == CHIP_ERROR_INVALID_INTEGER_VALUE);
 
     // odd byte(s) cases
-    NL_TEST_ASSERT(inSuite, base41Decode("96", decoded) == CHIP_NO_ERROR); // this is 255
+    NL_TEST_ASSERT(inSuite, base38Decode("R6", decoded) == CHIP_NO_ERROR); // this is 255
     NL_TEST_ASSERT(inSuite, decoded.size() == 1 && decoded[0] == 255);
-    NL_TEST_ASSERT(inSuite, base41Decode("A6", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, base38Decode("S600", decoded) == CHIP_NO_ERROR); // this is 256, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == 256);
-    NL_TEST_ASSERT(inSuite, base41Decode("..", decoded) == CHIP_NO_ERROR); // this is (41*41)-1, or 1680, needs 2 output bytes
+    NL_TEST_ASSERT(inSuite, base38Decode("..00", decoded) == CHIP_NO_ERROR); // this is (38*38)-1, or 1443, needs 2 output bytes
     NL_TEST_ASSERT(inSuite, decoded.size() == 2 && decoded[0] + decoded[1] * 256 == (kRadix * kRadix) - 1);
 }
 
@@ -194,9 +212,11 @@ void TestSetupPayloadVerify(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid rendezvousInformation
-    test_payload = payload;
-    test_payload.rendezvousInformation =
-        static_cast<RendezvousInformationFlags>(static_cast<uint16_t>(RendezvousInformationFlags::kAllMask) + 1);
+    test_payload                       = payload;
+    RendezvousInformationFlags invalid = RendezvousInformationFlags(
+        RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork);
+    invalid.SetRaw(static_cast<uint16_t>(invalid.Raw() + 1));
+    test_payload.rendezvousInformation = invalid;
     NL_TEST_ASSERT(inSuite, test_payload.isValidQRCodePayload() == false);
 
     // test invalid discriminator
@@ -259,13 +279,13 @@ void TestQRCodeToPayloadGeneration(nlTestSuite * inSuite, void * inContext)
     SetupPayload payload = GetDefaultPayload();
 
     QRCodeSetupPayloadGenerator generator(payload);
-    string base41Rep;
-    CHIP_ERROR err  = generator.payloadBase41Representation(base41Rep);
+    string base38Rep;
+    CHIP_ERROR err  = generator.payloadBase38Representation(base38Rep);
     bool didSucceed = err == CHIP_NO_ERROR;
     NL_TEST_ASSERT(inSuite, didSucceed == true);
 
     SetupPayload resultingPayload;
-    QRCodeSetupPayloadParser parser(base41Rep);
+    QRCodeSetupPayloadParser parser(base38Rep);
 
     err        = parser.populatePayload(resultingPayload);
     didSucceed = err == CHIP_NO_ERROR;
@@ -306,10 +326,10 @@ void TestExtractPayload(nlTestSuite * inSuite, void * inContext)
 const nlTest sTests[] =
 {
     NL_TEST_DEF("Test Rendezvous Flags",                                            TestRendezvousFlags),
-    NL_TEST_DEF("Test Base 41",                                                     TestBase41),
+    NL_TEST_DEF("Test Base 38",                                                     TestBase38),
     NL_TEST_DEF("Test Bitset Length",                                               TestBitsetLen),
     NL_TEST_DEF("Test Payload Byte Array Representation",                           TestPayloadByteArrayRep),
-    NL_TEST_DEF("Test Payload Base 41 Representation",                              TestPayloadBase41Rep),
+    NL_TEST_DEF("Test Payload Base 38 Representation",                              TestPayloadBase38Rep),
     NL_TEST_DEF("Test Setup Payload Verify",                                        TestSetupPayloadVerify),
     NL_TEST_DEF("Test Payload Equality",                                            TestPayloadEquality),
     NL_TEST_DEF("Test Payload Inequality",                                          TestPayloadInEquality),

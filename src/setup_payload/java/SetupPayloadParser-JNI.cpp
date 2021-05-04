@@ -1,7 +1,8 @@
-#include "ManualSetupPayloadParser.h"
-#include "QRCodeSetupPayloadParser.h"
+#include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
 #include <vector>
@@ -10,9 +11,21 @@
 
 using namespace chip;
 
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_MIN 10000
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_MAX 10999
+
+#define _SETUP_PAYLOAD_PARSER_JNI_ERROR(e) (SETUP_PAYLOAD_PARSER_JNI_ERROR_MIN + (e))
+
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN _SETUP_PAYLOAD_PARSER_JNI_ERROR(0)
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(1)
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(2)
+#define SETUP_PAYLOAD_PARSER_JNI_ERROR_FIELD_NOT_FOUND _SETUP_PAYLOAD_PARSER_JNI_ERROR(3)
+
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_setuppayload_SetupPayloadParser_##METHOD_NAME
 
 static jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload);
+static CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj);
+static CHIP_ERROR ThrowInvalidEntryCodeFormatException(JNIEnv * env, jstring entryCodeObj);
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -23,30 +36,48 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 
 JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj)
 {
-    CHIP_ERROR err;
-    const char * qrString                      = NULL;
-    QRCodeSetupPayloadParser * qrPayloadParser = NULL;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    const char * qrString = NULL;
     SetupPayload payload;
 
-    qrString        = env->GetStringUTFChars(qrCodeObj, 0);
-    qrPayloadParser = new QRCodeSetupPayloadParser(qrString);
+    qrString = env->GetStringUTFChars(qrCodeObj, 0);
 
-    err = qrPayloadParser->populatePayload(payload);
+    err = QRCodeSetupPayloadParser(qrString).populatePayload(payload);
+    env->ReleaseStringUTFChars(qrCodeObj, qrString);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        err = ThrowUnrecognizedQRCodeException(env, qrCodeObj);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SetupPayload, "Error throwing UnrecognizedQRCodeException: %d", err);
+        }
+        return nullptr;
+    }
 
     return TransformSetupPayload(env, payload);
 }
 
 JNI_METHOD(jobject, fetchPayloadFromManualEntryCode)(JNIEnv * env, jobject self, jstring entryCode)
 {
-    CHIP_ERROR err;
-    const char * entryCodeString                        = NULL;
-    ManualSetupPayloadParser * manualSetupPayloadParser = NULL;
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    const char * entryCodeString = NULL;
     SetupPayload payload;
 
-    entryCodeString          = env->GetStringUTFChars(entryCode, 0);
-    manualSetupPayloadParser = new ManualSetupPayloadParser(entryCodeString);
+    entryCodeString = env->GetStringUTFChars(entryCode, 0);
+    env->ReleaseStringUTFChars(entryCode, entryCodeString);
 
-    err = manualSetupPayloadParser->populatePayload(payload);
+    err = ManualSetupPayloadParser(entryCodeString).populatePayload(payload);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        err = ThrowInvalidEntryCodeFormatException(env, entryCode);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SetupPayload, "Error throwing InvalidEntryCodeFormatException: %d", err);
+        }
+        return nullptr;
+    }
 
     return TransformSetupPayload(env, payload);
 }
@@ -130,4 +161,46 @@ jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload)
     }
 
     return setupPayload;
+}
+
+CHIP_ERROR ThrowUnrecognizedQRCodeException(JNIEnv * env, jstring qrCodeObj)
+{
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    jclass exceptionCls            = nullptr;
+    jmethodID exceptionConstructor = nullptr;
+    jthrowable exception           = nullptr;
+
+    env->ExceptionClear();
+
+    exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$UnrecognizedQrCodeException");
+    VerifyOrExit(exceptionCls != NULL, err = SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
+    exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
+    VerifyOrExit(exceptionConstructor != NULL, err = SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
+    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, qrCodeObj);
+    VerifyOrExit(exception != NULL, err = SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN);
+
+    env->Throw(exception);
+exit:
+    return err;
+}
+
+CHIP_ERROR ThrowInvalidEntryCodeFormatException(JNIEnv * env, jstring entryCodeObj)
+{
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    jclass exceptionCls            = nullptr;
+    jmethodID exceptionConstructor = nullptr;
+    jthrowable exception           = nullptr;
+
+    env->ExceptionClear();
+
+    exceptionCls = env->FindClass("chip/setuppayload/SetupPayloadParser$InvalidEntryCodeFormatException");
+    VerifyOrExit(exceptionCls != NULL, err = SETUP_PAYLOAD_PARSER_JNI_ERROR_TYPE_NOT_FOUND);
+    exceptionConstructor = env->GetMethodID(exceptionCls, "<init>", "(Ljava/lang/String;)V");
+    VerifyOrExit(exceptionConstructor != NULL, err = SETUP_PAYLOAD_PARSER_JNI_ERROR_METHOD_NOT_FOUND);
+    exception = (jthrowable) env->NewObject(exceptionCls, exceptionConstructor, entryCodeObj);
+    VerifyOrExit(exception != NULL, err = SETUP_PAYLOAD_PARSER_JNI_ERROR_EXCEPTION_THROWN);
+
+    env->Throw(exception);
+exit:
+    return err;
 }

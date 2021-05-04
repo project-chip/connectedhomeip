@@ -54,31 +54,28 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
-    mCB = cb;
+    mCB                              = cb;
+    RendezvousInformationFlags flags = RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE);
 
     // Initialize the CHIP stack.
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    switch (static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE))
+    if (flags.Has(RendezvousInformationFlag::kBLE))
     {
-    case RendezvousInformationFlags::kBLE:
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-        break;
-
-    case RendezvousInformationFlags::kWiFi:
+    }
+    else if (flags.Has(RendezvousInformationFlag::kSoftAP))
+    {
+        // TODO(cecille): Fix for the case where BLE and SoftAP are both enabled.`
         ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-        break;
-
-    case RendezvousInformationFlags::kNone:
+    }
+    else
+    {
         // If rendezvous is bypassed, enable SoftAP so that the device can still
         // be communicated with via its SoftAP as needed.
         ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
-        break;
-
-    default:
-        break;
     }
 
     err = Platform::MemoryInit();

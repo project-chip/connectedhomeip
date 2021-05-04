@@ -17,10 +17,10 @@
 
 #include <bitset>
 
-#include "Base41.cpp"
-#include "QRCodeSetupPayloadGenerator.cpp"
-#include "QRCodeSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
+#include <setup_payload/Base38.cpp>
+#include <setup_payload/QRCodeSetupPayloadGenerator.cpp>
+#include <setup_payload/QRCodeSetupPayloadParser.cpp>
+#include <setup_payload/SetupPayload.cpp>
 
 namespace chip {
 
@@ -44,7 +44,7 @@ inline SetupPayload GetDefaultPayload()
     payload.vendorID              = 12;
     payload.productID             = 1;
     payload.requiresCustomFlow    = 0;
-    payload.rendezvousInformation = RendezvousInformationFlags::kWiFi;
+    payload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP);
     payload.discriminator         = 128;
     payload.setUpPINCode          = 2048;
 
@@ -69,14 +69,14 @@ inline SetupPayload GetDefaultPayloadWithOptionalDefaults()
     return payload;
 }
 
-inline std::string toBinaryRepresentation(std::string base41Result)
+inline std::string toBinaryRepresentation(std::string base38Result)
 {
     // Remove the kQRCodePrefix
-    base41Result.erase(0, strlen(kQRCodePrefix));
+    base38Result.erase(0, strlen(kQRCodePrefix));
 
-    // Decode the base41 encoded string
+    // Decode the base38 encoded string
     std::vector<uint8_t> buffer;
-    base41Decode(base41Result, buffer);
+    base38Decode(base38Result, buffer);
 
     // Convert it to binary
     std::string binaryResult;
@@ -121,7 +121,7 @@ inline bool CompareBinary(SetupPayload & payload, std::string & expectedBinary)
 
     std::string result;
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
 
     std::string resultBinary = toBinaryRepresentation(result);
     return (expectedBinary == resultBinary);
@@ -134,7 +134,7 @@ inline bool CheckWriteRead(SetupPayload & inPayload)
 
     QRCodeSetupPayloadGenerator generator(inPayload);
     uint8_t optionalInfo[kDefaultBufferSizeInBytes];
-    generator.payloadBase41Representation(result, optionalInfo, sizeof(optionalInfo));
+    generator.payloadBase38Representation(result, optionalInfo, sizeof(optionalInfo));
 
     QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(result);
     parser.populatePayload(outPayload);

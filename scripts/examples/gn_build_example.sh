@@ -38,6 +38,9 @@ for arg; do
         *=*)
             GN_ARGS+=("$arg")
             ;;
+        *import*)
+            GN_ARGS+=("$arg")
+            ;;
         *)
             echo >&2 "invalid argument: $arg"
             exit 2

@@ -54,7 +54,7 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 12345678
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
 // Use a default pairing code if one hasn't been provisioned in flash.
@@ -95,14 +95,14 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
  *
  * A string identifying the firmware revision running on the device.
  * CHIP currently expects the firmware version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION "0.1ALPHA"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -148,6 +148,26 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE should change his advertisements
+ * from fast interval to slow interval.
+ *
+ * 30000 (30 secondes).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT (30 * 1000)
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
+ * from the moment of slow advertisement commencement.
+ *
+ * Defaults to 9000000 (15 minutes).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

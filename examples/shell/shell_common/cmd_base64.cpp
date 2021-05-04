@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/shell.h>
+#include <lib/shell/shell_core.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/Base64.h>

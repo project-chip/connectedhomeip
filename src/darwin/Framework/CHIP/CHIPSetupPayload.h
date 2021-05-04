@@ -25,13 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_ENUM(NSUInteger, RendezvousInformationFlags) {
     kRendezvousInformationNone = 0, // Device does not support any method for rendezvous
-    kRendezvousInformationWiFi = 1 << 0, // Device supports WiFi
+    kRendezvousInformationSoftAP = 1 << 0, // Device supports WiFi softAP
     kRendezvousInformationBLE = 1 << 1, // Device supports BLE
-    kRendezvousInformationThread = 1 << 2, // Device supports Thread
-    kRendezvousInformationEthernet = 1 << 3, // Device MAY be attached to a wired 802." connection"
+    kRendezvousInformationOnNetwork = 1 << 2, // Device supports On Network setup
 
-    kRendezvousInformationAllMask
-    = kRendezvousInformationWiFi | kRendezvousInformationBLE | kRendezvousInformationThread | kRendezvousInformationEthernet,
+    kRendezvousInformationAllMask = kRendezvousInformationSoftAP | kRendezvousInformationBLE | kRendezvousInformationOnNetwork,
 };
 
 typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) {

@@ -82,26 +82,65 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     chip::CommandId commandId;
     chip::EndpointId endpointId;
 
-    ReturnErrorOnFailure(aCommandElement.GetCommandPath(&commandPath));
-    ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
-    ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
-    ReturnErrorOnFailure(commandPath.GetEndpointId(&endpointId));
+    err = aCommandElement.GetCommandPath(&commandPath);
+    SuccessOrExit(err);
+    err = commandPath.GetClusterId(&clusterId);
+    SuccessOrExit(err);
+    err = commandPath.GetCommandId(&commandId);
+    SuccessOrExit(err);
+    err = commandPath.GetEndpointId(&endpointId);
+    SuccessOrExit(err);
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
-        // Empty Command, Add status code in invoke command response, notify cluster handler to hand it further.
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        AddStatusCode(static_cast<uint16_t>(GeneralStatusCode::kSuccess), Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeSuccess, clusterId);
+        // The Path is not present when the CommandDataElement is used with an empty response, ResponseCommandElement would only
+        // have status code,
+        AddStatusCode(nullptr, GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
+                      Protocols::SecureChannel::kProtocolCodeSuccess);
     }
     else if (CHIP_NO_ERROR == err)
     {
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
 
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        // The Path is not present when there is an error to be conveyed back. ResponseCommandElement would only have status code,
+        // set the error with CHIP_NO_ERROR, then continue to process rest of commands
+        AddStatusCode(nullptr, GeneralStatusCode::kInvalidArgument, Protocols::SecureChannel::Id,
+                      Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+        err = CHIP_NO_ERROR;
+    }
     return err;
 }
+
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,
+                                         const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
+                                         const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    StatusElement::Builder statusElementBuilder;
+
+    err = PrepareCommand(apCommandPathParams, true /* isStatus */);
+    SuccessOrExit(err);
+
+    statusElementBuilder =
+        mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().CreateStatusElementBuilder();
+    statusElementBuilder.EncodeStatusElement(aGeneralCode, aProtocolId.ToFullyQualifiedSpecForm(), aProtocolCode)
+        .EndOfStatusElement();
+    err = statusElementBuilder.GetError();
+    SuccessOrExit(err);
+
+    err = FinishCommand(true /* isStatus */);
+
+exit:
+    ChipLogFunctError(err);
+    return err;
+}
+
 } // namespace app
 } // namespace chip

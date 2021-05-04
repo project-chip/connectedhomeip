@@ -16,27 +16,38 @@
  *    limitations under the License.
  */
 
+#include <cassert>
+#include <iostream>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include <app/Command.h>
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <core/CHIPError.h>
 #include <support/CHIPMem.h>
 #include <support/RandUtils.h>
 
-#include "Server.h"
+#include "AppMain.h"
 
-#include <cassert>
 #include <iostream>
+#include <support/ErrorStr.h>
+
+#include "include/application-launcher/ApplicationLauncherManager.h"
+#include "include/audio-output/AudioOutputManager.h"
+#include "include/content-launcher/ContentLauncherManager.h"
+#include "include/keypad-input/KeypadInputManager.h"
+#include "include/media-input/MediaInputManager.h"
+#include "include/media-playback/MediaPlaybackManager.h"
+#include "include/target-navigator/TargetNavigatorManager.h"
+#include "include/tv-channel/TvChannelManager.h"
 
 using namespace chip;
-using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
@@ -44,7 +55,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {}
 
-bool emberAfBasicClusterMfgSpecificPingCallback(void)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -54,17 +65,40 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = chip::Platform::MemoryInit();
+    // Init Keypad Input manager
+    err = KeypadInputManager().Init();
     SuccessOrExit(err);
 
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    // Init Application Launcher Manager
+    err = ApplicationLauncherManager().Init();
     SuccessOrExit(err);
 
-    // Init ZCL Data Model and CHIP App Server
-    InitServer();
+    // Init Audio Output Manager
+    err = AudioOutputManager().Init();
+    SuccessOrExit(err);
 
-    chip::DeviceLayer::PlatformMgr().RunEventLoop();
+    // Init Content Launcher Manager
+    err = ContentLauncherManager().Init();
+    SuccessOrExit(err);
 
+    // Init Media Input Manager
+    err = MediaInputManager().Init();
+    SuccessOrExit(err);
+
+    // Init Media Playback Manager
+    err = MediaPlaybackManager().Init();
+    SuccessOrExit(err);
+
+    // Init Target Navigator Manager
+    err = TargetNavigatorManager().Init();
+    SuccessOrExit(err);
+
+    // Init Tv Channel Manager
+    err = TvChannelManager().Init();
+    SuccessOrExit(err);
+
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    ChipLinuxAppMainLoop();
 exit:
     if (err != CHIP_NO_ERROR)
     {

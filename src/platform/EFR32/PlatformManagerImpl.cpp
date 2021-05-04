@@ -29,6 +29,8 @@
 
 #include <lwip/tcpip.h>
 
+#include "AppConfig.h"
+
 namespace chip {
 namespace DeviceLayer {
 

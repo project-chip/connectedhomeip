@@ -19,8 +19,8 @@ import("$dir_pw_build/target_types.gni")
 static_library("pw_rpc") {
   output_name = "libPwRpc"
 
-  public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
   sources = [ "${dir_pigweed}/pw_hdlc/rpc_example/hdlc_rpc_server.cc" ]
+
   deps = [
     "$dir_pw_rpc:server",
     "$dir_pw_rpc/nanopb:echo_service",
@@ -31,6 +31,8 @@ static_library("pw_rpc") {
     dir_pw_hdlc,
     dir_pw_log,
   ]
+
+  public_configs = [ "${dir_pigweed}/pw_hdlc:default_config" ]
 
   output_dir = "${root_out_dir}/lib"
 

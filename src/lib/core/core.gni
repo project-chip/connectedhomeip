@@ -44,6 +44,9 @@ declare_args() {
 
   # Memory management debug option: use dmalloc
   chip_config_memory_debug_dmalloc = false
+
+  # Overall experimental options for CHIP
+  chip_enable_interaction_model = false
 }
 
 if (chip_target_style == "") {

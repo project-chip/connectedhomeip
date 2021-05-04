@@ -228,6 +228,9 @@ private:
     static void blekw_connection_timeout_cb(TimerHandle_t timer);
     static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
     static void blekw_new_data_received_notification(uint32_t mask);
+    static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
+    static void CancelBleAdvTimeoutTimer(void);
+    static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
     static CHIP_ERROR blekw_controller_init(void);
     static CHIP_ERROR blekw_host_init(void);
     static void Host_Task(osaTaskParam_t argument);

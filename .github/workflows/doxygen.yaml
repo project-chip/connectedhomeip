@@ -15,7 +15,8 @@
 name: Doxygen
 
 on:
-    tag:
+    push:
+    pull_request:
 
 jobs:
     doxygen:
@@ -37,7 +38,7 @@ jobs:
               run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
               id: extract_branch
             - name: Deploy if master
-              if: steps.extract_branch.outputs.branch == 'master'
+              if: steps.extract_branch.outputs.branch == 'master' && github.repository == 'project-chip/connectedhomeip'
               uses: peaceiris/actions-gh-pages@v3
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
