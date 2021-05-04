@@ -127,6 +127,7 @@ public:
 // Test input data.
 
 static volatile bool sOverflowTestDone;
+static volatile bool sStartTimerHandled;
 
 void TimerFailed(void * aState)
 {
@@ -206,6 +207,66 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     ServiceEvents(lSys, sleepTime);
 }
 
+void HandleStartTimer(Layer * inetLayer, void * aState, Error aError)
+{
+    TestContext & lContext = *static_cast<TestContext *>(aState);
+    NL_TEST_ASSERT(lContext.mTestSuite, true);
+    sStartTimerHandled = true;
+}
+
+static void CheckStartTimer(nlTestSuite * inSuite, void * aContext)
+{
+    uint32_t timeout_100ms = 100;
+
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    Layer & lSys           = *lContext.mLayer;
+
+    sStartTimerHandled = false;
+
+    Error err = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
+    NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
+
+    while (!sStartTimerHandled)
+    {
+        struct timeval sleepTime;
+        sleepTime.tv_sec  = 0;
+        sleepTime.tv_usec = 1000; // 1 ms tick
+        ServiceEvents(lSys, sleepTime);
+    }
+
+    NL_TEST_ASSERT(lContext.mTestSuite, sStartTimerHandled == true);
+    lSys.CancelTimer(HandleStartTimer, aContext);
+}
+
+static void CheckExtendTimer(nlTestSuite * inSuite, void * aContext)
+{
+    uint32_t timeout_50ms  = 50;
+    uint32_t timeout_100ms = 100;
+
+    TestContext & lContext = *static_cast<TestContext *>(aContext);
+    Layer & lSys           = *lContext.mLayer;
+
+    sStartTimerHandled = false;
+
+    Error err = CHIP_SYSTEM_NO_ERROR;
+
+    err = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
+    NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
+
+    err = lSys.ExtendTimer(timeout_50ms, HandleStartTimer, aContext);
+    NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
+
+    while (!sStartTimerHandled)
+    {
+        struct timeval sleepTime;
+        sleepTime.tv_sec  = 0;
+        sleepTime.tv_usec = 1000; // 1 ms tick
+        ServiceEvents(lSys, sleepTime);
+    }
+
+    NL_TEST_ASSERT(lContext.mTestSuite, sStartTimerHandled == true);
+}
+
 // Test Suite
 
 /**
@@ -214,6 +275,8 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
 // clang-format off
 static const nlTest sTests[] =
 {
+    NL_TEST_DEF("Timer::TestStartTimer",           CheckStartTimer),
+    NL_TEST_DEF("Timer::TestExtendTimer",          CheckExtendTimer),
     NL_TEST_DEF("Timer::TestOverflow",             CheckOverflow),
     NL_TEST_DEF("Timer::TestTimerStarvation",      CheckStarvation),
     NL_TEST_SENTINEL()

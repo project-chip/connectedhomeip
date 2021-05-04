@@ -308,6 +308,49 @@ exit:
 
 /**
  * @brief
+ *   This method extends a one-shot timer.
+ *
+ *   @note
+ *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
+ *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
+ *       the currently-running timer will be extended for a duration of specified period.
+ *
+ *   @param[in]  aMilliseconds Extension time in milliseconds.
+ *   @param[in]  aComplete     A pointer to the function called when timer expires.
+ *   @param[in]  aAppState     A pointer to the application state object used when timer expires.
+ *
+ *   @return CHIP_SYSTEM_NO_ERROR On success.
+ *   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
+ *   @return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE If System Layer is not initialized.
+ *   @return Other Value indicating timer failed to start or extend.
+ *
+ */
+Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aOnComplete, void * aAppState)
+{
+    VerifyOrReturnError(this->State() == kLayerState_Initialized, CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
+
+    Timer * lTimer = nullptr;
+    for (size_t i = 0; i < Timer::sPool.Size(); ++i)
+    {
+        Timer * timer = Timer::sPool.Get(*this, i);
+
+        if (timer != nullptr && timer->OnComplete == aOnComplete && timer->AppState == aAppState)
+        {
+            lTimer = timer;
+            break;
+        }
+    }
+
+    if (lTimer)
+    {
+        aMilliseconds += static_cast<uint32_t>(lTimer->mAwakenEpoch - Timer::GetCurrentEpoch());
+    }
+
+    return StartTimer(aMilliseconds, aOnComplete, aAppState);
+}
+
+/**
+ * @brief
  *   This method cancels a one-shot timer, started earlier through @p StartTimer().
  *
  *   @note
