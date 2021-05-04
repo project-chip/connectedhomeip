@@ -903,7 +903,7 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnStatusUpdate(PairingSessionDelegate::SecurePairingFailed);
+        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
     }
 
     RendezvousCleanup(err);
@@ -939,7 +939,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnStatusUpdate(PairingSessionDelegate::SecurePairingSuccess);
+        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
     }
 
     RendezvousCleanup(CHIP_NO_ERROR);

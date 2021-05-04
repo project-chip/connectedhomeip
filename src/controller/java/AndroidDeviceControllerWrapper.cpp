@@ -215,7 +215,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     return wrapper.release();
 }
 
-void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::PairingSessionDelegate::Status status)
+void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::DevicePairingDelegate::Status status)
 {
     CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onStatusUpdate", static_cast<jint>(status));
 }

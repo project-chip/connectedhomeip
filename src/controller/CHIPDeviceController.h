@@ -39,7 +39,6 @@
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PairingSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -85,13 +84,19 @@ class DLL_EXPORT DevicePairingDelegate
 public:
     virtual ~DevicePairingDelegate() {}
 
+    enum Status : uint8_t
+    {
+        SecurePairingSuccess = 0,
+        SecurePairingFailed,
+    };
+
     /**
      * @brief
      *   Called when the pairing reaches a certain stage.
      *
      * @param status Current status of pairing
      */
-    virtual void OnStatusUpdate(PairingSessionDelegate::Status status) {}
+    virtual void OnStatusUpdate(DevicePairingDelegate::Status status) {}
 
     /**
      * @brief
