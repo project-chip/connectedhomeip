@@ -76,10 +76,13 @@ macro(chip_gn_arg_bool ARG BOOLEAN)
 endmacro()
 
 macro(chip_gn_arg_flags ARG CFLAGS)
+    list(SORT CFLAGS)
     string(APPEND CHIP_GN_ARGS "${ARG} = [${CFLAGS}]\n")
 endmacro()
 
 macro(chip_gn_arg_lang_flags ARG CFLAGS)
+    list(SORT CFLAGS)
+    list(SORT CHIP_CFLAG_EXCLUDES)
     set(CFLAG_EXCLUDES "[")
     foreach(cflag ${CHIP_CFLAG_EXCLUDES})
         string(APPEND CFLAG_EXCLUDES "\"${cflag}\", ")
@@ -154,6 +157,11 @@ list(APPEND CHIP_CFLAGS
     \"-D__LINUX_ERRNO_EXTENSIONS__=1\"
 )
 
+# CFLAGS are put in random order, sort them before converting them to a string
+list(SORT CHIP_CFLAGS)
+list(SORT CHIP_CFLAGS_C)
+list(SORT CHIP_CFLAGS_CC)
+
 set(SEPARATOR ",")
 convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS ${SEPARATOR})
 set(SEPARATOR " ")
@@ -221,10 +229,11 @@ ExternalProject_Add(
     PREFIX                  ${CMAKE_CURRENT_BINARY_DIR}
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/mbed/chip-gn gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/mbed/chip-gn gen --export-compile-commands --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
     BUILD_COMMAND           ninja
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${CHIP_LIBRARIES}
+    CONFIGURE_ALWAYS        TRUE   
     BUILD_ALWAYS            TRUE
     USES_TERMINAL_CONFIGURE TRUE
     USES_TERMINAL_BUILD     TRUE
