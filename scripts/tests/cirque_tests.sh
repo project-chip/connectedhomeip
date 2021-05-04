@@ -35,6 +35,7 @@ OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation.tgz"
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
     "EchoTest"
+    "InteractionModelTest"
     "MobileDeviceTest"
 )
 
