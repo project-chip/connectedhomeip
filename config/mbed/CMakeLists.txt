@@ -93,7 +93,6 @@ endmacro()
 
 macro(mbed_interface_library_named name)
   add_library(${name} INTERFACE)
-  set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS ${name})
 endmacro()
 
 # ==============================================================================
@@ -212,12 +211,6 @@ chip_gn_arg_bool  ("chip_build_tests"                     CONFIG_CHIP_BUILD_TEST
 chip_gn_arg_bool  ("chip_build_libshell"                  CONFIG_CHIP_LIB_SHELL)
 chip_gn_arg_bool  ("chip_with_platform_mbedtls"           CONFIG_CHIP_WITH_EXTERNAL_MBEDTLS)
 chip_gn_arg_bool  ("chip_bypass_rendezvous"               CONFIG_CHIP_BYPASS_RENDEZVOUS)
-
-if (BOARD STREQUAL "native_posix")
-    chip_gn_arg_string("target_cpu" "x86")
-elseif (BOARD STREQUAL "native_posix_64")
-    chip_gn_arg_string("target_cpu" "x64")
-endif()
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
 
