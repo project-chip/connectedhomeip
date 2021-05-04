@@ -239,14 +239,10 @@ mbed_interface_library_named(chip)
 target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
 target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src
-    ${CHIP_ROOT}/src/app/server
-    ${CHIP_ROOT}/src/app/util
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
-    ${CHIP_ROOT}/src/lib/core
     ${CHIP_ROOT}/third_party/nlassert/repo/include
     ${CMAKE_CURRENT_BINARY_DIR}/gen/include
-    ${CMAKE_CURRENT_BINARY_DIR}/gen/third_party/connectedhomeip/src/app/include
 )
 target_link_directories(chip INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/lib)
 target_link_libraries(chip INTERFACE -Wl,--start-group ${CHIP_LIBRARIES} -Wl,--end-group)

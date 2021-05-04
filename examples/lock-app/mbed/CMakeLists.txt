@@ -33,6 +33,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${APP_ROOT}/lock-common
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
+                           ${CHIP_ROOT}/third_party/nlio/repo/include
 )
 
 target_sources(${APP_TARGET} PRIVATE
@@ -60,6 +61,10 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
+               ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/server/Server.cpp
+               ${CHIP_ROOT}/src/app/server/StorablePeerConnection.cpp
                ${CHIP_ROOT}/src/app/clusters/basic/basic.cpp
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp

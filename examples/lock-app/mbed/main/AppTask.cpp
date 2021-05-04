@@ -19,23 +19,23 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 
 // FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
 // from unistd.h to avoid a conflicting declaration with the `sleep()` provided
 // by Mbed-OS in mbed_power_mgmt.h.
 #define sleep unistd_sleep
-#include "Server.h"
+#include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
 #undef sleep
 
 #include <support/logging/CHIPLogging.h>
 
 // ZAP -- ZCL Advanced Platform
-#include "attribute-storage.h"
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
+#include <app/util/attribute-storage.h>
 
 // mbed-os headers
 #include "drivers/InterruptIn.h"
