@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "CHIPSetupPayload.h"
+#import "CHIPSetupPayload_Internal.h"
 #import "CHIPError.h"
 #import <setup_payload/SetupPayload.h>
 
@@ -26,7 +26,7 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
-- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+- (CHIPRendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
 {
     if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
         return kRendezvousInformationBLE;
