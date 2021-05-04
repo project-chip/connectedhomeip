@@ -43,21 +43,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Identify
- *
- */
-@interface CHIPIdentify : CHIPCluster
-
-- (void)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler;
-- (void)identifyQuery:(ResponseHandler)completionHandler;
-
-- (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
-- (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-/**
  * Cluster On/off
  *
  */

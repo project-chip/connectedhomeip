@@ -27,31 +27,8 @@
 namespace chip {
 namespace Controller {
 
-constexpr ClusterId kIdentifyClusterId                    = 0x0003;
 constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
-
-class DLL_EXPORT IdentifyCluster : public ClusterBase
-{
-public:
-    IdentifyCluster() : ClusterBase(kIdentifyClusterId) {}
-    ~IdentifyCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t identifyTime);
-    CHIP_ERROR IdentifyQuery(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-    // Cluster Attributes
-    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint16_t value);
-
-private:
-    static constexpr CommandId kIdentifyCommandId      = 0x00;
-    static constexpr CommandId kIdentifyQueryCommandId = 0x01;
-};
 
 class DLL_EXPORT OnOffCluster : public ClusterBase
 {

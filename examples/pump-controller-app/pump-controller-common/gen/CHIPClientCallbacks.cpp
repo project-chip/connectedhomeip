@@ -718,19 +718,6 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * commandObj, uint16_t timeout)
-{
-    ChipLogProgress(Zcl, "IdentifyQueryResponse:");
-    ChipLogProgress(Zcl, "  timeout: %" PRIu16 "", timeout);
-
-    GET_RESPONSE_CALLBACKS("IdentifyClusterIdentifyQueryResponseCallback");
-
-    Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback> * cb =
-        Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, timeout);
-    return true;
-}
-
 bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uint16_t messageLen)
 {
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");

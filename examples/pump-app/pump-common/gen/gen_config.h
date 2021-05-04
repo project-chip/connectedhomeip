@@ -30,8 +30,6 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_GROUPS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
-#define EMBER_AF_IDENTIFY_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
-#define EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT (1)
@@ -42,15 +40,6 @@
 #define ZCL_USING_GROUPS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GROUPS_SERVER
 #define EMBER_AF_PLUGIN_GROUPS
-
-// Use this macro to check if the client side of the Identify cluster is included
-#define ZCL_USING_IDENTIFY_CLUSTER_CLIENT
-#define EMBER_AF_PLUGIN_IDENTIFY_CLIENT
-
-// Use this macro to check if the server side of the Identify cluster is included
-#define ZCL_USING_IDENTIFY_CLUSTER_SERVER
-#define EMBER_AF_PLUGIN_IDENTIFY_SERVER
-#define EMBER_AF_PLUGIN_IDENTIFY
 
 // Use this macro to check if the server side of the On/off cluster is included
 #define ZCL_USING_ON_OFF_CLUSTER_SERVER
