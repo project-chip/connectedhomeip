@@ -48,7 +48,7 @@ jobs:
                   fetch-depth: 0
                   submodules: true
 
-            - name: Build example Shell App
+            - name: Build example
               run: scripts/examples/mbed_example.sh -a=${{matrix.EXAMPLE_APP}} -b=${{matrix.EXAMPLE_TARGET}} -p=$EXAMPLE_PROFILE
 
             - name: Copy aside build products
