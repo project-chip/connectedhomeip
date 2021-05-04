@@ -208,7 +208,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     XCTAssertNotNil(cluster);
 
     {{asObjectiveCBasicType type}} value = {{asTestValue}};
-    [cluster writeAttribute{{asCamelCased name false}}WithValue:value completionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster writeAttribute{{asCamelCased name false}}WithValue:value responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"{{asCamelCased parent.name false}} {{asCamelCased name false}} Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
