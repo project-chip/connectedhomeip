@@ -297,9 +297,6 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
 
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
-    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
-    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
-
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
