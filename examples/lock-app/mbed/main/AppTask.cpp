@@ -111,9 +111,7 @@ int AppTask::Init()
 
 int AppTask::StartApp()
 {
-    int ret                            = Init();
-    uint64_t mLastPublishServiceTimeUS = 0;
-
+    int ret = Init();
     if (ret)
     {
         ChipLogError(NotSpecified, "AppTask.Init() failed");
@@ -179,16 +177,6 @@ int AppTask::StartApp()
 
         sStatusLED.Animate();
         sLockLED.Animate();
-
-        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            // TODO:
-            // PublishService();
-            mLastPublishServiceTimeUS = nowUS;
-        }
     }
 }
 
