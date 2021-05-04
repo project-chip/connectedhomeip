@@ -389,6 +389,24 @@ void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, S
     }
 }
 
+void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate)
+{
+    for (auto & ec : mContextPool)
+    {
+        if (ec.GetReferenceCount() == 0 || ec.GetDelegate() != delegate)
+        {
+            continue;
+        }
+
+        // Make sure to null out the delegate before closing the context, so
+        // we don't notify the delegate that the context is closing.  We
+        // have to do this, because the delegate might be partially
+        // destroyed by this point.
+        ec.SetDelegate(nullptr);
+        ec.Close();
+    }
+}
+
 void ExchangeManager::IncrementContextsInUse()
 {
     mContextsInUse++;
