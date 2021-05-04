@@ -173,7 +173,7 @@ CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::
     // Sent buffer data format is:
     //    - packet size as a uint16_t
     //    - actual data
-    
+
     VerifyOrReturnError(address.GetTransportType() == Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(kPacketSizeBytes + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(),
