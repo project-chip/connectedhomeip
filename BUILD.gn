@@ -63,6 +63,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     deps = [
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
+      "${chip_root}/src/channel",
       "${chip_root}/src/controller",
       "${chip_root}/src/credentials",
       "${chip_root}/src/crypto",

@@ -21,9 +21,10 @@
 #pragma once
 
 #include "af-structs.h"
-#include "af-types.h"
-#include "basic-types.h"
+#include <app/util/af-types.h>
+#include <app/util/basic-types.h>
 
+#include <app/Command.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -509,7 +510,7 @@ void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
  * @param groupName
  */
 
-bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
 
 /**
  * @brief Groups Cluster AddGroupIfIdentifying Command callback
@@ -517,7 +518,7 @@ bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
  * @param groupName
  */
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
 
 /**
  * @brief Groups Cluster GetGroupMembership Command callback
@@ -525,66 +526,66 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
  * @param groupList
  */
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount,
+bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * commandObj, uint8_t groupCount,
                                                     /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
  * @brief Groups Cluster RemoveAllGroups Command callback
  */
 
-bool emberAfGroupsClusterRemoveAllGroupsCallback();
+bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Groups Cluster RemoveGroup Command callback
  * @param groupId
  */
 
-bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId);
+bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Groups Cluster ViewGroup Command callback
  * @param groupId
  */
 
-bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId);
+bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Identify Cluster IdentifyQueryResponse Command callback
  * @param timeout
  */
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout);
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * commandObj, uint16_t timeout);
 
 /**
  * @brief Identify Cluster Identify Command callback
  * @param identifyTime
  */
 
-bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime);
+bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uint16_t identifyTime);
 
 /**
  * @brief Identify Cluster IdentifyQuery Command callback
  */
 
-bool emberAfIdentifyClusterIdentifyQueryCallback();
+bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj);
 
 /**
  * @brief On/off Cluster Off Command callback
  */
 
-bool emberAfOnOffClusterOffCallback();
+bool emberAfOnOffClusterOffCallback(chip::app::Command * commandObj);
 
 /**
  * @brief On/off Cluster On Command callback
  */
 
-bool emberAfOnOffClusterOnCallback();
+bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj);
 
 /**
  * @brief On/off Cluster Toggle Command callback
  */
 
-bool emberAfOnOffClusterToggleCallback();
+bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Scenes Cluster AddScene Command callback
@@ -595,7 +596,8 @@ bool emberAfOnOffClusterToggleCallback();
  * @param extensionFieldSets
  */
 
-bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
+                                          uint16_t transitionTime, uint8_t * sceneName,
                                           /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
@@ -603,7 +605,7 @@ bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uin
  * @param groupId
  */
 
-bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId);
+bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Scenes Cluster RecallScene Command callback
@@ -612,14 +614,15 @@ bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId);
  * @param transitionTime
  */
 
-bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime);
+bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
+                                             uint16_t transitionTime);
 
 /**
  * @brief Scenes Cluster RemoveAllScenes Command callback
  * @param groupId
  */
 
-bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId);
+bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Scenes Cluster RemoveScene Command callback
@@ -627,7 +630,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId);
  * @param sceneId
  */
 
-bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster StoreScene Command callback
@@ -635,7 +638,7 @@ bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId);
  * @param sceneId
  */
 
-bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster ViewScene Command callback
@@ -643,7 +646,7 @@ bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId);
  * @param sceneId
  */
 
-bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterViewSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
 
 //
 // Non-Cluster Related Callbacks
@@ -1093,15 +1096,6 @@ uint32_t emberAfGetCurrentTimeCallback();
  */
 bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
                                     EmberAfEndpointInfoStruct * returnEndpointInfo);
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t emberAfGetSourceRouteOverheadCallback(chip::NodeId destination);
 
 /** @brief Registration Abort
  *

@@ -24,10 +24,11 @@
 #import "CHIPError.h"
 #import "app/util/af.h"
 #import "gen/CHIPClientCallbacks.h"
+#import "gen/CHIPClusters.h"
 #import "gen/CHIPClustersObjc.h"
 
-#include <controller/CHIPClusters.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 
@@ -103,16 +104,15 @@ public:
 
     static void CallbackFn(void * context, chip::ByteSpan value)
     {
+        NSData * data = [NSData dataWithBytes:value.data() length:value.size()];
+
         CHIPStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPStringAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 if (callback->mOctetString) {
-                    NSData * data = [NSData dataWithBytes:value.data() length:value.size()];
                     callback->mHandler(nil, @ { @"value" : data });
                 } else {
-                    NSString * str = [[NSString alloc] initWithBytes:value.data()
-                                                              length:value.size()
-                                                            encoding:NSUTF8StringEncoding];
+                    NSString * str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                     callback->mHandler(nil, @ { @"value" : str });
                 }
 
@@ -1143,22 +1143,22 @@ private:
     dispatch_queue_t mQueue;
 };
 
-class CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge
-    : public Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback> {
+class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
+    : public Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> {
 public:
-    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
-        : Callback::Callback<GeneralCommissioningClusterSetFabricResponseCallback>(CallbackFn, this)
+    CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>(CallbackFn, this)
         , mHandler(handler)
         , mQueue(queue)
     {
     }
 
-    ~CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge() {};
+    ~CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge() {};
 
     static void CallbackFn(void * context, uint8_t errorCode, uint8_t * debugText)
     {
-        CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * callback
-            = reinterpret_cast<CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge *>(context);
+        CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
@@ -1608,6 +1608,38 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge
+    : public Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> {
+public:
+    CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge() {};
+
+    static void CallbackFn(void * context, chip::FabricId FabricId)
+    {
+        CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge * callback
+            = reinterpret_cast<CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ {
+                    @"FabricId" : [NSNumber numberWithUnsignedLongLong:FabricId],
+                });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    };
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPScenesClusterAddSceneResponseCallbackBridge : public Callback::Callback<ScenesClusterAddSceneResponseCallback> {
 public:
     CHIPScenesClusterAddSceneResponseCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
@@ -2012,10 +2044,49 @@ public:
                 values[i] = [[NSDictionary alloc]
                     initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
                     [NSNumber numberWithUnsignedShort:entries[i].GroupKeyIndex], @"GroupKeyIndex",
-                    [NSData dataWithBytes:entries[i].GroupKeyRoot + 1u length:emberAfStringLength(entries[i].GroupKeyRoot)],
-                    @"GroupKeyRoot", [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime],
-                    @"GroupKeyEpochStartTime", [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy],
-                    @"GroupKeySecurityPolicy", nil];
+                    [NSData dataWithBytes:entries[i].GroupKeyRoot.data() length:entries[i].GroupKeyRoot.size()], @"GroupKeyRoot",
+                    [NSNumber numberWithUnsignedLongLong:entries[i].GroupKeyEpochStartTime], @"GroupKeyEpochStartTime",
+                    [NSNumber numberWithUnsignedChar:entries[i].GroupKeySecurityPolicy], @"GroupKeySecurityPolicy", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPOperationalCredentialsFabricsListAttributeCallbackBridge
+    : public Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> {
+public:
+    CHIPOperationalCredentialsFabricsListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPOperationalCredentialsFabricsListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _FabricDescriptor * entries)
+    {
+        CHIPOperationalCredentialsFabricsListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPOperationalCredentialsFabricsListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] =
+                    [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].FabricId],
+                                          @"FabricId", [NSNumber numberWithUnsignedShort:entries[i].VendorId], @"VendorId",
+                                          [NSData dataWithBytes:entries[i].Label.data() length:entries[i].Label.size()], @"Label",
+                                          [NSNumber numberWithUnsignedLongLong:entries[i].NodeId], @"NodeId", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -2034,6 +2105,7 @@ private:
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@property (readonly, nonatomic) dispatch_queue_t chipWorkQueue;
 - (Controller::ClusterBase *)getCluster;
 @end
 
@@ -2046,8 +2118,17 @@ private:
             return nil;
         }
 
+        if (device == nullptr) {
+            return nil;
+        }
+
         CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
         if (err != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+        if (_chipWorkQueue == nil) {
             return nil;
         }
 
@@ -2089,7 +2170,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeVendorName(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeVendorName(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2112,7 +2197,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeVendorId(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeVendorId(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2136,7 +2225,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeApplicationName(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeApplicationName(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2159,7 +2252,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeProductId(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeProductId(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2183,7 +2280,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeApplicationId(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeApplicationId(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2206,7 +2307,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCatalogVendorId(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCatalogVendorId(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2229,7 +2334,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeApplicationSatus(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeApplicationSatus(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2252,7 +2361,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2288,7 +2401,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.BarrierControlGoToPercent(onSuccess->Cancel(), onFailure->Cancel(), percentOpen);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.BarrierControlGoToPercent(onSuccess->Cancel(), onFailure->Cancel(), percentOpen);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2310,7 +2427,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.BarrierControlStop(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.BarrierControlStop(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2333,7 +2454,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierMovingState(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeBarrierMovingState(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2356,7 +2481,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierSafetyStatus(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeBarrierSafetyStatus(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2379,7 +2508,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierCapabilities(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeBarrierCapabilities(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2402,7 +2535,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBarrierPosition(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeBarrierPosition(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2425,7 +2562,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2461,7 +2602,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MfgSpecificPing(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MfgSpecificPing(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2484,7 +2629,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeInteractionModelVersion(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeInteractionModelVersion(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2508,7 +2657,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeVendorName(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeVendorName(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2531,7 +2684,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeVendorID(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeVendorID(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2555,7 +2712,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeProductName(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeProductName(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2578,7 +2739,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeProductID(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeProductID(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2602,7 +2767,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeUserLabel(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2625,9 +2794,13 @@ private:
         return;
     }
 
-    NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-    CHIP_ERROR err = self.cppCluster.WriteAttributeUserLabel(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) data.bytes, data.length));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
+        err = self.cppCluster.WriteAttributeUserLabel(
+            onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) data.bytes, data.length));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2651,7 +2824,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeLocation(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeLocation(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2674,9 +2851,13 @@ private:
         return;
     }
 
-    NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
-    CHIP_ERROR err = self.cppCluster.WriteAttributeLocation(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) data.bytes, data.length));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        NSData * data = [value dataUsingEncoding:NSUTF8StringEncoding];
+        err = self.cppCluster.WriteAttributeLocation(
+            onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) data.bytes, data.length));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2699,7 +2880,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeHardwareVersion(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeHardwareVersion(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2723,7 +2908,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeHardwareVersionString(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeHardwareVersionString(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2746,7 +2935,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeSoftwareVersion(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSoftwareVersion(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2770,7 +2963,206 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeSoftwareVersionString(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSoftwareVersionString(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeManufacturingDate:(ResponseHandler)completionHandler
+{
+    CHIPStringAttributeCallbackBridge * onSuccess
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeManufacturingDate(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributePartNumber:(ResponseHandler)completionHandler
+{
+    CHIPStringAttributeCallbackBridge * onSuccess
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePartNumber(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeProductURL:(ResponseHandler)completionHandler
+{
+    CHIPStringAttributeCallbackBridge * onSuccess
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeProductURL(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeProductLabel:(ResponseHandler)completionHandler
+{
+    CHIPStringAttributeCallbackBridge * onSuccess
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeProductLabel(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeSerialNumber:(ResponseHandler)completionHandler
+{
+    CHIPStringAttributeCallbackBridge * onSuccess
+        = new CHIPStringAttributeCallbackBridge(completionHandler, [self callbackQueue], false);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSerialNumber(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeLocalConfigDisabled:(ResponseHandler)completionHandler
+{
+    CHIPBooleanAttributeCallbackBridge * onSuccess
+        = new CHIPBooleanAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeLocalConfigDisabled(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeLocalConfigDisabled:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeLocalConfigDisabled(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2793,7 +3185,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2833,7 +3229,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Bind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Bind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2859,7 +3259,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Unbind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Unbind(onSuccess->Cancel(), onFailure->Cancel(), nodeId, groupId, endpointId, clusterId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2882,7 +3286,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2922,8 +3330,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveColor(onSuccess->Cancel(), onFailure->Cancel(), rateX, rateY, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2951,8 +3362,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate,
-        colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate,
+            colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -2978,8 +3393,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveHue(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3005,8 +3423,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveSaturation(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveSaturation(
+            onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3033,8 +3455,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColor(
-        onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToColor(
+            onSuccess->Cancel(), onFailure->Cancel(), colorX, colorY, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3060,8 +3486,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToColorTemperature(
-        onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToColorTemperature(
+            onSuccess->Cancel(), onFailure->Cancel(), colorTemperature, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3088,8 +3518,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHue(
-        onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToHue(
+            onSuccess->Cancel(), onFailure->Cancel(), hue, direction, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3116,8 +3550,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToHueAndSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToHueAndSaturation(
+            onSuccess->Cancel(), onFailure->Cancel(), hue, saturation, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3143,8 +3581,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToSaturation(
+            onSuccess->Cancel(), onFailure->Cancel(), saturation, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3171,8 +3613,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColor(
-        onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StepColor(
+            onSuccess->Cancel(), onFailure->Cancel(), stepX, stepY, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3201,8 +3647,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize,
-        transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StepColorTemperature(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime,
+            colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3229,8 +3679,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepHue(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StepHue(
+            onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3257,8 +3711,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StepSaturation(
+            onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3282,7 +3740,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StopMoveStep(onSuccess->Cancel(), onFailure->Cancel(), optionsMask, optionsOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StopMoveStep(onSuccess->Cancel(), onFailure->Cancel(), optionsMask, optionsOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3305,7 +3767,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3331,8 +3797,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeCurrentHue(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCurrentHue(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3348,7 +3818,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeCurrentHue(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCurrentHue(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -3370,7 +3844,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentSaturation(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentSaturation(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3396,8 +3874,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentSaturation(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCurrentSaturation(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3413,7 +3895,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeCurrentSaturation(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCurrentSaturation(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -3435,7 +3921,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeRemainingTime(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeRemainingTime(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3458,7 +3948,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3484,8 +3978,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeCurrentX(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCurrentX(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3501,7 +3999,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeCurrentX(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCurrentX(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -3523,7 +4025,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3549,8 +4055,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeCurrentY(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCurrentY(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3566,7 +4076,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeCurrentY(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCurrentY(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -3588,7 +4102,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeDriftCompensation(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeDriftCompensation(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3612,7 +4130,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCompensationText(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCompensationText(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3635,7 +4157,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorTemperature(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorTemperature(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3661,8 +4187,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeColorTemperature(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeColorTemperature(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3678,7 +4208,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeColorTemperature(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeColorTemperature(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -3700,7 +4234,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorMode(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorMode(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3723,7 +4261,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorControlOptions(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorControlOptions(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3746,7 +4288,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorControlOptions(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorControlOptions(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3769,7 +4315,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeNumberOfPrimaries(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeNumberOfPrimaries(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3792,7 +4342,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary1X(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary1X(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3815,7 +4369,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary1Y(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary1Y(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3838,7 +4396,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary1Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary1Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3861,7 +4423,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary2X(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary2X(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3884,7 +4450,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary2Y(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary2Y(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3907,7 +4477,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary2Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary2Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3930,7 +4504,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary3X(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary3X(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3953,7 +4531,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary3Y(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary3Y(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3976,7 +4558,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary3Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary3Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -3999,7 +4585,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary4X(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary4X(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4022,7 +4612,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary4Y(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary4Y(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4045,7 +4639,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary4Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary4Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4068,7 +4666,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary5X(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary5X(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4091,7 +4693,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary5Y(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary5Y(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4114,7 +4720,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary5Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary5Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4137,7 +4747,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary6X(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary6X(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4160,7 +4774,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary6Y(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary6Y(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4183,7 +4801,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePrimary6Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePrimary6Intensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4206,7 +4828,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeWhitePointX(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeWhitePointX(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4229,7 +4855,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeWhitePointX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeWhitePointX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4252,7 +4882,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeWhitePointY(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeWhitePointY(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4275,7 +4909,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeWhitePointY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeWhitePointY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4298,7 +4936,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointRX(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointRX(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4321,7 +4963,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointRX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointRX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4344,7 +4990,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointRY(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointRY(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4367,7 +5017,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointRY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointRY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4390,7 +5044,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointRIntensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointRIntensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4413,7 +5071,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointRIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointRIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4436,7 +5098,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointGX(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointGX(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4459,7 +5125,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointGX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointGX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4482,7 +5152,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointGY(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointGY(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4505,7 +5179,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointGY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointGY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4528,7 +5206,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointGIntensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointGIntensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4551,7 +5233,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointGIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointGIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4574,7 +5260,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointBX(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointBX(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4597,7 +5287,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointBX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointBX(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4620,7 +5314,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointBY(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointBY(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4643,7 +5341,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointBY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointBY(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4666,7 +5368,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorPointBIntensity(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorPointBIntensity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4689,7 +5395,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeColorPointBIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeColorPointBIntensity(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4712,7 +5422,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeEnhancedCurrentHue(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeEnhancedCurrentHue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4735,7 +5449,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeEnhancedColorMode(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeEnhancedColorMode(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4758,7 +5476,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorLoopActive(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorLoopActive(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4781,7 +5503,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorLoopDirection(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorLoopDirection(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4804,7 +5530,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorLoopTime(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorLoopTime(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4827,7 +5557,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorCapabilities(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorCapabilities(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4850,7 +5584,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorTempPhysicalMin(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorTempPhysicalMin(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4873,7 +5611,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeColorTempPhysicalMax(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeColorTempPhysicalMax(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4896,7 +5638,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCoupleColorTempToLevelMinMireds(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCoupleColorTempToLevelMinMireds(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4919,7 +5665,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeStartUpColorTemperatureMireds(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeStartUpColorTemperatureMireds(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4942,7 +5692,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeStartUpColorTemperatureMireds(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeStartUpColorTemperatureMireds(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -4965,7 +5719,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5002,7 +5760,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeDeviceList(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeDeviceList(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5026,7 +5788,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeServerList(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeServerList(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5050,7 +5816,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClientList(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClientList(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5074,7 +5844,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributePartsList(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributePartsList(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5097,7 +5871,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5134,7 +5912,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearAllPins(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearAllPins(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5157,7 +5939,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearAllRfids(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearAllRfids(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5180,7 +5966,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5203,7 +5993,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5226,7 +6020,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5249,7 +6047,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5272,7 +6074,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ClearYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5295,7 +6101,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetHolidaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5318,7 +6128,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetLogRecord(onSuccess->Cancel(), onFailure->Cancel(), logIndex);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetLogRecord(onSuccess->Cancel(), onFailure->Cancel(), logIndex);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5341,7 +6155,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetPin(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5364,7 +6182,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5387,7 +6209,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5410,7 +6236,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetWeekdaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5433,7 +6263,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetYeardaySchedule(onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5456,9 +6290,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.LockDoor(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5485,8 +6323,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetHolidaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetHolidaySchedule(
+            onSuccess->Cancel(), onFailure->Cancel(), scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5513,9 +6355,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetPin(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
+            chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5542,9 +6388,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
-        chip::ByteSpan((const uint8_t *) [id dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [id lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetRfid(onSuccess->Cancel(), onFailure->Cancel(), userId, userStatus, userType,
+            chip::ByteSpan((const uint8_t *) [id dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [id lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5567,7 +6417,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId, userType);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetUserType(onSuccess->Cancel(), onFailure->Cancel(), userId, userType);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5597,8 +6451,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetWeekdaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetWeekdaySchedule(
+            onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5625,8 +6483,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetYeardaySchedule(
-        onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetYeardaySchedule(
+            onSuccess->Cancel(), onFailure->Cancel(), scheduleId, userId, localStartTime, localEndTime);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5649,9 +6511,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.UnlockDoor(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5674,9 +6540,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds,
-        chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.UnlockWithTimeout(onSuccess->Cancel(), onFailure->Cancel(), timeoutInSeconds,
+            chip::ByteSpan((const uint8_t *) [pin dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [pin lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5699,7 +6569,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeLockState(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeLockState(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5724,8 +6598,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeLockState(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5741,7 +6618,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeLockState(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeLockState(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -5763,7 +6644,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeLockType(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeLockType(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5787,7 +6672,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeActuatorEnabled(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeActuatorEnabled(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5810,7 +6699,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5850,8 +6743,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.ArmFailSafe(onSuccess->Cancel(), onFailure->Cancel(), expiryLengthSeconds, breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ArmFailSafe(onSuccess->Cancel(), onFailure->Cancel(), expiryLengthSeconds, breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5874,21 +6770,25 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.CommissioningComplete(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.CommissioningComplete(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
         completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
     }
 }
-- (void)setFabric:(NSData *)fabricId
-         fabricSecret:(NSData *)fabricSecret
-           breadcrumb:(uint64_t)breadcrumb
-            timeoutMs:(uint32_t)timeoutMs
-    completionHandler:(ResponseHandler)completionHandler
+- (void)setRegulatoryConfig:(uint8_t)location
+                countryCode:(NSString *)countryCode
+                 breadcrumb:(uint64_t)breadcrumb
+                  timeoutMs:(uint32_t)timeoutMs
+          completionHandler:(ResponseHandler)completionHandler
 {
-    CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge * onSuccess
-        = new CHIPGeneralCommissioningClusterSetFabricResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge * onSuccess
+        = new CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(completionHandler, [self callbackQueue]);
     if (!onSuccess) {
         completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -5901,9 +6801,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.SetFabric(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) fabricId.bytes, fabricId.length),
-        chip::ByteSpan((const uint8_t *) fabricSecret.bytes, fabricSecret.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetRegulatoryConfig(onSuccess->Cancel(), onFailure->Cancel(), location,
+            chip::ByteSpan((const uint8_t *) [countryCode dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [countryCode lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
+            breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5927,7 +6832,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeFabricId(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeFabricId(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5950,7 +6859,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeBreadcrumb(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeBreadcrumb(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5973,7 +6886,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeBreadcrumb(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeBreadcrumb(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -5996,7 +6913,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6033,7 +6954,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeGroups(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeGroups(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6057,7 +6982,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeGroupKeys(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeGroupKeys(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6080,7 +7009,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6117,9 +7050,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId,
-        chip::ByteSpan((const uint8_t *) [groupName dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AddGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId,
+            chip::ByteSpan((const uint8_t *) [groupName dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6141,9 +7078,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId,
-        chip::ByteSpan((const uint8_t *) [groupName dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AddGroupIfIdentifying(onSuccess->Cancel(), onFailure->Cancel(), groupId,
+            chip::ByteSpan((const uint8_t *) [groupName dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [groupName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6166,7 +7107,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupCount, groupList);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetGroupMembership(onSuccess->Cancel(), onFailure->Cancel(), groupCount, groupList);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6188,7 +7133,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveAllGroups(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveAllGroups(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6211,7 +7160,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6234,7 +7187,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ViewGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ViewGroup(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6257,7 +7214,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeNameSupport(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeNameSupport(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6280,7 +7241,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6316,7 +7281,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6339,7 +7308,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6362,7 +7335,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6385,7 +7362,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6408,7 +7389,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6448,7 +7433,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Move(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionMask, optionOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Move(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate, optionMask, optionOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6474,8 +7463,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err
-        = self.cppCluster.MoveToLevel(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToLevel(
+            onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime, optionMask, optionOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6499,7 +7492,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveToLevelWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveToLevelWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), level, transitionTime);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6521,7 +7518,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.MoveWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.MoveWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), moveMode, rate);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6548,8 +7549,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Step(
-        onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Step(
+            onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime, optionMask, optionOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6574,7 +7579,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StepWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StepWithOnOff(onSuccess->Cancel(), onFailure->Cancel(), stepMode, stepSize, transitionTime);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6596,7 +7605,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Stop(onSuccess->Cancel(), onFailure->Cancel(), optionMask, optionOverride);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Stop(onSuccess->Cancel(), onFailure->Cancel(), optionMask, optionOverride);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6618,7 +7631,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StopWithOnOff(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StopWithOnOff(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6641,7 +7658,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentLevel(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentLevel(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6667,8 +7688,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeCurrentLevel(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCurrentLevel(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6684,7 +7709,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeCurrentLevel(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCurrentLevel(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -6706,7 +7735,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6742,7 +7775,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Sleep(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Sleep(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6765,7 +7802,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6805,8 +7846,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AddThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6833,9 +7878,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
-        chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AddWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
+            chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6861,8 +7910,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.DisableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6888,8 +7941,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.EnableNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6911,7 +7968,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetLastNetworkCommissioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetLastNetworkCommissioningResult(onSuccess->Cancel(), onFailure->Cancel(), timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6937,8 +7998,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) networkID.bytes, networkID.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6964,8 +8029,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ScanNetworks(
-        onSuccess->Cancel(), onFailure->Cancel(), chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ScanNetworks(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -6991,8 +8060,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.UpdateThreadNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) operationalDataset.bytes, operationalDataset.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7019,9 +8092,13 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
-        chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
-        chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.UpdateWiFiNetwork(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) ssid.bytes, ssid.length),
+            chip::ByteSpan((const uint8_t *) credentials.bytes, credentials.length), breadcrumb, timeoutMs);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7044,7 +8121,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7080,7 +8161,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Off(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7102,7 +8187,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.On(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7124,7 +8213,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Toggle(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7148,7 +8241,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7173,7 +8270,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeOnOff(onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7190,7 +8291,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeOnOff(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeOnOff(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -7212,7 +8317,470 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
+@interface CHIPOperationalCredentials ()
+@property (readonly) Controller::OperationalCredentialsCluster cppCluster;
+@end
+
+@implementation CHIPOperationalCredentials
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)getFabricId:(ResponseHandler)completionHandler
+{
+    CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsClusterGetFabricIdResponseCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetFabricId(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)removeFabric:(uint64_t)fabricId
+               nodeId:(uint64_t)nodeId
+             vendorId:(uint16_t)vendorId
+    completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveFabric(onSuccess->Cancel(), onFailure->Cancel(), fabricId, nodeId, vendorId);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)updateFabricLabel:(NSString *)label completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.UpdateFabricLabel(onSuccess->Cancel(), onFailure->Cancel(),
+            chip::ByteSpan((const uint8_t *) [label dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [label lengthOfBytesUsingEncoding:NSUTF8StringEncoding]));
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeFabricsList:(ResponseHandler)completionHandler
+{
+    CHIPOperationalCredentialsFabricsListAttributeCallbackBridge * onSuccess
+        = new CHIPOperationalCredentialsFabricsListAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeFabricsList(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
+@interface CHIPPumpConfigurationAndControl ()
+@property (readonly) Controller::PumpConfigurationAndControlCluster cppCluster;
+@end
+
+@implementation CHIPPumpConfigurationAndControl
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeMaxPressure:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMaxPressure(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMaxSpeed(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeMaxFlow:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMaxFlow(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeEffectiveOperationMode(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeEffectiveControlMode(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeCapacity:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCapacity(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)configureAttributeCapacity:(uint16_t)minInterval
+                       maxInterval:(uint16_t)maxInterval
+                            change:(int16_t)change
+                 completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCapacity(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)reportAttributeCapacity:(ResponseHandler)reportHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onReport = new CHIPInt16sAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
+    if (!onReport) {
+        reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCapacity(onReport->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onReport;
+        reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeOperationMode:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeOperationMode(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeOperationMode(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7256,10 +8824,14 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime,
-        chip::ByteSpan((const uint8_t *) [sceneName dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [sceneName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
-        clusterId, length, value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.AddScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime,
+            chip::ByteSpan((const uint8_t *) [sceneName dataUsingEncoding:NSUTF8StringEncoding].bytes,
+                [sceneName lengthOfBytesUsingEncoding:NSUTF8StringEncoding]),
+            clusterId, length, value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7282,7 +8854,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.GetSceneMembership(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetSceneMembership(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7307,7 +8883,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RecallScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RecallScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId, transitionTime);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7330,7 +8910,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveAllScenes(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveAllScenes(onSuccess->Cancel(), onFailure->Cancel(), groupId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7353,7 +8937,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.RemoveScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.RemoveScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7376,7 +8964,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.StoreScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.StoreScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7399,7 +8991,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ViewScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ViewScene(onSuccess->Cancel(), onFailure->Cancel(), groupId, sceneId);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7422,7 +9018,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeSceneCount(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSceneCount(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7445,7 +9045,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentScene(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentScene(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7468,7 +9072,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeCurrentGroup(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentGroup(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7492,7 +9100,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeSceneValid(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSceneValid(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7515,7 +9127,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeNameSupport(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeNameSupport(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7538,7 +9154,155 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
+@interface CHIPSwitch ()
+@property (readonly) Controller::SwitchCluster cppCluster;
+@end
+
+@implementation CHIPSwitch
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeNumberOfPositions:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeNumberOfPositions(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeCurrentPosition:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeCurrentPosition(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)configureAttributeCurrentPosition:(uint16_t)minInterval
+                              maxInterval:(uint16_t)maxInterval
+                                   change:(uint8_t)change
+                        completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeCurrentPosition(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)reportAttributeCurrentPosition:(ResponseHandler)reportHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onReport = new CHIPInt8uAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
+    if (!onReport) {
+        reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeCurrentPosition(onReport->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onReport;
+        reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7574,7 +9338,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7600,8 +9368,12 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ConfigureAttributeMeasuredValue(
-        onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeMeasuredValue(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7617,7 +9389,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReportAttributeMeasuredValue(onReport->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeMeasuredValue(onReport->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onReport;
         reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
@@ -7639,7 +9415,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeMinMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMinMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7662,7 +9442,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeMaxMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeMaxMeasuredValue(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -7685,7 +9469,482 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
+@interface CHIPThermostat ()
+@property (readonly) Controller::ThermostatCluster cppCluster;
+@end
+
+@implementation CHIPThermostat
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)clearWeeklySchedule:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ClearWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)getRelayStatusLog:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetRelayStatusLog(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)getWeeklySchedule:(uint8_t)daysToReturn
+             modeToReturn:(uint8_t)modeToReturn
+        completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.GetWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel(), daysToReturn, modeToReturn);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)setWeeklySchedule:(uint8_t)numberOfTransitionsForSequence
+     dayOfWeekForSequence:(uint8_t)dayOfWeekForSequence
+          modeForSequence:(uint8_t)modeForSequence
+                  payload:(uint8_t)payload
+        completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetWeeklySchedule(onSuccess->Cancel(), onFailure->Cancel(), numberOfTransitionsForSequence,
+            dayOfWeekForSequence, modeForSequence, payload);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+- (void)setpointRaiseLower:(uint8_t)mode amount:(int8_t)amount completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.SetpointRaiseLower(onSuccess->Cancel(), onFailure->Cancel(), mode, amount);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeLocalTemperature:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeLocalTemperature(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)configureAttributeLocalTemperature:(uint16_t)minInterval
+                               maxInterval:(uint16_t)maxInterval
+                                    change:(int16_t)change
+                         completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ConfigureAttributeLocalTemperature(
+            onSuccess->Cancel(), onFailure->Cancel(), minInterval, maxInterval, change);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)reportAttributeLocalTemperature:(ResponseHandler)reportHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onReport = new CHIPInt16sAttributeCallbackBridge(reportHandler, [self callbackQueue], true);
+    if (!onReport) {
+        reportHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReportAttributeLocalTemperature(onReport->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onReport;
+        reportHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeOccupiedCoolingSetpoint:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeOccupiedCoolingSetpoint(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeOccupiedCoolingSetpoint:(int16_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeOccupiedCoolingSetpoint(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeOccupiedHeatingSetpoint:(ResponseHandler)completionHandler
+{
+    CHIPInt16sAttributeCallbackBridge * onSuccess = new CHIPInt16sAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeOccupiedHeatingSetpoint(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeOccupiedHeatingSetpoint:(int16_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeOccupiedHeatingSetpoint(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeControlSequenceOfOperation:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeControlSequenceOfOperation(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeControlSequenceOfOperation:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeControlSequenceOfOperation(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeSystemMode:(ResponseHandler)completionHandler
+{
+    CHIPInt8uAttributeCallbackBridge * onSuccess = new CHIPInt8uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeSystemMode(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)writeAttributeSystemMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler
+{
+    CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeSystemMode(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        completionHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(completionHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        completionHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

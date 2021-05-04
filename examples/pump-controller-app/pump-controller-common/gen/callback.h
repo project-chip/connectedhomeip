@@ -21,9 +21,10 @@
 #pragma once
 
 #include "af-structs.h"
-#include "af-types.h"
-#include "basic-types.h"
+#include <app/util/af-types.h>
+#include <app/util/basic-types.h>
 
+#include <app/Command.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -352,20 +353,20 @@ void emberAfPumpConfigurationAndControlClusterClientTickCallback(chip::EndpointI
  * @param timeout
  */
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout);
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * commandObj, uint16_t timeout);
 
 /**
  * @brief Identify Cluster Identify Command callback
  * @param identifyTime
  */
 
-bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime);
+bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uint16_t identifyTime);
 
 /**
  * @brief Identify Cluster IdentifyQuery Command callback
  */
 
-bool emberAfIdentifyClusterIdentifyQueryCallback();
+bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj);
 
 //
 // Non-Cluster Related Callbacks
@@ -815,15 +816,6 @@ uint32_t emberAfGetCurrentTimeCallback();
  */
 bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
                                     EmberAfEndpointInfoStruct * returnEndpointInfo);
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t emberAfGetSourceRouteOverheadCallback(chip::NodeId destination);
 
 /** @brief Registration Abort
  *

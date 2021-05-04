@@ -66,15 +66,19 @@
 #define GENERATED_ATTRIBUTE_COUNT 5
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                                 \
-          ZAP_SIMPLE_DEFAULT(2) },                                     /* Identify (client): cluster revision */                   \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* Identify (server): cluster revision */                   \
-            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* Identify (server): identify time */                                                 \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(2) }, /* On/off (client): cluster revision */                                                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT),                                                             \
-              ZAP_SIMPLE_DEFAULT(0x0001) }, /* Pump Configuration and Control (client): cluster revision */                        \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Identify (server) */                                                                              \
+        { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* identify time */             \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                             /* cluster revision */          \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Identify (client) */                                                                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* cluster revision */             \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: On/off (client) */                                                                            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* cluster revision */             \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Pump Configuration and Control (client) */                                                    \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -91,13 +95,15 @@
 #define GENERATED_CLUSTER_COUNT 4
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
-        { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
-            { 0x0003,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(1),                                                                                              \
-              2,                                                                                                                   \
-              4,                                                                                                                   \
-              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
-              chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */                                         \
+        { 0x0003,                                                                                                                  \
+          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
+          2,                                                                                                                       \
+          4,                                                                                                                       \
+          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),               \
+          chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */                                             \
+            {                                                                                                                      \
+                0x0003, ZAP_ATTRIBUTE_INDEX(2), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+            }, /* Endpoint: 1, Cluster: Identify (client) */                                                                       \
             { 0x0006, ZAP_ATTRIBUTE_INDEX(3), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: On/off (client) */  \
             {                                                                                                                      \
                 0x0200, ZAP_ATTRIBUTE_INDEX(4), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
@@ -166,15 +172,21 @@
 #define EMBER_AF_GENERATED_COMMAND_COUNT (9)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify (client): Identify */                                 \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (client): IdentifyQueryResponse */                    \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): Identify */                                 \
-            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* Identify (server): IdentifyQueryResponse */                    \
-            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (client): IdentifyQuery */                            \
-            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify (server): IdentifyQuery */                            \
-            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): Off */                                        \
-            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): On */                                         \
-            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On/off (client): Toggle */                                     \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Identify (server) */                                                                              \
+        { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Identify */                                                    \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IdentifyQueryResponse */                                       \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* IdentifyQuery */                                               \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Identify (client) */                                                                          \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Identify */                                                    \
+            { 0x0003, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IdentifyQueryResponse */                                       \
+            { 0x0003, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* IdentifyQuery */                                               \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: On/off (client) */                                                                            \
+            { 0x0006, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Off */                                                         \
+            { 0x0006, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* On */                                                          \
+            { 0x0006, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Toggle */                                                      \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.

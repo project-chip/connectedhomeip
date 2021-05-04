@@ -29,6 +29,7 @@
 #include <messaging/Flags.h>
 #include <messaging/MessageCounterSync.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/BufferWriter.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -260,7 +261,7 @@ CHIP_ERROR MessageCounterSyncMgr::SendMsgCounterSyncReq(SecureSessionHandle sess
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Generate a 64-bit random number to uniquely identify the request.
-    err = DRBG_get_bytes(static_cast<uint8_t *>(challenge), kMsgCounterChallengeSize);
+    err = Crypto::DRBG_get_bytes(static_cast<uint8_t *>(challenge), kMsgCounterChallengeSize);
     SuccessOrExit(err);
 
     // Store generated Challenge value to ExchangeContext to resolve synchronization response.

@@ -21,7 +21,6 @@
  */
 
 #include "AppConfig.h"
-#include "DataModelHandler.h"
 #include "LightingManager.h"
 
 #include "gen/attribute-id.h"

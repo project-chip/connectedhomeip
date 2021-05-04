@@ -82,10 +82,14 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     chip::CommandId commandId;
     chip::EndpointId endpointId;
 
-    SuccessOrExit(aCommandElement.GetCommandPath(&commandPath));
-    SuccessOrExit(commandPath.GetClusterId(&clusterId));
-    SuccessOrExit(commandPath.GetCommandId(&commandId));
-    SuccessOrExit(commandPath.GetEndpointId(&endpointId));
+    err = aCommandElement.GetCommandPath(&commandPath);
+    SuccessOrExit(err);
+    err = commandPath.GetClusterId(&clusterId);
+    SuccessOrExit(err);
+    err = commandPath.GetCommandId(&commandId);
+    SuccessOrExit(err);
+    err = commandPath.GetEndpointId(&endpointId);
+    SuccessOrExit(err);
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -114,14 +118,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
+CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPathParams,
                                          const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                          const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandParams);
+    err = PrepareCommand(apCommandPathParams, true /* isStatus */);
     SuccessOrExit(err);
 
     statusElementBuilder =
@@ -131,7 +135,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandParams * apCommandParams,
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
-    err = FinishCommand();
+    err = FinishCommand(true /* isStatus */);
 
 exit:
     ChipLogFunctError(err);

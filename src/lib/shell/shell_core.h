@@ -100,6 +100,12 @@ protected:
     unsigned _commandSetSize[CHIP_SHELL_MAX_MODULES];
     unsigned _commandSetCount;
 
+public:
+    Shell() {}
+
+    /** Return the root singleton for the Shell command hierarchy. */
+    static Shell & Root() { return theShellRoot; }
+
     /**
      * Registers a set of defaults commands (help) for all Shell and sub-Shell instances.
      *
@@ -109,12 +115,6 @@ protected:
      *    version   - return the version of the CHIP library
      */
     void RegisterDefaultCommands();
-
-public:
-    Shell() {}
-
-    /** Return the root singleton for the Shell command hierarchy. */
-    static Shell & Root() { return theShellRoot; }
 
     /**
      * Execution callback for a shell command.

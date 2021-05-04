@@ -66,10 +66,10 @@ from .ChipBleUtility import (
 
 from .ChipBleBase import ChipBleBase
 
-chip_service = uuid.UUID("0000FEAF-0000-1000-8000-00805F9B34FB")
+chip_service = uuid.UUID("0000FFF6-0000-1000-8000-00805F9B34FB")
 chip_tx = uuid.UUID("18EE2EF5-263D-4559-959F-4F9C429F9D11")
 chip_rx = uuid.UUID("18EE2EF5-263D-4559-959F-4F9C429F9D12")
-chip_service_short = uuid.UUID("0000FEAF-0000-0000-0000-000000000000")
+chip_service_short = uuid.UUID("0000FFF6-0000-0000-0000-000000000000")
 chromecast_setup_service = uuid.UUID("0000FEA0-0000-1000-8000-00805F9B34FB")
 chromecast_setup_service_short = uuid.UUID("0000FEA0-0000-0000-0000-000000000000")
 

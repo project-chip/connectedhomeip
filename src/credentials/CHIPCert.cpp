@@ -431,6 +431,9 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     err = cert->mSubjectDN.GetCertType(certType);
     SuccessOrExit(err);
 
+    // Certificate with future-extension marked as "critical" is not allowed.
+    VerifyOrExit(!cert->mCertFlags.Has(CertFlags::kExtPresent_FutureIsCritical), err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
     // If the depth is greater than 0 then the certificate is required to be a CA certificate...
     if (depth > 0)
     {

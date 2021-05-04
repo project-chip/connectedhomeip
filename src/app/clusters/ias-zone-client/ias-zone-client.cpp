@@ -79,7 +79,8 @@
  ******************************************************************************/
 
 #include "ias-zone-client.h"
-#include "af.h"
+#include <app/Command.h>
+#include <app/util/af.h>
 
 //-----------------------------------------------------------------------------
 // Globals
@@ -306,8 +307,8 @@ static uint8_t findIasZoneServerByNodeId(EmberNodeId nodeId)
     return i;
 }
 
-bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStatus, uint8_t extendedStatus, uint8_t zoneId,
-                                                               uint16_t delay)
+bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(chip::app::Command * commandObj, uint16_t zoneStatus,
+                                                               uint8_t extendedStatus, uint8_t zoneId, uint16_t delay)
 {
     uint8_t serverIndex = findIasZoneServerByNodeId(emberAfCurrentCommand()->source);
     uint8_t status      = EMBER_ZCL_STATUS_NOT_FOUND;
@@ -327,7 +328,7 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
     return true;
 }
 
-bool emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t manufacturerCode)
+bool emberAfIasZoneClusterZoneEnrollRequestCallback(chip::app::Command * commandObj, uint16_t zoneType, uint16_t manufacturerCode)
 {
     EmberAfIasEnrollResponseCode responseCode = EMBER_ZCL_IAS_ENROLL_RESPONSE_CODE_NO_ENROLL_PERMIT;
     uint8_t zoneId                            = UNKNOWN_ZONE_ID;

@@ -85,11 +85,6 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
         goto exit;
     }
 
-    // Close the current exchange after receiving the response since the response message marks the
-    // end of conversation represented by the exchange. We should create an new exchange for a new
-    // conversation defined in Interaction Model protocol.
-    ClearExistingExchangeContext();
-
     err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
     SuccessOrExit(err);
 

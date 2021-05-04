@@ -30,7 +30,7 @@
 #include <app/InteractionModelEngine.h>
 
 // Currently we need some work to keep compatible with ember lib.
-#include <util/ember-compatibility-functions.h>
+#include <app/util/ember-compatibility-functions.h>
 
 namespace chip {
 namespace app {
@@ -118,7 +118,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterAddGroupCallback(groupId, const_cast<uint8_t *>(groupName));
+                emberAfGroupsClusterAddGroupCallback(apCommandObj, groupId, const_cast<uint8_t *>(groupName));
             }
             else
             {
@@ -202,7 +202,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterAddGroupIfIdentifyingCallback(groupId, const_cast<uint8_t *>(groupName));
+                emberAfGroupsClusterAddGroupIfIdentifyingCallback(apCommandObj, groupId, const_cast<uint8_t *>(groupName));
             }
             else
             {
@@ -286,7 +286,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterGetGroupMembershipCallback(groupCount, groupList);
+                emberAfGroupsClusterGetGroupMembershipCallback(apCommandObj, groupCount, groupList);
             }
             else
             {
@@ -301,7 +301,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         case ZCL_REMOVE_ALL_GROUPS_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfGroupsClusterRemoveAllGroupsCallback();
+            emberAfGroupsClusterRemoveAllGroupsCallback(apCommandObj);
             break;
         }
         case ZCL_REMOVE_GROUP_COMMAND_ID: {
@@ -359,7 +359,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterRemoveGroupCallback(groupId);
+                emberAfGroupsClusterRemoveGroupCallback(apCommandObj, groupId);
             }
             else
             {
@@ -426,7 +426,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfGroupsClusterViewGroupCallback(groupId);
+                emberAfGroupsClusterViewGroupCallback(apCommandObj, groupId);
             }
             else
             {
@@ -513,7 +513,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+                emberAfIdentifyClusterIdentifyQueryResponseCallback(apCommandObj, timeout);
             }
             else
             {
@@ -600,7 +600,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfIdentifyClusterIdentifyCallback(identifyTime);
+                emberAfIdentifyClusterIdentifyCallback(apCommandObj, identifyTime);
             }
             else
             {
@@ -615,7 +615,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfIdentifyClusterIdentifyQueryCallback();
+            emberAfIdentifyClusterIdentifyQueryCallback(apCommandObj);
             break;
         }
         default: {
@@ -641,19 +641,19 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         case ZCL_OFF_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfOnOffClusterOffCallback();
+            emberAfOnOffClusterOffCallback(apCommandObj);
             break;
         }
         case ZCL_ON_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfOnOffClusterOnCallback();
+            emberAfOnOffClusterOnCallback(apCommandObj);
             break;
         }
         case ZCL_TOGGLE_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfOnOffClusterToggleCallback();
+            emberAfOnOffClusterToggleCallback(apCommandObj);
             break;
         }
         default: {
@@ -797,8 +797,8 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterAddSceneCallback(groupId, sceneId, transitionTime, const_cast<uint8_t *>(sceneName),
-                                                     extensionFieldSets);
+                emberAfScenesClusterAddSceneCallback(apCommandObj, groupId, sceneId, transitionTime,
+                                                     const_cast<uint8_t *>(sceneName), extensionFieldSets);
             }
             else
             {
@@ -865,7 +865,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterGetSceneMembershipCallback(groupId);
+                emberAfScenesClusterGetSceneMembershipCallback(apCommandObj, groupId);
             }
             else
             {
@@ -964,7 +964,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterRecallSceneCallback(groupId, sceneId, transitionTime);
+                emberAfScenesClusterRecallSceneCallback(apCommandObj, groupId, sceneId, transitionTime);
             }
             else
             {
@@ -1031,7 +1031,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterRemoveAllScenesCallback(groupId);
+                emberAfScenesClusterRemoveAllScenesCallback(apCommandObj, groupId);
             }
             else
             {
@@ -1114,7 +1114,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterRemoveSceneCallback(groupId, sceneId);
+                emberAfScenesClusterRemoveSceneCallback(apCommandObj, groupId, sceneId);
             }
             else
             {
@@ -1197,7 +1197,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterStoreSceneCallback(groupId, sceneId);
+                emberAfScenesClusterStoreSceneCallback(apCommandObj, groupId, sceneId);
             }
             else
             {
@@ -1280,7 +1280,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfScenesClusterViewSceneCallback(groupId, sceneId);
+                emberAfScenesClusterViewSceneCallback(apCommandObj, groupId, sceneId);
             }
             else
             {

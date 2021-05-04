@@ -6,10 +6,10 @@
 #include <app/InteractionModelEngine.h>
 #include <lib/support/Span.h>
 
-#include <controller/CHIPClusters.h>
 #include <controller/CHIPDevice.h>
 
 #include "gen/CHIPClientCallbacks.h"
+#include "gen/CHIPClusters.h"
 
 using namespace chip;
 using namespace chip::app;

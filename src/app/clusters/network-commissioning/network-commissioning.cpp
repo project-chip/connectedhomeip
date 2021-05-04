@@ -21,6 +21,7 @@
 #include <cstring>
 #include <type_traits>
 
+#include <app/util/af.h>
 #include <gen/att-storage.h>
 #include <gen/attribute-id.h>
 #include <gen/attribute-type.h>
@@ -28,7 +29,6 @@
 #include <gen/cluster-id.h>
 #include <gen/command-id.h>
 #include <gen/enums.h>
-#include <util/af.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -41,8 +41,6 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
-#include <protocols/secure_channel/NetworkProvisioning.h>
 
 // Include DeviceNetworkProvisioningDelegateImpl for WiFi provisioning.
 // TODO: Enable wifi network should be done by ConnectivityManager. (Or other platform neutral interfaces)
@@ -214,7 +212,11 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
     {
     case NetworkType::kThread:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+// TODO: On linux, we are using Reset() instead of Detach() to disable thread network, which is not expected.
+// Upstream issue: https://github.com/openthread/ot-br-posix/issues/755
+#if !CHIP_DEVICE_LAYER_TARGET_LINUX
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+#endif
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(network->mData.mThread.AsByteSpan()));
         ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
 #else

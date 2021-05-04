@@ -25,6 +25,8 @@
 using chip::PersistentStorageResultDelegate;
 using chip::Controller::DeviceCommissioner;
 
+extern chip::Ble::BleLayer * GetJNIBleLayer();
+
 namespace {
 
 bool FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
@@ -187,7 +189,16 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
     wrapper->Controller()->SetUdpListenPort(CHIP_PORT + 1);
-    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, wrapper.get(), wrapper.get(), systemLayer, inetLayer);
+
+    chip::Controller::CommissionerInitParams initParams;
+
+    initParams.storageDelegate = wrapper.get();
+    initParams.pairingDelegate = wrapper.get();
+    initParams.systemLayer     = systemLayer;
+    initParams.inetLayer       = inetLayer;
+    initParams.bleLayer        = GetJNIBleLayer();
+
+    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
@@ -202,84 +213,6 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     }
 
     return wrapper.release();
-}
-
-void AndroidDeviceControllerWrapper::SendNetworkCredentials(const char * ssid, const char * password)
-{
-    if (mCredentialsDelegate == nullptr)
-    {
-        ChipLogError(Controller, "No credential callback available to send Wi-Fi credentials.");
-        return;
-    }
-
-    ChipLogProgress(Controller, "Sending network credentials for %s...", ssid);
-    mCredentialsDelegate->SendNetworkCredentials(ssid, password);
-}
-
-void AndroidDeviceControllerWrapper::SendThreadCredentials(chip::ByteSpan threadData)
-{
-    if (mCredentialsDelegate == nullptr)
-    {
-        ChipLogError(Controller, "No credential callback available to send Thread credentials.");
-        return;
-    }
-
-    chip::Thread::OperationalDataset dataset{};
-
-    if (!dataset.Init(threadData))
-    {
-        ChipLogError(Controller, "Failed to parse Thread credentials.");
-        return;
-    }
-
-    uint16_t channel = chip::Thread::kChannel_NotSpecified;
-    uint16_t panid   = chip::Thread::kPANId_NotSpecified;
-
-    dataset.GetChannel(channel);
-    dataset.GetPanId(panid);
-
-    ChipLogProgress(Controller, "Sending Thread credentials for channel %u, PAN ID 0x%04x...", channel, panid);
-    mCredentialsDelegate->SendThreadCredentials(threadData);
-}
-
-void AndroidDeviceControllerWrapper::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
-{
-    mCredentialsDelegate = callback;
-
-    JNIEnv * env = GetJavaEnv();
-
-    jmethodID method;
-    if (!FindMethod(env, mJavaObjectRef, "onNetworkCredentialsRequested", "()V", &method))
-    {
-        return;
-    }
-
-    env->ExceptionClear();
-    env->CallVoidMethod(mJavaObjectRef, method);
-}
-
-void AndroidDeviceControllerWrapper::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                                       chip::RendezvousDeviceCredentialsDelegate * callback)
-{
-    mCredentialsDelegate = callback;
-
-    JNIEnv * env = GetJavaEnv();
-
-    jbyteArray jCsr;
-    if (!N2J_ByteArray(env, reinterpret_cast<const uint8_t *>(csr), csr_length, jCsr))
-    {
-        ChipLogError(Controller, "Failed to build byte array for operational credential request");
-        return;
-    }
-
-    jmethodID method;
-    if (!FindMethod(env, mJavaObjectRef, "onOperationalCredentialsRequested", "([B)V", &method))
-    {
-        return;
-    }
-
-    env->ExceptionClear();
-    env->CallVoidMethod(mJavaObjectRef, method, jCsr);
 }
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)

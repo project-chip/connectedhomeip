@@ -590,18 +590,6 @@ emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex
     return false;
 }
 
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t __attribute__((weak)) emberAfGetSourceRouteOverheadCallback(chip::NodeId destination)
-{
-    return 0;
-}
-
 /** @brief Registration Abort
  *
  * This callback is called when the device should abort the registration

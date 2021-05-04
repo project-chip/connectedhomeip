@@ -30,7 +30,7 @@
 #include <app/InteractionModelEngine.h>
 
 // Currently we need some work to keep compatible with ember lib.
-#include <util/ember-compatibility-functions.h>
+#include <app/util/ember-compatibility-functions.h>
 
 namespace chip {
 namespace app {
@@ -101,7 +101,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+                emberAfIdentifyClusterIdentifyQueryResponseCallback(apCommandObj, timeout);
             }
             else
             {
@@ -188,7 +188,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfIdentifyClusterIdentifyCallback(identifyTime);
+                emberAfIdentifyClusterIdentifyCallback(apCommandObj, identifyTime);
             }
             else
             {
@@ -203,7 +203,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfIdentifyClusterIdentifyQueryCallback();
+            emberAfIdentifyClusterIdentifyQueryCallback(apCommandObj);
             break;
         }
         default: {

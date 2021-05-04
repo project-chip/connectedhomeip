@@ -144,7 +144,7 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandParams * const apCommandParams)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -153,14 +153,17 @@ CHIP_ERROR Command::PrepareCommand(const CommandParams * const apCommandParams)
     err = commandDataElement.GetError();
     SuccessOrExit(err);
 
-    if (apCommandParams != nullptr)
+    if (apCommandPathParams != nullptr)
     {
-        err = ConstructCommandPath(*apCommandParams, commandDataElement);
+        err = ConstructCommandPath(*apCommandPathParams, commandDataElement);
         SuccessOrExit(err);
     }
 
-    err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data), TLV::kTLVType_Structure,
-                                                         mDataElementContainerType);
+    if (!aIsStatus)
+    {
+        err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
+                                                             TLV::kTLVType_Structure, mDataElementContainerType);
+    }
 exit:
     ChipLogFunctError(err);
     return err;
@@ -171,13 +174,16 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
     return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
 }
 
-CHIP_ERROR Command::FinishCommand()
+CHIP_ERROR Command::FinishCommand(bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    err                                            = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
-    SuccessOrExit(err);
+    if (!aIsStatus)
+    {
+        err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
+        SuccessOrExit(err);
+    }
     commandDataElement.EndOfCommandDataElement();
     err = commandDataElement.GetError();
     SuccessOrExit(err);
@@ -188,20 +194,21 @@ exit:
     return err;
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandParams & aCommandParams, CommandDataElement::Builder aCommandDataElement)
+CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams,
+                                         CommandDataElement::Builder aCommandDataElement)
 {
     CommandPath::Builder commandPath = aCommandDataElement.CreateCommandPathBuilder();
-    if (aCommandParams.Flags.Has(CommandPathFlags::kEndpointIdValid))
+    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
     {
-        commandPath.EndpointId(aCommandParams.EndpointId);
+        commandPath.EndpointId(aCommandPathParams.mEndpointId);
     }
 
-    if (aCommandParams.Flags.Has(CommandPathFlags::kGroupIdValid))
+    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kGroupIdValid))
     {
-        commandPath.GroupId(aCommandParams.GroupId);
+        commandPath.GroupId(aCommandPathParams.mGroupId);
     }
 
-    commandPath.ClusterId(aCommandParams.ClusterId).CommandId(aCommandParams.CommandId).EndOfCommandPath();
+    commandPath.ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPath();
 
     return commandPath.GetError();
 }

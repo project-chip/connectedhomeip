@@ -280,6 +280,11 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
     TLVType outerContainer;
     OID extensionOID;
     bool critical = false;
+    const uint8_t * extensionSequence;
+    uint32_t extensionSequenceLen;
+
+    err = reader.GetConstructedType(extensionSequence, extensionSequenceLen);
+    SuccessOrExit(err);
 
     // Extension ::= SEQUENCE
     ASN1_ENTER_SEQUENCE
@@ -287,8 +292,11 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
         // extnID OBJECT IDENTIFIER,
         ASN1_PARSE_OBJECT_ID(extensionOID);
 
-        VerifyOrExit(extensionOID != kOID_Unknown, err = ASN1_ERROR_UNSUPPORTED_ENCODING);
-        VerifyOrExit(GetOIDCategory(extensionOID) == kOIDCategory_Extension, err = ASN1_ERROR_INVALID_ENCODING);
+        // The kOID_Unknown will be interpreted and encoded as future-extension.
+        if (extensionOID != kOID_Unknown)
+        {
+            VerifyOrExit(GetOIDCategory(extensionOID) == kOIDCategory_Extension, err = ASN1_ERROR_INVALID_ENCODING);
+        }
 
         // critical BOOLEAN DEFAULT FALSE,
         ASN1_PARSE_ANY;
@@ -460,9 +468,13 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                 err = writer.EndContainer(outerContainer);
                 SuccessOrExit(err);
             }
+            // Any other extension is treated as FutureExtension
             else
             {
-                ExitNow(err = ASN1_ERROR_UNSUPPORTED_ENCODING);
+                err = writer.PutBytes(ContextTag(kTag_FutureExtension), extensionSequence, extensionSequenceLen);
+                SuccessOrExit(err);
+
+                ASN1_PARSE_ANY;
             }
         }
         ASN1_EXIT_ENCAPSULATED;

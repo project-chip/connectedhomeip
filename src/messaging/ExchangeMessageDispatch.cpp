@@ -59,8 +59,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 #if !defined(NDEBUG)
         if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
         {
-            ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
-                            reliableMessageContext->GetPendingPeerAckId());
+            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
+                          reliableMessageContext->GetPendingPeerAckId());
         }
 #endif
     }

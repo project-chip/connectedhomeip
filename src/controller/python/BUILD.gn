@@ -32,7 +32,7 @@ config("controller_wno_deprecate") {
 }
 
 chip_data_model("python_data_model") {
-  cluster_sources = [ "media-playback-client" ]
+  cluster_sources = []
 
   zap_pregenerated_dir = "gen"
 

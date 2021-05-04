@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include <CommonRpc.h>
+
 namespace chip {
 namespace rpc {
 
 class LightingService;
-
-int Init();
 
 } // namespace rpc
 } // namespace chip

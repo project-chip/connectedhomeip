@@ -20,8 +20,9 @@
  * @brief Implementation for the Binding Server Cluster
  ***************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 
+#include <app/Command.h>
 #include <app/util/binding-table.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -87,7 +88,8 @@ EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
     return EMBER_NOT_FOUND;
 }
 
-bool emberAfBindingClusterBindCallback(NodeId nodeId, GroupId groupId, EndpointId endpointId, ClusterId clusterId)
+bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
+                                       ClusterId clusterId)
 {
     ChipLogDetail(Zcl, "RX: BindCallback");
 
@@ -116,7 +118,8 @@ bool emberAfBindingClusterBindCallback(NodeId nodeId, GroupId groupId, EndpointI
     return true;
 }
 
-bool emberAfBindingClusterUnbindCallback(NodeId nodeId, GroupId groupId, EndpointId endpointId, ClusterId clusterId)
+bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, NodeId nodeId, GroupId groupId, EndpointId endpointId,
+                                         ClusterId clusterId)
 {
     ChipLogDetail(Zcl, "RX: UnbindCallback");
 

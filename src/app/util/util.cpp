@@ -40,11 +40,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af-event.h"
-#include "af-main.h"
-#include "af.h"
 #include "app/util/common.h"
 #include <app/reporting/reporting.h>
+#include <app/util/af-event.h>
+#include <app/util/af-main.h>
+#include <app/util/af.h>
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
@@ -99,6 +99,9 @@ EmberAfClusterCommand curCmd;
 // emberAfProcessMessage. The pointer below is set
 // to NULL when the function exits.
 EmberAfClusterCommand * emAfCurrentCommand;
+
+// A pointer to the global exchange manager
+chip::Messaging::ExchangeManager * emAfExchangeMgr = nullptr;
 
 // DEPRECATED.
 uint8_t emberAfIncomingZclSequenceNumber = 0xFF;
@@ -266,12 +269,14 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
 // ****************************************
 // Initialize Clusters
 // ****************************************
-void emberAfInit(void)
+void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 {
     uint8_t i;
 #ifdef EMBER_AF_ENABLE_STATISTICS
     afNumPktsSent = 0;
 #endif
+
+    emAfExchangeMgr = exchangeMgr;
 
     for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
     {
@@ -846,52 +851,6 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
     return emberAfSendDefaultResponseWithCallback(cmd, status, NULL);
 }
 
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
-{
-    NodeId destination = EMBER_UNKNOWN_NODE_ID;
-    uint8_t max        = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
-
-    if ((apsFrame->options & EMBER_APS_OPTION_SOURCE_EUI64) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EUI64_SIZE);
-    }
-    if ((apsFrame->options & EMBER_APS_OPTION_DESTINATION_EUI64) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EUI64_SIZE);
-    }
-    if ((apsFrame->options & EMBER_APS_OPTION_FRAGMENT) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EMBER_AF_APS_FRAGMENTATION_OVERHEAD);
-    }
-
-    switch (type)
-    {
-    case EMBER_OUTGOING_DIRECT:
-        destination = indexOrDestination;
-        break;
-    case EMBER_OUTGOING_VIA_ADDRESS_TABLE:
-        // destination = emberGetAddressTableRemoteNodeId(indexOrDestination);
-        break;
-    case EMBER_OUTGOING_VIA_BINDING:
-        // destination = emberGetBindingRemoteNodeId(indexOrDestination);
-        break;
-    case EMBER_OUTGOING_MULTICAST:
-        // APS multicast messages include the two-byte group id and exclude the
-        // one-byte destination endpoint, for a net loss of an extra byte.
-        max--;
-        break;
-    case EMBER_OUTGOING_BROADCAST:
-        break;
-    default:
-        // MISRA requires default case.
-        break;
-    }
-
-    max = static_cast<uint8_t>(max - emberAfGetSourceRouteOverheadCallback(destination));
-
-    return max;
-}
-
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
     data[index]     = (uint8_t)(((x)) & 0xFF);
@@ -1239,4 +1198,9 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         // as case 0 to make MISRA happy.
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
+}
+
+chip::Messaging::ExchangeManager * chip::ExchangeManager()
+{
+    return emAfExchangeMgr;
 }

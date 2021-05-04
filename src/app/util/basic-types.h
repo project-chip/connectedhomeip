@@ -40,4 +40,5 @@ typedef uint64_t DataVersion;
 typedef uint32_t DeviceTypeId;
 typedef uint8_t FieldId;
 typedef uint16_t ListIndex;
+typedef uint64_t FabricId;
 } // namespace chip

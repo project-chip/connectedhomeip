@@ -81,10 +81,15 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: |
                       out/all_clusters_debug/all-clusters-server
+                      out/all_clusters_debug/all-clusters-server.map
                       out/bridge_debug/bridge-app-server
+                      out/bridge_debug/bridge-app-server.map
                       out/chip_tool_debug/chip-tool
+                      out/chip_tool_debug/chip-tool.map
                       out/lighting_app_debug_rpc/chip-lighting-app
+                      out/lighting_app_debug_rpc/chip-lighting-app.map
                       out/shell_debug/chip-shell
+                      out/shell_debug/chip-shell.map
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove dbus binaries for CodeQL Analysis

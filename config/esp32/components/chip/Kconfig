@@ -91,6 +91,12 @@ menu "CHIP Core"
                 The CHIP library is shipped with a minimal mDNS implementation,
                 enable this config to use it rather than the mDNS library in IDF.
 
+        config ENABLE_CHIP_SHELL
+            bool "Use the CHIP shell library"
+            default n
+            help
+                Link the application against CHIP interactive shell.
+
         # TODO: add log level selection
 
     endmenu # "General Options"
@@ -328,7 +334,7 @@ menu "CHIP Device Layer"
         config CHIP_TASK_STACK_SIZE
             int "CHIP Task Stack Size"
             range 0 65535
-            default 5120
+            default 6144
             help
                 The size (in bytes) of the CHIP task stack.
 

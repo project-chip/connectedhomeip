@@ -50,7 +50,7 @@ namespace {
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
 #define CHIP_ADV_SHORT_UUID_LEN 2
-#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFEAF
+#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFFF6
 
 // FreeeRTOS sw timer
 TimerHandle_t sbleAdvTimeoutTimer;
@@ -715,6 +715,10 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
             ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
             return;
         }
+        if (mFlags.Has(Flags::kRestartAdvertising))
+        {
+            BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        }
         break;
     }
     case QVCHIP_DM_CONN_OPEN_IND: {
@@ -903,8 +907,10 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
+        /* Stop advertising and defer restart for when stop confirmation is received from the stack */
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        sInstance.StopAdvertising();
+        sInstance.mFlags.Set(Flags::kRestartAdvertising);
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {

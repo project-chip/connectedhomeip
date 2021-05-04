@@ -114,7 +114,7 @@ EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * c
             }
             timeout = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(timeout);
+            wasHandled = emberAfIdentifyClusterIdentifyQueryResponseCallback(nullptr, timeout);
             break;
         }
         default: {
@@ -143,11 +143,11 @@ EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * c
             }
             identifyTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfIdentifyClusterIdentifyCallback(identifyTime);
+            wasHandled = emberAfIdentifyClusterIdentifyCallback(nullptr, identifyTime);
             break;
         }
         case ZCL_IDENTIFY_QUERY_COMMAND_ID: {
-            wasHandled = emberAfIdentifyClusterIdentifyQueryCallback();
+            wasHandled = emberAfIdentifyClusterIdentifyQueryCallback(nullptr);
             break;
         }
         default: {

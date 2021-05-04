@@ -129,12 +129,6 @@ class DeviceProvisioningFragment : Fragment() {
       }
     }
 
-    override fun onNetworkCredentialsRequested() {
-      childFragmentManager.beginTransaction()
-          .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))
-          .commit()
-    }
-
     override fun onPairingComplete(code: Int) {
       Log.d(TAG, "onPairingComplete: $code")
     }

@@ -6,7 +6,7 @@
 
 #include "ModelCommand.h"
 #include "gen/CHIPClientCallbacks.h"
-#include <controller/CHIPClusters.h>
+#include "gen/CHIPClusters.h"
 #include <lib/core/CHIPSafeCasts.h>
 
 static void OnDefaultSuccessResponse(void * context)

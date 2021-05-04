@@ -40,13 +40,7 @@ public:
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
-    void SendNetworkCredentials(const char * ssid, const char * password);
-    void SendThreadCredentials(chip::ByteSpan threadData);
-
     // DevicePairingDelegate implementation
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
     void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
@@ -82,8 +76,7 @@ private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
-    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-    chip::PersistentStorageResultDelegate * mStorageResultDelegate   = nullptr;
+    chip::PersistentStorageResultDelegate * mStorageResultDelegate = nullptr;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

@@ -124,6 +124,8 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    exchange->Close();
 }
 
 void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
@@ -146,6 +148,8 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    exchange->Close();
 }
 
 void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
@@ -192,6 +196,9 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
+
+    rm->ClearRetransTable(rc);
+    exchange->Close();
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
@@ -210,6 +217,8 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+
+    exchange->Close();
 }
 
 // Test Suite

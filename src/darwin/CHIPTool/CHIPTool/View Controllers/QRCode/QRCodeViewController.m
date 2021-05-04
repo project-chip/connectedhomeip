@@ -519,7 +519,7 @@
 - (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
 {
     self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
-                                                           endpoint:1
+                                                           endpoint:0
                                                               queue:dispatch_get_main_queue()];
     NSData * networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     NSData * credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
@@ -539,14 +539,13 @@
 - (void)addThreadNetwork:(NSData *)threadDataSet
 {
     self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:CHIPGetPairedDevice()
-                                                           endpoint:1
+                                                           endpoint:0
                                                               queue:dispatch_get_main_queue()];
-    NSData * credentials = [threadDataSet dataUsingEncoding:NSUTF8StringEncoding];
     uint64_t breadcrumb = 0;
     uint32_t timeoutMs = 3000;
 
     __weak typeof(self) weakSelf = self;
-    [_cluster addThreadNetwork:credentials
+    [_cluster addThreadNetwork:threadDataSet
                     breadcrumb:breadcrumb
                      timeoutMs:timeoutMs
              completionHandler:^(NSError * error, NSDictionary * values) {
@@ -566,7 +565,8 @@
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         networkId = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     } else {
-        networkId = [NSData dataWithBytes:TEMP_THREAD_NETWORK_ID length:sizeof(TEMP_THREAD_NETWORK_ID)];
+        uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
+        networkId = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
     }
     uint64_t breadcrumb = 0;
     uint32_t timeoutMs = 3000;
@@ -597,10 +597,6 @@
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
-}
-
-- (void)onNetworkCredentialsRequested:(CHIPNetworkCredentialType)type
-{
 }
 
 - (void)updateUIFields:(CHIPSetupPayload *)payload decimalString:(nullable NSString *)decimalString
@@ -760,7 +756,7 @@
         [self->_captureSession stopRunning];
         [self->_session invalidateSession];
     });
-    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase41Representation:qrCode];
+    CHIPQRCodeSetupPayloadParser * parser = [[CHIPQRCodeSetupPayloadParser alloc] initWithBase38Representation:qrCode];
     NSError * error;
     _setupPayload = [parser populatePayload:&error];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{

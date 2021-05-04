@@ -75,6 +75,7 @@ public:
                            System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
+        ec->Close();
     }
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
@@ -102,6 +103,9 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetDestinationNodeId());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerKeyID() == ctx.GetPeerKeyId());
+
+    ec1->Close();
+    ec2->Close();
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
@@ -149,16 +153,18 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // send a malicious packet
-    ec1->SendMessage(Protocols::Id(VendorId::Common, 0x0001), 0x0002,
-                     System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/4635
+    // ec1->SendMessage(0x0001, 0x0002, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+    //                 SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
     ec1->SendMessage(Protocols::Id(VendorId::Common, 0x0001), 0x0001,
                      System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
-                     SendFlags(Messaging::SendMessageFlags::kNone));
+                     SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    ec1->Close();
 }
 
 // Test Suite

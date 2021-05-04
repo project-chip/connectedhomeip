@@ -20,9 +20,10 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include "basic-types.h"
 #include "enums.h"
+#include <app/util/basic-types.h>
 #include <stdint.h>
+#include <support/Span.h>
 
 // Struct for ApplicationLauncherApp
 typedef struct _ApplicationLauncherApp
@@ -34,16 +35,16 @@ typedef struct _ApplicationLauncherApp
 // Struct for AudioOutputInfo
 typedef struct _AudioOutputInfo
 {
-    uint8_t Index;
-    uint8_t OutputType;
-    uint8_t * Name;
+    uint8_t index;
+    uint8_t outputType;
+    uint8_t * name;
 } EmberAfAudioOutputInfo;
 
-// Struct for BasicCommissioningInfo
-typedef struct _BasicCommissioningInfo
+// Struct for BasicCommissioningInfoType
+typedef struct _BasicCommissioningInfoType
 {
     uint32_t FailSafeExpiryLengthMs;
-} EmberAfBasicCommissioningInfo;
+} EmberAfBasicCommissioningInfoType;
 
 // Struct for BlockThreshold
 typedef struct _BlockThreshold
@@ -100,17 +101,44 @@ typedef struct _ConfigureReportingStatusRecord
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
-    uint8_t * Name;
-    uint8_t * Value;
+    uint8_t * name;
+    uint8_t * value;
 } EmberAfContentLaunchAdditionalInfo;
 
-// Struct for ContentLaunchSearch
-typedef struct _ContentLaunchSearch
+// Struct for ContentLaunchBrandingInformation
+typedef struct _ContentLaunchBrandingInformation
 {
-    uint8_t EntitiesList;
-    uint8_t * searchWindowStart;
-    uint8_t * searchWindowEnd;
-} EmberAfContentLaunchSearch;
+    uint8_t * providerName;
+    uint8_t background;
+    uint8_t logo;
+    uint8_t progressBar;
+    uint8_t splash;
+    uint8_t waterMark;
+} EmberAfContentLaunchBrandingInformation;
+
+// Struct for ContentLaunchDimension
+typedef struct _ContentLaunchDimension
+{
+    uint8_t * width;
+    uint8_t * height;
+    uint8_t metric;
+} EmberAfContentLaunchDimension;
+
+// Struct for ContentLaunchParamater
+typedef struct _ContentLaunchParamater
+{
+    uint8_t Type;
+    uint8_t * Value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+} EmberAfContentLaunchParamater;
+
+// Struct for ContentLaunchStyleInformation
+typedef struct _ContentLaunchStyleInformation
+{
+    uint8_t * imageUrl;
+    uint8_t * color;
+    uint8_t size;
+} EmberAfContentLaunchStyleInformation;
 
 // Struct for DebtPayload
 typedef struct _DebtPayload
@@ -174,7 +202,7 @@ typedef struct _EventLogPayload
     uint8_t logId;
     uint16_t eventId;
     uint32_t eventTime;
-    uint8_t * eventData;
+    chip::ByteSpan eventData;
 } EmberAfEventLogPayload;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
@@ -184,6 +212,15 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
     uint8_t attributeType;
     uint8_t attributeAccessControl;
 } EmberAfExtendedDiscoverAttributesInfoRecord;
+
+// Struct for FabricDescriptor
+typedef struct _FabricDescriptor
+{
+    chip::FabricId FabricId;
+    uint16_t VendorId;
+    chip::ByteSpan Label;
+    chip::NodeId NodeId;
+} EmberAfFabricDescriptor;
 
 // Struct for GpPairingConfigurationGroupList
 typedef struct _GpPairingConfigurationGroupList
@@ -201,8 +238,8 @@ typedef struct _GpTranslationTableUpdateTranslation
     uint16_t profile;
     uint16_t cluster;
     uint8_t zigbeeCommandId;
-    uint8_t * zigbeeCommandPayload;
-    uint8_t * additionalInfoBlock;
+    chip::ByteSpan zigbeeCommandPayload;
+    chip::ByteSpan additionalInfoBlock;
 } EmberAfGpTranslationTableUpdateTranslation;
 
 // Struct for GroupInformationRecord
@@ -217,7 +254,7 @@ typedef struct _GroupKey
 {
     uint16_t VendorId;
     uint16_t GroupKeyIndex;
-    uint8_t * GroupKeyRoot;
+    chip::ByteSpan GroupKeyRoot;
     uint64_t GroupKeyEpochStartTime;
     uint8_t GroupKeySecurityPolicy;
 } EmberAfGroupKey;
@@ -244,11 +281,18 @@ typedef uint8_t EmberAfIdentity;
 // Struct for MediaInputInfo
 typedef struct _MediaInputInfo
 {
-    uint8_t Index;
-    uint8_t InputType;
-    uint8_t * Name;
-    uint8_t * Description;
+    uint8_t index;
+    uint8_t inputType;
+    uint8_t * name;
+    uint8_t * description;
 } EmberAfMediaInputInfo;
+
+// Struct for MediaPlaybackPosition
+typedef struct _MediaPlaybackPosition
+{
+    uint64_t updatedAt;
+    uint64_t position;
+} EmberAfMediaPlaybackPosition;
 
 // Struct for NavigateTargetTargetInfo
 typedef struct _NavigateTargetTargetInfo
@@ -444,20 +488,20 @@ typedef struct _SpecialDay
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    uint8_t * DiscoveryResponse;
+    chip::ByteSpan DiscoveryResponse;
 } EmberAfThreadInterfaceScanResult;
 
 // Struct for TierLabelsPayload
 typedef struct _TierLabelsPayload
 {
     uint8_t tierId;
-    uint8_t * tierLabel;
+    chip::ByteSpan tierLabel;
 } EmberAfTierLabelsPayload;
 
 // Struct for TopUpPayload
 typedef struct _TopUpPayload
 {
-    uint8_t * topUpCode;
+    chip::ByteSpan topUpCode;
     int32_t topUpAmount;
     uint32_t topUpTime;
 } EmberAfTopUpPayload;
@@ -476,28 +520,28 @@ typedef struct _TransferredPhase
 // Struct for TvChannelInfo
 typedef struct _TvChannelInfo
 {
-    uint16_t MajorNumber;
-    uint16_t MinorNumber;
-    uint8_t * Name;
-    uint8_t * CallSign;
-    uint8_t * AffiliateCallSign;
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+    uint8_t * name;
+    uint8_t * callSign;
+    uint8_t * affiliateCallSign;
 } EmberAfTvChannelInfo;
 
 // Struct for TvChannelLineupInfo
 typedef struct _TvChannelLineupInfo
 {
-    uint8_t * OperatorName;
-    uint8_t * LineupName;
-    uint8_t * PostalCode;
-    uint8_t LineupInfoType;
+    uint8_t * operatorName;
+    uint8_t * lineupName;
+    uint8_t * postalCode;
+    uint8_t lineupInfoType;
 } EmberAfTvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
 {
     uint8_t Security;
-    uint8_t * SSID;
-    uint8_t * BSSID;
+    chip::ByteSpan SSID;
+    chip::ByteSpan BSSID;
     uint8_t Channel;
     uint32_t FrequencyBand;
 } EmberAfWiFiInterfaceScanResult;

@@ -39,9 +39,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
-#include "config.h"
-#include "util.h"
+#include <app/util/af.h>
+#include <app/util/config.h>
+#include <app/util/util.h>
 
 using namespace chip;
 

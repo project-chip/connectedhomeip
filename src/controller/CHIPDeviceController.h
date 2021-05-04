@@ -44,6 +44,13 @@
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <mdns/Resolver.h>
@@ -61,6 +68,10 @@ struct ControllerInitParams
     PersistentStorageDelegate * storageDelegate = nullptr;
     System::Layer * systemLayer                 = nullptr;
     Inet::InetLayer * inetLayer                 = nullptr;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * bleLayer = nullptr;
+#endif
 #if CHIP_ENABLE_INTERACTION_MODEL
     app::InteractionModelDelegate * imDelegate = nullptr;
 #endif
@@ -84,25 +95,6 @@ public:
 
     /**
      * @brief
-     *   Called when the network credentials are needed for the remote device
-     *
-     * @param callback Callback delegate that provisions the network credentials
-     */
-    virtual void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) = 0;
-
-    /**
-     * @brief
-     *   Called when the operational credentials are needed for the remote device
-     *
-     * @param csr Certificate signing request from the device
-     * @param csr_length The length of CSR
-     * @param callback Callback delegate that provisions the operational credentials
-     */
-    virtual void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                   RendezvousDeviceCredentialsDelegate * callback) = 0;
-
-    /**
-     * @brief
      *   Called when the pairing is complete (with success or error)
      *
      * @param error Error cause, if any
@@ -116,6 +108,11 @@ public:
      * @param error Error cause, if any
      */
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
+};
+
+struct CommissionerInitParams : public ControllerInitParams
+{
+    DevicePairingDelegate * pairingDelegate = nullptr;
 };
 
 /**
@@ -138,15 +135,7 @@ public:
     DeviceController();
     virtual ~DeviceController() {}
 
-    /**
-     * Init function to be used when there exists a device layer that takes care of initializing
-     * System::Layer and InetLayer.
-     */
     CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params);
-
-    // Note: Future modifications should be made to ControllerInitParams
-    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
     virtual CHIP_ERROR Shutdown();
 
@@ -238,6 +227,9 @@ protected:
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     Inet::InetLayer * mInetLayer;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
     System::Layer * mSystemLayer;
 
     uint16_t mListenPort;
@@ -309,15 +301,9 @@ public:
     ~DeviceCommissioner() {}
 
     /**
-     * Init function to be used when there exists a device layer that takes care of initializing
-     * System::Layer and InetLayer.
+     * Commisioner-specific initialization, includes parameters such as the pairing delegate.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, ControllerInitParams params, DevicePairingDelegate * pairingDelegate = nullptr);
-
-    // Note: Future modifications should be made to ControllerInitParams
-    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
-                    DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
-                    Inet::InetLayer * inetLayer = nullptr);
+    CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 
     void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
@@ -371,6 +357,17 @@ public:
 
     void ReleaseDevice(Device * device) override;
 
+#if CONFIG_NETWORK_LAYER_BLE
+    /**
+     * @brief
+     *   Once we have finished all commissioning work, the Controller should close the BLE
+     *   connection to the device and establish CASE session / another PASE session to the device
+     *   if needed.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR CloseBleConnection();
+#endif
+
 private:
     DevicePairingDelegate * mPairingDelegate;
     RendezvousSession * mRendezvousSession;
@@ -394,6 +391,8 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
+
+    void PersistNextKeyId();
 
     void FreeRendezvousSession();
 

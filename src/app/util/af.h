@@ -51,7 +51,7 @@
 #pragma once
 
 #ifndef CONFIGURATION_HEADER
-#define CONFIGURATION_HEADER "config.h"
+#define CONFIGURATION_HEADER <app/util/config.h>
 #endif
 #include CONFIGURATION_HEADER
 
@@ -66,11 +66,11 @@
 #include "stack/include/error.h"
 #endif // EZSP_HOST
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
-#include "client-api.h"
-#include "debug-printing.h"
-#include "ember-print.h"
+#include <app/util/client-api.h>
+#include <app/util/debug-printing.h>
+#include <app/util/ember-print.h>
 
 /** @name Attribute Storage */
 // @{
@@ -732,7 +732,7 @@ int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool si
  */
 void emberAfGetEui64(EmberEUI64 returnEui64);
 
-#ifdef EZSP_HOST
+#if (BIGENDIAN_CPU) || defined(EZSP_HOST)
 // Normally this is provided by the stack code, but on the host
 // it is provided by the application code.
 void emberReverseMemCopy(uint8_t * dest, const uint8_t * src, uint16_t length);
@@ -1473,24 +1473,6 @@ EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
  * @brief emberAfSendImmediateDefaultResponse with attached message sent callback.
  */
 EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Returns the maximum size of the payload that the Application
- * Support sub-layer will accept for the given message type, destination, and
- * APS frame.
- *
- * The size depends on multiple factors, including the security level in use
- * and additional information added to the message to support the various
- * options.
- *
- * @param type The outgoing message type.
- * @param indexOrDestination Depending on the message type, this is either the
- *  EmberNodeId of the destination, an index into the address table, an index
- *  into the binding table, the multicast identifier, or a broadcast address.
- * @param apsFrame The APS frame for the message.
- * @return The maximum APS payload length for the given message.
- */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.

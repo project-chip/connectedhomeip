@@ -23,7 +23,10 @@
 
 #pragma once
 
+#include <dispatch/dispatch.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
+
+static constexpr const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.controller.workqueue";
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,7 +49,14 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    /* none so far */
+    dispatch_queue_t GetWorkQueue()
+    {
+        if (mWorkQueue == nullptr)
+        {
+            mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL);
+        }
+        return mWorkQueue;
+    }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -60,6 +70,8 @@ private:
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
+
+    dispatch_queue_t mWorkQueue = nullptr;
 };
 
 /**

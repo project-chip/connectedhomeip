@@ -20,6 +20,7 @@
 #include "gen/CHIPClientCallbacks.h"
 
 #include "gen/enums.h"
+#include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -717,7 +718,7 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     return true;
 }
 
-bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
+bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * commandObj, uint16_t timeout)
 {
     ChipLogProgress(Zcl, "IdentifyQueryResponse:");
     ChipLogProgress(Zcl, "  timeout: %" PRIu16 "", timeout);

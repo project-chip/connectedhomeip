@@ -33,6 +33,7 @@ from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
 from .interaction_model import delegate as im
+from .exceptions import *
 import enum
 
 
@@ -152,6 +153,11 @@ class ChipDeviceController(object):
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         )
 
+    def CloseBLEConnection(self):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceCommissioner_CloseBleConnection(self.devCtrl)
+        )
+
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
@@ -243,18 +249,6 @@ class ChipDeviceController(object):
     def SetBlockingCB(self, blockingCB):
         self._ChipStack.blockingCB = blockingCB
 
-    def SetWifiCredential(self, ssid, password):
-        ret = self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential(
-            self.devCtrl, ssid.encode("utf-8") + b'\0', password.encode("utf-8") + b'\0')
-        if ret != 0:
-            raise self._ChipStack.ErrorToException(res)
-
-    def SetThreadCredential(self, channel, panid, masterKey):
-        ret = self._dmLib.pychip_ScriptDevicePairingDelegate_SetThreadCredential(
-            self.devCtrl, channel, panid, masterKey.encode("utf-8") + b'\0')
-        if ret != 0:
-            raise self._ChipStack.ErrorToException(ret)
-
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
@@ -280,10 +274,6 @@ class ChipDeviceController(object):
                 c_void_p, c_uint64, c_char_p, c_uint64, POINTER(c_uint16)]
             self._dmLib.pychip_DeviceController_GetAddressAndPort.restype = c_uint32
 
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [
-                c_void_p, c_char_p, c_char_p]
-            self._dmLib.pychip_ScriptDevicePairingDelegate_SetWifiCredential.restype = c_uint32
-
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.argtypes = [
                 c_void_p, _DevicePairingDelegate_OnPairingCompleteFunct]
             self._dmLib.pychip_ScriptDevicePairingDelegate_SetKeyExchangeCallback.restype = c_uint32
@@ -300,5 +290,9 @@ class ChipDeviceController(object):
                 c_void_p, c_uint64, POINTER(c_void_p)]
             self._dmLib.pychip_GetDeviceByNodeId.restype = c_uint32
 
+            self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [c_void_p]
+            self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.restype = c_uint32
+
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
+

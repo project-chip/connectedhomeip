@@ -25,10 +25,8 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/NetworkProvisioning.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
-#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/BufferWriter.h>
 #include <transport/AdminPairingTable.h>
 #include <transport/RendezvousSessionDelegate.h>
@@ -66,21 +64,9 @@ class SecureSessionHandle;
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public SessionEstablishmentDelegate,
-                          public RendezvousSessionDelegate,
-                          public RendezvousDeviceCredentialsDelegate,
-                          public NetworkProvisioningDelegate,
-                          public TransportMgrDelegate
+class RendezvousSession : public SessionEstablishmentDelegate, public RendezvousSessionDelegate, public TransportMgrDelegate
 {
 public:
-    enum State : uint8_t
-    {
-        kInit = 0,
-        kSecurePairing,
-        kNetworkProvisioning,
-        kRendezvousComplete,
-    };
-
     RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
     ~RendezvousSession() override;
 
@@ -117,27 +103,9 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
 
-    //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
-    void SendNetworkCredentials(const char * ssid, const char * passwd) override;
-    void SendThreadCredentials(ByteSpan threadData) override;
-    void SendOperationalCredentials() override;
-
-    //////////// NetworkProvisioningDelegate Implementation ///////////////
-    void OnNetworkProvisioningError(CHIP_ERROR error) override;
-    void OnNetworkProvisioningComplete() override;
-
     //////////// TransportMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                            System::PacketBufferHandle msgBuf) override;
-
-    /**
-     * @brief
-     *  Get the IP address assigned to the device during network provisioning
-     *  process.
-     *
-     * @return The IP address of the device
-     */
-    const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
     Transport::AdminId GetAdminId() const { return (mAdmin != nullptr) ? mAdmin->GetAdminId() : Transport::kUndefinedAdminId; }
 
@@ -149,25 +117,18 @@ private:
     CHIP_ERROR WaitForPairing(uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier);
 
-    Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
 
     PASESession mPairingSession;
-    NetworkProvisioning mNetworkProvision;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
     TransportMgrBase * mTransportMgr;
-    uint16_t mNextKeyId                         = 0;
-    SecureSessionMgr * mSecureSessionMgr        = nullptr;
-    SecureSessionHandle * mPairingSessionHandle = nullptr;
+    uint16_t mNextKeyId                  = 0;
+    SecureSessionMgr * mSecureSessionMgr = nullptr;
 
     Transport::AdminPairingInfo * mAdmin = nullptr;
 
-    RendezvousSession::State mCurrentState = State::kInit;
-    void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
-
-    void InitPairingSessionHandle();
-    void ReleasePairingSessionHandle();
+    void Cleanup();
 };
 
 } // namespace chip

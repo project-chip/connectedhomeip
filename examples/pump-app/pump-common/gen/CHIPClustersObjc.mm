@@ -24,10 +24,11 @@
 #import "CHIPError.h"
 #import "app/util/af.h"
 #import "gen/CHIPClientCallbacks.h"
+#import "gen/CHIPClusters.h"
 #import "gen/CHIPClustersObjc.h"
 
-#include <controller/CHIPClusters.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 
@@ -103,16 +104,15 @@ public:
 
     static void CallbackFn(void * context, chip::ByteSpan value)
     {
+        NSData * data = [NSData dataWithBytes:value.data() length:value.size()];
+
         CHIPStringAttributeCallbackBridge * callback = reinterpret_cast<CHIPStringAttributeCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 if (callback->mOctetString) {
-                    NSData * data = [NSData dataWithBytes:value.data() length:value.size()];
                     callback->mHandler(nil, @ { @"value" : data });
                 } else {
-                    NSString * str = [[NSString alloc] initWithBytes:value.data()
-                                                              length:value.size()
-                                                            encoding:NSUTF8StringEncoding];
+                    NSString * str = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                     callback->mHandler(nil, @ { @"value" : str });
                 }
 
@@ -389,6 +389,7 @@ private:
 
 @interface CHIPCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
+@property (readonly, nonatomic) dispatch_queue_t chipWorkQueue;
 - (Controller::ClusterBase *)getCluster;
 @end
 
@@ -401,8 +402,17 @@ private:
             return nil;
         }
 
+        if (device == nullptr) {
+            return nil;
+        }
+
         CHIP_ERROR err = cppCluster->Associate([device internalDevice], endpoint);
         if (err != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+        if (_chipWorkQueue == nil) {
             return nil;
         }
 
@@ -443,7 +453,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.Identify(onSuccess->Cancel(), onFailure->Cancel(), identifyTime);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -466,7 +480,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.IdentifyQuery(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -489,7 +507,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -512,7 +534,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), value);
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.WriteAttributeIdentifyTime(onSuccess->Cancel(), onFailure->Cancel(), value);
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;
@@ -535,7 +561,11 @@ private:
         return;
     }
 
-    CHIP_ERROR err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
     if (err != CHIP_NO_ERROR) {
         delete onSuccess;
         delete onFailure;

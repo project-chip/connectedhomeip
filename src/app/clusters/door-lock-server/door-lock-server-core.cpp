@@ -37,8 +37,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
 #include "door-lock-server.h"
+#include <app/util/af.h>
 
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"

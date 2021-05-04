@@ -20,8 +20,8 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
-#include "controller/CHIPClusters.h"
 #include "gen/CHIPClientCallbacks.h"
+#include "gen/CHIPClusters.h"
 
 enum class PairingMode
 {
@@ -30,6 +30,7 @@ enum class PairingMode
     Ble,
     SoftAP,
     Ethernet,
+    OnNetwork,
 };
 
 enum class PairingNetworkType
@@ -75,6 +76,7 @@ public:
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
+        case PairingMode::OnNetwork:
         case PairingMode::SoftAP:
             AddArgument("fabric-id", 0, UINT64_MAX, &mFabricId);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
@@ -96,9 +98,6 @@ public:
 
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 

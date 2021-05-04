@@ -83,5 +83,6 @@ enum
     ZCL_COMMAND_ID_ATTRIBUTE_TYPE        = 0xF4, // Command Id
     ZCL_NODE_ID_ATTRIBUTE_TYPE           = 0xF5, // Node Id
     ZCL_DEVICE_TYPE_ID_ATTRIBUTE_TYPE    = 0xF6, // Device Type Id
+    ZCL_FABRIC_ID_ATTRIBUTE_TYPE         = 0xF7, // Fabric Id
     ZCL_UNKNOWN_ATTRIBUTE_TYPE           = 0xFF, // Unknown
 };
