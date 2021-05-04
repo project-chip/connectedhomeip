@@ -51,6 +51,7 @@ EmberAfStatus emberAfPumpConfigurationAndControlClusterServerCommandParse(EmberA
 EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfSwitchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfTestClusterClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThermostatClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
@@ -167,6 +168,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             // No commands are enabled for cluster Temperature Measurement
             result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_TEST_CLUSTER_ID:
+            result = emberAfTestClusterClusterServerCommandParse(cmd);
             break;
         case ZCL_THERMOSTAT_CLUSTER_ID:
             // No commands are enabled for cluster Thermostat
@@ -2515,6 +2519,34 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
             sceneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfScenesClusterViewSceneCallback(nullptr, groupId, sceneId);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfTestClusterClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_TEST_COMMAND_ID: {
+            wasHandled = emberAfTestClusterClusterTestCallback(nullptr);
+            break;
+        }
+        case ZCL_TEST_NOT_HANDLED_COMMAND_ID: {
+            wasHandled = emberAfTestClusterClusterTestNotHandledCallback(nullptr);
+            break;
+        }
+        case ZCL_TEST_SPECIFIC_COMMAND_ID: {
+            wasHandled = emberAfTestClusterClusterTestSpecificCallback(nullptr);
             break;
         }
         default: {

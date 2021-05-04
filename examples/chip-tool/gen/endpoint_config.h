@@ -63,7 +63,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 31
+#define GENERATED_ATTRIBUTE_COUNT 32
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -155,6 +155,9 @@
             /* Endpoint: 1, Cluster: Account Login (client) */                                                                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Test Cluster (client) */                                                                      \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Binding (client) */                                                                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */        \
                                                                                                                                    \
@@ -169,7 +172,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 31
+#define GENERATED_CLUSTER_COUNT 32
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
@@ -248,10 +251,13 @@
                 0x050E, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Account Login (client) */                                                                  \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(29), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0x050F, ZAP_ATTRIBUTE_INDEX(29), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Test Cluster (client) */                                                                   \
+            {                                                                                                                      \
+                0xF000, ZAP_ATTRIBUTE_INDEX(30), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
             {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(30), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+                0xF004, ZAP_ATTRIBUTE_INDEX(31), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Group Key Management (client) */                                                           \
     }
 
@@ -260,7 +266,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 31, 62 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 32, 64 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -270,7 +276,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (2)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (62)
+#define ATTRIBUTE_MAX_SIZE (64)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
@@ -314,7 +320,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (187)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (191)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
@@ -559,6 +565,12 @@
             { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* GetSetupPIN */                                                 \
             { 0x050E, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* GetSetupPINResponse */                                         \
             { 0x050E, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Login */                                                       \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Test Cluster (client) */                                                                      \
+            { 0x050F, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Test */                                                        \
+            { 0x050F, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* TestSpecificResponse */                                        \
+            { 0x050F, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestNotHandled */                                              \
+            { 0x050F, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* TestSpecific */                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binding (client) */                                                                           \
             { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Bind */                                                        \

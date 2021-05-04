@@ -219,6 +219,26 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x050F: // Test Cluster Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x001A: // list_int8u
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // INT8U
+            break;
+        }
+        }
+        break;
+    }
     }
 
     return entryLength;
@@ -278,6 +298,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0001: // fabrics list
             // Struct _FabricDescriptor
             entryLength = 50;
+            break;
+        }
+        break;
+    case 0x050F: // Test Cluster Cluster
+        switch (attributeId)
+        {
+        case 0x001A: // list_int8u
+            // uint8_t
+            entryLength = 1;
             break;
         }
         break;

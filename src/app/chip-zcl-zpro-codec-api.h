@@ -57,6 +57,7 @@
 | TvChannel                                                           | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
 | TemperatureMeasurement                                              | 0x0402 |
+| TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
@@ -2844,6 +2845,286 @@ encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(uint8_t seqNum,
  */
 chip::System::PacketBufferHandle
 encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster TestCluster                                                 | 0x050F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * Test                                                              |   0x00 |
+| * TestNotHandled                                                    |   0x01 |
+| * TestSpecific                                                      |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * Boolean                                                           | 0x0000 |
+| * Bitmap8                                                           | 0x0001 |
+| * Bitmap16                                                          | 0x0002 |
+| * Bitmap32                                                          | 0x0003 |
+| * Bitmap64                                                          | 0x0004 |
+| * Int8u                                                             | 0x0005 |
+| * Int16u                                                            | 0x0006 |
+| * Int32u                                                            | 0x0008 |
+| * Int64u                                                            | 0x000C |
+| * Int8s                                                             | 0x000D |
+| * Int16s                                                            | 0x000E |
+| * Int32s                                                            | 0x0010 |
+| * Int64s                                                            | 0x0014 |
+| * Enum8                                                             | 0x0015 |
+| * Enum16                                                            | 0x0016 |
+| * OctetString                                                       | 0x0019 |
+| * ListInt8u                                                         | 0x001A |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an Test command for Test Cluster server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterTestCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an TestNotHandled command for Test Cluster server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterTestNotHandledCommand(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode an TestSpecific command for Test Cluster server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterTestSpecificCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterDiscoverAttributes(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the boolean attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadBooleanAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the boolean attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteBooleanAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                               uint8_t boolean);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the bitmap8 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadBitmap8Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the bitmap8 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteBitmap8Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                               uint8_t bitmap8);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the bitmap16 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadBitmap16Attribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the bitmap16 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTestClusterClusterWriteBitmap16Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t bitmap16);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the bitmap32 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadBitmap32Attribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the bitmap32 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTestClusterClusterWriteBitmap32Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint32_t bitmap32);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the bitmap64 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadBitmap64Attribute(uint8_t seqNum,
+                                                                               chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the bitmap64 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTestClusterClusterWriteBitmap64Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint64_t bitmap64);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int8u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt8uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int8u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt8uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint8_t int8u);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int16u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt16uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int16u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt16uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint16_t int16u);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int32u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt32uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int32u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt32uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint32_t int32u);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int64u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt64uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int64u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt64uAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint64_t int64u);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int8s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt8sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int8s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt8sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             int8_t int8s);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int16s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt16sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int16s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt16sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              int16_t int16s);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int32s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt32sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int32s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt32sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              int32_t int32s);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the int64s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadInt64sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the int64s attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteInt64sAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              int64_t int64s);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the enum8 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadEnum8Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the enum8 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteEnum8Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                             uint8_t enum8);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the enum16 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadEnum16Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the enum16 attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterWriteEnum16Attribute(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                              uint16_t enum16);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadOctetStringAttribute(uint8_t seqNum,
+                                                                                  chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server write command for the octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan octetString);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the list_int8u attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(uint8_t seqNum,
+                                                                                chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Thermostat                                                  | 0x0201 |
