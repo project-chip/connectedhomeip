@@ -123,7 +123,17 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
     // an error arising below. at the end, we have to close it.
     Retain();
 
-    bool reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+    bool reliableTransmissionRequested = true;
+
+    // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
+    if (state && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
+    {
+        reliableTransmissionRequested = false;
+    }
+    else
+    {
+        reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+    }
 
     ExchangeMessageDispatch * dispatch = GetMessageDispatch();
     ApplicationExchangeDispatch defaultDispatch;
