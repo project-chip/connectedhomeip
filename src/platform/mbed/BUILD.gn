@@ -4,21 +4,21 @@ import("${chip_root}/src/platform/device.gni")
 assert(chip_device_platform == "mbed")
 
 source_set("mbed_bsd_socket") {
-    public_configs = [ "${chip_root}/src:includes" ]
+  public_configs = [ "${chip_root}/src:includes" ]
 
-    sources = [
-        "${chip_root}/src/platform/mbed/net/src/BSDSocket.cpp",
-        "${chip_root}/src/platform/mbed/net/src/common.cpp",
-        "${chip_root}/src/platform/mbed/net/src/net_dns.cpp",
-        "${chip_root}/src/platform/mbed/net/src/net_if.cpp",
-        "${chip_root}/src/platform/mbed/net/src/net_socket.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/eventfd.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/if.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/ifaddrs.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/inet.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/ioctl.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/netdb.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/select.cpp",
-        "${chip_root}/src/platform/mbed/posix/src/socket.cpp",
-    ]
+  sources = [
+    "net/src/BSDSocket.cpp",
+    "net/src/common.cpp",
+    "net/src/net_dns.cpp",
+    "net/src/net_if.cpp",
+    "net/src/net_socket.cpp",
+    "posix/src/eventfd.cpp",
+    "posix/src/if.cpp",
+    "posix/src/ifaddrs.cpp",
+    "posix/src/inet.cpp",
+    "posix/src/ioctl.cpp",
+    "posix/src/netdb.cpp",
+    "posix/src/select.cpp",
+    "posix/src/socket.cpp",
+  ]
 }
