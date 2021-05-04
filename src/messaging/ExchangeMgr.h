@@ -176,6 +176,13 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
+    /**
+     * A method to call Close() on all contexts that have a given delegate as
+     * their delegate.  To be used if the delegate is being destroyed.  This
+     * method will guarantee that it does not call into the delegate.
+     */
+    void CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate);
+
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
