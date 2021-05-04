@@ -150,6 +150,17 @@ pygments==2.8.1
     #   ipython
 pykwalify==1.8.0
     # via west
+pyobjc-core==7.1 ; sys_platform == "darwin"
+    # via
+    #   -r requirements.in
+    #   pyobjc-framework-cocoa
+    #   pyobjc-framework-corebluetooth
+pyobjc-framework-cocoa==7.1 ; sys_platform == "darwin"
+    # via
+    #   -r requirements.in
+    #   pyobjc-framework-corebluetooth
+pyobjc-framework-corebluetooth==7.1 ; sys_platform == "darwin"
+    # via -r requirements.in
 pyparsing==2.3.1
     # via
     #   -r requirements.in
