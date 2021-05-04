@@ -51,6 +51,7 @@ public:
         ChipLogProgress(chipTool, "NodeId Resolution: failed!");
         SetCommandExitStatus(false);
     }
+    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override {}
 };
 
 class Update : public DiscoverCommand
