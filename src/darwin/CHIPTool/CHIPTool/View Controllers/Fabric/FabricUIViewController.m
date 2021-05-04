@@ -208,7 +208,7 @@
 {
     NSLog(@"Request to fetchFabricsList");
     [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-    [self.cluster readAttributeFabricsList:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+    [self.cluster readAttributeFabricsListWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
         NSArray * fabricsList = [values objectForKey:@"value"];
         if (error) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -263,25 +263,26 @@
     [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
     [self.cluster
         updateFabricLabel:label
-        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (error) {
-                    NSLog(@"Got back error trying to updateFabricLabel %@", error);
-                    self->_updateFabricLabelTextField.text = @"";
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@", error]
-                                   isError:YES];
-                    });
-                } else {
-                    NSLog(@"Successfully updated the label: %@", values);
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [self updateResult:[NSString
+          responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  if (error) {
+                      NSLog(@"Got back error trying to updateFabricLabel %@", error);
+                      self->_updateFabricLabelTextField.text = @"";
+                      dispatch_async(dispatch_get_main_queue(), ^{
+                          [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@", error]
+                                     isError:YES];
+                      });
+                  } else {
+                      NSLog(@"Successfully updated the label: %@", values);
+                      dispatch_async(dispatch_get_main_queue(), ^{
+                          [self
+                              updateResult:[NSString
                                                stringWithFormat:@"Command updateFabricLabel succeeded to update label to %@", label]
                                    isError:NO];
-                    });
-                }
-            });
-        }];
+                      });
+                  }
+              });
+          }];
 }
 
 - (IBAction)removeFabricButtonPressed:(id)sender
@@ -298,23 +299,24 @@
         [self.cluster removeFabric:[fabricId unsignedLongLongValue]
                             nodeId:[nodeID unsignedLongLongValue]
                           vendorId:[vendorID unsignedShortValue]
-                 completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                     if (error) {
-                         NSLog(@"Failed to remove fabric with error %@", error);
-                         dispatch_async(dispatch_get_main_queue(), ^{
-                             [self updateResult:[NSString stringWithFormat:@"Command removeFabric failed with error %@", error]
-                                        isError:YES];
-                             self->_removeFabricTextField.text = @"";
-                         });
-                     } else {
-                         NSLog(@"Succeeded removing fabric!");
-                         dispatch_async(dispatch_get_main_queue(), ^{
-                             self->_removeFabricTextField.text = @"";
-                             [self updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@", fabricId]
+                   responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                       if (error) {
+                           NSLog(@"Failed to remove fabric with error %@", error);
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               [self updateResult:[NSString stringWithFormat:@"Command removeFabric failed with error %@", error]
+                                          isError:YES];
+                               self->_removeFabricTextField.text = @"";
+                           });
+                       } else {
+                           NSLog(@"Succeeded removing fabric!");
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               self->_removeFabricTextField.text = @"";
+                               [self
+                                   updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@", fabricId]
                                         isError:NO];
-                         });
-                     }
-                 }];
+                           });
+                       }
+                   }];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_removeFabricTextField.text = @"";
