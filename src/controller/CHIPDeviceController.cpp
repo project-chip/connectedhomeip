@@ -82,6 +82,8 @@ constexpr uint16_t kMdnsPort = 5353;
 
 constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
+constexpr uint32_t kMaxCHIPOpCertLength = 600;
+
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
@@ -649,6 +651,8 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     }
 
     mPairingDelegate = params.pairingDelegate;
+
+    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
     return CHIP_NO_ERROR;
 }
 
@@ -915,6 +919,18 @@ void DeviceCommissioner::OnSessionEstablished()
     }
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
+
+    if (mOperationalCredentialsDelegate != nullptr)
+    {
+        err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+            OnSessionEstablishmentError(err);
+            return;
+        }
+    }
+
     mPairingSession.ToSerializable(device->GetPairing());
     mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
@@ -934,6 +950,53 @@ void DeviceCommissioner::OnSessionEstablished()
     }
 
     RendezvousCleanup(CHIP_NO_ERROR);
+}
+
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId)
+{
+    // TODO: Call OperationalCredentials cluster API to send command
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId node, const uint8_t * csrBuf, uint32_t csrLength)
+{
+    ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    uint8_t opCert[kMaxCHIPOpCertLength];
+    uint32_t opCertLen = 0;
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(node, 0, csrBuf, csrLength, 0, opCert,
+                                                                                             kMaxCHIPOpCertLength, opCertLen));
+
+    uint8_t signingCert[kMaxCHIPOpCertLength];
+    uint32_t signingCertLen = 0;
+    CHIP_ERROR err =
+        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert, kMaxCHIPOpCertLength, signingCertLen);
+    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        err            = CHIP_NO_ERROR;
+        signingCertLen = 0;
+    }
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorOnFailure(SendOperationalCertificate(node, opCert, opCertLen, signingCert, signingCertLen));
+
+    ReturnErrorOnFailure(
+        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert, kMaxCHIPOpCertLength, signingCertLen));
+
+    return SendTrustedRootCertificate(node, signingCert, signingCertLen);
+}
+
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const uint8_t * opCertBuf, uint32_t opCertLength,
+                                                          const uint8_t * icaCertBuf, uint32_t icaCertLength)
+{
+    // TODO: Call OperationalCredentials cluster API to add operational credentials on the device
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(NodeId remoteDeviceId, const uint8_t * certBuf, uint32_t certLength)
+{
+    // TODO: Call TrustedRootCertificate cluster API to add root certificate on the device
+    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::PersistDeviceList()
