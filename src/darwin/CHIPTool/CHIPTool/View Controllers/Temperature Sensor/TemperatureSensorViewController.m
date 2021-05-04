@@ -166,7 +166,7 @@
 
 - (void)readCurrentTemperature
 {
-    [self.cluster readAttributeMeasuredValue:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+    [self.cluster readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
         if (error != nil)
             return;
         NSNumber * value = values[@"value"];
@@ -184,16 +184,16 @@
         @(deltaInFahrenheit));
 
     [self.cluster
-        configureAttributeMeasuredValue:minIntervalSeconds
+        configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
                             maxInterval:maxIntervalSeconds
                                  change:deltaInFahrenheit
-                      completionHandler:^(NSError * error, NSDictionary * values) {
+                      responseHandler:^(NSError * error, NSDictionary * values) {
                           if (error == nil)
                               return;
                           NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
                       }];
 
-    [self.cluster reportAttributeMeasuredValue:^(NSError * error, NSDictionary * values) {
+    [self.cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
         if (error != nil)
             return;
         NSNumber * value = values[@"value"];

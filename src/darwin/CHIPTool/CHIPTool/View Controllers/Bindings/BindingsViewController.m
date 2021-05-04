@@ -144,7 +144,7 @@
                   groupId:groupId
                endpointId:endpointId
                 clusterId:clusterId
-        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+        responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
             NSString * resultString
                 = (error == nil) ? @"Bind command: success!" : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
             NSLog(resultString, nil);
@@ -162,7 +162,7 @@
                   groupId:groupId
                endpointId:endpointId
                 clusterId:clusterId
-        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+        responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
             NSString * resultString = (error == nil) ? @"Unbind command: success!"
                                                      : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
             NSLog(resultString, nil);
