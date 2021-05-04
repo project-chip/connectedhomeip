@@ -857,8 +857,8 @@
           "commands": [
             {
               "name": "MfgSpecificPing",
-              "code": 0,
-              "mfgCode": 4098,
+              "code": 160,
+              "mfgCode": null,
               "source": "client",
               "incoming": 1,
               "outgoing": 1
@@ -5012,8 +5012,8 @@
           "commands": [
             {
               "name": "MfgSpecificPing",
-              "code": 0,
-              "mfgCode": 4098,
+              "code": 160,
+              "mfgCode": null,
               "source": "client",
               "incoming": 1,
               "outgoing": 0

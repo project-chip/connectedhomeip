@@ -205,6 +205,9 @@ limitations under the License.
     <command source="server" code="0x02" name="Leave" optional="false">
       <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
     </command>
+    <command source="client" code="0xa0" name="MfgSpecificPing" optional="true">
+      <description>MfgSpecificPing without manufacturer namespace before we fill the gap for MfgCode</description>
+    </command>
   </cluster>
   <cluster singleton="true">
     <name>Power Configuration</name>

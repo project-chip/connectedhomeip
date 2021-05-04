@@ -1,5 +1,5 @@
 {
-  "featureLevel": 29,
+  "featureLevel": 26,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -857,8 +857,8 @@
           "commands": [
             {
               "name": "MfgSpecificPing",
-              "code": 0,
-              "mfgCode": 4098,
+              "code": 160,
+              "mfgCode": null,
               "source": "client",
               "incoming": 0,
               "outgoing": 1
@@ -6027,9 +6027,7 @@
       "endpointTypeIndex": 0,
       "profileId": "0x0103",
       "endpointId": 1,
-      "networkId": 0,
-      "endpointVersion": null,
-      "deviceIdentifier": null
+      "networkId": 0
     }
   ],
   "log": []
