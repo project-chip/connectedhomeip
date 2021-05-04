@@ -48,7 +48,7 @@ public:
      *   Handle received secure message.
      *
      * @param source    the source address of the package
-     * @param msgBuf    the buffer of (encrypted) payload
+     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
      */
     virtual void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) = 0;
 };
