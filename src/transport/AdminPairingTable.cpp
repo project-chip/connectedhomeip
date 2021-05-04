@@ -238,7 +238,7 @@ CHIP_ERROR AdminPairingTable::Delete(AdminId id)
 
     admin              = FindAdminWithId(id);
     adminIsInitialized = admin != nullptr && admin->IsInitialized();
-    err = AdminPairingInfo::DeleteFromKVS(mStorage, id); // Delete from storage regardless
+    err                = AdminPairingInfo::DeleteFromKVS(mStorage, id); // Delete from storage regardless
 
 exit:
     if (err == CHIP_NO_ERROR)
