@@ -63,7 +63,6 @@ CHIP_ERROR RendezvousServer::WaitForPairing(const RendezvousParameters & params,
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 #endif
-    //    mTransportMgr    = transportMgr;
     mSessionMgr      = sessionMgr;
     mAdmin           = admin;
     mExchangeManager = exchangeManager;
@@ -124,13 +123,13 @@ void RendezvousServer::OnSessionEstablished()
         return;
     }
 
-    Cleanup();
-
     ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
     if (mDelegate != nullptr)
     {
         mDelegate->OnRendezvousStarted();
     }
+
+    Cleanup();
 
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
     StorablePeerConnection connection(mPairingSession, mAdmin->GetAdminId());

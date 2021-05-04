@@ -262,9 +262,10 @@ public:
         {
             ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
         }
+
+        if (mDelegate != nullptr)
         {
-            if (mDelegate != nullptr)
-                mDelegate->OnPairingWindowClosed();
+            mDelegate->OnPairingWindowClosed();
         }
 
         AdminPairingInfo * admin = gAdminPairings.FindAdmin(mAdmin);
