@@ -79,8 +79,9 @@ void ReadClient::MoveToState(const ClientState aTargetState)
 
 CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
                                        size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                                       size_t aAttributePathParamsListSize)
+                                       size_t aAttributePathParamsListSize, EventNumber aEventNumber)
 {
+    // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
     ChipLogDetail(DataManagement, "%s: Client[%u] [%5.5s]", __func__,
@@ -103,7 +104,27 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
         if (aEventPathParamsListSize != 0 && apEventPathParamsList != nullptr)
         {
-            // TODO: fill to construct event paths
+            EventPathList::Builder & eventPathListBuilder = request.CreateEventPathListBuilder();
+            EventPath::Builder eventPathBuilder           = eventPathListBuilder.CreateEventPathBuilder();
+            for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+            {
+                EventPathParams eventPath = apEventPathParamsList[eventIndex];
+                eventPathBuilder.NodeId(eventPath.mNodeId)
+                    .EventId(eventPath.mEventId)
+                    .EndpointId(eventPath.mEndpointId)
+                    .ClusterId(eventPath.mClusterId)
+                    .EndOfEventPath();
+                SuccessOrExit(err = eventPathBuilder.GetError());
+            }
+
+            eventPathListBuilder.EndOfEventPathList();
+            SuccessOrExit(err = eventPathListBuilder.GetError());
+
+            if (aEventNumber != 0)
+            {
+                // EventNumber is optional
+                request.EventNumber(aEventNumber);
+            }
         }
 
         if (aAttributePathParamsListSize != 0 && apAttributePathParamsList != nullptr)
@@ -293,7 +314,7 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         chip::TLV::TLVReader dataReader;
         AttributeDataElement::Parser element;
         AttributePath::Parser attributePathParser;
-        AttributePathParams attributePathParams;
+        ClusterInfo clusterInfo;
         TLV::TLVReader reader = aAttributeDataListReader;
         err                   = element.Init(reader);
         SuccessOrExit(err);
@@ -301,31 +322,31 @@ CHIP_ERROR ReadClient::ProcessAttributeDataList(TLV::TLVReader & aAttributeDataL
         err = element.GetAttributePath(&attributePathParser);
         SuccessOrExit(err);
 
-        err = attributePathParser.GetNodeId(&(attributePathParams.mNodeId));
+        err = attributePathParser.GetNodeId(&(clusterInfo.mNodeId));
         SuccessOrExit(err);
 
-        err = attributePathParser.GetEndpointId(&(attributePathParams.mEndpointId));
+        err = attributePathParser.GetEndpointId(&(clusterInfo.mEndpointId));
         SuccessOrExit(err);
 
-        err = attributePathParser.GetClusterId(&(attributePathParams.mClusterId));
+        err = attributePathParser.GetClusterId(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
 
-        err = attributePathParser.GetFieldId(&(attributePathParams.mFieldId));
+        err = attributePathParser.GetFieldId(&(clusterInfo.mFieldId));
         if (CHIP_NO_ERROR == err)
         {
-            attributePathParams.mFlags = AttributePathFlags::kFieldIdValid;
+            clusterInfo.mType = ClusterInfo::Type::kFieldIdValid;
         }
         else if (CHIP_END_OF_TLV == err)
         {
-            err = attributePathParser.GetListIndex(&(attributePathParams.mListIndex));
+            err = attributePathParser.GetListIndex(&(clusterInfo.mListIndex));
             SuccessOrExit(err);
-            attributePathParams.mFlags = AttributePathFlags::kListIndexValid;
+            clusterInfo.mType = ClusterInfo::Type::kListIndexValid;
         }
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
-        err = WriteSingleClusterData(attributePathParams, dataReader);
+        err = WriteSingleClusterData(clusterInfo, dataReader);
         SuccessOrExit(err);
     }
 

@@ -28,6 +28,7 @@
 
 #include "EventLoggingDelegate.h"
 #include "EventLoggingTypes.h"
+#include <app/ClusterInfo.h>
 #include <app/MessageDef/EventDataElement.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCircularTLVBuffer.h>
@@ -373,7 +374,7 @@ public:
      * will terminate the event writing on event boundary.
      *
      * @param[in] aWriter     The writer to use for event storage
-     *
+     * @param[in] apEventClusterInfolist  the interested cluster info list with event path inside
      * @param[in] aPriority The priority of events to be fetched
      *
      * @param[inout] aEventNumber On input, the Event number immediately
@@ -394,7 +395,8 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber & aEventNumber);
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
+                                EventNumber & aEventNumber);
 
     /**
      * @brief
@@ -448,6 +450,19 @@ public:
      * @return EventNumber First currently stored event Number for that event priority
      */
     EventNumber GetFirstEventNumber(PriorityLevel aPriority);
+
+    /**
+     * @brief
+     *   IsValid returns whether the EventManagement instance is valid
+     */
+    bool IsValid(void) { return EventManagementStates::Shutdown != mState; };
+
+    /**
+     *  Logger would save last logged event number for each logger buffer into schedule event number array
+     *
+     *
+     */
+    CHIP_ERROR SetScheduledEventEndpoint(EventNumber * aEventEndpoints);
 
 private:
     CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, uint32_t & requiredSize);
@@ -555,7 +570,7 @@ private:
     // EventBuffer for debug level,
     CircularEventBuffer * mpEventBuffer        = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    EventManagementStates mState               = EventManagementStates::Idle;
+    EventManagementStates mState               = EventManagementStates::Shutdown;
     uint32_t mBytesWritten                     = 0;
 };
 } // namespace app

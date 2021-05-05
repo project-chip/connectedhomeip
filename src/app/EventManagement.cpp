@@ -654,8 +654,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, PriorityLevel aPriority, EventNumber & aEventNumber)
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
+                                             EventNumber & aEventNumber)
 {
+    // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
     const bool recurse = false;
     TLVReader reader;
@@ -785,6 +787,27 @@ CHIP_ERROR EventManagement::ScheduleFlushIfNeeded(EventOptions::Type aUrgent)
 {
     // TODO: Implement ScheduleFlushIfNeeded
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
+{
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    CircularEventBuffer * eventBuffer = mpEventBuffer;
+
+    CriticalSectionEnter();
+
+    while (eventBuffer != nullptr)
+    {
+        if (eventBuffer->GetPriorityLevel() >= PriorityLevel::First && (eventBuffer->GetPriorityLevel() <= PriorityLevel::Last))
+        {
+            apEventEndpoints[static_cast<uint8_t>(eventBuffer->GetPriorityLevel())] = eventBuffer->GetLastEventNumber();
+        }
+        eventBuffer = eventBuffer->GetNextCircularEventBuffer();
+    }
+
+    CriticalSectionExit();
+
+    return err;
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
