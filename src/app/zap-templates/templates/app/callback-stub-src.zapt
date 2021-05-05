@@ -349,7 +349,7 @@ bool __attribute__((weak)) emberAfMessageSentCallback(
  */
 EmberAfStatus __attribute__((weak)) emberAfPreAttributeChangeCallback(
     EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                 uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
@@ -372,7 +372,7 @@ EmberAfStatus __attribute__((weak)) emberAfPreAttributeChangeCallback(
  */
 void __attribute__((weak)) emberAfPostAttributeChangeCallback(
     EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-    uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
+    uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
     uint8_t * value)
 {
 }

@@ -173,7 +173,7 @@ typedef struct
     /**
      * Size of this attribute in bytes.
      */
-    uint16_t size;
+    uint8_t size;
     /**
      * Attribute mask, tagging attribute with specific
      * functionality. See ATTRIBUTE_MASK_ macros defined
@@ -1232,7 +1232,7 @@ typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(chip:
  * This function is called before an attribute changes.
  */
 typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
+                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
 /**

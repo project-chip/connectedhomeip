@@ -283,7 +283,7 @@ EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::Clust
  *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
-                                   uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
+                                   uint8_t * dataPtr, uint8_t readLength, EmberAfAttributeType * dataType);
 
 /**
  * @brief Read the server attribute value, performing all the checks.
@@ -298,7 +298,7 @@ EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cl
  *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint16_t readLength);
+                                         uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief Read the client attribute value, performing all the checks.
@@ -313,7 +313,7 @@ EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::Cluste
  *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint16_t readLength);
+                                         uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief Read the manufacturer-specific server attribute value, performing all checks.
@@ -328,7 +328,7 @@ EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::Cluste
  */
 EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint16_t readLength);
+                                                             uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief Read the manufacturer-specific client attribute value, performing all checks.
@@ -343,7 +343,7 @@ EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId en
  */
 EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint16_t readLength);
+                                                             uint8_t * dataPtr, uint8_t readLength);
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -725,7 +725,7 @@ uint8_t emberAfGetLastSequenceNumber(void);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber);
+int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber);
 
 /**
  * @brief populates the passed EUI64 with the local EUI64 MAC address.

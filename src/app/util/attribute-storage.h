@@ -176,7 +176,7 @@ void emAfClusterAttributeChangedCallback(chip::EndpointId endpoint, chip::Cluste
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                      chip::AttributeId attributeId, uint8_t clientServerMask,
-                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint16_t size,
+                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint8_t size,
                                                      uint8_t * value);
 
 // Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback

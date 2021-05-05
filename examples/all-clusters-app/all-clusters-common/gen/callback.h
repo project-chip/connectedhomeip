@@ -302,7 +302,7 @@ void emberAfApplicationBasicClusterServerMessageSentCallback(EmberOutgoingMessag
  */
 EmberAfStatus emberAfApplicationBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                               chip::AttributeId attributeId,
-                                                                              EmberAfAttributeType attributeType, uint16_t size,
+                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 
 /** @brief Application Basic Cluster Server Tick
@@ -373,7 +373,7 @@ void emberAfBarrierControlClusterServerMessageSentCallback(EmberOutgoingMessageT
  */
 EmberAfStatus emberAfBarrierControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                             chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint16_t size,
+                                                                            EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 
 /** @brief Barrier Control Cluster Server Tick
@@ -441,7 +441,7 @@ void emberAfBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param value         Attribute value
  */
 EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
+                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
 /** @brief Basic Cluster Server Tick
@@ -511,7 +511,7 @@ void emberAfBindingClusterServerMessageSentCallback(EmberOutgoingMessageType typ
  * @param value         Attribute value
  */
 EmberAfStatus emberAfBindingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
+                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 
 /** @brief Binding Cluster Server Tick
@@ -581,7 +581,7 @@ void emberAfColorControlClusterServerMessageSentCallback(EmberOutgoingMessageTyp
  * @param value         Attribute value
  */
 EmberAfStatus emberAfColorControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
+                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 
 /** @brief Color Control Cluster Server Tick
@@ -651,7 +651,7 @@ void emberAfDescriptorClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param value         Attribute value
  */
 EmberAfStatus emberAfDescriptorClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
+                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 
 /** @brief Descriptor Cluster Server Tick
@@ -721,7 +721,7 @@ void emberAfDoorLockClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param value         Attribute value
  */
 EmberAfStatus emberAfDoorLockClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 
 /** @brief Door Lock Cluster Server Tick
@@ -792,7 +792,7 @@ void emberAfGeneralCommissioningClusterServerMessageSentCallback(EmberOutgoingMe
  */
 EmberAfStatus emberAfGeneralCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                   chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
+                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                   uint8_t * value);
 
 /** @brief General Commissioning Cluster Server Tick
@@ -863,7 +863,7 @@ void emberAfGroupKeyManagementClusterServerMessageSentCallback(EmberOutgoingMess
  */
 EmberAfStatus emberAfGroupKeyManagementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                 chip::AttributeId attributeId,
-                                                                                EmberAfAttributeType attributeType, uint16_t size,
+                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                 uint8_t * value);
 
 /** @brief Group Key Management Cluster Server Tick
@@ -933,7 +933,7 @@ void emberAfGroupsClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param value         Attribute value
  */
 EmberAfStatus emberAfGroupsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
+                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 
 /** @brief Groups Cluster Server Tick
@@ -1003,7 +1003,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType typ
  * @param value         Attribute value
  */
 EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint16_t size,
+                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 
 /** @brief IAS Zone Cluster Server Tick
@@ -1073,7 +1073,7 @@ void emberAfIdentifyClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param value         Attribute value
  */
 EmberAfStatus emberAfIdentifyClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 
 /** @brief Identify Cluster Server Tick
@@ -1143,7 +1143,7 @@ void emberAfLevelControlClusterServerMessageSentCallback(EmberOutgoingMessageTyp
  * @param value         Attribute value
  */
 EmberAfStatus emberAfLevelControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                          EmberAfAttributeType attributeType, uint16_t size,
+                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 
 /** @brief Level Control Cluster Server Tick
@@ -1213,7 +1213,7 @@ void emberAfLowPowerClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param value         Attribute value
  */
 EmberAfStatus emberAfLowPowerClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                      EmberAfAttributeType attributeType, uint16_t size,
+                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 
 /** @brief Low Power Cluster Server Tick
@@ -1284,7 +1284,7 @@ void emberAfNetworkCommissioningClusterServerMessageSentCallback(EmberOutgoingMe
  */
 EmberAfStatus emberAfNetworkCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                   chip::AttributeId attributeId,
-                                                                                  EmberAfAttributeType attributeType, uint16_t size,
+                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                   uint8_t * value);
 
 /** @brief Network Commissioning Cluster Server Tick
@@ -1357,7 +1357,7 @@ void emberAfOtaSoftwareUpdateClientClusterServerMessageSentCallback(EmberOutgoin
 EmberAfStatus emberAfOtaSoftwareUpdateClientClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                      chip::AttributeId attributeId,
                                                                                      EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+                                                                                     uint8_t size, uint8_t * value);
 
 /** @brief OTA Software Update Client Cluster Server Tick
  *
@@ -1429,7 +1429,7 @@ void emberAfOtaSoftwareUpdateServerClusterServerMessageSentCallback(EmberOutgoin
 EmberAfStatus emberAfOtaSoftwareUpdateServerClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                      chip::AttributeId attributeId,
                                                                                      EmberAfAttributeType attributeType,
-                                                                                     uint16_t size, uint8_t * value);
+                                                                                     uint8_t size, uint8_t * value);
 
 /** @brief OTA Software Update Server Cluster Server Tick
  *
@@ -1496,7 +1496,7 @@ void emberAfOnOffClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param value         Attribute value
  */
 EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
+                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
 /** @brief On/off Cluster Server Tick
@@ -1569,7 +1569,7 @@ void emberAfOperationalCredentialsClusterServerMessageSentCallback(EmberOutgoing
 EmberAfStatus emberAfOperationalCredentialsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                     chip::AttributeId attributeId,
                                                                                     EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+                                                                                    uint8_t size, uint8_t * value);
 
 /** @brief Operational Credentials Cluster Server Tick
  *
@@ -1642,7 +1642,7 @@ void emberAfPumpConfigurationAndControlClusterServerMessageSentCallback(EmberOut
 EmberAfStatus emberAfPumpConfigurationAndControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                          chip::AttributeId attributeId,
                                                                                          EmberAfAttributeType attributeType,
-                                                                                         uint16_t size, uint8_t * value);
+                                                                                         uint8_t size, uint8_t * value);
 
 /** @brief Pump Configuration and Control Cluster Server Tick
  *
@@ -1711,7 +1711,7 @@ void emberAfScenesClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param value         Attribute value
  */
 EmberAfStatus emberAfScenesClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
+                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 
 /** @brief Scenes Cluster Server Tick
@@ -1781,7 +1781,7 @@ void emberAfSwitchClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param value         Attribute value
  */
 EmberAfStatus emberAfSwitchClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                    EmberAfAttributeType attributeType, uint16_t size,
+                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 
 /** @brief Switch Cluster Server Tick
@@ -1854,7 +1854,7 @@ void emberAfTemperatureMeasurementClusterServerMessageSentCallback(EmberOutgoing
 EmberAfStatus emberAfTemperatureMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                                     chip::AttributeId attributeId,
                                                                                     EmberAfAttributeType attributeType,
-                                                                                    uint16_t size, uint8_t * value);
+                                                                                    uint8_t size, uint8_t * value);
 
 /** @brief Temperature Measurement Cluster Server Tick
  *
@@ -1923,7 +1923,7 @@ void emberAfTestClusterClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param value         Attribute value
  */
 EmberAfStatus emberAfTestClusterClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                         EmberAfAttributeType attributeType, uint16_t size,
+                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 
 /** @brief Test Cluster Cluster Server Tick
@@ -1993,7 +1993,7 @@ void emberAfThermostatClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param value         Attribute value
  */
 EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                        EmberAfAttributeType attributeType, uint16_t size,
+                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 
 /** @brief Thermostat Cluster Server Tick
@@ -3094,7 +3094,7 @@ bool emberAfMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSend
  * @param value   Ver.: always
  */
 EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                 uint8_t * value);
 
 /** @brief Post Attribute Change
@@ -3113,7 +3113,7 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
  * @param value   Ver.: always
  */
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 
 /** @brief Read Attributes Response
  *

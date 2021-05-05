@@ -93,7 +93,7 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}Message
  * @param size          Attribute size
  * @param value         Attribute value
  */
-EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}PreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}PreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 
 /** @brief {{name}} Cluster {{asCamelCased side false}} Tick
  *
@@ -398,7 +398,7 @@ bool emberAfMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSend
  * @param value   Ver.: always
  */
 EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                 uint8_t * value);
 
 /** @brief Post Attribute Change
@@ -417,7 +417,7 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
  * @param value   Ver.: always
  */
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 
 /** @brief Read Attributes Response
  *

@@ -281,7 +281,7 @@ void emAfClusterAttributeChangedCallback(EndpointId endpoint, ClusterId clusterI
 // This function is used to call the per-cluster pre-attribute changed callback
 EmberAfStatus emAfClusterPreAttributeChangedCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                                                      uint8_t clientServerMask, uint16_t manufacturerCode,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+                                                     EmberAfAttributeType attributeType, uint8_t size, uint8_t * value)
 {
     EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, clientServerMask, manufacturerCode);
     if (cluster == NULL)
