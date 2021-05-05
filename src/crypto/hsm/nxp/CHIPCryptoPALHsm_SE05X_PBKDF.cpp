@@ -70,8 +70,8 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
 
     VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
 
-    smStatus = Se05x_API_PBKDF2(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, salt,
-                                slen, (uint16_t) iteration_count, (uint16_t) key_length, output, (size_t *) &key_length);
+    smStatus = Se05x_API_PBKDF2(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, salt, slen,
+                                (uint16_t) iteration_count, (uint16_t) key_length, output, (size_t *) &key_length);
 
     VerifyOrExit(smStatus == SM_OK, error = CHIP_ERROR_INTERNAL);
 
