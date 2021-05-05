@@ -29,13 +29,13 @@ class SetupPayload:
     def __init__(self):
         self.chipLib = GetLibraryHandle()
         self.__InitNativeFunctions(self.chipLib)
-        self.attributes = []
-        self.vendor_attributes = []
+        self.attributes = {}
+        self.vendor_attributes = {}
 
         def AddAttribute(name, value):
-            self.attributes += [(name.decode(), value.decode())]
+            self.attributes[name.decode()] = value.decode()
         def AddVendorAttribute(tag, value):
-            self.vendor_attributes+= [(tag, value.decode())]
+            self.vendor_attributes[tag] = value.decode()
 
         self.attribute_visitor = SetupPayload.AttributeVisitor(AddAttribute)
         self.vendor_attribute_visitor = SetupPayload.VendorAttributeVisitor(AddVendorAttribute)
@@ -63,7 +63,7 @@ class SetupPayload:
         return self
 
     def Print(self):
-        for name, value in self.attributes:
+        for name, value in self.attributes.items():
             decorated_value = self.__DecorateValue(name, value)
             decorated_value = f" [{decorated_value}]" if decorated_value else ""
             print(f"{name}: {value}{decorated_value}")

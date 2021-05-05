@@ -91,8 +91,6 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                              uint32_t setupPINCode, chip::NodeId nodeid);
 
-CHIP_ERROR pychip_DeviceController_ParseQRCode(const char * qrCode, SetupPayload * output);
-
 CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::Controller::DeviceCommissioner * devCtrl,
                                                                           uint16_t long_discriminator);
 CHIP_ERROR pychip_DeviceController_DiscoverAllCommissioning(chip::Controller::DeviceCommissioner * devCtrl);
@@ -216,27 +214,6 @@ CHIP_ERROR pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommission
                                    .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                                    .SetSetupPINCode(setupPINCode)
                                    .SetDiscriminator(discriminator));
-}
-
-CHIP_ERROR pychip_DeviceController_ParseQRCode(const char * qrCode, SetupPayload * output)
-{
-    SetupPayload payload;
-    QRCodeSetupPayloadParser parser(qrCode);
-    CHIP_ERROR err = parser.populatePayload(payload);
-    if (err != CHIP_NO_ERROR)
-    {
-        printf("Unable to parse payload\n");
-        return err;
-    }
-    // Python SetupPayload is a simplified version of the C one (only the data members), so add one-by-one to match python.
-    output->version               = payload.version;
-    output->vendorID              = payload.vendorID;
-    output->productID             = payload.productID;
-    output->requiresCustomFlow    = payload.requiresCustomFlow;
-    output->rendezvousInformation = payload.rendezvousInformation;
-    output->discriminator         = payload.discriminator;
-    output->setUpPINCode          = payload.setUpPINCode;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,

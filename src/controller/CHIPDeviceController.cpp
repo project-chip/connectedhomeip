@@ -649,6 +649,7 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
             return;
         }
     }
+    ChipLogError(Discovery, "Failed to add discovered commisisonable node - Insufficient space");
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
@@ -1040,62 +1041,58 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
-
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
     return Mdns::Resolver::Instance().FindCommissionableNodes();
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
     Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::kLong, long_discriminator);
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 void DeviceCommissioner::PrintDiscoveredDevices()
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     for (int i = 0; i < kMaxCommissionableNodes; ++i)
     {
         if (!mCommissionableNodes[i].IsValid())
         {
             continue;
         }
-        printf("Device %d\n", i);
-        printf("\tHost name:\t\t%s\n", mCommissionableNodes[i].hostName);
-        printf("\tLong discriminator:\t%u\n", mCommissionableNodes[i].longDiscriminator);
-        printf("\tVendor ID:\t\t%u\n", mCommissionableNodes[i].vendorId);
-        printf("\tProduct ID:\t\t%u\n", mCommissionableNodes[i].productId);
+        ChipLogProgress(Discovery, "Device %d", i);
+        ChipLogProgress(Discovery, "\tHost name:\t\t%s", mCommissionableNodes[i].hostName);
+        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", mCommissionableNodes[i].longDiscriminator);
+        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", mCommissionableNodes[i].vendorId);
+        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", mCommissionableNodes[i].productId);
         for (int j = 0; j < mCommissionableNodes[i].numIPs; ++j)
         {
             char buf[kMaxIPAddressStringLength];
             mCommissionableNodes[i].ipAddress[j].ToString(buf);
-            printf("\tAddress %d:\t\t%s\n", j, buf);
+            ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
         }
     }
-#endif
 }
 
 const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+
     if (mCommissionableNodes[idx].IsValid())
     {
         return &mCommissionableNodes[idx];
     }
     return nullptr;
-#else
-    return nullptr;
-#endif
 }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 } // namespace Controller
 } // namespace chip

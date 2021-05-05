@@ -399,9 +399,10 @@ class DeviceMgrCmd(Cmd):
         # Devices may be uncommissioned, or may already be on the network. Need to check both ways.
         # TODO(cecille): implement soft-ap connection.
 
-        if setupPayload.rendezvousInformationFlags & onnetwork:
+        if int(setupPayload.attributes["RendezvousInformation"]) & onnetwork:
             print("Attempting to find device on Network")
-            self.devCtrl.DiscoverCommissioningLongDiscriminator(setupPayload.discriminator)
+            longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+            self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
             print("Waiting for device responses...")
             strlen = 100;
             addrStrStorage = ctypes.create_string_buffer(strlen)
@@ -419,7 +420,8 @@ class DeviceMgrCmd(Cmd):
             if ok:
                 addrStr = addrStrStorage.value.decode('utf-8')
                 print("Connecting to device at " + addrStr)
-                if self.devCtrl.ConnectIP(addrStrStorage, setupPayload.setUpPINCode, nodeid):
+                pincode = ctypes.c_uint32(int(setupPayload.attributes['SetUpPINCode']))
+                if self.devCtrl.ConnectIP(addrStrStorage, pincode, nodeid):
                     print("Connected")
                     return 0
                 else:
@@ -427,7 +429,7 @@ class DeviceMgrCmd(Cmd):
             else:
                 print("Unable to locate device on network")
 
-        if setupPayload.rendezvousInformationFlags & ble:
+        if int(setupPayload.attributes["RendezvousInformation"]) & ble:
             print("Attempting to connect via BLE")
             if self.devCtrl.ConnectBLE(setupPayload.discriminator, setupPayload.setUpPINCode, nodeid):
                 print("Connected")
@@ -444,6 +446,7 @@ class DeviceMgrCmd(Cmd):
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
+        -qr option will connect to the first device with a matching long discriminator.
 
         TODO: Add more methods to connect to device (like cert for auth, and IP
               for connection)
@@ -468,11 +471,8 @@ class DeviceMgrCmd(Cmd):
                 self.devCtrl.ConnectBLE(int(args[1]), int(args[2]), nodeid)
             elif args[0] == '-qr' and len(args) >=2:
                 print("Parsing QR code {}".format(args[1]))
-                setupPayload = ChipDeviceCtrl.SetupPayload()
-                if self.devCtrl.ParseQRCode(args[1].encode('utf-8'), ctypes.byref(setupPayload)) == 0:
-                    self.ConnectFromSetupPayload(setupPayload, nodeid)
-                else:
-                  print("Error parsing QR code")
+                setupPayload = SetupPayload().ParseQrCode(args[1])
+                self.ConnectFromSetupPayload(setupPayload, nodeid)
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
@@ -520,12 +520,9 @@ class DeviceMgrCmd(Cmd):
                 return
 
             if args[0] == "-qr" and len(args) >= 2:
-                setupPayload = ChipDeviceCtrl.SetupPayload()
-                if self.devCtrl.ParseQRCode(args[1].encode('utf-8'), ctypes.byref(setupPayload)) != 0:
-                  print("Failed to parse QR code")
-                  return
-
-                self.devCtrl.DiscoverCommissioningLongDiscriminator(setupPayload.discriminator)
+                setupPayload = SetupPayload().ParseQrCode(args[1])
+                longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+                self.devCtrl.DiscoverCommissioningLongDiscriminator(longDiscriminator)
                 print("Waiting for device responses...")
                 strlen = 100;
                 addrStrStorage = ctypes.create_string_buffer(strlen)

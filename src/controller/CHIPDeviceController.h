@@ -28,14 +28,11 @@
 
 #pragma once
 
-#include <optional>
-
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
-#include <mdns/Resolver.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/RendezvousSession.h>
@@ -375,6 +372,7 @@ public:
      */
     CHIP_ERROR CloseBleConnection();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     /**
      * @brief
      *   Discover devices advertising as commissionable that match the long discriminator.
@@ -401,6 +399,7 @@ public:
      * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
     const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
+#endif
 
 private:
     DevicePairingDelegate * mPairingDelegate;

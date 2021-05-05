@@ -65,16 +65,6 @@ class DCState(enum.IntEnum):
     RENDEZVOUS_ONGOING = 3
     RENDEZVOUS_CONNECTED = 4
 
-
-class SetupPayload(Structure):
-    _fields_ = [("version", c_uint8),
-                ("vendorID", c_uint16),
-                ("productID", c_uint16),
-                ("requiresCustomFlow", c_uint8),
-                ("rendezvousInformationFlags", c_uint16),
-                ("discriminator", c_uint16),
-                ("setUpPINCode", c_uint32)]
-
 @_singleton
 class ChipDeviceController(object):
     def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None):
@@ -308,9 +298,6 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.argtypes = [c_void_p, c_uint16]
             self._dmLib.pychip_DeviceController_DiscoverCommissioningLongDiscriminator.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_ParseQRCode.argtypes = [c_char_p, POINTER(SetupPayload)]
-            self._dmLib.pychip_DeviceController_ParseQRCode.restype = c_uint32
-
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [c_void_p]
 
             self._dmLib.pychip_DeviceController_GetIPForDiscoveredDevice.argtypes = [c_void_p, c_int, c_char_p, c_uint32]
@@ -344,4 +331,3 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_GetCommandSenderHandle.argtypes = [c_void_p]
             self._dmLib.pychip_GetCommandSenderHandle.restype = c_uint64
-

@@ -67,7 +67,7 @@ bool IsKey(const mdns::Minimal::BytesRange key, const char * desired)
 uint16_t MakeU16(const mdns::Minimal::BytesRange & val)
 {
     uint32_t u32          = 0;
-    const uint16_t errval = 0xFFFF;
+    const uint16_t errval = 0x0;
     for (size_t i = 0; i < val.Size(); ++i)
     {
         char c = static_cast<char>(val.Start()[i]);
@@ -117,7 +117,7 @@ void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, con
             mNodeData->productId = MakeU16(mdns::Minimal::BytesRange(value.Start() + plussign + 1, value.End()));
         }
     }
-    // TODO(cecille): Add the new stuff from 0.7 part 2.
+    // TODO(cecille): Add the new stuff from 0.7 ballot 2.
 }
 
 constexpr size_t kMdnsMaxPacketSize = 1024;
@@ -321,7 +321,7 @@ void PacketDataReporter::OnResource(ResourceType type, const ResourceData & data
         Inet::IPAddress addr;
         if (!ParseAAAARecord(data.GetData(), &addr))
         {
-            ChipLogError(Discovery, "Packet data reporter failed to parse A record");
+            ChipLogError(Discovery, "Packet data reporter failed to parse AAAA record");
             mHasIP = false;
         }
         else
