@@ -187,12 +187,12 @@ CHIP_ERROR AttributePath::Parser::GetClusterId(chip::ClusterId * const apCluster
     return GetUnsignedInteger(kCsTag_ClusterId, apClusterId);
 }
 
-CHIP_ERROR AttributePath::Parser::GetFieldId(uint8_t * const apFieldId) const
+CHIP_ERROR AttributePath::Parser::GetFieldId(chip::FieldId * const apFieldId) const
 {
     return GetUnsignedInteger(kCsTag_FieldId, apFieldId);
 }
 
-CHIP_ERROR AttributePath::Parser::GetListIndex(uint16_t * const apListIndex) const
+CHIP_ERROR AttributePath::Parser::GetListIndex(chip::ListIndex * const apListIndex) const
 {
     return GetUnsignedInteger(kCsTag_ListIndex, apListIndex);
 }
@@ -255,7 +255,7 @@ exit:
     return *this;
 }
 
-AttributePath::Builder & AttributePath::Builder::FieldId(const uint8_t aFieldId)
+AttributePath::Builder & AttributePath::Builder::FieldId(const chip::FieldId aFieldId)
 {
     // skip if error has already been set
     SuccessOrExit(mError);
@@ -267,7 +267,7 @@ exit:
     return *this;
 }
 
-AttributePath::Builder & AttributePath::Builder::ListIndex(const uint16_t aListIndex)
+AttributePath::Builder & AttributePath::Builder::ListIndex(const chip::ListIndex aListIndex)
 {
     // skip if error has already been set
     SuccessOrExit(mError);

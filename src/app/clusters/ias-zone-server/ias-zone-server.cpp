@@ -51,6 +51,7 @@
 // *****************************************************************************
 
 #include "ias-zone-server.h"
+#include <app/Command.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
@@ -210,7 +211,7 @@ static void enrollWithClient(EndpointId endpoint)
 }
 
 EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     EmberAfAttributeType attributeType, uint16_t size,
                                                                      uint8_t * value)
 {
     uint8_t i;
@@ -348,7 +349,7 @@ static void updateEnrollState(EndpointId endpoint, bool enrolled)
     emberAfIasZoneClusterPrintln("IAS Zone Server State: %pEnrolled", (enrolled ? "" : "NOT "));
 }
 
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCode, uint8_t zoneId)
+bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::Command * commandObj, uint8_t enrollResponseCode, uint8_t zoneId)
 {
     EndpointId endpoint;
     uint8_t epZoneId;
@@ -761,7 +762,7 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination,
                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                     EmberStatus status)
 {

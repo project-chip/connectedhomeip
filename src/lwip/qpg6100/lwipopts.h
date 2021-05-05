@@ -50,16 +50,25 @@
 
 #define LWIP_SOCKET 0
 
-// TODO: seems like this is unnecessary on Thread-only platforms
+#ifdef INET_CONFIG_ENABLE_RAW_ENDPOINT
 #define LWIP_RAW 1
 #define MEMP_NUM_RAW_PCB (5)
+#else
+#define LWIP_RAW 0
+#define MEMP_NUM_RAW_PCB 0
+#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
+#ifdef INET_CONFIG_ENABLE_TCP_ENDPOINT
+#define LWIP_TCP 1
+#else
+#define LWIP_TCP 0
+#define MEMP_NUM_TCP_PCB 0
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 // TODO: verify count
 #define MEMP_NUM_UDP_PCB (7)
 
-#define LWIP_HAVE_LOOPIF (0)
-
 // TODO: not sure why this is disabled
+#define LWIP_HAVE_LOOPIF (0)
 #define LWIP_NETIF_LOOPBACK (0)
 
 #define MEMP_NUM_NETCONN (0)
@@ -89,14 +98,8 @@
 #define MEMP_SEPARATE_POOLS (1)
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
-#define PBUF_POOL_SIZE (4)
-#define PBUF_POOL_BUFSIZE (1500)
-#define PBUF_POOL_SIZE_LARGE (1)
-#define PBUF_POOL_SIZE_MEDIUM (2)
-#define PBUF_POOL_SIZE_SMALL (2)
-#define PBUF_POOL_BUFSIZE_LARGE (1280)
-#define PBUF_POOL_BUFSIZE_MEDIUM (640)
-#define PBUF_POOL_BUFSIZE_SMALL (256)
+#define PBUF_POOL_SIZE (6)
+#define PBUF_POOL_BUFSIZE (1280)
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_PBUF_POOL_SMALL)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_PBUF_POOL_LARGE)
 

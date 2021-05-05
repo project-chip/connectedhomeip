@@ -280,16 +280,24 @@ via 2002::2
 
 ## Running Pigweed RPC console
 
--   If you build the example with pigweed RPC option you can can interact with
-    the example by UART using the RPC LightingService. Call the following
-    command in your terminal
+-   As part of building the example with RPCs enabled the lighting_app python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/lighting_app_wheels. To install
+    the wheel files without rebuilding:
+    `pip3 install out/debug/lighting_app_wheels/*.whl`
 
-    `python -m pw_hdlc.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 /<CHIP_ROOT>/examples/lighting-app/lighting-common/lighting_service/pigweed_lighting.proto -o /<YourFolder>/pw_log.out`
+-   To use the lighting-app console after it has been installed run:
+    `python3 -m lighting_app.rpc_console --device /dev/tty.<SERIALDEVICE> -b 115200 -o /<YourFolder>/pw_log.out`
 
 -   Then you can simulate a button press or realease using the following command
     where : idx = 0 or 1 for Button PB0 or PB1 action = 0 for PRESSED, 1 for
     RELEASE Test toggling the LED with
-    `rpcs.chip.rpc.LightingService.ButtonEvent(idx=1,action=0)`
+    `rpcs.chip.rpc.Button.Event(idx=1, pushed=True)`
+
+-   You can also Get and Set the light directly using the RPCs:
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True)`
 
 ## Memory settings
 

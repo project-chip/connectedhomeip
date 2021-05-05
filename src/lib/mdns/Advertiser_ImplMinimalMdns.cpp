@@ -20,7 +20,9 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
+
 #include <mdns/minimal/ResponseSender.h>
 #include <mdns/minimal/Server.h>
 #include <mdns/minimal/core/FlatAllocatedQName.h>
@@ -94,117 +96,14 @@ void LogQuery(const QueryData & data)
 void LogQuery(const QueryData & data) {}
 #endif
 
-/// Checks if the current interface is powered on
-/// and not local loopback.
-template <typename T>
-bool IsCurrentInterfaceUsable(T & iterator)
-{
-    if (!iterator.IsUp() || !iterator.SupportsMulticast())
-    {
-        return false; // not a usable interface
-    }
-    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
-    if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to get interface name.");
-        return false;
-    }
-
-    // TODO: need a better way to ignore local loopback interfaces/addresses
-    // We do not want to listen on local loopback even though they are up and
-    // support multicast
-    //
-    // Some way to detect 'is local looback' that is smarter (e.g. at least
-    // strict string compare on linux instead of substring) would be better.
-    //
-    // This would reject likely valid interfaces like 'lollipop' or 'lostinspace'
-    if (strncmp(name, "lo", 2) == 0)
-    {
-        /// local loopback interface is not usable by MDNS
-        return false;
-    }
-    return true;
-}
-
-class AllInterfaces : public ListenIterator
-{
-private:
-public:
-    AllInterfaces() { SkipToFirstValidInterface(); }
-
-    bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false;
-        }
-
-#if INET_CONFIG_ENABLE_IPV4
-        if (mState == State::kIpV4)
-        {
-            *id    = mIterator.GetInterfaceId();
-            *type  = chip::Inet::kIPAddressType_IPv4;
-            mState = State::kIpV6;
-            return true;
-        }
-#endif
-
-        *id   = mIterator.GetInterfaceId();
-        *type = chip::Inet::kIPAddressType_IPv6;
-#if INET_CONFIG_ENABLE_IPV4
-        mState = State::kIpV4;
-#endif
-
-        for (mIterator.Next(); SkipCurrentInterface(); mIterator.Next())
-        {
-        }
-        return true;
-    }
-
-private:
-    enum class State
-    {
-        kIpV4,
-        kIpV6,
-    };
-#if INET_CONFIG_ENABLE_IPV4
-    State mState = State::kIpV4;
-#else
-    State mState = State::kIpV6;
-#endif
-    chip::Inet::InterfaceIterator mIterator;
-
-    void SkipToFirstValidInterface()
-    {
-        do
-        {
-            if (!SkipCurrentInterface())
-            {
-                break;
-            }
-        } while (mIterator.Next());
-    }
-
-    bool SkipCurrentInterface()
-    {
-        if (!mIterator.HasCurrent())
-        {
-            return false; // nothing to try.
-        }
-
-        return !IsCurrentInterfaceUsable(mIterator);
-    }
-};
-
 class AdvertiserMinMdns : public ServiceAdvertiser,
-                          public ServerDelegate, // gets queries
-                          public ParserDelegate  // parses queries
+                          public MdnsPacketDelegate, // receive query packets
+                          public ParserDelegate      // parses queries
 {
 public:
-    AdvertiserMinMdns() : mResponseSender(&mServer, &mQueryResponder)
-
+    AdvertiserMinMdns() : mResponseSender(&GlobalMinimalMdnsServer::Server(), &mQueryResponder)
     {
-        mServer.SetDelegate(this);
+        GlobalMinimalMdnsServer::Instance().SetQueryDelegate(this);
 
         for (size_t i = 0; i < kMaxAllocatedResponders; i++)
         {
@@ -223,9 +122,8 @@ public:
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
     CHIP_ERROR StopPublishDevice() override;
 
-    // ServerDelegate
-    void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
-    void OnResponse(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override {}
+    // MdnsPacketDelegate
+    void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     // ParserDelegate
     void OnHeader(ConstHeaderRef & header) override { mMessageId = header.GetMessageId(); }
@@ -304,12 +202,10 @@ private:
 
     FullQName GetCommisioningTextEntries(const CommissionAdvertisingParameters & params);
 
-    static constexpr size_t kMaxEndPoints           = 60;
     static constexpr size_t kMaxRecords             = 32;
     static constexpr size_t kMaxAllocatedResponders = 64;
     static constexpr size_t kMaxAllocatedQNameData  = 32;
 
-    Server<kMaxEndPoints> mServer;
     QueryResponder<kMaxRecords> mQueryResponder;
     ResponseSender mResponseSender;
 
@@ -326,7 +222,7 @@ private:
     };
 };
 
-void AdvertiserMinMdns::OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
+void AdvertiserMinMdns::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
 #ifdef DETAIL_LOGGING
     ChipLogDetail(Discovery, "MinMdns received a query.");
@@ -359,11 +255,9 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
 
 CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
 {
-    mServer.Shutdown();
+    GlobalMinimalMdnsServer::Server().Shutdown();
 
-    AllInterfaces allInterfaces;
-
-    ReturnErrorOnFailure(mServer.Listen(inetLayer, &allInterfaces, port));
+    ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, port));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
 
@@ -409,7 +303,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     char nameBuffer[64] = "";
 
     /// need to set server name
-    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetFabricId(), params.GetNodeId()));
+    ReturnErrorOnFailure(MakeInstanceName(nameBuffer, sizeof(nameBuffer), params.GetPeerId()));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
     FullQName operationalServerName  = AllocateQName(nameBuffer, "_chip", "_tcp", "local");
@@ -734,9 +628,10 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
 
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
 {
-    for (unsigned i = 0; i < mServer.GetEndpointCount(); i++)
+    auto & server = GlobalMinimalMdnsServer::Server();
+    for (unsigned i = 0; i < server.GetEndpointCount(); i++)
     {
-        const ServerBase::EndpointInfo & info = mServer.GetEndpoints()[i];
+        const ServerBase::EndpointInfo & info = server.GetEndpoints()[i];
 
         if (info.udp == nullptr)
         {
@@ -770,7 +665,7 @@ void AdvertiserMinMdns::AdvertiseRecords()
 
     for (; interfaceAddress.HasCurrent(); interfaceAddress.Next())
     {
-        if (!IsCurrentInterfaceUsable(interfaceAddress))
+        if (!Internal::IsCurrentInterfaceUsable(interfaceAddress))
         {
             continue;
         }

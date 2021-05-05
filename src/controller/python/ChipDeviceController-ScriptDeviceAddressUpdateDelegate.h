@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <controller/DeviceAddressUpdater.h>
+#include <controller/DeviceAddressUpdateDelegate.h>
 
 namespace chip {
 namespace Controller {

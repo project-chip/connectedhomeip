@@ -1,6 +1,6 @@
 {{> header}}
 
-#include "chip-zcl-zpro-codec.h"
+#include <app/chip-zcl-zpro-codec.h>
 
 #include <support/BufferWriter.h>
 #include <support/SafeInt.h>

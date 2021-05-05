@@ -24,5 +24,7 @@
 
 #include <app/util/DataModelHandler.h>
 
-__attribute__((weak)) void InitDataModelHandler() {}
-__attribute__((weak)) void HandleDataModelMessage(chip::NodeId nodeId, chip::System::PacketBufferHandle buffer) {}
+__attribute__((weak)) void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
+__attribute__((weak)) void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange,
+                                                  chip::System::PacketBufferHandle buffer)
+{}

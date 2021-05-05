@@ -85,8 +85,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
         handler.Reset();
     }
 
-    mSessionMgr->GetTransportManager()->SetRendezvousSession(this);
-
     sessionMgr->SetDelegate(this);
 
     mReliableMessageMgr.Init(sessionMgr->SystemLayer(), sessionMgr);
@@ -104,6 +102,12 @@ CHIP_ERROR ExchangeManager::Shutdown()
     mMessageCounterSyncMgr.Shutdown();
     mReliableMessageMgr.Shutdown();
 
+    for (auto & ec : mContextPool)
+    {
+        // ExchangeContext leaked
+        assert(ec.GetReferenceCount() == 0);
+    }
+
     if (mSessionMgr != nullptr)
     {
         mSessionMgr->SetDelegate(nullptr);
@@ -115,18 +119,18 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate)
 {
     return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegateBase * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
-                                                                     ExchangeDelegate * delegate)
+                                                                     ExchangeDelegateBase * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
@@ -147,7 +151,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                                ExchangeDelegate * delegate)
+                                                ExchangeDelegateBase * delegate)
 {
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
@@ -163,7 +167,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
     return nullptr;
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate)
 {
     UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
@@ -212,12 +216,16 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                        SecureSessionHandle session, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
+
+    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(),
+                    payloadHeader.GetProtocolID());
 
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
@@ -226,13 +234,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             // Found a matching exchange. Set flag for correct subsequent CRMP
             // retransmission timeout selection.
-            if (!ec.mReliableMessageContext.HasRcvdMsgFromPeer())
+            if (!ec.HasRcvdMsgFromPeer())
             {
-                ec.mReliableMessageContext.SetMsgRcvdFromPeer(true);
+                ec.SetMsgRcvdFromPeer(true);
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
+            ec.HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 
             ExitNow(err = CHIP_NO_ERROR);
         }
@@ -284,6 +292,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             // If rcvd msg is from initiator then this exchange is created as not Initiator.
             // If rcvd msg is not from initiator then this exchange is created as Initiator.
+            // TODO: Figure out which channel to use for the received message
             ec = AllocContext(payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
         }
         else
@@ -293,10 +302,10 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
-                        ec->GetDelegate());
+        ChipLogDetail(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
+                      ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
+        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
@@ -338,53 +347,12 @@ exit:
     return err;
 }
 
-ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
-{
-    ChannelContext * channelContext = nullptr;
-
-    // Find an existing Channel matching the builder
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesBuilder(builder))
-        {
-            channelContext = context;
-            return false;
-        }
-        return true;
-    });
-
-    if (channelContext == nullptr)
-    {
-        // create a new channel if not found
-        channelContext = mChannelContexts.CreateObject(this);
-        if (channelContext == nullptr)
-            return ChannelHandle{ nullptr };
-        channelContext->Start(builder);
-    }
-    else
-    {
-        channelContext->Retain();
-    }
-
-    ChannelContextHandleAssociation * association = mChannelHandles.CreateObject(channelContext, delegate);
-    channelContext->Release();
-    return ChannelHandle{ association };
-}
-
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     if (mDelegate != nullptr)
     {
         mDelegate->OnNewConnection(session, this);
     }
-
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesSession(session, mgr))
-        {
-            context->OnNewConnection(session);
-            return false;
-        }
-        return true;
-    });
 }
 
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
@@ -402,21 +370,15 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
     }
-
-    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->MatchesSession(session, mgr))
-        {
-            context->OnConnectionExpired(session);
-            return false;
-        }
-        return true;
-    });
 }
 
-void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
 {
-    auto peer = header.GetSourceNodeId();
+    PacketHeader header;
+
+    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
+
+    Optional<NodeId> peer = header.GetSourceNodeId();
     if (!peer.HasValue())
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
@@ -425,28 +387,23 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Trans
                      addrBuffer);
         return;
     }
+}
 
-    auto node     = peer.Value();
-    auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-        if (context->IsCasePairing() && context->MatchNodeId(node))
-        {
-            CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
-            if (err != CHIP_NO_ERROR)
-                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node 0x%08" PRIx32 "%08" PRIx32 ".",
-                             chip::ErrorStr(err), static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
-            return false;
-        }
-        return true;
-    });
-
-    if (notFound)
+void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate)
+{
+    for (auto & ec : mContextPool)
     {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager,
-                     "Unencrypted message from %s is dropped since no session found for node 0x%08" PRIx32 "%08" PRIx32 ".",
-                     addrBuffer, static_cast<uint32_t>(node >> 32), static_cast<uint32_t>(node));
-        return;
+        if (ec.GetReferenceCount() == 0 || ec.GetDelegate() != delegate)
+        {
+            continue;
+        }
+
+        // Make sure to null out the delegate before closing the context, so
+        // we don't notify the delegate that the context is closing.  We
+        // have to do this, because the delegate might be partially
+        // destroyed by this point.
+        ec.SetDelegate(nullptr);
+        ec.Close();
     }
 }
 

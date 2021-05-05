@@ -53,7 +53,7 @@ const bt_uuid_128 UUID128_CHIPoBLEChar_RX =
     BT_UUID_INIT_128(0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18);
 const bt_uuid_128 UUID128_CHIPoBLEChar_TX =
     BT_UUID_INIT_128(0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18);
-bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFEAF);
+bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -234,11 +234,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!isAdvertisingRerun)
     {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
 #if CONFIG_BT_PRIVACY
         static_assert((CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT / 1000) <= CONFIG_BT_RPA_TIMEOUT,
                       "BLE advertising timeout is too long relative to RPA timeout");
@@ -311,11 +306,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         {

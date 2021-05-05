@@ -132,7 +132,7 @@ exit:
     return err;
 }
 
-std::vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData()
+std::vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData() const
 {
     std::vector<OptionalQRCodeInfo> returnedOptionalInfo;
     for (auto & entry : optionalVendorData)
@@ -183,7 +183,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::getSerialNumber(std::string & outSerialNumber)
+CHIP_ERROR SetupPayload::getSerialNumber(std::string & outSerialNumber) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OptionalQRCodeInfoExtension info;
@@ -246,14 +246,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info)
+CHIP_ERROR SetupPayload::getOptionalExtensionData(uint8_t tag, OptionalQRCodeInfoExtension & info) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(optionalExtensionData.find(tag) != optionalExtensionData.end(), err = CHIP_ERROR_KEY_NOT_FOUND);
-    info = optionalExtensionData[tag];
-
-exit:
-    return err;
+    const auto it = optionalExtensionData.find(tag);
+    VerifyOrReturnError(it != optionalExtensionData.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    info = it->second;
+    return CHIP_NO_ERROR;
 }
 
 optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)

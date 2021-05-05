@@ -38,7 +38,7 @@ public:
     void UpdateClusterState();
 
 private:
-    friend class chip::rpc::LightingService;
+    friend class chip::rpc::Button;
     friend AppTask & GetAppTask(void);
 
     int Init();

@@ -38,72 +38,73 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app/Command.h>
 #include <app/util/af.h>
 
-bool emberAfMediaPlaybackClusterFastForwardRequestCallback()
+bool emberAfMediaPlaybackClusterFastForwardRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterNextRequestCallback()
+bool emberAfMediaPlaybackClusterNextRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterPauseRequestCallback()
+bool emberAfMediaPlaybackClusterPauseRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterPlayRequestCallback()
+bool emberAfMediaPlaybackClusterPlayRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterPreviousRequestCallback()
+bool emberAfMediaPlaybackClusterPreviousRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterRewindRequestCallback()
+bool emberAfMediaPlaybackClusterRewindRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterStopRequestCallback()
+bool emberAfMediaPlaybackClusterStopRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterSkipBackwardRequestCallback()
+bool emberAfMediaPlaybackClusterSkipBackwardRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterStartOverRequestCallback()
+bool emberAfMediaPlaybackClusterStartOverRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterSkipForwardRequestCallback()
+bool emberAfMediaPlaybackClusterSkipForwardRequestCallback(chip::app::Command * commandObj)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     emberAfSendImmediateDefaultResponse(status);

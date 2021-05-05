@@ -77,6 +77,14 @@ CHIP_ERROR CHIPDeviceCallbacksMgr::AddResponseCallback(NodeId nodeId, uint8_t se
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CHIPDeviceCallbacksMgr::CancelResponseCallback(NodeId nodeId, uint8_t sequenceNumber)
+{
+    ResponseCallbackInfo info = { nodeId, sequenceNumber };
+    CancelCallback(info, mResponsesSuccess);
+    CancelCallback(info, mResponsesFailure);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CHIPDeviceCallbacksMgr::GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber,
                                                        Callback::Cancelable ** onSuccessCallback,
                                                        Callback::Cancelable ** onFailureCallback)

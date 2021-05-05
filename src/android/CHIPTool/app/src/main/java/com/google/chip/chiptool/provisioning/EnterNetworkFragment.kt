@@ -75,9 +75,7 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    ChipClient.getDeviceController().apply {
-      sendWiFiCredentials(ssid.toString(), pwd.toString())
-    }
+    // Do something with the credentials
   }
 
   private fun saveThreadNetwork() {
@@ -116,11 +114,7 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    ChipClient.getDeviceController().sendThreadCredentials(
-        channelStr.toString().toInt(),
-        panIdStr.toString().toInt(16),
-        xpanIdStr.hexToByteArray(),
-        masterKeyStr.hexToByteArray())
+    // Do something with the credentials
   }
 
   private fun String.hexToByteArray(): ByteArray {

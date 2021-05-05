@@ -29,6 +29,7 @@ chip_test_suite("tests") {
     "TestCHIPCounter.cpp",
     "TestCHIPMem.cpp",
     "TestErrorStr.cpp",
+    "TestOwnerOf.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
@@ -37,6 +38,7 @@ chip_test_suite("tests") {
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",
     "TestStringBuilder.cpp",
+    "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
   ]
   sources = []

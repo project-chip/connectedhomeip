@@ -17,33 +17,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 chip_data_model("all-clusters-common") {
-  cluster_sources = [
-    "account-login-server",
-    "application-launcher-server",
-    "audio-output-server",
-    "barrier-control-server",
-    "basic",
-    "bindings",
-    "color-control-server",
-    "content-launch-server",
-    "descriptor",
-    "door-lock-server",
-    "general-commissioning-server",
-    "groups-server",
-    "ias-zone-server",
-    "identify",
-    "keypad-input-server",
-    "level-control",
-    "low-power-server",
-    "media-input-server",
-    "media-playback-server",
-    "network-commissioning",
-    "on-off-server",
-    "scenes",
-    "target-navigator-server",
-    "temperature-measurement-server",
-    "tv-channel-server",
-  ]
+  zap_file = "all-clusters-app.zap"
 
   zap_pregenerated_dir = "gen"
+  is_server = true
 }

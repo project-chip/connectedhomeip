@@ -30,7 +30,7 @@
 #include <app/InteractionModelEngine.h>
 
 // Currently we need some work to keep compatible with ember lib.
-#include <util/ember-compatibility-functions.h>
+#include <app/util/ember-compatibility-functions.h>
 
 namespace chip {
 namespace app {
@@ -49,7 +49,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         case ZCL_WINDOW_COVERING_DOWN_CLOSE_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringDownCloseCallback();
+            emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(apCommandObj);
             break;
         }
         case ZCL_WINDOW_COVERING_GO_TO_LIFT_PERCENTAGE_COMMAND_ID: {
@@ -107,7 +107,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(percentageLiftValue);
+                emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(apCommandObj, percentageLiftValue);
             }
             else
             {
@@ -174,7 +174,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(liftValue);
+                emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(apCommandObj, liftValue);
             }
             else
             {
@@ -241,7 +241,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(percentageTiltValue);
+                emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(apCommandObj, percentageTiltValue);
             }
             else
             {
@@ -308,7 +308,7 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(tiltValue);
+                emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(apCommandObj, tiltValue);
             }
             else
             {
@@ -323,13 +323,13 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
         case ZCL_WINDOW_COVERING_STOP_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringStopCallback();
+            emberAfWindowCoveringClusterWindowCoveringStopCallback(apCommandObj);
             break;
         }
         case ZCL_WINDOW_COVERING_UP_OPEN_COMMAND_ID: {
 
             // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-            emberAfWindowCoveringClusterWindowCoveringUpOpenCallback();
+            emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(apCommandObj);
             break;
         }
         default: {
@@ -353,6 +353,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     ChipLogDetail(Zcl, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId, aCommandId,
                   aEndPointId);
     Compatibility::SetupEmberAfObjects(apCommandObj, aClusterId, aCommandId, aEndPointId);
+    TLV::TLVType dataTlvType;
+    SuccessOrExit(aReader.EnterContainer(dataTlvType));
     switch (aClusterId)
     {
     case ZCL_WINDOW_COVERING_CLUSTER_ID:
@@ -365,7 +367,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         ChipLogError(Zcl, "Unknown cluster %" PRIx16, aClusterId);
         break;
     }
+exit:
     Compatibility::ResetEmberAfObjects();
+    aReader.ExitContainer(dataTlvType);
 }
 
 } // namespace app

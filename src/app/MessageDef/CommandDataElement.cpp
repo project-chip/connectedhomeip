@@ -59,7 +59,7 @@ CommandDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth
 
     if (aDepth == 0)
     {
-        PRETTY_PRINT("\tCommandDataElement = ");
+        PRETTY_PRINT("\tCommandData = ");
     }
     else
     {

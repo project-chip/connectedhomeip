@@ -897,9 +897,6 @@ static void StartTest()
         lStatus = gInet.NewRawEndPoint(lIPVersion, lIPProtocol, &sRawIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewRawEndPoint failed");
 
-        sRawIPEndPoint->OnMessageReceived = HandleRawMessageReceived;
-        sRawIPEndPoint->OnReceiveError    = HandleRawReceiveError;
-
         lStatus = sRawIPEndPoint->Bind(lIPAddressType, lAddress);
         INET_FAIL_ERROR(lStatus, "RawEndPoint::Bind failed");
 
@@ -915,7 +912,7 @@ static void StartTest()
             INET_FAIL_ERROR(lStatus, "RawEndPoint::BindInterface failed");
         }
 
-        lStatus = sRawIPEndPoint->Listen();
+        lStatus = sRawIPEndPoint->Listen(HandleRawMessageReceived, HandleRawReceiveError);
         INET_FAIL_ERROR(lStatus, "RawEndPoint::Listen failed");
 
         lEndPoint = sRawIPEndPoint;
@@ -924,9 +921,6 @@ static void StartTest()
     {
         lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
         INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
-
-        sUDPIPEndPoint->OnMessageReceived = HandleUDPMessageReceived;
-        sUDPIPEndPoint->OnReceiveError    = HandleUDPReceiveError;
 
         lStatus = sUDPIPEndPoint->Bind(lIPAddressType, lAddress, kUDPPort);
         INET_FAIL_ERROR(lStatus, "UDPEndPoint::Bind failed");
@@ -937,7 +931,7 @@ static void StartTest()
             INET_FAIL_ERROR(lStatus, "UDPEndPoint::BindInterface failed");
         }
 
-        lStatus = sUDPIPEndPoint->Listen();
+        lStatus = sUDPIPEndPoint->Listen(HandleUDPMessageReceived, HandleUDPReceiveError);
         INET_FAIL_ERROR(lStatus, "UDPEndPoint::Listen failed");
 
         lEndPoint = sUDPIPEndPoint;

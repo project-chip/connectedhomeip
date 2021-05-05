@@ -25,10 +25,10 @@
 #include <nlunit-test.h>
 #include <stdio.h>
 
-#include "ManualSetupPayloadGenerator.cpp"
-#include "ManualSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
-#include "SetupPayload.h"
+#include <setup_payload/ManualSetupPayloadGenerator.cpp>
+#include <setup_payload/ManualSetupPayloadParser.cpp>
+#include <setup_payload/SetupPayload.cpp>
+#include <setup_payload/SetupPayload.h>
 
 #include <support/UnitTestRegistration.h>
 #include <support/verhoeff/Verhoeff.h>

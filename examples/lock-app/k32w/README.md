@@ -23,6 +23,7 @@ network.
 -   [Device UI](#device-ui)
 -   [Building](#building)
 -   [Flashing and debugging](#flashdebug)
+-   [Known Issues](#knownissues)
 -   [Testing the example](#testing-the-example)
 
 <hr>
@@ -148,7 +149,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
 user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.2_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/mr2_fixes/patch_k32w_mr2_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/openthread/repo$ cd examples/lock-app/k32w/
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
@@ -183,6 +184,13 @@ Program the firmware using the official
 All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w061-lock-example.bin_ if DK6Programmer is
 used or with _out/debug/chip-k32w061-lock-example_ if MCUXpresso is used.
+
+<a name="knownissues"></a>
+
+## Known issues
+
+-   When cross-compiling on Linux - Log messages from the Plug&Trust middleware
+    stack may not echo to the console.
 
 ## Testing the example
 

@@ -198,13 +198,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
-      "../include/platform/SoftwareUpdateManager.h",
       "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/TimeSyncManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
-      "../include/platform/internal/DeviceDescriptionServer.h",
+      "../include/platform/internal/DeviceControlServer.h",
       "../include/platform/internal/DeviceNetworkInfo.h",
       "../include/platform/internal/DeviceNetworkProvisioning.h",
       "../include/platform/internal/EventLogging.h",
@@ -222,6 +221,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl.h",
       "../include/platform/internal/GenericSoftwareUpdateManagerImpl_BDX.h",
       "../include/platform/internal/testing/ConfigUnitTest.h",
+      "DeviceControlServer.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
       "PersistedStorage.cpp",
@@ -598,7 +598,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
 
       if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+        public_deps += [ "${openthread_root}:libopenthread-mtd" ]
 
         public_configs += [ "${chip_root}/third_party/openthread/platforms/qpg6100:openthread_qpg6100_config" ]
 
