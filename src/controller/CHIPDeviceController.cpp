@@ -1074,3 +1074,25 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 
 } // namespace Controller
 } // namespace chip
+
+namespace chip {
+namespace Platform {
+namespace PersistedStorage {
+
+/*
+* Dummy implementations of PersistedStorage platform methods. These aren't
+* used in the context of the Device Controller, but are required to satisfy
+* the linker.
+*/
+
+CHIP_ERROR Read(const char *aKey, uint32_t &aValue) {
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Write(const char *aKey, uint32_t aValue) {
+    return CHIP_NO_ERROR;
+}
+
+}
+}
+}

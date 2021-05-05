@@ -24,6 +24,7 @@
  */
 
 #include "MockEvents.h"
+#include "common.h"
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -31,15 +32,11 @@
 #include <system/SystemPacketBuffer.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
+#include <protocols/secure_channel/PASESession.h>
 
-static const chip::NodeId kTestNodeId           = 0x18B4300000000001ULL;
-static const chip::NodeId kTestNodeId1          = 0x18B4300000000002ULL;
-static const chip::ClusterId kLivenessClusterId = 0x00000022;
-static const uint32_t kLivenessChangeEvent      = 1;
-static const chip::EndpointId kTestEndpointId   = 2;
-static const uint64_t kLivenessDeviceStatus     = chip::TLV::ContextTag(1);
-static bool gMockEventStop                      = false;
-static bool gEventIsStopped                     = false;
+static uint64_t kLivenessDeviceStatus = chip::TLV::ContextTag(1);
+static bool gMockEventStop            = false;
+static bool gEventIsStopped           = false;
 
 EventGenerator::EventGenerator(size_t aNumStates, size_t aInitialState) : mNumStates(aNumStates), mState(aInitialState) {}
 
@@ -56,43 +53,43 @@ void LivenessEventGenerator::Generate(void)
     switch (mState)
     {
     case 0:
-        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 1:
-        LogLiveness(kTestNodeId1, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 2:
-        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 3:
-        LogLiveness(kTestNodeId1, kTestEndpointId, LIVENESS_DEVICE_STATUS_UNREACHABLE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_UNREACHABLE);
         break;
 
     case 4:
-        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 5:
-        LogLiveness(kTestNodeId1, kTestEndpointId, LIVENESS_DEVICE_STATUS_REBOOTING);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_REBOOTING);
         break;
 
     case 6:
-        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 7:
-        LogLiveness(kTestNodeId1, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 8:
-        LogLiveness(kTestNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     case 9:
-        LogLiveness(kTestNodeId1, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
+        LogLiveness(chip::kTestDeviceNodeId, kTestEndpointId, LIVENESS_DEVICE_STATUS_ONLINE);
         break;
 
     default:
@@ -115,7 +112,7 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
     chip::app::EventManagement & logManager = chip::app::EventManagement::GetInstance();
     chip::EventNumber number                = 0;
     chip::app::EventSchema schema           = {
-        aNodeId, aEndpointId, kLivenessClusterId, kLivenessChangeEvent, chip::app::PriorityLevel::Critical,
+        aNodeId, aEndpointId, kTestClusterId, kLivenessChangeEvent, chip::app::PriorityLevel::Critical,
     };
     chip::app::EventOptions options;
     mStatus               = static_cast<int32_t>(aStatus);

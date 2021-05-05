@@ -79,8 +79,10 @@ private:
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
     CHIP_ERROR BuildSingleReportDataAttributeDataList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-
+    CHIP_ERROR BuildSingleReportDataEventList(ReportData::Builder & reportDataBuilder, ReadHandler * apReadHandler);
     CHIP_ERROR RetrieveClusterData(AttributeDataElement::Builder & aAttributeDataElementBuilder, ClusterInfo & aClusterInfo);
+    EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
+
     /**
      * Send Report via ReadHandler
      *
