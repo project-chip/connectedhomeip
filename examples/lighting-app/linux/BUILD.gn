@@ -23,6 +23,7 @@ executable("chip-lighting-app") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
+    "include/CHIPProjectAppConfig.h",
     "include/LightingManager.h",
     "main.cpp",
   ]

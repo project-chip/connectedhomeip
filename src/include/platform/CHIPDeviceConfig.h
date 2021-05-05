@@ -620,6 +620,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+ *
+ * Enable MDNS commissionable node advertising when not yet provisioned.
+ *
+ * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
+ *
+ * This should be 0 for Thread/BLE devices and WiFi/BLE devices
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
  *
  * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
@@ -1048,6 +1061,27 @@
 // -------------------- Device DNS-SD Advertising Configuration --------------------
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+ *
+ * Enable or disable whether this device advertises as a commissioner.
+ *
+ * For Video Players, this value will be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+ *
+ * Enable or disable whether this device advertises when not in commissioning mode.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
  *
  * Enable or disable including device type in commissionable node discovery.
@@ -1055,7 +1089,7 @@
  * For Video Players, this value will often be 1
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
-#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 1
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 0
 #endif
 
 /**
@@ -1082,7 +1116,7 @@
  * For Video Players, this value will often be 1
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME
-#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 1
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 0
 #endif
 
 /**
@@ -1103,12 +1137,10 @@
  * Bits:
  * 0 - Power Cycle
  * 5 - See Device Manual
- * 8 - Press Reset for N seconds (see pairing instruction for value of N)
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT
 #define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT                                                                                    \
-    (1 << CHIP_COMMISSIONING_HINT_INDEX_POWER_CYCLE | 1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_MANUAL |                              \
-     1 << CHIP_COMMISSIONING_HINT_INDEX_PRESS_RESET_SECONDS)
+    (1 << CHIP_COMMISSIONING_HINT_INDEX_POWER_CYCLE | 1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_MANUAL)
 #endif
 
 /**
@@ -1119,7 +1151,7 @@
  * Meaning is depedent upon pairing hint value.
  */
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION
-#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION "10"
+#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION ""
 #endif
 
 /**

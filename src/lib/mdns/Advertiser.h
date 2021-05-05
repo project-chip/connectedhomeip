@@ -32,6 +32,23 @@ static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
 
+#define CHIP_MDNS_KEY_DISCRIMINATOR_MAXLENGTH 5
+#define CHIP_MDNS_KEY_VENDOR_PRODUCT_MAXLENGTH 11
+#define CHIP_MDNS_KEY_ADDITIONAL_PAIRING_MAXLENGTH 1
+#define CHIP_MDNS_KEY_COMMISSIONING_MODE_MAXLENGTH 1
+#define CHIP_MDNS_KEY_DEVICE_TYPE_MAXLENGTH 5
+#define CHIP_MDNS_KEY_DEVICE_NAME_MAXLENGTH 32
+#define CHIP_MDNS_KEY_ROTATING_ID_MAXLENGTH 100
+#define CHIP_MDNS_KEY_PAIRING_INSTRUCTION_MAXLENGTH 128
+#define CHIP_MDNS_KEY_PAIRING_HINT_MAXLENGTH 10
+
+#define CHIP_MDNS_SUBTYPE_SHORT_DISCRIMINATOR_MAXLENGTH 3
+#define CHIP_MDNS_SUBTYPE_LONG_DISCRIMINATOR_MAXLENGTH 4
+#define CHIP_MDNS_SUBTYPE_VENDOR_MAXLENGTH 5
+#define CHIP_MDNS_SUBTYPE_DEVICE_TYPE_MAXLENGTH 5
+#define CHIP_MDNS_SUBTYPE_COMMISSIONING_MODE_MAXLENGTH 1
+#define CHIP_MDNS_SUBTYPE_ADDITIONAL_PAIRING_MAXLENGTH 1
+
 enum class CommssionAdvertiseMode : uint8_t
 {
     kCommissionableNode,
@@ -218,8 +235,11 @@ public:
     /// Advertises the CHIP node as an operational node
     virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
 
-    /// Advertises the CHIP node as a commisioning/commissionable node
+    /// Advertises the CHIP node as a commissioner/commissionable node
     virtual CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) = 0;
+
+    /// Stops the advertiser.
+    virtual CHIP_ERROR StopPublishDevice() = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();

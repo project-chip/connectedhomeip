@@ -110,10 +110,25 @@ CHIP_ERROR AdvertiseOperational()
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
-/// Set MDNS commisioning advertisement
-CHIP_ERROR AdvertiseCommisioning()
+/// Set MDNS commissioner advertisement
+CHIP_ERROR AdvertiseCommisioner()
+{
+    return Advertise(false);
+}
+
+/// Set MDNS commissionable node advertisement
+CHIP_ERROR AdvertiseCommissionableNode()
+{
+    return Advertise(true);
+}
+
+/// commissionableNode
+// CHIP_ERROR Advertise(chip::Mdns::CommssionAdvertiseMode mode)
+CHIP_ERROR Advertise(bool commissionableNode)
 {
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+    advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
+                                                                      : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
 
     // TODO: device can re-enter commissioning mode after being fully provisioned
     // (additionalPairing == true)
@@ -227,17 +242,23 @@ void StartServer()
     if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
     {
         err = app::Mdns::AdvertiseOperational();
-        // TODO: add commissionable advertising when enabled
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+        err = app::Mdns::AdvertiseCommissionableNode();
+#endif
     }
     else
     {
 // TODO: Thread devices are not able to advertise using mDNS before being provisioned,
 // so configuraton should be added to enable commissioning advertising based on supported
 // Rendezvous methods.
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        err = app::Mdns::AdvertiseCommisioning();
+#if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS)
+        err = app::Mdns::AdvertiseCommissionableNode();
 #endif
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = app::Mdns::AdvertiseCommisioner();
+#endif
 
     if (err != CHIP_NO_ERROR)
     {

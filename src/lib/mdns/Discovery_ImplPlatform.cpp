@@ -111,11 +111,6 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
         {
             publisher->Advertise(publisher->mOperationalAdvertisingParams);
         }
-        // TODO: revisit (value is never true)
-        if (publisher->mIsCommissionalPublishing)
-        {
-            publisher->Advertise(publisher->mCommissioningdvertisingParams);
-        }
     }
     else
     {
@@ -145,23 +140,27 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
-    char discriminatorBuf[6];
-    char vendorProductBuf[12];
-    char commissioningModeBuf[2];
-    char additionalPairingBuf[2];
-    char deviceTypeBuf[6];
-    char deviceNameBuf[33];
-    char rotatingIdBuf[37];
-    char pairingHintBuf[11];
-    char pairingInstrBuf[129];
+    // add newline to lengths for TXT entries
+    char discriminatorBuf[CHIP_MDNS_KEY_DISCRIMINATOR_MAXLENGTH + 1];
+    char vendorProductBuf[CHIP_MDNS_KEY_VENDOR_PRODUCT_MAXLENGTH + 1];
+    char commissioningModeBuf[CHIP_MDNS_KEY_COMMISSIONING_MODE_MAXLENGTH + 1];
+    char additionalPairingBuf[CHIP_MDNS_KEY_ADDITIONAL_PAIRING_MAXLENGTH + 1];
+    char deviceTypeBuf[CHIP_MDNS_KEY_DEVICE_TYPE_MAXLENGTH + 1];
+    char deviceNameBuf[CHIP_MDNS_KEY_DEVICE_NAME_MAXLENGTH + 1];
+    char rotatingIdBuf[CHIP_MDNS_KEY_ROTATING_ID_MAXLENGTH + 1];
+    char pairingHintBuf[CHIP_MDNS_KEY_PAIRING_HINT_MAXLENGTH + 1];
+    char pairingInstrBuf[CHIP_MDNS_KEY_PAIRING_INSTRUCTION_MAXLENGTH + 1];
+    // size of textEntries array should be count of Bufs above
     TextEntry textEntries[9];
     size_t textEntrySize = 0;
-    char shortDiscriminatorSubtype[6];
-    char longDiscriminatorSubtype[8];
-    char vendorSubType[8];
-    char commissioningModeSubType[4];
-    char openWindowSubType[4];
-    char deviceTypeSubType[8];
+    // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
+    char shortDiscriminatorSubtype[CHIP_MDNS_SUBTYPE_SHORT_DISCRIMINATOR_MAXLENGTH + 3]; // add
+    char longDiscriminatorSubtype[CHIP_MDNS_SUBTYPE_LONG_DISCRIMINATOR_MAXLENGTH + 3];
+    char vendorSubType[CHIP_MDNS_SUBTYPE_VENDOR_MAXLENGTH + 3];
+    char commissioningModeSubType[CHIP_MDNS_SUBTYPE_COMMISSIONING_MODE_MAXLENGTH+3;
+    char openWindowSubType[CHIP_MDNS_SUBTYPE_ADDITIONAL_PAIRING_MAXLENGTH+3];
+    char deviceTypeSubType[CHIP_MDNS_SUBTYPE_DEVICE_TYPE_MAXLENGTH+3];
+    // size of subTypes array should be count of SubTypes above
     const char * subTypes[6];
     size_t subTypeSize = 0;
 
@@ -382,13 +381,16 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mAddressType = Inet::kIPAddressType_Any;
     error                = ChipMdnsPublishService(&service);
 
+    mIsOperationalPublishing = true;
+
     return error;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 {
-    mIsOperationalPublishing  = false;
-    mIsCommissionalPublishing = false;
+    mIsOperationalPublishing        = false;
+    mIsCommissionableNodePublishing = false;
+    mIsCommissionerPublishing       = false;
     return ChipMdnsStopPublish();
 }
 
