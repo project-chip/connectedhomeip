@@ -32,6 +32,7 @@
 #include <openthread/srp_client.h>
 #endif
 
+#include <lib/mdns/Advertiser.h>
 #include <lib/mdns/platform/Mdns.h>
 
 namespace chip {
@@ -119,16 +120,14 @@ private:
 
     struct SrpClient
     {
-        static constexpr uint8_t kServiceId           = 0x5d;
         static constexpr uint8_t kMaxServicesNumber   = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
         static constexpr uint8_t kMaxInstanceNameSize = chip::Mdns::kMdnsNameMaxSize;
         static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeMaxSize + chip::Mdns::kMdnsProtocolTextMaxSize + 1;
         static constexpr uint8_t kMaxHostNameSize     = 32;
-        // Thread only supports operational discovery currently, increase when commissionable discovery would get added
-        // see GH issue:#5351
-        static constexpr uint8_t kMaxTxtEntriesNumber = 2;     // Based on operational discovery - 2 records required
-        static constexpr uint8_t kMaxTxtValueSize     = 16;    // Based on operational discovery - 32-bit numbers filled in
-        static constexpr uint8_t kMaxTxtKeySize       = 3 + 1; // Based on operational discovery - CRI/CRA
+        // Thread only supports operational discovery
+        static constexpr uint8_t kMaxTxtEntriesNumber = chip::Mdns::OperationalAdvertisingParameters::kNumAdvertisingTxtEntries;
+        static constexpr uint8_t kMaxTxtValueSize     = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxValueSize;
+        static constexpr uint8_t kMaxTxtKeySize       = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxKeySize;
 
         struct Service
         {
