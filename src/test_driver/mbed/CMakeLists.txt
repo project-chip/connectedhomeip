@@ -79,8 +79,10 @@ set(CHIP_TESTS
     # -lSupportTests
     # -lSystemLayerTests
     -lTransportLayerTests
-   #-lMinimalMdnsCoreTests
-   # -lMinimalMdnstests
+    -lMinimalMdnsCoreTests
+    -lMinimalMdnstests
+    -lMinimalMdnsRecordsTests
+    -lMinimalMdnsRespondersTests
 )
 
 # Link the *whole-archives* to keep the static test objects.
@@ -93,6 +95,10 @@ target_link_libraries(${APP_TARGET}
         NetworkTestHelpers
         nlunit-test
         ChipCertTestVectors
+        Mdns
+        MdnsCore
+        MinimalMdnsResponders
+        MinimalMdnsRecords
 )
 
 target_link_libraries(${APP_TARGET} mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-mbedtls-cryptocell310 chip)

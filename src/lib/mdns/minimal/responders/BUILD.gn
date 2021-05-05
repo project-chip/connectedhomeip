@@ -15,6 +15,8 @@
 import("//build_overrides/chip.gni")
 
 static_library("responders") {
+  output_name = "libMinimalMdnsResponders"
+  output_dir = "${root_out_dir}/lib"
   sources = [
     "IP.cpp",
     "IP.h",

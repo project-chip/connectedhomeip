@@ -19,7 +19,7 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "LibMinimalMdnsRecordsTests"
+  output_name = "libMinimalMdnsRecordsTests"
 
   test_sources = [
     "TestResourceRecord.cpp",
