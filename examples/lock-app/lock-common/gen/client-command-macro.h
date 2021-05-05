@@ -2217,6 +2217,15 @@
                                                                                                                                    \
                                                                             ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
 
+/** @brief Command description for RemoveAllFabrics
+ *
+ * Command: RemoveAllFabrics
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveAllFabrics() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
+
 /** @brief Command description for UpdateFabricLabel
  *
  * Command: UpdateFabricLabel

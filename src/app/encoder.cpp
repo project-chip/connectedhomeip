@@ -302,6 +302,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_TOGGLE_COMMAND_ID (0x02)
 
 #define OPERATIONAL_CREDENTIALS_CLUSTER_ID 0x003E
+#define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x02)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
@@ -4142,6 +4143,7 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * RemoveAllFabrics                                                  |   0x02 |
 | * RemoveFabric                                                      |   0x0A |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
@@ -4150,6 +4152,16 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | * FabricsList                                                       | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command RemoveAllFabrics
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterRemoveAllFabricsCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("RemoveAllFabrics", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_REMOVE_ALL_FABRICS_COMMAND_ID);
+    COMMAND_FOOTER();
+}
 
 /*
  * Command RemoveFabric
