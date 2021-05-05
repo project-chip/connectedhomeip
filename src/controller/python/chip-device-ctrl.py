@@ -687,7 +687,9 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Additions needed by the Test Harness Tool
+###  Additions needed by the Test Harness Tool ###
+# TODO: Implement a custom device manager instead of using the existing manager object
+# https://github.com/chip-csg/connectedhomeip/issues/8
 device_manager = DeviceMgrCmd(rendezvousAddr=None,
                              controllerNodeId=0, bluetoothAdapter=0)
 
