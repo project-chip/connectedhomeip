@@ -377,7 +377,7 @@ public:
 #endif
     /**
      * @brief
-     *   Discovery devices advertising as commissionable that match the long descriptor.
+     *   Discove devices advertising as commissionable that match the long discriminator.
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator);
