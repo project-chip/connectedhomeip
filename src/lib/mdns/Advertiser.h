@@ -113,7 +113,7 @@ public:
     static constexpr uint8_t kNumAdvertisingTxtEntries = 8; // Min 1 - Max 8
     static constexpr uint8_t kTxtMaxKeySize = 2 + 1; // "D"/"VP"/"CM"/"DT"/"DN"/"RI"/"PI"/"PH" as possible keys
     static constexpr uint8_t kTxtMaxValueSize = 128; // Max from PI - Pairing Instruction
-    
+
     CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {
         mShortDiscriminator = discriminator;
