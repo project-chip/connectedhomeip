@@ -29,8 +29,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)
     {
-    case ZCL_GROUPS_CLUSTER_ID:
-        emberAfGroupsClusterInitCallback(endpoint);
+    case ZCL_BASIC_CLUSTER_ID:
+        emberAfBasicClusterInitCallback(endpoint);
+        break;
+    case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
+        emberAfGeneralCommissioningClusterInitCallback(endpoint);
+        break;
+    case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
+        emberAfNetworkCommissioningClusterInitCallback(endpoint);
         break;
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
@@ -38,16 +44,23 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
         break;
-    case ZCL_SCENES_CLUSTER_ID:
-        emberAfScenesClusterInitCallback(endpoint);
-        break;
     default:
         // Unrecognized cluster ID
         break;
     }
 }
 
-void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfBasicClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -58,11 +71,6 @@ void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
