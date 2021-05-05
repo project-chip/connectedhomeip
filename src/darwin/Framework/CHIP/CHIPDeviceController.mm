@@ -30,7 +30,6 @@
 #include <platform/PlatformManager.h>
 #include <support/CHIPMem.h>
 
-static const char * const CHIP_CONTROLLER_QUEUE = "com.zigbee.chip.framework.controller.workqueue";
 static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
