@@ -309,6 +309,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     INET_ERROR err;
     IPAddress addr_any = IPAddress::Any;
     IPAddress addr;
+    InterfaceAddressIterator addrIterator;
 #if INET_CONFIG_ENABLE_IPV4
     IPAddress addr_v4;
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -324,6 +325,9 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     bool didBind             = false;
     bool didListen           = false;
+
+    IPAddress tmpAddr    = addrIterator.GetAddress();
+    bool IsIPv6Available = tmpAddr.IsIPv6();
 
     // init all the EndPoints
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRaw6EP);
@@ -365,10 +369,11 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 
     // A bind should succeed with appropriate permissions but will
     // otherwise fail.
-
-    err = testRaw6EP->BindIPv6LinkLocal(intId, addr);
-    NL_TEST_ASSERT(inSuite, (err == INET_NO_ERROR) || (err == System::MapErrorPOSIX(EPERM)));
-
+    if (IsIPv6Available)
+    {
+        err = testRaw6EP->BindIPv6LinkLocal(intId, addr);
+        NL_TEST_ASSERT(inSuite, (err == INET_NO_ERROR) || (err == System::MapErrorPOSIX(EPERM)));
+    }
     didBind = (err == INET_NO_ERROR);
 
     // Listen after bind should succeed if the prior bind succeeded.
@@ -387,11 +392,12 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 
     // A bind-after-listen should result in an incorrect state error;
     // otherwise, it will fail with a permissions error.
-
-    err = testRaw6EP->Bind(kIPAddressType_IPv6, addr);
-    NL_TEST_ASSERT(inSuite,
-                   (didListen && (err == INET_ERROR_INCORRECT_STATE)) || (!didListen && (err == System::MapErrorPOSIX(EPERM))));
-
+    if (IsIPv6Available)
+    {
+        err = testRaw6EP->Bind(kIPAddressType_IPv6, addr);
+        NL_TEST_ASSERT(inSuite,
+                       (didListen && (err == INET_ERROR_INCORRECT_STATE)) || (!didListen && (err == System::MapErrorPOSIX(EPERM))));
+    }
     // error SetICMPFilter case
     err = testRaw6EP->SetICMPFilter(0, ICMP6Types);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_BAD_ARGS);
@@ -430,10 +436,15 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 
     err = testUDPEP->Listen();
     err = testUDPEP->Listen();
-    err = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
-    NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
+    if (IsIPv6Available)
+    {
+        err = testUDPEP->Bind(kIPAddressType_IPv6, addr, 3000, intId);
+        NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
+    }
+#if HAVE_SO_BINDTODEVICE
     err = testUDPEP->BindInterface(kIPAddressType_IPv6, intId);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
+#endif
     testUDPEP->Free();
 
     err = gInet.NewUDPEndPoint(&testUDPEP);

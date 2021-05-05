@@ -20,16 +20,25 @@
 // #include <support/CHIPMem.h>
 // #include <support/CodeUtils.h>
 // #include <support/ErrorStr.h>
+#include "netsocket/WiFiInterface.h"
 #include <support/UnitTestRegistration.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
-// using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer;
+WiFiInterface * _interface;
+#define concat_(x, y) x##y
+#define concat(x, y) concat_(x, y)
+#define SECURITY concat(NSAPI_SECURITY_, MBED_CONF_NSAPI_DEFAULT_WIFI_SECURITY)
 
 int main()
 {
     ChipLogProgress(NotSpecified, "Starting CHIP tests!");
+    _interface = WiFiInterface::get_default_instance();
+    _interface->connect(MBED_CONF_NSAPI_DEFAULT_WIFI_SSID, MBED_CONF_NSAPI_DEFAULT_WIFI_PASSWORD, SECURITY);
+    _interface->get_connection_status();
+
     int status = RunRegisteredUnitTests();
     ChipLogProgress(NotSpecified, "CHIP test status: %d", status);
 
