@@ -27,7 +27,8 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-const uint16_t kTimeoutInMs = 10;
+const uint16_t kPairingTimeoutInSeconds = 10;
+const uint16_t kTimeoutInSeconds = 3;
 const uint64_t kDeviceId = 1;
 const uint16_t kDiscriminator = 3840;
 const uint32_t kSetupPINCode = 20202021;
@@ -75,6 +76,11 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
 @implementation CHIPClustersTests
 
+- (void)setUp {
+    [super setUp];
+    [self setContinueAfterFailure:NO];
+}
+
 - (void)testInitStack
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
@@ -100,7 +106,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
                      error:&error];
     XCTAssertEqual(error.code, 0);
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 }
 
 - (void)testShutdownStack
@@ -116,54 +122,85 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     XCTAssertTrue(stopped);
 }
 
-{{#chip_client_clusters}}
-{{#chip_server_cluster_commands}}
-{{#unless (zcl_command_arguments_count this.id)}}
-- (void)testSendCluster{{asCamelCased parent.name false}}{{asCamelCased name false}}Command
+- (void)testSendClusterTestCommand
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asCamelCased parent.name false}}{{asCamelCased name false}}"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TestClusterTestCommand"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIP{{asCamelCased parent.name false}} * cluster = [[CHIP{{asCamelCased parent.name false}} alloc] initWithDevice:device endpoint:{{asExpectedEndpointForCluster (asCamelCased parent.name false)}} queue:queue];
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster {{asCamelCased name}}:^(NSError * err, NSDictionary * values) {
-        NSLog(@"{{asCamelCased parent.name false}} {{asCamelCased name false}} Error: %@", err);
-        XCTAssertEqual(err.code, {{asExpectedReturnValueForCommand (asCamelCased parent.name false) (asCamelCased name false)}});
+    [cluster test:^(NSError * err, NSDictionary * values) {
+        NSLog(@"TestCluster test Error: %@", err);
+        XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-{{/unless}}
-{{/chip_server_cluster_commands}}
-{{/chip_client_clusters}}
+
+- (void)testSendClusterTestNotHandledCommand
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TestClusterTestNotHandledCommand"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster testNotHandled:^(NSError * err, NSDictionary * values) {
+        NSLog(@"TestCluster testNotHandled Error: %@", err);
+        XCTAssertEqual(err.code, 1);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestSpecificCommand
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"TestClusterTestSpecificCommand"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestCluster * cluster = [[CHIPTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster testSpecific:^(NSError * err, NSDictionary * values) {
+        NSLog(@"TestCluster testSpecific Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        XCTAssertEqual([values[@"returnValue"] intValue], 7);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
-- (void)testSendCluster{{asCamelCased parent.name false}}ReadAttribute{{asCamelCased name false}}
+- (void)testSendCluster{{asCamelCased parent.name false}}ReadAttribute{{asCamelCased name false}}WithResponseHandler
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asCamelCased parent.name false}}ReadAttribute{{asCamelCased name false}}"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asCamelCased parent.name false}}ReadAttribute{{asCamelCased name false}}WithResponseHandler"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
     CHIP{{asCamelCased parent.name false}} * cluster = [[CHIP{{asCamelCased parent.name false}} alloc] initWithDevice:device endpoint:{{asExpectedEndpointForCluster (asCamelCased parent.name false)}} queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster readAttribute{{asCamelCased name false}}:^(NSError * err, NSDictionary * values) {
+    [cluster readAttribute{{asCamelCased name false}}WithResponseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"{{asCamelCased parent.name false}} {{asCamelCased name false}} Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
 {{#if (isWritableAttribute)}}
-- (void)testSendCluster{{asCamelCased parent.name false}}WriteAttribute{{asCamelCased name false}}
+- (void)testSendCluster{{asCamelCased parent.name false}}WriteAttribute{{asCamelCased name false}}WithValue
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asCamelCased parent.name false}}WriteAttribute{{asCamelCased name false}}"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"{{asCamelCased parent.name false}}WriteAttribute{{asCamelCased name false}}WithValue"];
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -171,13 +208,13 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     XCTAssertNotNil(cluster);
 
     {{asObjectiveCBasicType type}} value = {{asTestValue}};
-    [cluster writeAttribute{{asCamelCased name false}}:value completionHandler:^(NSError * err, NSDictionary * values) {
+    [cluster writeAttribute{{asCamelCased name false}}WithValue:value responseHandler:^(NSError * err, NSDictionary * values) {
         NSLog(@"{{asCamelCased parent.name false}} {{asCamelCased name false}} Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
 
-    [self waitForExpectationsWithTimeout:kTimeoutInMs handler:nil];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 {{/if}}
 {{/chip_server_cluster_attributes}}

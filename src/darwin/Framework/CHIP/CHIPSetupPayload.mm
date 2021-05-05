@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "CHIPSetupPayload.h"
 #import "CHIPError.h"
+#import "CHIPSetupPayload_Internal.h"
 #import <setup_payload/SetupPayload.h>
 
 @implementation CHIPOptionalQRCodeInfo
@@ -26,7 +26,7 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
-- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+- (CHIPRendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
 {
     if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
         return kRendezvousInformationBLE;
@@ -49,7 +49,7 @@
         _requiresCustomFlow = setupPayload.requiresCustomFlow == 1;
         _rendezvousInformation = [self valueOf:setupPayload.rendezvousInformation];
         _discriminator = [NSNumber numberWithUnsignedShort:setupPayload.discriminator];
-        _setUpPINCode = [NSNumber numberWithUnsignedLong:setupPayload.setUpPINCode];
+        _setUpPINCode = [NSNumber numberWithUnsignedInt:setupPayload.setUpPINCode];
 
         [self getSerialNumber:setupPayload];
     }

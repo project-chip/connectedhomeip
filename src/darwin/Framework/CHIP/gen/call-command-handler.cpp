@@ -48,6 +48,7 @@ EmberAfStatus emberAfPumpConfigurationAndControlClusterClientCommandParse(EmberA
 EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfSwitchClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfTestClusterClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThermostatClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
@@ -151,6 +152,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             // No commands are enabled for cluster Temperature Measurement
             result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_TEST_CLUSTER_ID:
+            result = emberAfTestClusterClusterClientCommandParse(cmd);
             break;
         case ZCL_THERMOSTAT_CLUSTER_ID:
             // No commands are enabled for cluster Thermostat
@@ -1092,7 +1096,7 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
     {
         switch (cmd->commandId)
         {
-        case ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID: {
+        case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             chip::FabricId FabricId;
 
@@ -1102,7 +1106,7 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
             }
             FabricId = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(nullptr, FabricId);
+            wasHandled = emberAfOperationalCredentialsClusterSetFabricResponseCallback(nullptr, FabricId);
             break;
         }
         default: {
@@ -1338,6 +1342,35 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
 
             wasHandled = emberAfScenesClusterViewSceneResponseCallback(nullptr, status, groupId, sceneId, transitionTime, sceneName,
                                                                        extensionFieldSets);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfTestClusterClusterClientCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t returnValue;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            returnValue = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfTestClusterClusterTestSpecificResponseCallback(nullptr, returnValue);
             break;
         }
         default: {

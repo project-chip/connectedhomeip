@@ -1240,6 +1240,29 @@
 
 // Server attributes
 
+// Attribute ids for cluster: Test Cluster
+
+// Client attributes
+
+// Server attributes
+#define ZCL_BOOLEAN_ATTRIBUTE_ID (0x0000)
+#define ZCL_BITMAP8_ATTRIBUTE_ID (0x0001)
+#define ZCL_BITMAP16_ATTRIBUTE_ID (0x0002)
+#define ZCL_BITMAP32_ATTRIBUTE_ID (0x0003)
+#define ZCL_BITMAP64_ATTRIBUTE_ID (0x0004)
+#define ZCL_INT8_U_ATTRIBUTE_ID (0x0005)
+#define ZCL_INT16_U_ATTRIBUTE_ID (0x0006)
+#define ZCL_INT32_U_ATTRIBUTE_ID (0x0008)
+#define ZCL_INT64_U_ATTRIBUTE_ID (0x000C)
+#define ZCL_INT8_S_ATTRIBUTE_ID (0x000D)
+#define ZCL_INT16_S_ATTRIBUTE_ID (0x000E)
+#define ZCL_INT32_S_ATTRIBUTE_ID (0x0010)
+#define ZCL_INT64_S_ATTRIBUTE_ID (0x0014)
+#define ZCL_ENUM8_ATTRIBUTE_ID (0x0015)
+#define ZCL_ENUM16_ATTRIBUTE_ID (0x0016)
+#define ZCL_OCTET_STRING_ATTRIBUTE_ID (0x0019)
+#define ZCL_LIST_ATTRIBUTE_ID (0x001A)
+
 // Attribute ids for cluster: Generic Tunnel
 
 // Client attributes

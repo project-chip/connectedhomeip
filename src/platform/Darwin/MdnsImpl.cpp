@@ -364,6 +364,9 @@ CHIP_ERROR Browse(void * context, MdnsBrowseCallback callback, uint32_t interfac
     err   = DNSServiceBrowse(&sdRef, 0 /* flags */, interfaceId, type, kLocalDomain, OnBrowse, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
 
+    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
+
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
@@ -415,6 +418,9 @@ CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t in
     err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, kDNSServiceProtocol_IPv4, hostname, OnGetAddrInfo, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
+    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
+
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
@@ -438,6 +444,9 @@ CHIP_ERROR Resolve(void * context, MdnsResolveCallback callback, uint32_t interf
     sdCtx = chip::Platform::New<ResolveContext>(context, callback, name);
     err   = DNSServiceResolve(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, OnResolve, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err), CHIP_ERROR_INTERNAL);
+
+    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }

@@ -458,7 +458,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].GroupKeyRoot = emberAfGetString(message, 0, messageLen);
+                            data[i].GroupKeyRoot = chip::ByteSpan(message, 16);
                             message += 16;
                             CHECK_MESSAGE_LENGTH(16);
                             data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, messageLen);
@@ -490,9 +490,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].Label = emberAfGetString(message, 0, messageLen);
-                            message += 32;
-                            CHECK_MESSAGE_LENGTH(32);
                             data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
                             message += 8;
                             CHECK_MESSAGE_LENGTH(8);
@@ -501,6 +498,26 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
                             Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x050F:
+                    switch (attributeId)
+                    {
+                    case 0x001A: // INT8U
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt8u(message, 0, messageLen);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                        }
+
+                        Callback::Callback<TestClusterListInt8uListAttributeCallback> * cb =
+                            Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
                     }
@@ -1623,15 +1640,15 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
 {
-    ChipLogProgress(Zcl, "GetFabricIdResponse:");
+    ChipLogProgress(Zcl, "SetFabricResponse:");
     ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterGetFabricIdResponseCallback");
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
 
-    Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, FabricId);
     return true;
 }
@@ -1782,6 +1799,19 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandO
     Callback::Callback<ScenesClusterViewSceneResponseCallback> * cb =
         Callback::Callback<ScenesClusterViewSceneResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * commandObj, uint8_t returnValue)
+{
+    ChipLogProgress(Zcl, "TestSpecificResponse:");
+    ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
+
+    GET_RESPONSE_CALLBACKS("TestClusterClusterTestSpecificResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, returnValue);
     return true;
 }
 

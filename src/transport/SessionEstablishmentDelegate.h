@@ -36,23 +36,6 @@ class DLL_EXPORT SessionEstablishmentDelegate
 public:
     /**
      * @brief
-     *   Called when the session establishment process generates a new message that should be sent to peer.
-     *
-     * @param header the message header for the sent message
-     * @param peerAddress the destination of the message
-     * @param msgBuf the raw data for the message being sent
-     * @return CHIP_ERROR Error thrown when sending the message
-     *
-     * TODO: Rename function as per issue: https://github.com/project-chip/connectedhomeip/issues/4468
-     */
-    virtual CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                                       System::PacketBufferHandle msgBuf)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * @brief
      *   Called when session establishment fails with an error
      *
      * @param error error code

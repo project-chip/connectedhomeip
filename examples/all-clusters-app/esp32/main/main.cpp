@@ -656,6 +656,7 @@ extern "C" void app_main()
             ->Item("QR Code",
                    [=]() {
                        ESP_LOGI(TAG, "Opening QR code screen");
+                       ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
                        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
                    })
             ->Item("Setup",

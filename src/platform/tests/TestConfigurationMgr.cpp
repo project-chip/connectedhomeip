@@ -395,6 +395,52 @@ static void TestConfigurationMgr_ServiceProvisioningData(nlTestSuite * inSuite, 
     NL_TEST_ASSERT(inSuite, memcmp(buf, serviceConfig, serviceConfigLen) == 0);
 }
 
+static void TestConfigurationMgr_RegulatoryLocation(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    uint32_t location = 0;
+
+    err = ConfigurationMgr().StoreRegulatoryLocation(12345);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetRegulatoryLocation(location);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, location == 12345);
+}
+
+static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[8];
+    size_t countryCodeLen    = 0;
+    const char * countryCode = "US";
+
+    err = ConfigurationMgr().StoreCountryCode(countryCode, strlen(countryCode));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetCountryCode(buf, 8, countryCodeLen);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, countryCodeLen == strlen(countryCode));
+    NL_TEST_ASSERT(inSuite, strcmp(buf, countryCode) == 0);
+}
+
+static void TestConfigurationMgr_Breadcrumb(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint64_t breadcrumb = 0;
+
+    err = ConfigurationMgr().StoreBreadcrumb(12345);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetBreadcrumb(breadcrumb);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, breadcrumb == 12345);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -418,6 +464,9 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::ServiceConfig", TestConfigurationMgr_ServiceConfig),
     NL_TEST_DEF("Test ConfigurationMgr::PairedAccountId", TestConfigurationMgr_PairedAccountId),
     NL_TEST_DEF("Test ConfigurationMgr::ServiceProvisioningData", TestConfigurationMgr_ServiceProvisioningData),
+    NL_TEST_DEF("Test ConfigurationMgr::RegulatoryLocation", TestConfigurationMgr_RegulatoryLocation),
+    NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
+    NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
     NL_TEST_SENTINEL()
 };
 

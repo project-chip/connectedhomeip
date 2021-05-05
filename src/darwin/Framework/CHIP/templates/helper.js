@@ -40,41 +40,6 @@ function asExpectedEndpointForCluster(clusterName)
   return 1;
 }
 
-function asExpectedReturnValueForCommand(clusterName, commandName)
-{
-  switch (clusterName) {
-  case 'GeneralCommissioning':
-    switch (commandName) {
-    // All methods are not implemented and returns `EMBER_ZCL_STATUS_FAILURE`
-    default:
-      return 1;
-    }
-    break;
-
-  case 'OperationalCredentials':
-    switch (commandName) {
-    // All methods are not implemented and returns `EMBER_ZCL_STATUS_FAILURE`
-    default:
-      return 1;
-    }
-    break;
-
-  case 'Thermostat':
-    switch (commandName) {
-    // All those methods are not implemented and directly returns false. So the stack returns
-    // `EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND`
-    case 'GetRelayStatusLog':
-    case 'ClearWeeklySchedule':
-    case 'SetWeeklySchedule':
-    case 'GetWeeklySchedule':
-      return 1;
-    }
-    break;
-  }
-
-  return 0;
-}
-
 function asTestValue()
 {
   if (StringHelper.isOctetString(this.type)) {
@@ -89,6 +54,5 @@ function asTestValue()
 //
 // Module exports
 //
-exports.asExpectedEndpointForCluster    = asExpectedEndpointForCluster;
-exports.asExpectedReturnValueForCommand = asExpectedReturnValueForCommand;
-exports.asTestValue                     = asTestValue;
+exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
+exports.asTestValue                  = asTestValue;

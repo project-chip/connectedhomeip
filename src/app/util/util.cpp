@@ -145,6 +145,12 @@ void emberAfPluginDoorLockServerInitCallback(void);
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 void emberAfPluginDescriptorServerInitCallback(void);
 #endif
+#ifdef ZCL_USING_TEST_CLUSTER_SERVER
+void emberAfPluginTestClusterServerInitCallback(void);
+#endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+void emberAfPluginOperationalCredentialsServerInitCallback(void);
+#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -308,6 +314,12 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 #endif
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
     emberAfPluginDescriptorServerInitCallback();
+#endif
+#ifdef ZCL_USING_TEST_CLUSTER_SERVER
+    emberAfPluginTestClusterServerInitCallback();
+#endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+    emberAfPluginOperationalCredentialsServerInitCallback();
 #endif
 
     emAfCallInits();
@@ -851,52 +863,6 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
     return emberAfSendDefaultResponseWithCallback(cmd, status, NULL);
 }
 
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
-{
-    NodeId destination = EMBER_UNKNOWN_NODE_ID;
-    uint8_t max        = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
-
-    if ((apsFrame->options & EMBER_APS_OPTION_SOURCE_EUI64) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EUI64_SIZE);
-    }
-    if ((apsFrame->options & EMBER_APS_OPTION_DESTINATION_EUI64) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EUI64_SIZE);
-    }
-    if ((apsFrame->options & EMBER_APS_OPTION_FRAGMENT) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EMBER_AF_APS_FRAGMENTATION_OVERHEAD);
-    }
-
-    switch (type)
-    {
-    case EMBER_OUTGOING_DIRECT:
-        destination = indexOrDestination;
-        break;
-    case EMBER_OUTGOING_VIA_ADDRESS_TABLE:
-        // destination = emberGetAddressTableRemoteNodeId(indexOrDestination);
-        break;
-    case EMBER_OUTGOING_VIA_BINDING:
-        // destination = emberGetBindingRemoteNodeId(indexOrDestination);
-        break;
-    case EMBER_OUTGOING_MULTICAST:
-        // APS multicast messages include the two-byte group id and exclude the
-        // one-byte destination endpoint, for a net loss of an extra byte.
-        max--;
-        break;
-    case EMBER_OUTGOING_BROADCAST:
-        break;
-    default:
-        // MISRA requires default case.
-        break;
-    }
-
-    max = static_cast<uint8_t>(max - emberAfGetSourceRouteOverheadCallback(destination));
-
-    return max;
-}
-
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
     data[index]     = (uint8_t)(((x)) & 0xFF);
@@ -973,7 +939,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
 // You can pass in val1 as NULL, which will assume that it is
 // pointing to an array of all zeroes. This is used so that
 // default value of NULL is treated as all zeroes.
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber)
+int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber)
 {
     uint8_t i, j, k;
     if (signedNumber)

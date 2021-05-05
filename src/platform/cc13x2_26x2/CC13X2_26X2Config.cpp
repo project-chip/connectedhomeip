@@ -68,6 +68,10 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_OperationalDeviceICAC
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_OperationalDevicePrivateKey = { { kCC13X2_26X2ChipFactory_Sysid,
                                                                                              0x001d } };
 
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_RegulatoryLocation = { { kCC13X2_26X2ChipFactory_Sysid, 0x001e } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = { { kCC13X2_26X2ChipFactory_Sysid, 0x001f } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = { { kCC13X2_26X2ChipFactory_Sysid, 0x0020 } };
+
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
 
