@@ -273,3 +273,12 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
+
+// Up for discussion in Multi-Admin TT: chip-spec:#2891
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Command * commandObj)
+{
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    OpenDefaultPairingWindow(ResetAdmins::kYes);
+    return true;
+}

@@ -111,6 +111,24 @@
 
     removeFabricView.translatesAutoresizingMaskIntoConstraints = false;
     [removeFabricView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
+    
+    // Remove All Fabrics
+
+    UIButton * removeAllFabricsButton = [UIButton new];
+    removeAllFabricsButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    removeAllFabricsButton.titleLabel.textColor = [UIColor blackColor];
+    removeAllFabricsButton.layer.cornerRadius = 5;
+    removeAllFabricsButton.clipsToBounds = YES;
+    removeAllFabricsButton.backgroundColor = UIColor.systemBlueColor;
+    [removeAllFabricsButton setTitle:@"Remove All Fabrics" forState:UIControlStateNormal];
+    [removeAllFabricsButton addTarget:self
+                             action:@selector(removeAllFabricsButtonPressed:)
+                   forControlEvents:UIControlEventTouchUpInside];
+    [_stackView addArrangedSubview:removeAllFabricsButton];
+
+    removeAllFabricsButton.translatesAutoresizingMaskIntoConstraints = false;
+    [removeAllFabricsButton.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
+    [removeAllFabricsButton.leadingAnchor constraintEqualToAnchor:_stackView.leadingAnchor].active = YES;
 
     // Get Fabrics List
 
@@ -222,6 +240,20 @@
 }
 
 // MARK: UIButton methods
+
+- (IBAction)removeAllFabricsButtonPressed:(id)sender
+{
+    NSLog(@"Request to Remove All Fabrics.");
+    [self.cluster removeAllFabrics:^(NSError * error, NSDictionary * values) {
+        BOOL errorOccured = (error != nil);
+        NSString * resultString = errorOccured ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                                 : @"Remove all fabrics success";
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateResult:resultString isError:errorOccured];
+        });
+    }];
+}
+
 
 - (IBAction)updateFabricLabelButtonPressed:(id)sender
 {
