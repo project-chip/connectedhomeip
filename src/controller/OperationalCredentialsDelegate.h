@@ -38,7 +38,7 @@ public:
      *   The API generates the certificate in X.509 DER format.
      *
      *   The delegate is expected to use the certificate authority whose certificate
-     *   is returned in `GetIntermediateCACertificate()` or `GenerateRootCACertificate()`
+     *   is returned in `GetIntermediateCACertificate()` or `GetRootCACertificate()`
      *   API calls.
      *
      * @param[in] nodeId       Node ID of the target device.
