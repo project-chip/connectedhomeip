@@ -313,7 +313,8 @@ exit:
  *   @note
  *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
  *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
- *       the currently-running timer will be extended for a duration of specified period.
+ *       the currently-running timer will be extended for a duration of specified period, otherwise,
+ *       it will just start a new one.
  *
  *   @param[in]  aMilliseconds Extension time in milliseconds.
  *   @param[in]  aComplete     A pointer to the function called when timer expires.
@@ -343,7 +344,13 @@ Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aOnCo
 
     if (lTimer)
     {
-        aMilliseconds += static_cast<uint32_t>(lTimer->mAwakenEpoch - Timer::GetCurrentEpoch());
+        Timer::Epoch currentEpoch = Timer::GetCurrentEpoch();
+
+        // Make sure the currently-running timer is not overdue. The platform timer API has MSEC resolution, we only extend
+        // the timer if it has more than 1 msec to expire.
+        VerifyOrReturnError(!Timer::IsEarlierEpoch(lTimer->mAwakenEpoch, currentEpoch + 1), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
+
+        aMilliseconds += static_cast<uint32_t>(lTimer->mAwakenEpoch - currentEpoch);
     }
 
     return StartTimer(aMilliseconds, aOnComplete, aAppState);

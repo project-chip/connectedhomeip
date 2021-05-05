@@ -249,18 +249,24 @@ static void CheckExtendTimer(nlTestSuite * inSuite, void * aContext)
     sStartTimerHandled = false;
 
     Error err = CHIP_SYSTEM_NO_ERROR;
+    struct timeval sleepTime;
+    sleepTime.tv_sec  = 0;
+    sleepTime.tv_usec = 1000; // 1 ms tick
 
     err = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
     NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
+
+    // Sleep for 20ms before extending the timer
+    for (int i = 0; i < 20; i++)
+    {
+        ServiceEvents(lSys, sleepTime);
+    }
 
     err = lSys.ExtendTimer(timeout_50ms, HandleStartTimer, aContext);
     NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
 
     while (!sStartTimerHandled)
     {
-        struct timeval sleepTime;
-        sleepTime.tv_sec  = 0;
-        sleepTime.tv_usec = 1000; // 1 ms tick
         ServiceEvents(lSys, sleepTime);
     }
 
