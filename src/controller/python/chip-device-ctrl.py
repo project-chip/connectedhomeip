@@ -71,6 +71,7 @@ elif sys.platform.startswith('linux'):
 
 # The exceptions for CHIP Device Controller CLI
 
+
 class ChipDevCtrlException(exceptions.ChipStackException):
     pass
 
@@ -683,6 +684,7 @@ def main():
         print("\nQuitting")
 
     sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
