@@ -1624,6 +1624,14 @@
               "outgoing": 1
             },
             {
+              "name": "RemoveAllFabrics",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
               "name": "UpdateFabricLabel",
               "code": 9,
               "mfgCode": null,
