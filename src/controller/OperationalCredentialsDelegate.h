@@ -59,7 +59,7 @@ public:
     /**
      * @brief
      *   This function returns the intermediate certificate authority (ICA) certificate corresponding to the
-     *   provide fabric ID. Intermediate certificate authority is optional. If the controller
+     *   provided fabric ID. Intermediate certificate authority is optional. If the controller
      *   application does not require ICA, this API call will return `CHIP_ERROR_NOT_IMPLEMENTED`.
      *
      *   The returned certificate is in X.509 DER format.
