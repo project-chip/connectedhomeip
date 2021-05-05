@@ -322,65 +322,6 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
     }
 }
 
-JNI_METHOD(void, sendWiFiCredentials)(JNIEnv * env, jobject self, jlong handle, jstring ssid, jstring password)
-{
-    JniUtfString ssidStr(env, ssid);
-    JniUtfString passwordStr(env, password);
-
-    ChipLogProgress(Controller, "Sending Wi-Fi credentials for: %s", ssidStr.c_str());
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
-    }
-}
-
-JNI_METHOD(void, sendThreadCredentials)
-(JNIEnv * env, jobject self, jlong handle, jint channel, jint panId, jbyteArray xpanId, jbyteArray masterKey)
-{
-    using namespace chip::DeviceLayer::Internal;
-
-    JniByteArray xpanIdBytes(env, xpanId);
-    JniByteArray masterKeyBytes(env, masterKey);
-
-    VerifyOrReturn(CanCastTo<uint8_t>(channel), ChipLogError(Controller, "sendThreadCredentials() called with invalid Channel"));
-    VerifyOrReturn(CanCastTo<uint16_t>(panId), ChipLogError(Controller, "sendThreadCredentials() called with invalid PAN ID"));
-    VerifyOrReturn(xpanIdBytes.size() == static_cast<jsize>(Thread::kSizeExtendedPanId),
-                   ChipLogError(Controller, "sendThreadCredentials() called with invalid XPAN ID"));
-    VerifyOrReturn(masterKeyBytes.size() == static_cast<jsize>(Thread::kSizeMasterKey),
-                   ChipLogError(Controller, "sendThreadCredentials() called with invalid Master Key"));
-
-    Thread::OperationalDataset dataset{};
-
-    dataset.SetChannel(channel);
-    dataset.SetPanId(panId);
-
-    // TODO network name is required, need to add UI
-    {
-        char networkName[Thread::kSizeNetworkName + 1];
-
-        snprintf(networkName, sizeof(networkName), "CHIP-%04X", panId);
-        dataset.SetNetworkName(networkName);
-    }
-
-    {
-        uint8_t value[Thread::kSizeMasterKey];
-
-        memcpy(value, masterKeyBytes.data(), sizeof(value));
-
-        dataset.SetMasterKey(value);
-    }
-    {
-        uint8_t value[Thread::kSizeExtendedPanId];
-
-        memcpy(value, xpanIdBytes.data(), sizeof(value));
-
-        dataset.SetExtendedPanId(value);
-    }
-
-    ScopedPthreadLock lock(&sStackLock);
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(dataset.AsByteSpan());
-}
-
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;

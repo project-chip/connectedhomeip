@@ -57,10 +57,10 @@ protected:
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
-    bool IsTransportReliable() override
+    bool IsReliableTransmissionAllowed() override
     {
-        // If the underlying transport is not UDP.
-        return (mPeerAddress.GetTransportType() != Transport::Type::kUdp);
+        // If the underlying transport is UDP.
+        return (mPeerAddress.GetTransportType() == Transport::Type::kUdp);
     }
 
 private:

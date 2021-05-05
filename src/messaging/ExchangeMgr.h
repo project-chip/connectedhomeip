@@ -251,8 +251,7 @@ private:
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     // TransportMgrDelegate interface for rendezvous sessions
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
 
     CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf) override;
 };

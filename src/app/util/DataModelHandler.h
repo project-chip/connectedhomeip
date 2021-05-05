@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <messaging/ExchangeMgr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -30,7 +31,7 @@
  * data model messages.
  *
  */
-void InitDataModelHandler();
+void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr);
 
 /**
  * Handle a message that should be processed via our data model processing

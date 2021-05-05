@@ -51,6 +51,13 @@ jobs:
             - name: Clean Build
               run: xcodebuild clean
               working-directory: src/darwin/Framework
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+            - name: Run Build Test Server
+              run: |
+                scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug chip_config_network_layer_ble=false
             - name: Run Tests
-              run: xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx
+              run: |
+                ../../../out/debug/chip-all-clusters-app &
+                xcodebuild test -target "CHIP" -scheme "CHIP Framework Tests" -sdk macosx
               working-directory: src/darwin/Framework

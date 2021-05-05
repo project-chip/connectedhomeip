@@ -5,6 +5,7 @@
 
 #include <stdint.h>
 #include <app/util/basic-types.h>
+#include <support/Span.h>
 #include "enums.h"
 
 {{#zcl_structs}}

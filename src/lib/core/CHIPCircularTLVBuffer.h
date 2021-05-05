@@ -60,11 +60,12 @@ public:
     CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength);
     CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead);
 
+    void Init(uint8_t * inBuffer, uint32_t inBufferLength);
     inline uint8_t * QueueHead() const { return mQueueHead; }
     inline uint8_t * QueueTail() const { return mQueue + ((static_cast<size_t>(mQueueHead - mQueue) + mQueueLength) % mQueueSize); }
     inline uint32_t DataLength() const { return mQueueLength; }
     inline uint32_t AvailableDataLength() const { return mQueueSize - mQueueLength; }
-    inline uint32_t GetQueueSize() const { return mQueueSize; }
+    inline uint32_t GetTotalDataLength() const { return mQueueSize; }
     inline uint8_t * GetQueue() const { return mQueue; }
 
     CHIP_ERROR EvictHead();

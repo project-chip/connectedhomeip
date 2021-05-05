@@ -52,7 +52,7 @@
 #define CHIP_MAX_NUM_READ_CLIENT 1
 #define CHIP_MAX_NUM_READ_HANDLER 1
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1
-#define IM_SERVER_MAX_NUM_PATH_GROUPS 256
+#define IM_SERVER_MAX_NUM_PATH_GROUPS 8
 
 namespace chip {
 namespace app {

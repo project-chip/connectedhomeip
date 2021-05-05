@@ -86,9 +86,12 @@ public:
     static constexpr Key kConfigKey_OperationalDeviceCert       = QorvoConfigKey(kFileId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_OperationalDeviceICACerts   = QorvoConfigKey(kFileId_ChipConfig, 0x0B);
     static constexpr Key kConfigKey_OperationalDevicePrivateKey = QorvoConfigKey(kFileId_ChipConfig, 0x0C);
+    static constexpr Key kConfigKey_RegulatoryLocation          = QorvoConfigKey(kFileId_ChipConfig, 0x0D);
+    static constexpr Key kConfigKey_CountryCode                 = QorvoConfigKey(kFileId_ChipConfig, 0x0E);
+    static constexpr Key kConfigKey_Breadcrumb                  = QorvoConfigKey(kFileId_ChipConfig, 0x0F);
 
-    static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0D);
-    static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1C); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x10);
+    static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1F); // Allows 16 Group Keys to be created.
 
     static constexpr Key kConfigKey_CounterKeyBase = QorvoConfigKey(kFileId_ChipCounter, 0x00);
     static constexpr Key kConfigKey_CounterKeyMax =

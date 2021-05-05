@@ -458,7 +458,7 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].GroupKeyRoot = emberAfGetString(message, 0, messageLen);
+                            data[i].GroupKeyRoot = chip::ByteSpan(message, 16);
                             message += 16;
                             CHECK_MESSAGE_LENGTH(16);
                             data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, messageLen);
@@ -490,9 +490,6 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].Label = emberAfGetString(message, 0, messageLen);
-                            message += 32;
-                            CHECK_MESSAGE_LENGTH(32);
                             data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
                             message += 8;
                             CHECK_MESSAGE_LENGTH(8);
@@ -501,6 +498,26 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
                             Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x050F:
+                    switch (attributeId)
+                    {
+                    case 0x001A: // INT8U
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i] = emberAfGetInt8u(message, 0, messageLen);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                        }
+
+                        Callback::Callback<TestClusterListInt8uListAttributeCallback> * cb =
+                            Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
                     }
@@ -866,6 +883,71 @@ bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16
     GET_RESPONSE_CALLBACKS("emberAfDiscoverCommandsGeneratedResponseCallback");
     Callback::Callback<DefaultSuccessCallback> * cb = Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext);
+    return true;
+}
+
+bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::app::Command * commandObj, uint8_t * setupPIN)
+{
+    ChipLogProgress(Zcl, "GetSetupPINResponse:");
+    ChipLogProgress(Zcl, "  setupPIN: %s", setupPIN);
+
+    GET_RESPONSE_CALLBACKS("AccountLoginClusterGetSetupPINResponseCallback");
+
+    Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback> * cb =
+        Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, setupPIN);
+    return true;
+}
+
+bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t * data)
+{
+    ChipLogProgress(Zcl, "LaunchAppResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  data: %s", data);
+
+    GET_RESPONSE_CALLBACKS("ApplicationLauncherClusterLaunchAppResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback> * cb =
+        Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, data);
+    return true;
+}
+
+bool emberAfContentLaunchClusterLaunchContentResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+                                                              uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchContentResponse:");
+    ChipLogProgress(Zcl, "  data: %s", data);
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchContentResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, data, contentLaunchStatus);
+    return true;
+}
+
+bool emberAfContentLaunchClusterLaunchURLResponseCallback(chip::app::Command * commandObj, uint8_t * data,
+                                                          uint8_t contentLaunchStatus)
+{
+    ChipLogProgress(Zcl, "LaunchURLResponse:");
+    ChipLogProgress(Zcl, "  data: %s", data);
+    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+
+    GET_RESPONSE_CALLBACKS("ContentLaunchClusterLaunchURLResponseCallback");
+
+    Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback> * cb =
+        Callback::Callback<ContentLaunchClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, data, contentLaunchStatus);
     return true;
 }
 
@@ -1499,6 +1581,170 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * co
     return true;
 }
 
+bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::app::Command * commandObj, uint8_t status)
+{
+    ChipLogProgress(Zcl, "SendKeyResponse:");
+    LogStatus(status);
+
+    GET_RESPONSE_CALLBACKS("KeypadInputClusterSendKeyResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<KeypadInputClusterSendKeyResponseCallback> * cb =
+        Callback::Callback<KeypadInputClusterSendKeyResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaFastForwardResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaFastForwardResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaNextResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaNextResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaNextResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaPauseResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPauseResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaPlayResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPlayResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaPreviousResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPreviousResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaRewindResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaRewindResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaSkipBackwardResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipBackwardResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaSkipForwardResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipForwardResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaSkipSeekResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaSkipSeekResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipSeekResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaSkipSeekResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaStartOverResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaStartOverResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
+bool emberAfMediaPlaybackClusterMediaStopResponseCallback(chip::app::Command * commandObj, uint8_t mediaPlaybackStatus)
+{
+    ChipLogProgress(Zcl, "MediaStopResponse:");
+    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+
+    GET_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaStopResponseCallback");
+
+    Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    return true;
+}
+
 bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::app::Command * commandObj, uint8_t errorCode,
                                                                         uint8_t * debugText)
 {
@@ -1623,15 +1869,15 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
+bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
 {
-    ChipLogProgress(Zcl, "GetFabricIdResponse:");
+    ChipLogProgress(Zcl, "SetFabricResponse:");
     ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterGetFabricIdResponseCallback");
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
 
-    Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, FabricId);
     return true;
 }
@@ -1782,6 +2028,57 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandO
     Callback::Callback<ScenesClusterViewSceneResponseCallback> * cb =
         Callback::Callback<ScenesClusterViewSceneResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
+    return true;
+}
+
+bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::app::Command * commandObj,
+                                                          /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
+                                                          uint8_t ErrorType)
+{
+    ChipLogProgress(Zcl, "ChangeChannelResponse:");
+    ChipLogProgress(Zcl, "  ChannelMatch: %p", ChannelMatch);
+    ChipLogProgress(Zcl, "  ErrorType: %" PRIu8 "", ErrorType);
+
+    GET_RESPONSE_CALLBACKS("TvChannelClusterChangeChannelResponseCallback");
+
+    Callback::Callback<TvChannelClusterChangeChannelResponseCallback> * cb =
+        Callback::Callback<TvChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, ChannelMatch, ErrorType);
+    return true;
+}
+
+bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::app::Command * commandObj, uint8_t status, uint8_t * data)
+{
+    ChipLogProgress(Zcl, "NavigateTargetResponse:");
+    LogStatus(status);
+    ChipLogProgress(Zcl, "  data: %s", data);
+
+    GET_RESPONSE_CALLBACKS("TargetNavigatorClusterNavigateTargetResponseCallback");
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, status);
+        return true;
+    }
+
+    Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback> * cb =
+        Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, data);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * commandObj, uint8_t returnValue)
+{
+    ChipLogProgress(Zcl, "TestSpecificResponse:");
+    ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
+
+    GET_RESPONSE_CALLBACKS("TestClusterClusterTestSpecificResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, returnValue);
     return true;
 }
 

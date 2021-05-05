@@ -40,7 +40,7 @@
 #endif
 
 #include <app/InteractionModelEngine.h>
-#include <app/server/DataModelHandler.h>
+#include <app/util/DataModelHandler.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -75,6 +75,10 @@ using namespace chip::Encoding;
 constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
+
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+constexpr uint16_t kMdnsPort = 5353;
+#endif
 
 constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
@@ -188,7 +192,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    InitDataModelHandler();
+    InitDataModelHandler(mExchangeMgr);
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -349,6 +353,8 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    ReturnErrorOnFailure(Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort));
+
     return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
 #else
@@ -622,7 +628,6 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 DeviceCommissioner::DeviceCommissioner()
 {
     mPairingDelegate      = nullptr;
-    mRendezvousSession    = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
     mPairedDevicesUpdated = false;
 }
@@ -661,7 +666,9 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     Device * device                    = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    Transport::AdminPairingInfo * admin = mAdmins.FindAdmin(mAdminId);
+    Messaging::ExchangeContext * exchangeCtxt = nullptr;
+
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
 
     VerifyOrExit(remoteDeviceId != kAnyNodeId && remoteDeviceId != kUndefinedNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
@@ -696,13 +703,11 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
-    mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
-    VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    mRendezvousSession->SetNextKeyId(mNextKeyId);
-    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mExchangeMgr,
-                                   mTransportMgr, mSessionMgr, admin);
+    mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
+
+    err = mPairingSession.MessageDispatch().Init(mTransportMgr);
     SuccessOrExit(err);
+    mPairingSession.MessageDispatch().SetPeerAddress(params.GetPeerAddress());
 
     device->Init(GetControllerDeviceInitParams(), mListenPort, remoteDeviceId, peerAddress, admin->GetAdminId());
 
@@ -728,7 +733,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
         }
     }
 #endif
-    mRendezvousSession->OnRendezvousConnectionOpened();
+    exchangeCtxt = mExchangeMgr->NewContext(SecureSessionHandle(), &mPairingSession);
+    VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    err = mPairingSession.Pair(params.GetPeerAddress(), params.GetSetupPINCode(), mNextKeyId++, exchangeCtxt, this);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -776,7 +784,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     device->Serialize(serialized);
 
-    OnRendezvousComplete();
+    OnSessionEstablished();
 
 exit:
     if (testSecurePairingSecret != nullptr)
@@ -840,16 +848,14 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
 void DeviceCommissioner::FreeRendezvousSession()
 {
-    if (mRendezvousSession != nullptr)
-    {
-        mNextKeyId = mRendezvousSession->GetNextKeyId();
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    PersistNextKeyId();
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
+    mRendezvousAdvDelegate.StopAdvertisement();
+    mRendezvousAdvDelegate.RendezvousComplete();
+
     FreeRendezvousSession();
 
     // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.
@@ -871,54 +877,52 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
     }
 }
 
-void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
+void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 {
+    mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingFailed);
+    }
+
     RendezvousCleanup(err);
 }
 
-void DeviceCommissioner::OnRendezvousComplete()
+void DeviceCommissioner::OnSessionEstablished()
 {
-    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices, OnRendezvousError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
+    VerifyOrReturn(mDeviceBeingPaired < kNumMaxActiveDevices, OnSessionEstablishmentError(CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR));
 
     Device * device = &mActiveDevices[mDeviceBeingPaired];
+
+    mPairingSession.PeerConnection().SetPeerNodeId(device->GetDeviceId());
+
+    CHIP_ERROR err =
+        mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
+                                mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
+                                SecureSessionMgr::PairingDirection::kInitiator, mAdminId, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        OnSessionEstablishmentError(err);
+        return;
+    }
+
+    ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
+    mPairingSession.ToSerializable(device->GetPairing());
+    mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
+
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
     PersistDevice(device);
 
-    RendezvousCleanup(CHIP_NO_ERROR);
-}
-
-void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
-{
-    Device * device = nullptr;
-    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
-    {
-        ExitNow();
-    }
-
-    device = &mActiveDevices[mDeviceBeingPaired];
-    switch (status)
-    {
-    case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-        break;
-
-    case RendezvousSessionDelegate::SecurePairingFailed:
-        ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
-        mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
-        break;
-
-    default:
-        break;
-    };
-exit:
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnStatusUpdate(status);
+        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
     }
+
+    RendezvousCleanup(CHIP_NO_ERROR);
 }
 
 void DeviceCommissioner::PersistDeviceList()
@@ -940,7 +944,13 @@ void DeviceCommissioner::PersistDeviceList()
             }
             chip::Platform::MemoryFree(serialized);
         }
+    }
+}
 
+void DeviceCommissioner::PersistNextKeyId()
+{
+    if (mStorageDelegate != nullptr)
+    {
         mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &mNextKeyId, sizeof(mNextKeyId));
     }
 }

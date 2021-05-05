@@ -108,36 +108,17 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     return mCommissioner.UnpairDevice(remoteId);
 }
 
-void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
+void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     switch (status)
     {
-    case RendezvousSessionDelegate::Status::SecurePairingSuccess:
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
         ChipLogProgress(chipTool, "Secure Pairing Success");
         break;
-    case RendezvousSessionDelegate::Status::SecurePairingFailed:
+    case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         break;
-    case RendezvousSessionDelegate::Status::NetworkProvisioningSuccess:
-        ChipLogProgress(chipTool, "Network Provisioning Success");
-        break;
-    case RendezvousSessionDelegate::Status::NetworkProvisioningFailed:
-        ChipLogError(chipTool, "Network Provisioning Failed");
-        break;
     }
-}
-
-void PairingCommand::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
-{
-    ChipLogProgress(chipTool, "OnNetworkCredentialsRequested");
-    callback->SendNetworkCredentials(mSSID, mPassword);
-}
-
-void PairingCommand::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                       RendezvousDeviceCredentialsDelegate * callback)
-{
-    // TODO Implement this
-    ChipLogProgress(chipTool, "OnOperationalCredentialsRequested");
 }
 
 void PairingCommand::OnPairingComplete(CHIP_ERROR err)

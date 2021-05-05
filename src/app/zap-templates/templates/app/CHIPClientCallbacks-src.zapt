@@ -348,12 +348,20 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             {
                                 {{#if isStruct}}
                                 {{#chip_attribute_list_entryTypes}}
+                                {{#if (isOctetString type)}}
+                                data[i].{{name}} = chip::ByteSpan(message, {{size}});
+                                {{else}}
                                 data[i].{{name}} = emberAfGet{{asReadType type}}(message, 0, messageLen);
+                                {{/if}}
                                 message += {{size}};
                                 CHECK_MESSAGE_LENGTH({{size}});
                                 {{/chip_attribute_list_entryTypes}}
                                 {{else}}
+                                {{#if (isOctetString type)}}
+                                data[i] = chip::ByteSpan(message, {{size}});
+                                {{else}}
                                 data[i] = emberAfGet{{asReadType type}}(message, 0, messageLen);
+                                {{/if}}
                                 message += {{size}};
                                 CHECK_MESSAGE_LENGTH({{size}});
                                 {{/if}}

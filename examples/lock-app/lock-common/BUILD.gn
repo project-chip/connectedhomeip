@@ -20,4 +20,5 @@ chip_data_model("lock-common") {
   zap_file = "lock-app.zap"
 
   zap_pregenerated_dir = "gen"
+  is_server = true
 }

@@ -224,6 +224,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
+    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(),
+                    payloadHeader.GetProtocolID());
+
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
     {
@@ -369,10 +372,13 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     }
 }
 
-void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
 {
-    auto peer = header.GetSourceNodeId();
+    PacketHeader header;
+
+    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
+
+    Optional<NodeId> peer = header.GetSourceNodeId();
     if (!peer.HasValue())
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
