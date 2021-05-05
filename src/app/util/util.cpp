@@ -148,6 +148,9 @@ void emberAfPluginDescriptorServerInitCallback(void);
 #ifdef ZCL_USING_TEST_CLUSTER_SERVER
 void emberAfPluginTestClusterServerInitCallback(void);
 #endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+void emberAfPluginOperationalCredentialsServerInitCallback(void);
+#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -314,6 +317,9 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 #endif
 #ifdef ZCL_USING_TEST_CLUSTER_SERVER
     emberAfPluginTestClusterServerInitCallback();
+#endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+    emberAfPluginOperationalCredentialsServerInitCallback();
 #endif
 
     emAfCallInits();

@@ -90,15 +90,27 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
+        ChipLogProgress(AppServer, "Retrieved value from server storage.");
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
+        ChipLogProgress(AppServer, "Stored value in server storage");
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        ChipLogProgress(AppServer, "Delete value in server storage");
+        return PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
+
+    void AsyncDeleteKeyValue(const char * key) override
+    {
+        ChipLogProgress(AppServer, "Delete value in server storage.");
+        PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -108,7 +120,7 @@ CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvaila
     ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
 
-    ReturnErrorOnFailure(admin->StoreIntoKVS(gServerStorage));
+    ReturnErrorOnFailure(GetGlobalAdminPairingTable().Store(admin->GetAdminId()));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
 
     ChipLogProgress(AppServer, "Persisting admin ID successfully");
@@ -127,18 +139,18 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
     //       Also, the current approach can make ID lookup slower as more IDs are allocated and freed.
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
-        AdminPairingInfo * admin = adminPairings.AssignAdminId(id);
         // Recreate the binding if one exists in persistent storage. Else skip to the next ID
-        if (admin->FetchFromKVS(gServerStorage) != CHIP_NO_ERROR)
+        if (adminPairings.LoadFromStorage(id) == CHIP_NO_ERROR)
         {
-            adminPairings.ReleaseAdminId(id);
-        }
-        else
-        {
-            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
-                            static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+            AdminPairingInfo * admin = adminPairings.FindAdminWithId(id);
+            if (admin != nullptr)
+            {
+                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
+                                static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+            }
         }
     }
+    ChipLogProgress(AppServer, "Restored all admin pairings from KVS.");
 
     return CHIP_NO_ERROR;
 }
@@ -149,7 +161,7 @@ void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
 
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
-        AdminPairingInfo::DeleteFromKVS(gServerStorage, id);
+        GetGlobalAdminPairingTable().Delete(id);
     }
 }
 
@@ -268,7 +280,7 @@ public:
             mDelegate->OnPairingWindowClosed();
         }
 
-        AdminPairingInfo * admin = gAdminPairings.FindAdmin(mAdmin);
+        AdminPairingInfo * admin = gAdminPairings.FindAdminWithId(mAdmin);
         if (admin != nullptr)
         {
             ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
@@ -492,6 +504,9 @@ void InitServer(AppDelegate * delegate)
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
+
+    err = gAdminPairings.Init(&gServerStorage);
+    SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
     err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6)

@@ -132,6 +132,14 @@ public:
      *
      * @param[in] key Key to be deleted
      */
+    virtual CHIP_ERROR SyncDeleteKeyValue(const char * key) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief
+     *   Deletes the value for the key
+     *
+     * @param[in] key Key to be deleted
+     */
     virtual void AsyncDeleteKeyValue(const char * key) = 0;
 };
 
