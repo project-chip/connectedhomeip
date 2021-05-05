@@ -78,8 +78,8 @@ class OperationalAdvertisingParameters : public BaseAdvertisingParams<Operationa
 public:
     // Amount of mDNS text entries required for this advertising type
     static constexpr uint8_t kNumAdvertisingTxtEntries = 2;
-    static constexpr uint8_t kTxtMaxKeySize = 3 + 1; // "CRI"/"CRA" as possible keys
-    static constexpr uint8_t kTxtMaxValueSize = 7 + 1; // Max for text representation of the 32-bit CRMP intervals
+    static constexpr uint8_t kTxtMaxKeySize            = 3 + 1; // "CRI"/"CRA" as possible keys
+    static constexpr uint8_t kTxtMaxValueSize          = 7 + 1; // Max for text representation of the 32-bit CRMP intervals
 
     OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
@@ -110,9 +110,9 @@ class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionA
 {
 public:
     // Amount of mDNS text entries required for this advertising type
-    static constexpr uint8_t kNumAdvertisingTxtEntries = 8; // Min 1 - Max 8
-    static constexpr uint8_t kTxtMaxKeySize = 2 + 1; // "D"/"VP"/"CM"/"DT"/"DN"/"RI"/"PI"/"PH" as possible keys
-    static constexpr uint8_t kTxtMaxValueSize = 128; // Max from PI - Pairing Instruction
+    static constexpr uint8_t kNumAdvertisingTxtEntries = 8;     // Min 1 - Max 8
+    static constexpr uint8_t kTxtMaxKeySize            = 2 + 1; // "D"/"VP"/"CM"/"DT"/"DN"/"RI"/"PI"/"PH" as possible keys
+    static constexpr uint8_t kTxtMaxValueSize          = 128;   // Max from PI - Pairing Instruction
 
     CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {

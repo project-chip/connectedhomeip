@@ -32,8 +32,8 @@
 #include <openthread/srp_client.h>
 #endif
 
-#include <lib/mdns/platform/Mdns.h>
 #include <lib/mdns/Advertiser.h>
+#include <lib/mdns/platform/Mdns.h>
 
 namespace chip {
 namespace DeviceLayer {
