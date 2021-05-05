@@ -404,10 +404,9 @@ private:
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId);
-    CHIP_ERROR OnOperationalCertificateSigningRequest(NodeId node, const uint8_t * opCertBuf, uint32_t opCertLength);
-    CHIP_ERROR SendOperationalCertificate(NodeId remoteDeviceId, const uint8_t * opCertBuf, uint32_t opCertLength,
-                                          const uint8_t * icaCertBuf, uint32_t icaCertLength);
-    CHIP_ERROR SendTrustedRootCertificate(NodeId remoteDeviceId, const uint8_t * certBuf, uint32_t certLength);
+    CHIP_ERROR OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr);
+    CHIP_ERROR SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf);
 
     uint16_t mNextKeyId = 0;
 

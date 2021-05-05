@@ -958,13 +958,13 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(N
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId node, const uint8_t * csrBuf, uint32_t csrLength)
+CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr)
 {
     ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint8_t opCert[kMaxCHIPOpCertLength];
     uint32_t opCertLen = 0;
-    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(node, 0, csrBuf, csrLength, 0, opCert,
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(node, 0, csr, 0, opCert,
                                                                                              kMaxCHIPOpCertLength, opCertLen));
 
     uint8_t signingCert[kMaxCHIPOpCertLength];
@@ -978,22 +978,22 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId nod
     }
     ReturnErrorOnFailure(err);
 
-    ReturnErrorOnFailure(SendOperationalCertificate(node, opCert, opCertLen, signingCert, signingCertLen));
+    ReturnErrorOnFailure(SendOperationalCertificate(node, ByteSpan(opCert, opCertLen), ByteSpan(signingCert, signingCertLen)));
 
     ReturnErrorOnFailure(
         mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert, kMaxCHIPOpCertLength, signingCertLen));
 
-    return SendTrustedRootCertificate(node, signingCert, signingCertLen);
+    return SendTrustedRootCertificate(node, ByteSpan(signingCert, signingCertLen));
 }
 
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const uint8_t * opCertBuf, uint32_t opCertLength,
-                                                          const uint8_t * icaCertBuf, uint32_t icaCertLength)
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf,
+                                                          const ByteSpan & icaCertBuf)
 {
     // TODO: Call OperationalCredentials cluster API to add operational credentials on the device
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(NodeId remoteDeviceId, const uint8_t * certBuf, uint32_t certLength)
+CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf)
 {
     // TODO: Call TrustedRootCertificate cluster API to add root certificate on the device
     return CHIP_NO_ERROR;

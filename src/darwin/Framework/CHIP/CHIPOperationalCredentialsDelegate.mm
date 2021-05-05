@@ -27,19 +27,47 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/TimeUtils.h>
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::init()
+CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegateBridge * storage)
 {
+    if (storage == nil) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    mStorage = storage;
+
     CHIP_ERROR err = LoadKeysFromKeyChain();
-    if (err != CHIP_NO_ERROR) {
+    if (err == CHIP_NO_ERROR) {
         err = GenerateKeys();
     }
 
-    if (err != CHIP_NO_ERROR) {
-        err = chip::Crypto::DRBG_get_bytes((uint8_t *) &mIssuerId, sizeof(mIssuerId));
+    if (err == CHIP_NO_ERROR) {
+        err = SetIssuerID(storage);
     }
 
     CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init returning %d", err);
     return err;
+}
+
+CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorageDelegateBridge * storage)
+{
+    static const char * const CHIP_COMMISSIONER_CA_ISSUER_ID = "com.zigbee.chip.commissioner.ca.issuer.id";
+    if (storage == nil) {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    uint16_t idStringLen = 16;
+    char issuerIdString[idStringLen];
+    if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
+        mIssuerId = arc4random();
+        CHIP_LOG_ERROR("Assigned %d certificate issuer ID to the commissioner", mIssuerId);
+        storage->AsyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, [[NSString stringWithFormat:@"%x", mIssuerId] UTF8String]);
+    } else {
+        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:issuerIdString]];
+        [scanner scanHexInt:&mIssuerId];
+        CHIP_LOG_ERROR("Found %d certificate issuer ID for the commissioner", mIssuerId);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::ConvertToP256Keypair(SecKeyRef keypair)
@@ -146,7 +174,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(chip::NodeId nodeId, chip::FabricId fabricId,
-    const uint8_t * csr, size_t csrLength, int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
+    const chip::ByteSpan & csr, int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
 {
     uint32_t validityStart, validityEnd;
 
@@ -164,7 +192,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
         = { serialNumber, mIssuerId, validityStart, validityEnd, true, fabricId, true, nodeId };
 
     chip::Crypto::P256PublicKey pubkey;
-    CHIP_ERROR err = chip::Crypto::VerifyCertificateSigningRequest(csr, csrLength, pubkey);
+    CHIP_ERROR err = chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey);
     if (err != CHIP_NO_ERROR) {
         return err;
     }

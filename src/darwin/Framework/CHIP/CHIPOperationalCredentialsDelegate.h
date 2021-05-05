@@ -19,6 +19,7 @@
 #import <Security/Security.h>
 
 #import "CHIPError.h"
+#import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
 
@@ -30,10 +31,10 @@ public:
 
     ~CHIPOperationalCredentialsDelegate() {}
 
-    CHIP_ERROR init();
+    CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage);
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(chip::NodeId nodeId, chip::FabricId fabricId, const uint8_t * csr,
-        size_t csrLength, int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(chip::NodeId nodeId, chip::FabricId fabricId, const chip::ByteSpan & csr,
+        int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
 
     CHIP_ERROR GetRootCACertificate(
         chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
@@ -45,6 +46,8 @@ private:
 
     CHIP_ERROR ConvertToP256Keypair(SecKeyRef privateKey);
 
+    CHIP_ERROR SetIssuerID(CHIPPersistentStorageDelegateBridge * storage);
+
     bool ToChipEpochTime(uint32_t offset, uint32_t & epoch);
 
     chip::Crypto::P256Keypair mIssuerKey;
@@ -55,6 +58,8 @@ private:
 
     id mKeyType = (id) kSecAttrKeyTypeECSECPrimeRandom;
     id mKeySize = @256;
+
+    CHIPPersistentStorageDelegateBridge * mStorage;
 };
 
 NS_ASSUME_NONNULL_END

@@ -21,6 +21,7 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -44,7 +45,6 @@ public:
      * @param[in] nodeId       Node ID of the target device.
      * @param[in] fabricId     Fabric ID for which the credentials are being generated.
      * @param[in] csr          Certificate Signing Request from the node in DER format.
-     * @param[in] csrLength    The length of Certificate Signing Request.
      * @param[in] serialNumber Serial number to assign to the new certificate.
      * @param[in] certBuf      The API will fill in the generated cert in this buffer. The buffer is allocated by the caller.
      * @param[in] certBufSize  The size of certBuf buffer.
@@ -52,7 +52,7 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNodeOperationalCertificate(NodeId nodeId, FabricId fabricId, const uint8_t * csr, size_t csrLength,
+    virtual CHIP_ERROR GenerateNodeOperationalCertificate(NodeId nodeId, FabricId fabricId, const ByteSpan & csr,
                                                           int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize,
                                                           uint32_t & outCertLen) = 0;
 

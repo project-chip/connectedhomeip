@@ -143,7 +143,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
 
-        errorCode = _operationalCredentialsDelegate->init();
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
             return;
         }
