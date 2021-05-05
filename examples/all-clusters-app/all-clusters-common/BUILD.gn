@@ -21,4 +21,6 @@ chip_data_model("all-clusters-common") {
 
   zap_pregenerated_dir = "gen"
   is_server = true
+
+  defines = [ "OTA_SERVER_CLUSTER_EXAMPLE_IMPL=1" ]
 }
