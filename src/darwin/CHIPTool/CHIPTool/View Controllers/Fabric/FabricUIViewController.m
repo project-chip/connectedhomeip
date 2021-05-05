@@ -111,7 +111,7 @@
 
     removeFabricView.translatesAutoresizingMaskIntoConstraints = false;
     [removeFabricView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
-    
+
     // Remove All Fabrics
 
     UIButton * removeAllFabricsButton = [UIButton new];
