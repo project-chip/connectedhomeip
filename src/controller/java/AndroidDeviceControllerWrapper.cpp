@@ -68,21 +68,6 @@ void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint arg
     env->CallVoidMethod(object, method, argument);
 }
 
-CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    outArray = env->NewByteArray((int) inArrayLen);
-    VerifyOrExit(outArray != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    env->ExceptionClear();
-    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-
-exit:
-    return err;
-}
-
 } // namespace
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()

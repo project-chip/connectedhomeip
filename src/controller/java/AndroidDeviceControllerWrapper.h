@@ -75,8 +75,6 @@ private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
-    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
-    chip::PersistentStorageResultDelegate * mStorageResultDelegate = nullptr;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
