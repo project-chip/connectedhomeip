@@ -920,15 +920,13 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
 
-    if (mOperationalCredentialsDelegate != nullptr)
+    // TODO: Add code to wait for OpCSR from the device, and process the signing request
+    err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
+    if (err != CHIP_NO_ERROR)
     {
-        err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
-            OnSessionEstablishmentError(err);
-            return;
-        }
+        ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+        OnSessionEstablishmentError(err);
+        return;
     }
 
     mPairingSession.ToSerializable(device->GetPairing());
@@ -962,28 +960,34 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId nod
 {
     ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    uint8_t opCert[kMaxCHIPOpCertLength];
+    auto opCertBuf     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(kMaxCHIPOpCertLength));
+    auto opCert        = std::unique_ptr<uint8_t>(opCertBuf);
     uint32_t opCertLen = 0;
-    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(node, 0, csr, 0, opCert,
-                                                                                             kMaxCHIPOpCertLength, opCertLen));
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
+        PeerId().SetNodeId(node), csr, 0, opCert.get(), kMaxCHIPOpCertLength, opCertLen));
 
-    uint8_t signingCert[kMaxCHIPOpCertLength];
+    auto signingCertBuf     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(kMaxCHIPOpCertLength));
+    auto signingCert        = std::unique_ptr<uint8_t>(signingCertBuf);
     uint32_t signingCertLen = 0;
     CHIP_ERROR err =
-        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert, kMaxCHIPOpCertLength, signingCertLen);
-    if (err == CHIP_ERROR_NOT_IMPLEMENTED)
+        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert.get(), kMaxCHIPOpCertLength, signingCertLen);
+    if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
+        // This implies that the commissioner application uses root CA to sign the operational
+        // certificates, and an intermediate CA is not needed. It's not an error condition, so
+        // let's just send operational certificate and root CA certificate to the device.
         err            = CHIP_NO_ERROR;
         signingCertLen = 0;
     }
     ReturnErrorOnFailure(err);
 
-    ReturnErrorOnFailure(SendOperationalCertificate(node, ByteSpan(opCert, opCertLen), ByteSpan(signingCert, signingCertLen)));
+    ReturnErrorOnFailure(
+        SendOperationalCertificate(node, ByteSpan(opCert.get(), opCertLen), ByteSpan(signingCert.get(), signingCertLen)));
 
     ReturnErrorOnFailure(
-        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert, kMaxCHIPOpCertLength, signingCertLen));
+        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.get(), kMaxCHIPOpCertLength, signingCertLen));
 
-    return SendTrustedRootCertificate(node, ByteSpan(signingCert, signingCertLen));
+    return SendTrustedRootCertificate(node, ByteSpan(signingCert.get(), signingCertLen));
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf,

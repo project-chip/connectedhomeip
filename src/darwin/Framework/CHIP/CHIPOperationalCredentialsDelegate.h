@@ -33,8 +33,8 @@ public:
 
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage);
 
-    CHIP_ERROR GenerateNodeOperationalCertificate(chip::NodeId nodeId, chip::FabricId fabricId, const chip::ByteSpan & csr,
-        int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
+    CHIP_ERROR GenerateNodeOperationalCertificate(const chip::PeerId & peerId, const chip::ByteSpan & csr, int64_t serialNumber,
+        uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
 
     CHIP_ERROR GetRootCACertificate(
         chip::FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;

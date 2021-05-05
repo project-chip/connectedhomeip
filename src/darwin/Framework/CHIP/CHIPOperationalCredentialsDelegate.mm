@@ -173,7 +173,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(chip::NodeId nodeId, chip::FabricId fabricId,
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificate(const chip::PeerId & peerId,
     const chip::ByteSpan & csr, int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen)
 {
     uint32_t validityStart, validityEnd;
@@ -189,7 +189,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
     }
 
     chip::Credentials::X509CertRequestParams request
-        = { serialNumber, mIssuerId, validityStart, validityEnd, true, fabricId, true, nodeId };
+        = { serialNumber, mIssuerId, validityStart, validityEnd, true, peerId.GetFabricId(), true, peerId.GetNodeId() };
 
     chip::Crypto::P256PublicKey pubkey;
     CHIP_ERROR err = chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey);

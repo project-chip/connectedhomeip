@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <core/PeerId.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/DLLUtil.h>
 #include <support/Span.h>
@@ -42,8 +43,7 @@ public:
      *   is returned in `GetIntermediateCACertificate()` or `GetRootCACertificate()`
      *   API calls.
      *
-     * @param[in] nodeId       Node ID of the target device.
-     * @param[in] fabricId     Fabric ID for which the credentials are being generated.
+     * @param[in] peerId       Node ID and Fabric ID of the target device.
      * @param[in] csr          Certificate Signing Request from the node in DER format.
      * @param[in] serialNumber Serial number to assign to the new certificate.
      * @param[in] certBuf      The API will fill in the generated cert in this buffer. The buffer is allocated by the caller.
@@ -52,15 +52,14 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
      */
-    virtual CHIP_ERROR GenerateNodeOperationalCertificate(NodeId nodeId, FabricId fabricId, const ByteSpan & csr,
-                                                          int64_t serialNumber, uint8_t * certBuf, uint32_t certBufSize,
-                                                          uint32_t & outCertLen) = 0;
+    virtual CHIP_ERROR GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr, int64_t serialNumber,
+                                                          uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) = 0;
 
     /**
      * @brief
      *   This function returns the intermediate certificate authority (ICA) certificate corresponding to the
      *   provided fabric ID. Intermediate certificate authority is optional. If the controller
-     *   application does not require ICA, this API call will return `CHIP_ERROR_NOT_IMPLEMENTED`.
+     *   application does not require ICA, this API call will return `CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED`.
      *
      *   The returned certificate is in X.509 DER format.
      *
@@ -70,12 +69,15 @@ public:
      * @param[out] outCertLen The size of the actual certificate that was written in the certBuf.
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     *         CHIP_ERROR_NOT_IMPLEMENTED is not a critical error. It indicates that ICA is not needed.
+     *         CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED is not a critical error. It indicates that ICA is not needed.
      */
     virtual CHIP_ERROR GetIntermediateCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize,
                                                     uint32_t & outCertLen)
     {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        // By default, let's return CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED status. It'll allow
+        // commissioner applications to not implement GetIntermediateCACertificate() if they don't require an
+        // intermediate CA.
+        return CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED;
     }
 
     /**
