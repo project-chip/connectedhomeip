@@ -160,7 +160,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     ReturnErrorOnFailure(SetupHostname(params.GetMac()));
 
-    snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
+    snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
+             static_cast<uint32_t>(mCommissionInstanceName));
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
     {
         strncpy(service.mType, "_chipc", sizeof(service.mType));
@@ -374,7 +375,8 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-    ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeData.mPeerId.GetNodeId());
+    ChipLogProgress(Discovery, "Node ID resolved for 0x08%" PRIX32 "08%" PRIX32,
+                    static_cast<uint32_t>(nodeData.mPeerId.GetNodeId() >> 32), static_cast<uint32_t>(nodeData.mPeerId.GetNodeId()));
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

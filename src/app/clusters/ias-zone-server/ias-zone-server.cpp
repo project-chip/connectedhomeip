@@ -211,7 +211,7 @@ static void enrollWithClient(EndpointId endpoint)
 }
 
 EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint8_t size,
+                                                                     EmberAfAttributeType attributeType, uint16_t size,
                                                                      uint8_t * value)
 {
     uint8_t i;

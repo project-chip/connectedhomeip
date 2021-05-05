@@ -181,6 +181,8 @@ function asChipUnderlyingType(label, type)
     return 'chip::GroupId';
   } else if (zclHelper.isStrEqual(label, "commandId")) {
     return 'chip::CommandId';
+  } else if (type == 'OCTET_STRING') {
+    return 'chip::ByteSpan';
   } else {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options);

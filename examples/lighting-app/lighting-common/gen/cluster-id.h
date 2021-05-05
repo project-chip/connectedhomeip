@@ -293,6 +293,9 @@
 // Definitions for cluster: Account Login
 #define ZCL_ACCOUNT_LOGIN_CLUSTER_ID (0x050E)
 
+// Definitions for cluster: Test Cluster
+#define ZCL_TEST_CLUSTER_ID (0x050F)
+
 // Definitions for cluster: Generic Tunnel
 #define ZCL_GENERIC_TUNNEL_CLUSTER_ID (0x0600)
 

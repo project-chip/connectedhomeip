@@ -63,7 +63,7 @@ protected:
     virtual CHIP_ERROR SendMessageImpl(SecureSessionHandle session, PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle && message, EncryptedPacketBufferHandle * retainedMessage) = 0;
 
-    virtual bool IsTransportReliable() { return false; }
+    virtual bool IsReliableTransmissionAllowed() { return true; }
 
 private:
     ReliableMessageMgr * mReliableMessageMgr = nullptr;
