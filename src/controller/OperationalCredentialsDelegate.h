@@ -81,7 +81,7 @@ public:
     /**
      * @brief
      *   This function returns the root certificate authority (root CA) certificate corresponding to the
-     *   provide fabric ID.
+     *   provided fabric ID.
      *
      *   The returned certificate is in X.509 DER format.
      *
