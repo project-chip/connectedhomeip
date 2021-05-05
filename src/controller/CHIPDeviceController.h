@@ -384,7 +384,7 @@ public:
 
     /**
      * @brief
-     *   Discovery all devices advertising as commissionable.
+     *   Discover all devices advertising as commissionable.
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR DiscoverAllCommissioning();
