@@ -2217,6 +2217,73 @@
                                                                                                                                    \
                                                                             ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
 
+/** @brief Command description for OpCSRRequest
+ *
+ * Command: OpCSRRequest
+ * @param CSRNonce OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterOpCSRRequest(CSRNonce) emberAfFillExternalBuffer(mask,                                                       \
+                                                                                                                                   \
+                                                                       ZCL_OP_CSR_REQUEST_COMMAND_ID, "u", CSRNonce);
+
+/** @brief Command description for OpCSRResponse
+ *
+ * Command: OpCSRResponse
+ * @param CSR OCTET_STRING
+ * @param CSRNonce OCTET_STRING
+ * @param VendorReserved1 OCTET_STRING
+ * @param VendorReserved2 OCTET_STRING
+ * @param VendorReserved3 OCTET_STRING
+ * @param Signature OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
+                                  VendorReserved3, Signature);
+
+/** @brief Command description for AddOpCert
+ *
+ * Command: AddOpCert
+ * @param NOC OCTET_STRING
+ * @param ICACertificate OCTET_STRING
+ * @param IPKValue OCTET_STRING
+ * @param CaseAdminNode NODE_ID
+ * @param AdminVendorId INT16U
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterAddOpCert(NOC, ICACertificate, IPKValue, CaseAdminNode, AdminVendorId) emberAfFillExternalBuffer(            \
+        mask,                                                                                                                      \
+                                                                                                                                   \
+        ZCL_ADD_OP_CERT_COMMAND_ID, "uuuuu", NOC, ICACertificate, IPKValue, CaseAdminNode, AdminVendorId);
+
+/** @brief Command description for UpdateOpCert
+ *
+ * Command: UpdateOpCert
+ * @param NOC OCTET_STRING
+ * @param ICACertificate OCTET_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterUpdateOpCert(NOC, ICACertificate)                                                                            \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_UPDATE_OP_CERT_COMMAND_ID, "uu", NOC, ICACertificate);
+
+/** @brief Command description for OpCertResponse
+ *
+ * Command: OpCertResponse
+ * @param StatusCode INT8U
+ * @param FabricIndex INT64U
+ * @param DebugText CHAR_STRING
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterOpCertResponse(StatusCode, FabricIndex, DebugText)                                                           \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_OP_CERT_RESPONSE_COMMAND_ID, "uuu", StatusCode, FabricIndex, DebugText);
+
 /** @brief Command description for UpdateFabricLabel
  *
  * Command: UpdateFabricLabel
