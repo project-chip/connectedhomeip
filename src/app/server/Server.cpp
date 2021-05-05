@@ -93,12 +93,6 @@ class ServerStorageDelegate : public PersistentStorageDelegate
         ChipLogProgress(AppServer, "Delete value in server storage");
         return PersistedStorage::KeyValueStoreMgr().Delete(key);
     }
-
-    void AsyncDeleteKeyValue(const char * key) override
-    {
-        ChipLogProgress(AppServer, "Delete value in server storage.");
-        PersistedStorage::KeyValueStoreMgr().Delete(key);
-    }
 };
 
 ServerStorageDelegate gServerStorage;
