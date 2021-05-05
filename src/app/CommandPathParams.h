@@ -32,7 +32,7 @@ enum class CommandPathFlags : uint8_t
 
 /**
  *
- * @brief This is used to record command path, and can pass command path info between IM and ember library.
+ * @brief This is used to record a command path.
  *
  */
 struct CommandPathParams
