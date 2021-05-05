@@ -76,6 +76,10 @@ constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+constexpr uint16_t kMdnsPort = 5353;
+#endif
+
 constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
 // Maximum key ID is 65535 (given it's uint16_t type)
@@ -362,6 +366,8 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    ReturnErrorOnFailure(Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort));
+
     return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
 #else
