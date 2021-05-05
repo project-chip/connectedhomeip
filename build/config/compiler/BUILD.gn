@@ -147,6 +147,7 @@ config("disabled_warnings") {
     "-Wno-deprecated-declarations",
     "-Wno-missing-field-initializers",
     "-Wno-unused-parameter",
+    "-Wno-unknown-warning-option",
   ]
   if (!is_debug) {
     # assert() causes unused variable warnings in release.
