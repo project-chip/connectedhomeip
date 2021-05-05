@@ -60,6 +60,7 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include <memory>
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>

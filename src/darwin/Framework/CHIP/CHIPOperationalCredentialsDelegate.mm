@@ -36,11 +36,13 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
     mStorage = storage;
 
     CHIP_ERROR err = LoadKeysFromKeyChain();
-    if (err == CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR) {
+        // Generate keys if keys could not be loaded
         err = GenerateKeys();
     }
 
     if (err == CHIP_NO_ERROR) {
+        // If keys were loaded, or generated, let's get the certificate issuer ID
         err = SetIssuerID(storage);
     }
 
@@ -60,7 +62,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorage
     if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
         mIssuerId = arc4random();
         CHIP_LOG_ERROR("Assigned %d certificate issuer ID to the commissioner", mIssuerId);
-        storage->AsyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, [[NSString stringWithFormat:@"%x", mIssuerId] UTF8String]);
+        NSString * value = [NSString stringWithFormat:@"%x", mIssuerId];
+        storage->SyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, [value UTF8String], [value length]);
     } else {
         NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:issuerIdString]];
         [scanner scanHexInt:&mIssuerId];
