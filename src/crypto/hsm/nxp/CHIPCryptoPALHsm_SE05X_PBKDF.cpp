@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,14 +48,12 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
 
     VerifyOrExit(password != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(plen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    if (slen > 0)
-    {
-        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
     VerifyOrExit(key_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(slen >= chip::Crypto::kMin_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(slen <= chip::Crypto::kMax_Salt_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+
     VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
 
     se05x_sessionOpen();
@@ -72,8 +70,9 @@ CHIP_ERROR PBKDF2_sha256HSM::pbkdf2_sha256(const uint8_t * password, size_t plen
 
     VerifyOrExit(gex_sss_chip_ctx.ks.session != NULL, error = CHIP_ERROR_INTERNAL);
 
-    smStatus = Se05x_API_PBKDF2(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, kSE05x_Pbkdf2_HMAC_SHA256, salt,
+    smStatus = Se05x_API_PBKDF2(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, salt,
                                 slen, (uint16_t) iteration_count, (uint16_t) key_length, output, (size_t *) &key_length);
+
     VerifyOrExit(smStatus == SM_OK, error = CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_erase_key(&gex_sss_chip_ctx.ks, &hmacKeyObj);
