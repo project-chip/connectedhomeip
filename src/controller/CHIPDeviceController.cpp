@@ -630,8 +630,20 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
 {
     for (int i = 0; i < kMaxCommissionableNodes; ++i)
     {
-        bool sameRecord = strncmp(mCommissionableNodes[i].hostName, nodeData.hostName, nodeData.kHostNameSize) == 0;
-        if (sameRecord || !mCommissionableNodes[i].IsValid())
+        if (!mCommissionableNodes[i].IsValid())
+        {
+            continue;
+        }
+        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0)
+        {
+            mCommissionableNodes[i] = nodeData;
+            return;
+        }
+    }
+    // Didn't find the host name already in our list, return an invalid
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        if (!mCommissionableNodes[i].IsValid())
         {
             mCommissionableNodes[i] = nodeData;
             return;
@@ -1041,7 +1053,7 @@ CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
 CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::LONG, long_discriminator);
+    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::kLong, long_discriminator);
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -1064,7 +1076,7 @@ void DeviceCommissioner::PrintDiscoveredDevices()
         printf("\tProduct ID:\t\t%u\n", mCommissionableNodes[i].productId);
         for (int j = 0; j < mCommissionableNodes[i].numIPs; ++j)
         {
-            char buf[50];
+            char buf[kMaxIPAddressStringLength];
             mCommissionableNodes[i].ipAddress[j].ToString(buf);
             printf("\tAddress %d:\t\t%s\n", j, buf);
         }

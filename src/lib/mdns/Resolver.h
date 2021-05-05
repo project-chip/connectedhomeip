@@ -50,7 +50,7 @@ struct CommissionableNodeData
     Inet::IPAddress ipAddress[kMaxIPAddresses];
     void Reset()
     {
-        memset(hostName, 0, kHostNameSize + 1);
+        memset(hostName, 0, sizeof(hostName));
         longDiscriminator = 0;
         vendorId          = 0;
         productId         = 0;
@@ -61,22 +61,22 @@ struct CommissionableNodeData
         }
     }
     CommissionableNodeData() { Reset(); }
-    bool IsHost(const char * host) const { return strncmp(host, hostName, kHostNameSize) == 0; }
+    bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
-}; // namespace Mdns
+};
 
 enum class CommissionableNodeFilterType
 {
-    NONE,
-    SHORT,
-    LONG,
-    VENDOR,
+    kNone,
+    kShort,
+    kLong,
+    kVendor,
 };
 struct CommissionableNodeFilter
 {
     CommissionableNodeFilterType type;
     uint16_t code;
-    CommissionableNodeFilter() : type(CommissionableNodeFilterType::NONE), code(0) {}
+    CommissionableNodeFilter() : type(CommissionableNodeFilterType::kNone), code(0) {}
     CommissionableNodeFilter(CommissionableNodeFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
 };
 /// Groups callbacks for CHIP service resolution requests
