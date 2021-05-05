@@ -82,9 +82,6 @@ constexpr uint16_t kMdnsPort = 5353;
 
 constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
-// Maximum key ID is 65535 (given it's uint16_t type)
-constexpr uint16_t kMaxKeyIDStringSize = 6;
-
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
@@ -148,11 +145,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mBleLayer = params.bleLayer;
     VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 #endif
-
-    if (mStorageDelegate != nullptr)
-    {
-        mStorageDelegate->SetStorageDelegate(this);
-    }
 
     mTransportMgr = chip::Platform::New<DeviceTransportMgr>();
     mSessionMgr   = chip::Platform::New<SecureSessionMgr>();
@@ -228,14 +220,9 @@ CHIP_ERROR DeviceController::Shutdown()
     chip::Platform::Delete(mInetLayer);
 #endif // CONFIG_DEVICE_LAYER
 
-    mSystemLayer = nullptr;
-    mInetLayer   = nullptr;
-
-    if (mStorageDelegate != nullptr)
-    {
-        mStorageDelegate->SetStorageDelegate(nullptr);
-        mStorageDelegate = nullptr;
-    }
+    mSystemLayer     = nullptr;
+    mInetLayer       = nullptr;
+    mStorageDelegate = nullptr;
 
     if (mExchangeMgr != nullptr)
     {
@@ -342,7 +329,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             uint16_t size = sizeof(deviceInfo.inner);
 
             PERSISTENT_KEY_OP(deviceId, kPairedDeviceKeyPrefix, key,
-                              err = mStorageDelegate->SyncGetKeyValue(key, Uint8::to_char(deviceInfo.inner), size));
+                              err = mStorageDelegate->SyncGetKeyValue(key, deviceInfo.inner, size));
             SuccessOrExit(err);
             VerifyOrExit(size <= sizeof(deviceInfo.inner), err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
@@ -386,8 +373,10 @@ void DeviceController::PersistDevice(Device * device)
     {
         SerializedDevice serialized;
         device->Serialize(serialized);
+
+        // TODO: no need to base-64 the serialized values AGAIN
         PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->AsyncSetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+                          mStorageDelegate->SyncSetKeyValue(key, serialized.inner, sizeof(serialized.inner)));
     }
 }
 
@@ -596,8 +585,6 @@ exit:
     return err;
 }
 
-void DeviceController::OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) {}
-
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
@@ -645,25 +632,12 @@ DeviceCommissioner::DeviceCommissioner()
     mPairedDevicesUpdated = false;
 }
 
-CHIP_ERROR DeviceCommissioner::LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out)
-{
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    // TODO: Consider storing value in binary representation instead of converting to string
-    char keyIDStr[kMaxKeyIDStringSize];
-    uint16_t size = sizeof(keyIDStr);
-    ReturnErrorOnFailure(delegate->SyncGetKeyValue(kNextAvailableKeyID, keyIDStr, size));
-
-    ReturnErrorCodeIf(!ArgParser::ParseInt(keyIDStr, out), CHIP_ERROR_INTERNAL);
-
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
 
-    if (LoadKeyId(mStorageDelegate, mNextKeyId) != CHIP_NO_ERROR)
+    uint16_t size = sizeof(mNextKeyId);
+    if (!mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &mNextKeyId, size) || (size != sizeof(mNextKeyId)))
     {
         mNextKeyId = 0;
     }
@@ -862,7 +836,7 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
     if (mStorageDelegate != nullptr)
     {
-        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->AsyncDeleteKeyValue(key));
+        PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->SyncDeleteKeyValue(key));
     }
 
     mPairedDevices.Remove(remoteDeviceId);
@@ -963,8 +937,9 @@ void DeviceCommissioner::PersistDeviceList()
             const char * value = mPairedDevices.SerializeBase64(serialized, requiredSize);
             if (value != nullptr && requiredSize <= size)
             {
+                // TODO: no need to base64 again the value
                 PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                                  mStorageDelegate->AsyncSetKeyValue(key, value));
+                                  mStorageDelegate->SyncSetKeyValue(key, value, static_cast<uint16_t>(strlen(value))));
                 mPairedDevicesUpdated = false;
             }
             chip::Platform::MemoryFree(serialized);
@@ -976,10 +951,7 @@ void DeviceCommissioner::PersistNextKeyId()
 {
     if (mStorageDelegate != nullptr)
     {
-        // TODO: Consider storing value in binary representation instead of converting to string
-        char keyIDStr[kMaxKeyIDStringSize];
-        snprintf(keyIDStr, sizeof(keyIDStr), "%d", mNextKeyId);
-        mStorageDelegate->AsyncSetKeyValue(kNextAvailableKeyID, keyIDStr);
+        mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &mNextKeyId, sizeof(mNextKeyId));
     }
 }
 
