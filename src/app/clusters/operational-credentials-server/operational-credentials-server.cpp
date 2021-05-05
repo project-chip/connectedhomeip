@@ -216,7 +216,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
 
     // Delete admin
     adminId = admin->GetAdminId();
-    err     = GetGlobalAdminPairingTable().Delete(admin->GetAdminId());
+    err     = GetGlobalAdminPairingTable().Delete(adminId);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
 exit:
