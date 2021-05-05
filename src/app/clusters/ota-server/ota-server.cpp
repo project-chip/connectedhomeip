@@ -28,12 +28,21 @@
 
 #include <support/Span.h>
 
-using namespace chip;
+#include "ota-server-delegate.h"
 
-// TODO: all callbacks need implementations
+using namespace chip;
+using namespace chip::app::clusters;
+
+namespace {
+constexpr uint8_t kLocationParamLength   = 2;   // The expected length of the Location parameter in QueryImage
+constexpr size_t kMaxMetadataLen         = 512; // The maximum length of Metadata in any OTA Server command
+constexpr size_t kUpdateTokenParamLength = 32;  // The expected length of the Update Token parameter used in multiple commands
+} // namespace
 
 /**
  * @brief OTA Software Update Server Cluster ApplyUpdateRequest Command callback
+ *
+ * @note It is the application's reponsibility to send the ApplyUpdateRequestResponse command after this is handled.
  *
  * @param updateToken Identifier for the Software Image to be applied. Should be 32 octets long.
  * @param newVersion The SoftwareVersion value of the new Software Image that the client is ready to apply.
@@ -42,11 +51,28 @@ using namespace chip;
 bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Command * commandObj, chip::ByteSpan updateToken,
                                                                      uint32_t newVersion)
 {
-    return false;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    ChipLogDetail(Zcl, "OTA Server received ApplyUpdateRequest");
+
+    if (updateToken.size() != kUpdateTokenParamLength)
+    {
+        // TODO: correct error?
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+    }
+
+    status = OTAServerDelegate::HandleApplyUpdateRequest(updateToken, newVersion);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfSendImmediateDefaultResponse(status);
+    }
+
+    return true;
 }
 
 /**
  * @brief OTA Software Update Server Cluster NotifyUpdateApplied Command callback
+ *
  *
  * @param updateToken Identifier for the Software Image that was applied. Should be 32 octets long.
  * @param currentVersion The current SoftwareVersion value. Should match the SoftwarVersion attribute in the
@@ -56,7 +82,22 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Comman
 bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Command * commandObj, chip::ByteSpan updateToken,
                                                                       uint32_t currentVersion)
 {
-    return false;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    ChipLogDetail(Zcl, "OTA Server received NotifyUpdateUpplied");
+
+    if (updateToken.size() != kUpdateTokenParamLength)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+    }
+
+    status = OTAServerDelegate::HandleNotifyUpdateApplied(updateToken, currentVersion);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfSendImmediateDefaultResponse(status);
+    }
+
+    return true;
 }
 
 /**
@@ -82,5 +123,24 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
     /* TYPE WARNING: array array defaults to */ uint8_t * protocolsSupported, uint8_t * location, uint8_t clientCanConsent,
     chip::ByteSpan metadataForServer)
 {
-    return false;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    ChipLogDetail(Zcl, "OTA Server received QueryImage");
+
+    const uint8_t locationLen = emberAfStringLength(location);
+    if ((locationLen != kLocationParamLength) || (metadataForServer.size() > kMaxMetadataLen))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
+    }
+
+    chip::ByteSpan locationSpan(location, locationLen);
+
+    status = OTAServerDelegate::HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion,
+                                                 protocolsSupported, locationSpan, clientCanConsent, metadataForServer);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfSendImmediateDefaultResponse(status);
+    }
+
+    return true;
 }
