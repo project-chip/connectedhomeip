@@ -168,36 +168,24 @@ TCPBase::ActiveConnectionState * TCPBase::FindActiveConnection(const Inet::TCPEn
     return nullptr;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
-                                System::PacketBufferHandle msgBuf)
+CHIP_ERROR TCPBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
     // Sent buffer data format is:
-    //    - packet size as a uint16_t (inludes size of header and actual data)
-    //    - header
+    //    - packet size as a uint16_t
     //    - actual data
-    const size_t prefixSize = header.EncodeSizeBytes() + kPacketSizeBytes;
 
     VerifyOrReturnError(address.GetTransportType() == Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(prefixSize + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(kPacketSizeBytes + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
-    // The check above about prefixSize + msgBuf->DataLength() means prefixSize
-    // definitely fits in uint16_t.
-    VerifyOrReturnError(msgBuf->EnsureReservedSize(static_cast<uint16_t>(prefixSize)), CHIP_ERROR_NO_MEMORY);
+    // The check above about kPacketSizeBytes + msgBuf->DataLength() means it definitely fits in uint16_t.
+    VerifyOrReturnError(msgBuf->EnsureReservedSize(static_cast<uint16_t>(kPacketSizeBytes)), CHIP_ERROR_NO_MEMORY);
 
-    msgBuf->SetStart(msgBuf->Start() - prefixSize);
-
-    // Length is actual data, without considering the length bytes themselves
-    VerifyOrReturnError(msgBuf->DataLength() >= kPacketSizeBytes, CHIP_ERROR_INTERNAL);
+    msgBuf->SetStart(msgBuf->Start() - kPacketSizeBytes);
 
     uint8_t * output = msgBuf->Start();
     LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
-
-    uint16_t actualEncodedHeaderSize;
-    ReturnErrorOnFailure(header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize));
-
-    // header encoding has to match space that we allocated
-    VerifyOrReturnError(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, CHIP_ERROR_INTERNAL);
 
     // Reuse existing connection if one exists, otherwise a new one
     // will be established
@@ -360,10 +348,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
         message->SetDataLength(messageSize);
     }
 
-    PacketHeader header;
-    ReturnErrorOnFailure(header.DecodeAndConsume(message));
-
-    HandleMessageReceived(header, peerAddress, std::move(message));
+    HandleMessageReceived(peerAddress, std::move(message));
     return CHIP_NO_ERROR;
 }
 
