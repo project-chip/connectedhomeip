@@ -232,13 +232,13 @@ void emberAfAccountLoginClusterServerManufacturerSpecificAttributeChangedCallbac
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfAccountLoginClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfAccountLoginClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                          EmberStatus status);
 
@@ -302,15 +302,15 @@ void emberAfApplicationBasicClusterServerManufacturerSpecificAttributeChangedCal
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfApplicationBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfApplicationBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type,
+                                                             chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
+                                                             uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Application Basic Cluster Server Pre Attribute Changed
  *
@@ -373,15 +373,15 @@ void emberAfApplicationLauncherClusterServerManufacturerSpecificAttributeChanged
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfApplicationLauncherClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfApplicationLauncherClusterServerMessageSentCallback(EmberOutgoingMessageType type,
+                                                                chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Application Launcher Cluster Server Pre Attribute Changed
  *
@@ -444,13 +444,13 @@ void emberAfAudioOutputClusterServerManufacturerSpecificAttributeChangedCallback
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfAudioOutputClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfAudioOutputClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                         EmberStatus status);
 
@@ -514,13 +514,13 @@ void emberAfColorControlClusterServerManufacturerSpecificAttributeChangedCallbac
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfColorControlClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfColorControlClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                          EmberStatus status);
 
@@ -584,13 +584,13 @@ void emberAfContentLaunchClusterServerManufacturerSpecificAttributeChangedCallba
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfContentLaunchClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfContentLaunchClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                           EmberStatus status);
 
@@ -654,15 +654,15 @@ void emberAfGeneralCommissioningClusterServerManufacturerSpecificAttributeChange
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfGeneralCommissioningClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                 EmberStatus status);
+void emberAfGeneralCommissioningClusterServerMessageSentCallback(EmberOutgoingMessageType type,
+                                                                 chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
+                                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief General Commissioning Cluster Server Pre Attribute Changed
  *
@@ -725,13 +725,13 @@ void emberAfGroupsClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfGroupsClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfGroupsClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                    EmberStatus status);
 
@@ -795,13 +795,13 @@ void emberAfIdentifyClusterServerManufacturerSpecificAttributeChangedCallback(ch
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfIdentifyClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfIdentifyClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                      EmberStatus status);
 
@@ -865,13 +865,13 @@ void emberAfKeypadInputClusterServerManufacturerSpecificAttributeChangedCallback
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfKeypadInputClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfKeypadInputClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                         EmberStatus status);
 
@@ -935,13 +935,13 @@ void emberAfLevelControlClusterServerManufacturerSpecificAttributeChangedCallbac
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfLevelControlClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfLevelControlClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                          EmberStatus status);
 
@@ -1005,13 +1005,13 @@ void emberAfLowPowerClusterServerManufacturerSpecificAttributeChangedCallback(ch
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfLowPowerClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfLowPowerClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                      EmberStatus status);
 
@@ -1075,13 +1075,13 @@ void emberAfMediaInputClusterServerManufacturerSpecificAttributeChangedCallback(
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfMediaInputClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfMediaInputClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                        EmberStatus status);
 
@@ -1145,13 +1145,13 @@ void emberAfMediaPlaybackClusterServerManufacturerSpecificAttributeChangedCallba
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfMediaPlaybackClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfMediaPlaybackClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                           EmberStatus status);
 
@@ -1214,13 +1214,13 @@ void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfOnOffClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfOnOffClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief On/off Cluster Server Pre Attribute Changed
@@ -1283,13 +1283,13 @@ void emberAfScenesClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfScenesClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfScenesClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                    EmberStatus status);
 
@@ -1353,13 +1353,13 @@ void emberAfTvChannelClusterServerManufacturerSpecificAttributeChangedCallback(c
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTvChannelClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfTvChannelClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                       EmberStatus status);
 
@@ -1423,13 +1423,13 @@ void emberAfTargetNavigatorClusterServerManufacturerSpecificAttributeChangedCall
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTargetNavigatorClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfTargetNavigatorClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                             EmberStatus status);
 
@@ -1494,13 +1494,13 @@ void emberAfWakeOnLanClusterServerManufacturerSpecificAttributeChangedCallback(c
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfWakeOnLanClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfWakeOnLanClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                       EmberStatus status);
 
@@ -2009,13 +2009,13 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * be handled by the application framework.
  *
  * @param type   Ver.: always
- * @param indexOrDestination   Ver.: always
+ * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
+bool emberAfMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change
