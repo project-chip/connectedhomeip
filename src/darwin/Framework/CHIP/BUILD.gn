@@ -44,6 +44,7 @@ static_library("framework") {
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
+    "CHIPOnboardingPayloadParser.m",
     "CHIPPersistentStorageDelegate.h",
     "CHIPPersistentStorageDelegateBridge.h",
     "CHIPPersistentStorageDelegateBridge.mm",
