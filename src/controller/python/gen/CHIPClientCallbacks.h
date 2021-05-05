@@ -110,6 +110,12 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
+typedef void (*OtaSoftwareUpdateServerClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
+                                                                                 uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateServerClusterQueryImageResponseCallback)(void * context, uint32_t delayedActionTime,
+                                                                         uint8_t * imageURI, uint32_t softwareVersion,
+                                                                         uint8_t * updateToken, uint8_t userConsentNeeded,
+                                                                         uint8_t * metadataForClient);
 typedef void (*OperationalCredentialsClusterGetFabricIdResponseCallback)(void * context, chip::FabricId FabricId);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,

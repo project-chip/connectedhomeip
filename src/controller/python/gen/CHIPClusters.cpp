@@ -4398,6 +4398,139 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// OtaSoftwareUpdateServer Cluster Commands
+CHIP_ERROR OtaSoftwareUpdateServerCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
+                                                              uint32_t newVersion)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kApplyUpdateRequestCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // updateToken: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    // newVersion: int32u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), newVersion));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeOtaSoftwareUpdateServerClusterApplyUpdateRequestCommand(seqNum, mEndpoint, updateToken, newVersion);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR OtaSoftwareUpdateServerCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
+                                                               uint32_t currentVersion)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kNotifyUpdateAppliedCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // updateToken: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    // currentVersion: int32u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCommand(seqNum, mEndpoint, updateToken, currentVersion);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t vendorId,
+                                                      uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+                                                      uint32_t currentVersion, uint8_t protocolsSupported, chip::ByteSpan location,
+                                                      uint8_t clientCanConsent, chip::ByteSpan metadataForServer)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kQueryImageCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // vendorId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
+    // productId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), productId));
+    // imageType: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), imageType));
+    // hardwareVersion: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
+    // currentVersion: int32u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+    // protocolsSupported: oTADownloadProtocol
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
+    // location: charString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    // clientCanConsent: boolean
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), clientCanConsent));
+    // metadataForServer: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), metadataForServer));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateServerClusterQueryImageCommand(
+        seqNum, mEndpoint, vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported, location,
+        clientCanConsent, metadataForServer);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+// OtaSoftwareUpdateServer Cluster Attributes
+CHIP_ERROR OtaSoftwareUpdateServerCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR OtaSoftwareUpdateServerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {

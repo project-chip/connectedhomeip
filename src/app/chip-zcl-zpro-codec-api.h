@@ -49,6 +49,7 @@
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
@@ -2300,6 +2301,59 @@ chip::System::PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttrib
  */
 chip::System::PacketBufferHandle
 encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ApplyUpdateRequest                                                |   0x01 |
+| * NotifyUpdateApplied                                               |   0x02 |
+| * QueryImage                                                        |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ApplyUpdateRequest command for OTA Software Update Server server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOtaSoftwareUpdateServerClusterApplyUpdateRequestCommand(uint8_t seqNum,
+                                                                                               chip::EndpointId destinationEndpoint,
+                                                                                               chip::ByteSpan updateToken,
+                                                                                               uint32_t newVersion);
+
+/**
+ * @brief
+ *    Encode an NotifyUpdateApplied command for OTA Software Update Server server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                               chip::ByteSpan updateToken, uint32_t currentVersion);
+
+/**
+ * @brief
+ *    Encode an QueryImage command for OTA Software Update Server server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOtaSoftwareUpdateServerClusterQueryImageCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, uint16_t vendorId,
+                                                      uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+                                                      uint32_t currentVersion, uint8_t protocolsSupported, chip::ByteSpan location,
+                                                      uint8_t clientCanConsent, chip::ByteSpan metadataForServer);
+
+/**
+ * @brief
+ *    Encode a OTA Software Update Server server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a OTA Software Update Server server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |

@@ -120,6 +120,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
 | NetworkCommissioning                                                | 0x0031 |
+| OtaSoftwareUpdateServer                                             | 0x0029 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
@@ -295,6 +296,11 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_SCAN_NETWORKS_COMMAND_ID (0x00)
 #define ZCL_UPDATE_THREAD_NETWORK_COMMAND_ID (0x08)
 #define ZCL_UPDATE_WI_FI_NETWORK_COMMAND_ID (0x04)
+
+#define OTA_SERVER_CLUSTER_ID 0x0029
+#define ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID (0x01)
+#define ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID (0x02)
+#define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
 
 #define ON_OFF_CLUSTER_ID 0x0006
 #define ZCL_OFF_COMMAND_ID (0x00)
@@ -4049,6 +4055,124 @@ PacketBufferHandle encodeNetworkCommissioningClusterDiscoverAttributes(uint8_t s
 PacketBufferHandle encodeNetworkCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadNetworkCommissioningClusterRevision", NETWORK_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster OtaSoftwareUpdateServer                                     | 0x0029 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ApplyUpdateRequest                                                |   0x01 |
+| * NotifyUpdateApplied                                               |   0x02 |
+| * QueryImage                                                        |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ApplyUpdateRequest
+ */
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterApplyUpdateRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                 chip::ByteSpan updateToken, uint32_t newVersion)
+{
+    COMMAND_HEADER("ApplyUpdateRequest", OTA_SERVER_CLUSTER_ID);
+    size_t updateTokenStrLen = updateToken.size();
+    if (!CanCastTo<uint8_t>(updateTokenStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, updateTokenStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_APPLY_UPDATE_REQUEST_COMMAND_ID)
+        .Put(static_cast<uint8_t>(updateTokenStrLen))
+        .Put(updateToken.data(), updateToken.size())
+        .Put32(newVersion);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command NotifyUpdateApplied
+ */
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                                  chip::ByteSpan updateToken,
+                                                                                  uint32_t currentVersion)
+{
+    COMMAND_HEADER("NotifyUpdateApplied", OTA_SERVER_CLUSTER_ID);
+    size_t updateTokenStrLen = updateToken.size();
+    if (!CanCastTo<uint8_t>(updateTokenStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, updateTokenStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_NOTIFY_UPDATE_APPLIED_COMMAND_ID)
+        .Put(static_cast<uint8_t>(updateTokenStrLen))
+        .Put(updateToken.data(), updateToken.size())
+        .Put32(currentVersion);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command QueryImage
+ */
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterQueryImageCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                         uint16_t vendorId, uint16_t productId, uint16_t imageType,
+                                                                         uint16_t hardwareVersion, uint32_t currentVersion,
+                                                                         uint8_t protocolsSupported, chip::ByteSpan location,
+                                                                         uint8_t clientCanConsent, chip::ByteSpan metadataForServer)
+{
+    COMMAND_HEADER("QueryImage", OTA_SERVER_CLUSTER_ID);
+
+    size_t locationStrLen = location.size();
+    if (!CanCastTo<uint8_t>(locationStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, locationStrLen);
+        return PacketBufferHandle();
+    }
+
+    size_t metadataForServerStrLen = metadataForServer.size();
+    if (!CanCastTo<uint8_t>(metadataForServerStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, metadataForServerStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_QUERY_IMAGE_COMMAND_ID)
+        .Put16(vendorId)
+        .Put16(productId)
+        .Put16(imageType)
+        .Put16(hardwareVersion)
+        .Put32(currentVersion)
+        .Put8(protocolsSupported)
+        .Put(static_cast<uint8_t>(locationStrLen))
+        .Put(location.data(), location.size())
+        .Put8(clientCanConsent)
+        .Put(static_cast<uint8_t>(metadataForServerStrLen))
+        .Put(metadataForServer.data(), metadataForServer.size());
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverOtaSoftwareUpdateServerAttributes", OTA_SERVER_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadOtaSoftwareUpdateServerClusterRevision", OTA_SERVER_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
