@@ -374,7 +374,7 @@
                                                                                          endpoint:0
                                                                                             queue:dispatch_get_main_queue()];
         [opCreds setFabric:kCHIPToolTmpVendorId
-            completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+            responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
                 if (error.code != CHIPSuccess) {
                     NSLog(@"Got back error trying to getFabricId %@", error);
                 } else {
