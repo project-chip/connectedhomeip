@@ -251,19 +251,6 @@ void ChannelContext::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, cons
     }
 }
 
-// Session establishment
-CHIP_ERROR ChannelContext::SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                                           System::PacketBufferHandle msgIn)
-{
-    return mExchangeManager->GetSessionMgr()->GetTransportManager()->SendMessage(header, peerAddress, std::move(msgIn));
-}
-
-CHIP_ERROR ChannelContext::HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                System::PacketBufferHandle && msg)
-{
-    return CHIP_ERROR_INCORRECT_STATE;
-}
-
 void ChannelContext::EnterCasePairingState()
 {
     mStateVars.mPreparing.mState              = PrepareState::kCasePairing;

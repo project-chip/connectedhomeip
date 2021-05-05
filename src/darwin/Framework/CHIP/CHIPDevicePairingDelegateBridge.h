@@ -32,7 +32,7 @@ public:
 
     void setDelegate(id<CHIPDevicePairingDelegate> delegate, dispatch_queue_t queue);
 
-    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
     void OnPairingComplete(CHIP_ERROR error) override;
 
@@ -44,7 +44,7 @@ private:
     id<CHIPDevicePairingDelegate> mDelegate;
     dispatch_queue_t mQueue;
 
-    CHIPPairingStatus MapStatus(chip::RendezvousSessionDelegate::Status status);
+    CHIPPairingStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };
 
 NS_ASSUME_NONNULL_END

@@ -111,10 +111,6 @@ public:
     void OnConnectionExpired(SecureSessionHandle session);
 
     // Pairing callbacks
-    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                    System::PacketBufferHandle && msg);
-    CHIP_ERROR SendSessionEstablishmentMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                               System::PacketBufferHandle msgIn) override;
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 

@@ -18,7 +18,7 @@
 #import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
-#import "CHIPSetupPayload.h"
+#import "CHIPSetupPayload_Internal.h"
 
 #import <setup_payload/QRCodeSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>

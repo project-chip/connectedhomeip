@@ -63,9 +63,9 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        HandleMessageReceived(header, address, std::move(msgBuf));
+        HandleMessageReceived(address, std::move(msgBuf));
         return CHIP_NO_ERROR;
     }
 
@@ -78,13 +78,11 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
         System::PacketBufferHandle recvdMsg = msgBuf.CloneData();
 
-        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
-
-        HandleMessageReceived(header, address, std::move(recvdMsg));
+        HandleMessageReceived(address, std::move(recvdMsg));
         return CHIP_NO_ERROR;
     }
 

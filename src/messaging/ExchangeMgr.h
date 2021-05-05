@@ -176,6 +176,13 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
+    /**
+     * A method to call Close() on all contexts that have a given delegate as
+     * their delegate.  To be used if the delegate is being destroyed.  This
+     * method will guarantee that it does not call into the delegate.
+     */
+    void CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate);
+
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
@@ -251,8 +258,7 @@ private:
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 
     // TransportMgrDelegate interface for rendezvous sessions
-    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
 
     CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf) override;
 };

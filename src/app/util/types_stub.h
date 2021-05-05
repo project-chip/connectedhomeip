@@ -392,7 +392,9 @@ enum
     EMBER_OUTGOING_BROADCAST_WITH_ALIAS,
     /** A broadcast message.  This value is passed to emberMessageSentHandler() only.
      * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_BROADCAST
+    EMBER_OUTGOING_BROADCAST,
+    /** A messaging going via some existing exchange. */
+    EMBER_OUTGOING_VIA_EXCHANGE,
 };
 
 /** @brief Endpoint information (a ZigBee Simple Descriptor).

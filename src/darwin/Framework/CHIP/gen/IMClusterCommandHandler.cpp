@@ -3546,7 +3546,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
-        case ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID: {
+        case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
             // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
             // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
             // Any error value TLVUnpackError means we have received an illegal value.
@@ -3601,7 +3601,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(apCommandObj, FabricId);
+                emberAfOperationalCredentialsClusterSetFabricResponseCallback(apCommandObj, FabricId);
             }
             else
             {
