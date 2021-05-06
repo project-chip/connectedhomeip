@@ -33,6 +33,12 @@ declare_args() {
   chip_system_config_provide_statistics = true
 }
 
+declare_args() {
+  # use the dispatch library
+  chip_system_config_use_dispatch = chip_system_config_use_sockets &&
+                                     (current_os == "mac" || current_os == "ios")
+}
+
 if (chip_system_config_locking == "") {
   if (current_os != "freertos") {
     chip_system_config_locking = "posix"

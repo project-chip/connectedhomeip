@@ -574,7 +574,17 @@ void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
         // one-shot
         chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
         cb->Cancel();
-        cb->mCall(cb->mContext);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        if (mDispatchQueue != nullptr)
+        {
+            dispatch_async(mDispatchQueue, ^{
+                cb->mCall(cb->mContext);
+            });
+        }
+        else
+#endif
+            cb->mCall(cb->mContext);
     }
 }
 

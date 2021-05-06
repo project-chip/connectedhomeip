@@ -1082,7 +1082,11 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 {
     INET_ERROR lStatus = INET_NO_ERROR;
     IPPacketInfo lPacketInfo;
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    __block System::PacketBufferHandle lBuffer;
+#else
     System::PacketBufferHandle lBuffer;
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
@@ -1189,12 +1193,43 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     if (lStatus == INET_NO_ERROR)
     {
         lBuffer.RightSize();
-        OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+        if (dispatchQueue != nullptr)
+        {
+            dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+            dispatch_async(dispatchQueue, ^{
+                OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
+                dispatch_semaphore_signal(semaphore);
+            });
+            dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+            dispatch_release(semaphore);
+        }
+        else
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+            OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
     }
     else
     {
         if (OnReceiveError != nullptr && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
-            OnReceiveError(this, lStatus, nullptr);
+        {
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+            dispatch_queue_t dispatchQueue = SystemLayer().GetDispatchQueue();
+            if (dispatchQueue != nullptr)
+            {
+                dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+                dispatch_async(dispatchQueue, ^{
+                    OnReceiveError(this, lStatus, nullptr);
+                    dispatch_semaphore_signal(semaphore);
+                });
+                dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+                dispatch_release(semaphore);
+            }
+            else
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+                OnReceiveError(this, lStatus, nullptr);
+        }
     }
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
