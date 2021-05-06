@@ -37,7 +37,7 @@ typedef struct _AudioOutputInfo
 {
     uint8_t index;
     uint8_t outputType;
-    uint8_t * name;
+    chip::ByteSpan name;
 } EmberAfAudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
@@ -282,8 +282,8 @@ typedef struct _MediaInputInfo
 {
     uint8_t index;
     uint8_t inputType;
-    uint8_t * name;
-    uint8_t * description;
+    chip::ByteSpan name;
+    chip::ByteSpan description;
 } EmberAfMediaInputInfo;
 
 // Struct for MediaPlaybackPosition
@@ -297,7 +297,7 @@ typedef struct _MediaPlaybackPosition
 typedef struct _NavigateTargetTargetInfo
 {
     uint8_t identifier;
-    uint8_t * name;
+    chip::ByteSpan name;
 } EmberAfNavigateTargetTargetInfo;
 
 // Struct for NeighborInfo
@@ -521,9 +521,9 @@ typedef struct _TvChannelInfo
 {
     uint16_t majorNumber;
     uint16_t minorNumber;
-    uint8_t * name;
-    uint8_t * callSign;
-    uint8_t * affiliateCallSign;
+    chip::ByteSpan name;
+    chip::ByteSpan callSign;
+    chip::ByteSpan affiliateCallSign;
 } EmberAfTvChannelInfo;
 
 // Struct for TvChannelLineupInfo

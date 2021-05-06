@@ -26,6 +26,8 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <support/CodeUtils.h>
 
 #include <map>
 #include <string>
@@ -40,28 +42,26 @@ CHIP_ERROR AudioOutputManager::Init()
     map<string, bool> featureMap;
     featureMap["NU"] = true;
 
-    // TODO: when list is not supported enable
-    // list<EmberAfAudioOutputInfo> listOfAudioOutputs = AudioOutputManager().proxyGetListOfAudioOutputInfo();
-    // EmberAfStatus status = emberAfWriteServerAttribute(endpoint, ZCL_AUDIO_OUTPUT_CLUSTER_ID, ZCL_AUDIO_OUTPUT_LIST_ATTRIBUTE_ID,
-    //                                                    (uint8_t *) &listOfAudioOutputs, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-    // if (status != EMBER_ZCL_STATUS_SUCCESS)
-    // {
-    //     emberAfAudioOutputClusterPrintln("Failed to write Output List attribute: 0x%X", status);
-    // }
     return err;
 }
 
-list<EmberAfAudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo()
+vector<EmberAfAudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo()
 {
     // TODO: Insert code here
-    list<EmberAfAudioOutputInfo> listOfAudioOutputInfos;
-    EmberAfAudioOutputInfo audioOutputInfo = {};
-    // audioOutputInfo.Name                   = "";
-    audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
-    audioOutputInfo.index      = 1;
+    vector<EmberAfAudioOutputInfo> audioOutputInfos;
+    int maximumVectorSize = 3;
+    char name[]           = "exampleName";
 
-    listOfAudioOutputInfos.push_back(audioOutputInfo);
-    return listOfAudioOutputInfos;
+    for (uint8_t i = 0; i < maximumVectorSize; ++i)
+    {
+        EmberAfAudioOutputInfo audioOutputInfo;
+        audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
+        audioOutputInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
+        audioOutputInfo.index      = 1 + i;
+        audioOutputInfos.push_back(audioOutputInfo);
+    }
+
+    return audioOutputInfos;
 }
 
 bool AudioOutputManager::proxySelectOutputRequest(uint8_t index)

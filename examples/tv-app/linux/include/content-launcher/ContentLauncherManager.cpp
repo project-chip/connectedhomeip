@@ -26,6 +26,8 @@
 #include <app/Command.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <support/CodeUtils.h>
 
 #include <map>
 
@@ -41,35 +43,31 @@ CHIP_ERROR ContentLauncherManager::Init()
     featureMap["UP"] = true;
     featureMap["WA"] = true;
 
-    // TODO: Update once storing a list attribute is supported
-    // list<string> acceptedHeaderList = ContentLauncherManager().proxyGetAcceptsHeader();
-    // emberAfWriteServerAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID, ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID,
-    //                             (uint8_t *) &acceptedHeaderList, ZCL_STRUCT_ATTRIBUTE_TYPE);
-
-    // TODO: Update once storing a list attribute is supported
-    // list<string> supportedStreamingTypes = ContentLauncherManager().proxyGetAcceptsHeader();
-    // emberAfWriteServerAttribute(endpoint, ZCL_CONTENT_LAUNCH_CLUSTER_ID,
-    //                             ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_TYPES_ATTRIBUTE_ID, (uint8_t *)
-    //                             &supportedStreamingTypes, ZCL_STRUCT_ATTRIBUTE_TYPE);
-
     SuccessOrExit(err);
 exit:
     return err;
 }
 
-list<string> ContentLauncherManager::proxyGetAcceptsHeader()
+vector<chip::ByteSpan> ContentLauncherManager::proxyGetAcceptsHeader()
 {
     // TODO: Insert code here
-    list<string> acceptedHeaderList;
-    acceptedHeaderList.push_back("HeaderExample");
-    return acceptedHeaderList;
+    vector<chip::ByteSpan> acceptedHeader;
+    char headerExample[]  = "exampleHeader";
+    int maximumVectorSize = 1;
+
+    for (uint16_t i = 0; i < maximumVectorSize; ++i)
+    {
+        acceptedHeader.push_back(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample)));
+    }
+    return acceptedHeader;
 }
 
-list<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSupportedStreamingTypes()
+vector<EmberAfContentLaunchStreamingType> ContentLauncherManager::proxyGetSupportedStreamingTypes()
 {
     // TODO: Insert code here
-    list<EmberAfContentLaunchStreamingType> supportedStreamingTypes;
+    vector<EmberAfContentLaunchStreamingType> supportedStreamingTypes;
     supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH);
+    supportedStreamingTypes.push_back(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS);
     return supportedStreamingTypes;
 }
 

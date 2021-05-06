@@ -77,6 +77,170 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x050C: // Application Launcher Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // application launcher list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // INT16U
+            break;
+        }
+        }
+        break;
+    }
+    case 0x050B: // Audio Output Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // audio output list
+        {
+            entryLength = 34;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _AudioOutputInfo
+            _AudioOutputInfo * entry = reinterpret_cast<_AudioOutputInfo *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->index, write ? (uint8_t *) &entry->index : src, write, &entryOffset,
+                           sizeof(entry->index)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->outputType, write ? (uint8_t *) &entry->outputType : src, write,
+                           &entryOffset, sizeof(entry->outputType)); // AudioOutputType
+            copyListMember(write ? dest : (uint8_t *) &entry->name, write ? (uint8_t *) &entry->name : src, write, &entryOffset,
+                           32); // OCTET_STRING
+            break;
+        }
+        }
+        break;
+    }
+    case 0x050A: // Content Launch Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // accepts header list
+        {
+            entryLength = 254;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // OCTET_STRING
+            break;
+        }
+        case 0x0001: // supported streaming types
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ContentLaunchStreamingType
+            break;
+        }
+        }
+        break;
+    }
+    case 0x0507: // Media Input Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // media input list
+        {
+            entryLength = 66;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _MediaInputInfo
+            _MediaInputInfo * entry = reinterpret_cast<_MediaInputInfo *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->index, write ? (uint8_t *) &entry->index : src, write, &entryOffset,
+                           sizeof(entry->index)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->inputType, write ? (uint8_t *) &entry->inputType : src, write,
+                           &entryOffset, sizeof(entry->inputType)); // MediaInputType
+            copyListMember(write ? dest : (uint8_t *) &entry->name, write ? (uint8_t *) &entry->name : src, write, &entryOffset,
+                           32); // OCTET_STRING
+            copyListMember(write ? dest : (uint8_t *) &entry->description, write ? (uint8_t *) &entry->description : src, write,
+                           &entryOffset, 32); // OCTET_STRING
+            break;
+        }
+        }
+        break;
+    }
+    case 0x0504: // TV Channel Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // tv channel list
+        {
+            entryLength = 100;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _TvChannelInfo
+            _TvChannelInfo * entry = reinterpret_cast<_TvChannelInfo *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->majorNumber, write ? (uint8_t *) &entry->majorNumber : src, write,
+                           &entryOffset, sizeof(entry->majorNumber)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->minorNumber, write ? (uint8_t *) &entry->minorNumber : src, write,
+                           &entryOffset, sizeof(entry->minorNumber)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->name, write ? (uint8_t *) &entry->name : src, write, &entryOffset,
+                           32); // OCTET_STRING
+            copyListMember(write ? dest : (uint8_t *) &entry->callSign, write ? (uint8_t *) &entry->callSign : src, write,
+                           &entryOffset, 32); // OCTET_STRING
+            copyListMember(write ? dest : (uint8_t *) &entry->affiliateCallSign,
+                           write ? (uint8_t *) &entry->affiliateCallSign : src, write, &entryOffset, 32); // OCTET_STRING
+            break;
+        }
+        }
+        break;
+    }
+    case 0x0505: // Target Navigator Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // target navigator list
+        {
+            entryLength = 33;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _NavigateTargetTargetInfo
+            _NavigateTargetTargetInfo * entry = reinterpret_cast<_NavigateTargetTargetInfo *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->identifier, write ? (uint8_t *) &entry->identifier : src, write,
+                           &entryOffset, sizeof(entry->identifier)); // INT8U
+            copyListMember(write ? dest : (uint8_t *) &entry->name, write ? (uint8_t *) &entry->name : src, write, &entryOffset,
+                           32); // OCTET_STRING
+            break;
+        }
+        }
+        break;
+    }
     }
 
     return entryLength;
@@ -96,6 +260,64 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x050C: // Application Launcher Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // application launcher list
+            // uint16_t
+            entryLength = 2;
+            break;
+        }
+        break;
+    case 0x050B: // Audio Output Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // audio output list
+            // Struct _AudioOutputInfo
+            entryLength = 34;
+            break;
+        }
+        break;
+    case 0x050A: // Content Launch Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // accepts header list
+            // chip::ByteSpan
+            entryLength = 254;
+            break;
+        case 0x0001: // supported streaming types
+            // uint8_t
+            entryLength = 1;
+            break;
+        }
+        break;
+    case 0x0507: // Media Input Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // media input list
+            // Struct _MediaInputInfo
+            entryLength = 66;
+            break;
+        }
+        break;
+    case 0x0504: // TV Channel Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // tv channel list
+            // Struct _TvChannelInfo
+            entryLength = 100;
+            break;
+        }
+        break;
+    case 0x0505: // Target Navigator Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // target navigator list
+            // Struct _NavigateTargetTargetInfo
+            entryLength = 33;
+            break;
+        }
+        break;
     }
 
     uint32_t totalSize = kSizeLengthInBytes + (entryCount * entryLength);

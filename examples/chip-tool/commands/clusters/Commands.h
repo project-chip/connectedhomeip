@@ -660,6 +660,61 @@ static void OnTestClusterClusterTestSpecificResponse(void * context, uint8_t ret
     command->SetCommandExitStatus(true);
 }
 
+static void OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context, uint16_t count, uint16_t * entries)
+{
+    ChipLogProgress(chipTool, "OnApplicationLauncherApplicationLauncherListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "INT16U[%lu]: %" PRIu16 "", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnAudioOutputAudioOutputListListAttributeResponse(void * context, uint16_t count, _AudioOutputInfo * entries)
+{
+    ChipLogProgress(chipTool, "OnAudioOutputAudioOutputListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "AudioOutputInfo[%lu]:", i);
+        ChipLogProgress(chipTool, "  index: %" PRIu8 "", entries[i].index);
+        ChipLogProgress(chipTool, "  outputType: %" PRIu8 "", entries[i].outputType);
+        ChipLogProgress(chipTool, "  name: %s", entries[i].name);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnContentLaunchAcceptsHeaderListListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
+{
+    ChipLogProgress(chipTool, "OnContentLaunchAcceptsHeaderListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "OCTET_STRING[%lu]: %s", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnContentLaunchSupportedStreamingTypesListAttributeResponse(void * context, uint16_t count, uint8_t * entries)
+{
+    ChipLogProgress(chipTool, "OnContentLaunchSupportedStreamingTypesListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "ContentLaunchStreamingType[%lu]: %" PRIu8 "", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 static void OnDescriptorDeviceListListAttributeResponse(void * context, uint16_t count, _DeviceType * entries)
 {
     ChipLogProgress(chipTool, "OnDescriptorDeviceListListAttributeResponse: %lu entries", count);
@@ -748,6 +803,23 @@ static void OnGroupKeyManagementGroupKeysListAttributeResponse(void * context, u
     command->SetCommandExitStatus(true);
 }
 
+static void OnMediaInputMediaInputListListAttributeResponse(void * context, uint16_t count, _MediaInputInfo * entries)
+{
+    ChipLogProgress(chipTool, "OnMediaInputMediaInputListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "MediaInputInfo[%lu]:", i);
+        ChipLogProgress(chipTool, "  index: %" PRIu8 "", entries[i].index);
+        ChipLogProgress(chipTool, "  inputType: %" PRIu8 "", entries[i].inputType);
+        ChipLogProgress(chipTool, "  name: %s", entries[i].name);
+        ChipLogProgress(chipTool, "  description: %s", entries[i].description);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 static void OnOperationalCredentialsFabricsListListAttributeResponse(void * context, uint16_t count, _FabricDescriptor * entries)
 {
     ChipLogProgress(chipTool, "OnOperationalCredentialsFabricsListListAttributeResponse: %lu entries", count);
@@ -758,6 +830,40 @@ static void OnOperationalCredentialsFabricsListListAttributeResponse(void * cont
         ChipLogProgress(chipTool, "  FabricId: %" PRIu64 "", entries[i].FabricId);
         ChipLogProgress(chipTool, "  VendorId: %" PRIu16 "", entries[i].VendorId);
         ChipLogProgress(chipTool, "  NodeId: %" PRIu64 "", entries[i].NodeId);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnTvChannelTvChannelListListAttributeResponse(void * context, uint16_t count, _TvChannelInfo * entries)
+{
+    ChipLogProgress(chipTool, "OnTvChannelTvChannelListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "TvChannelInfo[%lu]:", i);
+        ChipLogProgress(chipTool, "  majorNumber: %" PRIu16 "", entries[i].majorNumber);
+        ChipLogProgress(chipTool, "  minorNumber: %" PRIu16 "", entries[i].minorNumber);
+        ChipLogProgress(chipTool, "  name: %s", entries[i].name);
+        ChipLogProgress(chipTool, "  callSign: %s", entries[i].callSign);
+        ChipLogProgress(chipTool, "  affiliateCallSign: %s", entries[i].affiliateCallSign);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(void * context, uint16_t count,
+                                                                      _NavigateTargetTargetInfo * entries)
+{
+    ChipLogProgress(chipTool, "OnTargetNavigatorTargetNavigatorListListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "NavigateTargetTargetInfo[%lu]:", i);
+        ChipLogProgress(chipTool, "  identifier: %" PRIu8 "", entries[i].identifier);
+        ChipLogProgress(chipTool, "  name: %s", entries[i].name);
     }
 
     ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
@@ -1424,8 +1530,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>(
+            OnApplicationLauncherApplicationLauncherListListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -1605,8 +1712,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>(
+            OnAudioOutputAudioOutputListListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -6123,8 +6231,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback>(
+            OnContentLaunchAcceptsHeaderListListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -6157,8 +6266,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>(
+            OnContentLaunchSupportedStreamingTypesListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -9337,8 +9447,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback>(OnMediaInputMediaInputListListAttributeResponse,
+                                                                                    this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -12030,8 +12141,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback>(OnTvChannelTvChannelListListAttributeResponse,
+                                                                                  this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -12245,8 +12357,9 @@ public:
     }
 
 private:
-    chip::Callback::Callback<StringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<StringAttributeCallback>(OnStringAttributeResponse, this);
+    chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>(
+            OnTargetNavigatorTargetNavigatorListListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
