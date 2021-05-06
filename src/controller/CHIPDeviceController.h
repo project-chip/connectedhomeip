@@ -36,8 +36,8 @@
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
-#include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/AdminPairingTable.h>
