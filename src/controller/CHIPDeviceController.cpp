@@ -921,7 +921,12 @@ void DeviceCommissioner::OnSessionEstablished()
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
+    // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
+    // the rendezvous session and mark pairing success
     PersistDevice(device);
+    // Also persist the device list at this time
+    // This makes sure that a newly added device is immediately available
+    PersistDeviceList();
 
     if (mPairingDelegate != nullptr)
     {
