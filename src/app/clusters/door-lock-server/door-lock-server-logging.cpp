@@ -122,6 +122,7 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
 {
     EmberStatus status;
     EmberAfPluginDoorLockServerLogEntry entry;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (LOG_IS_EMPTY() || !emberAfPluginDoorLockServerGetLogEntry(&entryId, &entry))
     {
         status = emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -132,15 +133,39 @@ bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj,
     }
     else
     {
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID, "vwuuuvs", entry.logEntryId, entry.timestamp,
-                                  entry.eventType, entry.source, entry.eventId, entry.userId, entry.pin);
-
-        status = emberAfSendResponse();
-        if (status != EMBER_SUCCESS)
+        if (commandObj == nullptr)
         {
-            emberAfDoorLockClusterPrintln("Failed to send GetLogRecordResponse: 0x%X", status);
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
+                                      ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID, "vwuuuvs", entry.logEntryId, entry.timestamp,
+                                      entry.eventType, entry.source, entry.eventId, entry.userId, entry.pin);
+
+            status = emberAfSendResponse();
+            if (status != EMBER_SUCCESS)
+            {
+                emberAfDoorLockClusterPrintln("Failed to send GetLogRecordResponse: 0x%X", status);
+            }
         }
+        else
+        {
+            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
+                                                 ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,
+                                                 (chip::app::CommandPathFlags::kEndpointIdValid) };
+            TLV::TLVWriter * writer          = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(0), entry.logEntryId));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(1), entry.timestamp));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(2), entry.eventType));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(3), entry.source));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(4), entry.eventId));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(5), entry.userId));
+            SuccessOrExit(err = writer->PutBytes(TLV::ContextTag(6), entry.pin + 1, entry.pin[0]));
+            SuccessOrExit(err = commandObj->FinishCommand());
+        }
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
