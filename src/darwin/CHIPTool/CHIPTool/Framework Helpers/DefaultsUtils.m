@@ -65,14 +65,12 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
 
 CHIPDeviceController * InitializeCHIP(void)
 {
-    static dispatch_queue_t callbackQueue;
     static CHIPToolPersistentStorageDelegate * storage = nil;
     static dispatch_once_t onceToken;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
-        [controller startup:storage queue:callbackQueue];
+        [controller startup:storage];
     });
 
     return controller;

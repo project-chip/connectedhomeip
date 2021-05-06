@@ -28,7 +28,7 @@ public:
     CHIPPersistentStorageDelegateBridge();
     ~CHIPPersistentStorageDelegateBridge();
 
-    void setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate, _Nullable dispatch_queue_t queue);
+    void setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate);
 
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
 
