@@ -51,7 +51,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
     MoveToState(CommandState::Sending);
 
