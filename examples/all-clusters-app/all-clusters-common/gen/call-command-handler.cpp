@@ -223,17 +223,14 @@ EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
 
-    if (cmd->mfgSpecific)
-    {
-        if (cmd->mfgCode == 4098 && cmd->commandId == ZCL_MFG_SPECIFIC_PING_COMMAND_ID)
-        {
-            wasHandled = emberAfBasicClusterMfgSpecificPingCallback(nullptr);
-        }
-    }
-    else
+    if (!cmd->mfgSpecific)
     {
         switch (cmd->commandId)
         {
+        case ZCL_MFG_SPECIFIC_PING_COMMAND_ID: {
+            wasHandled = emberAfBasicClusterMfgSpecificPingCallback(nullptr);
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             break;

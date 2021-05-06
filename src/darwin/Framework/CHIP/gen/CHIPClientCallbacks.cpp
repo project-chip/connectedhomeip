@@ -80,6 +80,27 @@ using namespace ::chip;
         return true;                                                                                                               \
     }
 
+#define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                       \
+    Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
+    Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
+    NodeId sourceIdentifier                  = reinterpret_cast<NodeId>(commandObj);                                               \
+    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceIdentifier, 0, &onSuccessCallback, &onFailureCallback);                  \
+                                                                                                                                   \
+    if (CHIP_NO_ERROR != err)                                                                                                      \
+    {                                                                                                                              \
+        if (onSuccessCallback == nullptr)                                                                                          \
+        {                                                                                                                          \
+            ChipLogDetail(Zcl, "%s: Missing success callback", name);                                                              \
+        }                                                                                                                          \
+                                                                                                                                   \
+        if (onFailureCallback == nullptr)                                                                                          \
+        {                                                                                                                          \
+            ChipLogDetail(Zcl, "%s: Missing failure callback", name);                                                              \
+        }                                                                                                                          \
+                                                                                                                                   \
+        return true;                                                                                                               \
+    }
+
 #define GET_REPORT_CALLBACK(name)                                                                                                  \
     Callback::Cancelable * onReportCallback = nullptr;                                                                             \
     CHIP_ERROR err = gCallbacks.GetReportCallback(sourceId, endpointId, clusterId, attributeId, &onReportCallback);                \
@@ -891,7 +912,7 @@ bool emberAfDoorLockClusterClearAllPinsResponseCallback(chip::app::Command * com
     ChipLogProgress(Zcl, "ClearAllPinsResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearAllPinsResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearAllPinsResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -912,7 +933,7 @@ bool emberAfDoorLockClusterClearAllRfidsResponseCallback(chip::app::Command * co
     ChipLogProgress(Zcl, "ClearAllRfidsResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearAllRfidsResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearAllRfidsResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -933,7 +954,7 @@ bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(chip::app::Comma
     ChipLogProgress(Zcl, "ClearHolidayScheduleResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearHolidayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearHolidayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -954,7 +975,7 @@ bool emberAfDoorLockClusterClearPinResponseCallback(chip::app::Command * command
     ChipLogProgress(Zcl, "ClearPinResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearPinResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearPinResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -975,7 +996,7 @@ bool emberAfDoorLockClusterClearRfidResponseCallback(chip::app::Command * comman
     ChipLogProgress(Zcl, "ClearRfidResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearRfidResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearRfidResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -996,7 +1017,7 @@ bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(chip::app::Comma
     ChipLogProgress(Zcl, "ClearWeekdayScheduleResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearWeekdayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearWeekdayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1017,7 +1038,7 @@ bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(chip::app::Comma
     ChipLogProgress(Zcl, "ClearYeardayScheduleResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterClearYeardayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearYeardayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1044,7 +1065,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(chip::app::Command
     ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
     ChipLogProgress(Zcl, "  operatingModeDuringHoliday: %" PRIu8 "", operatingModeDuringHoliday);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetHolidayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetHolidayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1073,7 +1094,7 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(chip::app::Command * com
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  pin: %s", pin);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
 
     Callback::Callback<DoorLockClusterGetLogRecordResponseCallback> * cb =
         Callback::Callback<DoorLockClusterGetLogRecordResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1090,7 +1111,7 @@ bool emberAfDoorLockClusterGetPinResponseCallback(chip::app::Command * commandOb
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
     ChipLogProgress(Zcl, "  pin: %s", pin);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
 
     Callback::Callback<DoorLockClusterGetPinResponseCallback> * cb =
         Callback::Callback<DoorLockClusterGetPinResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1107,7 +1128,7 @@ bool emberAfDoorLockClusterGetRfidResponseCallback(chip::app::Command * commandO
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
     ChipLogProgress(Zcl, "  rfid: %s", rfid);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
 
     Callback::Callback<DoorLockClusterGetRfidResponseCallback> * cb =
         Callback::Callback<DoorLockClusterGetRfidResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1121,7 +1142,7 @@ bool emberAfDoorLockClusterGetUserTypeResponseCallback(chip::app::Command * comm
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetUserTypeResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetUserTypeResponseCallback");
 
     Callback::Callback<DoorLockClusterGetUserTypeResponseCallback> * cb =
         Callback::Callback<DoorLockClusterGetUserTypeResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1143,7 +1164,7 @@ bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(chip::app::Command
     ChipLogProgress(Zcl, "  endHour: %" PRIu8 "", endHour);
     ChipLogProgress(Zcl, "  endMinute: %" PRIu8 "", endMinute);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetWeekdayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetWeekdayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1169,7 +1190,7 @@ bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(chip::app::Command
     ChipLogProgress(Zcl, "  localStartTime: %" PRIu32 "", localStartTime);
     ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterGetYeardayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetYeardayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1190,7 +1211,7 @@ bool emberAfDoorLockClusterLockDoorResponseCallback(chip::app::Command * command
     ChipLogProgress(Zcl, "LockDoorResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterLockDoorResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterLockDoorResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1211,7 +1232,7 @@ bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(chip::app::Command
     ChipLogProgress(Zcl, "SetHolidayScheduleResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterSetHolidayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetHolidayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1232,7 +1253,7 @@ bool emberAfDoorLockClusterSetPinResponseCallback(chip::app::Command * commandOb
     ChipLogProgress(Zcl, "SetPinResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterSetPinResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetPinResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1253,7 +1274,7 @@ bool emberAfDoorLockClusterSetRfidResponseCallback(chip::app::Command * commandO
     ChipLogProgress(Zcl, "SetRfidResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterSetRfidResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetRfidResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1274,7 +1295,7 @@ bool emberAfDoorLockClusterSetUserTypeResponseCallback(chip::app::Command * comm
     ChipLogProgress(Zcl, "SetUserTypeResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterSetUserTypeResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetUserTypeResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1295,7 +1316,7 @@ bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(chip::app::Command
     ChipLogProgress(Zcl, "SetWeekdayScheduleResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterSetWeekdayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetWeekdayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1316,7 +1337,7 @@ bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(chip::app::Command
     ChipLogProgress(Zcl, "SetYeardayScheduleResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterSetYeardayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetYeardayScheduleResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1337,7 +1358,7 @@ bool emberAfDoorLockClusterUnlockDoorResponseCallback(chip::app::Command * comma
     ChipLogProgress(Zcl, "UnlockDoorResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterUnlockDoorResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterUnlockDoorResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1358,7 +1379,7 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(chip::app::Command 
     ChipLogProgress(Zcl, "UnlockWithTimeoutResponse:");
     LogStatus(status);
 
-    GET_RESPONSE_CALLBACKS("DoorLockClusterUnlockWithTimeoutResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterUnlockWithTimeoutResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1381,7 +1402,7 @@ bool emberAfGeneralCommissioningClusterArmFailSafeResponseCallback(chip::app::Co
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterArmFailSafeResponseCallback");
 
     Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback> * cb =
         Callback::Callback<GeneralCommissioningClusterArmFailSafeResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1396,7 +1417,7 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteResponseCallback(chi
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterCommissioningCompleteResponseCallback");
 
     Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback> * cb =
         Callback::Callback<GeneralCommissioningClusterCommissioningCompleteResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1411,7 +1432,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(chip:
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GeneralCommissioningClusterSetRegulatoryConfigResponseCallback");
 
     Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * cb =
         Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1425,7 +1446,7 @@ bool emberAfGroupsClusterAddGroupResponseCallback(chip::app::Command * commandOb
     LogStatus(status);
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
 
-    GET_RESPONSE_CALLBACKS("GroupsClusterAddGroupResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterAddGroupResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1449,7 +1470,7 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(chip::app::Command *
     ChipLogProgress(Zcl, "  groupCount: %" PRIu8 "", groupCount);
     ChipLogProgress(Zcl, "  groupList: %p", groupList);
 
-    GET_RESPONSE_CALLBACKS("GroupsClusterGetGroupMembershipResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterGetGroupMembershipResponseCallback");
 
     Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> * cb =
         Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1463,7 +1484,7 @@ bool emberAfGroupsClusterRemoveGroupResponseCallback(chip::app::Command * comman
     LogStatus(status);
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
 
-    GET_RESPONSE_CALLBACKS("GroupsClusterRemoveGroupResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterRemoveGroupResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1487,7 +1508,7 @@ bool emberAfGroupsClusterViewGroupResponseCallback(chip::app::Command * commandO
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
     ChipLogProgress(Zcl, "  groupName: %s", groupName);
 
-    GET_RESPONSE_CALLBACKS("GroupsClusterViewGroupResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterViewGroupResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1508,7 +1529,7 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(chip::app::Command * co
     ChipLogProgress(Zcl, "IdentifyQueryResponse:");
     ChipLogProgress(Zcl, "  timeout: %" PRIu16 "", timeout);
 
-    GET_RESPONSE_CALLBACKS("IdentifyClusterIdentifyQueryResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("IdentifyClusterIdentifyQueryResponseCallback");
 
     Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback> * cb =
         Callback::Callback<IdentifyClusterIdentifyQueryResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1523,7 +1544,7 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::ap
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddThreadNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddThreadNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1538,7 +1559,7 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::app:
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddWiFiNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterAddWiFiNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1553,7 +1574,7 @@ bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::app:
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterDisableNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterDisableNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterDisableNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1568,7 +1589,7 @@ bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::app::
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterEnableNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterEnableNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1583,7 +1604,7 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::app::
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterRemoveNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterRemoveNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterRemoveNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1602,7 +1623,7 @@ bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
     ChipLogProgress(Zcl, "  wifiScanResults: %p", wifiScanResults);
     ChipLogProgress(Zcl, "  threadScanResults: %p", threadScanResults);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterScanNetworksResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterScanNetworksResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterScanNetworksResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1617,7 +1638,7 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip:
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateThreadNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateThreadNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1632,7 +1653,7 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     ChipLogProgress(Zcl, "  errorCode: %" PRIu8 "", errorCode);
     ChipLogProgress(Zcl, "  debugText: %s", debugText);
 
-    GET_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback");
 
     Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback> * cb =
         Callback::Callback<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1645,7 +1666,7 @@ bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Co
     ChipLogProgress(Zcl, "SetFabricResponse:");
     ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
 
     Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1661,7 +1682,7 @@ bool emberAfScenesClusterAddSceneResponseCallback(chip::app::Command * commandOb
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
     ChipLogProgress(Zcl, "  sceneId: %" PRIu8 "", sceneId);
 
-    GET_RESPONSE_CALLBACKS("ScenesClusterAddSceneResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterAddSceneResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1688,7 +1709,7 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(chip::app::Command *
     ChipLogProgress(Zcl, "  sceneCount: %" PRIu8 "", sceneCount);
     ChipLogProgress(Zcl, "  sceneList: %p", sceneList);
 
-    GET_RESPONSE_CALLBACKS("ScenesClusterGetSceneMembershipResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterGetSceneMembershipResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1710,7 +1731,7 @@ bool emberAfScenesClusterRemoveAllScenesResponseCallback(chip::app::Command * co
     LogStatus(status);
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
 
-    GET_RESPONSE_CALLBACKS("ScenesClusterRemoveAllScenesResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterRemoveAllScenesResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1734,7 +1755,7 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(chip::app::Command * comman
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
     ChipLogProgress(Zcl, "  sceneId: %" PRIu8 "", sceneId);
 
-    GET_RESPONSE_CALLBACKS("ScenesClusterRemoveSceneResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterRemoveSceneResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1758,7 +1779,7 @@ bool emberAfScenesClusterStoreSceneResponseCallback(chip::app::Command * command
     ChipLogProgress(Zcl, "  groupId: %" PRIu16 "", groupId);
     ChipLogProgress(Zcl, "  sceneId: %" PRIu8 "", sceneId);
 
-    GET_RESPONSE_CALLBACKS("ScenesClusterStoreSceneResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterStoreSceneResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1786,7 +1807,7 @@ bool emberAfScenesClusterViewSceneResponseCallback(chip::app::Command * commandO
     ChipLogProgress(Zcl, "  sceneName: %s", sceneName);
     ChipLogProgress(Zcl, "  extensionFieldSets: %p", extensionFieldSets);
 
-    GET_RESPONSE_CALLBACKS("ScenesClusterViewSceneResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ScenesClusterViewSceneResponseCallback");
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -1807,7 +1828,7 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::app::Command * 
     ChipLogProgress(Zcl, "TestSpecificResponse:");
     ChipLogProgress(Zcl, "  returnValue: %" PRIu8 "", returnValue);
 
-    GET_RESPONSE_CALLBACKS("TestClusterClusterTestSpecificResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestSpecificResponseCallback");
 
     Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);

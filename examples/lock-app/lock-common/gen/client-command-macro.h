@@ -1813,6 +1813,15 @@
                                                                                                                                    \
                               ZCL_LEAVE_COMMAND_ID, "", );
 
+/** @brief Command description for MfgSpecificPing
+ *
+ * Command: MfgSpecificPing
+ */
+#define emberAfFillCommandBasicClusterMfgSpecificPing()                                                                            \
+    emberAfFillExternalBuffer(mask,                                                                                                \
+                                                                                                                                   \
+                              ZCL_MFG_SPECIFIC_PING_COMMAND_ID, "", );
+
 /** @brief Command description for QueryImage
  *
  * Command: QueryImage

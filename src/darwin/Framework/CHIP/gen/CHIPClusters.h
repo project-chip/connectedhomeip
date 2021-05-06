@@ -132,7 +132,7 @@ public:
                                                  uint8_t value);
 
 private:
-    static constexpr CommandId kMfgSpecificPingCommandId = 0x00;
+    static constexpr CommandId kMfgSpecificPingCommandId = 0xA0;
 };
 
 class DLL_EXPORT BindingCluster : public ClusterBase

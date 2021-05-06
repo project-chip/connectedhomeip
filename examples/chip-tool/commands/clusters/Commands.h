@@ -1927,7 +1927,7 @@ private:
 | Cluster Basic                                                       | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * MfgSpecificPing                                                   |   0x00 |
+| * MfgSpecificPing                                                   |   0xA0 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InteractionModelVersion                                           | 0x0000 |
@@ -1965,7 +1965,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0x00) on endpoint %" PRIu16, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0xA0) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);

@@ -178,7 +178,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_BARRIER_CONTROL_STOP_COMMAND_ID (0x01)
 
 #define BASIC_CLUSTER_ID 0x0028
-#define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
+#define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0xA0)
 
 #define BINDING_CLUSTER_ID 0xF000
 #define ZCL_BIND_COMMAND_ID (0x00)
@@ -797,7 +797,7 @@ PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8
 | Cluster Basic                                                       | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * MfgSpecificPing                                                   |   0x00 |
+| * MfgSpecificPing                                                   |   0xA0 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InteractionModelVersion                                           | 0x0000 |
@@ -826,7 +826,7 @@ PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionAttribute(uint8
 PacketBufferHandle encodeBasicClusterMfgSpecificPingCommand(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("MfgSpecificPing", BASIC_CLUSTER_ID);
-    buf.Put8(kFrameControlClusterSpecificCommand | (1u << 2)).Put16(0x1002).Put8(seqNum).Put8(ZCL_MFG_SPECIFIC_PING_COMMAND_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_MFG_SPECIFIC_PING_COMMAND_ID);
     COMMAND_FOOTER();
 }
 

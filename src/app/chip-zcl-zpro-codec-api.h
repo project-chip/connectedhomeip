@@ -345,7 +345,7 @@ chip::System::PacketBufferHandle encodeBarrierControlClusterReadClusterRevisionA
 | Cluster Basic                                                       | 0x0028 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * MfgSpecificPing                                                   |   0x00 |
+| * MfgSpecificPing                                                   |   0xA0 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * InteractionModelVersion                                           | 0x0000 |

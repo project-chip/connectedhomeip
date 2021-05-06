@@ -224,9 +224,9 @@
 
 // Commands for cluster: Basic
 #define ZCL_START_UP_COMMAND_ID (0x00)
-#define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
 #define ZCL_SHUT_DOWN_COMMAND_ID (0x01)
 #define ZCL_LEAVE_COMMAND_ID (0x02)
+#define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0xA0)
 
 // Commands for cluster: OTA Software Update Server
 #define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
