@@ -232,7 +232,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
 
     // Fetch current admin
     AdminPairingInfo * admin = retrieveCurrentAdmin();
@@ -277,6 +277,10 @@ exit:
     if (sendStatus != EMBER_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to send %s response: 0x%x", "set_fabric", sendStatus);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
     }
 
     return true;
