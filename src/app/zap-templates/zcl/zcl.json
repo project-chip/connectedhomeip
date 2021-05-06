@@ -28,6 +28,7 @@
         "group-key-mgmt-cluster.xml",
         "ha.xml",
         "ha-devices.xml",
+        "pump-configuration-and-control-cluster.xml",
         "cba.xml",
         "cba-devices.xml",
         "ota.xml",
