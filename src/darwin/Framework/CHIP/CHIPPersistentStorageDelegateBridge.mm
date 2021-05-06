@@ -60,8 +60,7 @@ CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
 
-void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(
-    _Nullable id<CHIPPersistentStorageDelegate> delegate)
+void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate)
 {
     dispatch_async(mWorkQueue, ^{
         if (delegate) {
@@ -124,7 +123,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
         if (strongDelegate) {
-                [strongDelegate CHIPSetKeyValue:keyString value:valueString];
+            [strongDelegate CHIPSetKeyValue:keyString value:valueString];
         } else {
             [mDefaultPersistentStorage setObject:valueString forKey:keyString];
         }
@@ -145,7 +144,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * 
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
         if (strongDelegate) {
-                [strongDelegate CHIPDeleteKeyValue:keyString];
+            [strongDelegate CHIPDeleteKeyValue:keyString];
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
         }
