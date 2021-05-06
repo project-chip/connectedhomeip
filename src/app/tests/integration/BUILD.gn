@@ -39,12 +39,12 @@ executable("chip-im-initiator") {
 
 executable("chip-im-responder") {
   sources = [
+    "MockEvents.cpp",
     "chip_im_responder.cpp",
     "common.cpp",
   ]
 
   deps = [
-    "${chip_root}/src/app",
     "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

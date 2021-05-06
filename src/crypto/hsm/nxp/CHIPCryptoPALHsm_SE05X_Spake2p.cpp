@@ -26,17 +26,17 @@
 
 #if ((ENABLE_HSM_SPAKE_VERIFIER) || (ENABLE_HSM_SPAKE_PROVER))
 
-const int m_id = 0x2345;
-const int n_id = 0x2346;
+const uint32_t m_id = 0x2345;
+const uint32_t n_id = 0x2346;
 
 #if ENABLE_HSM_SPAKE_VERIFIER
-const int w0in_id_v = 0x2347;
-const int Lin_id_v  = 0x2348;
+const uint32_t w0in_id_v = 0x2347;
+const uint32_t Lin_id_v  = 0x2348;
 #endif
 
 #if ENABLE_HSM_SPAKE_PROVER
-const int w0in_id_p = 0x2349;
-const int w1in_id_p = 0x2350;
+const uint32_t w0in_id_p = 0x2349;
+const uint32_t w1in_id_p = 0x2350;
 #endif
 
 void Spake2p_Finish_HSM(hsm_pake_context_t * phsm_pake_context)
@@ -116,7 +116,7 @@ CHIP_ERROR create_init_crypto_obj(chip::Crypto::CHIP_SPAKE2P_ROLE role, hsm_pake
     smstatus = Se05x_API_ReadCryptoObjectList(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, list, &listlen);
     for (i = 0; i < listlen; i += 4)
     {
-        uint32_t cryptoObjectId = list[i + 1] | (list[i + 0] << 8);
+        uint32_t cryptoObjectId = static_cast<uint32_t>(list[i + 1] | (list[i + 0] << 8));
         if (cryptoObjectId == spakeObjectId)
         {
             create_crypto_obj = 0;

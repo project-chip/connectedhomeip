@@ -2310,10 +2310,6 @@ EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClus
     {
         switch (cmd->commandId)
         {
-        case ZCL_GET_FABRIC_ID_COMMAND_ID: {
-            wasHandled = emberAfOperationalCredentialsClusterGetFabricIdCallback(nullptr);
-            break;
-        }
         case ZCL_REMOVE_FABRIC_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             chip::FabricId FabricId;
@@ -2339,6 +2335,19 @@ EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClus
             VendorId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(nullptr, FabricId, NodeId, VendorId);
+            break;
+        }
+        case ZCL_SET_FABRIC_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t VendorId;
+
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            VendorId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfOperationalCredentialsClusterSetFabricCallback(nullptr, VendorId);
             break;
         }
         case ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID: {

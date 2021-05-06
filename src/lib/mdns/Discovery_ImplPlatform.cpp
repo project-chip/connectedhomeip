@@ -141,7 +141,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char discriminatorBuf[6];
     char vendorProductBuf[12];
     char pairingInstrBuf[128];
-    TextEntry textEntries[4];
+    TextEntry textEntries[CommissionAdvertisingParameters::kNumAdvertisingTxtEntries];
     size_t textEntrySize = 0;
     char shortDiscriminatorSubtype[6];
     char longDiscriminatorSubtype[8];
@@ -210,6 +210,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                          strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
     }
 
+    // TODO: Add missing "CM" / "DT" / "DN" keys + split "P" into "PH"/"PI" to be spec-compliant
+
     snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
     subTypes[subTypeSize++] = shortDiscriminatorSubtype;
     snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
@@ -250,7 +252,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     constexpr uint8_t kMaxCRMPRetryBufferSize = 7 + 1;
     char crmpRetryIntervalIdleBuf[kMaxCRMPRetryBufferSize];
     char crmpRetryIntervalActiveBuf[kMaxCRMPRetryBufferSize];
-    TextEntry crmpRetryIntervalEntries[2];
+    TextEntry crmpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
     size_t textEntrySize = 0;
     uint32_t crmpRetryIntervalIdle, crmpRetryIntervalActive;
     int writtenCharactersNumber;

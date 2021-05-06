@@ -2170,14 +2170,6 @@ CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device
 // End of Cluster OnOff
 // Cluster OperationalCredentials
 
-CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_GetFabricId(chip::Controller::Device * device,
-                                                                     chip::EndpointId ZCLendpointId, chip::GroupId)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.GetFabricId(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                       chip::FabricId fabricId, chip::NodeId nodeId,
@@ -2187,6 +2179,14 @@ CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Cont
     chip::Controller::OperationalCredentialsCluster cluster;
     cluster.Associate(device, ZCLendpointId);
     return cluster.RemoveFabric(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), fabricId, nodeId, vendorId);
+}
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_SetFabric(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId, uint16_t vendorId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.SetFabric(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), vendorId);
 }
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(chip::Controller::Device * device,
                                                                            chip::EndpointId ZCLendpointId, chip::GroupId,
