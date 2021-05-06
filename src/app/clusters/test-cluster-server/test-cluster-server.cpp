@@ -44,7 +44,7 @@ bool emberAfTestClusterClusterTestCallback(chip::app::Command *)
 
 bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apCommandObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t returnValue = 7;
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_TEST_CLUSTER_ID,
                               ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, "u", returnValue);
@@ -60,7 +60,7 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apComman
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TEST_CLUSTER_ID,
                                              ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID,
                                              (chip::app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer = nullptr;
+        TLV::TLVWriter * writer          = nullptr;
 
         SuccessOrExit(err = apCommandObj->PrepareCommand(&cmdParams));
         writer = apCommandObj->GetCommandDataElementTLVWriter();
