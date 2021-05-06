@@ -641,11 +641,9 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "ApplicationLauncher": [
-                "ApplicationLauncherList",
                 "ClusterRevision",
             ],
             "AudioOutput": [
-                "AudioOutputList",
                 "ClusterRevision",
             ],
             "BarrierControl": [
@@ -732,8 +730,6 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "ContentLaunch": [
-                "AcceptsHeaderList",
-                "SupportedStreamingTypes",
                 "ClusterRevision",
             ],
             "Descriptor": [
@@ -776,7 +772,6 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "MediaInput": [
-                "MediaInputList",
                 "ClusterRevision",
             ],
             "MediaPlayback": [
@@ -816,13 +811,11 @@ class ChipClusters:
                 "ClusterRevision",
             ],
             "TvChannel": [
-                "TvChannelList",
                 "TvChannelLineup",
                 "CurrentTvChannel",
                 "ClusterRevision",
             ],
             "TargetNavigator": [
-                "TargetNavigatorList",
                 "ClusterRevision",
             ],
             "TemperatureMeasurement": [
@@ -1469,12 +1462,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ApplicationSatus(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationBasic_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterApplicationLauncher_ReadAttributeApplicationLauncherList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList(device, ZCLendpoint, ZCLgroupid)
     def ClusterApplicationLauncher_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterAudioOutput_ReadAttributeAudioOutputList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList(device, ZCLendpoint, ZCLgroupid)
     def ClusterAudioOutput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterBarrierControl_ReadAttributeBarrierMovingState(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1637,10 +1626,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_StartUpColorTemperatureMireds(device, ZCLendpoint, ZCLgroupid)
     def ClusterColorControl_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterContentLaunch_ReadAttributeAcceptsHeaderList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList(device, ZCLendpoint, ZCLgroupid)
-    def ClusterContentLaunch_ReadAttributeSupportedStreamingTypes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes(device, ZCLendpoint, ZCLgroupid)
     def ClusterContentLaunch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_ContentLaunch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterDescriptor_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1685,8 +1670,6 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterLowPower_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_LowPower_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterMediaInput_ReadAttributeMediaInputList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaInput_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterMediaPlayback_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1739,16 +1722,12 @@ class ChipClusters:
         return self._chipLib.chip_ime_ConfigureAttribute_Switch_CurrentPosition(device, ZCLendpoint, minInterval, maxInterval, change)
     def ClusterSwitch_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterTvChannel_ReadAttributeTvChannelList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelList(device, ZCLendpoint, ZCLgroupid)
     def ClusterTvChannel_ReadAttributeTvChannelLineup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelLineup(device, ZCLendpoint, ZCLgroupid)
     def ClusterTvChannel_ReadAttributeCurrentTvChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TvChannel_CurrentTvChannel(device, ZCLendpoint, ZCLgroupid)
     def ClusterTvChannel_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TvChannel_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
-    def ClusterTargetNavigator_ReadAttributeTargetNavigatorList(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
-        return self._chipLib.chip_ime_ReadAttribute_TargetNavigator_TargetNavigatorList(device, ZCLendpoint, ZCLgroupid)
     def ClusterTargetNavigator_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_TargetNavigator_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterTemperatureMeasurement_ReadAttributeMeasuredValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -1892,9 +1871,6 @@ class ChipClusters:
         # Cluster ApplicationLauncher Command LaunchApp
         self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.restype = ctypes.c_uint32
-        # Cluster ApplicationLauncher ReadAttribute ApplicationLauncherList
-        self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList.restype = ctypes.c_uint32
         # Cluster ApplicationLauncher ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision.restype = ctypes.c_uint32
@@ -1905,9 +1881,6 @@ class ChipClusters:
         # Cluster AudioOutput Command SelectOutput
         self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.restype = ctypes.c_uint32
-        # Cluster AudioOutput ReadAttribute AudioOutputList
-        self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList.restype = ctypes.c_uint32
         # Cluster AudioOutput ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision.restype = ctypes.c_uint32
@@ -2219,12 +2192,6 @@ class ChipClusters:
         # Cluster ContentLaunch Command LaunchURL
         self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.restype = ctypes.c_uint32
-        # Cluster ContentLaunch ReadAttribute AcceptsHeaderList
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList.restype = ctypes.c_uint32
-        # Cluster ContentLaunch ReadAttribute SupportedStreamingTypes
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_ContentLaunch_SupportedStreamingTypes.restype = ctypes.c_uint32
         # Cluster ContentLaunch ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_ContentLaunch_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_ContentLaunch_ClusterRevision.restype = ctypes.c_uint32
@@ -2446,9 +2413,6 @@ class ChipClusters:
         # Cluster MediaInput Command ShowInputStatus
         self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.restype = ctypes.c_uint32
-        # Cluster MediaInput ReadAttribute MediaInputList
-        self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList.restype = ctypes.c_uint32
         # Cluster MediaInput ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision.restype = ctypes.c_uint32
@@ -2652,9 +2616,6 @@ class ChipClusters:
         # Cluster TvChannel Command SkipChannel
         self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.restype = ctypes.c_uint32
-        # Cluster TvChannel ReadAttribute TvChannelList
-        self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelList.restype = ctypes.c_uint32
         # Cluster TvChannel ReadAttribute TvChannelLineup
         self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelLineup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelLineup.restype = ctypes.c_uint32
@@ -2668,9 +2629,6 @@ class ChipClusters:
         # Cluster TargetNavigator Command NavigateTarget
         self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.restype = ctypes.c_uint32
-        # Cluster TargetNavigator ReadAttribute TargetNavigatorList
-        self._chipLib.chip_ime_ReadAttribute_TargetNavigator_TargetNavigatorList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
-        self._chipLib.chip_ime_ReadAttribute_TargetNavigator_TargetNavigatorList.restype = ctypes.c_uint32
         # Cluster TargetNavigator ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TargetNavigator_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_TargetNavigator_ClusterRevision.restype = ctypes.c_uint32

@@ -26,11 +26,9 @@ limitations under the License.
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
-    <!-- TODO: Convert this to list once it is supported -->
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPTS_HEADER" type="OCTET_STRING" length="32" writable="false" optional="false">accepts header list</attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_TYPES" type="OCTET_STRING" length="32" writable="false" optional="false">supported streaming types</attribute>
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPTS_HEADER" type="ARRAY" entryType="OCTET_STRING" length="254" writable="false" optional="false">acceptsHeaderList</attribute>
+    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_TYPES" type="ARRAY" entryType="ContentLaunchStreamingType" length="254" writable="false" optional="false">supported streaming types</attribute>
 
-    
     <command source="client" code="0x00" name="LaunchContent" optional="false">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
       <arg name="autoPlay" type="BOOLEAN"/>

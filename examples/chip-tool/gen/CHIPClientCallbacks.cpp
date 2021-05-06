@@ -419,6 +419,91 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 
                 switch (clusterId)
                 {
+                case 0x050C:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // INT16U
+                    {
+                        uint16_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i] = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                        }
+
+                        Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback> * cb =
+                            Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x050B:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // AudioOutputInfo
+                    {
+                        _AudioOutputInfo data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].index = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].outputType = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
+                            messageLen -= 34;
+                            message += 34;
+                        }
+
+                        Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * cb =
+                            Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x050A:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // OCTET_STRING
+                    {
+                        chip::ByteSpan data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_STATUS(ReadByteSpan(message, messageLen, &data[i]));
+                            uint16_t entryLength = static_cast<uint16_t>(data[i].size() + kByteSpanSizeLengthInBytes);
+                            messageLen -= entryLength;
+                            message += entryLength;
+                        }
+
+                        Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> * cb =
+                            Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x0001: // ContentLaunchStreamingType
+                    {
+                        uint8_t data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i] = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback> * cb =
+                            Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 case 0x001D:
                     switch (attributeId)
                     {
@@ -576,6 +661,35 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x0507:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // MediaInputInfo
+                    {
+                        _MediaInputInfo data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].index = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].inputType = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
+                            messageLen -= 34;
+                            message += 34;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].description));
+                            messageLen -= 34;
+                            message += 34;
+                        }
+
+                        Callback::Callback<MediaInputMediaInputListListAttributeCallback> * cb =
+                            Callback::Callback<MediaInputMediaInputListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 case 0x003E:
                     switch (attributeId)
                     {
@@ -597,6 +711,62 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 
                         Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * cb =
                             Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x0504:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // TvChannelInfo
+                    {
+                        _TvChannelInfo data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].majorNumber = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_MESSAGE_LENGTH(2);
+                            data[i].minorNumber = emberAfGetInt16u(message, 0, 2);
+                            message += 2;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
+                            messageLen -= 34;
+                            message += 34;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].callSign));
+                            messageLen -= 34;
+                            message += 34;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].affiliateCallSign));
+                            messageLen -= 34;
+                            message += 34;
+                        }
+
+                        Callback::Callback<TvChannelTvChannelListListAttributeCallback> * cb =
+                            Callback::Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
+                case 0x0505:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // NavigateTargetTargetInfo
+                    {
+                        _NavigateTargetTargetInfo data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].identifier = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].name));
+                            messageLen -= 34;
+                            message += 34;
+                        }
+
+                        Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> * cb =
+                            Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(
                                 onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;

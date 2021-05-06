@@ -1298,7 +1298,7 @@ chip::System::PacketBufferHandle encodeContentLaunchClusterDiscoverAttributes(ui
 
 /**
  * @brief
- *    Encode a Content Launch server read command for the accepts header list attribute into buffer including the APS frame
+ *    Encode a Content Launch server read command for the acceptsHeaderList attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeContentLaunchClusterReadAcceptsHeaderListAttribute(uint8_t seqNum,
                                                                                           chip::EndpointId destinationEndpoint);

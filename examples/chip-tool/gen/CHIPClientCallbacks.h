@@ -141,6 +141,10 @@ typedef void (*ThermostatClusterRelayStatusLogCallback)(void * context, uint16_t
                                                         uint16_t unreadEntries);
 
 // List specific responses
+typedef void (*ApplicationLauncherApplicationLauncherListListAttributeCallback)(void * context, uint16_t count, uint16_t * entries);
+typedef void (*AudioOutputAudioOutputListListAttributeCallback)(void * context, uint16_t count, _AudioOutputInfo * entries);
+typedef void (*ContentLaunchAcceptsHeaderListListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
+typedef void (*ContentLaunchSupportedStreamingTypesListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
 typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16_t count, _DeviceType * entries);
 typedef void (*DescriptorServerListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
@@ -149,7 +153,11 @@ typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(void * 
                                                                          _NetworkInterfaceType * entries);
 typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, uint16_t count, _GroupState * entries);
 typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);
+typedef void (*MediaInputMediaInputListListAttributeCallback)(void * context, uint16_t count, _MediaInputInfo * entries);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
+typedef void (*TvChannelTvChannelListListAttributeCallback)(void * context, uint16_t count, _TvChannelInfo * entries);
+typedef void (*TargetNavigatorTargetNavigatorListListAttributeCallback)(void * context, uint16_t count,
+                                                                        _NavigateTargetTargetInfo * entries);
 typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
 typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
 typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
