@@ -187,8 +187,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         _persistentStorageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
     } else {
-        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithFormat:@"%lld", _localDeviceId]];
-        [scanner scanHexLongLong:&_localDeviceId];
         CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }
     return [NSNumber numberWithUnsignedLongLong:_localDeviceId];
