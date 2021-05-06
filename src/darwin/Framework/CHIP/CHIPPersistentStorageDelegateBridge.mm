@@ -105,7 +105,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncGetKeyValue(const char * key
                 } else {
                     error = CHIP_ERROR_NO_MEMORY;
                 }
-                size = decoded.length();
+                size = static_cast<uint16_t>(decoded.length());
             }
         } else {
             error = CHIP_ERROR_KEY_NOT_FOUND;
