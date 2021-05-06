@@ -16,7 +16,6 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  </domain>
   <cluster>
     <name>Pump Configuration and Control</name>
     <domain>HVAC</domain>
@@ -49,51 +48,54 @@ limitations under the License.
     <attribute side="server" code="0x0020" define="OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="false">operation mode</attribute>
     <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFe" writable="true" default="0x00" optional="true">control mode</attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">alarm mask</attribute>
-    <!-- ALARM_MASK -->
   </cluster>
 
   <bitmap name="PumpStatus" type="BITMAP16">
-    <field name="deviceFault" mask="0x1"/>
-    <field name="supplyfault" mask="0x2"/>
-    <field name="speedLow" mask="0x4"/>
-    <field name="speedHigh" mask="0x8"/>
-    <field name="localOverride" mask="0x10"/>
-    <field name="running" mask="0x20"/>
-    <field name="remotePressure" mask="0x40"/>
-    <field name="remoteFlow" mask="0x80"/>
+    <field name="DeviceFault" mask="0x1"/>
+    <field name="Supplyfault" mask="0x2"/>
+    <field name="SpeedLow" mask="0x4"/>
+    <field name="SpeedHigh" mask="0x8"/>
+    <field name="LocalOverride" mask="0x10"/>
+    <field name="Running" mask="0x20"/>
+    <field name="RemotePressure" mask="0x40"/>
+    <field name="RemoteFlow" mask="0x80"/>
     <field name="remoteTemperature" mask="0x100"/>
   </bitmap>
 
-  <enum name="PumpOperationMode" type="ENUM8">
-    <item name="normal" value="0x0"/>
-    <item name="minimum" value="0x1"/>
-    <item name="maximum" value="0x2"/>
-    <item name="local" value="0x3"/>
+  <enum name="OperationMode" type="ENUM8">
+    <item name="Normal" value="0x0"/>
+    <item name="Minimum" value="0x1"/>
+    <item name="Maximum" value="0x2"/>
+    <item name="Local" value="0x3"/>
   </enum>
 
-  <enum name="PumpControlMode" type="ENUM8">
-    <item name="constantSpeed" value="0x0"/>
-    <item name="constantPressure" value="0x1"/>
-    <item name="proportionalPressure" value="0x2"/>
-    <item name="constantFlow" value="0x3"/>
-    <item name="constantTemperature" value="0x5"/>
-    <item name="automatic" value="0x7"/>
+  <enum name="ControlMode" type="ENUM8">
+    <item name="ConstantSpeed" value="0x0"/>
+    <item name="ConstantPressure" value="0x1"/>
+    <item name="ProportionalPressure" value="0x2"/>
+    <item name="ConstantFlow" value="0x3"/>
+    <item name="ConstantTemperature" value="0x5"/>
+    <item name="Automatic" value="0x7"/>
   </enum>
 
-  <bitmap name="PumpAlarmMask" type="BITMAP16">
-    <field name="SupplyVoltageTooLow" mask="0x1"/>
-    <field name="SupplyVoltageTooHigh" mask="0x2"/>
+  <bitmap name="AlarmMask" type="BITMAP16">
+    <field name="SupplyVoltageLow" mask="0x1"/>
+    <field name="SupplyVoltageHigh" mask="0x2"/>
     <field name="PowerMissingPhase" mask="0x4"/>
-    <field name="SystemPressureTooLow" mask="0x8"/>
-    <field name="SystemPressureTooHigh" mask="0x10"/>
+    <field name="SystemPressureLow" mask="0x8"/>
+    <field name="SystemPressureHigh" mask="0x10"/>
     <field name="DryRunning" mask="0x20"/>
-    <field name="MotorTemperatureTooHigh" mask="0x40"/>
-    <field name="PumpMotorHasFatalFailure" mask="0x80"/>
-    <field name="ElectronicTemperatureTooHigh" mask="0x100"/>
+    <field name="MotorTemperatureHigh" mask="0x40"/>
+    <field name="PumpMotorFatalFailure" mask="0x80"/>
+    <field name="ElectronicTemperatureHigh" mask="0x100"/>
     <field name="PumpBlocked" mask="0x200"/>
     <field name="SensorFailure" mask="0x400"/>
     <field name="ElectronicNonFatalFailure" mask="0x800"/>
     <field name="ElectronicFatalFailure" mask="0x1000"/>
     <field name="GeneralFault" mask="0x2000"/>
+    <field name="Leakage" mask="0x4000"/>
+    <field name="AirDetection" mask="0x8000"/>
+    <field name="TurbineOperation" mask="0x10000"/>
   </bitmap>
+
 </configurator>
