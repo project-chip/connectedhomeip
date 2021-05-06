@@ -173,8 +173,8 @@ int main(int argc, char * argv[])
 
     InitializeEventLogging(&gExchangeManager);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
-                                     chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
+                                     gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");

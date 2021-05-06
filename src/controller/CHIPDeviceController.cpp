@@ -906,7 +906,7 @@ void DeviceCommissioner::OnSessionEstablished()
     CHIP_ERROR err =
         mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
                                 mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSessionMgr::PairingDirection::kInitiator, mAdminId, nullptr);
+                                SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));

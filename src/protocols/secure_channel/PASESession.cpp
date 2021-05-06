@@ -332,13 +332,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
 {
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-
-    return session.InitFromSecret(mKe, mKeLen, nullptr, 0, info, info_len);
+    return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
+                                  SecureSession::SessionInfoType::kSessionEstablishment, role);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()

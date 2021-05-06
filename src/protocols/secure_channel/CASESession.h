@@ -116,13 +116,12 @@ public:
      *   Derive a secure session from the established session. The API will return error
      *   if called before session is established.
      *
-     * @param info        Information string used for key derivation
-     * @param info_len    Length of info string
      * @param session     Reference to the secure session that will be
      *                    initialized once session establishment is complete
+     * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
+    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
     /**
      * @brief
