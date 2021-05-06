@@ -427,8 +427,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
         uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
-        // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0 
-        // can continue sending messages to accessory as next available admin will also be 0. 
+        // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
+        // can continue sending messages to accessory as next available admin will also be 0.
         // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
         gAdminPairings.Reset();
     }
