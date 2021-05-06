@@ -410,7 +410,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     newBufferEntry.status      = newStatus;
     newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
 #endif
-    EmberStatus sendStatus;
+    EmberStatus sendStatus = EMBER_SUCCESS;
 
     emberAfWriteServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATUS_ATTRIBUTE_ID, (uint8_t *) &newStatus,
                                 ZCL_INT16U_ATTRIBUTE_TYPE);
