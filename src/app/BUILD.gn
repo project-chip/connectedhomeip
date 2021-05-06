@@ -31,6 +31,8 @@ if (chip_im_config_critical_section == "") {
     chip_im_config_critical_section = "rtos"
   } else if (current_os == "zephyr") {
     chip_im_config_critical_section = "zephyr"
+  } else if (current_os == "mbed") {
+    chip_im_config_critical_section = "mbed"
   } else {
     chip_im_config_critical_section = "posix"
   }
@@ -116,6 +118,8 @@ static_library("app") {
     sources += [ "CriticalSectionImplRtos.cpp" ]
   } else if (chip_im_config_critical_section == "zephyr") {
     sources += [ "CriticalSectionImplZephyr.cpp" ]
+  } else if (chip_im_config_critical_section == "mbed") {
+    sources += [ "CriticalSectionImplMbed.cpp" ]
   } else {
     assert(false, "Unknown IM critical section implementation.")
   }
