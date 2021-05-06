@@ -44,29 +44,19 @@ bool emberAfTestClusterClusterTestCallback(chip::app::Command *)
 
 bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * apCommandObj)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t returnValue = 7;
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_TEST_CLUSTER_ID,
-                              ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, "u", returnValue);
 
-    EmberStatus sendStatus = emberAfSendResponse();
-    if (EMBER_SUCCESS != sendStatus)
-    {
-        ChipLogError(Zcl, "Test Cluster: failed to send TestSpecific response: 0x%x", sendStatus);
-    }
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TEST_CLUSTER_ID,
+                                         ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+    TLV::TLVWriter * writer          = nullptr;
 
-    if (apCommandObj != nullptr)
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_TEST_CLUSTER_ID,
-                                             ZCL_TEST_SPECIFIC_RESPONSE_COMMAND_ID,
-                                             (chip::app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer = nullptr;
+    VerifyOrExit(apCommandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        SuccessOrExit(err = apCommandObj->PrepareCommand(&cmdParams));
-        writer = apCommandObj->GetCommandDataElementTLVWriter();
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), returnValue));
-        SuccessOrExit(err = apCommandObj->FinishCommand());
-    }
+    SuccessOrExit(err = apCommandObj->PrepareCommand(&cmdParams));
+    writer = apCommandObj->GetCommandDataElementTLVWriter();
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), returnValue));
+    SuccessOrExit(err = apCommandObj->FinishCommand());
 
 exit:
     if (CHIP_NO_ERROR != err)
