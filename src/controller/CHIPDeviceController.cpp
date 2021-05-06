@@ -641,8 +641,9 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
 {
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
 
-    uint16_t size = sizeof(mNextKeyId);
-    if (!mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &mNextKeyId, size) || (size != sizeof(mNextKeyId)))
+    uint16_t size    = sizeof(mNextKeyId);
+    CHIP_ERROR error = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &mNextKeyId, size);
+    if (error || (size != sizeof(mNextKeyId)))
     {
         mNextKeyId = 0;
     }
