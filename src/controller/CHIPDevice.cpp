@@ -400,18 +400,22 @@ void Device::CancelResponseHandler(uint8_t seqNum)
 
 void Device::AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
+    // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
+    // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
+    // chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    mCallbacksMgr.AddResponseCallback(reinterpret_cast<chip::NodeId>(static_cast<app::Command *>(mCommandSender)),
-                                      0 /* seqNum, always 0 for IM */, onSuccessCallback, onFailureCallback);
+    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(static_cast<app::Command *>(mCommandSender));
+    mCallbacksMgr.AddResponseCallback(transactionId, 0 /* seqNum, always 0 for IM */, onSuccessCallback, onFailureCallback);
 }
 
 void Device::CancelIMResponseHandler()
 {
-    // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
+    // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
+    // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
+    // chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    mCallbacksMgr.CancelResponseCallback(reinterpret_cast<chip::NodeId>(static_cast<app::Command *>(mCommandSender)),
-                                         0 /* seqNum, always 0 for IM */);
+    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(static_cast<app::Command *>(mCommandSender));
+    mCallbacksMgr.CancelResponseCallback(transactionId, 0 /* seqNum, always 0 for IM */);
 }
 
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,

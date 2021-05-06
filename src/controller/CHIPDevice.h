@@ -328,7 +328,10 @@ public:
     void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
-    // This two functions are pretty tricky, it is used to bridge the response
+    // This two functions are pretty tricky, it is used to bridge the response, we need to implement interaction model delegate on
+    // the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
+    // type-safe.
+    // TODO: Implement interaction model delegate in the application.
     void AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     void CancelIMResponseHandler();
 

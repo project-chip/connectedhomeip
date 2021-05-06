@@ -1021,7 +1021,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
 {
     // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    NodeId deviceId                           = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
+    NodeId transactionId                      = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
     app::CHIPDeviceCallbacksMgr * callbackMgr = &app::CHIPDeviceCallbacksMgr::GetInstance();
 
     // Here we verify that the error code is not 0, since we may want to send more command to the device if we received success
@@ -1033,7 +1033,10 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
 
     // The command response in IM is identified by the command sender pointer -- the response of the command will return to the same
     // object used for send the command.
-    callbackMgr->GetResponseCallback(deviceId, 0, &onSuccessCallback, &onFailureCallback);
+    // This function, and the following functions takes the idea that we are using the command object as a identifier of command
+    // transactions, so we always set the SeqNum to 0 since there will only be one transaction at a time on one command sender
+    // object.
+    callbackMgr->GetResponseCallback(transactionId, 0, &onSuccessCallback, &onFailureCallback);
 
     typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
 
@@ -1053,7 +1056,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const 
 {
     // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    NodeId deviceId                           = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
+    NodeId transactionId                      = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
     app::CHIPDeviceCallbacksMgr * callbackMgr = &app::CHIPDeviceCallbacksMgr::GetInstance();
 
     Callback::Cancelable * onSuccessCallback = nullptr;
@@ -1061,7 +1064,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseError(const 
 
     // The command response in IM is identified by the command sender pointer -- the response of the command will return to the same
     // object used for send the command.
-    callbackMgr->GetResponseCallback(deviceId, 0, &onSuccessCallback, &onFailureCallback);
+    callbackMgr->GetResponseCallback(transactionId, 0, &onSuccessCallback, &onFailureCallback);
 
     typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
 
@@ -1080,7 +1083,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(co
 {
     // This is a bit tricky, we try to assume that chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    NodeId deviceId                           = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
+    NodeId transactionId                      = reinterpret_cast<chip::NodeId>(static_cast<const app::Command *>(apCommandSender));
     app::CHIPDeviceCallbacksMgr * callbackMgr = &app::CHIPDeviceCallbacksMgr::GetInstance();
 
     Callback::Cancelable * onSuccessCallback = nullptr;
@@ -1088,7 +1091,7 @@ CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseProcessed(co
 
     // The command response in IM is identified by the command sender pointer -- the response of the command will return to the same
     // object used for send the command.
-    callbackMgr->GetResponseCallback(deviceId, 0, &onSuccessCallback, &onFailureCallback);
+    callbackMgr->GetResponseCallback(transactionId, 0, &onSuccessCallback, &onFailureCallback);
 
     typedef void (*DefaultSuccessCallback)(void * context);
 
