@@ -48,7 +48,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <sys/select.h>
+#include <system/SystemSockets.h>
 #if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif // HAVE_SYS_SOCKET_H
@@ -334,17 +334,17 @@ INET_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
         goto ret;
     }
 
-    if (::setsockopt(mSocket, IPPROTO_IPV6, IPV6_MULTICAST_IF, &lIfIndex, sizeof(lIfIndex)) != 0)
+    if (::setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_MULTICAST_IF, &lIfIndex, sizeof(lIfIndex)) != 0)
     {
         goto optfail;
     }
 
-    if (::setsockopt(mSocket, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
+    if (::setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
     {
         goto optfail;
     }
 
-    if (::setsockopt(mSocket, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
+    if (::setsockopt(mSocket.GetFD(), IPPROTO_IPV6, IPV6_UNICAST_HOPS, &sInt255, sizeof(sInt255)) != 0)
     {
         goto optfail;
     }
@@ -354,8 +354,7 @@ INET_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & 
 
 optfail:
     res = chip::System::MapErrorPOSIX(errno);
-    ::close(mSocket);
-    mSocket   = INET_INVALID_SOCKET_FD;
+    mSocket.Close();
     mAddrType = kIPAddressType_Unknown;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -423,16 +422,12 @@ INET_ERROR RawEndPoint::Listen(IPEndPointBasis::OnMessageReceivedFunct onMessage
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    // Wake the thread calling select so that it starts selecting on the new socket.
-    SystemLayer().WakeSelect();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
     mState = kState_Listening;
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // Wait for ability to read on this endpoint.
-    mRequestIO.SetRead();
+    mSocket.SetCallback(HandlePendingIO, this);
+    mSocket.RequestCallbackOnPendingRead();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     return INET_NO_ERROR;
@@ -473,22 +468,13 @@ void RawEndPoint::Close()
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-        if (mSocket != INET_INVALID_SOCKET_FD)
+        if (mSocket.HasFD())
         {
-            chip::System::Layer & lSystemLayer = SystemLayer();
-
-            // Wake the thread calling select so that it recognizes the socket is closed.
-            lSystemLayer.WakeSelect();
-
-            close(mSocket);
-            mSocket = INET_INVALID_SOCKET_FD;
+            mSocket.Close();
         }
 
         // Clear any results from select() that indicate pending I/O for the socket.
-        mPendingIO.Clear();
-
-        // Do not wait for I/O on this endpoint.
-        mRequestIO.Clear();
+        mSocket.ClearPendingIO();
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
         if (mReadableSource)
@@ -735,7 +721,7 @@ INET_ERROR RawEndPoint::SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICM
     {
         ICMP6_FILTER_SETPASSALL(&filter);
     }
-    if (setsockopt(mSocket, IPPROTO_ICMPV6, ICMP6_FILTER, &filter, sizeof(filter)) == -1)
+    if (setsockopt(mSocket.GetFD(), IPPROTO_ICMPV6, ICMP6_FILTER, &filter, sizeof(filter)) == -1)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
@@ -1039,16 +1025,22 @@ INET_ERROR RawEndPoint::GetSocket(IPAddressType aAddressType)
     return IPEndPointBasis::GetSocket(aAddressType, lType, lProtocol);
 }
 
+// static
+void RawEndPoint::HandlePendingIO(System::WatchableSocket & socket)
+{
+    static_cast<RawEndPoint *>(socket.GetCallbackData())->HandlePendingIO();
+}
+
 void RawEndPoint::HandlePendingIO()
 {
-    if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
+    if (mState == kState_Listening && OnMessageReceived != nullptr && mSocket.HasPendingRead())
     {
         const uint16_t lPort = 0;
 
         IPEndPointBasis::HandlePendingIO(lPort);
     }
 
-    mPendingIO.Clear();
+    mSocket.ClearPendingIO();
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

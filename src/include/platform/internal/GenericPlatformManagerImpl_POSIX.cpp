@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -42,21 +42,10 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <sched.h>
-#include <sys/select.h>
 #include <unistd.h>
 
-#define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 namespace chip {
-namespace Mdns {
-void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet, int & maxFd, timeval & timeout);
-void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
-} // namespace Mdns
-} // namespace chip
-#endif
 
-namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
@@ -125,6 +114,8 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThr
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
 {
+    // TODO(#5556): Integrate timer platform details with WatchableEventManager.
+
     // Let SystemLayer.PrepareSelect() handle timers.
     return CHIP_NO_ERROR;
 }
@@ -133,7 +124,10 @@ template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_PostEvent(const ChipDeviceEvent * event)
 {
     mChipEventQueue.push(*event); // Thread safe due to ChipStackLock taken by App thread
-    SysOnEventSignal(this);       // Trigger wake select on CHIP thread
+
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+    SystemLayer.WakeIOThread(); // Trigger wake select on CHIP thread
+#endif                          // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
 }
 
 template <class ImplClass>
@@ -147,86 +141,25 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::ProcessDeviceEvents()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::SysOnEventSignal(void * arg)
-{
-    SystemLayer.WakeSelect();
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
-{
-    FD_ZERO(&mReadSet);
-    FD_ZERO(&mWriteSet);
-    FD_ZERO(&mErrorSet);
-    mMaxFd = 0;
-
-    // Max out this duration and let CHIP set it appropriately.
-    mNextTimeout.tv_sec  = DEFAULT_MIN_SLEEP_PERIOD;
-    mNextTimeout.tv_usec = 0;
-
-    if (SystemLayer.State() == System::kLayerState_Initialized)
-    {
-        SystemLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
-    }
-
-#if !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-    if (InetLayer.State == InetLayer::kState_Initialized)
-    {
-        InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
-    }
-#endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    chip::Mdns::UpdateMdnsDataset(mReadSet, mWriteSet, mErrorSet, mMaxFd, mNextTimeout);
-#endif
-}
-
-template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
-{
-    int selectRes;
-    int64_t nextTimeoutMs;
-
-    nextTimeoutMs = mNextTimeout.tv_sec * 1000 + mNextTimeout.tv_usec / 1000;
-    _StartChipTimer(nextTimeoutMs);
-
-    Impl()->UnlockChipStack();
-    selectRes = select(mMaxFd + 1, &mReadSet, &mWriteSet, &mErrorSet, &mNextTimeout);
-    Impl()->LockChipStack();
-
-    if (selectRes < 0)
-    {
-        ChipLogError(DeviceLayer, "select failed: %s\n", ErrorStr(System::MapErrorPOSIX(errno)));
-        return;
-    }
-
-    if (SystemLayer.State() == System::kLayerState_Initialized)
-    {
-        SystemLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
-    }
-
-#if !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-    if (InetLayer.State == InetLayer::kState_Initialized)
-    {
-        InetLayer.HandleSelectResult(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet);
-    }
-#endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
-
-    ProcessDeviceEvents();
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    chip::Mdns::ProcessMdns(mReadSet, mWriteSet, mErrorSet);
-#endif
-}
-
-template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 {
     Impl()->LockChipStack();
 
+    System::WatchableEventManager & watchState = SystemLayer.WatchableEvents();
+    watchState.EventLoopBegins();
     do
     {
-        SysUpdate();
-        SysProcess();
+        watchState.PrepareEvents();
+
+        Impl()->UnlockChipStack();
+        watchState.WaitForEvents();
+        Impl()->LockChipStack();
+
+        watchState.HandleEvents();
+
+        ProcessDeviceEvents();
     } while (mShouldRunEventLoop.load(std::memory_order_relaxed));
+    watchState.EventLoopEnds();
 
     Impl()->UnlockChipStack();
 }
@@ -263,7 +196,10 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);
     if (mChipTask)
     {
-        SystemLayer.WakeSelect();
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+        SystemLayer.WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
     // Call up to the base class _Shutdown() to perform the bulk of the shutdown.

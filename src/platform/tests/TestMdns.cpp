@@ -135,7 +135,9 @@ int TestMdns()
 
             chip::DeviceLayer::PlatformMgr().LockChipStack();
             chip::DeviceLayer::PlatformMgr().Shutdown();
-            chip::DeviceLayer::SystemLayer.WakeSelect();
+#if CHIP_SYSTEM_CONFIG_USE_IO_THREAD
+            chip::DeviceLayer::SystemLayer.WakeIOThread();
+#endif // CHIP_SYSTEM_CONFIG_USE_IO_THREAD
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
             // TODO: the above does not seem to actually reliably shut down the chip stack.
