@@ -101,7 +101,7 @@ void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * excha
 void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * exchangeContext)
 {
     Transport::PeerConnectionState * state =
-        mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSessionHandle());
+        mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSession());
 
     if (state != nullptr)
     {
@@ -306,7 +306,7 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     ChipLogDetail(SecureChannel, "Received MsgCounterSyncResp response");
 
     // Find an active connection to the specified peer node
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSessionHandle());
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(exchangeContext->GetSecureSession());
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     VerifyOrExit(msgBuf->DataLength() == kSyncRespMsgSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
