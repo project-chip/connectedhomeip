@@ -10498,6 +10498,7 @@ private:
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
@@ -10506,6 +10507,35 @@ private:
 | * FabricsList                                                       | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command RemoveAllFabrics
+ */
+class OperationalCredentialsRemoveAllFabrics : public ModelCommand
+{
+public:
+    OperationalCredentialsRemoveAllFabrics() : ModelCommand("remove-all-fabrics") { ModelCommand::AddArguments(); }
+    ~OperationalCredentialsRemoveAllFabrics()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x0B) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.RemoveAllFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
 
 /*
  * Command RemoveFabric
@@ -14923,9 +14953,10 @@ void registerClusterOperationalCredentials(Commands & commands)
     const char * clusterName = "OperationalCredentials";
 
     commands_list clusterCommands = {
-        make_unique<OperationalCredentialsRemoveFabric>(),      make_unique<OperationalCredentialsSetFabric>(),
-        make_unique<OperationalCredentialsUpdateFabricLabel>(), make_unique<DiscoverOperationalCredentialsAttributes>(),
-        make_unique<ReadOperationalCredentialsFabricsList>(),   make_unique<ReadOperationalCredentialsClusterRevision>(),
+        make_unique<OperationalCredentialsRemoveAllFabrics>(),    make_unique<OperationalCredentialsRemoveFabric>(),
+        make_unique<OperationalCredentialsSetFabric>(),           make_unique<OperationalCredentialsUpdateFabricLabel>(),
+        make_unique<DiscoverOperationalCredentialsAttributes>(),  make_unique<ReadOperationalCredentialsFabricsList>(),
+        make_unique<ReadOperationalCredentialsClusterRevision>(),
     };
 
     commands.Register(clusterName, clusterCommands);

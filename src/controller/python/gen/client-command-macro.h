@@ -2240,6 +2240,15 @@
                                                                                                                                    \
                                   ZCL_REMOVE_FABRIC_COMMAND_ID, "uuu", FabricId, NodeId, VendorId);
 
+/** @brief Command description for RemoveAllFabrics
+ *
+ * Command: RemoveAllFabrics
+ */
+#define emberAfFillCommandOperational                                                                                              \
+    CredentialsClusterRemoveAllFabrics() emberAfFillExternalBuffer(mask,                                                           \
+                                                                                                                                   \
+                                                                   ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
+
 /** @brief Command description for LockDoor
  *
  * Command: LockDoor

@@ -2310,6 +2310,10 @@ EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClus
     {
         switch (cmd->commandId)
         {
+        case ZCL_REMOVE_ALL_FABRICS_COMMAND_ID: {
+            wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(nullptr);
+            break;
+        }
         case ZCL_REMOVE_FABRIC_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             chip::FabricId FabricId;

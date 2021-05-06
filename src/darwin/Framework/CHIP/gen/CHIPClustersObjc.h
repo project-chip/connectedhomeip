@@ -578,6 +578,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPOperationalCredentials : CHIPCluster
 
+- (void)removeAllFabrics:(ResponseHandler)responseHandler;
 - (void)removeFabric:(uint64_t)fabricId
               nodeId:(uint64_t)nodeId
             vendorId:(uint16_t)vendorId
