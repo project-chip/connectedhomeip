@@ -65,7 +65,7 @@ endif()
 #   An automated way that includes figuring out dependencies would be much better
 set(CHIP_TESTS
 # TODO: Enable all the tests.
-    # -lAppTests
+    -lAppTests
     -lASN1Tests
     -lBleLayerTests
     -lChipCryptoTests
