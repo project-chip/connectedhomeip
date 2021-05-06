@@ -31,12 +31,11 @@
  *        * UDP network transport
  *        * Raw network transport
  *
- *      For BSD/POSIX Sockets, event readiness notification is handled
- *      via file descriptors and a traditional poll / select
- *      implementation on the platform adaptation.
+ *      For BSD/POSIX Sockets (CHIP_SYSTEM_CONFIG_USE_SOCKETS), event readiness
+ *      notification is handled via file descriptors, using System::WatchableSocket.
  *
- *      For LwIP, event readiness notification is handle via events /
- *      messages and platform- and system-specific hooks for the event
+ *      For LwIP (CHIP_SYSTEM_CONFIG_USE_LWIP), event readiness notification is handled
+ *      via events / messages and platform- and system-specific hooks for the event
  *      / message system.
  *
  */
@@ -1095,168 +1094,6 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-/**
- *  Prepare the sets of file descriptors for @p select() to work with.
- *
- *  @param[out]    nfds       The range of file descriptors in the file
- *                            descriptor set.
- *
- *  @param[in]     readfds    A pointer to the set of readable file descriptors.
- *
- *  @param[in]     writefds   A pointer to the set of writable file descriptors.
- *
- *  @param[in]     exceptfds  A pointer to the set of file descriptors with errors.
- *
- * @param[in]      sleepTimeTV A pointer to a structure specifying how long the select should sleep
- *
- */
-void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval & sleepTimeTV)
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (State != kState_Initialized)
-        return;
-
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-    {
-        RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-    {
-        TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-    {
-        UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-        if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
-    }
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-}
-
-/**
- *  Handle I/O from a select call. This method registers the pending I/O
- *  event in each active endpoint and then invokes the respective I/O
- *  handling functions for those endpoints.
- *
- *  @note
- *    It is important to set the pending I/O fields for all endpoints
- *    *before* making any callbacks. This avoids the case where an
- *    endpoint is closed and then re-opened within the callback for
- *    another endpoint. When this happens the new endpoint is likely
- *    to be assigned the same file descriptor as the old endpoint.
- *    However, any pending I/O for that file descriptor number represents
- *    I/O related to the old incarnation of the endpoint, not the current
- *    one. Saving the pending I/O state in each endpoint before acting
- *    on it allows the endpoint code to clear the I/O flags in the event
- *    of a close, thus avoiding any confusion.
- *
- *  @param[in]    selectRes    The return value of the select call.
- *
- *  @param[in]    readfds      A pointer to the set of read file descriptors.
- *
- *  @param[in]    writefds     A pointer to the set of write file descriptors.
- *
- *  @param[in]    exceptfds    A pointer to the set of file descriptors with
- *                             errors.
- *
- */
-void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
-{
-    assertChipStackLockedByCurrentThread();
-
-    if (State != kState_Initialized)
-        return;
-
-    if (selectRes < 0)
-        return;
-
-    if (selectRes > 0)
-    {
-        // Set the pending I/O field for each active endpoint based on the value returned by select.
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-        {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-        {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->mPendingIO = SocketEvents::FromFDs(lEndPoint->mSocket, readfds, writefds, exceptfds);
-            }
-        }
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-        // Now call each active endpoint to handle its pending I/O.
-#if INET_CONFIG_ENABLE_RAW_ENDPOINT
-        for (size_t i = 0; i < RawEndPoint::sPool.Size(); i++)
-        {
-            RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        for (size_t i = 0; i < TCPEndPoint::sPool.Size(); i++)
-        {
-            TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        for (size_t i = 0; i < UDPEndPoint::sPool.Size(); i++)
-        {
-            UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
-            if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            {
-                lEndPoint->HandlePendingIO();
-            }
-        }
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-    }
-}
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 /**
  *  Reset the members of the IPPacketInfo object.

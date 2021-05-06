@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
  *      data stream built on top of two file descriptors.
  */
 
-#include <system/SystemWakeEvent.h>
+#include <system/SystemSockets.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -50,18 +50,30 @@ inline int SetNonBlockingMode(int fd)
 }
 } // anonymous namespace
 
-Error SystemWakeEvent::Open()
+Error SystemWakeEvent::Open(WatchableEventManager & watchState)
 {
-    mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
+    enum
+    {
+        FD_READ  = 0,
+        FD_WRITE = 1
+    };
+    int fds[2];
 
-    if (::pipe(mFDs) < 0)
+    if (::pipe(fds) < 0)
         return chip::System::MapErrorPOSIX(errno);
 
-    if (SetNonBlockingMode(mFDs[FD_READ]) < 0)
+    if (SetNonBlockingMode(fds[FD_READ]) < 0)
         return chip::System::MapErrorPOSIX(errno);
 
-    if (SetNonBlockingMode(mFDs[FD_WRITE]) < 0)
+    if (SetNonBlockingMode(fds[FD_WRITE]) < 0)
         return chip::System::MapErrorPOSIX(errno);
+
+    mFD.Init(watchState);
+    mFD.Attach(fds[FD_READ]);
+    mFD.SetCallback(Confirm, this);
+    mFD.RequestCallbackOnPendingRead();
+
+    mWriteFD = fds[FD_WRITE];
 
     return CHIP_SYSTEM_NO_ERROR;
 }
@@ -70,9 +82,9 @@ Error SystemWakeEvent::Close()
 {
     int res = 0;
 
-    res |= ::close(mFDs[FD_WRITE]);
-    res |= ::close(mFDs[FD_READ]);
-    mFDs[FD_READ] = mFDs[FD_WRITE] = -1;
+    res |= mFD.Close();
+    res |= ::close(mWriteFD);
+    mWriteFD = -1;
 
     if (res < 0)
     {
@@ -82,28 +94,27 @@ Error SystemWakeEvent::Close()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-Error SystemWakeEvent::Confirm()
+void SystemWakeEvent::Confirm()
 {
     uint8_t buffer[128];
     ssize_t res;
 
     do
     {
-        res = ::read(mFDs[FD_READ], buffer, sizeof(buffer));
+        res = ::read(mFD.GetFD(), buffer, sizeof(buffer));
         if (res < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
         {
-            return chip::System::MapErrorPOSIX(errno);
+            ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(chip::System::MapErrorPOSIX(errno)));
+            return;
         }
     } while (res == sizeof(buffer));
-
-    return CHIP_SYSTEM_NO_ERROR;
 }
 
 Error SystemWakeEvent::Notify()
 {
     char byte = 1;
 
-    if (::write(mFDs[FD_WRITE], &byte, 1) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+    if (::write(mWriteFD, &byte, 1) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
@@ -113,22 +124,26 @@ Error SystemWakeEvent::Notify()
 
 #else // CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
 
-Error SystemWakeEvent::Open()
+Error SystemWakeEvent::Open(WatchableEventManager & watchState)
 {
-    mFD = ::eventfd(0, 0);
+    mFD.Init(watchState);
 
-    if (mFD == -1)
+    const int fd = ::eventfd(0, 0);
+    if (fd == -1)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
+
+    mFD.Attach(fd);
+    mFD.SetCallback(Confirm, this);
+    mFD.RequestCallbackOnPendingRead();
 
     return CHIP_SYSTEM_NO_ERROR;
 }
 
 Error SystemWakeEvent::Close()
 {
-    int res = ::close(mFD);
-    mFD     = -1;
+    int res = mFD.Close();
 
     if (res < 0)
     {
@@ -138,23 +153,21 @@ Error SystemWakeEvent::Close()
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-Error SystemWakeEvent::Confirm()
+void SystemWakeEvent::Confirm()
 {
     uint64_t value;
 
-    if (::read(mFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+    if (::read(mFD.GetFD(), &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
-        return chip::System::MapErrorPOSIX(errno);
+        ChipLogError(chipSystemLayer, "System wake event confirm failed: %s", ErrorStr(chip::System::MapErrorPOSIX(errno)));
     }
-
-    return CHIP_SYSTEM_NO_ERROR;
 }
 
 Error SystemWakeEvent::Notify()
 {
     uint64_t value = 1;
 
-    if (::write(mFD, &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
+    if (::write(mFD.GetFD(), &value, sizeof(value)) < 0 && errno != EAGAIN && errno != EWOULDBLOCK)
     {
         return chip::System::MapErrorPOSIX(errno);
     }
