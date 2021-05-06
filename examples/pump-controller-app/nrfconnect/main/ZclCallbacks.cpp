@@ -100,7 +100,7 @@ bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::Cluster
 {
     ChipLogProgress(Zcl, "%s: %d %d %d %d", __FUNCTION__, endpoint, clusterId, manufacturerCode, attributeId);
     return true;
-}                                        
+}
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
@@ -123,7 +123,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
     return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-}                                                   
+}
 
 void emberAfGroupsClusterServerInitCallback(chip::EndpointId endpoint)
 {
@@ -151,16 +151,16 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
     return EMBER_ZCL_STATUS_SUCCESS;//EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
-}                                                
+}
 
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                           chip::AttributeId attributeId, uint8_t mask,
                                                                           uint16_t manufacturerCode, uint8_t * value, uint8_t type)
 
 {
-    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);    
+    ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_READ_ONLY;
-}                                                                          
+}
 
 bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
@@ -204,7 +204,7 @@ bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool d
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
     return false;
-}                                               
+}
 
 bool emberAfPreCommandReceivedCallback(EmberAfClusterCommand * cmd)
 {
