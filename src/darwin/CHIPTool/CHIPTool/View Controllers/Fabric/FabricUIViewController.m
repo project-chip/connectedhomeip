@@ -111,7 +111,7 @@
 
     removeFabricView.translatesAutoresizingMaskIntoConstraints = false;
     [removeFabricView.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
-    
+
     // Remove All Fabrics
 
     UIButton * removeAllFabricsButton = [UIButton new];
@@ -259,13 +259,13 @@
             });
         }];
     }];
-    
+
     UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel
        handler:^(UIAlertAction * action) {}];
-    
+
     [alert addAction:cancelAction];
     [alert addAction:defaultAction];
-    
+
     [self presentViewController:alert animated:YES completion:nil];
 }
 
