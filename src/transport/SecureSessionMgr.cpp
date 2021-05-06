@@ -150,13 +150,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
 
     Transport::AdminPairingInfo * admin = nullptr;
 
-    // Hold the reference to encrypted message in stack variable.
-    // In case of any failures, the reference is not returned, and this stack variable
-    // will automatically free the reference on returning from the function.
-    EncryptedPacketBufferHandle encryptedMsg;
-
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!msgBuf->HasChainedBuffer(), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -188,7 +182,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     // Retain the packet buffer in case it's needed for retransmissions.
     if (bufferRetainSlot != nullptr)
     {
-        encryptedMsg = msgBuf.Retain();
+        (*bufferRetainSlot) = msgBuf.Retain();
     }
 
     ChipLogProgress(Inet,
@@ -209,11 +203,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     }
     ChipLogProgress(Inet, "Secure msg send status %s", ErrorStr(err));
     SuccessOrExit(err);
-
-    if (bufferRetainSlot != nullptr)
-    {
-        (*bufferRetainSlot) = std::move(encryptedMsg);
-    }
 
 exit:
     if (!msgBuf.IsNull())
