@@ -36,7 +36,7 @@ declare_args() {
 declare_args() {
   # use the dispatch library
   chip_system_config_use_dispatch = chip_system_config_use_sockets &&
-                                     (current_os == "mac" || current_os == "ios")
+                                    (current_os == "mac" || current_os == "ios")
 }
 
 if (chip_system_config_locking == "") {
