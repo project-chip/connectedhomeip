@@ -55,16 +55,6 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-// TODO: This is a placeholder delegate for exchange context created in Device::SendMessage()
-//       Delete this class when Device::SendMessage() is obsoleted.
-class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
-{
-    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override
-    {}
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-};
-
 CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
 {
     System::PacketBufferHandle resend;
@@ -88,15 +78,13 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
         resend = buffer.CloneData();
     }
 
-    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currenlty, we use a temporary Protocol
-    // TempZCL to carry over legacy ZCL messages, use an ephemeral exchange to send message and use its unsolicited message
-    // handler to receive messages. We need to set flag kFromInitiator to allow receiver to deliver message to corresponding
-    // unsolicited message handler, and we also need to set flag kNoAutoRequestAck since there is no persistent exchange to
-    // receive the ack message. This logic need to be deleted after we converting all legacy ZCL messages to IM messages.
+    // TODO(#5675): This code is temporary, and must be updated to use the IM API. Currently, we use a temporary Protocol
+    // TempZCL to carry over legacy ZCL messages.  We need to set flag kFromInitiator to allow receiver to deliver message to
+    // corresponding unsolicited message handler.
+    //
+    // TODO: Also, disable CRMP for now because it just doesn't seem to work
     sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-
-    DeviceExchangeDelegate delegate;
-    exchange->SetDelegate(&delegate);
+    exchange->SetDelegate(this);
 
     CHIP_ERROR err = exchange->SendMessage(protocolId, msgType, std::move(buffer), sendFlags);
 
@@ -112,16 +100,15 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
         ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kYes));
 
         err = exchange->SendMessage(protocolId, msgType, std::move(resend), sendFlags);
-        ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
-        ReturnErrorOnFailure(err);
+        ChipLogDetail(Controller, "Re-SendMessage returned %s", ErrorStr(err));
     }
 
-    if (exchange != nullptr)
+    if (err != CHIP_NO_ERROR)
     {
         exchange->Close();
     }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
@@ -276,7 +263,8 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
+                               const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -286,9 +274,15 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         }
         else
         {
-            HandleDataModelMessage(mDeviceId, std::move(msgBuf));
+            HandleDataModelMessage(exchange, std::move(msgBuf));
         }
     }
+    exchange->Close();
+}
+
+void Device::OnResponseTimeout(Messaging::ExchangeContext * ec)
+{
+    ec->Close();
 }
 
 CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption option, SetupPayload & setupPayload)

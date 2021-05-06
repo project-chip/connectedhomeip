@@ -145,6 +145,12 @@ void emberAfPluginDoorLockServerInitCallback(void);
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
 void emberAfPluginDescriptorServerInitCallback(void);
 #endif
+#ifdef ZCL_USING_TEST_CLUSTER_SERVER
+void emberAfPluginTestClusterServerInitCallback(void);
+#endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+void emberAfPluginOperationalCredentialsServerInitCallback(void);
+#endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -308,6 +314,12 @@ void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
 #endif
 #ifdef ZCL_USING_DESCRIPTOR_CLUSTER_SERVER
     emberAfPluginDescriptorServerInitCallback();
+#endif
+#ifdef ZCL_USING_TEST_CLUSTER_SERVER
+    emberAfPluginTestClusterServerInitCallback();
+#endif
+#ifdef ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
+    emberAfPluginOperationalCredentialsServerInitCallback();
 #endif
 
     emAfCallInits();
@@ -481,7 +493,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 }
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, NodeId source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, Messaging::ExchangeContext * exchange, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd)
 {
     uint8_t minLength =
@@ -496,7 +508,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
     // Populate the cluster command struct for processing.
     returnCmd->apsFrame        = apsFrame;
     returnCmd->type            = type;
-    returnCmd->source          = source;
+    returnCmd->source          = exchange;
     returnCmd->buffer          = message;
     returnCmd->bufLen          = messageLength;
     returnCmd->clusterSpecific = (message[0] & ZCL_CLUSTER_SPECIFIC_COMMAND);
@@ -527,12 +539,12 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 
 // a single call to process global and cluster-specific messages and callbacks.
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           NodeId source, InterPanHeader * interPanHeader)
+                           Messaging::ExchangeContext * exchange, InterPanHeader * interPanHeader)
 {
     bool msgHandled = false;
     // reset/reinitialize curCmd
     curCmd = staticCmd;
-    if (!emberAfProcessMessageIntoZclCmd(apsFrame, type, message, msgLen, source, interPanHeader, &curCmd))
+    if (!emberAfProcessMessageIntoZclCmd(apsFrame, type, message, msgLen, exchange, interPanHeader, &curCmd))
     {
         goto kickout;
     }
@@ -691,9 +703,9 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(NodeId responseDestination)
+static bool isBroadcastDestination(Messaging::ExchangeContext * responseDestination)
 {
-    // FIXME: Will need to actually figure out how to test for this!
+    // TODO: Will need to actually figure out how to test for this!
     return false;
 }
 
@@ -743,8 +755,8 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
-        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT, emberAfResponseDestination, &emberAfResponseApsFrame,
-                                                appResponseLength, appResponseData, callback);
+        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_VIA_EXCHANGE, MessageSendDestination(emberAfResponseDestination),
+                                                &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     else
     {
@@ -927,7 +939,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, uint16_t size)
 // You can pass in val1 as NULL, which will assume that it is
 // pointing to an array of all zeroes. This is used so that
 // default value of NULL is treated as all zeroes.
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber)
+int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber)
 {
     uint8_t i, j, k;
     if (signedNumber)

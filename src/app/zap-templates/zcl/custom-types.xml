@@ -46,7 +46,7 @@ limitations under the License.
   <struct name="FabricDescriptor">
      <item name="FabricId" type="FABRIC_ID"/>
      <item name="VendorId" type="INT16U"/> // Change INT16U to new type VendorID #2395
-     <item name="Label" type="OCTET_STRING" length="32"/> // Change this to CHAR_STRING once it is supported #6112
      <item name="NodeId" type="NODE_ID"/>
+     // TODO: Add Label once CHAR_STRING or OCTET_STRING works
    </struct>
 </configurator>

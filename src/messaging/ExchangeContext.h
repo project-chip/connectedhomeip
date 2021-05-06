@@ -137,7 +137,7 @@ public:
     {
         if (mExchangeACL == nullptr)
         {
-            Transport::AdminPairingInfo * admin = table.FindAdmin(mSecureSession.GetAdminId());
+            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
             if (admin != nullptr)
             {
                 mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);

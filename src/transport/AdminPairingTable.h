@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
@@ -54,6 +55,8 @@ struct AccessControlList
  * Information contained within the state:
  *   - Admin identification
  *   - Node Id assigned by the admin to the device
+ *   - Vendor Id
+ *   - Fabric Id
  *   - Device operational credentials
  *   - Access control list
  */
@@ -65,8 +68,14 @@ public:
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
 
+    FabricId GetFabricId() const { return mFabricId; }
+    void SetFabricId(FabricId fabricId) { mFabricId = fabricId; }
+
     AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(AdminId adminId) { mAdmin = adminId; }
+
+    uint16_t GetVendorId() const { return mVendorId; }
+    void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
     const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
     OperationalCredentials & GetOperationalCreds() { return mOpCred; }
@@ -83,19 +92,19 @@ public:
      */
     void Reset()
     {
-        mNodeId = kUndefinedNodeId;
-        mAdmin  = kUndefinedAdminId;
+        mNodeId   = kUndefinedNodeId;
+        mAdmin    = kUndefinedAdminId;
+        mFabricId = kUndefinedFabricId;
+        mVendorId = kUndefinedVendorId;
     }
 
-    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate & kvs);
-
-    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate & kvs);
-
-    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate & kvs, AdminId id);
+    friend class AdminPairingTable;
 
 private:
-    AdminId mAdmin = kUndefinedAdminId;
-    NodeId mNodeId = kUndefinedNodeId;
+    AdminId mAdmin     = kUndefinedAdminId;
+    NodeId mNodeId     = kUndefinedNodeId;
+    FabricId mFabricId = kUndefinedFabricId;
+    uint16_t mVendorId = kUndefinedVendorId;
 
     OperationalCredentials mOpCred;
     AccessControlList mACL;
@@ -104,11 +113,40 @@ private:
 
     static CHIP_ERROR GenerateKey(AdminId id, char * key, size_t len);
 
+    CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
+    CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
+    static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
+
     struct StorableAdminPairingInfo
     {
-        uint16_t mAdmin;  /* This field is serialized in LittleEndian byte order */
-        uint64_t mNodeId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mAdmin;    /* This field is serialized in LittleEndian byte order */
+        uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
+        uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
+        uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
     };
+};
+
+// Once attribute store has persistence implemented, AdminPairingTable shoud be backed using
+// attribute store so no need for this Delegate API anymore
+// TODO: Reimplement AdminPairingTable to only have one backing store.
+class DLL_EXPORT AdminPairingTableDelegate
+{
+public:
+    virtual ~AdminPairingTableDelegate() {}
+    /**
+     * Gets called when an admin is deleted from KVS store.
+     **/
+    virtual void OnAdminDeletedFromStorage(AdminId adminId) = 0;
+
+    /**
+     * Gets called when an admin is loaded into Admin Pairing Table from KVS store.
+     **/
+    virtual void OnAdminRetrievedFromStorage(AdminPairingInfo * adminInfo) = 0;
+
+    /**
+     * Gets called when an admin in Admin Pairing Table is persisted to KVS store.
+     **/
+    virtual void OnAdminPersistedToStorage(AdminPairingInfo * adminInfo) = 0;
 };
 
 /**
@@ -182,15 +220,25 @@ private:
 class DLL_EXPORT AdminPairingTable
 {
 public:
+    CHIP_ERROR Store(AdminId id);
+    CHIP_ERROR LoadFromStorage(AdminId id);
+    CHIP_ERROR Delete(AdminId id);
+
     AdminPairingInfo * AssignAdminId(AdminId adminId);
 
     AdminPairingInfo * AssignAdminId(AdminId adminId, NodeId nodeId);
 
     void ReleaseAdminId(AdminId adminId);
 
-    AdminPairingInfo * FindAdmin(AdminId adminId);
+    AdminPairingInfo * FindAdminWithId(AdminId adminId);
+
+    AdminPairingInfo * FindAdminForNode(FabricId fabricId, NodeId nodeId = kUndefinedNodeId,
+                                        uint16_t vendorId = kUndefinedVendorId);
 
     void Reset();
+
+    CHIP_ERROR Init(PersistentStorageDelegate * storage);
+    CHIP_ERROR SetAdminPairingDelegate(AdminPairingTableDelegate * delegate);
 
     ConstAdminIterator cbegin() const { return ConstAdminIterator(mStates, 0, CHIP_CONFIG_MAX_DEVICE_ADMINS); }
     ConstAdminIterator cend() const
@@ -202,6 +250,10 @@ public:
 
 private:
     AdminPairingInfo mStates[CHIP_CONFIG_MAX_DEVICE_ADMINS];
+    PersistentStorageDelegate * mStorage = nullptr;
+
+    // TODO: Admin Pairing table should be backed by a single backing store (attribute store), remove delegate callbacks #6419
+    AdminPairingTableDelegate * mDelegate = nullptr;
 };
 
 } // namespace Transport
