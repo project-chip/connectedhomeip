@@ -95,6 +95,7 @@ public:
     CHIP_ERROR Shutdown();
 
 private:
+    bool mInitialized = false;
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
@@ -181,7 +182,14 @@ namespace DeviceLayer {
 
 inline CHIP_ERROR PlatformManager::InitChipStack()
 {
-    return static_cast<ImplClass *>(this)->_InitChipStack();
+    if (mInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_InitChipStack();
+    mInitialized   = (err == CHIP_NO_ERROR);
+    return err;
 }
 
 inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, intptr_t arg)
