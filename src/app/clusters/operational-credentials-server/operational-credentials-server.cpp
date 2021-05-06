@@ -246,10 +246,27 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->SourceNodeId()) as
     // fabricId until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
-                              ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
-                              emberAfCurrentCommand()->SourceNodeId());
-    sendStatus = emberAfSendResponse();
+    if (commandObj == nullptr)
+    {
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
+                                  ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
+                                  emberAfCurrentCommand()->SourceNodeId());
+        sendStatus = emberAfSendResponse();
+    }
+    else
+    {
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                             ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+        TLV::TLVWriter * writer          = nullptr;
+
+        VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        writer = commandObj->GetCommandDataElementTLVWriter();
+        SuccessOrExit(
+            err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSessionHandle().GetPeerNodeId()));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
 
 exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)
