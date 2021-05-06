@@ -117,7 +117,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThread() const
 {
-    return mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread));
+    return !mMainLoopStarted || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
 }
 #endif
 
@@ -234,7 +234,7 @@ template <class ImplClass>
 void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP task running");
-
+    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->mMainLoopStarted = true;
     static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->RunEventLoop();
     return nullptr;
 }
