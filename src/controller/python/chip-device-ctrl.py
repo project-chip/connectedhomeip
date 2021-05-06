@@ -611,6 +611,35 @@ class DeviceMgrCmd(Cmd):
     def emptyline(self):
         pass
 
+###  Additions needed by the Test Harness Tool ###
+# TODO: Implement a custom device manager instead of using the existing manager object
+# https://github.com/chip-csg/connectedhomeip/issues/8
+device_manager = DeviceMgrCmd(rendezvousAddr=None,
+                             controllerNodeId=0, bluetoothAdapter=0)
+
+# CHIP commands needed by the Harness Tool
+def echo_alive(message):
+    print(message)
+    return message
+
+def ble_scan():
+    device_manager.do_blescan("")
+    #TODO: Return a list of available devices
+    return "Scan started"
+
+def start_rpc_server():
+    with SimpleXMLRPCServer(("0.0.0.0", 5000)) as server:
+        server.register_function(echo_alive)
+        server.register_function(ble_scan)
+        server.register_multicall_functions()
+        print('Serving XML-RPC on localhost port 5000')
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("\nKeyboard interrupt received, exiting.")
+            sys.exit(0)
+
+######--------------------------------------------------######
 
 def main():
     start_rpc_server()
@@ -688,31 +717,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-###  Additions needed by the Test Harness Tool ###
-# TODO: Implement a custom device manager instead of using the existing manager object
-# https://github.com/chip-csg/connectedhomeip/issues/8
-device_manager = DeviceMgrCmd(rendezvousAddr=None,
-                             controllerNodeId=0, bluetoothAdapter=0)
-
-# CHIP commands needed by the Harness Tool
-def echo_alive(message):
-    print(message)
-    return message
-
-def ble_scan():
-    device_manager.do_blescan("")
-    #TODO: Return a list of available devices
-    return "Scan started"
-
-def start_rpc_server():
-    with SimpleXMLRPCServer(("0.0.0.0", 5000)) as server:
-        server.register_function(echo_alive)
-        server.register_function(ble_scan)
-        server.register_multicall_functions()
-        print('Serving XML-RPC on localhost port 5000')
-        try:
-            server.serve_forever()
-        except KeyboardInterrupt:
-            print("\nKeyboard interrupt received, exiting.")
-            sys.exit(0)
