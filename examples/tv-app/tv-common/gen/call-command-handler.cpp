@@ -35,15 +35,12 @@ EmberAfStatus emberAfAudioOutputClusterServerCommandParse(EmberAfClusterCommand 
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfContentLaunchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfKeypadInputClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLowPowerClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfMediaInputClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfMediaPlaybackClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
-EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTvChannelClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTargetNavigatorClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWakeOnLanClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -110,20 +107,11 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
             result = emberAfGeneralCommissioningClusterServerCommandParse(cmd);
             break;
-        case ZCL_GROUPS_CLUSTER_ID:
-            // No commands are enabled for cluster Groups
-            result = status(false, true, cmd->mfgSpecific);
-            break;
-        case ZCL_IDENTIFY_CLUSTER_ID:
-            // No commands are enabled for cluster Identify
-            result = status(false, true, cmd->mfgSpecific);
-            break;
         case ZCL_KEYPAD_INPUT_CLUSTER_ID:
             result = emberAfKeypadInputClusterServerCommandParse(cmd);
             break;
         case ZCL_LEVEL_CONTROL_CLUSTER_ID:
-            // No commands are enabled for cluster Level Control
-            result = status(false, true, cmd->mfgSpecific);
+            result = emberAfLevelControlClusterServerCommandParse(cmd);
             break;
         case ZCL_LOW_POWER_CLUSTER_ID:
             result = emberAfLowPowerClusterServerCommandParse(cmd);
@@ -136,10 +124,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             result = emberAfOnOffClusterServerCommandParse(cmd);
-            break;
-        case ZCL_SCENES_CLUSTER_ID:
-            // No commands are enabled for cluster Scenes
-            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_TV_CHANNEL_CLUSTER_ID:
             result = emberAfTvChannelClusterServerCommandParse(cmd);
@@ -448,6 +432,223 @@ EmberAfStatus emberAfKeypadInputClusterServerCommandParse(EmberAfClusterCommand 
             keyCode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfKeypadInputClusterSendKeyCallback(nullptr, keyCode);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_MOVE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t moveMode;
+            uint8_t rate;
+            uint8_t optionMask;
+            uint8_t optionOverride;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            moveMode      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            rate          = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfLevelControlClusterMoveCallback(nullptr, moveMode, rate, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_MOVE_TO_LEVEL_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t level;
+            uint16_t transitionTime;
+            uint8_t optionMask;
+            uint8_t optionOverride;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            level         = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset  = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfLevelControlClusterMoveToLevelCallback(nullptr, level, transitionTime, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t level;
+            uint16_t transitionTime;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            level         = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(nullptr, level, transitionTime);
+            break;
+        }
+        case ZCL_MOVE_WITH_ON_OFF_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t moveMode;
+            uint8_t rate;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            moveMode      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            rate = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(nullptr, moveMode, rate);
+            break;
+        }
+        case ZCL_STEP_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t stepMode;
+            uint8_t stepSize;
+            uint16_t transitionTime;
+            uint8_t optionMask;
+            uint8_t optionOverride;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepMode      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepSize      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset  = static_cast<uint16_t>(payloadOffset + 2);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled =
+                emberAfLevelControlClusterStepCallback(nullptr, stepMode, stepSize, transitionTime, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_STEP_WITH_ON_OFF_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t stepMode;
+            uint8_t stepSize;
+            uint16_t transitionTime;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepMode      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepSize      = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(nullptr, stepMode, stepSize, transitionTime);
+            break;
+        }
+        case ZCL_STOP_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t optionMask;
+            uint8_t optionOverride;
+
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask    = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 1);
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfLevelControlClusterStopCallback(nullptr, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
+            wasHandled = emberAfLevelControlClusterStopWithOnOffCallback(nullptr);
             break;
         }
         default: {
