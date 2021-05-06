@@ -65,7 +65,7 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(SecureSessionHandle session, uin
 #endif
     }
 
-    if (IsReliableTransmissionAllowed() && reliableMessageContext->AutoRequestAck() && mReliableMessageMgr != nullptr &&
+    if (!IsTransportReliable() && reliableMessageContext->AutoRequestAck() && mReliableMessageMgr != nullptr &&
         isReliableTransmission)
     {
         payloadHeader.SetNeedsAck(true);
@@ -105,7 +105,7 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(const PayloadHeader & payl
     ReturnErrorCodeIf(!MessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
                       CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (IsReliableTransmissionAllowed())
+    if (!IsTransportReliable())
     {
         if (payloadHeader.IsAckMsg() && payloadHeader.GetAckId().HasValue())
         {

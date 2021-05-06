@@ -97,7 +97,7 @@ public:
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
     /////////// DevicePairingDelegate Interface /////////
-    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
+    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
 

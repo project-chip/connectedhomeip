@@ -17,10 +17,7 @@
  */
 #include "PersistentStorage.h"
 
-#include <support/Base64.h>
-
 #include <fstream>
-#include <memory>
 
 using String   = std::basic_string<char>;
 using Section  = std::map<String, String>;
@@ -35,37 +32,6 @@ constexpr const char kDefaultSectionName[] = "Default";
 constexpr const char kPortKey[]            = "ListenPort";
 constexpr const char kLoggingKey[]         = "LoggingLevel";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
-
-namespace {
-
-std::string StringToBase64(const std::string & value)
-{
-    std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value.length())]);
-
-    uint32_t len =
-        chip::Base64Encode32(reinterpret_cast<const uint8_t *>(value.data()), static_cast<uint32_t>(value.length()), buffer.get());
-    if (len == UINT32_MAX)
-    {
-        return "";
-    }
-
-    return std::string(buffer.get(), len);
-}
-
-std::string Base64ToString(const std::string & b64Value)
-{
-    std::unique_ptr<uint8_t[]> buffer(new uint8_t[BASE64_MAX_DECODED_LEN(b64Value.length())]);
-
-    uint32_t len = chip::Base64Decode32(b64Value.data(), static_cast<uint32_t>(b64Value.length()), buffer.get());
-    if (len == UINT32_MAX)
-    {
-        return "";
-    }
-
-    return std::string(reinterpret_cast<const char *>(buffer.get()), len);
-}
-
-} // namespace
 
 CHIP_ERROR PersistentStorage::Init()
 {
@@ -87,47 +53,46 @@ exit:
     return err;
 }
 
-CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
+void PersistentStorage::SetStorageDelegate(PersistentStorageResultDelegate * delegate) {}
+
+CHIP_ERROR PersistentStorage::SyncGetKeyValue(const char * key, char * value, uint16_t & size)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     std::string iniValue;
+    size_t iniValueLength = 0;
 
     auto section = mConfig.sections[kDefaultSectionName];
     auto it      = section.find(key);
-    ReturnErrorCodeIf(it == section.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    VerifyOrExit(it != section.end(), err = CHIP_ERROR_KEY_NOT_FOUND);
 
-    ReturnErrorCodeIf(!inipp::extract(section[key], iniValue), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(inipp::extract(section[key], iniValue), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    iniValue = Base64ToString(iniValue);
+    iniValueLength = iniValue.size();
+    VerifyOrExit(iniValueLength <= static_cast<size_t>(size) - 1, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint16_t dataSize = static_cast<uint16_t>(iniValue.size());
-    if (dataSize > size)
-    {
-        size = dataSize;
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
+    iniValueLength        = iniValue.copy(value, iniValueLength);
+    value[iniValueLength] = '\0';
 
-    size = dataSize;
-    memcpy(value, iniValue.data(), dataSize);
-
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
-CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
+void PersistentStorage::AsyncSetKeyValue(const char * key, const char * value)
 {
     auto section = mConfig.sections[kDefaultSectionName];
-    section[key] = StringToBase64(std::string(static_cast<const char *>(value), size));
+    section[key] = std::string(value);
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig();
+    CommitConfig();
 }
 
-CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
+void PersistentStorage::AsyncDeleteKeyValue(const char * key)
 {
     auto section = mConfig.sections[kDefaultSectionName];
     section.erase(key);
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig();
+    CommitConfig();
 }
 
 CHIP_ERROR PersistentStorage::CommitConfig()

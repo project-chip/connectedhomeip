@@ -1453,7 +1453,7 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
     {
         switch (cmd->commandId)
         {
-        case ZCL_SET_FABRIC_RESPONSE_COMMAND_ID: {
+        case ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             chip::FabricId FabricId;
 
@@ -1463,7 +1463,7 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
             }
             FabricId = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
 
-            wasHandled = emberAfOperationalCredentialsClusterSetFabricResponseCallback(nullptr, FabricId);
+            wasHandled = emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(nullptr, FabricId);
             break;
         }
         default: {

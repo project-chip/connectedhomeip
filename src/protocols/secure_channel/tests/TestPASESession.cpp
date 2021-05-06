@@ -44,11 +44,11 @@ using TestContext = chip::Test::MessagingContext;
 class LoopbackTransport : public Transport::Base
 {
 public:
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
         ReturnErrorOnFailure(mMessageSendError);
         mSentMessageCount++;
-        HandleMessageReceived(address, std::move(msgBuf));
+        HandleMessageReceived(header, address, std::move(msgBuf));
 
         return CHIP_NO_ERROR;
     }

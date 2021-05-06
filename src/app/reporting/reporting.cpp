@@ -74,8 +74,8 @@ static void removeConfigurationAndScheduleTick(uint8_t index);
 static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, AttributeId attributeId, uint8_t mask,
                                                 uint16_t timeout);
 static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry, EmberAfAttributeType dataType);
-static void retrySendReport(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                            uint16_t msgLen, uint8_t * message, EmberStatus status);
+static void retrySendReport(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
+                            uint8_t * message, EmberStatus status);
 static uint32_t computeStringHash(uint8_t * data, uint8_t length);
 
 EmberEventControl emberAfPluginReportingTickEventControl;
@@ -100,13 +100,13 @@ EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReport
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-static void retrySendReport(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
-                            uint16_t msgLen, uint8_t * message, EmberStatus status)
+static void retrySendReport(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
+                            uint8_t * message, EmberStatus status)
 {
     // Retry once, and do so by unicasting without a pointer to this callback
     if (status != EMBER_SUCCESS)
     {
-        emberAfSendUnicast(type, destination, apsFrame, msgLen, message);
+        emberAfSendUnicast(type, indexOrDestination, apsFrame, msgLen, message);
     }
 }
 
@@ -626,8 +626,7 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
                 entry.clusterId == cmd->apsFrame->clusterId && entry.attributeId == attributeId && entry.mask == mask &&
                 entry.manufacturerCode == cmd->mfgCode &&
                 (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED ||
-                 (entry.data.received.source == cmd->SourceNodeId() &&
-                  entry.data.received.endpoint == cmd->apsFrame->sourceEndpoint)))
+                 (entry.data.received.source == cmd->source && entry.data.received.endpoint == cmd->apsFrame->sourceEndpoint)))
             {
                 found = true;
                 break;
@@ -991,7 +990,7 @@ static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cm
         }
         if (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_RECEIVED && entry.endpoint == cmd->apsFrame->destinationEndpoint &&
             entry.clusterId == cmd->apsFrame->clusterId && entry.attributeId == attributeId && entry.mask == mask &&
-            entry.manufacturerCode == cmd->mfgCode && entry.data.received.source == cmd->SourceNodeId() &&
+            entry.manufacturerCode == cmd->mfgCode && entry.data.received.source == cmd->source &&
             entry.data.received.endpoint == cmd->apsFrame->sourceEndpoint)
         {
             initialize = false;
@@ -1016,7 +1015,7 @@ static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cm
         entry.attributeId            = attributeId;
         entry.mask                   = mask;
         entry.manufacturerCode       = cmd->mfgCode;
-        entry.data.received.source   = cmd->SourceNodeId();
+        entry.data.received.source   = cmd->source;
         entry.data.received.endpoint = cmd->apsFrame->sourceEndpoint;
     }
 

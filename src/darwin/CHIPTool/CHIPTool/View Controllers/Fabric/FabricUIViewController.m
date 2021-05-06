@@ -39,7 +39,7 @@
                                                                 queue:dispatch_get_main_queue()];
 
     [self setupUIElements];
-    [self fetchFabricsList];
+    [self fetchFabricId];
 
     // listen for taps to dismiss the keyboard
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
@@ -75,14 +75,17 @@
     [_stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
     // Get Fabric ID
+    UIButton * getFabricIDButton = [UIButton new];
+    [getFabricIDButton setTitle:@"Go" forState:UIControlStateNormal];
+    [getFabricIDButton addTarget:self action:@selector(getFabricIDButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     _getFabricIDLabel = [UILabel new];
-    NSNumber * fabricId = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey);
-    _getFabricIDLabel.text = [NSString stringWithFormat:@"FabricID: %@", fabricId];
-    [_stackView addArrangedSubview:_getFabricIDLabel];
-
-    _getFabricIDLabel.translatesAutoresizingMaskIntoConstraints = false;
-    [_getFabricIDLabel.leadingAnchor constraintEqualToAnchor:_stackView.leadingAnchor].active = YES;
-    [_getFabricIDLabel.trailingAnchor constraintEqualToAnchor:_stackView.trailingAnchor].active = YES;
+    _getFabricIDLabel.text = @"FabricID:";
+    UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:_getFabricIDLabel buttons:@[ getFabricIDButton ]];
+    stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
+    stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
+    stackViewButtons.alignment = UIStackViewAlignmentLeading;
+    stackViewButtons.spacing = 10;
+    [_stackView addArrangedSubview:stackViewButtons];
 
     // Update Fabric Label
     UIButton * updateFabricLabelButton = [UIButton new];
@@ -120,7 +123,7 @@
     getFabricsListButton.layer.cornerRadius = 5;
     getFabricsListButton.clipsToBounds = YES;
     getFabricsListButton.backgroundColor = UIColor.systemBlueColor;
-    [getFabricsListButton setTitle:@"Update Fabrics List" forState:UIControlStateNormal];
+    [getFabricsListButton setTitle:@"Get Fabrics List" forState:UIControlStateNormal];
     [getFabricsListButton addTarget:self
                              action:@selector(getFabricsListButtonPressed:)
                    forControlEvents:UIControlEventTouchUpInside];
@@ -132,7 +135,7 @@
 
     // Result message
     _resultLabel = [UILabel new];
-    _resultLabel.font = [UIFont systemFontOfSize:12];
+    _resultLabel.font = [UIFont systemFontOfSize:14];
     _resultLabel.textColor = UIColor.systemBlueColor;
     _resultLabel.lineBreakMode = NSLineBreakByWordWrapping;
     _resultLabel.numberOfLines = 0;
@@ -144,7 +147,7 @@
 
     // Fabrics text view
     _fabricsListTextView = [UITextView new];
-    _fabricsListTextView.font = [UIFont systemFontOfSize:12];
+    _fabricsListTextView.font = [UIFont systemFontOfSize:14];
     _fabricsListTextView.textColor = [UIColor systemBlueColor];
     _fabricsListTextView.scrollEnabled = YES;
     _fabricsListTextView.userInteractionEnabled = NO;
@@ -186,7 +189,7 @@
             [fabricsText appendString:[NSString stringWithFormat:@"NodeId: %@\n", nodeID]];
             [fabricsText appendString:[NSString stringWithFormat:@"VendorId: %@\n", vendorID]];
             [fabricsText appendString:[NSString stringWithFormat:@"FabricLabel: %@\n", [label length] > 0 ? label : @"not set"]];
-            [fabricsText appendString:@"------\n"];
+            [fabricsText appendString:@"------"];
             fabricIndex++;
         }
     } else {
@@ -205,7 +208,7 @@
 {
     NSLog(@"Request to fetchFabricsList");
     [self updateResult:[NSString stringWithFormat:@"readAttributeFabricsList command sent."] isError:NO];
-    [self.cluster readAttributeFabricsListWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+    [self.cluster readAttributeFabricsList:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
         NSArray * fabricsList = [values objectForKey:@"value"];
         if (error) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -221,7 +224,37 @@
     }];
 }
 
+- (void)fetchFabricId
+{
+    NSLog(@"Request to fetchFabricId");
+    [self updateResult:[NSString stringWithFormat:@"getFabricId command sent."] isError:NO];
+    [self.cluster getFabricId:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+        if (error) {
+            NSLog(@"Got back error trying to getFabricId %@", error);
+            [self updateResult:[NSString stringWithFormat:@"getFabricId command failed with error %@.", error] isError:YES];
+        } else {
+            NSLog(@"Got back fabricID values %@", values);
+            NSNumber * fabricID = [values objectForKey:@"FabricId"];
+            if (fabricID) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self->_fabricID = fabricID;
+                    self->_getFabricIDLabel.text = [NSString stringWithFormat:@"FabricID: %@", fabricID];
+                    [self updateResult:[NSString
+                                           stringWithFormat:@"getFabricId command returned %@. Updating fabrics list.", fabricID]
+                               isError:NO];
+                    [self fetchFabricsList];
+                });
+            }
+        }
+    }];
+}
+
 // MARK: UIButton methods
+
+- (IBAction)getFabricIDButtonPressed:(id)sender
+{
+    [self fetchFabricId];
+}
 
 - (IBAction)updateFabricLabelButtonPressed:(id)sender
 {
@@ -230,26 +263,25 @@
     [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
     [self.cluster
         updateFabricLabel:label
-          responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  if (error) {
-                      NSLog(@"Got back error trying to updateFabricLabel %@", error);
-                      self->_updateFabricLabelTextField.text = @"";
-                      dispatch_async(dispatch_get_main_queue(), ^{
-                          [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@", error]
-                                     isError:YES];
-                      });
-                  } else {
-                      NSLog(@"Successfully updated the label: %@", values);
-                      dispatch_async(dispatch_get_main_queue(), ^{
-                          [self
-                              updateResult:[NSString
+        completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (error) {
+                    NSLog(@"Got back error trying to updateFabricLabel %@", error);
+                    self->_updateFabricLabelTextField.text = @"";
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel failed with error %@", error]
+                                   isError:YES];
+                    });
+                } else {
+                    NSLog(@"Successfully updated the label: %@", values);
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self updateResult:[NSString
                                                stringWithFormat:@"Command updateFabricLabel succeeded to update label to %@", label]
                                    isError:NO];
-                      });
-                  }
-              });
-          }];
+                    });
+                }
+            });
+        }];
 }
 
 - (IBAction)removeFabricButtonPressed:(id)sender
@@ -266,24 +298,23 @@
         [self.cluster removeFabric:[fabricId unsignedLongLongValue]
                             nodeId:[nodeID unsignedLongLongValue]
                           vendorId:[vendorID unsignedShortValue]
-                   responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                       if (error) {
-                           NSLog(@"Failed to remove fabric with error %@", error);
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               [self updateResult:[NSString stringWithFormat:@"Command removeFabric failed with error %@", error]
-                                          isError:YES];
-                               self->_removeFabricTextField.text = @"";
-                           });
-                       } else {
-                           NSLog(@"Succeeded removing fabric!");
-                           dispatch_async(dispatch_get_main_queue(), ^{
-                               self->_removeFabricTextField.text = @"";
-                               [self
-                                   updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@", fabricId]
+                 completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+                     if (error) {
+                         NSLog(@"Failed to remove fabric with error %@", error);
+                         dispatch_async(dispatch_get_main_queue(), ^{
+                             [self updateResult:[NSString stringWithFormat:@"Command removeFabric failed with error %@", error]
+                                        isError:YES];
+                             self->_removeFabricTextField.text = @"";
+                         });
+                     } else {
+                         NSLog(@"Succeeded removing fabric!");
+                         dispatch_async(dispatch_get_main_queue(), ^{
+                             self->_removeFabricTextField.text = @"";
+                             [self updateResult:[NSString stringWithFormat:@"Command removeFabric succeeded to remove %@", fabricId]
                                         isError:NO];
-                           });
-                       }
-                   }];
+                         });
+                     }
+                 }];
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             self->_removeFabricTextField.text = @"";

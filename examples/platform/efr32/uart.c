@@ -21,7 +21,6 @@
 #include "em_core.h"
 #include "em_usart.h"
 #include "hal-config.h"
-#include "sl_uartdrv_usart_vcom_config.h"
 #include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>
@@ -29,14 +28,6 @@
 #if !defined(MIN)
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
-
-#define HELPER1(x) USART##x##_RX_IRQn
-#define HELPER2(x) HELPER1(x)
-#define USART_IRQ HELPER2(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
-
-#define HELPER3(x) USART##x##_RX_IRQHandler
-#define HELPER4(x) HELPER3(x)
-#define USART_IRQHandler HELPER4(SL_UARTDRV_USART_VCOM_PERIPHERAL_NO)
 
 DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_RX_BUFS, sUartRxQueue);
 DEFINE_BUF_QUEUE(EMDRV_UARTDRV_MAX_CONCURRENT_TX_BUFS, sUartTxQueue);
@@ -222,18 +213,6 @@ void uartConsoleInit(void)
     // Activate 2 dma queues to always have one active
     UARTDRV_Receive(sUartHandle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(sUartHandle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
-
-    // Enable USART0 interrupt to wake OT task when data arrives
-    NVIC_ClearPendingIRQ(USART_IRQ);
-    NVIC_EnableIRQ(USART_IRQ);
-    USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
-}
-
-void USART_IRQHandler(void)
-{
-#ifndef PW_RPC_ENABLED
-    otSysEventSignalPending();
-#endif
 }
 
 /*
@@ -251,9 +230,6 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
     }
 
     UARTDRV_Receive(sUartHandle, data, transferCount, UART_rx_callback);
-#ifndef PW_RPC_ENABLED
-    otSysEventSignalPending();
-#endif
 }
 
 /*

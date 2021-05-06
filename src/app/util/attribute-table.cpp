@@ -137,33 +137,33 @@ EmberAfStatus emberAfVerifyAttributeWrite(EndpointId endpoint, ClusterId cluster
 }
 
 EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * dataPtr,
-                                   uint16_t readLength, EmberAfAttributeType * dataType)
+                                   uint8_t readLength, EmberAfAttributeType * dataType)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, mask, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr, readLength, dataType);
 }
 
 EmberAfStatus emberAfReadServerAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                         uint16_t readLength)
+                                         uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr,
                              readLength, NULL);
 }
 
 EmberAfStatus emberAfReadClientAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                         uint16_t readLength)
+                                         uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr,
                              readLength, NULL);
 }
 
 EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID,
-                                                             uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength)
+                                                             uint16_t manufacturerCode, uint8_t * dataPtr, uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, manufacturerCode, dataPtr, readLength, NULL);
 }
 
 EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID,
-                                                             uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength)
+                                                             uint16_t manufacturerCode, uint8_t * dataPtr, uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, manufacturerCode, dataPtr, readLength, NULL);
 }
@@ -532,7 +532,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
         EmberAfDefaultAttributeValue maxv = metadata->defaultValue.ptrToMinMaxValue->maxValue;
         bool isAttributeSigned            = emberAfIsTypeSigned(metadata->attributeType);
-        uint16_t dataLen                  = emberAfAttributeSize(metadata);
+        uint8_t dataLen                   = emberAfAttributeSize(metadata);
         if (dataLen <= 2)
         {
             int8_t minR, maxR;

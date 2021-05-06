@@ -21,7 +21,6 @@ NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
 NSString * const kCHIPNextAvailableDeviceIDKey = @"nextDeviceID";
-NSString * const kFabricIdKey = @"fabricId";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
 {
@@ -99,12 +98,7 @@ CHIPDevice * CHIPGetPairedDeviceWithID(uint64_t deviceId)
     CHIPDeviceController * controller = InitializeCHIP();
 
     NSError * error;
-    CHIPDevice * device = [controller getPairedDevice:deviceId error:&error];
-    if (error.code != CHIPSuccess) {
-        NSLog(@"Got back error retrieve device with deviceId %llu", deviceId);
-        return nil;
-    }
-    return device;
+    return [controller getPairedDevice:deviceId error:&error];
 }
 
 void CHIPUnpairDeviceWithID(uint64_t deviceId)
@@ -118,6 +112,12 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 @implementation CHIPToolPersistentStorageDelegate
 
 // MARK: CHIPPersistentStorageDelegate
+- (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
+{
+    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    completionHandler(key, value);
+}
 
 - (NSString *)CHIPGetKeyValue:(NSString *)key
 {
@@ -126,14 +126,16 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
     return value;
 }
 
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(CHIPSendSetStatus)completionHandler
 {
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
-- (void)CHIPDeleteKeyValue:(NSString *)key
+- (void)CHIPDeleteKeyValue:(NSString *)key handler:(CHIPSendDeleteStatus)completionHandler
 {
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
 @end

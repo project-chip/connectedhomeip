@@ -24,6 +24,7 @@ static_library("transport") {
     "AdminPairingTable.h",
     "PeerConnectionState.h",
     "PeerConnections.h",
+    "RendezvousSessionDelegate.h",
     "SecureMessageCodec.cpp",
     "SecureMessageCodec.h",
     "SecureSession.cpp",

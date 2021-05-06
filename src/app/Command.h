@@ -109,7 +109,7 @@ public:
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+    const Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
 
     CHIP_ERROR Reset();
 

@@ -224,9 +224,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
-    ChipLogProgress(ExchangeManager, "Received message of type %d and protocolId %d", payloadHeader.GetMessageType(),
-                    payloadHeader.GetProtocolID());
-
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : mContextPool)
     {
@@ -372,13 +369,10 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     }
 }
 
-void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf)
 {
-    PacketHeader header;
-
-    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
-
-    Optional<NodeId> peer = header.GetSourceNodeId();
+    auto peer = header.GetSourceNodeId();
     if (!peer.HasValue())
     {
         char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
@@ -386,24 +380,6 @@ void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, S
         ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
                      addrBuffer);
         return;
-    }
-}
-
-void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate)
-{
-    for (auto & ec : mContextPool)
-    {
-        if (ec.GetReferenceCount() == 0 || ec.GetDelegate() != delegate)
-        {
-            continue;
-        }
-
-        // Make sure to null out the delegate before closing the context, so
-        // we don't notify the delegate that the context is closing.  We
-        // have to do this, because the delegate might be partially
-        // destroyed by this point.
-        ec.SetDelegate(nullptr);
-        ec.Close();
     }
 }
 

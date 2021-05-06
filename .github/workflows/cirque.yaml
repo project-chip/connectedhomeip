@@ -14,7 +14,9 @@
 
 name: Cirque
 
-on: workflow_dispatch
+on:
+    push:
+    pull_request:
 
 jobs:
     cirque:

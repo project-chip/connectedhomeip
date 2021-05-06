@@ -166,7 +166,7 @@
 
 - (void)readCurrentTemperature
 {
-    [self.cluster readAttributeMeasuredValueWithResponseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
+    [self.cluster readAttributeMeasuredValue:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
         if (error != nil)
             return;
         NSNumber * value = values[@"value"];
@@ -183,17 +183,17 @@
     NSLog(@"Sending temp reporting values: min %@ max %@ value %@", @(minIntervalSeconds), @(maxIntervalSeconds),
         @(deltaInFahrenheit));
 
-    [self.cluster configureAttributeMeasuredValueWithMinInterval:minIntervalSeconds
-                                                     maxInterval:maxIntervalSeconds
-                                                          change:deltaInFahrenheit
-                                                 responseHandler:^(NSError * error, NSDictionary * values) {
-                                                     if (error == nil)
-                                                         return;
-                                                     NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@",
-                                                         [error description]);
-                                                 }];
+    [self.cluster
+        configureAttributeMeasuredValue:minIntervalSeconds
+                            maxInterval:maxIntervalSeconds
+                                 change:deltaInFahrenheit
+                      completionHandler:^(NSError * error, NSDictionary * values) {
+                          if (error == nil)
+                              return;
+                          NSLog(@"Status: update reportAttributeMeasuredValue completed with error %@", [error description]);
+                      }];
 
-    [self.cluster reportAttributeMeasuredValueWithResponseHandler:^(NSError * error, NSDictionary * values) {
+    [self.cluster reportAttributeMeasuredValue:^(NSError * error, NSDictionary * values) {
         if (error != nil)
             return;
         NSNumber * value = values[@"value"];

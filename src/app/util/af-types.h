@@ -55,8 +55,6 @@
 #include <app/util/basic-types.h>
 #include <app/util/types_stub.h> // For various types.
 
-#include <messaging/ExchangeContext.h>
-
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
 #endif
@@ -173,7 +171,7 @@ typedef struct
     /**
      * Size of this attribute in bytes.
      */
-    uint16_t size;
+    uint8_t size;
     /**
      * Attribute mask, tagging attribute with specific
      * functionality. See ATTRIBUTE_MASK_ macros defined
@@ -425,16 +423,14 @@ typedef struct
  *   and pass a pointer to that location around during
  *   command processing
  */
-struct EmberAfClusterCommand
+typedef struct
 {
-    chip::NodeId SourceNodeId() const { return source->GetSecureSession().GetPeerNodeId(); }
-
     /**
      * APS frame for the incoming message
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    chip::Messaging::ExchangeContext * source;
+    chip::NodeId source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
@@ -446,7 +442,7 @@ struct EmberAfClusterCommand
     uint8_t direction;
     EmberAfInterpanHeader * interPanHeader;
     uint8_t networkIndex;
-};
+} EmberAfClusterCommand;
 
 /**
  * @brief Endpoint type struct describes clusters that are on the endpoint.
@@ -1232,7 +1228,7 @@ typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(chip:
  * This function is called before an attribute changes.
  */
 typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
-                                                                   EmberAfAttributeType attributeType, uint16_t size,
+                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
 /**
@@ -1243,38 +1239,13 @@ typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::Endpoin
  */
 typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 
-namespace chip {
-/**
- * @brief a type that represents where we are trying to send a message.  This
- *        must always be paired with an EmberOutgoingMessageType that identifies
- *        which arm of the union is in use.
- */
-union MessageSendDestination
-{
-    explicit constexpr MessageSendDestination(uint8_t aBindingIndex) : mBindingIndex(aBindingIndex) {}
-    explicit constexpr MessageSendDestination(NodeId aNodeId) : mNodeId(aNodeId) {}
-    explicit constexpr MessageSendDestination(GroupId aGroupId) : mGroupId(aGroupId) {}
-    explicit constexpr MessageSendDestination(Messaging::ExchangeContext * aExchangeContext) : mExchangeContext(aExchangeContext) {}
-
-    // Used when the type is EMBER_OUTGOING_VIA_BINDING
-    uint8_t mBindingIndex;
-    // Used when the type is EMBER_OUTGOING_DIRECT
-    NodeId mNodeId;
-    // Used when the type is EMBER_OUTGOING_MULTICAST or
-    // EMBER_OUTGOING_MULTICAST_WITH_ALIAS
-    GroupId mGroupId;
-    // Used when the type is EMBER_OUTGOING_VIA_EXCHANGE
-    Messaging::ExchangeContext * mExchangeContext;
-};
-} // namespace chip
-
 /**
  * @brief Type for referring to the message sent callback function.
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
-                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
+                                           uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1286,7 +1257,7 @@ typedef struct
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    chip::MessageSendDestination destination;
+    uint64_t indexOrDestination;
     uint16_t messageLength;
     EmberOutgoingMessageType type;
     bool broadcast;

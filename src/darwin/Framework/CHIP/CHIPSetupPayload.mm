@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
+#import "CHIPSetupPayload.h"
 #import "CHIPError.h"
-#import "CHIPSetupPayload_Internal.h"
 #import <setup_payload/SetupPayload.h>
 
 @implementation CHIPOptionalQRCodeInfo
@@ -26,7 +26,7 @@
     chip::SetupPayload _chipSetupPayload;
 }
 
-- (CHIPRendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
+- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value
 {
     if (value.Has(chip::RendezvousInformationFlag::kBLE)) {
         return kRendezvousInformationBLE;

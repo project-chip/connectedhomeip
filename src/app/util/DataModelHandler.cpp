@@ -65,7 +65,7 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
 #endif
 }
 
-void HandleDataModelMessage(Messaging::ExchangeContext * exchange, System::PacketBufferHandle buffer)
+void HandleDataModelMessage(NodeId nodeId, System::PacketBufferHandle buffer)
 {
 #ifdef USE_ZAP_CONFIG
     EmberApsFrame frame;
@@ -85,7 +85,7 @@ void HandleDataModelMessage(Messaging::ExchangeContext * exchange, System::Packe
     ok                  = emberAfProcessMessage(&frame,
                                0, // type
                                message, messageLen,
-                               exchange, // source identifier
+                               nodeId, // source identifier
                                NULL);
 
     if (ok)

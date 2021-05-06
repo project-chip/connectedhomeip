@@ -50,7 +50,8 @@ CHIP_ERROR StorablePeerConnection::DeleteFromKVS(PersistentStorageDelegate & kvs
     char key[KeySize()];
     ReturnErrorOnFailure(GenerateKey(keyId, key, sizeof(key)));
 
-    return kvs.SyncDeleteKeyValue(key);
+    kvs.AsyncDeleteKeyValue(key);
+    return CHIP_NO_ERROR;
 }
 
 constexpr size_t StorablePeerConnection::KeySize()

@@ -38,6 +38,7 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
 import chip.devicecontroller.KeyValueStoreManager
+import chip.devicecontroller.PersistentStorage
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 
@@ -53,6 +54,7 @@ class CHIPToolActivity :
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
 
+    PersistentStorage.initialize(this);
     KeyValueStoreManager.initialize(this);
 
     if (savedInstanceState == null) {

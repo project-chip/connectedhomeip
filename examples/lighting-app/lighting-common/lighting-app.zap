@@ -1307,7 +1307,7 @@
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
       "profileId": "0x0104",
-      "endpointId": 0,
+      "endpointId": 1,
       "networkId": 0
     }
   ],

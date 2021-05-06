@@ -58,16 +58,12 @@ public:
     MockTransportMgrDelegate(nlTestSuite * inSuite) : mSuite(inSuite) {}
     ~MockTransportMgrDelegate() override {}
 
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override
     {
-        PacketHeader packetHeader;
-
-        CHIP_ERROR err = packetHeader.DecodeAndConsume(msgBuf);
-        NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
-
-        NL_TEST_ASSERT(mSuite, packetHeader.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
-        NL_TEST_ASSERT(mSuite, packetHeader.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, packetHeader.GetMessageId() == kMessageId);
+        NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
+        NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
+        NL_TEST_ASSERT(mSuite, header.GetMessageId() == kMessageId);
 
         size_t data_len = msgBuf->DataLength();
         int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
@@ -135,11 +131,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     PacketHeader header;
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
-    err = header.EncodeBeforeData(buffer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(Transport::PeerAddress::UDP(addr), std::move(buffer));
+    err = udp.SendMessage(header, Transport::PeerAddress::UDP(addr), std::move(buffer));
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return

@@ -365,39 +365,13 @@
     _session = nil;
 }
 
-- (void)setVendorIDOnAccessory
-{
-    NSLog(@"Call to setVendorIDOnAccessory");
-    CHIPDevice * device = CHIPGetPairedDevice();
-    if (device) {
-        CHIPOperationalCredentials * opCreds = [[CHIPOperationalCredentials alloc] initWithDevice:device
-                                                                                         endpoint:0
-                                                                                            queue:dispatch_get_main_queue()];
-        [opCreds setFabric:kCHIPToolTmpVendorId
-            completionHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                if (error.code != CHIPSuccess) {
-                    NSLog(@"Got back error trying to getFabricId %@", error);
-                } else {
-                    NSLog(@"Got back fabricID values %@, storing it", values);
-                    NSNumber * fabricID = [values objectForKey:@"FabricId"];
-                    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kFabricIdKey, fabricID);
-                }
-            }];
-    }
-}
-
 // MARK: CHIPDevicePairingDelegate
 - (void)onPairingComplete:(NSError *)error
 {
-    if (error.code != CHIPSuccess) {
-        NSLog(@"Got pairing error back %@", error);
-    } else {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-            [self->_deviceList refreshDeviceList];
-            [self retrieveAndSendWifiCredentials];
-            [self setVendorIDOnAccessory];
-        });
-    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+        [self->_deviceList refreshDeviceList];
+        [self retrieveAndSendWifiCredentials];
+    });
 }
 
 // MARK: UI Helper methods
@@ -557,9 +531,9 @@
                  credentials:credentials
                   breadcrumb:breadcrumb
                    timeoutMs:timeoutMs
-             responseHandler:^(NSError * error, NSDictionary * values) {
-                 [weakSelf onAddNetworkResponse:error isWiFi:YES];
-             }];
+           completionHandler:^(NSError * error, NSDictionary * values) {
+               [weakSelf onAddNetworkResponse:error isWiFi:YES];
+           }];
 }
 
 - (void)addThreadNetwork:(NSData *)threadDataSet
@@ -574,9 +548,9 @@
     [_cluster addThreadNetwork:threadDataSet
                     breadcrumb:breadcrumb
                      timeoutMs:timeoutMs
-               responseHandler:^(NSError * error, NSDictionary * values) {
-                   [weakSelf onAddNetworkResponse:error isWiFi:NO];
-               }];
+             completionHandler:^(NSError * error, NSDictionary * values) {
+                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
+             }];
 }
 
 - (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi
@@ -601,9 +575,9 @@
     [_cluster enableNetwork:networkId
                  breadcrumb:breadcrumb
                   timeoutMs:timeoutMs
-            responseHandler:^(NSError * err, NSDictionary * values) {
-                [weakSelf onEnableNetworkResponse:err];
-            }];
+          completionHandler:^(NSError * err, NSDictionary * values) {
+              [weakSelf onEnableNetworkResponse:err];
+          }];
 }
 
 - (void)onEnableNetworkResponse:(NSError *)error

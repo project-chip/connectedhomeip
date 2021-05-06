@@ -61,7 +61,7 @@ using namespace ::chip;
 #define GET_RESPONSE_CALLBACKS(name)                                                                                               \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
     Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
-    NodeId sourceId                          = emberAfCurrentCommand()->SourceNodeId();                                            \
+    NodeId sourceId                          = emberAfCurrentCommand()->source;                                                    \
     uint8_t sequenceNumber                   = emberAfCurrentCommand()->seqNum;                                                    \
     CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback);             \
                                                                                                                                    \
@@ -490,6 +490,9 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].VendorId = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
+                            data[i].Label = chip::ByteSpan(message, 32);
+                            message += 32;
+                            CHECK_MESSAGE_LENGTH(32);
                             data[i].NodeId = emberAfGetInt64u(message, 0, messageLen);
                             message += 8;
                             CHECK_MESSAGE_LENGTH(8);
@@ -1869,15 +1872,15 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
+bool emberAfOperationalCredentialsClusterGetFabricIdResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
 {
-    ChipLogProgress(Zcl, "SetFabricResponse:");
+    ChipLogProgress(Zcl, "GetFabricIdResponse:");
     ChipLogProgress(Zcl, "  FabricId: %" PRIu64 "", FabricId);
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterSetFabricResponseCallback");
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterGetFabricIdResponseCallback");
 
-    Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback> * cb =
-        Callback::Callback<OperationalCredentialsClusterSetFabricResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterGetFabricIdResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, FabricId);
     return true;
 }
@@ -2087,7 +2090,7 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     ChipLogProgress(Zcl, "emberAfReportAttributeCallback:");
     ChipLogProgress(Zcl, "  ClusterId: 0x%04x", clusterId);
 
-    NodeId sourceId = emberAfCurrentCommand()->SourceNodeId();
+    NodeId sourceId = emberAfCurrentCommand()->source;
     ChipLogProgress(Zcl, "  Source NodeId: %" PRIu64, sourceId);
 
     EndpointId endpointId = emberAfCurrentCommand()->apsFrame->sourceEndpoint;

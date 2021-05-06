@@ -287,10 +287,10 @@ public:
      *   Called when a cached group message that was waiting for message counter
      *   sync shold be reprocessed.
      *
-     * @param keyId         The encryption Key ID of the message buffer
+     * @param packetHeader  The message header
      * @param msgBuf        The received message
      */
-    void HandleGroupMessageReceived(uint16_t keyId, System::PacketBufferHandle msgBuf);
+    void HandleGroupMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf);
 
     /**
      * @brief
@@ -317,10 +317,12 @@ protected:
      * @brief
      *   Handle received secure message. Implements TransportMgrDelegate
      *
+     * @param header    the received message header
      * @param source    the source address of the package
-     * @param msgBuf    the buffer containing a full CHIP message (except for the optional length field).
+     * @param msgBuf    the buffer of (encrypted) payload
      */
-    void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override;
 
 private:
     /**

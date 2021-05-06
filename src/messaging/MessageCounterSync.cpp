@@ -207,9 +207,10 @@ void MessageCounterSyncMgr::ProcessPendingGroupMsgs(NodeId peerNodeId)
 
             if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
             {
+                (entry.msgBuf)->ConsumeHead(headerSize);
+
                 // Reprocess message.
-                mExchangeMgr->GetSessionMgr()->HandleGroupMessageReceived(packetHeader.GetEncryptionKeyID(),
-                                                                          std::move(entry.msgBuf));
+                mExchangeMgr->GetSessionMgr()->HandleGroupMessageReceived(packetHeader, std::move(entry.msgBuf));
 
                 // Explicitly free any buffer owned by this handle.  The
                 // HandleGroupMessageReceived() call should really handle this, but

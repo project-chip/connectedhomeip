@@ -51,8 +51,7 @@ class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 extern Messaging::ExchangeManager * ExchangeManager();
 } // namespace chip
 
-EmberStatus chipSendUnicast(Messaging::ExchangeContext * exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
-                            uint8_t * message, Messaging::SendFlags sendFlags)
+EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);
@@ -87,21 +86,6 @@ EmberStatus chipSendUnicast(Messaging::ExchangeContext * exchange, EmberApsFrame
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    // TODO: Disable CRMP for now, because it just doesn't seem to work
-    sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
-    CHIP_ERROR err = exchange->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer), sendFlags);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        // FIXME: Figure out better translations between our error types?
-        return EMBER_DELIVERY_FAILED;
-    }
-
-    return EMBER_SUCCESS;
-}
-
-EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
-{
     // TODO: temporary create a handle from node id, will be fix in PR 3602
     Messaging::ExchangeManager * exchangeMgr = ExchangeManager();
     if (exchangeMgr == nullptr)
@@ -122,15 +106,18 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     // receive the ack message. This logic needs to be deleted after we convert all legacy ZCL messages to IM messages.
     DeviceExchangeDelegate delegate;
     exchange->SetDelegate(&delegate);
-
     Messaging::SendFlags sendFlags;
 
     sendFlags.Set(Messaging::SendMessageFlags::kFromInitiator).Set(Messaging::SendMessageFlags::kNoAutoRequestAck);
+    CHIP_ERROR err = exchange->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer), sendFlags);
 
-    EmberStatus err = chipSendUnicast(exchange, apsFrame, messageLength, message, sendFlags);
-
-    // Make sure we always close the temporary exchange we just created.
     exchange->Close();
 
-    return err;
+    if (err != CHIP_NO_ERROR)
+    {
+        // FIXME: Figure out better translations between our error types?
+        return EMBER_DELIVERY_FAILED;
+    }
+
+    return EMBER_SUCCESS;
 }

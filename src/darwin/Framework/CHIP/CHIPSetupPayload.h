@@ -17,9 +17,13 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef __cplusplus
+#import <setup_payload/SetupPayload.h>
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, CHIPRendezvousInformationFlags) {
+typedef NS_ENUM(NSUInteger, RendezvousInformationFlags) {
     kRendezvousInformationNone = 0, // Device does not support any method for rendezvous
     kRendezvousInformationSoftAP = 1 << 0, // Device supports WiFi softAP
     kRendezvousInformationBLE = 1 << 1, // Device supports BLE
@@ -28,7 +32,7 @@ typedef NS_ENUM(NSUInteger, CHIPRendezvousInformationFlags) {
     kRendezvousInformationAllMask = kRendezvousInformationSoftAP | kRendezvousInformationBLE | kRendezvousInformationOnNetwork,
 };
 
-typedef NS_ENUM(NSUInteger, CHIPOptionalQRCodeInfoType) {
+typedef NS_ENUM(NSUInteger, OptionalQRCodeInfoType) {
     kOptionalQRCodeInfoTypeUnknown,
     kOptionalQRCodeInfoTypeString,
     kOptionalQRCodeInfoTypeInt32
@@ -47,12 +51,17 @@ typedef NS_ENUM(NSUInteger, CHIPOptionalQRCodeInfoType) {
 @property (nonatomic, strong) NSNumber * vendorID;
 @property (nonatomic, strong) NSNumber * productID;
 @property (nonatomic, assign) BOOL requiresCustomFlow;
-@property (nonatomic, assign) CHIPRendezvousInformationFlags rendezvousInformation;
+@property (nonatomic, assign) RendezvousInformationFlags rendezvousInformation;
 @property (nonatomic, strong) NSNumber * discriminator;
 @property (nonatomic, strong) NSNumber * setUpPINCode;
 
 @property (nonatomic, strong) NSString * serialNumber;
 - (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
+
+#ifdef __cplusplus
+- (id)initWithSetupPayload:(chip::SetupPayload)setupPayload;
+- (RendezvousInformationFlags)valueOf:(chip::RendezvousInformationFlags)value;
+#endif
 
 @end
 

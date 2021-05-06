@@ -32,14 +32,10 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
                                                                  System::PacketBufferHandle && message,
                                                                  EncryptedPacketBufferHandle * retainedMessage)
 {
-    PacketHeader packetHeader;
-
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
-    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
-
     if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
+        return mTransportMgr->SendMessage(PacketHeader(), mPeerAddress, std::move(message));
     }
 
     return CHIP_ERROR_INCORRECT_STATE;
