@@ -122,8 +122,8 @@
     removeAllFabricsButton.backgroundColor = UIColor.systemBlueColor;
     [removeAllFabricsButton setTitle:@"Remove All Fabrics" forState:UIControlStateNormal];
     [removeAllFabricsButton addTarget:self
-                             action:@selector(removeAllFabricsButtonPressed:)
-                   forControlEvents:UIControlEventTouchUpInside];
+                               action:@selector(removeAllFabricsButtonPressed:)
+                     forControlEvents:UIControlEventTouchUpInside];
     [_stackView addArrangedSubview:removeAllFabricsButton];
 
     removeAllFabricsButton.translatesAutoresizingMaskIntoConstraints = false;
@@ -244,31 +244,37 @@
 - (IBAction)removeAllFabricsButtonPressed:(id)sender
 {
     NSLog(@"Request to Remove All Fabrics.");
-    UIAlertController* alert = [UIAlertController alertControllerWithTitle:@"Remove All Fabrics?"
-                                   message:@"Are you sure you want to remove all fabrics, this will remove all fabrics on accessory, including this one, and put the device back in commissioning."
-                                   preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController * alert =
+        [UIAlertController alertControllerWithTitle:@"Remove All Fabrics?"
+                                            message:@"Are you sure you want to remove all fabrics, this will remove all fabrics on "
+                                                    @"accessory, including this one, and put the device back in commissioning."
+                                     preferredStyle:UIAlertControllerStyleAlert];
 
-    UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"Remove" style:UIAlertActionStyleDefault
-       handler:^(UIAlertAction * action) {
-        [self.cluster removeAllFabrics:^(NSError * error, NSDictionary * values) {
-            BOOL errorOccured = (error != nil);
-            NSString * resultString = errorOccured ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
-                                                     : @"Remove all fabrics success";
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateResult:resultString isError:errorOccured];
-            });
-        }];
-    }];
+    UIAlertAction * defaultAction =
+        [UIAlertAction actionWithTitle:@"Remove"
+                                 style:UIAlertActionStyleDefault
+                               handler:^(UIAlertAction * action) {
+                                   [self.cluster removeAllFabrics:^(NSError * error, NSDictionary * values) {
+                                       BOOL errorOccured = (error != nil);
+                                       NSString * resultString = errorOccured
+                                           ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                                           : @"Remove all fabrics success";
+                                       dispatch_async(dispatch_get_main_queue(), ^{
+                                           [self updateResult:resultString isError:errorOccured];
+                                       });
+                                   }];
+                               }];
 
-    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel
-       handler:^(UIAlertAction * action) {}];
+    UIAlertAction * cancelAction = [UIAlertAction actionWithTitle:@"Cancel"
+                                                            style:UIAlertActionStyleCancel
+                                                          handler:^(UIAlertAction * action) {
+                                                          }];
 
     [alert addAction:cancelAction];
     [alert addAction:defaultAction];
 
     [self presentViewController:alert animated:YES completion:nil];
 }
-
 
 - (IBAction)updateFabricLabelButtonPressed:(id)sender
 {
