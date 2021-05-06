@@ -944,7 +944,7 @@ void DeviceCommissioner::PersistDeviceList()
             {
                 // TODO: no need to base64 again the value
                 PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                                  mStorageDelegate->SyncSetKeyValue(key, value, static_cast<uint16_t>(strlen(value))));
+                                  mStorageDelegate->SyncSetKeyValue(key, value, requiredSize));
                 mPairedDevicesUpdated = false;
             }
             chip::Platform::MemoryFree(serialized);
