@@ -191,7 +191,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "Identify",
@@ -234,7 +234,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "IdentifyQueryResponse",
@@ -359,7 +359,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -516,7 +516,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddSceneResponse",
