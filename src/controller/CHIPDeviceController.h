@@ -229,7 +229,6 @@ protected:
     PersistentStorageDelegate * mStorageDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
-    static constexpr uint16_t kMdnsPort                        = 5353;
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
