@@ -65,4 +65,3 @@
 
 // ========== Platform-specific Cluster Overrides =========
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 1
-

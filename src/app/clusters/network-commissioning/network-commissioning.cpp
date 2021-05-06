@@ -214,7 +214,7 @@ exit:
     ChipLogDetail(Zcl, "AddWiFiNetwork: %d", err);
     return err;
 #else
-    // The target does not supports WiFiNetwork. 
+    // The target does not supports WiFiNetwork.
     // return "Command not found" error.
     return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
 #endif
