@@ -682,20 +682,6 @@ struct LwIPEvent;
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-#ifndef CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __MBED__
-/**
- *  @def CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
- *
- *  @brief
- *      Use Mbed netwrok interface API to enumerate available network interfaces
- *
- *  Defaults to enabled on Mbed platforms using sockets
- */
-#define CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF 1
-#endif
-#endif // CHIP_SYSTEM_CONFIG_USE_MBED_NET_IF
-
 /**
  *  @def CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
  *
