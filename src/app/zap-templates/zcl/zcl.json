@@ -15,6 +15,7 @@
         "low-power-cluster.xml",
         "keypad-input-cluster.xml",
         "wake-on-lan-cluster.xml",
+        "wifi-network-diagnostics-cluster.xml",
         "media-input-cluster.xml",
         "tv-channel-cluster.xml",
         "target-navigator-cluster.xml",
