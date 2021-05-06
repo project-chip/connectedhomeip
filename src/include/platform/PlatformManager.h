@@ -186,7 +186,7 @@ inline CHIP_ERROR PlatformManager::InitChipStack()
     // InitChipStack itself on many platforms.
     //
     // In the future, this could be moved into specific platform code (where it can
-    // be made thread safe) or we could use std::atomic. In general however, init twice
+    // be made thread safe). In general however, init twice
     // is likely a logic error and we may want to avoid that path anyway. Likely to
     // be done once code stabilizes a bit more.
     if (mInitialized)
