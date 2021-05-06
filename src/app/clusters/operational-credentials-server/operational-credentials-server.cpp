@@ -208,7 +208,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     AdminPairingInfo * admin;
     AdminId adminId;
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Fetch matching admin
     admin = GetGlobalAdminPairingTable().FindAdminForNode(fabricId, nodeId, vendorId);
@@ -232,7 +232,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
 
     // Fetch current admin
     AdminPairingInfo * admin = retrieveCurrentAdmin();
