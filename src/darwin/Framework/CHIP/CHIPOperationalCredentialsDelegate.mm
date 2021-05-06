@@ -62,11 +62,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::SetIssuerID(CHIPPersistentStorage
     if (CHIP_NO_ERROR != storage->SyncGetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, issuerIdString, idStringLen)) {
         mIssuerId = arc4random();
         CHIP_LOG_ERROR("Assigned %d certificate issuer ID to the commissioner", mIssuerId);
-        NSString * value = [NSString stringWithFormat:@"%x", mIssuerId];
-        storage->SyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, [value UTF8String], [value length]);
+        storage->SyncSetKeyValue(CHIP_COMMISSIONER_CA_ISSUER_ID, &mIssuerId, sizeof(mIssuerId));
     } else {
-        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:issuerIdString]];
-        [scanner scanHexInt:&mIssuerId];
         CHIP_LOG_ERROR("Found %d certificate issuer ID for the commissioner", mIssuerId);
     }
 
