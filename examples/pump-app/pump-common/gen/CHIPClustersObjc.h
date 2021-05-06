@@ -48,12 +48,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPIdentify : CHIPCluster
 
-- (void)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler;
-- (void)identifyQuery:(ResponseHandler)completionHandler;
+- (void)identify:(uint16_t)identifyTime responseHandler:(ResponseHandler)responseHandler;
+- (void)identifyQuery:(ResponseHandler)responseHandler;
 
-- (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
-- (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+- (void)readAttributeIdentifyTimeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeIdentifyTimeWithValue:(uint16_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
 

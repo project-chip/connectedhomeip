@@ -106,7 +106,7 @@ ti_simplelink_executable("pump_app") {
 
   ldscript = "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/cc13x2x7_cc26x2x7.lds"
 
-  inputs = [ ldscripts ]
+  inputs = [ ldscript ]
   
   ldflags = [
     "-L${ti_simplelink_sdk_root}/source",

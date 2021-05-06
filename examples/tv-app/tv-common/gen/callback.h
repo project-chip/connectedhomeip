@@ -1544,15 +1544,6 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(chip::app::Command * commandO
 bool emberAfAccountLoginClusterLoginCallback(chip::app::Command * commandObj, uint8_t * tempAccountIdentifier, uint8_t * setupPIN);
 
 /**
- * @brief Application Launcher Cluster LaunchApp Command callback
- * @param data
- * @param application
- */
-
-bool emberAfApplicationLauncherClusterLaunchAppCallback(chip::app::Command * commandObj, uint8_t * data,
-                                                        /* TYPE WARNING: array array defaults to */ uint8_t * application);
-
-/**
  * @brief Audio Output Cluster RenameOutput Command callback
  * @param index
  * @param name
@@ -1611,44 +1602,79 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Co
                                                                    uint8_t * countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
 /**
- * @brief Keypad Input Cluster SendKey Command callback
- * @param keyCode
+ * @brief Level Control Cluster Move Command callback
+ * @param moveMode
+ * @param rate
+ * @param optionMask
+ * @param optionOverride
  */
 
-bool emberAfKeypadInputClusterSendKeyCallback(chip::app::Command * commandObj, uint8_t keyCode);
+bool emberAfLevelControlClusterMoveCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
+                                            uint8_t optionOverride);
 
 /**
- * @brief Low Power Cluster Sleep Command callback
+ * @brief Level Control Cluster MoveToLevel Command callback
+ * @param level
+ * @param transitionTime
+ * @param optionMask
+ * @param optionOverride
  */
 
-bool emberAfLowPowerClusterSleepCallback(chip::app::Command * commandObj);
+bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::Command * commandObj, uint8_t level, uint16_t transitionTime,
+                                                   uint8_t optionMask, uint8_t optionOverride);
 
 /**
- * @brief Media Input Cluster HideInputStatus Command callback
+ * @brief Level Control Cluster MoveToLevelWithOnOff Command callback
+ * @param level
+ * @param transitionTime
  */
 
-bool emberAfMediaInputClusterHideInputStatusCallback(chip::app::Command * commandObj);
+bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::Command * commandObj, uint8_t level,
+                                                            uint16_t transitionTime);
 
 /**
- * @brief Media Input Cluster RenameInput Command callback
- * @param index
- * @param name
+ * @brief Level Control Cluster MoveWithOnOff Command callback
+ * @param moveMode
+ * @param rate
  */
 
-bool emberAfMediaInputClusterRenameInputCallback(chip::app::Command * commandObj, uint8_t index, uint8_t * name);
+bool emberAfLevelControlClusterMoveWithOnOffCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate);
 
 /**
- * @brief Media Input Cluster SelectInput Command callback
- * @param index
+ * @brief Level Control Cluster Step Command callback
+ * @param stepMode
+ * @param stepSize
+ * @param transitionTime
+ * @param optionMask
+ * @param optionOverride
  */
 
-bool emberAfMediaInputClusterSelectInputCallback(chip::app::Command * commandObj, uint8_t index);
+bool emberAfLevelControlClusterStepCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                            uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride);
 
 /**
- * @brief Media Input Cluster ShowInputStatus Command callback
+ * @brief Level Control Cluster StepWithOnOff Command callback
+ * @param stepMode
+ * @param stepSize
+ * @param transitionTime
  */
 
-bool emberAfMediaInputClusterShowInputStatusCallback(chip::app::Command * commandObj);
+bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
+                                                     uint16_t transitionTime);
+
+/**
+ * @brief Level Control Cluster Stop Command callback
+ * @param optionMask
+ * @param optionOverride
+ */
+
+bool emberAfLevelControlClusterStopCallback(chip::app::Command * commandObj, uint8_t optionMask, uint8_t optionOverride);
+
+/**
+ * @brief Level Control Cluster StopWithOnOff Command callback
+ */
+
+bool emberAfLevelControlClusterStopWithOnOffCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Media Playback Cluster MediaFastForward Command callback
@@ -1736,37 +1762,6 @@ bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj);
  */
 
 bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
-
-/**
- * @brief TV Channel Cluster ChangeChannel Command callback
- * @param match
- */
-
-bool emberAfTvChannelClusterChangeChannelCallback(chip::app::Command * commandObj, uint8_t * match);
-
-/**
- * @brief TV Channel Cluster ChangeChannelByNumber Command callback
- * @param majorNumber
- * @param minorNumber
- */
-
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(chip::app::Command * commandObj, uint16_t majorNumber,
-                                                          uint16_t minorNumber);
-
-/**
- * @brief TV Channel Cluster SkipChannel Command callback
- * @param count
- */
-
-bool emberAfTvChannelClusterSkipChannelCallback(chip::app::Command * commandObj, uint16_t Count);
-
-/**
- * @brief Target Navigator Cluster NavigateTarget Command callback
- * @param target
- * @param data
- */
-
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(chip::app::Command * commandObj, uint8_t target, uint8_t * data);
 
 //
 // Non-Cluster Related Callbacks

@@ -2197,25 +2197,25 @@
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
-/** @brief Command description for GetFabricId
+/** @brief Command description for SetFabric
  *
- * Command: GetFabricId
+ * Command: SetFabric
+ * @param VendorId INT16U
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterGetFabricId() emberAfFillExternalBuffer(mask,                                                                \
+    CredentialsClusterSetFabric(VendorId) emberAfFillExternalBuffer(mask,                                                          \
                                                                                                                                    \
-                                                              ZCL_GET_FABRIC_ID_COMMAND_ID, "", );
+                                                                    ZCL_SET_FABRIC_COMMAND_ID, "u", VendorId);
 
-/** @brief Command description for GetFabricIdResponse
+/** @brief Command description for SetFabricResponse
  *
- * Command: GetFabricIdResponse
+ * Command: SetFabricResponse
  * @param FabricId FABRIC_ID
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterGetFabricIdResponse(FabricId)                                                                                \
-        emberAfFillExternalBuffer(mask,                                                                                            \
+    CredentialsClusterSetFabricResponse(FabricId) emberAfFillExternalBuffer(mask,                                                  \
                                                                                                                                    \
-                                  ZCL_GET_FABRIC_ID_RESPONSE_COMMAND_ID, "u", FabricId);
+                                                                            ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "u", FabricId);
 
 /** @brief Command description for UpdateFabricLabel
  *
@@ -3628,6 +3628,34 @@
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
                                   ZCL_LOGIN_COMMAND_ID, "uu", tempAccountIdentifier, setupPIN);
+
+/** @brief Command description for Test
+ *
+ * Command: Test
+ * @param returnValue INT8U
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTest(returnValue) emberAfFillExternalBuffer(mask,                                                                \
+                                                                                                                                   \
+                                                              ZCL_TEST_COMMAND_ID, "u", returnValue);
+
+/** @brief Command description for TestNotHandled
+ *
+ * Command: TestNotHandled
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestNotHandled() emberAfFillExternalBuffer(mask,                                                                 \
+                                                                                                                                   \
+                                                             ZCL_TEST_NOT_HANDLED_COMMAND_ID, "", );
+
+/** @brief Command description for TestSpecific
+ *
+ * Command: TestSpecific
+ */
+#define emberAfFillCommandTest                                                                                                     \
+    ClusterClusterTestSpecific() emberAfFillExternalBuffer(mask,                                                                   \
+                                                                                                                                   \
+                                                           ZCL_TEST_SPECIFIC_COMMAND_ID, "", );
 
 /** @brief Command description for MatchProtocolAddress
  *

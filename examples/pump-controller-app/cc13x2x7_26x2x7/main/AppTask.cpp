@@ -20,7 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include "Server.h"
+#include <app/server/Server.h>
 
 #include "FreeRTOS.h"
 
@@ -28,9 +28,9 @@
 #include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
-#include "OnboardingCodesUtil.h"
+#include <app/server/OnboardingCodesUtil.h>
 
-#include "DataModelHandler.h"
+//#include <app/server/DataModelHandler.h>
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
@@ -180,7 +180,7 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags::kBLE);
+    PrintOnboardingCodes(chip::RendezvousInformationFlag::kBLE);
 
     return 0;
 }
@@ -329,8 +329,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
             // Enable BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                PLAT_LOG("Enabled BLE Advertisements");
+                if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+                {
+                    PLAT_LOG("Enabled BLE Advertisement");
+                }
+                else
+                {
+                    PLAT_LOG("OpenDefaultPairingWindow() failed");
+                }
             }
         }
         break;
