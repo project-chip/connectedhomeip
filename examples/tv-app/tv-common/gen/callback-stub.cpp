@@ -77,6 +77,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_WAKE_ON_LAN_CLUSTER_ID:
         emberAfWakeOnLanClusterInitCallback(endpoint);
         break;
+    case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+        emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
     default:
         // Unrecognized cluster ID
         break;
@@ -159,6 +162,11 @@ void __attribute__((weak)) emberAfTargetNavigatorClusterInitCallback(EndpointId 
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -27,141 +27,146 @@
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: Wake on LAN (server), big-endian */                                                               \
+        /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), big-endian */                                                  \
                                                                                                                                    \
-        /* 0 - wake on lan mac address, */                                                                                         \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+        /* 0 - bssid, */                                                                                                           \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                        \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: TV Channel (server), big-endian */                                                            \
+            /* Endpoint: 0, Cluster: Wake on LAN (server), big-endian */                                                           \
                                                                                                                                    \
-            /* 32 - tv channel list, */                                                                                            \
-            1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
-                                                                                                                                   \
-            /* 64 - tv channel lineup, */                                                                                          \
+            /* 6 - wake on lan mac address, */                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 96 - current tv channel, */                                                                                         \
+            /* Endpoint: 0, Cluster: TV Channel (server), big-endian */                                                            \
+                                                                                                                                   \
+            /* 38 - tv channel list, */                                                                                            \
+            1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+                                                                                                                                   \
+            /* 70 - tv channel lineup, */                                                                                          \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 102 - current tv channel, */                                                                                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Target Navigator (server), big-endian */                                                      \
                                                                                                                                    \
-            /* 128 - target navigator list, */                                                                                     \
+            /* 134 - target navigator list, */                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Media Playback (server), big-endian */                                                        \
                                                                                                                                    \
-            /* 160 - start time, */                                                                                                \
+            /* 166 - start time, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
                                                                                                                                    \
-            /* 168 - duration, */                                                                                                  \
+            /* 174 - duration, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 176 - updated at, */                                                                                                \
+            /* 182 - updated at, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 184 - posistion, */                                                                                                 \
+            /* 190 - posistion, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 192 - playback speed, */                                                                                            \
+            /* 198 - playback speed, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 200 - seek range end, */                                                                                            \
+            /* 206 - seek range end, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 208 - seek range start, */                                                                                          \
+            /* 214 - seek range start, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Media Input (server), big-endian */                                                           \
                                                                                                                                    \
-            /* 216 - media input list, */                                                                                          \
+            /* 222 - media input list, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Content Launch (server), big-endian */                                                        \
                                                                                                                                    \
-            /* 248 - accepts header list, */                                                                                       \
+            /* 254 - accepts header list, */                                                                                       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Application Launcher (server), big-endian */                                                  \
                                                                                                                                    \
-            /* 280 - application launcher list, */                                                                                 \
+            /* 286 - application launcher list, */                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (server), big-endian */                                                          \
                                                                                                                                    \
-            /* 312 - audio output list, */                                                                                         \
+            /* 318 - audio output list, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Media Playback (server), big-endian */                                                        \
                                                                                                                                    \
-            /* 344 - start time, */                                                                                                \
+            /* 350 - start time, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
                                                                                                                                    \
-            /* 352 - duration, */                                                                                                  \
+            /* 358 - duration, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 360 - updated at, */                                                                                                \
+            /* 366 - updated at, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 368 - posistion, */                                                                                                 \
+            /* 374 - posistion, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 376 - playback speed, */                                                                                            \
+            /* 382 - playback speed, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 384 - seek range end, */                                                                                            \
+            /* 390 - seek range end, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 392 - seek range start, */                                                                                          \
+            /* 398 - seek range start, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Application Basic (server), big-endian */                                                     \
                                                                                                                                    \
-            /* 400 - vendor name, */                                                                                               \
+            /* 406 - vendor name, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 432 - application name, */                                                                                          \
+            /* 438 - application name, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 464 - application id, */                                                                                            \
+            /* 470 - application id, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Application Basic (server), big-endian */                                                     \
                                                                                                                                    \
-            /* 496 - vendor name, */                                                                                               \
+            /* 502 - vendor name, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 528 - application name, */                                                                                          \
+            /* 534 - application name, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 560 - application id, */                                                                                            \
+            /* 566 - application id, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 4, Cluster: Application Basic (server), big-endian */                                                     \
                                                                                                                                    \
-            /* 592 - vendor name, */                                                                                               \
+            /* 598 - vendor name, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 624 - application name, */                                                                                          \
+            /* 630 - application name, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 656 - application id, */                                                                                            \
+            /* 662 - application id, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
     }
@@ -170,148 +175,153 @@
 #define GENERATED_DEFAULTS                                                                                                         \
     {                                                                                                                              \
                                                                                                                                    \
-        /* Endpoint: 0, Cluster: Wake on LAN (server), little-endian */                                                            \
+        /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), little-endian */                                               \
                                                                                                                                    \
-        /* 0 - wake on lan mac address, */                                                                                         \
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+        /* 0 - bssid, */                                                                                                           \
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                        \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: TV Channel (server), little-endian */                                                         \
+            /* Endpoint: 0, Cluster: Wake on LAN (server), little-endian */                                                        \
                                                                                                                                    \
-            /* 32 - tv channel list, */                                                                                            \
-            1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
-                                                                                                                                   \
-            /* 64 - tv channel lineup, */                                                                                          \
+            /* 6 - wake on lan mac address, */                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 96 - current tv channel, */                                                                                         \
+            /* Endpoint: 0, Cluster: TV Channel (server), little-endian */                                                         \
+                                                                                                                                   \
+            /* 38 - tv channel list, */                                                                                            \
+            1, 'o', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,    \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+                                                                                                                                   \
+            /* 70 - tv channel lineup, */                                                                                          \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
+                                                                                                                                   \
+            /* 102 - current tv channel, */                                                                                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Target Navigator (server), little-endian */                                                   \
                                                                                                                                    \
-            /* 128 - target navigator list, */                                                                                     \
+            /* 134 - target navigator list, */                                                                                     \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Media Playback (server), little-endian */                                                     \
                                                                                                                                    \
-            /* 160 - start time, */                                                                                                \
+            /* 166 - start time, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
                                                                                                                                    \
-            /* 168 - duration, */                                                                                                  \
+            /* 174 - duration, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 176 - updated at, */                                                                                                \
+            /* 182 - updated at, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 184 - posistion, */                                                                                                 \
+            /* 190 - posistion, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 192 - playback speed, */                                                                                            \
+            /* 198 - playback speed, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 200 - seek range end, */                                                                                            \
+            /* 206 - seek range end, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 208 - seek range start, */                                                                                          \
+            /* 214 - seek range start, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Media Input (server), little-endian */                                                        \
                                                                                                                                    \
-            /* 216 - media input list, */                                                                                          \
+            /* 222 - media input list, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Content Launch (server), little-endian */                                                     \
                                                                                                                                    \
-            /* 248 - accepts header list, */                                                                                       \
+            /* 254 - accepts header list, */                                                                                       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Application Launcher (server), little-endian */                                               \
                                                                                                                                    \
-            /* 280 - application launcher list, */                                                                                 \
+            /* 286 - application launcher list, */                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (server), little-endian */                                                       \
                                                                                                                                    \
-            /* 312 - audio output list, */                                                                                         \
+            /* 318 - audio output list, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Media Playback (server), little-endian */                                                     \
                                                                                                                                    \
-            /* 344 - start time, */                                                                                                \
+            /* 350 - start time, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
                                                                                                                                    \
-            /* 352 - duration, */                                                                                                  \
+            /* 358 - duration, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 360 - updated at, */                                                                                                \
+            /* 366 - updated at, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 368 - posistion, */                                                                                                 \
+            /* 374 - posistion, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 376 - playback speed, */                                                                                            \
+            /* 382 - playback speed, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 384 - seek range end, */                                                                                            \
+            /* 390 - seek range end, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 392 - seek range start, */                                                                                          \
+            /* 398 - seek range start, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Application Basic (server), little-endian */                                                  \
                                                                                                                                    \
-            /* 400 - vendor name, */                                                                                               \
+            /* 406 - vendor name, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 432 - application name, */                                                                                          \
+            /* 438 - application name, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 464 - application id, */                                                                                            \
+            /* 470 - application id, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Application Basic (server), little-endian */                                                  \
                                                                                                                                    \
-            /* 496 - vendor name, */                                                                                               \
+            /* 502 - vendor name, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 528 - application name, */                                                                                          \
+            /* 534 - application name, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 560 - application id, */                                                                                            \
+            /* 566 - application id, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 4, Cluster: Application Basic (server), little-endian */                                                  \
                                                                                                                                    \
-            /* 592 - vendor name, */                                                                                               \
+            /* 598 - vendor name, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 624 - application name, */                                                                                          \
+            /* 630 - application name, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
-            /* 656 - application id, */                                                                                            \
+            /* 662 - application id, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (32)
+#define GENERATED_DEFAULTS_COUNT (33)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -339,7 +349,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 76
+#define GENERATED_ATTRIBUTE_COUNT 82
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -349,6 +359,14 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 6, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* bssid */                                      \
+            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },               /* SecurityType */                               \
+            { 0x0002, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },               /* WiFiVersion */                                \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },       /* ChannelNumber */                              \
+            { 0x0004, ZAP_TYPE(INT8S), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },          /* Rssi */                                       \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },       /* cluster revision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Color Control (server) */                                                                     \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x616B) },                           /* current x */              \
@@ -360,31 +378,31 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* cluster revision */                                      \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Wake on LAN (server) */                                                                       \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(0) }, /* wake on lan mac address */                    \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(6) }, /* wake on lan mac address */                    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },       /* cluster revision */                           \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: TV Channel (server) */                                                                        \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(32) }, /* tv channel list */                          \
-            { 0x0001, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(64) }, /* tv channel lineup */                        \
-            { 0x0002, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(96) }, /* current tv channel */                       \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* cluster revision */                         \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(38) },  /* tv channel list */                         \
+            { 0x0001, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(70) },  /* tv channel lineup */                       \
+            { 0x0002, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(102) }, /* current tv channel */                      \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* cluster revision */                        \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Target Navigator (server) */                                                                  \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(128) }, /* target navigator list */                   \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(134) }, /* target navigator list */                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* cluster revision */                        \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Media Playback (server) */                                                                    \
             { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },           /* playback state */                                 \
-            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(160) }, /* start time */                                     \
-            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(168) }, /* duration */                                       \
-            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(176) }, /* updated at */                                     \
-            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(184) }, /* posistion */                                      \
-            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(192) }, /* playback speed */                                 \
-            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(200) }, /* seek range end */                                 \
-            { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(208) }, /* seek range start */                               \
+            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(166) }, /* start time */                                     \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(174) }, /* duration */                                       \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(182) }, /* updated at */                                     \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(190) }, /* posistion */                                      \
+            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(198) }, /* playback speed */                                 \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(206) }, /* seek range end */                                 \
+            { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(214) }, /* seek range start */                               \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Media Input (server) */                                                                       \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(216) }, /* media input list */                        \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(222) }, /* media input list */                        \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* cluster revision */                        \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Low Power (server) */                                                                         \
@@ -394,11 +412,11 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Content Launch (server) */                                                                    \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(248) }, /* accepts header list */                     \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(254) }, /* accepts header list */                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* cluster revision */                        \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Application Launcher (server) */                                                              \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(280) }, /* application launcher list */               \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(286) }, /* application launcher list */               \
             { 0x0001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },             /* catalog vendor id */                       \
             { 0x0002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },             /* application id */                          \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* cluster revision */                        \
@@ -411,29 +429,29 @@
             { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* current level */                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (server) */                                                                      \
-            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(312) }, /* audio output list */                       \
+            { 0x0000, ZAP_TYPE(OCTET_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(318) }, /* audio output list */                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },          /* cluster revision */                        \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Media Playback (server) */                                                                    \
             { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* playback state */                                 \
-            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(344) }, /* start time */                                     \
-            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(352) }, /* duration */                                       \
-            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(360) }, /* updated at */                                     \
-            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(368) }, /* posistion */                                      \
-            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(376) }, /* playback speed */                                 \
-            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(384) }, /* seek range end */                                 \
-            { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(392) }, /* seek range start */                               \
+            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(350) }, /* start time */                                     \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(358) }, /* duration */                                       \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(366) }, /* updated at */                                     \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(374) }, /* posistion */                                      \
+            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(382) }, /* playback speed */                                 \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(390) }, /* seek range end */                                 \
+            { 0x0007, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(398) }, /* seek range start */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* cluster revision */                               \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Content Launch (server) */                                                                    \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Application Basic (server) */                                                                 \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(400) }, /* vendor name */                              \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(406) }, /* vendor name */                              \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* vendor id */                                \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(432) }, /* application name */                         \
+            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(438) }, /* application name */                         \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* product id */                               \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(464) }, /* application id */                           \
+            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(470) }, /* application id */                           \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* catalog vendor id */                        \
             { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },            /* application satus */                        \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* cluster revision */                         \
@@ -442,11 +460,11 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
             /* Endpoint: 3, Cluster: Application Basic (server) */                                                                 \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(496) }, /* vendor name */                              \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(502) }, /* vendor name */                              \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* vendor id */                                \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(528) }, /* application name */                         \
+            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(534) }, /* application name */                         \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* product id */                               \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(560) }, /* application id */                           \
+            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(566) }, /* application id */                           \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* catalog vendor id */                        \
             { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },            /* application satus */                        \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* cluster revision */                         \
@@ -455,11 +473,11 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
             /* Endpoint: 4, Cluster: Application Basic (server) */                                                                 \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(592) }, /* vendor name */                              \
+            { 0x0000, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(598) }, /* vendor name */                              \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* vendor id */                                \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(624) }, /* application name */                         \
+            { 0x0002, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(630) }, /* application name */                         \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* product id */                               \
-            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(656) }, /* application id */                           \
+            { 0x0005, ZAP_TYPE(CHAR_STRING), 32, 0, ZAP_LONG_DEFAULTS_INDEX(662) }, /* application id */                           \
             { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                /* catalog vendor id */                        \
             { 0x0007, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },            /* application satus */                        \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },         /* cluster revision */                         \
@@ -481,7 +499,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 22
+#define GENERATED_CLUSTER_COUNT 23
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -495,74 +513,77 @@
             {                                                                                                                      \
                 0x0030, ZAP_ATTRIBUTE_INDEX(2), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x0036, ZAP_ATTRIBUTE_INDEX(3), 6, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
             { 0x0300,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(9),                                                                                              \
               6,                                                                                                                   \
               11,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayColorControlServer }, /* Endpoint: 0, Cluster: Color Control (server) */                                \
             {                                                                                                                      \
-                0x0503, ZAP_ATTRIBUTE_INDEX(9), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0503, ZAP_ATTRIBUTE_INDEX(15), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Wake on LAN (server) */                                                                    \
             {                                                                                                                      \
-                0x0504, ZAP_ATTRIBUTE_INDEX(11), 4, 98, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0504, ZAP_ATTRIBUTE_INDEX(17), 4, 98, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: TV Channel (server) */                                                                     \
             {                                                                                                                      \
-                0x0505, ZAP_ATTRIBUTE_INDEX(15), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0505, ZAP_ATTRIBUTE_INDEX(21), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Target Navigator (server) */                                                               \
             {                                                                                                                      \
-                0x0506, ZAP_ATTRIBUTE_INDEX(17), 8, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0506, ZAP_ATTRIBUTE_INDEX(23), 8, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Media Playback (server) */                                                                 \
             {                                                                                                                      \
-                0x0507, ZAP_ATTRIBUTE_INDEX(25), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0507, ZAP_ATTRIBUTE_INDEX(31), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Media Input (server) */                                                                    \
             {                                                                                                                      \
-                0x0508, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0508, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Low Power (server) */                                                                      \
             {                                                                                                                      \
-                0x0509, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0509, ZAP_ATTRIBUTE_INDEX(34), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Keypad Input (server) */                                                                   \
             {                                                                                                                      \
-                0x050A, ZAP_ATTRIBUTE_INDEX(29), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x050A, ZAP_ATTRIBUTE_INDEX(35), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Content Launch (server) */                                                                 \
             {                                                                                                                      \
-                0x050C, ZAP_ATTRIBUTE_INDEX(31), 4, 36, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x050C, ZAP_ATTRIBUTE_INDEX(37), 4, 36, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Application Launcher (server) */                                                           \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(35),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(41),                                                                                             \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(37),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(43),                                                                                             \
               1,                                                                                                                   \
               1,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
             {                                                                                                                      \
-                0x050B, ZAP_ATTRIBUTE_INDEX(38), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x050B, ZAP_ATTRIBUTE_INDEX(44), 2, 34, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Audio Output (server) */                                                                   \
             {                                                                                                                      \
-                0x0506, ZAP_ATTRIBUTE_INDEX(40), 9, 59, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0506, ZAP_ATTRIBUTE_INDEX(46), 9, 59, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 2, Cluster: Media Playback (server) */                                                                 \
             {                                                                                                                      \
-                0x050A, ZAP_ATTRIBUTE_INDEX(49), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x050A, ZAP_ATTRIBUTE_INDEX(55), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 2, Cluster: Content Launch (server) */                                                                 \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(50), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x050D, ZAP_ATTRIBUTE_INDEX(56), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 2, Cluster: Application Basic (server) */                                                              \
             {                                                                                                                      \
-                0x050E, ZAP_ATTRIBUTE_INDEX(58), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x050E, ZAP_ATTRIBUTE_INDEX(64), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 2, Cluster: Account Login (server) */                                                                  \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(59), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x050D, ZAP_ATTRIBUTE_INDEX(65), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 3, Cluster: Application Basic (server) */                                                              \
             {                                                                                                                      \
-                0x050A, ZAP_ATTRIBUTE_INDEX(67), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x050A, ZAP_ATTRIBUTE_INDEX(73), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 4, Cluster: Content Launch (server) */                                                                 \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(68), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x050D, ZAP_ATTRIBUTE_INDEX(74), 8, 105, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 4, Cluster: Application Basic (server) */                                                              \
     }
 
@@ -571,8 +592,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 347 }, { ZAP_CLUSTER_INDEX(12), 3, 38 }, { ZAP_CLUSTER_INDEX(15), 4, 168 },                    \
-            { ZAP_CLUSTER_INDEX(19), 1, 105 }, { ZAP_CLUSTER_INDEX(20), 2, 107 },                                                  \
+        { ZAP_CLUSTER_INDEX(0), 13, 360 }, { ZAP_CLUSTER_INDEX(13), 3, 38 }, { ZAP_CLUSTER_INDEX(16), 4, 168 },                    \
+            { ZAP_CLUSTER_INDEX(20), 1, 105 }, { ZAP_CLUSTER_INDEX(21), 2, 107 },                                                  \
     }
 
 // Largest attribute size is needed for various buffers
@@ -582,7 +603,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (765)
+#define ATTRIBUTE_MAX_SIZE (778)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (5)
