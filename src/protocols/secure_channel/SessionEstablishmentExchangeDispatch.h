@@ -57,11 +57,10 @@ protected:
 
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
-    bool IsTransportReliable() override
+    bool IsReliableTransmissionAllowed() override
     {
-        // If we are not using BLE as the transport, the underlying transport is UDP based.
-        // (return true only if BLE is being used as the transport)
-        return (mTransportMgr == nullptr);
+        // If the underlying transport is UDP.
+        return (mPeerAddress.GetTransportType() == Transport::Type::kUdp);
     }
 
 private:

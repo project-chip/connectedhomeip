@@ -60,7 +60,7 @@ efr32_sdk("sdk") {
   defines = [
     "BOARD_ID=${efr32_board}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "SL_HEAP_SIZE=(10 * 1024)",
+    "SL_HEAP_SIZE=(12 * 1024)",
   ]
 }
 
@@ -118,6 +118,8 @@ efr32_executable("window_app") {
   } else if (efr32_family == "efr32mg21") {
     ldscript = "${examples_plat_dir}/ldscripts/efr32-MG21.ld"
   }
+
+  inputs = [ ldscript ]
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
 

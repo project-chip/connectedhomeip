@@ -65,10 +65,8 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
-
         gSendMessageCount++;
 
         return CHIP_NO_ERROR;
@@ -124,6 +122,8 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    exchange->Close();
 }
 
 void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
@@ -146,6 +146,8 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    exchange->Close();
 }
 
 void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
@@ -192,6 +194,9 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
+
+    rm->ClearRetransTable(rc);
+    exchange->Close();
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
@@ -210,6 +215,8 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+
+    exchange->Close();
 }
 
 // Test Suite

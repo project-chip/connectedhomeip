@@ -30,19 +30,6 @@ namespace {
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
-
-    void AsyncSetKeyValue(const char * key, const char * value) override
-    {
-
-        CHIP_ERROR err = SyncSetKeyValue(key, value, strlen(value));
-
-        if (err != CHIP_NO_ERROR)
-        {
-            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
-        }
-    }
-
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
@@ -54,45 +41,19 @@ public:
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
-
-private:
-    chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
 };
 
 // FIXME: implement this class
 class ScriptDevicePairingDelegate final : public chip::Controller::DevicePairingDelegate
 {
 public:
-    using OnNetworkCredentialsRequestedCallback     = void (*)();
-    using OnOperationalCredentialsRequestedCallback = void (*)(const char * csr, size_t length);
-    using OnPairingCompleteCallback                 = void (*)(CHIP_ERROR err);
+    using OnPairingCompleteCallback = void (*)(CHIP_ERROR err);
 
     ~ScriptDevicePairingDelegate() = default;
-
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override
-    {
-        mCredentialsDelegate = callback;
-        if (mNetworkCredentialsRequested == nullptr)
-        {
-            ChipLogError(Controller, "Callback for network credentials is not defined.");
-            return;
-        }
-        mNetworkCredentialsRequested();
-    }
-
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           chip::RendezvousDeviceCredentialsDelegate * callback) override
-    {
-        mCredentialsDelegate = callback;
-        if (mOperationalCredentialsRequested == nullptr)
-        {
-            ChipLogError(Controller, "Callback for operational credentials is not defined.");
-            return;
-        }
-
-        mOperationalCredentialsRequested(csr, csr_length);
-    }
 
     void OnPairingComplete(CHIP_ERROR error) override
     {
@@ -104,116 +65,16 @@ public:
         mPairingComplete(error);
     }
 
-    void SetNetworkCredentialsRequestedCallback(OnNetworkCredentialsRequestedCallback callback)
-    {
-        mNetworkCredentialsRequested = callback;
-    }
-
-    void SetOperatioonalCredentialsRequestedCallback(OnOperationalCredentialsRequestedCallback callback)
-    {
-        mOperationalCredentialsRequested = callback;
-    }
-
     void SetPairingCompleteCallback(OnPairingCompleteCallback callback) { mPairingComplete = callback; }
 
-    void SetWifiCredentials(const char * ssid, const char * password)
-    {
-        if (mCredentialsDelegate == nullptr)
-        {
-            ChipLogError(Controller, "Wifi credentials received before delegate available.");
-            return;
-        }
-
-        mCredentialsDelegate->SendNetworkCredentials(ssid, password);
-    }
-
-    void SetThreadCredentials(chip::ByteSpan threadData)
-    {
-        if (mCredentialsDelegate == nullptr)
-        {
-            ChipLogError(Controller, "Thread credentials received before delegate available.");
-            return;
-        }
-
-        mCredentialsDelegate->SendThreadCredentials(threadData);
-    }
-
 private:
-    OnNetworkCredentialsRequestedCallback mNetworkCredentialsRequested         = nullptr;
-    OnOperationalCredentialsRequestedCallback mOperationalCredentialsRequested = nullptr;
-    OnPairingCompleteCallback mPairingComplete                                 = nullptr;
-
-    /// Delegate is set during request callbacks
-    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
+    OnPairingCompleteCallback mPairingComplete = nullptr;
 };
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 
 } // namespace
-
-extern "C" void pychip_internal_PairingDelegate_SetWifiCredentials(const char * ssid, const char * password)
-{
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetWifiCredentials(ssid, password); });
-}
-
-extern "C" CHIP_ERROR pychip_internal_PairingDelegate_SetThreadCredentials(const void * data, uint32_t length)
-{
-    chip::Thread::OperationalDataset dataset{};
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    struct
-    {
-        uint64_t mActiveTimestamp;
-        uint8_t mMasterKey[chip::Thread::kSizeMasterKey];
-        uint8_t mPSKc[chip::Thread::kSizePSKc];
-        uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
-        uint8_t mMeshLocalPrefix[chip::Thread::kSizeMeshLocalPrefix];
-        uint16_t mPanId;
-        char mNetworkName[chip::Thread::kSizeNetworkName + 1];
-        uint8_t mChannel;
-    } netInfo;
-
-    assert(length == sizeof(netInfo));
-
-    memcpy(&netInfo, data, length);
-
-    if (netInfo.mNetworkName[0] != 0)
-    {
-        SuccessOrExit(err = dataset.SetNetworkName(netInfo.mNetworkName));
-    }
-
-    SuccessOrExit(err = dataset.SetExtendedPanId(netInfo.mExtendedPanId));
-    SuccessOrExit(err = dataset.SetMeshLocalPrefix(netInfo.mMeshLocalPrefix));
-    SuccessOrExit(err = dataset.SetMasterKey(netInfo.mMasterKey));
-    SuccessOrExit(err = dataset.SetPSKc(netInfo.mPSKc));
-    SuccessOrExit(err = dataset.SetPanId(netInfo.mPanId));
-    SuccessOrExit(err = dataset.SetChannel(netInfo.mChannel));
-    SuccessOrExit(err = dataset.SetActiveTimestamp(netInfo.mActiveTimestamp));
-
-    if (!dataset.IsCommissioned())
-    {
-        ChipLogError(Controller, "Invalid Thread operational dataset");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    chip::python::ChipMainThreadScheduleAndWait([&]() { gPairingDelegate.SetThreadCredentials(dataset.AsByteSpan()); });
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
-extern "C" void pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(
-    ScriptDevicePairingDelegate::OnNetworkCredentialsRequestedCallback callback)
-{
-    gPairingDelegate.SetNetworkCredentialsRequestedCallback(callback);
-}
-
-extern "C" void pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback(
-    ScriptDevicePairingDelegate::OnOperationalCredentialsRequestedCallback callback)
-{
-    gPairingDelegate.SetOperatioonalCredentialsRequestedCallback(callback);
-}
 
 extern "C" void
 pychip_internal_PairingDelegate_SetPairingCompleteCallback(ScriptDevicePairingDelegate::OnPairingCompleteCallback callback)
@@ -231,13 +92,14 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         // System and Inet layers explicitly passed to indicate that the CHIP stack is
         // already assumed initialized
-        err = result->Init(localDeviceId,
-                           chip::Controller::ControllerInitParams{
-                               .storageDelegate = &gServerStorage,
-                               .systemLayer     = &chip::DeviceLayer::SystemLayer,
-                               .inetLayer       = &chip::DeviceLayer::InetLayer,
-                           },
-                           &gPairingDelegate);
+        chip::Controller::CommissionerInitParams params;
+
+        params.storageDelegate = &gServerStorage;
+        params.systemLayer     = &chip::DeviceLayer::SystemLayer;
+        params.inetLayer       = &chip::DeviceLayer::InetLayer;
+        params.pairingDelegate = &gPairingDelegate;
+
+        err = result->Init(localDeviceId, params);
     });
 
     if (err != CHIP_NO_ERROR)

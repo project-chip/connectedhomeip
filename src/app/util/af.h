@@ -51,7 +51,7 @@
 #pragma once
 
 #ifndef CONFIGURATION_HEADER
-#define CONFIGURATION_HEADER "config.h"
+#define CONFIGURATION_HEADER <app/util/config.h>
 #endif
 #include CONFIGURATION_HEADER
 
@@ -66,11 +66,11 @@
 #include "stack/include/error.h"
 #endif // EZSP_HOST
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
-#include "client-api.h"
-#include "debug-printing.h"
-#include "ember-print.h"
+#include <app/util/client-api.h>
+#include <app/util/debug-printing.h>
+#include <app/util/ember-print.h>
 
 /** @name Attribute Storage */
 // @{
@@ -283,7 +283,7 @@ EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::Clust
  *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
-                                   uint8_t * dataPtr, uint8_t readLength, EmberAfAttributeType * dataType);
+                                   uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
 
 /**
  * @brief Read the server attribute value, performing all the checks.
@@ -298,7 +298,7 @@ EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cl
  *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint8_t readLength);
+                                         uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief Read the client attribute value, performing all the checks.
@@ -313,7 +313,7 @@ EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::Cluste
  *      emberAfReadManufacturerSpecificServerAttribute
  */
 EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                         uint8_t * dataPtr, uint8_t readLength);
+                                         uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief Read the manufacturer-specific server attribute value, performing all checks.
@@ -328,7 +328,7 @@ EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::Cluste
  */
 EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint8_t readLength);
+                                                             uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief Read the manufacturer-specific client attribute value, performing all checks.
@@ -343,7 +343,7 @@ EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId en
  */
 EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
-                                                             uint8_t * dataPtr, uint8_t readLength);
+                                                             uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -725,7 +725,7 @@ uint8_t emberAfGetLastSequenceNumber(void);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint8_t len, bool signedNumber);
+int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber);
 
 /**
  * @brief populates the passed EUI64 with the local EUI64 MAC address.
@@ -1279,32 +1279,33 @@ EmberStatus emberAfSendMulticastWithCallback(chip::GroupId multicastId, EmberAps
 /**
  * @brief Sends broadcast.
  */
-EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
+// EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends broadcast with attached message sent callback.
  */
-EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                             uint8_t * message, EmberAfMessageSentFunction callback);
+// EmberStatus emberAfSendBroadcastWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+//                                             uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends broadcast with alias with attached message sent callback.
  */
-EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
-                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
-                                                      EmberAfMessageSentFunction callback);
+// EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+//                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
+//                                                      EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
                                uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
+                                           EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
+                                           EmberAfMessageSentFunction callback);
 
 /**
  * @brief Unicasts the message to each remote node in the binding table that
@@ -1473,24 +1474,6 @@ EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
  * @brief emberAfSendImmediateDefaultResponse with attached message sent callback.
  */
 EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Returns the maximum size of the payload that the Application
- * Support sub-layer will accept for the given message type, destination, and
- * APS frame.
- *
- * The size depends on multiple factors, including the security level in use
- * and additional information added to the message to support the various
- * options.
- *
- * @param type The outgoing message type.
- * @param indexOrDestination Depending on the message type, this is either the
- *  EmberNodeId of the destination, an index into the address table, an index
- *  into the binding table, the multicast identifier, or a broadcast address.
- * @param apsFrame The APS frame for the message.
- * @return The maximum APS payload length for the given message.
- */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.

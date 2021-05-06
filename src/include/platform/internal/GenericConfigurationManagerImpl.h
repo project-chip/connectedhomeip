@@ -116,6 +116,12 @@ public:
     CHIP_ERROR _GetQRCodeString(char * buf, size_t bufSize);
     CHIP_ERROR _GetWiFiAPSSID(char * buf, size_t bufSize);
     CHIP_ERROR _GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
+    CHIP_ERROR _GetRegulatoryLocation(uint32_t & location);
+    CHIP_ERROR _StoreRegulatoryLocation(uint32_t location);
+    CHIP_ERROR _GetCountryCode(char * buf, size_t bufSize, size_t & codeLen);
+    CHIP_ERROR _StoreCountryCode(const char * code, size_t codeLen);
+    CHIP_ERROR _GetBreadcrumb(uint64_t & breadcrumb);
+    CHIP_ERROR _StoreBreadcrumb(uint64_t breadcrumb);
     CHIP_ERROR _ConfigureChipStack();
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void);

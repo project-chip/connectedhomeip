@@ -44,6 +44,7 @@ static_library("framework") {
     "CHIPLogging.h",
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
+    "CHIPOnboardingPayloadParser.m",
     "CHIPPersistentStorageDelegate.h",
     "CHIPPersistentStorageDelegateBridge.h",
     "CHIPPersistentStorageDelegateBridge.mm",
@@ -51,6 +52,8 @@ static_library("framework") {
     "CHIPQRCodeSetupPayloadParser.mm",
     "CHIPSetupPayload.h",
     "CHIPSetupPayload.mm",
+    "gen/CHIPClusters.cpp",
+    "gen/CHIPClusters.h",
     "gen/CHIPClustersObjc.h",
     "gen/CHIPClustersObjc.mm",
   ]
@@ -65,16 +68,13 @@ static_library("framework") {
 }
 
 chip_data_model("darwin_data_model") {
-  cluster_sources = [
-    "media-playback-client",
-    "network-commissioning",
-  ]
+  zap_file = "chip-tool.zap"
 
   zap_pregenerated_dir = "gen"
 
-  public_configs = [ ":darwin_config" ]
-
   use_default_client_callbacks = true
+
+  public_configs = [ ":darwin_config" ]
 }
 
 group("CHIP") {

@@ -715,6 +715,10 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
             ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
             return;
         }
+        if (mFlags.Has(Flags::kRestartAdvertising))
+        {
+            BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        }
         break;
     }
     case QVCHIP_DM_CONN_OPEN_IND: {
@@ -903,8 +907,10 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
+        /* Stop advertising and defer restart for when stop confirmation is received from the stack */
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        sInstance.StopAdvertising();
+        sInstance.mFlags.Set(Flags::kRestartAdvertising);
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {

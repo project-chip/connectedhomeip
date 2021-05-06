@@ -25,7 +25,7 @@
 #define CHIP_ZCL_ENDPOINT_MIN 0x00
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
-class ReportingCommand : public Command, public chip::Controller::DeviceStatusDelegate
+class ReportingCommand : public Command
 {
 public:
     ReportingCommand(const char * commandName) : Command(commandName)
@@ -35,10 +35,6 @@ public:
 
     /////////// Command Interface /////////
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
-
-    /////////// DeviceStatusDelegate Interface /////////
-    void OnMessage(PacketBufferHandle buffer) override;
-    void OnStatusChange(void) override;
 
     virtual void AddReportCallbacks(uint8_t endPointId) = 0;
 

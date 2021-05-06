@@ -66,23 +66,18 @@
 #define GENERATED_ATTRIBUTE_COUNT 10
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },       /* Window Covering (server): cluster revision */          \
-            { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* Window Covering (server): window covering type */      \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* Window Covering (server): current position - lift */                                \
-            { 0x0004, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
-              ZAP_SIMPLE_DEFAULT(0x0000) },                                /* Window Covering (server): current position - tilt */ \
-            { 0x0007, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x03) }, /* Window Covering (server): config status */           \
-            { 0x0010, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* Window Covering (server): installed open limit - lift */                            \
-            { 0x0011, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
-              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* Window Covering (server): installed closed limit - lift */                          \
-            { 0x0012, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* Window Covering (server): installed open limit - tilt */                            \
-            { 0x0013, ZAP_TYPE(INT16U), 2, 0,                                                                                      \
-              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* Window Covering (server): installed closed limit - tilt */                          \
-            { 0x0017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                          \
-              ZAP_SIMPLE_DEFAULT(0x14) }, /* Window Covering (server): mode */                                                     \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Window Covering (server) */                                                                       \
+        { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* window covering type */                             \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* current position - lift */                          \
+            { 0x0004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* current position - tilt */                          \
+            { 0x0007, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x03) },  /* config status */                                    \
+            { 0x0010, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* installed open limit - lift */                      \
+            { 0x0011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* installed closed limit - lift */                    \
+            { 0x0012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* installed open limit - tilt */                      \
+            { 0x0013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* installed closed limit - tilt */                    \
+            { 0x0017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x14) }, /* mode */                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },                                /* cluster revision */       \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -162,13 +157,15 @@
 #define EMBER_AF_GENERATED_COMMAND_COUNT (7)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* Window Covering (server): WindowCoveringUpOpen */              \
-            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Window Covering (server): WindowCoveringDownClose */           \
-            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Window Covering (server): WindowCoveringStop */                \
-            { 0x0102, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Window Covering (server): WindowCoveringGoToLiftValue */       \
-            { 0x0102, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Window Covering (server): WindowCoveringGoToLiftPercentage */  \
-            { 0x0102, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Window Covering (server): WindowCoveringGoToTiltValue */       \
-            { 0x0102, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Window Covering (server): WindowCoveringGoToTiltPercentage */  \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Window Covering (server) */                                                                       \
+        { 0x0102, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) },     /* WindowCoveringUpOpen */                                        \
+            { 0x0102, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringDownClose */                                     \
+            { 0x0102, 0x02, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringStop */                                          \
+            { 0x0102, 0x04, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringGoToLiftValue */                                 \
+            { 0x0102, 0x05, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringGoToLiftPercentage */                            \
+            { 0x0102, 0x07, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringGoToTiltValue */                                 \
+            { 0x0102, 0x08, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* WindowCoveringGoToTiltPercentage */                            \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
@@ -209,28 +206,30 @@
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (8)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Window Covering (server) */                                                                       \
         {                                                                                                                          \
             ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }          \
-        }, /* Reporting for cluster: "Window Covering", attribute: "window covering type". side: server */                         \
+        }, /* window covering type */                                                                                              \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0003, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "current position - lift". side: server */                  \
+            }, /* current position - lift */                                                                                       \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0004, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "current position - tilt". side: server */                  \
+            }, /* current position - tilt */                                                                                       \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0007, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "config status". side: server */                            \
+            }, /* config status */                                                                                                 \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0010, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "installed open limit - lift". side: server */              \
+            }, /* installed open limit - lift */                                                                                   \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0011, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "installed closed limit - lift". side: server */            \
+            }, /* installed closed limit - lift */                                                                                 \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0012, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "installed open limit - tilt". side: server */              \
+            }, /* installed open limit - tilt */                                                                                   \
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0001, 0x0102, 0x0013, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
-            }, /* Reporting for cluster: "Window Covering", attribute: "installed closed limit - tilt". side: server */            \
+            }, /* installed closed limit - tilt */                                                                                 \
     }

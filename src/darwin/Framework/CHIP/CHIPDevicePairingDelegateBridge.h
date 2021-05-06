@@ -24,23 +24,15 @@
 NS_ASSUME_NONNULL_BEGIN
 
 class CHIPDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate,
-                                        public chip::Controller::DeviceAddressUpdateDelegate {
+                                        public chip::Controller::DeviceAddressUpdateDelegate
+{
 public:
     CHIPDevicePairingDelegateBridge();
     ~CHIPDevicePairingDelegateBridge();
 
     void setDelegate(id<CHIPDevicePairingDelegate> delegate, dispatch_queue_t queue);
 
-    void SendWiFiCredentials(NSString * ssid, NSString * password);
-
-    void SendThreadCredentials(NSData * threadDataSet);
-
-    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
-
-    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
-
-    void OnOperationalCredentialsRequested(
-        const char * csr, size_t csr_length, chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
 
     void OnPairingComplete(CHIP_ERROR error) override;
 
@@ -52,7 +44,7 @@ private:
     id<CHIPDevicePairingDelegate> mDelegate;
     dispatch_queue_t mQueue;
 
-    CHIPPairingStatus MapStatus(chip::RendezvousSessionDelegate::Status status);
+    CHIPPairingStatus MapStatus(chip::Controller::DevicePairingDelegate::Status status);
 };
 
 NS_ASSUME_NONNULL_END

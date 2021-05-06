@@ -43,36 +43,21 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Identify
- *
- */
-@interface CHIPIdentify : CHIPCluster
-
-- (void)identify:(uint16_t)identifyTime completionHandler:(ResponseHandler)completionHandler;
-- (void)identifyQuery:(ResponseHandler)completionHandler;
-
-- (void)readAttributeIdentifyTime:(ResponseHandler)completionHandler;
-- (void)writeAttributeIdentifyTime:(uint16_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
-
-@end
-
-/**
  * Cluster On/off
  *
  */
 @interface CHIPOnOff : CHIPCluster
 
-- (void)off:(ResponseHandler)completionHandler;
-- (void)on:(ResponseHandler)completionHandler;
-- (void)toggle:(ResponseHandler)completionHandler;
+- (void)off:(ResponseHandler)responseHandler;
+- (void)on:(ResponseHandler)responseHandler;
+- (void)toggle:(ResponseHandler)responseHandler;
 
-- (void)readAttributeOnOff:(ResponseHandler)completionHandler;
-- (void)configureAttributeOnOff:(uint16_t)minInterval
-                    maxInterval:(uint16_t)maxInterval
-              completionHandler:(ResponseHandler)completionHandler;
-- (void)reportAttributeOnOff:(ResponseHandler)reportHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+- (void)readAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeOnOffWithMinInterval:(uint16_t)minInterval
+                                   maxInterval:(uint16_t)maxInterval
+                               responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOnOffWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
 
@@ -82,20 +67,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPPumpConfigurationAndControl : CHIPCluster
 
-- (void)readAttributeMaxPressure:(ResponseHandler)completionHandler;
-- (void)readAttributeMaxSpeed:(ResponseHandler)completionHandler;
-- (void)readAttributeMaxFlow:(ResponseHandler)completionHandler;
-- (void)readAttributeEffectiveOperationMode:(ResponseHandler)completionHandler;
-- (void)readAttributeEffectiveControlMode:(ResponseHandler)completionHandler;
-- (void)readAttributeCapacity:(ResponseHandler)completionHandler;
-- (void)configureAttributeCapacity:(uint16_t)minInterval
-                       maxInterval:(uint16_t)maxInterval
-                            change:(int16_t)change
-                 completionHandler:(ResponseHandler)completionHandler;
-- (void)reportAttributeCapacity:(ResponseHandler)reportHandler;
-- (void)readAttributeOperationMode:(ResponseHandler)completionHandler;
-- (void)writeAttributeOperationMode:(uint8_t)value completionHandler:(ResponseHandler)completionHandler;
-- (void)readAttributeClusterRevision:(ResponseHandler)completionHandler;
+- (void)readAttributeMaxPressureWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxSpeedWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeMaxFlowWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEffectiveOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeEffectiveControlModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeCapacityWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                           change:(int16_t)change
+                                  responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeCapacityWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeOperationModeWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOperationModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
 

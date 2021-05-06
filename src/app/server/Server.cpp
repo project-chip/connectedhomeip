@@ -43,7 +43,7 @@
 #include <transport/SecureSessionMgr.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-#include "Mdns.h"
+#include <app/server/Mdns.h>
 #endif
 
 using namespace ::chip;
@@ -76,29 +76,23 @@ constexpr bool useTestPairing()
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
-    void AsyncSetKeyValue(const char * key, const char * value) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
+        ChipLogProgress(AppServer, "Retrieved value from server storage.");
         return PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size);
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
+        ChipLogProgress(AppServer, "Stored value in server storage");
         return PersistedStorage::KeyValueStoreMgr().Put(key, value, size);
     }
 
-    void AsyncDeleteKeyValue(const char * key) override { PersistedStorage::KeyValueStoreMgr().Delete(key); }
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override
+    {
+        ChipLogProgress(AppServer, "Delete value in server storage");
+        return PersistedStorage::KeyValueStoreMgr().Delete(key);
+    }
 };
 
 ServerStorageDelegate gServerStorage;
@@ -108,7 +102,7 @@ CHIP_ERROR PersistAdminPairingToKVS(AdminPairingInfo * admin, AdminId nextAvaila
     ReturnErrorCodeIf(admin == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogProgress(AppServer, "Persisting admin ID %d, next available %d", admin->GetAdminId(), nextAvailableId);
 
-    ReturnErrorOnFailure(admin->StoreIntoKVS(gServerStorage));
+    ReturnErrorOnFailure(GetGlobalAdminPairingTable().Store(admin->GetAdminId()));
     ReturnErrorOnFailure(PersistedStorage::KeyValueStoreMgr().Put(kAdminTableCountKey, &nextAvailableId, sizeof(nextAvailableId)));
 
     ChipLogProgress(AppServer, "Persisting admin ID successfully");
@@ -127,18 +121,18 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
     //       Also, the current approach can make ID lookup slower as more IDs are allocated and freed.
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
-        AdminPairingInfo * admin = adminPairings.AssignAdminId(id);
         // Recreate the binding if one exists in persistent storage. Else skip to the next ID
-        if (admin->FetchFromKVS(gServerStorage) != CHIP_NO_ERROR)
+        if (adminPairings.LoadFromStorage(id) == CHIP_NO_ERROR)
         {
-            adminPairings.ReleaseAdminId(id);
-        }
-        else
-        {
-            ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
-                            static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+            AdminPairingInfo * admin = adminPairings.FindAdminWithId(id);
+            if (admin != nullptr)
+            {
+                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
+                                static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+            }
         }
     }
+    ChipLogProgress(AppServer, "Restored all admin pairings from KVS.");
 
     return CHIP_NO_ERROR;
 }
@@ -149,7 +143,7 @@ void EraseAllAdminPairingsUpTo(AdminId nextAvailableId)
 
     for (AdminId id = 0; id < nextAvailableId; id++)
     {
-        AdminPairingInfo::DeleteFromKVS(gServerStorage, id);
+        GetGlobalAdminPairingTable().Delete(id);
     }
 }
 
@@ -184,7 +178,7 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
 
     chip::Platform::Delete(session);
 
-    server.GetRendezvousSession()->SetNextKeyId(nextSessionKeyId);
+    server.SetNextKeyId(nextSessionKeyId);
     return CHIP_NO_ERROR;
 }
 
@@ -262,12 +256,13 @@ public:
         {
             ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false));
         }
+
+        if (mDelegate != nullptr)
         {
-            if (mDelegate != nullptr)
-                mDelegate->OnPairingWindowClosed();
+            mDelegate->OnPairingWindowClosed();
         }
 
-        AdminPairingInfo * admin = gAdminPairings.FindAdmin(mAdmin);
+        AdminPairingInfo * admin = gAdminPairings.FindAdminWithId(mAdmin);
         if (admin != nullptr)
         {
             ReturnErrorOnFailure(PersistAdminPairingToKVS(admin, gNextAvailableAdminId));
@@ -275,17 +270,6 @@ public:
 
         return CHIP_NO_ERROR;
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    void RendezvousComplete() const override
-    {
-        // Once rendezvous completed, assume we are operational
-        if (app::Mdns::AdvertiseOperational() != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to start advertising operational state at rendezvous completion time.");
-        }
-    }
-#endif
 
     void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
     void SetBLE(bool ble) { isBLE = ble; }
@@ -389,7 +373,7 @@ public:
         }
         else
         {
-            HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
+            HandleDataModelMessage(exchangeContext, std::move(buffer));
         }
 
     exit:
@@ -418,16 +402,6 @@ SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
 
-SecureSessionMgr & chip::SessionManager()
-{
-    return gSessions;
-}
-
-Messaging::ExchangeManager & chip::ExchangeManager()
-{
-    return gExchangeMgr;
-}
-
 CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindowAdvertisement advertisementMode)
 {
     // TODO(cecille): If this is re-called when the window is already open, what should happen?
@@ -450,7 +424,7 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
 
     if (resetAdmins == ResetAdmins::kYes)
     {
-        uint16_t nextKeyId = gRendezvousServer.GetRendezvousSession()->GetNextKeyId();
+        uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
         gNextAvailableAdminId = 0;
@@ -465,6 +439,33 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     return gRendezvousServer.WaitForPairing(std::move(params), &gExchangeMgr, &gTransports, &gSessions, adminInfo);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
+static void ChipEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t)
+{
+    const auto advertise = [] {
+        CHIP_ERROR err = app::Mdns::AdvertiseOperational();
+        if (err != CHIP_NO_ERROR)
+            ChipLogError(AppServer, "Failed to start operational advertising: %s", chip::ErrorStr(err));
+    };
+
+    switch (event->Type)
+    {
+    case DeviceLayer::DeviceEventType::kInternetConnectivityChange:
+        VerifyOrReturn(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established);
+        advertise();
+        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    case DeviceLayer::DeviceEventType::kThreadStateChange:
+        VerifyOrReturn(event->ThreadStateChange.AddressChanged);
+        advertise();
+        break;
+#endif
+    default:
+        break;
+    }
+}
+#endif
+
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
 void InitServer(AppDelegate * delegate)
@@ -473,13 +474,21 @@ void InitServer(AppDelegate * delegate)
 
     chip::Platform::MemoryInit();
 
-    InitDataModelHandler();
+    InitDataModelHandler(&gExchangeMgr);
     gCallbacks.SetDelegate(delegate);
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
+    SuccessOrExit(err);
+#endif
 
     err = gRendezvousServer.Init(delegate, &gServerStorage);
     SuccessOrExit(err);
 
     gAdvDelegate.SetDelegate(delegate);
+
+    err = gAdminPairings.Init(&gServerStorage);
+    SuccessOrExit(err);
 
     // Init transport before operations with secure session mgr.
     err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6)
@@ -537,11 +546,10 @@ void InitServer(AppDelegate * delegate)
 #endif
     }
 
-// Starting mDNS server only for Thread devices due to problem reported in issue #5076.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+// ESP32 examples have a custom logic for enabling DNS-SD
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
     app::Mdns::StartServer();
-#endif
+    PlatformMgr().AddEventHandler(ChipEventHandler, {});
 #endif
 
     gCallbacks.SetSessionMgr(&gSessions);

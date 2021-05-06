@@ -40,6 +40,5 @@ typedef void (*ReadReportingConfigurationReportedCallback)(void * context, uint1
 typedef void (*ReadReportingConfigurationReceivedCallback)(void * context, uint16_t timeout);
 
 // Cluster Specific Response Callbacks
-typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
 
 // List specific responses

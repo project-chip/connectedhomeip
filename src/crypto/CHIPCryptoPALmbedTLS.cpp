@@ -35,6 +35,7 @@
 #include <mbedtls/hkdf.h>
 #include <mbedtls/md.h>
 #include <mbedtls/pkcs5.h>
+#include <mbedtls/sha1.h>
 #include <mbedtls/sha256.h>
 #include <mbedtls/x509_csr.h>
 
@@ -189,6 +190,19 @@ exit:
     return error;
 }
 
+CHIP_ERROR Hash_SHA1(const uint8_t * data, const size_t data_length, uint8_t * out_buffer)
+{
+    int result = 0;
+
+    // zero data length hash is supported.
+    VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_sha1_ret(Uint8::to_const_uchar(data), data_length, Uint8::to_uchar(out_buffer));
+    VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
 Hash_SHA256_stream::Hash_SHA256_stream(void) {}
 
 Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
@@ -278,8 +292,8 @@ exit:
     return error;
 }
 
-CHIP_ERROR pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen, unsigned int iteration_count,
-                         uint32_t key_length, uint8_t * output)
+CHIP_ERROR PBKDF2_sha256::pbkdf2_sha256(const uint8_t * password, size_t plen, const uint8_t * salt, size_t slen,
+                                        unsigned int iteration_count, uint32_t key_length, uint8_t * output)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
@@ -707,8 +721,10 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    int result       = 0;
-    size_t length    = csr_length;
+
+    int result = 0;
+
+    size_t out_length;
 
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
 
@@ -732,9 +748,27 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
 
     mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
 
-    result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
+    // TODO: mbedTLS CSR parser fails if the subject name is not set (or if empty).
+    //       CHIP Spec doesn't specify the subject name that can be used.
+    //       Figure out the correct value and update this code.
+    result = mbedtls_x509write_csr_set_subject_name(&csr, "O=CSR");
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    csr_length = strlen(Uint8::to_const_char(out_csr));
+
+    result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, CryptoRNG, nullptr);
+    VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
+
+    out_length = (size_t) result;
+    VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
+
+    if (csr_length != out_length)
+    {
+        // mbedTLS API writes the CSR at the end of the provided buffer.
+        // Let's move it to the start of the buffer.
+        size_t offset = csr_length - out_length;
+        memmove(out_csr, &out_csr[offset], out_length);
+    }
+
+    csr_length = out_length;
 
 exit:
     keypair = nullptr;
@@ -743,6 +777,55 @@ exit:
     mbedtls_pk_free(&pk);
     _log_mbedTLS_error(result);
     return error;
+}
+
+CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
+{
+#if !CHIP_TARGET_STYLE_EMBEDDED
+    // TODO: For some embedded targets, mbedTLS library doesn't have mbedtls_x509_csr_parse_der, and mbedtls_x509_csr_parse_free.
+    //       Taking a step back, embedded targets likely will not process CSR requests. Adding this action item to reevaluate
+    //       this if there's a need for this processing for embedded targets.
+    CHIP_ERROR error   = CHIP_NO_ERROR;
+    size_t pubkey_size = 0;
+
+    mbedtls_ecp_keypair * keypair = nullptr;
+
+    P256ECDSASignature signature;
+
+    mbedtls_x509_csr csr;
+    mbedtls_x509_csr_init(&csr);
+
+    int result = mbedtls_x509_csr_parse_der(&csr, csr_buf, csr_length);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // Verify the signature algorithm and public key type
+    VerifyOrExit(csr.sig_md == MBEDTLS_MD_SHA256, error = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+    VerifyOrExit(csr.sig_pk == MBEDTLS_PK_ECDSA, error = CHIP_ERROR_WRONG_KEY_TYPE);
+
+    keypair = mbedtls_pk_ec(csr.pk);
+
+    // Copy the public key from the CSR
+    result = mbedtls_ecp_point_write_binary(&keypair->grp, &keypair->Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size,
+                                            Uint8::to_uchar(pubkey), pubkey.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
+
+    // Verify the signature using the public key
+    VerifyOrExit(kMax_ECDSA_Signature_Length >= csr.sig.len, error = CHIP_ERROR_INTERNAL);
+    memmove(Uint8::to_uchar(signature), csr.sig.p, csr.sig.len);
+    signature.SetLength(csr.sig.len);
+
+    error = pubkey.ECDSA_validate_msg_signature(csr.cri.p, csr.cri.len, signature);
+    SuccessOrExit(error);
+
+exit:
+    mbedtls_x509_csr_free(&csr);
+    _log_mbedTLS_error(result);
+    return error;
+#else
+    ChipLogError(Crypto, "MBEDTLS_X509_CSR_PARSE_C is not enabled. CSR cannot be parsed");
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
 }
 
 typedef struct Spake2p_Context

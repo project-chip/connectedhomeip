@@ -46,6 +46,9 @@
 #define OPENTHREAD_CONFIG_NCP_UART_ENABLE 1
 #define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
 
+#define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
+#define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
+
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.
 //

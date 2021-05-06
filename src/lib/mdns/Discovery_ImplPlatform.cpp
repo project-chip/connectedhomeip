@@ -160,7 +160,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     ReturnErrorOnFailure(SetupHostname(params.GetMac()));
 
-    snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
+    snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
+             static_cast<uint32_t>(mCommissionInstanceName));
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
     {
         strncpy(service.mType, "_chipc", sizeof(service.mType));
@@ -276,7 +277,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
                         chip::ErrorStr(error));
         crmpRetryIntervalIdle = kMaxCRMPRetryInterval;
     }
-    writtenCharactersNumber = snprintf(crmpRetryIntervalIdleBuf, sizeof(crmpRetryIntervalIdleBuf), "%u", crmpRetryIntervalIdle);
+    writtenCharactersNumber =
+        snprintf(crmpRetryIntervalIdleBuf, sizeof(crmpRetryIntervalIdleBuf), "%" PRIu32, crmpRetryIntervalIdle);
     VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
                         CHIP_ERROR_INVALID_STRING_LENGTH);
     crmpRetryIntervalEntries[textEntrySize++] = { "CRI", reinterpret_cast<const uint8_t *>(crmpRetryIntervalIdleBuf),
@@ -289,7 +291,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
         crmpRetryIntervalActive = kMaxCRMPRetryInterval;
     }
     writtenCharactersNumber =
-        snprintf(crmpRetryIntervalActiveBuf, sizeof(crmpRetryIntervalActiveBuf), "%u", crmpRetryIntervalActive);
+        snprintf(crmpRetryIntervalActiveBuf, sizeof(crmpRetryIntervalActiveBuf), "%" PRIu32, crmpRetryIntervalActive);
     VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < kMaxCRMPRetryBufferSize),
                         CHIP_ERROR_INVALID_STRING_LENGTH);
     crmpRetryIntervalEntries[textEntrySize++] = { "CRA", reinterpret_cast<const uint8_t *>(crmpRetryIntervalActiveBuf),
@@ -373,7 +375,8 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, MdnsService * re
     nodeData.mAddress     = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
 
-    ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeData.mPeerId.GetNodeId());
+    ChipLogProgress(Discovery, "Node ID resolved for 0x08%" PRIX32 "08%" PRIX32,
+                    static_cast<uint32_t>(nodeData.mPeerId.GetNodeId() >> 32), static_cast<uint32_t>(nodeData.mPeerId.GetNodeId()));
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

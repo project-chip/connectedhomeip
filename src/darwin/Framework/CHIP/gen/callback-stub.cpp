@@ -77,11 +77,23 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
         break;
+    case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
+        emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
+        break;
     case ZCL_SCENES_CLUSTER_ID:
         emberAfScenesClusterInitCallback(endpoint);
         break;
+    case ZCL_SWITCH_CLUSTER_ID:
+        emberAfSwitchClusterInitCallback(endpoint);
+        break;
     case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
         emberAfTemperatureMeasurementClusterInitCallback(endpoint);
+        break;
+    case ZCL_TEST_CLUSTER_ID:
+        emberAfTestClusterClusterInitCallback(endpoint);
+        break;
+    case ZCL_THERMOSTAT_CLUSTER_ID:
+        emberAfThermostatClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -169,12 +181,32 @@ void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(Endp
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfTestClusterClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThermostatClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -463,8 +495,8 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * @param status   Ver.: always
  */
 bool __attribute__((weak))
-emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                           uint8_t * message, EmberStatus status)
+emberAfMessageSentCallback(EmberOutgoingMessageType type, MessageSendDestination destination, EmberApsFrame * apsFrame,
+                           uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
@@ -488,7 +520,7 @@ emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestin
  */
 EmberAfStatus __attribute__((weak))
 emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                  uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -510,7 +542,7 @@ emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, Attr
  */
 void __attribute__((weak))
 emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                   uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                   uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {}
 
 /** @brief Read Attributes Response
@@ -692,18 +724,6 @@ bool __attribute__((weak))
 emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
-}
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t __attribute__((weak)) emberAfGetSourceRouteOverheadCallback(chip::NodeId destination)
-{
-    return 0;
 }
 
 /** @brief Registration Abort

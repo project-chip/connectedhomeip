@@ -33,7 +33,7 @@ set -e
 CHIP_ROOT=$(cd "$here/../.." && pwd)
 
 restyle-paths() {
-    url=https://github.com/restyled-io/restyler/raw/master/bin/restyle-path
+    url=https://github.com/restyled-io/restyler/raw/main/bin/restyle-path
 
     sh <(curl --location --proto "=https" --tlsv1.2 "$url" -sSf) "$@"
 }

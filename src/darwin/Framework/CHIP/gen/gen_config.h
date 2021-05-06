@@ -45,8 +45,12 @@
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ON_OFF_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_SCENES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_SWITCH_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TEST_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -114,10 +118,26 @@
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_CLIENT
 
+// Use this macro to check if the client side of the Pump Configuration and Control cluster is included
+#define ZCL_USING_PUMP_CONFIG_CONTROL_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_CLIENT
+
 // Use this macro to check if the client side of the Scenes cluster is included
 #define ZCL_USING_SCENES_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_SCENES_CLIENT
 
+// Use this macro to check if the client side of the Switch cluster is included
+#define ZCL_USING_SWITCH_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_SWITCH_CLIENT
+
 // Use this macro to check if the client side of the Temperature Measurement cluster is included
 #define ZCL_USING_TEMP_MEASUREMENT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_CLIENT
+
+// Use this macro to check if the client side of the Test Cluster cluster is included
+#define ZCL_USING_TEST_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TEST_CLUSTER_CLIENT
+
+// Use this macro to check if the client side of the Thermostat cluster is included
+#define ZCL_USING_THERMOSTAT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_THERMOSTAT_CLIENT

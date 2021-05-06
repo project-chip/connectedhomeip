@@ -91,6 +91,12 @@ menu "CHIP Core"
                 The CHIP library is shipped with a minimal mDNS implementation,
                 enable this config to use it rather than the mDNS library in IDF.
 
+        config ENABLE_CHIP_SHELL
+            bool "Use the CHIP shell library"
+            default n
+            help
+                Link the application against CHIP interactive shell.
+
         # TODO: add log level selection
 
     endmenu # "General Options"

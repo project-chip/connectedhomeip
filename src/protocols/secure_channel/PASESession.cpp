@@ -60,6 +60,12 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Salt";
 // The session establishment fails if the response is not received with in timeout window.
 static constexpr ExchangeContext::Timeout kSpake2p_Response_Timeout = 30000;
 
+#ifdef ENABLE_HSM_PBKDF2
+using PBKDF2_sha256_crypto = PBKDF2_sha256HSM;
+#else
+using PBKDF2_sha256_crypto = PBKDF2_sha256;
+#endif
+
 PASESession::PASESession() {}
 
 PASESession::~PASESession()
@@ -95,7 +101,7 @@ void PASESession::Clear()
 
     if (mExchangeCtxt != nullptr)
     {
-        mExchangeCtxt->Release();
+        mExchangeCtxt->Close();
         mExchangeCtxt = nullptr;
     }
 }
@@ -189,11 +195,12 @@ CHIP_ERROR PASESession::Init(uint16_t myKeyId, uint32_t setupCode, SessionEstabl
 CHIP_ERROR PASESession::ComputePASEVerifier(uint32_t setUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                             PASEVerifier & verifier)
 {
+    PBKDF2_sha256_crypto mPBKDF;
     uint8_t littleEndianSetupPINCode[sizeof(uint32_t)];
     Encoding::LittleEndian::Put32(littleEndianSetupPINCode, setUpPINCode);
 
-    return pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt, saltLen, pbkdf2IterCount,
-                         sizeof(PASEVerifier), &verifier[0][0]);
+    return mPBKDF.pbkdf2_sha256(littleEndianSetupPINCode, sizeof(littleEndianSetupPINCode), salt, saltLen, pbkdf2IterCount,
+                                sizeof(PASEVerifier), &verifier[0][0]);
 }
 
 CHIP_ERROR PASESession::GeneratePASEVerifier(PASEVerifier & verifier, bool useRandomPIN, uint32_t & setupPIN)
@@ -299,7 +306,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     CHIP_ERROR err = Init(myKeyId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
 
-    mExchangeCtxt = exchangeCtxt->Retain();
+    mExchangeCtxt = exchangeCtxt;
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
 
     mConnectionState.SetPeerAddress(peerAddress);
@@ -758,7 +765,7 @@ void PASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
 
     if (mExchangeCtxt == nullptr)
     {
-        mExchangeCtxt = ec->Retain();
+        mExchangeCtxt = ec;
         mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
     }
 

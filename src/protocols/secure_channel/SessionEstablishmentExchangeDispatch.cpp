@@ -32,11 +32,14 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::SendMessageImpl(SecureSessionHa
                                                                  System::PacketBufferHandle && message,
                                                                  EncryptedPacketBufferHandle * retainedMessage)
 {
-    ChipLogProgress(ExchangeManager, "SessionEstablishmentExchangeDispatch::SendMessageImpl  mTransportMgr %p", mTransportMgr);
+    PacketHeader packetHeader;
+
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
+    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
+
     if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(PacketHeader(), mPeerAddress, std::move(message));
+        return mTransportMgr->SendMessage(mPeerAddress, std::move(message));
     }
 
     return CHIP_ERROR_INCORRECT_STATE;
@@ -46,10 +49,8 @@ CHIP_ERROR SessionEstablishmentExchangeDispatch::OnMessageReceived(const Payload
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    ReliableMessageContext * reliableMessageContext)
 {
-    ReturnErrorOnFailure(ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext));
     mPeerAddress = peerAddress;
-
-    return CHIP_NO_ERROR;
+    return ExchangeMessageDispatch::OnMessageReceived(payloadHeader, messageId, peerAddress, reliableMessageContext);
 }
 
 bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, uint8_t type)

@@ -45,12 +45,14 @@
 // Use smaller maximum interval to speed up reattaching.
 #define OPENTHREAD_CONFIG_MLE_ATTACH_BACKOFF_MAXIMUM_INTERVAL (60 * 10 * 1000) // default 1200000 ms
 
-#define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
-
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 1
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 0
 #define UART_AS_SERIAL_TRANSPORT 1
 #define OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE 1
+
+#define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
+#define OPENTHREAD_CONFIG_ECDSA_ENABLE 1
+#define OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE 1
 
 // Use the TI-supplied default platform configuration for remainder
 #include "openthread-core-cc13x2_26x2-config.h"

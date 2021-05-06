@@ -47,6 +47,9 @@
 
 #pragma once
 
+#include <inttypes.h>
+#include <messaging/ExchangeMgr.h>
+
 // User asserts can override SLAB_ASSERT and should be defined as follows:
 // void userAssert (int file, int line);                   // declaration
 // #define USER_ASSERT(file, line) userAssert(file, line)  // definition
@@ -80,7 +83,7 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #define ZCL_NULL_CLUSTER_ID 0xFFFF
 
-#include "af.h"
+#include <app/util/af.h>
 
 // Override APS retry: 0 - don't touch, 1 - always set, 2 - always unset
 typedef enum
@@ -139,7 +142,7 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 // EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH is defined in config.h
 #define EMBER_AF_RESPONSE_BUFFER_LEN EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH
 
-void emberAfInit(void);
+void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
 uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
@@ -149,11 +152,11 @@ void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
 void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           chip::NodeId source, InterPanHeader * interPanHeader);
+                           chip::Messaging::ExchangeContext * source, InterPanHeader * interPanHeader);
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, chip::NodeId source, InterPanHeader * interPanHeader,
-                                     EmberAfClusterCommand * returnCmd);
+                                     uint16_t messageLength, chip::Messaging::ExchangeContext * source,
+                                     InterPanHeader * interPanHeader, EmberAfClusterCommand * returnCmd);
 
 /**
  * Retrieves the difference between the two passed values.
@@ -284,3 +287,7 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  * @return 8-bit encoded channel-page, 0xFF if invalid
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
+
+namespace chip {
+chip::Messaging::ExchangeManager * ExchangeManager();
+} // namespace chip

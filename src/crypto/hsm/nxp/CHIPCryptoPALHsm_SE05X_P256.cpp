@@ -1,0 +1,324 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/**
+ *    @file
+ *      HSM based implementation of CHIP crypto primitives
+ *      Based on configurations in CHIPCryptoPALHsm_config.h file,
+ *      chip crypto apis use either HSM or rollback to software implementation.
+ */
+
+#include "CHIPCryptoPALHsm_SE05X_utils.h"
+#include <core/CHIPEncoding.h>
+
+#if ENABLE_HSM_GENERATE_EC_KEY
+
+#define MAX_SHA_ONE_SHOT_DATA_LEN 900
+#define NIST256_HEADER_OFFSET 26
+
+namespace chip {
+namespace Crypto {
+
+P256KeypairHSM::~P256KeypairHSM()
+{
+    if (keyid != kKeyId_NotInitialized)
+    {
+        if (provisioned_key == false)
+        {
+            ChipLogDetail(Crypto, "Deleting key with id - %x !", keyid);
+            se05x_delete_key(keyid);
+        }
+        else
+        {
+            ChipLogDetail(Crypto, "Provisioned key ! Not deleting key in HSM");
+        }
+    }
+}
+
+CHIP_ERROR P256KeypairHSM::Initialize()
+{
+    CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
+    sss_status_t status    = kStatus_SSS_Success;
+    sss_object_t keyObject = { 0 };
+    uint8_t pubkey[128]    = {
+        0,
+    };
+    size_t pubKeyLen   = sizeof(pubkey);
+    size_t pbKeyBitLen = sizeof(pubkey) * 8;
+
+    if (keyid == 0)
+    {
+        ChipLogDetail(Crypto, "Keyid not set !. Set key id using 'SetKeyId' member class !");
+        ExitNow();
+    }
+
+    se05x_sessionOpen();
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    if (provisioned_key == false)
+    {
+
+        status = sss_key_object_allocate_handle(&keyObject, keyid, kSSS_KeyPart_Pair, kSSS_CipherType_EC_NIST_P, 256,
+                                                kKeyObject_Mode_Transient);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+        ChipLogDetail(Crypto, "Creating Nist256 key on SE05X !");
+
+        status = sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+
+        // if the key is provisioned already, only get the public key,
+        // and set it in public key member of this class.
+        ChipLogDetail(Crypto, "Provisioned key ! Not creating key in HSM");
+
+        status = sss_key_object_get_handle(&keyObject, keyid);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    }
+
+    status = sss_key_store_get_key(&gex_sss_chip_ctx.ks, &keyObject, pubkey, &pubKeyLen, &pbKeyBitLen);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    {
+        /* Set the public key */
+        const P256PublicKey & public_key = Pubkey();
+        VerifyOrExit(pubKeyLen > NIST256_HEADER_OFFSET, error = CHIP_ERROR_INTERNAL);
+        VerifyOrExit((pubKeyLen - NIST256_HEADER_OFFSET) <= kP256_PublicKey_Length, error = CHIP_ERROR_INTERNAL);
+        memcpy((void *) Uint8::to_const_uchar(public_key), pubkey + NIST256_HEADER_OFFSET, pubKeyLen - NIST256_HEADER_OFFSET);
+    }
+
+    error = CHIP_NO_ERROR;
+exit:
+    return error;
+}
+
+CHIP_ERROR P256KeypairHSM::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature)
+{
+    CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
+    sss_digest_t digest_ctx           = { 0 };
+    sss_asymmetric_t asymm_ctx        = { 0 };
+    uint8_t hash[kSHA256_Hash_Length] = {
+        0,
+    };
+    size_t hashLen         = sizeof(hash);
+    sss_status_t status    = kStatus_SSS_Success;
+    sss_object_t keyObject = { 0 };
+    size_t siglen          = out_signature.Capacity();
+
+    VerifyOrExit(msg != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msg_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
+
+    ChipLogDetail(Crypto, "ECDSA_sign_msg: Using SE05X for Ecc Sign!");
+
+    se05x_sessionOpen();
+
+    status = sss_digest_context_init(&digest_ctx, &gex_sss_chip_ctx.session, kAlgorithm_SSS_SHA256, kMode_SSS_Digest);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    if (msg_length <= MAX_SHA_ONE_SHOT_DATA_LEN)
+    {
+        status = sss_digest_one_go(&digest_ctx, msg, msg_length, hash, &hashLen);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    }
+    else
+    {
+        /* Calculate SHA using multistep calls */
+        size_t datalenTemp = 0;
+        size_t rem_len     = msg_length;
+
+        status = sss_digest_init(&digest_ctx);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+        while (rem_len > 0)
+        {
+            datalenTemp = (rem_len > MAX_SHA_ONE_SHOT_DATA_LEN) ? MAX_SHA_ONE_SHOT_DATA_LEN : rem_len;
+            status      = sss_digest_update(&digest_ctx, (msg + (msg_length - rem_len)), datalenTemp);
+            VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+            rem_len = rem_len - datalenTemp;
+        }
+
+        status = sss_digest_finish(&digest_ctx, hash, &hashLen);
+        VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+    }
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_get_handle(&keyObject, keyid);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    status = sss_asymmetric_sign_digest(&asymm_ctx, hash, hashLen, Uint8::to_uchar(out_signature), &siglen);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    SuccessOrExit(out_signature.SetLength(siglen));
+
+    error = CHIP_NO_ERROR;
+exit:
+    if (asymm_ctx.session != nullptr)
+    {
+        sss_asymmetric_context_free(&asymm_ctx);
+    }
+    if (digest_ctx.session != nullptr)
+    {
+        sss_digest_context_free(&digest_ctx);
+    }
+    return error;
+}
+
+CHIP_ERROR P256KeypairHSM::ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature)
+{
+    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    sss_asymmetric_t asymm_ctx = { 0 };
+    sss_status_t status        = kStatus_SSS_Success;
+    sss_object_t keyObject     = { 0 };
+    size_t siglen              = out_signature.Capacity();
+
+    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(out_signature != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
+
+    ChipLogDetail(Crypto, "ECDSA_sign_hash: Using SE05X for Ecc Sign!");
+
+    se05x_sessionOpen();
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_get_handle(&keyObject, keyid);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    status = sss_asymmetric_context_init(&asymm_ctx, &gex_sss_chip_ctx.session, &keyObject, kAlgorithm_SSS_SHA256, kMode_SSS_Sign);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    status =
+        sss_asymmetric_sign_digest(&asymm_ctx, const_cast<uint8_t *>(hash), hash_length, Uint8::to_uchar(out_signature), &siglen);
+    VerifyOrExit(status == kStatus_SSS_Success, error = CHIP_ERROR_INTERNAL);
+
+    SuccessOrExit(out_signature.SetLength(siglen));
+
+    error = CHIP_NO_ERROR;
+exit:
+    if (asymm_ctx.session != nullptr)
+    {
+        sss_asymmetric_context_free(&asymm_ctx);
+    }
+
+    return error;
+}
+
+CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output)
+{
+    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    size_t len       = output.Length() == 0 ? output.Capacity() : output.Length();
+    Encoding::BufferWriter bbuf(output, len);
+    uint8_t privkey[kP256_PrivateKey_Length] = {
+        0,
+    };
+
+    {
+        /* Set the public key */
+        P256PublicKey & public_key = const_cast<P256PublicKey &>(Pubkey());
+        bbuf.Put(Uint8::to_uchar(public_key), public_key.Length());
+    }
+
+    VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(sizeof(privkey) >= 4, error = CHIP_ERROR_INTERNAL);
+
+    {
+        /* When HSM is used for ECC key generation, store key info in private key buffer */
+        Encoding::LittleEndian::BufferWriter privkey_bbuf(privkey, sizeof(privkey));
+        privkey_bbuf.Put32(keyid);
+    }
+
+    bbuf.Put(privkey, sizeof(privkey));
+    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    output.SetLength(bbuf.Needed());
+
+    error = CHIP_NO_ERROR;
+exit:
+    return error;
+}
+
+CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
+{
+    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+
+    /* Set the public key */
+    const P256PublicKey & public_key = Pubkey();
+    Encoding::BufferWriter bbuf((uint8_t *) Uint8::to_const_uchar(public_key), public_key.Length());
+
+    VerifyOrExit(input.Length() == public_key.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    bbuf.Put(static_cast<uint8_t *>(input), public_key.Length());
+
+    /* Set private key info */
+    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
+    {
+        /* When HSM is used for ECC key generation, key info in stored in private key buffer */
+        const uint8_t * privkey = Uint8::to_const_uchar(input) + public_key.Length();
+        keyid                   = Encoding::LittleEndian::Get32(privkey);
+    }
+
+    error = CHIP_NO_ERROR;
+exit:
+    return error;
+}
+
+CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
+{
+    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    const uint8_t * rem_pubKey = nullptr;
+    size_t rem_pubKeyLen       = 0;
+    size_t secret_length       = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
+    smStatus_t smstatus        = SM_NOT_OK;
+
+    VerifyOrExit(keyid != kKeyId_NotInitialized, error = CHIP_ERROR_HSM);
+
+    ChipLogDetail(Crypto, "ECDH_derive_secret: Using SE05X for ECDH !");
+
+    se05x_sessionOpen();
+
+    rem_pubKey    = Uint8::to_const_uchar(remote_public_key);
+    rem_pubKeyLen = remote_public_key.Length();
+
+    VerifyOrExit(gex_sss_chip_ctx.ks.session != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    smstatus = Se05x_API_ECGenSharedSecret(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid, rem_pubKey,
+                                           rem_pubKeyLen, Uint8::to_uchar(out_secret), &secret_length);
+    VerifyOrExit(smstatus == SM_OK, error = CHIP_ERROR_INTERNAL);
+
+    SuccessOrExit(out_secret.SetLength(secret_length));
+
+    error = CHIP_NO_ERROR;
+exit:
+    return error;
+}
+
+} // namespace Crypto
+} // namespace chip
+
+#endif //#if ENABLE_HSM_GENERATE_EC_KEY

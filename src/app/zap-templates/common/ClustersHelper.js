@@ -261,7 +261,7 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
     item.name         = item.name || item.label;
     item.isStruct     = false;
     item.atomicTypeId = atomic.atomicId;
-    item.discrete     = atomic.discrete;
+    item.discrete     = atomic.isDiscrete;
     item.size         = atomic.size;
     item.chipType     = atomic.chipType;
     // For the moment, SECURITY_KEY is unhandled.

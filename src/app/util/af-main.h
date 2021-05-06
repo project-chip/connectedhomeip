@@ -40,7 +40,7 @@
 
 #pragma once
 
-#include "af-types.h"
+#include <app/util/af-types.h>
 
 //#include CONFIGURATION_HEADER
 //#include PLATFORM_HEADER     // Micro and compiler specific typedefs and macros
@@ -121,8 +121,8 @@ bool emAfProcessZdo(EmberNodeId sender, EmberApsFrame * apsFrame, uint8_t * mess
 
 void emAfIncomingMessageHandler(EmberIncomingMessageType type, EmberApsFrame * apsFrame, uint8_t lastHopLqi, int8_t lastHopRssi,
                                 uint16_t messageLength, uint8_t * messageContents);
-EmberStatus emAfSend(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint8_t messageLength,
-                     uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence);
+EmberStatus emAfSend(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
+                     uint8_t messageLength, uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence);
 void emAfMessageSentHandler(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                             EmberStatus status, uint16_t messageLength, uint8_t * messageContents, uint8_t messageTag);
 
