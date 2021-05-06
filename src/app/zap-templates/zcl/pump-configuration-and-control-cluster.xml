@@ -51,4 +51,49 @@ limitations under the License.
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">alarm mask</attribute>
     <!-- ALARM_MASK -->
   </cluster>
+
+  <bitmap name="PumpStatus" type="BITMAP16">
+    <field name="deviceFault" mask="0x1"/>
+    <field name="supplyfault" mask="0x2"/>
+    <field name="speedLow" mask="0x4"/>
+    <field name="speedHigh" mask="0x8"/>
+    <field name="localOverride" mask="0x10"/>
+    <field name="running" mask="0x20"/>
+    <field name="remotePressure" mask="0x40"/>
+    <field name="remoteFlow" mask="0x80"/>
+    <field name="remoteTemperature" mask="0x100"/>
+  </bitmap>
+
+  <enum name="PumpOperationMode" type="ENUM8">
+    <item name="normal" value="0x0"/>
+    <item name="minimum" value="0x1"/>
+    <item name="maximum" value="0x2"/>
+    <item name="local" value="0x3"/>
+  </enum>
+
+  <enum name="PumpControlMode" type="ENUM8">
+    <item name="constantSpeed" value="0x0"/>
+    <item name="constantPressure" value="0x1"/>
+    <item name="proportionalPressure" value="0x2"/>
+    <item name="constantFlow" value="0x3"/>
+    <item name="constantTemperature" value="0x5"/>
+    <item name="automatic" value="0x7"/>
+  </enum>
+
+  <bitmap name="PumpAlarmMask" type="BITMAP16">
+    <field name="SupplyVoltageTooLow" mask="0x1"/>
+    <field name="SupplyVoltageTooHigh" mask="0x2"/>
+    <field name="PowerMissingPhase" mask="0x4"/>
+    <field name="SystemPressureTooLow" mask="0x8"/>
+    <field name="SystemPressureTooHigh" mask="0x10"/>
+    <field name="DryRunning" mask="0x20"/>
+    <field name="MotorTemperatureTooHigh" mask="0x40"/>
+    <field name="PumpMotorHasFatalFailure" mask="0x80"/>
+    <field name="ElectronicTemperatureTooHigh" mask="0x100"/>
+    <field name="PumpBlocked" mask="0x200"/>
+    <field name="SensorFailure" mask="0x400"/>
+    <field name="ElectronicNonFatalFailure" mask="0x800"/>
+    <field name="ElectronicFatalFailure" mask="0x1000"/>
+    <field name="GeneralFault" mask="0x2000"/>
+  </bitmap>
 </configurator>
