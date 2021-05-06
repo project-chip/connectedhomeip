@@ -77,7 +77,8 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
 }
 
-bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
+bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
+                                    EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
 
@@ -99,10 +100,7 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
     return false;
 }
 
-void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks)
-{
-
-}
+void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
 
 bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                         chip::AttributeId attributeId)
@@ -159,7 +157,7 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
                                                 uint8_t * value)
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, endpoint);
-    return EMBER_ZCL_STATUS_SUCCESS;//EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+    return EMBER_ZCL_STATUS_SUCCESS; // EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
 }
 
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
@@ -207,9 +205,8 @@ bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId c
     return false;
 }
 
-
-bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
-                                               uint16_t bufLen, bool extended)
+bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
+                                               bool extended)
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, clusterId);
     return false;
@@ -243,7 +240,8 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
     return false;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, /* TYPE WARNING: array array defaults to */ uint8_t *  groupList)
+bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount,
+                                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupCount);
     return false;
@@ -285,7 +283,8 @@ bool emberAfIdentifyClusterIdentifyCallback(uint16_t identifyTime)
     return false;
 }
 
-bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName, /* TYPE WARNING: array array defaults to */ uint8_t *  extensionFieldSets)
+bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+                                          /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets)
 {
     ChipLogProgress(Zcl, "%s: %d", __FUNCTION__, groupId);
     return false;

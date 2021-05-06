@@ -139,7 +139,7 @@ void PumpManager::TimerEventHandler(k_timer * timer)
 void PumpManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
     PumpManager * lock = static_cast<PumpManager *>(aEvent->TimerEvent.Context);
-    int32_t actor          = 0;
+    int32_t actor      = 0;
 
     // Make sure auto lock timer is still armed.
     if (!lock->mAutoLockTimerArmed)

@@ -18,9 +18,9 @@
 
 #include "AppTask.h"
 #include "AppConfig.h"
-#include "PumpManager.h"
 #include "LEDWidget.h"
 #include "OnboardingCodesUtil.h"
+#include "PumpManager.h"
 #include "Server.h"
 #include "Service.h"
 #include "ThreadUtil.h"
@@ -210,7 +210,7 @@ int AppTask::StartApp()
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
     PumpManager::Action_t action = PumpManager::INVALID_ACTION;
-    int32_t actor                    = 0;
+    int32_t actor                = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
