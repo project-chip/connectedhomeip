@@ -89,10 +89,8 @@ NS_ASSUME_NONNULL_BEGIN
  * check if the stack needs to be started up.
  *
  * @param[in] storageDelegate The delegate for persistent storage
- *
- * @param[in] queue The queue on which the storage callbacks will be delivered
  */
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue;
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
