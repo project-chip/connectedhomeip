@@ -79,7 +79,8 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                         const SendFlags & sendFlags)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    Transport::PeerConnectionState * state = nullptr;
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -93,8 +94,9 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     bool reliableTransmissionRequested = true;
 
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    if (state && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
+    if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
         reliableTransmissionRequested = false;
     }

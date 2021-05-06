@@ -151,8 +151,6 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
-
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
