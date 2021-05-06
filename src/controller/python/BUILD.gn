@@ -32,9 +32,7 @@ config("controller_wno_deprecate") {
 }
 
 chip_data_model("python_data_model") {
-  cluster_sources = [
-    "ota-client",
-  ]
+  cluster_sources = [ "ota-client" ]
   defines = [ "OTA_SERVER_CLUSTER_EXAMPLE_IMPL=1" ]
 
   zap_pregenerated_dir = "gen"

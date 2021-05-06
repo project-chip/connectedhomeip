@@ -135,7 +135,7 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
         ]
-      }  else if (cluster == "ota-server") {
+      } else if (cluster == "ota-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}-delegate.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
