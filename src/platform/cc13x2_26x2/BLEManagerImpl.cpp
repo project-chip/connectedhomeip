@@ -425,7 +425,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
     memset(sInstance.mAdvDatachipOBle, 0, CHIPOBLE_ADV_DATA_MAX_SIZE);
 
     // Verify device name was not already set
-    if (!mFlags.Has(Flags::kBLEStackGATTNameSet))
+    if (!sInstance.mFlags.Has(Flags::kBLEStackGATTNameSet))
     {
         /* Default device name is CHIP-<DISCRIMINATOR> */
         deviceDiscriminator = mDeviceIdInfo.GetDeviceDiscriminator();
