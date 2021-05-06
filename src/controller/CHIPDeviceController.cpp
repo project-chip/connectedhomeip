@@ -355,8 +355,6 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    ReturnErrorOnFailure(Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort));
-
     return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
 #else
