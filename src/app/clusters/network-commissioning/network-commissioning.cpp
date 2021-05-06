@@ -52,7 +52,7 @@
 // TODO: Configuration should move to build-time configuration
 #ifndef CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
 #define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 4
-#endif //CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
+#endif // CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
 
 using namespace chip;
 using namespace chip::app;
