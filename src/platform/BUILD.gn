@@ -55,6 +55,9 @@ if (chip_device_platform != "none") {
 
     # Enable adding rotating device id to the additional data.
     chip_enable_rotating_device_id = true
+
+    # lock tracking: none/log/fatal or auto for a platform-dependent choice
+    chip_stack_lock_tracking = "auto"
   }
 
   buildconfig_header("platform_buildconfig") {
@@ -73,6 +76,31 @@ if (chip_device_platform != "none") {
 
     if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
+    }
+
+    stack_log_tracking = chip_stack_lock_tracking
+    if (stack_log_tracking == "auto") {
+      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+        # TODO: should be fatal for development. Change once bugs are fixed
+        stack_log_tracking = "log"
+      } else {
+        # TODO: may want to enable at least logging for embedded to find bugs
+        # this needs tuning depending on how many resources various platforms have
+        # available (mainly flash size)
+        stack_log_tracking = "none" 
+      }
+
+    }
+
+    if (stack_log_tracking == "fatal") { 
+      defines += [ 
+        "CHIP_STACK_LOCK_TRACKING_ENABLED=1",
+        "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=1",
+      ]
+    } else if (stack_log_tracking == "log") { 
+      defines += [ "CHIP_STACK_LOCK_TRACKING_ENABLED=1" ]
+    } else {
+      assert(stack_log_tracking == "none")
     }
 
     if (chip_enable_nfc) {
@@ -224,6 +252,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "DeviceControlServer.cpp",
       "GeneralUtils.cpp",
       "Globals.cpp",
+      "LockTracker.cpp",
       "PersistedStorage.cpp",
       "SystemEventSupport.cpp",
       "SystemTimerSupport.cpp",

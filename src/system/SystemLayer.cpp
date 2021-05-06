@@ -33,6 +33,7 @@
 #include <system/SystemTimer.h>
 
 // Include additional CHIP headers
+#include <platform/LockTracker.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -200,6 +201,8 @@ void Layer::SetPlatformData(void * aPlatformData)
 
 Error Layer::NewTimer(Timer *& aTimerPtr)
 {
+    assertChipStackLockedByCurrentThread();
+
     Timer * lTimer = nullptr;
 
     if (this->State() != kLayerState_Initialized)
@@ -246,6 +249,8 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  */
 void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
 {
+    assertChipStackLockedByCurrentThread();
+
     Cancelable * ca = aCallback->Cancel();
 
     ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
@@ -367,6 +372,8 @@ void Layer::CancelTimer(Layer::TimerCompleteFunct aOnComplete, void * aAppState)
  */
 Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void * aAppState)
 {
+    assertChipStackLockedByCurrentThread();
+
     Error lReturn;
     Timer * lTimer;
 
@@ -657,6 +664,8 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
  */
 void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet)
 {
+    assertChipStackLockedByCurrentThread();
+
     pthread_t lThreadSelf;
     Error lReturn;
 
