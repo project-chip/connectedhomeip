@@ -369,7 +369,7 @@ void DeviceController::PersistDevice(Device * device)
     // mainly by test applications, do not require a storage delegate. This is to
     // reduce overheads on these tests.
     // Let's make sure the delegate object is available before calling into it.
-    if (mStorageDelegate != nullptr)
+    if (mStorageDelegate != nullptr && mState == State::Initialized)
     {
         SerializedDevice serialized;
         device->Serialize(serialized);
@@ -938,7 +938,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
 void DeviceCommissioner::PersistDeviceList()
 {
-    if (mStorageDelegate != nullptr && mPairedDevicesUpdated)
+    if (mStorageDelegate != nullptr && mPairedDevicesUpdated && mState == State::Initialized)
     {
         constexpr uint16_t size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
         char * serialized       = static_cast<char *>(chip::Platform::MemoryAlloc(size));
@@ -960,7 +960,7 @@ void DeviceCommissioner::PersistDeviceList()
 
 void DeviceCommissioner::PersistNextKeyId()
 {
-    if (mStorageDelegate != nullptr)
+    if (mStorageDelegate != nullptr && mState == State::Initialized)
     {
         mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &mNextKeyId, sizeof(mNextKeyId));
     }
