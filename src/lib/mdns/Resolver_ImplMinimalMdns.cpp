@@ -234,7 +234,7 @@ void PacketDataReporter::OnCommissionableNodeSrvRecord(SerializedQNameIterator n
     {
         return;
     }
-    strncpy(mCommissionableNodeData.hostName, it.Value(), CommissionableNodeData::kHostNameSize);
+    strncpy(mCommissionableNodeData.hostName, it.Value(), sizeof(CommissionableNodeData::hostName));
 }
 
 void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & addr)
