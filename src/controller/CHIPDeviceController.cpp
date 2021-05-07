@@ -963,18 +963,14 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId nod
     ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
-
-    opCert.Alloc(kMaxCHIPOpCertLength);
-    ReturnErrorCodeIf(!opCert, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
 
     uint32_t opCertLen = 0;
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
         PeerId().SetNodeId(node), csr, 0, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
-
-    signingCert.Alloc(kMaxCHIPOpCertLength);
-    ReturnErrorCodeIf(!signingCert, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!signingCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
 
     uint32_t signingCertLen = 0;
     CHIP_ERROR err =
