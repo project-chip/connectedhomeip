@@ -1033,6 +1033,7 @@ CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
 
 CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
 {
+    // TODO(cecille): Add assertion about main loop.
     for (int i = 0; i < kMaxCommissionableNodes; ++i)
     {
         mCommissionableNodes[i].Reset();
@@ -1041,31 +1042,9 @@ CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t l
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
-void DeviceCommissioner::PrintDiscoveredDevices()
-{
-    for (int i = 0; i < kMaxCommissionableNodes; ++i)
-    {
-        if (!mCommissionableNodes[i].IsValid())
-        {
-            continue;
-        }
-        ChipLogProgress(Discovery, "Device %d", i);
-        ChipLogProgress(Discovery, "\tHost name:\t\t%s", mCommissionableNodes[i].hostName);
-        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", mCommissionableNodes[i].longDiscriminator);
-        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", mCommissionableNodes[i].vendorId);
-        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", mCommissionableNodes[i].productId);
-        for (int j = 0; j < mCommissionableNodes[i].numIPs; ++j)
-        {
-            char buf[kMaxIPAddressStringLength];
-            mCommissionableNodes[i].ipAddress[j].ToString(buf);
-            ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
-        }
-    }
-}
-
 const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
 {
-
+    // TODO(cecille): Add assertion about main loop.
     if (mCommissionableNodes[idx].IsValid())
     {
         return &mCommissionableNodes[idx];

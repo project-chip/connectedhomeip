@@ -382,22 +382,26 @@ public:
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
+     *   Should be called on main loop thread.
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR DiscoverAllCommissioning();
 
     /**
      * @brief
-     *   Helper function to print device info for device selection.
-     */
-    void PrintDiscoveredDevices();
-
-    /**
-     * @brief
      *   Returns information about discovered devices.
+     *   Should be called on main loop thread.
      * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
      */
     const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
+
+    /**
+     * @brief
+     *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
+     * @return int  The max number of commissionable nodes supported
+     */
+    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+
 #endif
 
 private:

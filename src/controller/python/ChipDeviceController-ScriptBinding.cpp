@@ -49,6 +49,7 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
+#include <inet/IPAddress.h>
 #include <mdns/Resolver.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/CHIPMem.h>
@@ -244,7 +245,25 @@ CHIP_ERROR pychip_DeviceController_DiscoverCommissioningLongDiscriminator(chip::
 
 void pychip_DeviceController_PrintDiscoveredDevices(chip::Controller::DeviceCommissioner * devCtrl)
 {
-    devCtrl->PrintDiscoveredDevices();
+    for (int i = 0; i < devCtrl->GetMaxCommissionableNodesSupported(); ++i)
+    {
+        const chip::Mdns::CommissionableNodeData * dnsSdInfo = devCtrl->GetDiscoveredDevice(i);
+        if (dnsSdInfo == nullptr)
+        {
+            continue;
+        }
+        ChipLogProgress(Discovery, "Device %d", i);
+        ChipLogProgress(Discovery, "\tHost name:\t\t%s", dnsSdInfo->hostName);
+        ChipLogProgress(Discovery, "\tLong discriminator:\t%u", dnsSdInfo->longDiscriminator);
+        ChipLogProgress(Discovery, "\tVendor ID:\t\t%u", dnsSdInfo->vendorId);
+        ChipLogProgress(Discovery, "\tProduct ID:\t\t%u", dnsSdInfo->productId);
+        for (int j = 0; j < dnsSdInfo->numIPs; ++j)
+        {
+            char buf[chip::Inet::kMaxIPAddressStringLength];
+            dnsSdInfo->ipAddress[j].ToString(buf);
+            ChipLogProgress(Discovery, "\tAddress %d:\t\t%s", j, buf);
+        }
+    }
 }
 
 bool pychip_DeviceController_GetIPForDiscoveredDevice(chip::Controller::DeviceCommissioner * devCtrl, int idx, char * addrStr,
