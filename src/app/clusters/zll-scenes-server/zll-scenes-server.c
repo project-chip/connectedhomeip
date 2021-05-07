@@ -74,8 +74,8 @@ bool emberAfScenesClusterCopySceneCallback(chip::app::Command * commandObj, uint
                                            uint16_t groupIdTo, uint8_t sceneIdTo)
 {
     EmberStatus sendStatus = EMBER_SUCCESS;
-    EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
-    bool copyAllScenes   = (mode & ZCL_SCENES_CLUSTER_MODE_COPY_ALL_SCENES_MASK);
+    EmberAfStatus status   = EMBER_ZCL_STATUS_INVALID_FIELD;
+    bool copyAllScenes     = (mode & ZCL_SCENES_CLUSTER_MODE_COPY_ALL_SCENES_MASK);
     uint8_t i;
 
     emberAfScenesClusterPrintln("RX: CopyScene 0x%x, 0x%2x, 0x%x, 0x%2x, 0x%x", mode, groupIdFrom, sceneIdFrom, groupIdTo,
