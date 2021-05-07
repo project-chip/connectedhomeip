@@ -38,7 +38,6 @@ public:
 
 private:
     id<CHIPPersistentStorageDelegate> mDelegate;
-    dispatch_queue_t mQueue;
 
     NSUserDefaults * mDefaultPersistentStorage;
     dispatch_queue_t mWorkQueue;
