@@ -19,17 +19,22 @@
 #include "CriticalSection.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
+#include <pthread.h>
 namespace chip {
 namespace app {
+static pthread_mutex_t eventLocker = PTHREAD_MUTEX_INITIALIZER;
 void CriticalSectionEnter()
 {
+    int err = pthread_mutex_lock(&eventLocker);
+    assert(err == 0);
     // TODO: Add freertos lock, it seems in EFR32, it needs portENTER_CRITICAL, in ESP32, it needs portENTER_CRITICAL(mux)
     // taskENTER_CRITICAL();
 }
 
 void CriticalSectionExit()
 {
+    int err = pthread_mutex_unlock(&eventLocker);
+    assert(err == 0);
     // taskEXIT_CRITICAL();
 }
 } // namespace app
