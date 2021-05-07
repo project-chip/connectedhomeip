@@ -51,9 +51,6 @@ namespace Internal {
 template <class ImplClass>
 class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplClass>
 {
-public:
-    using ThreadIdType = pthread_t;
-
 protected:
     // Members for select loop
     int mMaxFd;
