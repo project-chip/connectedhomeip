@@ -64,9 +64,9 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 {
     memset(mac, 0, 8);
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (chip::DeviceLayer::ThreadStackMgr().GetFactoryAssignedEUI64(mac) == CHIP_NO_ERROR)
+    if (chip::DeviceLayer::ThreadStackMgr().GetPrimary802154MACAddress(mac) == CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "Using Thread MAC for hostname.");
+        ChipLogDetail(Discovery, "Using Thread extended MAC for hostname.");
         return chip::ByteSpan(mac, 8);
     }
 #endif
