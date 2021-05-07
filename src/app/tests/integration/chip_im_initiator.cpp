@@ -365,6 +365,7 @@ int main(int argc, char * argv[])
     }
 
     gpCommandSender->Shutdown();
+    gpReadClient->Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ShutdownChip();
 
