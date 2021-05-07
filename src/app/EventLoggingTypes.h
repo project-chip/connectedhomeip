@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -168,9 +169,11 @@ struct EventLoadOutContext
     TLV::TLVWriter & mWriter;
     PriorityLevel mPriority          = PriorityLevel::Invalid;
     EventNumber mStartingEventNumber = 0;
+    Timestamp mPreviousSystemTime;
     Timestamp mCurrentSystemTime;
     EventNumber mCurrentEventNumber = 0;
     Timestamp mCurrentUTCTime;
+    ClusterInfo * mpInterestedEventPaths = nullptr;
     bool mFirst = true;
 };
 } // namespace app

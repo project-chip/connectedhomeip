@@ -79,21 +79,6 @@ struct CopyAndAdjustDeltaTimeContext
     EventLoadOutContext * mpContext = nullptr;
 };
 
-/**
- * @brief
- *  Internal structure for traversing events.
- */
-struct EventEnvelopeContext
-{
-    EventEnvelopeContext() {}
-
-    uint16_t mFieldsToRead = 0;
-    /* PriorityLevel and DeltaSystemTimestamp are there if that is not first event when putting events in report*/
-    Timestamp mDeltaSystemTime = Timestamp::System(0);
-    Timestamp mDeltaUtc        = Timestamp::UTC(0);
-    PriorityLevel mPriority    = PriorityLevel::First;
-};
-
 EventManagement::EventManagement(Messaging::ExchangeManager * apExchangeMgr, int aNumBuffers,
                                  CircularEventBuffer * apCircularEventBuffer,
                                  const LogStorageResources * const apLogStorageResources)
@@ -433,7 +418,8 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
         }
         else
         {
-            err = ctx->mpWriter->CopyElement(reader);
+            err = ctx->mpWriter->Put(TLV::ContextTag(EventDataElement::kCsTag_DeltaSystemTimestamp),
+                                     ctx->mpContext->mCurrentSystemTime.mValue - ctx->mpContext->mPreviousSystemTime.mValue);
         }
     }
     else
@@ -618,9 +604,8 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     if (event.mPriority == apEventLoadOutContext->mPriority)
     {
         apEventLoadOutContext->mCurrentSystemTime.mValue += event.mDeltaSystemTime.mValue;
-        VerifyOrExit(apEventLoadOutContext->mCurrentEventNumber < apEventLoadOutContext->mStartingEventNumber,
+        VerifyOrExit(!(apEventLoadOutContext->mCurrentEventNumber >= apEventLoadOutContext->mStartingEventNumber && IsInterestedEventPaths(apEventLoadOutContext->mpInterestedEventPaths, event)),
                      err = CHIP_EVENT_ID_FOUND);
-        apEventLoadOutContext->mCurrentEventNumber++;
     }
 
 exit:
@@ -633,6 +618,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
     TLV::TLVWriter checkpoint;
     EventLoadOutContext * loadOutContext = static_cast<EventLoadOutContext *>(apContext);
     err                                  = EventIterator(aReader, aDepth, loadOutContext);
+    loadOutContext->mCurrentEventNumber++;
     if (err == CHIP_EVENT_ID_FOUND)
     {
         // checkpoint the writer
@@ -646,9 +632,8 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         // before we began the copy operation.
         VerifyOrExit((err == CHIP_NO_ERROR) || (err == CHIP_END_OF_TLV), loadOutContext->mWriter = checkpoint);
 
-        loadOutContext->mCurrentSystemTime.mValue = 0;
+        loadOutContext->mPreviousSystemTime.mValue = loadOutContext->mCurrentSystemTime.mValue;
         loadOutContext->mFirst                    = false;
-        loadOutContext->mCurrentEventNumber++;
     }
 
 exit:
@@ -673,6 +658,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
         buf = buf->GetNextCircularEventBuffer();
     }
 
+    context.mpInterestedEventPaths    = apClusterInfolist;
     context.mCurrentSystemTime.mValue = buf->GetFirstEventSystemTimestamp();
     context.mCurrentEventNumber       = buf->GetFirstEventNumber();
     err                               = GetEventReader(reader, aPriority, &bufWrapper);
@@ -689,6 +675,20 @@ exit:
     CriticalSectionExit();
 
     return err;
+}
+
+bool EventManagement::IsInterestedEventPaths(ClusterInfo * apInterestedEventPaths, EventEnvelopeContext &aEvent)
+{
+    ClusterInfo * interestedEventPaths = apInterestedEventPaths;
+    while (interestedEventPaths != nullptr)
+    {
+        if (interestedEventPaths->mNodeId == aEvent.mNodeId&& interestedEventPaths->mEndpointId == aEvent.mEndpointId && interestedEventPaths->mClusterId == aEvent.mClusterId && interestedEventPaths->mEventId == aEvent.mEventId)
+        {
+            return true;
+        }
+        interestedEventPaths = interestedEventPaths->mpNext;
+    }
+    return false;
 }
 
 CHIP_ERROR EventManagement::GetEventReader(TLVReader & aReader, PriorityLevel aPriority, CircularEventBufferWrapper * apBufWrapper)
@@ -711,6 +711,17 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
     TLVReader reader;
     uint16_t extPriority; // Note: the type here matches the type case in EventManagement::LogEvent, priority section
     reader.Init(aReader);
+
+    if (reader.GetTag() == TLV::ContextTag(EventDataElement::kCsTag_EventPath))
+    {
+        EventPath::Parser path;
+        SuccessOrExit(err = path.Init(aReader));
+        SuccessOrExit(err = path.GetNodeId(&(envelope->mNodeId)));
+        SuccessOrExit(err = path.GetEndpointId(&(envelope->mEndpointId)));
+        SuccessOrExit(err = path.GetClusterId(&(envelope->mClusterId)));
+        SuccessOrExit(err = path.GetEventId(&(envelope->mEventId)));
+        envelope->mFieldsToRead |= 1 << EventDataElement::kCsTag_EventPath;
+    }
 
     if (reader.GetTag() == TLV::ContextTag(EventDataElement::kCsTag_PriorityLevel))
     {
