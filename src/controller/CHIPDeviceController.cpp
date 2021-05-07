@@ -50,6 +50,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -81,7 +82,7 @@ constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
 constexpr uint16_t kMdnsPort = 5353;
 #endif
 
-constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
 constexpr uint32_t kMaxCHIPOpCertLength = 600;
 
@@ -921,7 +922,7 @@ void DeviceCommissioner::OnSessionEstablished()
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
 
-    // TODO: Add code to wait for OpCSR from the device, and process the signing request
+    // TODO: Add code to receive OpCSR from the device, and process the signing request
     err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
     if (err != CHIP_NO_ERROR)
     {
@@ -961,17 +962,23 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId nod
 {
     ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    auto opCertBuf     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(kMaxCHIPOpCertLength));
-    auto opCert        = std::unique_ptr<uint8_t>(opCertBuf);
+    chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
+
+    opCert.Alloc(kMaxCHIPOpCertLength);
+    ReturnErrorCodeIf(!opCert, CHIP_ERROR_NO_MEMORY);
+
     uint32_t opCertLen = 0;
     ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        PeerId().SetNodeId(node), csr, 0, opCert.get(), kMaxCHIPOpCertLength, opCertLen));
+        PeerId().SetNodeId(node), csr, 0, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
 
-    auto signingCertBuf     = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(kMaxCHIPOpCertLength));
-    auto signingCert        = std::unique_ptr<uint8_t>(signingCertBuf);
+    chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
+
+    signingCert.Alloc(kMaxCHIPOpCertLength);
+    ReturnErrorCodeIf(!signingCert, CHIP_ERROR_NO_MEMORY);
+
     uint32_t signingCertLen = 0;
     CHIP_ERROR err =
-        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert.get(), kMaxCHIPOpCertLength, signingCertLen);
+        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen);
     if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
     {
         // This implies that the commissioner application uses root CA to sign the operational
@@ -983,12 +990,12 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId nod
     ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(
-        SendOperationalCertificate(node, ByteSpan(opCert.get(), opCertLen), ByteSpan(signingCert.get(), signingCertLen)));
+        SendOperationalCertificate(node, ByteSpan(opCert.Get(), opCertLen), ByteSpan(signingCert.Get(), signingCertLen)));
 
     ReturnErrorOnFailure(
-        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.get(), kMaxCHIPOpCertLength, signingCertLen));
+        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
 
-    return SendTrustedRootCertificate(node, ByteSpan(signingCert.get(), signingCertLen));
+    return SendTrustedRootCertificate(node, ByteSpan(signingCert.Get(), signingCertLen));
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf,
