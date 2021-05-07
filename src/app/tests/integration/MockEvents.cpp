@@ -28,11 +28,11 @@
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
-#include <protocols/secure_channel/PASESession.h>
 
 static uint64_t kLivenessDeviceStatus = chip::TLV::ContextTag(1);
 static bool gMockEventStop            = false;
