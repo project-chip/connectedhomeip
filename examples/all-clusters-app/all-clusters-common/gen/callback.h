@@ -2724,6 +2724,26 @@ bool emberAfOnOffClusterOnCallback(chip::app::Command * commandObj);
 bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
 
 /**
+ * @brief Operational Credentials Cluster AddOpCert Command callback
+ * @param noc
+ * @param iCACertificate
+ * @param iPKValue
+ * @param caseAdminNode
+ * @param adminVendorId
+ */
+
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
+                                                           chip::ByteSpan ICACertificate, chip::ByteSpan IPKValue,
+                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId);
+
+/**
+ * @brief Operational Credentials Cluster OpCSRRequest Command callback
+ * @param cSRNonce
+ */
+
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce);
+
+/**
  * @brief Operational Credentials Cluster RemoveAllFabrics Command callback
  */
 

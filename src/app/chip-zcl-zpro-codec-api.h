@@ -51,6 +51,7 @@
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
 | Switch                                                              | 0x003B |
@@ -2362,6 +2363,8 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * AddOpCert                                                         |   0x06 |
+| * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
 | * SetFabric                                                         |   0x00 |
@@ -2371,6 +2374,23 @@ chip::System::PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(
 | * FabricsList                                                       | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an AddOpCert command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeOperationalCredentialsClusterAddOpCertCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint, chip::ByteSpan noc,
+                                                    chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue,
+                                                    chip::NodeId caseAdminNode, uint16_t adminVendorId);
+
+/**
+ * @brief
+ *    Encode an OpCSRRequest command for Operational Credentials server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeOperationalCredentialsClusterOpCSRRequestCommand(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint,
+                                                                                        chip::ByteSpan cSRNonce);
 
 /**
  * @brief
