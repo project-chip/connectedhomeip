@@ -50,6 +50,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -60,6 +61,7 @@
 
 #include <errno.h>
 #include <inttypes.h>
+#include <memory>
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
@@ -80,7 +82,9 @@ constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
 constexpr uint16_t kMdnsPort = 5353;
 #endif
 
-constexpr const uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
+
+constexpr uint32_t kMaxCHIPOpCertLength = 600;
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
@@ -649,6 +653,8 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     }
 
     mPairingDelegate = params.pairingDelegate;
+
+    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
     return CHIP_NO_ERROR;
 }
 
@@ -915,6 +921,16 @@ void DeviceCommissioner::OnSessionEstablished()
     }
 
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
+
+    // TODO: Add code to receive OpCSR from the device, and process the signing request
+    err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+        OnSessionEstablishmentError(err);
+        return;
+    }
+
     mPairingSession.ToSerializable(device->GetPairing());
     mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
 
@@ -934,6 +950,61 @@ void DeviceCommissioner::OnSessionEstablished()
     }
 
     RendezvousCleanup(CHIP_NO_ERROR);
+}
+
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId)
+{
+    // TODO: Call OperationalCredentials cluster API to send command
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr)
+{
+    ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
+    ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t opCertLen = 0;
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
+        PeerId().SetNodeId(node), csr, 0, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
+    ReturnErrorCodeIf(!signingCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t signingCertLen = 0;
+    CHIP_ERROR err =
+        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen);
+    if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
+    {
+        // This implies that the commissioner application uses root CA to sign the operational
+        // certificates, and an intermediate CA is not needed. It's not an error condition, so
+        // let's just send operational certificate and root CA certificate to the device.
+        err            = CHIP_NO_ERROR;
+        signingCertLen = 0;
+    }
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorOnFailure(
+        SendOperationalCertificate(node, ByteSpan(opCert.Get(), opCertLen), ByteSpan(signingCert.Get(), signingCertLen)));
+
+    ReturnErrorOnFailure(
+        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
+
+    return SendTrustedRootCertificate(node, ByteSpan(signingCert.Get(), signingCertLen));
+}
+
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf,
+                                                          const ByteSpan & icaCertBuf)
+{
+    // TODO: Call OperationalCredentials cluster API to add operational credentials on the device
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf)
+{
+    // TODO: Call TrustedRootCertificate cluster API to add root certificate on the device
+    return CHIP_NO_ERROR;
 }
 
 void DeviceCommissioner::PersistDeviceList()

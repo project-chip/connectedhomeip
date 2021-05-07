@@ -20,6 +20,7 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
+#import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
 #import "gen/CHIPClustersObjc.h"
@@ -34,6 +35,7 @@ static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.com
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
@@ -52,6 +54,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
 @end
@@ -88,6 +91,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge();
         if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
+            return nil;
+        }
+
+        _operationalCredentialsDelegate = new CHIPOperationalCredentialsDelegate();
+        if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
     }
@@ -134,6 +142,12 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
         _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
+
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
+            return;
+        }
+
         // initialize NodeID if needed
         [self _getControllerNodeId];
 
