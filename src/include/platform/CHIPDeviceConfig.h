@@ -641,6 +641,15 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+ *
+ * Amount of services available for advertising using SRP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 3
+#endif
+
 // -------------------- Thread Configuration --------------------
 
 /**

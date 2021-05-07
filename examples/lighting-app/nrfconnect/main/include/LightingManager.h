@@ -46,7 +46,7 @@ public:
     int Init(const device * pwmDevice, uint32_t pwmChannel);
     bool IsTurnedOn() const { return mState == kState_On; }
     uint8_t GetLevel() const { return mLevel; }
-    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
+    bool InitiateAction(Action_t aAction, int32_t aActor, uint16_t size, uint8_t * value);
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:

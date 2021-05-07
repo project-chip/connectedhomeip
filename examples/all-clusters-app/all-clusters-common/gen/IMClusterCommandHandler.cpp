@@ -7023,6 +7023,12 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
     {
         switch (aCommandId)
         {
+        case ZCL_REMOVE_ALL_FABRICS_COMMAND_ID: {
+
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(apCommandObj);
+            break;
+        }
         case ZCL_REMOVE_FABRIC_COMMAND_ID: {
             // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
             // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.

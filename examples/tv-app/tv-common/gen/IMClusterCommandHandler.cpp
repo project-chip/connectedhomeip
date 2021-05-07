@@ -1008,6 +1008,742 @@ void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, En
 
 } // namespace KeypadInput
 
+namespace LevelControl {
+
+void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
+{
+    {
+        switch (aCommandId)
+        {
+        case ZCL_MOVE_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t moveMode;
+            bool moveModeExists = false;
+            uint8_t rate;
+            bool rateExists = false;
+            uint8_t optionMask;
+            bool optionMaskExists = false;
+            uint8_t optionOverride;
+            bool optionOverrideExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (moveModeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(moveMode);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        moveModeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (rateExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(rate);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        rateExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 2:
+                    if (optionMaskExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionMask);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionMaskExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 3:
+                    if (optionOverrideExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionOverride);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionOverrideExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterMoveCallback(apCommandObj, moveMode, rate, optionMask, optionOverride);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    4, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_MOVE_TO_LEVEL_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t level;
+            bool levelExists = false;
+            uint16_t transitionTime;
+            bool transitionTimeExists = false;
+            uint8_t optionMask;
+            bool optionMaskExists = false;
+            uint8_t optionOverride;
+            bool optionOverrideExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (levelExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(level);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        levelExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (transitionTimeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        transitionTimeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 2:
+                    if (optionMaskExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionMask);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionMaskExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 3:
+                    if (optionOverrideExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionOverride);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionOverrideExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterMoveToLevelCallback(apCommandObj, level, transitionTime, optionMask, optionOverride);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    4, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t level;
+            bool levelExists = false;
+            uint16_t transitionTime;
+            bool transitionTimeExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (levelExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(level);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        levelExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (transitionTimeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        transitionTimeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterMoveToLevelWithOnOffCallback(apCommandObj, level, transitionTime);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    2, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_MOVE_WITH_ON_OFF_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t moveMode;
+            bool moveModeExists = false;
+            uint8_t rate;
+            bool rateExists             = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (moveModeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(moveMode);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        moveModeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (rateExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(rate);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        rateExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterMoveWithOnOffCallback(apCommandObj, moveMode, rate);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    2, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_STEP_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t stepMode;
+            bool stepModeExists = false;
+            uint8_t stepSize;
+            bool stepSizeExists = false;
+            uint16_t transitionTime;
+            bool transitionTimeExists = false;
+            uint8_t optionMask;
+            bool optionMaskExists = false;
+            uint8_t optionOverride;
+            bool optionOverrideExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (stepModeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(stepMode);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        stepModeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (stepSizeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(stepSize);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        stepSizeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 2:
+                    if (transitionTimeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        transitionTimeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 3:
+                    if (optionMaskExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionMask);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionMaskExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 4:
+                    if (optionOverrideExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionOverride);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionOverrideExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterStepCallback(apCommandObj, stepMode, stepSize, transitionTime, optionMask,
+                                                       optionOverride);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    5, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_STEP_WITH_ON_OFF_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t stepMode;
+            bool stepModeExists = false;
+            uint8_t stepSize;
+            bool stepSizeExists = false;
+            uint16_t transitionTime;
+            bool transitionTimeExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (stepModeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(stepMode);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        stepModeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (stepSizeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(stepSize);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        stepSizeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 2:
+                    if (transitionTimeExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(transitionTime);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        transitionTimeExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterStepWithOnOffCallback(apCommandObj, stepMode, stepSize, transitionTime);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    3, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_STOP_COMMAND_ID: {
+            // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+            // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+            // Any error value TLVUnpackError means we have received an illegal value.
+            CHIP_ERROR TLVError       = CHIP_NO_ERROR;
+            CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
+            uint8_t optionMask;
+            bool optionMaskExists = false;
+            uint8_t optionOverride;
+            bool optionOverrideExists   = false;
+            uint32_t validArgumentCount = 0;
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                switch (TLV::TagNumFromTag(aDataTlv.GetTag()))
+                {
+                case 0:
+                    if (optionMaskExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionMask);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionMaskExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 1:
+                    if (optionOverrideExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(optionOverride);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        optionOverrideExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (TLVUnpackError != CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(Zcl, "Failed to decode TLV data with tag %" PRIx32 ": %" PRId32,
+                                    TLV::TagNumFromTag(aDataTlv.GetTag()), TLVUnpackError);
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+            else
+            {
+                ChipLogProgress(Zcl, "Failed to decode TLV data: %" PRId32, TLVError);
+            }
+
+            // TODO(#5590) We should encode a response of status code for invalid TLV.
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            {
+                // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+                emberAfLevelControlClusterStopCallback(apCommandObj, optionMask, optionOverride);
+            }
+            else
+            {
+                apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kBadRequest,
+                                            Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+                ChipLogProgress(
+                    Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
+                    2, validArgumentCount, TLVError, TLVUnpackError);
+            }
+            break;
+        }
+        case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
+
+            // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
+            emberAfLevelControlClusterStopWithOnOffCallback(apCommandObj);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatusCode(nullptr, Protocols::SecureChannel::GeneralStatusCode::kNotFound,
+                                        Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+            ChipLogError(Zcl, "Unknown command %" PRIx16 " for cluster %" PRIx16, aCommandId, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+            break;
+        }
+        }
+    }
+}
+
+} // namespace LevelControl
+
 namespace LowPower {
 
 void DispatchServerCommand(app::Command * apCommandObj, CommandId aCommandId, EndpointId aEndpointId, TLV::TLVReader & aDataTlv)
@@ -1895,6 +2631,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
         break;
     case ZCL_KEYPAD_INPUT_CLUSTER_ID:
         clusters::KeypadInput::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
+        break;
+    case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+        clusters::LevelControl::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);
         break;
     case ZCL_LOW_POWER_CLUSTER_ID:
         clusters::LowPower::DispatchServerCommand(apCommandObj, aCommandId, aEndPointId, aReader);

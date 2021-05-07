@@ -43,7 +43,7 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+                                        uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value)
 {}
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)

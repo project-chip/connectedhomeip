@@ -4511,6 +4511,32 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 }
 
 // OperationalCredentials Cluster Commands
+CHIP_ERROR OperationalCredentialsCluster::RemoveAllFabrics(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllFabricsCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    // Command takes no arguments.
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOperationalCredentialsClusterRemoveAllFabricsCommand(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
 CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, chip::FabricId fabricId,
                                                        chip::NodeId nodeId, uint16_t vendorId)

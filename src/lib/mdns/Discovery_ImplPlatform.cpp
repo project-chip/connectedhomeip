@@ -247,6 +247,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
             subTypes[subTypeSize++] = openWindowSubType;
         }
     }
+
     if (params.GetVendorId().HasValue())
     {
         snprintf(vendorSubType, sizeof(vendorSubType), "_V%u", params.GetVendorId().Value());
@@ -322,7 +323,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     constexpr uint8_t kMaxCRMPRetryBufferSize = 7 + 1;
     char crmpRetryIntervalIdleBuf[kMaxCRMPRetryBufferSize];
     char crmpRetryIntervalActiveBuf[kMaxCRMPRetryBufferSize];
-    TextEntry crmpRetryIntervalEntries[2];
+    TextEntry crmpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
     size_t textEntrySize = 0;
     uint32_t crmpRetryIntervalIdle, crmpRetryIntervalActive;
     int writtenCharactersNumber;
