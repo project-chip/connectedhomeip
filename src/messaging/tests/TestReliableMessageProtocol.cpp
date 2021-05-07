@@ -30,6 +30,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -306,3 +307,5 @@ int TestReliableMessageProtocol()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol)
