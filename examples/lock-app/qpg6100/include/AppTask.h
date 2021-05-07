@@ -69,7 +69,7 @@ private:
         kFunction_SoftwareUpdate = 1,
         kFunction_Joiner         = 2,
         kFunction_FactoryReset   = 3,
-        kFunction_StartBleAdv	 = 4,
+        kFunction_StartBleAdv    = 4,
 
         kFunction_Invalid
     } Function;
