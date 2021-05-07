@@ -563,7 +563,7 @@ exit:
     }
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to initialize the device list\n");
+        ChipLogError(Controller, "Failed to initialize the device list with error: %d\n", err);
     }
 
     return err;
@@ -580,7 +580,7 @@ CHIP_ERROR DeviceController::SetPairedDeviceList(const char * serialized)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed to recreate the device list\n");
+        ChipLogError(Controller, "Failed to recreate the device list with buffer %s\n", serialized);
     }
     else
     {
@@ -659,8 +659,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
     PersistDeviceList();
-
-    FreeRendezvousSession();
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
@@ -743,6 +741,9 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(exchangeCtxt != nullptr, err = CHIP_ERROR_INTERNAL);
 
     err = mPairingSession.Pair(params.GetPeerAddress(), params.GetSetupPINCode(), mNextKeyId++, exchangeCtxt, this);
+    // Immediately persist the updted mNextKeyID value
+    // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
+    PersistNextKeyId();
 
 exit:
     if (err != CHIP_NO_ERROR)
