@@ -218,7 +218,7 @@ exit:
 }
 
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                        PairingSession * pairing, PairingDirection direction, Transport::AdminId admin,
+                                        PairingSession * pairing, SecureSession::SessionRole direction, Transport::AdminId admin,
                                         Transport::Base * transport)
 {
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
@@ -237,6 +237,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     state = nullptr;
     ReturnErrorOnFailure(
         mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state));
+    ReturnErrorCodeIf(state == nullptr, CHIP_ERROR_NO_MEMORY);
 
     state->SetAdminId(admin);
     state->SetTransport(transport);
@@ -256,38 +257,11 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (state != nullptr)
+    ReturnErrorOnFailure(pairing->DeriveSecureSession(state->GetSecureSession(), direction));
+
+    if (mCB != nullptr)
     {
-        switch (direction)
-        {
-        case PairingDirection::kInitiator: {
-            const char * i2rInfo = pairing->GetI2RSessionInfo();
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(i2rInfo), strlen(i2rInfo),
-                                                              state->GetSenderSecureSession()));
-
-            const char * r2iInfo = pairing->GetR2ISessionInfo();
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(r2iInfo), strlen(r2iInfo),
-                                                              state->GetReceiverSecureSession()));
-        }
-        break;
-        case PairingDirection::kResponder: {
-            const char * i2rInfo = pairing->GetR2ISessionInfo();
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(i2rInfo), strlen(i2rInfo),
-                                                              state->GetSenderSecureSession()));
-
-            const char * r2iInfo = pairing->GetI2RSessionInfo();
-            ReturnErrorOnFailure(pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(r2iInfo), strlen(r2iInfo),
-                                                              state->GetReceiverSecureSession()));
-        }
-        break;
-        default:
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        };
-
-        if (mCB != nullptr)
-        {
-            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
-        }
+        mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID(), admin }, this);
     }
 
     return CHIP_NO_ERROR;
