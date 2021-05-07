@@ -46,7 +46,7 @@ public:
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
 
     /// This function stops publishing the device on mDNS.
-    CHIP_ERROR StopPublishDevice();
+    CHIP_ERROR StopPublishDevice() override;
 
     /// Registers a resolver delegate if none has been registered before
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
