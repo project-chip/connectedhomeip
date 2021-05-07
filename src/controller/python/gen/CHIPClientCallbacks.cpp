@@ -1885,7 +1885,6 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Comman
 
     GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
 
-
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
@@ -2351,5 +2350,4 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
 
     return true;
 }
-
 }
