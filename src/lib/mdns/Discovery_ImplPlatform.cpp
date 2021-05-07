@@ -141,9 +141,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3]; // add
     char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 3];
     char vendorSubType[kSubTypeVendorMaxLength + 3];
-    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength+3;
-    char openWindowSubType[kSubTypeAdditionalPairingMaxLength+3];
-    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength+3];
+    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 3];
+    char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 3];
+    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 3];
     // size of subTypes array should be count of SubTypes above
     const char * subTypes[6];
     size_t subTypeSize = 0;
