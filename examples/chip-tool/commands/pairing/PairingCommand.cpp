@@ -33,9 +33,10 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 
     chip::Controller::CommissionerInitParams params;
 
-    params.storageDelegate              = &storage;
-    params.mDeviceAddressUpdateDelegate = this;
-    params.pairingDelegate              = this;
+    params.storageDelegate                = &storage;
+    params.mDeviceAddressUpdateDelegate   = this;
+    params.pairingDelegate                = this;
+    params.operationalCredentialsDelegate = &mOpCredsIssuer;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));

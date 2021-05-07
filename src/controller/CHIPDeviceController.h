@@ -305,7 +305,7 @@ public:
     ~DeviceCommissioner() {}
 
     /**
-     * Commisioner-specific initialization, includes parameters such as the pairing delegate.
+     * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
 

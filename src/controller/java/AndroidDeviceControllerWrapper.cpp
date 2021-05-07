@@ -143,6 +143,14 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     initParams.inetLayer       = inetLayer;
     initParams.bleLayer        = GetJNIBleLayer();
 
+    *errInfoOnFailure = mOpCredsIssuer.Initialize();
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
+
     *errInfoOnFailure = wrapper->Controller()->Init(nodeId, initParams);
 
     if (*errInfoOnFailure != CHIP_NO_ERROR)
