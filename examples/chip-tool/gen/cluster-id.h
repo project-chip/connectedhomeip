@@ -86,11 +86,23 @@
 // Definitions for cluster: Basic
 #define ZCL_BASIC_CLUSTER_ID (0x0028)
 
+// Definitions for cluster: OTA Software Update Server
+#define ZCL_OTA_SERVER_CLUSTER_ID (0x0029)
+
+// Definitions for cluster: OTA Software Update Client
+#define ZCL_OTA_CLIENT_CLUSTER_ID (0x002A)
+
 // Definitions for cluster: General Commissioning
 #define ZCL_GENERAL_COMMISSIONING_CLUSTER_ID (0x0030)
 
 // Definitions for cluster: Network Commissioning
 #define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
+
+// Definitions for cluster: Switch
+#define ZCL_SWITCH_CLUSTER_ID (0x003B)
+
+// Definitions for cluster: Operational Credentials
+#define ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID (0x003E)
 
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
@@ -280,6 +292,9 @@
 
 // Definitions for cluster: Account Login
 #define ZCL_ACCOUNT_LOGIN_CLUSTER_ID (0x050E)
+
+// Definitions for cluster: Test Cluster
+#define ZCL_TEST_CLUSTER_ID (0x050F)
 
 // Definitions for cluster: Generic Tunnel
 #define ZCL_GENERIC_TUNNEL_CLUSTER_ID (0x0600)

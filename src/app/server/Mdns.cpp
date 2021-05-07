@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "Mdns.h"
+#include <app/server/Mdns.h>
 
 #include <inttypes.h>
 
@@ -25,12 +25,12 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
-#include <transport/PASESession.h>
 
-#include "Server.h"
+#include <app/server/Server.h>
 
 namespace chip {
 namespace app {
@@ -50,8 +50,9 @@ NodeId GetCurrentNodeId()
     auto pairing = GetGlobalAdminPairingTable().cbegin();
     if (pairing != GetGlobalAdminPairingTable().cend())
     {
-        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX16 ", node %" PRIX64, pairing->GetAdminId(),
-                        pairing->GetNodeId());
+        ChipLogProgress(Discovery, "Found admin paring for admin %" PRIX16 ", node 0x%08" PRIx32 "%08" PRIx32,
+                        pairing->GetAdminId(), static_cast<uint32_t>(pairing->GetNodeId() >> 32),
+                        static_cast<uint32_t>(pairing->GetNodeId()));
         return pairing->GetNodeId();
     }
 
@@ -98,15 +99,19 @@ CHIP_ERROR AdvertiseOperational()
 
     const auto advertiseParameters =
         chip::Mdns::OperationalAdvertisingParameters()
-            .SetFabricId(fabricId)
-            .SetNodeId(GetCurrentNodeId())
+            .SetPeerId(PeerId().SetFabricId(fabricId).SetNodeId(GetCurrentNodeId()))
             .SetMac(FillMAC(mac))
-            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .SetPort(CHIP_PORT)
+            .SetCRMPRetryIntervals(CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL, CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL)
             .EnableIpV4(true);
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
+    ChipLogProgress(Discovery, "Advertise operational node 0x%08" PRIx32 "%08" PRIx32 "-0x%08" PRIx32 "%08" PRIx32,
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetFabricId() >> 32),
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetFabricId()),
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetNodeId() >> 32),
+                    static_cast<uint32_t>(advertiseParameters.GetPeerId().GetNodeId()));
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
@@ -229,12 +234,16 @@ CHIP_ERROR Advertise(bool commissionableNode)
 
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
+                    advertiseParameters.GetVendorId(), advertiseParameters.GetProductId(),
+                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator());
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
 /// (Re-)starts the minmdns server
 void StartServer()
 {
+    ChipLogProgress(Discovery, "Start dns-sd server");
     CHIP_ERROR err = chip::Mdns::ServiceAdvertiser::Instance().Start(&chip::DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
 
     // TODO: advertise this only when really operational once we support both

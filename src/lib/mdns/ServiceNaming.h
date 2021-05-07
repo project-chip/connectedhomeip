@@ -18,6 +18,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <core/PeerId.h>
 #include <support/Span.h>
 
 #include <cstddef>
@@ -26,7 +27,14 @@
 namespace chip {
 namespace Mdns {
 
-CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, uint64_t fabricId, uint64_t nodeId);
+/// builds the MDNS advertising name for a given fabric + nodeid pair
+CHIP_ERROR MakeInstanceName(char * buffer, size_t bufferLen, const PeerId & peerId);
+
+/// Inverse of MakeInstanceName
+CHIP_ERROR ExtractIdFromInstanceName(const char * name, PeerId * peerId);
+
+/// Generates the host name that a CHIP device is to use for a given unique
+/// identifier (MAC address or EUI64)
 CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & macOrEui64);
 
 } // namespace Mdns

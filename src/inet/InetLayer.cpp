@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -445,91 +445,70 @@ bool InetLayer::IsIdleTimerRunning()
  */
 INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
 {
-    INET_ERROR err = INET_NO_ERROR;
+    VerifyOrReturnError(llAddr != nullptr, INET_ERROR_BAD_ARGS);
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if !LWIP_IPV6
-    err = INET_ERROR_NOT_IMPLEMENTED;
-    goto exit;
+    return INET_ERROR_NOT_IMPLEMENTED;
 #endif //! LWIP_IPV6
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    if (llAddr == nullptr)
-    {
-        err = INET_ERROR_BAD_ARGS;
-        goto exit;
-    }
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     for (struct netif * intf = netif_list; intf != NULL; intf = intf->next)
     {
         if ((link != NULL) && (link != intf))
             continue;
-        int j;
-        for (j = 0; j < LWIP_IPV6_NUM_ADDRESSES; ++j)
+        for (int j = 0; j < LWIP_IPV6_NUM_ADDRESSES; ++j)
         {
             if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
             {
                 (*llAddr) = IPAddress::FromIPv6(*netif_ip6_addr(intf, j));
-                goto exit;
+                return INET_NO_ERROR;
             }
         }
         if (link != NULL)
         {
-            err = INET_ERROR_ADDRESS_NOT_FOUND;
-            break;
+            return INET_ERROR_ADDRESS_NOT_FOUND;
         }
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     struct ifaddrs * ifaddr;
-    int rv;
-    rv = getifaddrs(&ifaddr);
-    if (rv != -1)
+    const int rv = getifaddrs(&ifaddr);
+    if (rv == -1)
     {
-        struct ifaddrs * ifaddr_iter = ifaddr;
-        while (ifaddr_iter != nullptr)
-        {
+        return INET_ERROR_ADDRESS_NOT_FOUND;
+    }
 
-            if (ifaddr_iter->ifa_addr != nullptr)
+    for (struct ifaddrs * ifaddr_iter = ifaddr; ifaddr_iter != nullptr; ifaddr_iter = ifaddr_iter->ifa_next)
+    {
+        if (ifaddr_iter->ifa_addr != nullptr)
+        {
+            if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
+                ((link == INET_NULL_INTERFACEID) || (if_nametoindex(ifaddr_iter->ifa_name) == link)))
             {
-                if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
-                    ((link == INET_NULL_INTERFACEID) || (if_nametoindex(ifaddr_iter->ifa_name) == link)))
+                struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
+                if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
                 {
-                    struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
-                    if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
-                    {
-                        (*llAddr) =
-                            IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
-                        break;
-                    }
+                    (*llAddr) = IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    break;
                 }
             }
-            ifaddr_iter = ifaddr_iter->ifa_next;
         }
-        freeifaddrs(ifaddr);
     }
-    else
-    {
-        err = INET_ERROR_ADDRESS_NOT_FOUND;
-    }
+    freeifaddrs(ifaddr);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-    net_if * iface;
-    in6_addr * ip6_addr;
+    net_if * const iface = (link == INET_NULL_INTERFACEID) ? net_if_get_default() : net_if_get_by_index(link);
+    VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
-    iface = (link == INET_NULL_INTERFACEID) ? net_if_get_default() : net_if_get_by_index(link);
-    VerifyOrExit(iface != nullptr, err = INET_ERROR_ADDRESS_NOT_FOUND);
-
-    ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
-    VerifyOrExit(ip6_addr != nullptr, err = INET_ERROR_ADDRESS_NOT_FOUND);
+    in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
+    VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
 
     *llAddr = IPAddress::FromIPv6(*ip6_addr);
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
 
-exit:
-    return err;
+    return INET_NO_ERROR;
 }
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
@@ -556,25 +535,21 @@ exit:
  */
 INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint)
 {
-    INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = nullptr;
+    *retEndPoint = nullptr;
 
-    VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
 
     *retEndPoint = RawEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != nullptr)
-    {
-        (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
-        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
-    }
-    else
+    if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "Raw");
-        err = INET_ERROR_NO_ENDPOINTS;
+        return INET_ERROR_NO_ENDPOINTS;
     }
 
-exit:
-    return err;
+    (*retEndPoint)->Inet::RawEndPoint::Init(this, ipVer, ipProto);
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumRawEps);
+
+    return INET_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
@@ -598,25 +573,21 @@ exit:
  */
 INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 {
-    INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = nullptr;
+    *retEndPoint = nullptr;
 
-    VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
 
     *retEndPoint = TCPEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != nullptr)
-    {
-        (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
-    }
-    else
+    if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "TCP");
-        err = INET_ERROR_NO_ENDPOINTS;
+        return INET_ERROR_NO_ENDPOINTS;
     }
 
-exit:
-    return err;
+    (*retEndPoint)->Init(this);
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumTCPEps);
+
+    return INET_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -640,25 +611,21 @@ exit:
  */
 INET_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 {
-    INET_ERROR err = INET_NO_ERROR;
-    *retEndPoint   = nullptr;
+    *retEndPoint = nullptr;
 
-    VerifyOrExit(State == kState_Initialized, err = INET_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
 
     *retEndPoint = UDPEndPoint::sPool.TryCreate(*mSystemLayer);
-    if (*retEndPoint != nullptr)
-    {
-        (*retEndPoint)->Init(this);
-        SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
-    }
-    else
+    if (*retEndPoint == nullptr)
     {
         ChipLogError(Inet, "%s endpoint pool FULL", "UDP");
-        err = INET_ERROR_NO_ENDPOINTS;
+        return INET_ERROR_NO_ENDPOINTS;
     }
 
-exit:
-    return err;
+    (*retEndPoint)->Init(this);
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kInetLayer_NumUDPEps);
+
+    return INET_NO_ERROR;
 }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
@@ -1049,10 +1016,7 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
 chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType,
                                                     uintptr_t aArgument)
 {
-    chip::System::Error lReturn = CHIP_SYSTEM_NO_ERROR;
-    InetLayerBasis & lBasis     = static_cast<InetLayerBasis &>(aTarget);
-
-    VerifyOrExit(INET_IsInetEvent(aEventType), lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
+    VerifyOrReturnError(INET_IsInetEvent(aEventType), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
     // Dispatch the event according to its type.
     switch (aEventType)
@@ -1101,20 +1065,19 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
     default:
-        lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
-        ExitNow();
+        return CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT;
     }
 
     // If the event was droppable, record the fact that it has been dequeued.
     if (IsDroppableEvent(aEventType))
     {
-        InetLayer & lInetLayer = lBasis.Layer();
+        InetLayerBasis & lBasis = static_cast<InetLayerBasis &>(aTarget);
+        InetLayer & lInetLayer  = lBasis.Layer();
 
         lInetLayer.DroppableEventDequeued();
     }
 
-exit:
-    return lReturn;
+    return CHIP_SYSTEM_NO_ERROR;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -1145,7 +1108,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     {
         RawEndPoint * lEndPoint = RawEndPoint::sPool.Get(*mSystemLayer, i);
         if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
+            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
@@ -1154,7 +1117,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     {
         TCPEndPoint * lEndPoint = TCPEndPoint::sPool.Get(*mSystemLayer, i);
         if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
+            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
@@ -1163,7 +1126,7 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
     {
         UDPEndPoint * lEndPoint = UDPEndPoint::sPool.Get(*mSystemLayer, i);
         if ((lEndPoint != nullptr) && lEndPoint->IsCreatedByInetLayer(*this))
-            lEndPoint->PrepareIO().SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
+            lEndPoint->mRequestIO.SetFDs(lEndPoint->mSocket, nfds, readfds, writefds, exceptfds);
     }
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 }

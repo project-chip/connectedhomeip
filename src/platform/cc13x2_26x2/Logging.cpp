@@ -45,7 +45,6 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
         size_t len                = (ret + 2U) < sizeof(sDebugUartBuffer) ? (ret + 2) : sizeof(sDebugUartBuffer);
         sDebugUartBuffer[len - 2] = '\r';
         sDebugUartBuffer[len - 1] = '\n';
-        sDebugUartBuffer[len]     = '\0';
 
         UART_write(sDebugUartHandle, sDebugUartBuffer, len);
     }

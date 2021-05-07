@@ -65,10 +65,8 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        ReturnErrorOnFailure(header.EncodeBeforeData(msgBuf));
-
         gSendMessageCount++;
 
         return CHIP_NO_ERROR;
@@ -105,18 +103,6 @@ void test_os_sleep_ms(uint64_t millisecs)
     nanosleep(&sleep_time, nullptr);
 }
 
-class ReliableMessageDelegateObject : public ReliableMessageDelegate
-{
-public:
-    ~ReliableMessageDelegateObject() override {}
-
-    /* Application callbacks */
-    void OnSendError(CHIP_ERROR err) override { SendErrorCalled = true; }
-    void OnAckRcvd() override {}
-
-    bool SendErrorCalled = false;
-};
-
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -136,6 +122,8 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    exchange->Close();
 }
 
 void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
@@ -154,14 +142,12 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     ReliableMessageMgr::RetransTableEntry * entry;
-    ReliableMessageDelegateObject delegate;
-    rc->SetDelegate(&delegate);
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    NL_TEST_ASSERT(inSuite, !delegate.SendErrorCalled);
     rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-    NL_TEST_ASSERT(inSuite, delegate.SendErrorCalled);
+
+    exchange->Close();
 }
 
 void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
@@ -191,8 +177,6 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     rc->SetConfig({
         1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
-        3, // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
     });
 
     gSendMessageCount = 0;
@@ -210,6 +194,9 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
+
+    rm->ClearRetransTable(rc);
+    exchange->Close();
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
@@ -227,10 +214,9 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    ReliableMessageDelegateObject delegate;
-    rc->SetDelegate(&delegate);
-
     NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+
+    exchange->Close();
 }
 
 // Test Suite

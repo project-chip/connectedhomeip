@@ -966,7 +966,7 @@ static BluezGattService1 * BluezServiceCreate(gpointer apClosure)
     object = bluez_object_skeleton_new(endpoint->mpServicePath);
 
     service = bluez_gatt_service1_skeleton_new();
-    bluez_gatt_service1_set_uuid(service, "0xFEAF");
+    bluez_gatt_service1_set_uuid(service, "0xFFF6");
     // device is only valid for remote services
     bluez_gatt_service1_set_primary(service, TRUE);
 

@@ -26,6 +26,9 @@
 namespace {
 
 pthread_t sPlatformMainThread;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+uint32_t sBluetoothAdapterId = 0;
+#endif
 
 void * PlatformMainLoop(void *)
 {
@@ -37,7 +40,20 @@ void * PlatformMainLoop(void *)
 
 } // namespace
 
-extern "C" void pychip_native_init()
+extern "C" {
+
+CHIP_ERROR pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId)
+{
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+    sBluetoothAdapterId = bluetoothAdapterId;
+    ReturnErrorOnFailure(
+        chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ bluetoothAdapterId, /* BLE central */ true));
+#endif
+    return CHIP_NO_ERROR;
+}
+
+void pychip_native_init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -49,18 +65,20 @@ extern "C" void pychip_native_init()
 
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
-    err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true);
+    err = chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ sBluetoothAdapterId, /* BLE central */ true);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to configure BLE central:  %s", chip::ErrorStr(err));
     }
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#ifndef CONFIG_DEVICE_LAYER
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
     }
+#endif
     int result   = pthread_create(&sPlatformMainThread, nullptr, PlatformMainLoop, nullptr);
     int tmpErrno = errno;
 
@@ -68,4 +86,5 @@ extern "C" void pychip_native_init()
     {
         ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: pthread_create failed: %s", strerror(tmpErrno));
     }
+}
 }

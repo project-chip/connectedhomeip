@@ -2517,6 +2517,29 @@
 #define emberAfDiagnosticsClusterPrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_DIAGNOSTICS_CLUSTER)
 
+// Printing macros for cluster: Application Basic
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER)
+#define emberAfApplicationBasicClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, __VA_ARGS__)
+#define emberAfApplicationBasicClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfApplicationBasicClusterFlush()
+#define emberAfApplicationBasicClusterDebugExec(x)                                                                                 \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER))                                                             \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfApplicationBasicClusterPrintBuffer(buffer, len, withSpace)                                                          \
+    emberAfPrintBuffer(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfApplicationBasicClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER, (buffer))
+#else
+#define emberAfApplicationBasicClusterPrint(...)
+#define emberAfApplicationBasicClusterPrintln(...)
+#define emberAfApplicationBasicClusterFlush()
+#define emberAfApplicationBasicClusterDebugExec(x)
+#define emberAfApplicationBasicClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfApplicationBasicClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APPLICATION_BASIC_CLUSTER)
+
 // Printing macros for cluster: ZLL Commissioning
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ZLL_COMMISSIONING_CLUSTER)
 #define emberAfZllCommissioningClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_ZLL_COMMISSIONING_CLUSTER, __VA_ARGS__)
@@ -2890,6 +2913,52 @@
 #define emberAfCustom2PrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_CUSTOM2)
 
+// Printing macros for cluster: Account Login
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER)
+#define emberAfAccountLoginClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER, __VA_ARGS__)
+#define emberAfAccountLoginClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfAccountLoginClusterFlush()
+#define emberAfAccountLoginClusterDebugExec(x)                                                                                     \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER))                                                                 \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfAccountLoginClusterPrintBuffer(buffer, len, withSpace)                                                              \
+    emberAfPrintBuffer(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfAccountLoginClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER, (buffer))
+#else
+#define emberAfAccountLoginClusterPrint(...)
+#define emberAfAccountLoginClusterPrintln(...)
+#define emberAfAccountLoginClusterFlush()
+#define emberAfAccountLoginClusterDebugExec(x)
+#define emberAfAccountLoginClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfAccountLoginClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ACCOUNT_LOGIN_CLUSTER)
+
+// Printing macros for cluster: Media Playback
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER)
+#define emberAfMediaPlaybackClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER, __VA_ARGS__)
+#define emberAfMediaPlaybackClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfMediaPlaybackClusterFlush()
+#define emberAfMediaPlaybackClusterDebugExec(x)                                                                                    \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER))                                                                \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfMediaPlaybackClusterPrintBuffer(buffer, len, withSpace)                                                             \
+    emberAfPrintBuffer(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfMediaPlaybackClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER, (buffer))
+#else
+#define emberAfMediaPlaybackClusterPrint(...)
+#define emberAfMediaPlaybackClusterPrintln(...)
+#define emberAfMediaPlaybackClusterFlush()
+#define emberAfMediaPlaybackClusterDebugExec(x)
+#define emberAfMediaPlaybackClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfMediaPlaybackClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_MEDIA_PLAYBACK_CLUSTER)
+
 // Printing macros for Custom messages (3)
 // Messages that can be used by the end developer
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_CUSTOM3)
@@ -2912,3 +2981,142 @@
 #define emberAfCustom3PrintBuffer(buffer, len, withSpace)
 #define emberAfCustom3PrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_CUSTOM3)
+
+// Printing macros for cluster: Application Launcher
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER)
+#define emberAfApplicationLauncherClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER, __VA_ARGS__)
+#define emberAfApplicationLauncherClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfApplicationLauncherClusterFlush()
+#define emberAfApplicationLauncherClusterDebugExec(x)                                                                              \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER))                                                          \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfApplicationLauncherClusterPrintBuffer(buffer, len, withSpace)                                                       \
+    emberAfPrintBuffer(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfApplicationLauncherClusterPrintString(buffer)                                                                       \
+    emberAfPrintString(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER, (buffer))
+#else
+#define emberAfApplicationLauncherClusterPrint(...)
+#define emberAfApplicationLauncherClusterPrintln(...)
+#define emberAfApplicationLauncherClusterFlush()
+#define emberAfApplicationLauncherClusterDebugExec(x)
+#define emberAfApplicationLauncherClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfApplicationLauncherClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APPLICATION_LAUNCHER_CLUSTER)
+
+// Printing macros for cluster: Audio Output
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER)
+#define emberAfAudioOutputClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER, __VA_ARGS__)
+#define emberAfAudioOutputClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfAudioOutputClusterFlush()
+#define emberAfAudioOutputClusterDebugExec(x)                                                                                      \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER))                                                                  \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfAudioOutputClusterPrintBuffer(buffer, len, withSpace)                                                               \
+    emberAfPrintBuffer(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfAudioOutputClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER, (buffer))
+#else
+#define emberAfAudioOutputClusterPrint(...)
+#define emberAfAudioOutputClusterPrintln(...)
+#define emberAfAudioOutputClusterFlush()
+#define emberAfAudioOutputClusterDebugExec(x)
+#define emberAfAudioOutputClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfAudioOutputClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_AUDIO_OUTPUT_CLUSTER)
+
+// Printing macros for cluster: Keypad Input
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER)
+#define emberAfKeypadInputClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER, __VA_ARGS__)
+#define emberAfKeypadInputClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfKeypadInputClusterFlush()
+#define emberAfKeypadInputClusterDebugExec(x)                                                                                      \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER))                                                                  \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfKeypadInputClusterPrintBuffer(buffer, len, withSpace)                                                               \
+    emberAfPrintBuffer(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfKeypadInputClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER, (buffer))
+#else
+#define emberAfKeypadInputClusterPrint(...)
+#define emberAfKeypadInputClusterPrintln(...)
+#define emberAfKeypadInputClusterFlush()
+#define emberAfKeypadInputClusterDebugExec(x)
+#define emberAfKeypadInputClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfKeypadInputClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_KEYPAD_INPUT_CLUSTER)
+
+// Printing macros for cluster: Content Launcher
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER)
+#define emberAfContentLauncherClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER, __VA_ARGS__)
+#define emberAfContentLauncherClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfContentLauncherClusterFlush()
+#define emberAfContentLauncherClusterDebugExec(x)                                                                                  \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER))                                                              \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfContentLauncherClusterPrintBuffer(buffer, len, withSpace)                                                           \
+    emberAfPrintBuffer(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfContentLauncherClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER, (buffer))
+#else
+#define emberAfContentLauncherClusterPrint(...)
+#define emberAfContentLauncherClusterPrintln(...)
+#define emberAfContentLauncherClusterFlush()
+#define emberAfContentLauncherClusterDebugExec(x)
+#define emberAfContentLauncherClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfContentLauncherClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_CONTENT_LAUNCHER_CLUSTER)
+
+// Printing macros for cluster: Target Navigator
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER)
+#define emberAfTargetNavigatorClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER, __VA_ARGS__)
+#define emberAfTargetNavigatorClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfTargetNavigatorClusterFlush()
+#define emberAfTargetNavigatorClusterDebugExec(x)                                                                                  \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER))                                                              \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfTargetNavigatorClusterPrintBuffer(buffer, len, withSpace)                                                           \
+    emberAfPrintBuffer(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfTargetNavigatorClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER, (buffer))
+#else
+#define emberAfTargetNavigatorClusterPrint(...)
+#define emberAfTargetNavigatorClusterPrintln(...)
+#define emberAfTargetNavigatorClusterFlush()
+#define emberAfTargetNavigatorClusterDebugExec(x)
+#define emberAfTargetNavigatorClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfTargetNavigatorClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_TARGET_NAVIGATOR_CLUSTER)
+
+// Printing macros for cluster: Wake on LAN
+#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER)
+#define emberAfWakeOnLanClusterPrint(...) emberAfPrint(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER, __VA_ARGS__)
+#define emberAfWakeOnLanClusterPrintln(...) emberAfPrintln(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER, __VA_ARGS__)
+// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
+#define emberAfWakeOnLanClusterFlush()
+#define emberAfWakeOnLanClusterDebugExec(x)                                                                                        \
+    if (emberAfPrintEnabled(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER))                                                                   \
+    {                                                                                                                              \
+        x;                                                                                                                         \
+    }
+#define emberAfWakeOnLanClusterPrintBuffer(buffer, len, withSpace)                                                                 \
+    emberAfPrintBuffer(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER, (buffer), (len), (withSpace))
+#define emberAfWakeOnLanClusterPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER, (buffer))
+#else
+#define emberAfWakeOnLanClusterPrint(...)
+#define emberAfWakeOnLanClusterPrintln(...)
+#define emberAfWakeOnLanClusterFlush()
+#define emberAfWakeOnLanClusterDebugExec(x)
+#define emberAfWakeOnLanClusterPrintBuffer(buffer, len, withSpace)
+#define emberAfWakeOnLanClusterPrintString(buffer)
+#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_WAKE_ON_LAN_CLUSTER)

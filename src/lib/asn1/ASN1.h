@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -113,6 +113,7 @@ public:
     ASN1_ERROR Next(void);
     ASN1_ERROR EnterConstructedType(void);
     ASN1_ERROR ExitConstructedType(void);
+    ASN1_ERROR GetConstructedType(const uint8_t *& val, uint32_t & valLen);
     ASN1_ERROR EnterEncapsulatedType(void);
     ASN1_ERROR ExitEncapsulatedType(void);
     bool IsContained(void) const;
@@ -178,6 +179,7 @@ public:
     ASN1_ERROR PutBitString(uint8_t unusedBits, chip::TLV::TLVReader & val);
     ASN1_ERROR PutTime(const ASN1UniversalTime & val);
     ASN1_ERROR PutNull(void);
+    ASN1_ERROR PutConstructedType(const uint8_t * val, uint16_t valLen);
     ASN1_ERROR StartConstructedType(uint8_t cls, uint32_t tag);
     ASN1_ERROR EndConstructedType(void);
     ASN1_ERROR StartEncapsulatedType(uint8_t cls, uint32_t tag, bool bitStringEncoding);

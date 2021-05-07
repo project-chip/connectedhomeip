@@ -156,6 +156,18 @@
 #define CHIP_PRINTCLUSTER_BASIC_CLUSTER
 #endif
 
+#if defined(ZCL_USING_OTA_SERVER_CLUSTER_SERVER) || defined(ZCL_USING_OTA_SERVER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER { ZCL_OTA_SERVER_CLUSTER_ID, 41, "OTA Software Update Server" },
+#else
+#define CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OTA_CLIENT_CLUSTER_SERVER) || defined(ZCL_USING_OTA_CLIENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER { ZCL_OTA_CLIENT_CLUSTER_ID, 42, "OTA Software Update Client" },
+#else
+#define CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER) || defined(ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER { ZCL_GENERAL_COMMISSIONING_CLUSTER_ID, 48, "General Commissioning" },
 #else
@@ -166,6 +178,18 @@
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER { ZCL_NETWORK_COMMISSIONING_CLUSTER_ID, 49, "Network Commissioning" },
 #else
 #define CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SWITCH_CLUSTER_SERVER) || defined(ZCL_USING_SWITCH_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SWITCH_CLUSTER { ZCL_SWITCH_CLUSTER_ID, 59, "Switch" },
+#else
+#define CHIP_PRINTCLUSTER_SWITCH_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER { ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, 62, "Operational Credentials" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER
 #endif
 
 #if defined(ZCL_USING_SHADE_CONFIG_CLUSTER_SERVER) || defined(ZCL_USING_SHADE_CONFIG_CLUSTER_CLIENT)
@@ -610,6 +634,12 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TEST_CLUSTER_SERVER) || defined(ZCL_USING_TEST_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TEST_CLUSTER { ZCL_TEST_CLUSTER_ID, 1295, "Test Cluster" },
+#else
+#define CHIP_PRINTCLUSTER_TEST_CLUSTER
+#endif
+
 #if defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_SERVER) || defined(ZCL_USING_GENERIC_TUNNEL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER { ZCL_GENERIC_TUNNEL_CLUSTER_ID, 1536, "Generic Tunnel" },
 #else
@@ -872,8 +902,12 @@
     CHIP_PRINTCLUSTER_GREEN_POWER_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_KEEPALIVE_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
+    CHIP_PRINTCLUSTER_OTA_SERVER_CLUSTER                                                                                           \
+    CHIP_PRINTCLUSTER_OTA_CLIENT_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
+    CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
@@ -937,6 +971,7 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_TEST_CLUSTER                                                                                                 \
     CHIP_PRINTCLUSTER_GENERIC_TUNNEL_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_BACNET_PROTOCOL_TUNNEL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_11073_PROTOCOL_TUNNEL_CLUSTER                                                                                \

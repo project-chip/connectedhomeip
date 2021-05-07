@@ -21,9 +21,10 @@
 #pragma once
 
 #include "af-structs.h"
-#include "af-types.h"
-#include "basic-types.h"
+#include <app/util/af-types.h>
+#include <app/util/basic-types.h>
 
+#include <app/Command.h>
 #include <lib/support/Span.h>
 
 /** @brief Cluster Init
@@ -87,13 +88,13 @@ void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallb
  * Server Message Sent
  *
  * @param type               The type of message sent
- * @param indexOrDestination The destination or address to which the message was sent
+ * @param destination        The destination to which the message was sent
  * @param apsFrame           The APS frame for the message
  * @param msgLen             The length of the message
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfWindowCoveringClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfWindowCoveringClusterServerMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                            EmberStatus status);
 
@@ -109,7 +110,7 @@ void emberAfWindowCoveringClusterServerMessageSentCallback(EmberOutgoingMessageT
  */
 EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
                                                                             chip::AttributeId attributeId,
-                                                                            EmberAfAttributeType attributeType, uint8_t size,
+                                                                            EmberAfAttributeType attributeType, uint16_t size,
                                                                             uint8_t * value);
 
 /** @brief Window Covering Cluster Server Tick
@@ -126,47 +127,49 @@ void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
  * @brief Window Covering Cluster WindowCoveringDownClose Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback();
+bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
  * @param percentageLiftValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(uint8_t percentageLiftValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * commandObj,
+                                                                          uint8_t percentageLiftValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
  * @param liftValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(uint16_t liftValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
  * @param percentageTiltValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(uint8_t percentageTiltValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * commandObj,
+                                                                          uint8_t percentageTiltValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
  * @param tiltValue
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(uint16_t tiltValue);
+bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringStop Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringStopCallback();
+bool emberAfWindowCoveringClusterWindowCoveringStopCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Window Covering Cluster WindowCoveringUpOpen Command callback
  */
 
-bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback();
+bool emberAfWindowCoveringClusterWindowCoveringUpOpenCallback(chip::app::Command * commandObj);
 
 //
 // Non-Cluster Related Callbacks
@@ -409,13 +412,13 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * be handled by the application framework.
  *
  * @param type   Ver.: always
- * @param indexOrDestination   Ver.: always
+ * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
+bool emberAfMessageSentCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change
@@ -436,7 +439,7 @@ bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrD
  * @param value   Ver.: always
  */
 EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size,
                                                 uint8_t * value);
 
 /** @brief Post Attribute Change
@@ -455,7 +458,7 @@ EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip:
  * @param value   Ver.: always
  */
 void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
+                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint16_t size, uint8_t * value);
 
 /** @brief Read Attributes Response
  *
@@ -616,15 +619,6 @@ uint32_t emberAfGetCurrentTimeCallback();
  */
 bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
                                     EmberAfEndpointInfoStruct * returnEndpointInfo);
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t emberAfGetSourceRouteOverheadCallback(chip::NodeId destination);
 
 /** @brief Registration Abort
  *

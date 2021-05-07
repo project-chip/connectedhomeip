@@ -38,7 +38,6 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
 import chip.devicecontroller.KeyValueStoreManager
-import chip.devicecontroller.PersistentStorage
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 
@@ -54,7 +53,6 @@ class CHIPToolActivity :
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
 
-    PersistentStorage.initialize(this);
     KeyValueStoreManager.initialize(this);
 
     if (savedInstanceState == null) {
@@ -156,9 +154,8 @@ class CHIPToolActivity :
 
     lateinit var setupPayload: SetupPayload
     try {
-      // TODO: Issue #4504 - Remove replacing _ with spaces after problem described in #415 will be fixed.
       setupPayload =
-        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase().replace('_', ' '))
+        SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized QR Code", ex)
       Toast.makeText(this, "Unrecognized QR Code", Toast.LENGTH_SHORT).show()

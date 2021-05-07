@@ -69,8 +69,6 @@ class Commissioner:
         self._handle = handle
         self._native = native
         self.pairing_state = PairingState.INITIALIZED
-        self.on_network_credentials_requested = None
-        self.on_operational_credentials_requested = None
         self.on_pairing_complete = None
 
     
@@ -81,44 +79,10 @@ class Commissioner:
 
         self.pairing_state = PairingState.PAIRING
     
-    def PairSendWifiCredentials(self, ssid: str, password: str):
-        """Send wifi credentials to the actively connected device."""
-
-        if self.pairing_state != PairingState.NEEDS_NETCREDS:
-            raise Exception("Not in a state requiring network credentials")
-
-        self._handle.pychip_internal_PairingDelegate_SetWifiCredentials(c_char_p(ssid.encode('utf8')), c_char_p(password.encode('utf8')))
-
-    def PairSendThreadCredentials(self, threadBlob: bytes):
-        """Send thread credentials. Thread credentials is an opaque blob from the API perspective."""
-
-        if self.pairing_state != PairingState.NEEDS_NETCREDS:
-            raise Exception("Not in a state requiring network credentials")
-
-        if type(threadBlob) != bytes:
-            raise Exception("Thread credentials MUST be of type bytes")
-
-        result = self._handle.pychip_internal_PairingDelegate_SetThreadCredentials(threadBlob, len(threadBlob))
-
-        if result != 0: 
-            raise Exception("Failed to send thread credentials. CHIP Error code %d" % result)
-
-
     def Unpair(self, remoteDeviceId: int):
         result = self._handle.pychip_internal_Commissioner_Unpair(self._native, remoteDeviceId)
         if result != 0: 
             raise Exception("Failed to unpair. CHIP Error code %d" % result)
-
-    
-    def _OnNetworkCredentialsRequested(self):
-        self.pairing_state = PairingState.NEEDS_NETCREDS
-        if self.on_network_credentials_requested:
-          self.on_network_credentials_requested()
-
-    def _OnOperationalCredentialsRequested(self, csr: bytes):
-        self.pairing_state = PairingState.NEEDS_OPCREDS
-        if self.on_operational_credentials_requested:
-          self.on_operational_credentials_requested(csr)
 
     def _OnPairingComplete(self, err: int):
         self.pairing_state = PairingState.INITIALIZED
@@ -134,12 +98,7 @@ def _SetNativeCallSignatues(handle: ctypes.CDLL):
     setter.Set('pychip_internal_Commissioner_Unpair', c_uint32, [Commissioner_p, c_uint64])
     setter.Set('pychip_internal_Commissioner_BleConnectForPairing', c_uint32, [Commissioner_p, c_uint64, c_uint32, c_uint16])
 
-    setter.Set('pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback', None, [NetworkCredentialsRequested])
-    setter.Set('pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback', None, [OperationalCredentialsRequested])
     setter.Set('pychip_internal_PairingDelegate_SetPairingCompleteCallback', None, [PairingComplete])
-    setter.Set('pychip_internal_PairingDelegate_SetWifiCredentials', None, [c_char_p, c_char_p])
-    setter.Set('pychip_internal_PairingDelegate_SetThreadCredentials', c_uint32, [ThreadBlob_p, c_uint32])
-
 
 commissionerSingleton: Optional[Commissioner] = None
 
@@ -159,8 +118,6 @@ def GetCommissioner() -> Commissioner:
         if not native:
             raise Exception('Failed to create commissioner object.') 
 
-        handle.pychip_internal_PairingDelegate_SetNetworkCredentialsRequestedCallback(OnNetworkCredentialsRequested)
-        handle.pychip_internal_PairingDelegate_SetOperationalCredentialsRequestedCallback(OnOperationalCredentialsRequested)
         handle.pychip_internal_PairingDelegate_SetPairingCompleteCallback(OnPairingComplete)
 
         commissionerSingleton = Commissioner(handle, native)

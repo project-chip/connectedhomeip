@@ -42,6 +42,7 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
+#include <support/ThreadOperationalDataset.h>
 #include <support/logging/CHIPLogging.h>
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
@@ -123,6 +124,15 @@ struct StackUnlockGuard
 chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
 chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
+#if CONFIG_NETWORK_LAYER_BLE
+
+chip::Ble::BleLayer * GetJNIBleLayer()
+{
+    return &sBleLayer;
+}
+
+#endif
+
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -139,7 +149,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     // Get a JNI environment object.
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
-    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(env);
+    chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().InitializeMethodForward(sJVM, env);
 
     ChipLogProgress(Controller, "Loading Java class references.");
 
@@ -310,44 +320,6 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
         ChipLogError(Controller, "Failed to unpair the device.");
         ThrowError(env, err);
     }
-}
-
-JNI_METHOD(void, sendWiFiCredentials)(JNIEnv * env, jobject self, jlong handle, jstring ssid, jstring password)
-{
-    JniUtfString ssidStr(env, ssid);
-    JniUtfString passwordStr(env, password);
-
-    ChipLogProgress(Controller, "Sending Wi-Fi credentials for: %s", ssidStr.c_str());
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
-    }
-}
-
-JNI_METHOD(void, sendThreadCredentials)
-(JNIEnv * env, jobject self, jlong handle, jint channel, jint panId, jbyteArray xpanId, jbyteArray masterKey)
-{
-    using namespace chip::DeviceLayer::Internal;
-
-    JniByteArray xpanIdBytes(env, xpanId);
-    JniByteArray masterKeyBytes(env, masterKey);
-
-    VerifyOrReturn(CanCastTo<uint8_t>(channel), ChipLogError(Controller, "sendThreadCredentials() called with invalid Channel"));
-    VerifyOrReturn(CanCastTo<uint16_t>(panId), ChipLogError(Controller, "sendThreadCredentials() called with invalid PAN ID"));
-    VerifyOrReturn(xpanIdBytes.size() <= static_cast<jsize>(kThreadExtendedPANIdLength),
-                   ChipLogError(Controller, "sendThreadCredentials() called with invalid XPAN ID"));
-    VerifyOrReturn(masterKeyBytes.size() <= static_cast<jsize>(kThreadMasterKeyLength),
-                   ChipLogError(Controller, "sendThreadCredentials() called with invalid Master Key"));
-
-    DeviceNetworkInfo threadData                = {};
-    threadData.ThreadChannel                    = channel;
-    threadData.ThreadPANId                      = panId;
-    threadData.FieldPresent.ThreadExtendedPANId = 1;
-    memcpy(threadData.ThreadExtendedPANId, xpanIdBytes.data(), xpanIdBytes.size());
-    memcpy(threadData.ThreadMasterKey, masterKeyBytes.data(), masterKeyBytes.size());
-
-    ScopedPthreadLock lock(&sStackLock);
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(threadData);
 }
 
 JNI_METHOD(void, pairTestDeviceWithoutSecurity)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)

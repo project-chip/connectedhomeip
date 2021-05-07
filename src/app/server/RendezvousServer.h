@@ -19,18 +19,17 @@
 
 #include <app/server/AppDelegate.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <transport/RendezvousSession.h>
+#include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
 
-class RendezvousServer : public RendezvousSessionDelegate
+class RendezvousServer : public SessionEstablishmentDelegate
 {
 public:
-    RendezvousServer();
-
-    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
-                              Transport::AdminPairingInfo * admin);
+    CHIP_ERROR WaitForPairing(const RendezvousParameters & params, Messaging::ExchangeManager * exchangeManager,
+                              TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, Transport::AdminPairingInfo * admin);
 
     CHIP_ERROR Init(AppDelegate * delegate, PersistentStorageDelegate * storage)
     {
@@ -40,21 +39,30 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    //////////////// RendezvousSessionDelegate Implementation ///////////////////
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
 
-    void OnRendezvousConnectionOpened() override;
-    void OnRendezvousConnectionClosed() override;
-    void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBufferHandle buffer) override;
-    void OnRendezvousComplete() override;
-    void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
-    RendezvousSession * GetRendezvousSession() { return &mRendezvousSession; };
+    void Cleanup();
+
+    uint16_t GetNextKeyId() const { return mNextKeyId; }
+    void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
 
 private:
-    RendezvousSession mRendezvousSession;
     AppDelegate * mDelegate;
-    PersistentStorageDelegate * mStorage = nullptr;
+    PersistentStorageDelegate * mStorage          = nullptr;
+    Messaging::ExchangeManager * mExchangeManager = nullptr;
+
+    PASESession mPairingSession;
+    uint16_t mNextKeyId            = 0;
+    SecureSessionMgr * mSessionMgr = nullptr;
+
+    Transport::AdminPairingInfo * mAdmin = nullptr;
+
+    const RendezvousAdvertisementDelegate * mAdvDelegate;
+
+    bool HasAdvertisementDelegate() const { return mAdvDelegate != nullptr; }
+    const RendezvousAdvertisementDelegate * GetAdvertisementDelegate() const { return mAdvDelegate; }
 };
 
 } // namespace chip

@@ -45,7 +45,7 @@
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
 
-    self.cluster = [[CHIPBasic alloc] initWithDevice:CHIPGetPairedDevice() endpoint:1 queue:dispatch_get_main_queue()];
+    self.cluster = [[CHIPBasic alloc] initWithDevice:CHIPGetPairedDevice() endpoint:0 queue:dispatch_get_main_queue()];
 }
 
 - (void)dismissKeyboard

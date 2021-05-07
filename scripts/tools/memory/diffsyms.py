@@ -29,6 +29,7 @@ from memdf import Config, ConfigDescription, SymbolDF
 CONFIG: ConfigDescription = {
     **memdf.util.config.CONFIG,
     **memdf.collect.CONFIG,
+    **memdf.select.CONFIG,
     **memdf.report.REPORT_CONFIG,
     **memdf.report.OUTPUT_CONFIG,
 }
@@ -47,35 +48,43 @@ def main(argv):
         a_dfs = memdf.collect.collect_files(config, files=[inputs[0]])
         b_dfs = memdf.collect.collect_files(config, files=[inputs[1]])
 
-        a_syms = a_dfs[SymbolDF.name].sort_values(by='symbol')
-        b_syms = b_dfs[SymbolDF.name].sort_values(by='symbol')
+        a_syms = a_dfs[SymbolDF.name].sort_values(by='symbol',
+                                                  ignore_index=True)
+        b_syms = b_dfs[SymbolDF.name].sort_values(by='symbol',
+                                                  ignore_index=True)
 
         # TBD: Differences other than size, configurably.
         differences = []
         ai = a_syms.itertuples()
         bi = b_syms.itertuples()
-        while True:
-            if (a := next(ai, None)) is None:
-                break
-            if (b := next(bi, None)) is None:
-                differences.append((a.symbol, a.size, None))
-                break
+        a = next(ai, None)
+        b = next(bi, None)
+        while a and b:
             if a.symbol < b.symbol:
-                differences.append((a.symbol, a.size, None))
+                differences.append((-a.size, a.size, 0, a.symbol))
                 a = next(ai, None)
                 continue
             if a.symbol > b.symbol:
-                differences.append((b.symbol, None, b.size))
+                differences.append((b.size, 0, b.size, b.symbol))
                 b = next(bi, None)
                 continue
             if a.size != b.size:
-                differences.append((a.symbol, a.size, b.size))
+                differences.append((b.size - a.size, a.size, b.size, a.symbol))
+            a = next(ai, None)
+            b = next(bi, None)
         for a in ai:
-            differences.append((a.symbol, a.Index, None))
+            differences.append((-a.size, a.size, 0, a.symbol))
         for b in bi:
-            differences.append((b.symbol, None, b.Index))
+            differences.append((b.size, 0, b.size, b.symbol))
 
-        df = pd.DataFrame(differences, columns=['symbol', 'a', 'b'])
+        df = pd.DataFrame(differences,
+                          columns=['change', 'a-size', 'b-size', 'symbol'])
+        if config['report.demangle']:
+            # Demangle early to sort by demangled name.
+            df['symbol'] = df['symbol'].apply(memdf.report.demangle)
+            config['report.demangle'] = False
+        df.sort_values(by=['change', 'symbol'], ascending=[False, True],
+                       inplace=True)
         memdf.report.write_dfs(config, {'Differences': df})
 
     except Exception as exception:

@@ -25,6 +25,7 @@
 #include <ble/BleError.h>
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/logging/CHIPLogging.h>
@@ -38,6 +39,7 @@ constexpr uint64_t kScanningTimeoutInSeconds = 60;
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
 @property (strong, nonatomic) dispatch_queue_t workQueue;
+@property (strong, nonatomic) dispatch_queue_t chipWorkQueue;
 @property (strong, nonatomic) CBCentralManager * centralManager;
 @property (strong, nonatomic) CBPeripheral * peripheral;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
@@ -68,6 +70,7 @@ namespace DeviceLayer {
             ble.appState = appState;
             ble.onConnectionComplete = OnConnectionComplete;
             ble.onConnectionError = OnConnectionError;
+            [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
         BLE_ERROR BleConnectionDelegateImpl::CancelConnection()
@@ -93,9 +96,9 @@ namespace DeviceLayer {
         self.shortServiceUUID = [UUIDHelper GetShortestServiceUUID:&chip::Ble::CHIP_BLE_SVC_ID];
         _deviceDiscriminator = deviceDiscriminator;
         _workQueue = dispatch_queue_create("com.chip.ble.work_queue", DISPATCH_QUEUE_SERIAL);
+        _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _centralManager = [CBCentralManager alloc];
-        [_centralManager initWithDelegate:self queue:_workQueue];
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
@@ -120,6 +123,7 @@ namespace DeviceLayer {
     case CBManagerStatePoweredOff:
         ChipLogDetail(Ble, "CBManagerState: OFF");
         [self stop];
+        _onConnectionError(_appState, BLE_ERROR_APP_CLOSED_CONNECTION);
         break;
     case CBManagerStateUnauthorized:
         ChipLogDetail(Ble, "CBManagerState: Unauthorized");
@@ -232,10 +236,14 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID svcId;
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
-        _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
+        dispatch_async(_chipWorkQueue, ^{
+            _mBleLayer->HandleWriteConfirmation((__bridge void *) peripheral, &svcId, &charId);
+        });
     } else {
         ChipLogError(Ble, "BLE:Error writing Characteristics in Chip service on the device: [%@]", error.localizedDescription);
-        _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
+        dispatch_async(_chipWorkQueue, ^{
+            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_WRITE_FAILED);
+        });
     }
 }
 
@@ -250,20 +258,24 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
-        if (isNotifying) {
-            _mBleLayer->HandleSubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
-        } else {
-            _mBleLayer->HandleUnsubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
-        }
+        dispatch_async(_chipWorkQueue, ^{
+            if (isNotifying) {
+                _mBleLayer->HandleSubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
+            } else {
+                _mBleLayer->HandleUnsubscribeComplete((__bridge void *) peripheral, &svcId, &charId);
+            }
+        });
     } else {
         ChipLogError(Ble, "BLE:Error subscribing/unsubcribing some characteristic on the device: [%@]", error.localizedDescription);
-        if (isNotifying) {
-            // we're still notifying, so we must failed the unsubscription
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
-        } else {
-            // we're not notifying, so we must failed the subscription
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
-        }
+        dispatch_async(_chipWorkQueue, ^{
+            if (isNotifying) {
+                // we're still notifying, so we must failed the unsubscription
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_UNSUBSCRIBE_FAILED);
+            } else {
+                // we're not notifying, so we must failed the subscription
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_SUBSCRIBE_FAILED);
+            }
+        });
     }
 }
 
@@ -277,22 +289,28 @@ namespace DeviceLayer {
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
         // build a inet buffer from the rxEv and send to blelayer.
-        chip::System::PacketBufferHandle msgBuf
+        __block chip::System::PacketBufferHandle msgBuf
             = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
 
         if (!msgBuf.IsNull()) {
-            if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
-                // since this error comes from device manager core
-                // we assume it would do the right thing, like closing the connection
-                ChipLogError(Ble, "Failed at handling incoming BLE data");
-            }
+            dispatch_async(_chipWorkQueue, ^{
+                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
+                    // since this error comes from device manager core
+                    // we assume it would do the right thing, like closing the connection
+                    ChipLogError(Ble, "Failed at handling incoming BLE data");
+                }
+            });
         } else {
             ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
-            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_NO_MEMORY);
+            dispatch_async(_chipWorkQueue, ^{
+                _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_NO_MEMORY);
+            });
         }
     } else {
         ChipLogError(Ble, "BLE:Error receiving indication of Characteristics on the device: [%@]", error.localizedDescription);
-        _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
+        dispatch_async(_chipWorkQueue, ^{
+            _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_GATT_INDICATE_FAILED);
+        });
     }
 }
 
@@ -308,6 +326,7 @@ namespace DeviceLayer {
 {
     [self stopScanning];
     [self disconnect];
+    _centralManager.delegate = nil;
     _centralManager = nil;
     _peripheral = nil;
 }

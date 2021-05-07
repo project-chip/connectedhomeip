@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/platform/device.gni")
 
 static_library("shell") {
   output_name = "libCHIPShell"
@@ -23,14 +24,18 @@ static_library("shell") {
   sources = [
     "commands.cpp",
     "commands.h",
-    "shell.cpp",
-    "shell.h",
+    "shell_core.cpp",
+    "shell_core.h",
     "streamer.cpp",
     "streamer.h",
   ]
 
   if (chip_target_style == "unix") {
     sources += [ "streamer_stdio.cpp" ]
+  }
+
+  if (chip_device_platform == "esp32") {
+    sources += [ "streamer_esp32.cpp" ]
   }
 
   if (current_os == "zephyr") {

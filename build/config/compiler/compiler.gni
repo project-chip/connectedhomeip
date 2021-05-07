@@ -34,4 +34,10 @@ declare_args() {
 
   # Remove unwind tables from the binary to save space.
   exclude_unwind_tables = current_os != "android"
+
+  # C standard level (value for -std flag).
+  c_standard = "gnu11"
+
+  # C++ standard level (value for -std flag).
+  cpp_standard = "gnu++14"
 }

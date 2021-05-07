@@ -50,7 +50,7 @@ namespace {
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
 
 #define CHIP_ADV_SHORT_UUID_LEN 2
-#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFEAF
+#define CHIP_ADV_CHIP_OVER_BLE_SERVICE_UUID16 0xFFF6
 
 // FreeeRTOS sw timer
 TimerHandle_t sbleAdvTimeoutTimer;
@@ -503,10 +503,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     else
     {
         ChipLogProgress(DeviceLayer, "CHIPoBLE start advertising");
-        // If necessary, inform the ThreadStackManager that CHIPoBLE advertising is about to start.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStart();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     }
 
     err = ConfigureAdvertisingData();
@@ -554,11 +550,6 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
         mFlags.Set(Flags::kFastAdvertisingEnabled);
 
         ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-
-        // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
         // Post a CHIPoBLEAdvertisingChange(Stopped) event.
         {
@@ -723,6 +714,10 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
         {
             ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
             return;
+        }
+        if (mFlags.Has(Flags::kRestartAdvertising))
+        {
+            BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
         }
         break;
     }
@@ -912,8 +907,10 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
+        /* Stop advertising and defer restart for when stop confirmation is received from the stack */
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        sInstance.StopAdvertising();
+        sInstance.mFlags.Set(Flags::kRestartAdvertising);
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {

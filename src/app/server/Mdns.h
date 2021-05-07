@@ -24,7 +24,7 @@ namespace chip {
 namespace app {
 namespace Mdns {
 
-/// Set MDNS operational advertisement
+/// Start operational advertising
 CHIP_ERROR AdvertiseOperational();
 
 /// Set MDNS commissioner advertisement

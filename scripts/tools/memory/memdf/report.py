@@ -175,18 +175,30 @@ def write_table(config: Config, df: DF, output: IO) -> None:
         df = df.copy()
         if 'symbol' in df.columns and config['report.demangle']:
             df['symbol'] = df['symbol'].apply(demangle)
+        last_column_is_left_justified = False
+        formatters = []
         for column in df.columns:
             if column.endswith('address'):
                 # Hex format address.
                 width = (int(df[column].max()).bit_length() + 3) // 4
-                df[column] = df[column].apply(lambda s: '{0:0{width}X}'.format(
-                    s, width=width))
+                formatters.append(lambda x:
+                                  '{0:0{width}X}'.format(x, width=width))
             elif pd.api.types.is_string_dtype(df.dtypes[column]):
-                # Left justify strings.
                 df[column] = df[column].astype(str)
+                # Left justify strings.
                 width = max(len(column), df[column].str.len().max())
-                df[column] = df[column].apply(lambda s: s.ljust(width))
-        print(df.to_string(index=False), file=output)
+                formatters.append(lambda x: x.ljust(width))
+                if column == df.columns[-1]:
+                    last_column_is_left_justified = True
+            else:
+                formatters.append(str)
+        s = df.to_string(index=False, formatters=formatters, justify='left')
+        if last_column_is_left_justified:
+            # Strip trailing spaces.
+            for line in s.split('\n'):
+                print(line.rstrip())
+        else:
+            print(s, file=output)
     else:
         # No rows. `df.to_string()` doesn't look like a text table in this case.
         print(' '.join(df.columns))

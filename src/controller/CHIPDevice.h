@@ -32,15 +32,22 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
-#include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
+
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/BleLayer.h>
+#include <transport/raw/BLE.h>
+#endif
 
 namespace chip {
 namespace Controller {
@@ -49,10 +56,16 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
+constexpr size_t kMaxBlePendingPackets = 1;
+
 using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #if INET_CONFIG_ENABLE_IPV4
                                         ,
                                         Transport::UDP /* IPv4 */
+#endif
+#if CONFIG_NETWORK_LAYER_BLE
+                                        ,
+                                        Transport::BLE<kMaxBlePendingPackets> /* BLE */
 #endif
                                         >;
 
@@ -62,13 +75,24 @@ struct ControllerDeviceInitParams
     SecureSessionMgr * sessionMgr            = nullptr;
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     Inet::InetLayer * inetLayer              = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * bleLayer = nullptr;
+#endif
 };
 
-class DLL_EXPORT Device
+class DLL_EXPORT Device : public Messaging::ExchangeDelegate
 {
 public:
     ~Device()
     {
+        if (mExchangeMgr)
+        {
+            // Ensure that any exchange contexts we have open get closed now,
+            // because we don't want them to call back in to us after this
+            // point.
+            mExchangeMgr->CloseAllContextsForDelegate(this);
+        }
+
         if (mCommandSender != nullptr)
         {
             mCommandSender->Shutdown();
@@ -148,6 +172,9 @@ public:
         mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
+#if CONFIG_NETWORK_LAYER_BLE
+        mBleLayer = params.bleLayer;
+#endif
 
 #if CHIP_ENABLE_INTERACTION_MODEL
         InitCommandSender();
@@ -178,15 +205,7 @@ public:
         mDeviceId = deviceId;
         mState    = ConnectionState::Connecting;
 
-        if (peerAddress.GetTransportType() != Transport::Type::kUdp)
-        {
-            ChipLogError(Controller, "Invalid peer address received in chip device initialization. Expected a UDP address.");
-            chipDie();
-        }
-        else
-        {
-            mDeviceUdpAddress = peerAddress;
-        }
+        mDeviceAddress = peerAddress;
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -227,11 +246,21 @@ public:
      *   device. The message ownership is transferred to the function, and it is expected
      *   to release the message buffer before returning.
      *
+     * @param[in] exchange      The exchange context the message was received
+     *                          on.  The Device guarantees that it will call
+     *                          Close() on exchange when it's done processing
+     *                          the message.
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
      * @param[in] msgBuf        The message buffer
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
+    void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           System::PacketBufferHandle msgBuf) override;
+
+    /**
+     * @brief ExchangeDelegate implementation of OnResponseTimeout.
+     */
+    void OnResponseTimeout(Messaging::ExchangeContext * exchange) override;
 
     /**
      * @brief
@@ -283,18 +312,22 @@ public:
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
         mInetLayer      = nullptr;
+#if CONFIG_NETWORK_LAYER_BLE
+        mBleLayer = nullptr;
+#endif
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
     bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceUdpAddress.SetIPAddress(deviceAddr); }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddress.SetIPAddress(deviceAddr); }
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
     uint8_t GetNextSequenceNumber() { return mSequenceNumber++; };
     void AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    void CancelResponseHandler(uint8_t seqNum);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute, Callback::Cancelable * onReportCallback);
 
 private:
@@ -313,15 +346,18 @@ private:
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
-    /** Address used to communicate with the device. MUST be Type::kUDP
-     *  in the current implementation.
+    /** Address used to communicate with the device.
      */
-    Transport::PeerAddress mDeviceUdpAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
+    Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
     Inet::InetLayer * mInetLayer = nullptr;
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
+
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer * mBleLayer = nullptr;
+#endif
 
     PASESessionSerializable mPairing;
 
@@ -421,6 +457,7 @@ typedef struct SerializableDevice
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
     uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    uint8_t mDeviceTransport;
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

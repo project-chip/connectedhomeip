@@ -104,7 +104,7 @@ inline void InetLayerBasis::InitInetLayerBasis(InetLayer & aInetLayer, void * aA
 class SocketEvents
 {
 public:
-    enum
+    enum : uint8_t
     {
         kRead  = 0x01, /**< Bit flag indicating if there is a read event on a socket. */
         kWrite = 0x02, /**< Bit flag indicating if there is a write event on a socket. */

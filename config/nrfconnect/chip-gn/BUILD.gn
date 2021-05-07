@@ -22,6 +22,7 @@ assert(current_os == "zephyr")
 declare_args() {
   chip_build_libshell = false
   chip_build_pw_rpc_lib = false
+  chip_build_zephyr_shell = false
 }
 
 group("nrfconnect") {
@@ -33,6 +34,10 @@ group("nrfconnect") {
 
   if (chip_build_libshell) {
     deps += [ "${chip_root}/src/lib/shell" ]
+  }
+
+  if (chip_build_zephyr_shell) {
+    deps += [ "${chip_root}/src/platform/nrfconnect/shell:chip-zephyr-shell" ]
   }
 
   # Building PW_RPC lib with GN may go obsolete after getting full CMake

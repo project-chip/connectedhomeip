@@ -74,3 +74,7 @@
 	path = third_party/efr32_sdk/repo
 	url = https://github.com/SiliconLabs/sdk_support.git
 	branch = master
+[submodule "simw-top-mini"]
+	path = third_party/simw-top-mini/repo
+	url = https://github.com/NXP/plug-and-trust.git
+	branch = int/CHIPSE_Release

@@ -39,9 +39,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
-#include "config.h"
-#include "util.h"
+#include <app/util/af.h>
+#include <app/util/config.h>
+#include <app/util/util.h>
 
 using namespace chip;
 
@@ -55,7 +55,7 @@ using namespace chip;
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
 EmberApsFrame emberAfResponseApsFrame;
-NodeId emberAfResponseDestination;
+Messaging::ExchangeContext * emberAfResponseDestination;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
 

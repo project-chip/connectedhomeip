@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include "AppDelegate.h"
 #include "BluetoothWidget.h"
 #include "Button.h"
 #include "CHIPDeviceManager.h"
@@ -24,10 +23,8 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
-#include "OnboardingCodesUtil.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
-#include "Server.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -37,6 +34,9 @@
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
 #include "nvs_flash.h"
 
 #include <cmath>
@@ -45,13 +45,18 @@
 #include <string>
 #include <vector>
 
+#include <app/server/AppDelegate.h>
+#include <app/server/Mdns.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <server/Mdns.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 
+#include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/temperature-measurement-server/temperature-measurement-server.h>
 
 using namespace ::chip;
@@ -149,6 +154,12 @@ public:
     {
         return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[attributeIndex];
     }
+    bool IsBooleanAttribute()
+    {
+        auto & attribute = this->attribute();
+        auto & value     = std::get<1>(attribute);
+        return value == "On" || value == "Off";
+    }
     virtual std::string GetTitle()
     {
         auto & attribute = this->attribute();
@@ -158,8 +169,15 @@ public:
         snprintf(buffer, sizeof(buffer), "%s : %s", name.c_str(), value.c_str());
         return buffer;
     }
-    virtual int GetItemCount() { return 2; }
-    virtual std::string GetItemText(int i) { return i == 0 ? "+" : "-"; }
+    virtual int GetItemCount() { return IsBooleanAttribute() ? 1 : 2; }
+    virtual std::string GetItemText(int i)
+    {
+        if (IsBooleanAttribute())
+        {
+            return "Toggle";
+        }
+        return i == 0 ? "+" : "-";
+    }
     virtual void ItemAction(int i)
     {
         auto & attribute = this->attribute();
@@ -180,10 +198,34 @@ public:
             }
             value = buffer;
         }
+        else if (IsBooleanAttribute())
+        {
+            auto & name    = std::get<0>(attribute);
+            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
+            value          = (value == "On") ? "Off" : "On";
+
+            if (name == "OnOff" && cluster == "OnOff")
+            {
+                uint8_t attributeValue = (value == "On") ? 1 : 0;
+                emberAfWriteServerAttribute(endpointIndex + 1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID,
+                                            (uint8_t *) &attributeValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+            }
+        }
         else
         {
+            auto & name    = std::get<0>(attribute);
+            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
+
             ESP_LOGI(TAG, "editing attribute as string: '%s' (%s)", value.c_str(), i == 0 ? "+" : "-");
             value = (value == "Closed") ? "Open" : "Closed";
+            ESP_LOGI(TAG, "name and cluster: '%s' (%s)", name.c_str(), cluster.c_str());
+            if (name == "State" && cluster == "Lock")
+            {
+                // update the doorlock attribute here
+                uint8_t attributeValue = value == "Closed" ? EMBER_ZCL_DOOR_LOCK_STATE_LOCKED : EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
+                emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID,
+                                            (uint8_t *) &attributeValue, ZCL_INT8U_ATTRIBUTE_TYPE);
+            }
         }
     }
 };
@@ -296,7 +338,7 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommisioning();
+            app::Mdns::AdvertiseCommisionable();
             OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }
@@ -333,6 +375,14 @@ void SetupPretendDevices()
     AddCluster("Step Counter");
     AddAttribute("Steps", "9876");
 
+    AddDevice("Light Bulb");
+    AddEndpoint("1");
+    AddCluster("OnOff");
+    AddAttribute("OnOff", "Off");
+    AddEndpoint("2");
+    AddCluster("OnOff");
+    AddAttribute("OnOff", "Off");
+
     AddDevice("Thermometer");
     AddEndpoint("External");
     AddCluster("Thermometer");
@@ -340,6 +390,14 @@ void SetupPretendDevices()
     // write the temp attribute
     emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(21 * 100));
 
+    AddDevice("Door Lock");
+    AddEndpoint("Default");
+    AddCluster("Lock");
+    AddAttribute("State", "Open");
+    // write the door lock state
+    uint8_t attributeValue = EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
+    emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID, &attributeValue,
+                                ZCL_INT8U_ATTRIBUTE_TYPE);
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
     AddCluster("Door");
@@ -429,12 +487,12 @@ std::string createSetupPayload()
 
         size_t tlvDataLen = sizeof(gw_ip);
         uint8_t tlvDataStart[tlvDataLen];
-        err = generator.payloadBase41Representation(result, tlvDataStart, tlvDataLen);
+        err = generator.payloadBase38Representation(result, tlvDataStart, tlvDataLen);
     }
     else
     {
         QRCodeSetupPayloadGenerator generator(payload);
-        err = generator.payloadBase41Representation(result);
+        err = generator.payloadBase38Representation(result);
     }
 
     {
@@ -598,6 +656,7 @@ extern "C" void app_main()
             ->Item("QR Code",
                    [=]() {
                        ESP_LOGI(TAG, "Opening QR code screen");
+                       ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
                        ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
                    })
             ->Item("Setup",

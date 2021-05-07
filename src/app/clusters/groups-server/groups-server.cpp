@@ -46,6 +46,7 @@
 // *******************************************************************
 #include "groups-server.h"
 
+#include <app/Command.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
@@ -151,7 +152,7 @@ static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId grou
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
 
@@ -173,7 +174,7 @@ bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
+bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
@@ -206,7 +207,7 @@ bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
     return true;
 }
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList)
+bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * commandObj, uint8_t groupCount, uint8_t * groupList)
 {
     EmberStatus status;
     uint8_t i, j;
@@ -288,7 +289,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
+bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, GroupId groupId)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;
@@ -319,7 +320,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
     return true;
 }
 
-bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
+bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::Command * commandObj)
 {
     EmberStatus sendStatus;
     uint8_t i;
@@ -367,7 +368,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
     return true;
 }
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(GroupId groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, GroupId groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;

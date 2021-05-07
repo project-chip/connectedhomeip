@@ -4,6 +4,13 @@ static_library("secure_channel") {
   output_name = "libSecureChannel"
 
   sources = [
+    "CASESession.cpp",
+    "CASESession.h",
+    "PASESession.cpp",
+    "PASESession.h",
+    "RendezvousParameters.h",
+    "SessionEstablishmentExchangeDispatch.cpp",
+    "SessionEstablishmentExchangeDispatch.h",
     "StatusReport.cpp",
     "StatusReport.h",
   ]
@@ -13,6 +20,7 @@ static_library("secure_channel") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/system",
   ]
 }
