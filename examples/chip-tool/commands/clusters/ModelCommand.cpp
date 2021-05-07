@@ -42,7 +42,10 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::CommissionerInitParams initParams;
 
+    InitInteractionModelDelegate();
+
     initParams.storageDelegate = &storage;
+    initParams.imDelegate      = mpIMDelegate;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
@@ -56,10 +59,10 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
     err = mCommissioner.GetDevice(remoteId, &mDevice);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
+    UpdateWaitForResponse(true);
     err = SendCommand(mDevice, mEndPointId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
 
-    UpdateWaitForResponse(true);
     WaitForResponse(kWaitDurationInSeconds);
 
     VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);

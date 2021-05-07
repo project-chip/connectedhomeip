@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>
@@ -87,8 +88,8 @@ public:
         ::chip::Inet::InterfaceId interfaceId;
     };
 
-    Command(const char * commandName) : mName(commandName) {}
-    virtual ~Command() {}
+    Command(const char * commandName);
+    virtual ~Command();
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
@@ -143,14 +144,14 @@ public:
     virtual CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) = 0;
 
     bool GetCommandExitStatus() const { return mCommandExitStatus; }
-    void SetCommandExitStatus(bool status)
-    {
-        mCommandExitStatus = status;
-        UpdateWaitForResponse(false);
-    }
+    void SetCommandExitStatus(bool status) { mCommandExitStatus = status; }
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(uint16_t duration);
+
+protected:
+    void InitInteractionModelDelegate();
+    chip::app::InteractionModelDelegate * mpIMDelegate;
 
 private:
     bool InitArgument(size_t argIndex, const char * argValue);
