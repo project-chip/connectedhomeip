@@ -21,8 +21,8 @@
 #include "gen/af-structs.h"
 
 #include <core/CHIPError.h>
-#include <vector>
 #include <string>
+#include <vector>
 
 class MediaInputManager
 {
