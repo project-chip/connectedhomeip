@@ -63,7 +63,8 @@ default settings by pressing button manually. However, this mode does not
 guarantee that the device will be able to communicate with the CHIP controller
 and other devices.
 
-The example can be configured to use the secure bootloader and utilize it for performing Over-the-air Device Firmware Upgrade via Bluetooth LE.
+The example can be configured to use the secure bootloader and utilize it for
+performing Over-the-air Device Firmware Upgrade via Bluetooth LE.
 
 ### Bluetooth LE advertising
 
@@ -92,23 +93,42 @@ with other Thread devices in the network.
 
 ### Device Firmware Upgrade
 
-The example allows enabling Over-the-air Device Firmware Upgrade feature. In this process device hosting new firmware image sends it to the CHIP device using Bluetooth LE transport and [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt). Then the old firmware image is replaced with the new one using [MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html) bootloader solution.
+The example allows enabling Over-the-air Device Firmware Upgrade feature. In
+this process device hosting new firmware image sends it to the CHIP device using
+Bluetooth LE transport and
+[Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
+Then the old firmware image is replaced with the new one using
+[MCUboot](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/mcuboot/index.html)
+bootloader solution.
 
 #### Bootloader
 
-MCUboot is a secure bootloader used for swapping firmware images of different versions and generating proper build output files that can be used in the device firmware upgrade process.
+MCUboot is a secure bootloader used for swapping firmware images of different
+versions and generating proper build output files that can be used in the device
+firmware upgrade process.
 
-Bootloader solution requires certain area of flash memory to perform application images swapping process regarding the firmware upgrade. The Nordic devices use for that purpose external memory chip that communicates with the microcontroller via QSPI bus.
+Bootloader solution requires certain area of flash memory to perform application
+images swapping process regarding the firmware upgrade. The Nordic devices use
+for that purpose external memory chip that communicates with the microcontroller
+via QSPI bus.
 
-See the [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support) section to learn how to change MCUboot and flash configuration in this example.
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to change MCUboot and flash configuration in this example.
 
 #### Simple Management Protocol
 
-Simple Management Protocol (SMP) is a basic transfer encoding that is used for device management purposes, including application image management. SMP supports using different transports like Bluetooth LE, UDP or serial USB/UART.
+Simple Management Protocol (SMP) is a basic transfer encoding that is used for
+device management purposes, including application image management. SMP supports
+using different transports like Bluetooth LE, UDP or serial USB/UART.
 
-In this example CHIP device runs SMP Server in order to download application update image using Bluetooth LE transport.
+In this example CHIP device runs SMP Server in order to download application
+update image using Bluetooth LE transport.
 
-See the [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support) section to learn how to enable SMP and utilize it for Device Firmware Upgrade purposes in this example.
+See the
+[Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+section to learn how to enable SMP and utilize it for Device Firmware Upgrade
+purposes in this example.
 
 <hr>
 
@@ -177,7 +197,10 @@ states are possible:
     initiated.
 
 -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
-    process. This feature is disabled by default, but can be enabled by following the [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support) instruction.
+    process. This feature is disabled by default, but can be enabled by
+    following the
+    [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
+    instruction.
 
 **Button 2** &mdash; Pressing the button once changes the lock state to the
 opposite one.
@@ -337,23 +360,40 @@ Semiconductor's kit you own.
 
 ### Building with Device Firmware Upgrade support
 
-To build the example with configuration enabling DFU, run the following command with _build-target_ replaced with the build target name of the Nordic Semiconductor's kit you own (e.g.`nrf52840dk_nrf52840`):
+To build the example with configuration enabling DFU, run the following command
+with _build-target_ replaced with the build target name of the Nordic
+Semiconductor's kit you own (e.g.`nrf52840dk_nrf52840`):
 
-> **_WARNING:_** Please do remember about replacing _build-target_ also in the PM_STATIC_YML_FILE path.
+> **_WARNING:_** Please do remember about replacing _build-target_ also in the
+> PM_STATIC_YML_FILE path.
 
     $ west build -b build-target -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/overlay-dfu_support.conf -DPM_STATIC_YML_FILE="configuration/build-target/pm_static.yml"
 
 #### Changing bootloader configuration
 
-To change default MCUboot configuration you can edit overlay file containing bootloader configuration options and located in the `config/nrfconnect/app/overlay-dfu_support.conf` or define desired options in your example `prj.conf` file.
+To change default MCUboot configuration you can edit overlay file containing
+bootloader configuration options and located in the
+`config/nrfconnect/app/overlay-dfu_support.conf` or define desired options in
+your example `prj.conf` file.
 
-It is important to introduce the same configuration changes, that were described above, in the `child_image/mcuboot.conf` file. That is necessary, as the bootloader image is separate application from the User application and it has own configuration file, which content must be consistent with the application configuration.  
+It is important to introduce the same configuration changes, that were described
+above, in the `child_image/mcuboot.conf` file. That is necessary, as the
+bootloader image is separate application from the User application and it has
+own configuration file, which content must be consistent with the application
+configuration.
 
 #### Changing flash memory settings
 
-In the default configuration MCUboot uses [Partition Manager](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#partition-manager) to configure flash partitions utilized for the bootloader application image slots purposes. Those settings can be changed by defining [static partitions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static), what was done in this example case in order to define using external flash.
+In the default configuration MCUboot uses
+[Partition Manager](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#partition-manager)
+to configure flash partitions utilized for the bootloader application image
+slots purposes. Those settings can be changed by defining
+[static partitions](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/scripts/partition_manager/partition_manager.html#ug-pm-static),
+what was done in this example case in order to define using external flash.
 
-To modify flash settings of your board named by the _build-target_ (e.g. `nrf52840dk_nrf52840`) edit file located in `configuration/build-target/pm_static.yml`. 
+To modify flash settings of your board named by the _build-target_ (e.g.
+`nrf52840dk_nrf52840`) edit file located in
+`configuration/build-target/pm_static.yml`.
 
 <hr>
 
@@ -414,4 +454,7 @@ CHIP-enabled Thread network.
 
 ### Testing Device Firmware Upgrade
 
-Visit [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades) and read `Download the new image to a device` section to see how to upgrade your device firmware over Bluetooth LE using smartphone.
+Visit
+[FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
+and read `Download the new image to a device` section to see how to upgrade your
+device firmware over Bluetooth LE using smartphone.
