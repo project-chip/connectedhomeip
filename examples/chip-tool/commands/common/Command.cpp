@@ -18,6 +18,8 @@
 
 #include "Command.h"
 
+#include <interactionmodel/Delegate.h>
+
 #include <netdb.h>
 #include <sstream>
 #include <sys/socket.h>
@@ -25,6 +27,16 @@
 
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+
+Command::Command(const char * commandName) : mName(commandName) {}
+
+Command::~Command()
+{
+    if (mpIMDelegate != nullptr)
+    {
+        chip::Platform::Delete(mpIMDelegate);
+    }
+}
 
 bool Command::InitArguments(int argc, char ** argv)
 {
@@ -305,6 +317,14 @@ const char * Command::GetAttribute(void) const
     }
 
     return nullptr;
+}
+
+void Command::InitInteractionModelDelegate()
+{
+    VerifyOrReturn(mpIMDelegate == nullptr);
+    ChipToolInteractionModelDelegate * imDelegate = chip::Platform::New<ChipToolInteractionModelDelegate>();
+    imDelegate->SetCommandObject(this);
+    mpIMDelegate = imDelegate;
 }
 
 void Command::UpdateWaitForResponse(bool value)

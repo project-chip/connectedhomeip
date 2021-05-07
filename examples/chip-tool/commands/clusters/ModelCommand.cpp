@@ -41,11 +41,13 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    InitInteractionModelDelegate();
     mOpCredsIssuer.Initialize();
 
     chip::Controller::CommissionerInitParams initParams;
     initParams.storageDelegate                = &storage;
     initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
+    initParams.imDelegate                     = mpIMDelegate;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
