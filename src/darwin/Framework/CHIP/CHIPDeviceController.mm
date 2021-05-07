@@ -122,7 +122,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
 {
     __block BOOL commissionerInitialized = NO;
     dispatch_sync(_chipWorkQueue, ^{
@@ -133,7 +133,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
-        _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate, queue);
+        _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
         // initialize NodeID if needed
         [self _getControllerNodeId];
 
@@ -187,8 +187,6 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         _persistentStorageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
     } else {
-        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithFormat:@"%lld", _localDeviceId]];
-        [scanner scanHexLongLong:&_localDeviceId];
         CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }
     return [NSNumber numberWithUnsignedLongLong:_localDeviceId];

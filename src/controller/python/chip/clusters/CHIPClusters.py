@@ -481,6 +481,8 @@ class ChipClusters:
                 },
             },
             "OperationalCredentials": {
+                "RemoveAllFabrics": {
+                },
                 "RemoveFabric": {
                     "fabricId": "int",
                     "nodeId": "int",
@@ -1277,6 +1279,10 @@ class ChipClusters:
         )
     def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
+                device, ZCLendpoint, ZCLgroupid
+        )
+    def ClusterOperationalCredentials_CommandRemoveAllFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics(
                 device, ZCLendpoint, ZCLgroupid
         )
     def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: int, nodeId: int, vendorId: int):
@@ -2478,6 +2484,9 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
+        # Cluster OperationalCredentials Command RemoveAllFabrics
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command RemoveFabric
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.restype = ctypes.c_uint32

@@ -1616,7 +1616,7 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "GetFabricId",
+              "name": "SetFabric",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -1634,6 +1634,14 @@
             {
               "name": "RemoveFabric",
               "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveAllFabrics",
+              "code": 11,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -1667,7 +1675,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "GetFabricIdResponse",
+              "name": "SetFabricResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
