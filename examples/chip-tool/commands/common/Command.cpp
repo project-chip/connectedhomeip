@@ -18,6 +18,8 @@
 
 #include "Command.h"
 
+#include <interactionmodel/Delegate.h>
+
 #include <netdb.h>
 #include <sstream>
 #include <sys/socket.h>
@@ -26,12 +28,22 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
+Command::Command(const char * commandName) : mName(commandName) {}
+
+Command::~Command()
+{
+    if (mpIMDelegate != nullptr)
+    {
+        chip::Platform::Delete(mpIMDelegate);
+    }
+}
+
 bool Command::InitArguments(int argc, char ** argv)
 {
     bool isValidCommand = false;
     size_t argsCount    = mArgs.size();
 
-    VerifyOrExit(argsCount == (size_t)(argc),
+    VerifyOrExit(argsCount == (size_t) (argc),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %zu instead of %zu", argc, argsCount));
 
     for (size_t i = 0; i < argsCount; i++)
@@ -305,6 +317,14 @@ const char * Command::GetAttribute(void) const
     }
 
     return nullptr;
+}
+
+void Command::InitInteractionModelDelegate()
+{
+    VerifyOrReturn(mpIMDelegate == nullptr);
+    ChipToolInteractionModelDelegate * imDelegate = chip::Platform::New<ChipToolInteractionModelDelegate>();
+    imDelegate->SetCommandObject(this);
+    mpIMDelegate = imDelegate;
 }
 
 void Command::UpdateWaitForResponse(bool value)

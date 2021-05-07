@@ -39,6 +39,7 @@ executable("chip-tool") {
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/reporting/ReportingCommand.cpp",
     "config/PersistentStorage.cpp",
+    "interactionmodel/Delegate.cpp",
     "main.cpp",
   ]
 
