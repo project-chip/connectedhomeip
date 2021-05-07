@@ -232,9 +232,8 @@ CHIP_ERROR ReadHandler::ProcessEventPathList(EventPathList::Parser & aEventPathL
         err = path.GetEventId(&(clusterInfo.mEventId));
         SuccessOrExit(err);
         clusterInfo.mType = ClusterInfo::Type::kEventIdValid;
-        err = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
+        err               = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
         SuccessOrExit(err);
-
     }
 
     // if we have exhausted this container
