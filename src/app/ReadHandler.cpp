@@ -91,8 +91,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle aPayload)
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReportData, std::move(aPayload));
 exit:
     ChipLogFunctError(err);
     Shutdown();
