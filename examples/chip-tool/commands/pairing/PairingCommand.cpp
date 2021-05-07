@@ -25,6 +25,7 @@ using namespace ::chip;
 constexpr uint16_t kWaitDurationInSeconds     = 120;
 constexpr uint64_t kBreadcrumb                = 0;
 constexpr uint32_t kTimeoutMs                 = 6000;
+constexpr uint32_t kMsPerSecond               = 1000;
 constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
 CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
@@ -33,9 +34,12 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 
     chip::Controller::CommissionerInitParams params;
 
+    InitInteractionModelDelegate();
+
     params.storageDelegate              = &storage;
     params.mDeviceAddressUpdateDelegate = this;
     params.pairingDelegate              = this;
+    params.imDelegate                   = mpIMDelegate;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
@@ -83,6 +87,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     }
     WaitForResponse(kWaitDurationInSeconds);
+
+    SetupNetwork();
+
     ReleaseCallbacks();
 
     return err;
@@ -126,13 +133,13 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Pairing Success");
-        SetupNetwork();
     }
     else
     {
         ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
         SetCommandExitStatus(false);
     }
+    UpdateWaitForResponse(false);
 }
 
 void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
@@ -168,9 +175,15 @@ CHIP_ERROR PairingCommand::SetupNetwork()
 
         mCluster.Associate(mDevice, mEndpointId);
 
+        UpdateWaitForResponse(true);
         err = AddNetwork(mNetworkType);
         VerifyOrExit(err == CHIP_NO_ERROR,
                      ChipLogError(chipTool, "Setup failure! Error calling AddWiFiNetwork: %s", ErrorStr(err)));
+        WaitForResponse(kTimeoutMs / kMsPerSecond);
+
+        err = EnableNetwork();
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(chipTool, "Setup failure. Internal error calling EnableNetwork: %s", ErrorStr(err)));
         break;
     }
 
@@ -261,14 +274,6 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, uin
     //    command->SetCommandExitStatus(false);
     //    return;
     // }
-
-    CHIP_ERROR err = command->EnableNetwork();
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(chipTool, "Setup failure. Internal error calling EnableNetwork: %s", ErrorStr(err));
-        command->SetCommandExitStatus(false);
-        return;
-    }
 
     // When the accessory is configured as a SoftAP and WiFi is configured to an other network
     // there won't be any response since the WiFi network is changing.

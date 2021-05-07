@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <string>
+#include <thread>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
