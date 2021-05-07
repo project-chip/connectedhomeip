@@ -136,7 +136,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
     bool additionalPairing  = false;
     advertiseParameters.SetCommissioningMode(notYetCommissioned, additionalPairing);
 
-    char pairingInst[129];
+    char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
 
     uint8_t mac[8];
     advertiseParameters.SetMac(FillMAC(mac));
@@ -173,7 +173,7 @@ CHIP_ERROR Advertise(bool commissionableNode)
         advertiseParameters.SetDeviceType(chip::Optional<uint16_t>::Value(value));
     }
 
-    char deviceName[129];
+    char deviceName[chip::Mdns::kKeyDeviceNameMaxLength + 1];
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
     {

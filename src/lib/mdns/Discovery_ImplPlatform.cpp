@@ -111,6 +111,14 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
         {
             publisher->Advertise(publisher->mOperationalAdvertisingParams);
         }
+        if (publisher->mIsCommissionableNodePublishing)
+        {
+            publisher->Advertise(publisher->mCommissionableNodeAdvertisingParams);
+        }
+        if (publisher->mIsCommissionerPublishing)
+        {
+            publisher->Advertise(publisher->mCommissionerAdvertisingParams);
+        }
     }
     else
     {
@@ -141,25 +149,25 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
     // add newline to lengths for TXT entries
-    char discriminatorBuf[CHIP_MDNS_KEY_DISCRIMINATOR_MAXLENGTH + 1];
-    char vendorProductBuf[CHIP_MDNS_KEY_VENDOR_PRODUCT_MAXLENGTH + 1];
-    char commissioningModeBuf[CHIP_MDNS_KEY_COMMISSIONING_MODE_MAXLENGTH + 1];
-    char additionalPairingBuf[CHIP_MDNS_KEY_ADDITIONAL_PAIRING_MAXLENGTH + 1];
-    char deviceTypeBuf[CHIP_MDNS_KEY_DEVICE_TYPE_MAXLENGTH + 1];
-    char deviceNameBuf[CHIP_MDNS_KEY_DEVICE_NAME_MAXLENGTH + 1];
-    char rotatingIdBuf[CHIP_MDNS_KEY_ROTATING_ID_MAXLENGTH + 1];
-    char pairingHintBuf[CHIP_MDNS_KEY_PAIRING_HINT_MAXLENGTH + 1];
-    char pairingInstrBuf[CHIP_MDNS_KEY_PAIRING_INSTRUCTION_MAXLENGTH + 1];
+    char discriminatorBuf[kKeyDiscriminatorMaxLength + 1];
+    char vendorProductBuf[kKeyVendorProductMaxLength + 1];
+    char commissioningModeBuf[kKeyCommissioningModeMaxLength + 1];
+    char additionalPairingBuf[kKeyAdditionalPairingMaxLength + 1];
+    char deviceTypeBuf[kKeyDeviceTypeMaxLength + 1];
+    char deviceNameBuf[kKeyDeviceNameMaxLength + 1];
+    char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
+    char pairingHintBuf[kKeyPairingHintMaxLength + 1];
+    char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
     // size of textEntries array should be count of Bufs above
     TextEntry textEntries[9];
     size_t textEntrySize = 0;
     // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
-    char shortDiscriminatorSubtype[CHIP_MDNS_SUBTYPE_SHORT_DISCRIMINATOR_MAXLENGTH + 3]; // add
-    char longDiscriminatorSubtype[CHIP_MDNS_SUBTYPE_LONG_DISCRIMINATOR_MAXLENGTH + 3];
-    char vendorSubType[CHIP_MDNS_SUBTYPE_VENDOR_MAXLENGTH + 3];
-    char commissioningModeSubType[CHIP_MDNS_SUBTYPE_COMMISSIONING_MODE_MAXLENGTH+3;
-    char openWindowSubType[CHIP_MDNS_SUBTYPE_ADDITIONAL_PAIRING_MAXLENGTH+3];
-    char deviceTypeSubType[CHIP_MDNS_SUBTYPE_DEVICE_TYPE_MAXLENGTH+3];
+    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3]; // add
+    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 3];
+    char vendorSubType[kSubTypeVendorMaxLength + 3];
+    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength+3;
+    char openWindowSubType[kSubTypeAdditionalPairingMaxLength+3];
+    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength+3];
     // size of subTypes array should be count of SubTypes above
     const char * subTypes[6];
     size_t subTypeSize = 0;
@@ -282,6 +290,20 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     service.mAddressType   = Inet::kIPAddressType_Any;
     error                  = ChipMdnsPublishService(&service);
 
+    if (error == CHIP_NO_ERROR)
+    {
+        if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+        {
+            mCommissionableNodeAdvertisingParams = params;
+            mIsCommissionableNodePublishing      = true;
+        }
+        else
+        {
+            mCommissionerAdvertisingParams = params;
+            mIsCommissionerPublishing      = true;
+        }
+    }
+
 #ifdef DETAIL_LOGGING
     PrintEntries(&service);
     return error;
@@ -381,17 +403,25 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mAddressType = Inet::kIPAddressType_Any;
     error                = ChipMdnsPublishService(&service);
 
-    mIsOperationalPublishing = true;
+    if (error == CHIP_NO_ERROR)
+    {
+        mIsOperationalPublishing = true;
+    }
 
     return error;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 {
-    mIsOperationalPublishing        = false;
-    mIsCommissionableNodePublishing = false;
-    mIsCommissionerPublishing       = false;
-    return ChipMdnsStopPublish();
+    CHIP_ERROR error = ChipMdnsStopPublish();
+
+    if (error == CHIP_NO_ERROR)
+    {
+        mIsOperationalPublishing        = false;
+        mIsCommissionableNodePublishing = false;
+        mIsCommissionerPublishing       = false;
+    }
+    return error;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)

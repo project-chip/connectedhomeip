@@ -32,22 +32,22 @@ static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
 
-#define CHIP_MDNS_KEY_DISCRIMINATOR_MAXLENGTH 5
-#define CHIP_MDNS_KEY_VENDOR_PRODUCT_MAXLENGTH 11
-#define CHIP_MDNS_KEY_ADDITIONAL_PAIRING_MAXLENGTH 1
-#define CHIP_MDNS_KEY_COMMISSIONING_MODE_MAXLENGTH 1
-#define CHIP_MDNS_KEY_DEVICE_TYPE_MAXLENGTH 5
-#define CHIP_MDNS_KEY_DEVICE_NAME_MAXLENGTH 32
-#define CHIP_MDNS_KEY_ROTATING_ID_MAXLENGTH 100
-#define CHIP_MDNS_KEY_PAIRING_INSTRUCTION_MAXLENGTH 128
-#define CHIP_MDNS_KEY_PAIRING_HINT_MAXLENGTH 10
+static constexpr size_t kKeyDiscriminatorMaxLength      = 5;
+static constexpr size_t kKeyVendorProductMaxLength      = 11;
+static constexpr size_t kKeyAdditionalPairingMaxLength  = 1;
+static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength         = 5;
+static constexpr size_t kKeyDeviceNameMaxLength         = 32;
+static constexpr size_t kKeyRotatingIdMaxLength         = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength = 128;
+static constexpr size_t kKeyPairingHintMaxLength        = 10;
 
-#define CHIP_MDNS_SUBTYPE_SHORT_DISCRIMINATOR_MAXLENGTH 3
-#define CHIP_MDNS_SUBTYPE_LONG_DISCRIMINATOR_MAXLENGTH 4
-#define CHIP_MDNS_SUBTYPE_VENDOR_MAXLENGTH 5
-#define CHIP_MDNS_SUBTYPE_DEVICE_TYPE_MAXLENGTH 5
-#define CHIP_MDNS_SUBTYPE_COMMISSIONING_MODE_MAXLENGTH 1
-#define CHIP_MDNS_SUBTYPE_ADDITIONAL_PAIRING_MAXLENGTH 1
+static constexpr size_t kSubTypeShortDiscriminatorMaxLength = 3;
+static constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 4;
+static constexpr size_t kSubTypeVendorMaxLength             = 5;
+static constexpr size_t kSubTypeDeviceTypeMaxLength         = 5;
+static constexpr size_t kSubTypeCommissioningModeMaxLength  = 1;
+static constexpr size_t kSubTypeAdditionalPairingMaxLength  = 1;
 
 enum class CommssionAdvertiseMode : uint8_t
 {
@@ -174,21 +174,33 @@ public:
 
     CommissionAdvertisingParameters & SetDeviceName(Optional<const char *> deviceName)
     {
-        mDeviceName = deviceName;
+        if (deviceName.HasValue())
+        {
+            strncpy(sDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(sDeviceName)));
+            mDeviceName = Optional<const char *>::Value(static_cast<const char *>(sDeviceName));
+        }
         return *this;
     }
     Optional<const char *> GetDeviceName() const { return mDeviceName; }
 
     CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
     {
-        mRotatingId = rotatingId;
+        if (rotatingId.HasValue())
+        {
+            strncpy(sRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(sRotatingId)));
+            mRotatingId = Optional<const char *>::Value(static_cast<const char *>(sRotatingId));
+        }
         return *this;
     }
     Optional<const char *> GetRotatingId() const { return mRotatingId; }
 
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
-        mPairingInstr = pairingInstr;
+        if (pairingInstr.HasValue())
+        {
+            strncpy(sPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(sPairingInstr)));
+            mPairingInstr = Optional<const char *>::Value(static_cast<const char *>(sPairingInstr));
+        }
         return *this;
     }
     Optional<const char *> GetPairingInstr() const { return mPairingInstr; }
@@ -216,10 +228,16 @@ private:
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
     chip::Optional<uint16_t> mDeviceType;
-    chip::Optional<const char *> mDeviceName;
-    chip::Optional<const char *> mRotatingId;
-    chip::Optional<const char *> mPairingInstr;
     chip::Optional<uint16_t> mPairingHint;
+
+    char sDeviceName[kKeyDeviceNameMaxLength + 1];
+    chip::Optional<const char *> mDeviceName;
+
+    char sRotatingId[kKeyRotatingIdMaxLength + 1];
+    chip::Optional<const char *> mRotatingId;
+
+    char sPairingInstr[kKeyPairingInstructionMaxLength + 1];
+    chip::Optional<const char *> mPairingInstr;
 };
 
 /// Handles advertising of CHIP nodes

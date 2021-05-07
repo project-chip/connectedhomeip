@@ -35,7 +35,7 @@
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING
-#define DETAIL_LOGGING
+// #define DETAIL_LOGGING
 
 namespace chip {
 namespace Mdns {
@@ -638,7 +638,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
 FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertisingParameters & params)
 {
-    char txtVidPid[CHIP_MDNS_KEY_VENDOR_PRODUCT_MAXLENGTH + 4];
+    char txtVidPid[chip::Mdns::kKeyVendorProductMaxLength + 4];
     if (params.GetProductId().HasValue())
     {
         sprintf(txtVidPid, "VP=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
@@ -648,7 +648,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         sprintf(txtVidPid, "VP=%d", params.GetVendorId().Value());
     }
 
-    char txtDeviceType[CHIP_MDNS_KEY_DEVICE_TYPE_MAXLENGTH + 4];
+    char txtDeviceType[chip::Mdns::kKeyDeviceTypeMaxLength + 4];
     if (params.GetDeviceType().HasValue())
     {
         sprintf(txtDeviceType, "DT=%d", params.GetDeviceType().Value());
@@ -658,7 +658,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         txtDeviceType[0] = '\0';
     }
 
-    char txtDeviceName[CHIP_MDNS_KEY_DEVICE_NAME_MAXLENGTH + 4];
+    char txtDeviceName[chip::Mdns::kKeyDeviceNameMaxLength + 4];
     if (params.GetDeviceName().HasValue())
     {
         sprintf(txtDeviceName, "DN=%s", params.GetDeviceName().Value());
@@ -672,7 +672,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         // a discriminator always exists
-        char txtDiscriminator[CHIP_MDNS_KEY_DISCRIMINATOR_MAXLENGTH + 3];
+        char txtDiscriminator[chip::Mdns::kKeyDiscriminatorMaxLength + 3];
         sprintf(txtDiscriminator, "D=%d", params.GetLongDiscriminator());
 
         if (!params.GetVendorId().HasValue())
@@ -680,10 +680,10 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
             return AllocateQName(txtDiscriminator);
         }
 
-        char txtCommissioningMode[CHIP_MDNS_KEY_COMMISSIONING_MODE_MAXLENGTH + 4];
+        char txtCommissioningMode[chip::Mdns::kKeyCommissioningModeMaxLength + 4];
         sprintf(txtCommissioningMode, "CM=%d", params.GetCommissioningMode() ? 1 : 0);
 
-        char txtOpenWindowCommissioningMode[CHIP_MDNS_KEY_ADDITIONAL_PAIRING_MAXLENGTH + 4];
+        char txtOpenWindowCommissioningMode[chip::Mdns::kKeyAdditionalPairingMaxLength + 4];
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
             sprintf(txtOpenWindowCommissioningMode, "AP=1");
@@ -693,7 +693,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
             txtOpenWindowCommissioningMode[0] = '\0';
         }
 
-        char txtRotatingDeviceId[CHIP_MDNS_KEY_ROTATING_ID_MAXLENGTH + 4];
+        char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];
         if (params.GetRotatingId().HasValue())
         {
             sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId().Value());
@@ -703,7 +703,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
             txtRotatingDeviceId[0] = '\0';
         }
 
-        char txtPairingHint[CHIP_MDNS_KEY_PAIRING_HINT_MAXLENGTH + 4];
+        char txtPairingHint[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingHint().HasValue())
         {
             sprintf(txtPairingHint, "PH=%d", params.GetPairingHint().Value());
@@ -713,7 +713,7 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
             txtPairingHint[0] = '\0';
         }
 
-        char txtPairingInstr[CHIP_MDNS_KEY_PAIRING_INSTRUCTION_MAXLENGTH + 4];
+        char txtPairingInstr[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
         if (params.GetPairingInstr().HasValue())
         {
             sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr().Value());

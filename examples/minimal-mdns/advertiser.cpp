@@ -312,7 +312,7 @@ int main(int argc, char ** args)
 
     if (err != CHIP_NO_ERROR)
     {
-        fprintf(stderr, "FAILED to setup advertisement parameters err=%d\n", err);
+        fprintf(stderr, "FAILED to setup advertisement parameters err=%s\n", chip::ErrorStr(err));
         return 1;
     }
 

@@ -74,7 +74,11 @@ private:
 #endif
 
     OperationalAdvertisingParameters mOperationalAdvertisingParams;
-    bool mIsOperationalPublishing = false;
+    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
+    CommissionAdvertisingParameters mCommissionerAdvertisingParams;
+    bool mIsOperationalPublishing        = false;
+    bool mIsCommissionableNodePublishing = false;
+    bool mIsCommissionerPublishing       = false;
     uint64_t mCommissionInstanceName;
 
     bool mMdnsInitialized                = false;
