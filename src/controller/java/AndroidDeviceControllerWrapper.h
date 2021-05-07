@@ -39,6 +39,7 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
+    chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     // DevicePairingDelegate implementation
