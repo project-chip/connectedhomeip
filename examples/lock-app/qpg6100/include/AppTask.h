@@ -66,9 +66,10 @@ private:
     enum Function_t
     {
         kFunction_NoneSelected   = 0,
-        kFunction_SoftwareUpdate = 0,
-        kFunction_Joiner         = 1,
-        kFunction_FactoryReset   = 2,
+        kFunction_SoftwareUpdate = 1,
+        kFunction_Joiner         = 2,
+        kFunction_FactoryReset   = 3,
+        kFunction_StartBleAdv	 = 4,
 
         kFunction_Invalid
     } Function;
