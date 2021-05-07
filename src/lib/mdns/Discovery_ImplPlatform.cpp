@@ -138,8 +138,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     TextEntry textEntries[9];
     size_t textEntrySize = 0;
     // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
-    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3]; // add
-    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 3];
+    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3];
+    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 4];
     char vendorSubType[kSubTypeVendorMaxLength + 3];
     char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 3];
     char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 3];
@@ -284,8 +284,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
 #ifdef DETAIL_LOGGING
     PrintEntries(&service);
-    return error;
 #endif
+    return error;
 }
 
 #ifdef DETAIL_LOGGING
