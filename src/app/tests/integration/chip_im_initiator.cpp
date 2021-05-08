@@ -128,13 +128,17 @@ exit:
 
 CHIP_ERROR SendReadRequest(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    chip::EventNumber number = 0;
+    chip::app::EventPathParams eventPathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, kLivenessChangeEvent,
+                                               false /*not urgent*/);
+
     chip::app::AttributePathParams attributePathParams(chip::kTestDeviceNodeId, kTestEndpointId, kTestClusterId, 1, 0,
                                                        chip::app::AttributePathFlags::kFieldIdValid);
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, nullptr, 0, &attributePathParams, 1);
+    err = gpReadClient->SendReadRequest(chip::kTestDeviceNodeId, gAdminId, &eventPathParams, 1, &attributePathParams, 1, number);
     SuccessOrExit(err);
 
     if (err == CHIP_NO_ERROR)
@@ -265,9 +269,9 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
     }
 }
 
-CHIP_ERROR WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader)
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader)
 {
-    if (aAttributePathParams.mClusterId != kTestClusterId || aAttributePathParams.mEndpointId != kTestEndpointId)
+    if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
