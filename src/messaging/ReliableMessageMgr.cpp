@@ -26,7 +26,6 @@
 #include <messaging/ReliableMessageMgr.h>
 
 #include <messaging/ErrorCategory.h>
-#include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
@@ -39,7 +38,7 @@ namespace Messaging {
 
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
-ReliableMessageMgr::ReliableMessageMgr(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+ReliableMessageMgr::ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
@@ -351,11 +350,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     // over to someone else, and on failure it will no longer be available.
     msgId = entry->retainedBuf.GetMsgId();
 
-    const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
-    VerifyOrExit(dispatcher != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err =
-        dispatcher->ResendMessage(rc->GetExchangeContext()->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
+    err = rc->GetExchangeContext()->ResendMessage(std::move(entry->retainedBuf), &entry->retainedBuf);
     SuccessOrExit(err);
 
     // Update the counters

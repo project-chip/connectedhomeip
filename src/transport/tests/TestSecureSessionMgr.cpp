@@ -93,7 +93,7 @@ public:
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+    void OnSecureMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
                            SecureSessionMgr * mgr) override
     {

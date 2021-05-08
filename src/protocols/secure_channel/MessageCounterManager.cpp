@@ -184,7 +184,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
     Messaging::SendFlags sendFlags;
 
     // Create and initialize new exchange.
-    exchangeContext = mExchangeMgr->NewContext(session, this);
+    exchangeContext = mExchangeMgr->NewSecureContext(session, this);
     VerifyOrExit(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Allocate a buffer for the reply message.

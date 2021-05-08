@@ -41,11 +41,10 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer,
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>(mPeer), GetDestinationNodeId(), &mPairingLocalToPeer,
                                                       SecureSession::SessionRole::kInitiator, mSrcAdminId));
 
-    return mSecureSessionMgr.NewPairing(mPeer, GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder,
-                                        mDestAdminId);
+    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>(mPeer), GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder, mDestAdminId);
 }
 
 // Shutdown all layers, finalize operations
@@ -67,16 +66,19 @@ SecureSessionHandle MessagingContext::GetSessionPeerToLocal()
     return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegateBase * delegate)
+Messaging::ExchangeContext * MessagingContext::NewSecureExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionLocalToPeer(), delegate);
+    return mExchangeManager.NewSecureContext(GetSessionLocalToPeer(), delegate);
 }
 
-Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegateBase * delegate)
+Messaging::ExchangeContext * MessagingContext::NewSecureExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext(GetSessionPeerToLocal(), delegate);
+    return mExchangeManager.NewSecureContext(GetSessionPeerToLocal(), delegate);
+}
+
+Messaging::ExchangeContext * MessagingContext::NewUnsecureExchange(Messaging::ExchangeDelegate * delegate)
+{
+    return mExchangeManager.NewUnsecureContext(mPeer, delegate);
 }
 
 } // namespace Test

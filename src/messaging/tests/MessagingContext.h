@@ -79,8 +79,9 @@ public:
     SecureSessionHandle GetSessionLocalToPeer();
     SecureSessionHandle GetSessionPeerToLocal();
 
-    Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegateBase * delegate);
-    Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegateBase * delegate);
+    Messaging::ExchangeContext * NewSecureExchangeToPeer(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewSecureExchangeToLocal(Messaging::ExchangeDelegate * delegate);
+    Messaging::ExchangeContext * NewUnsecureExchange(Messaging::ExchangeDelegate * delegate);
 
     Credentials::OperationalCredentialSet & GetOperationalCredentialSet() { return mOperationalCredentialSet; }
 
@@ -93,7 +94,7 @@ private:
     NodeId mDestinationNodeId = 111222333;
     uint16_t mLocalKeyId      = 1;
     uint16_t mPeerKeyId       = 2;
-    Optional<Transport::PeerAddress> mPeer;
+    Transport::PeerAddress mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
     SecurePairingUsingTestSecret mPairingLocalToPeer;
     Transport::AdminPairingTable mAdmins;

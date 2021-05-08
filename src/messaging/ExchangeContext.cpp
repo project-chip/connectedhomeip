@@ -76,11 +76,13 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
-                                        const SendFlags & sendFlags)
+CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf, const SendFlags & sendFlags)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
+    bool reliableTransmissionRequested = true;
+    PayloadHeader payloadHeader;
+    ReliableMessageContext * reliableMessageContext = GetReliableMessageContext();
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -92,26 +94,25 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     Retain();
 
-    bool reliableTransmissionRequested = true;
-
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
-        reliableTransmissionRequested = false;
-    }
-    else
-    {
-        reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
-    }
+        Transport::Type transportType;
+        if (IsSecure()) {
+            state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(GetVariantSecure().mSecureSession);
+            VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
+            transportType = state->GetPeerAddress().GetTransportType();
+        } else {
+            transportType = GetVariantUnsecure().mPeerAddress.GetTransportType();
+        }
 
-    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
-    ApplicationExchangeDispatch defaultDispatch;
-
-    if (dispatch == nullptr)
-    {
-        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        dispatch = &defaultDispatch;
+        // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
+        if (transportType != Transport::Type::kUdp)
+        {
+            reliableTransmissionRequested = false;
+        }
+        else
+        {
+            reliableTransmissionRequested = !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+        }
     }
 
     // If a response message is expected...
@@ -130,8 +131,65 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
     }
 
-    err = dispatch->SendMessage(mSecureSession, mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+    payloadHeader.SetExchangeID(mExchangeId).SetMessageType(protocolId, msgType).SetInitiator(IsInitiator());
+
+    // If there is a pending acknowledgment piggyback it on this message.
+    if (reliableMessageContext->HasPeerRequestedAck())
+    {
+        payloadHeader.SetAckId(reliableMessageContext->GetPendingPeerAckId());
+
+        // Set AckPending flag to false since current outgoing message is going to serve as the ack on this exchange.
+        reliableMessageContext->SetAckPending(false);
+
+#if !defined(NDEBUG)
+        if (!payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))
+        {
+            ChipLogDetail(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
+                          reliableMessageContext->GetPendingPeerAckId());
+        }
+#endif
+    }
+
+    if (IsSecure()) {
+        // TODO: CRMP is only enabled for secure messages, it should be enabled for all messages in the future.
+        if (reliableMessageContext->AutoRequestAck() && reliableTransmissionRequested)
+        {
+            payloadHeader.SetNeedsAck(true);
+
+            ReliableMessageMgr::RetransTableEntry * entry = nullptr;
+
+            // Add to Table for subsequent sending
+            ReturnErrorOnFailure(mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(reliableMessageContext, &entry));
+
+            err = mExchangeMgr->GetSessionMgr()->SendMessage(GetVariantSecure().mSecureSession, payloadHeader, std::move(msgBuf), &entry->retainedBuf);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                // Remove from table
+                ChipLogError(ExchangeManager, "Failed to send message with err %s", ::chip::ErrorStr(err));
+                mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(*entry);
+                ReturnErrorOnFailure(err);
+            }
+            else
+            {
+                VerifyOrDie(!entry->retainedBuf.IsNull()); // if send success, then retainedBuf mustn't be empty
+                mExchangeMgr->GetReliableMessageMgr()->StartRetransmision(entry);
+            }
+        }
+        else
+        {
+            // If the channel itself is providing reliability, let's not request CRMP acks
+            payloadHeader.SetNeedsAck(false);
+            err = mExchangeMgr->GetSessionMgr()->SendMessage(GetVariantSecure().mSecureSession, payloadHeader, std::move(msgBuf), nullptr);
+        }
+    } else {
+        PacketHeader packetHeader;
+
+        ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
+        ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
+
+        err = mExchangeMgr->GetSessionMgr()->GetTransportManager()->SendMessage(GetVariantUnsecure().mPeerAddress, std::move(msgBuf));
+    }
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -148,6 +206,15 @@ exit:
     Release();
 
     return err;
+}
+
+CHIP_ERROR ExchangeContext::ResendMessage(EncryptedPacketBufferHandle message, EncryptedPacketBufferHandle * retainedMessage)
+{
+    if (IsSecure()) {
+        return mExchangeMgr->GetSessionMgr()->SendEncryptedMessage(GetVariantSecure().mSecureSession, std::move(message), retainedMessage);
+    } else {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 }
 
 void ExchangeContext::DoClose(bool clearRetransTable)
@@ -212,34 +279,20 @@ void ExchangeContext::Abort()
     Release();
 }
 
-void ExchangeContext::Reset()
+void ExchangeContextDeletor::Release(ExchangeContext * ec)
 {
-    *this = ExchangeContext();
+    ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, bool Initiator, ExchangeDelegate * delegate)
 {
-    if (mDelegate != nullptr)
-    {
-        return mDelegate->GetMessageDispatch(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-    }
+    VerifyOrDie(mExchangeMgr == nullptr);
 
-    return nullptr;
-}
-
-ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                         ExchangeDelegateBase * delegate)
-{
-    VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
-
-    Reset();
-    Retain();
     mExchangeMgr = em;
-    em->IncrementContextsInUse();
     mExchangeId    = ExchangeId;
-    mSecureSession = session;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
+
 
     SetDropAckDebug(false);
     SetAckPending(false);
@@ -248,43 +301,41 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()), em->GetContextsInUse(),
-                  this);
+    ChipLogDetail(ExchangeManager, "ec++ id: %d", ExchangeId);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
-
-    return this;
 }
 
-void ExchangeContext::Free()
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate) : ExchangeContext(em, ExchangeId, Initiator, delegate)
+{
+    mFlags.Set(Flags::kIsSecure, true);
+    mSession.Set<SecureSession>(session);
+}
+
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const Transport::PeerAddress & peerAddress, bool Initiator, ExchangeDelegate * delegate) : ExchangeContext(em, ExchangeId, Initiator, delegate)
+{
+    mFlags.Set(Flags::kIsSecure, false);
+    mSession.Set<UnsecureSession>(peerAddress);
+}
+
+ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
     // the boolean parameter passed to DoClose() should not matter.
-    ExchangeManager * em = mExchangeMgr;
 
     DoClose(false);
     mExchangeMgr = nullptr;
 
-    em->DecrementContextsInUse();
-
-    if (mExchangeACL != nullptr)
-    {
-        chip::Platform::Delete(mExchangeACL);
-        mExchangeACL = nullptr;
-    }
-
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
-                  mExchangeId, em->GetContextsInUse(), this);
+    ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader,
-                                    const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return
@@ -292,19 +343,40 @@ bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHea
         // The exchange identifier of the message matches the exchange identifier of the context.
         (mExchangeId == payloadHeader.GetExchangeID())
 
-        // AND The message was received from the peer node associated with the exchange
-        && (mSecureSession == session)
-
-        // AND The message's source Node ID matches the peer Node ID associated with the exchange, or the peer Node ID of the
-        // exchange is 'any'.
-        && ((mSecureSession.GetPeerNodeId() == kAnyNodeId) ||
-            (packetHeader.GetSourceNodeId().HasValue() && mSecureSession.GetPeerNodeId() == packetHeader.GetSourceNodeId().Value()))
-
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast
         //    case, the initiator is ill defined)
 
         && (payloadHeader.IsInitiator() != IsInitiator());
+}
+
+bool ExchangeContext::MatchSecureExchange(SecureSessionHandle session, const PacketHeader & packetHeader,
+                                    const PayloadHeader & payloadHeader)
+{
+    // A given message is part of a particular exchange if...
+    return
+        MatchExchange(payloadHeader)
+
+        && IsSecure()
+
+        // AND The message was received from the peer node associated with the exchange
+        && (GetSecureSession() == session)
+
+        // AND The message's source Node ID matches the peer Node ID associated with the exchange, or the peer Node ID of the
+        // exchange is 'any'.
+        && ((GetSecureSession().GetPeerNodeId() == kAnyNodeId) ||
+            (packetHeader.GetSourceNodeId().HasValue() && GetSecureSession().GetPeerNodeId() == packetHeader.GetSourceNodeId().Value()));
+}
+
+bool ExchangeContext::MatchUnsecureExchange(const Transport::PeerAddress & peerAddress, const PayloadHeader & payloadHeader)
+{
+    // A given message is part of a particular exchange if...
+    return
+        MatchExchange(payloadHeader)
+
+        && !IsSecure()
+
+        && peerAddress == GetVariantUnsecure().mPeerAddress;
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
@@ -341,7 +413,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeDelegateBase * delegate = ec->GetDelegate();
+    ExchangeDelegate * delegate = ec->GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)
@@ -351,24 +423,33 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                           const Transport::PeerAddress & peerAddress, PacketBufferHandle msgBuf)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     // We hold a reference to the ExchangeContext here to
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
     Retain();
 
-    ExchangeMessageDispatch * dispatch = GetMessageDispatch();
-    ApplicationExchangeDispatch defaultDispatch;
-
-    if (dispatch == nullptr)
+    ReliableMessageContext * reliableMessageContext = GetReliableMessageContext();
+    if (payloadHeader.IsAckMsg() && payloadHeader.GetAckId().HasValue())
     {
-        defaultDispatch.Init(mExchangeMgr->GetReliableMessageMgr(), mExchangeMgr->GetSessionMgr());
-        dispatch = &defaultDispatch;
+        SuccessOrExit(err = reliableMessageContext->HandleRcvdAck(payloadHeader.GetAckId().Value()));
     }
 
-    CHIP_ERROR err =
-        dispatch->OnMessageReceived(payloadHeader, packetHeader.GetMessageId(), peerAddress, GetReliableMessageContext());
-    SuccessOrExit(err);
+    if (payloadHeader.NeedsAck())
+    {
+        MessageFlags msgFlags;
+
+        // An acknowledgment needs to be sent back to the peer for this message on this exchange,
+        // Set the flag in message header indicating an ack requested by peer;
+        msgFlags.Set(MessageFlagValues::kPeerRequestedAck);
+
+        // Also set the flag in the exchange context indicating an ack requested;
+        reliableMessageContext->SetPeerRequestedAck(true);
+
+        SuccessOrExit(err = reliableMessageContext->HandleNeedsAck(packetHeader.GetMessageId(), msgFlags));
+    }
 
     // The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck))

@@ -75,8 +75,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     mNextExchangeId = GetRandU16();
     mNextKeyId      = 0;
 
-    mContextsInUse = 0;
-
     for (auto & handler : UMHandlerPool)
     {
         // Mark all handlers as unallocated.  This handles both initial
@@ -98,11 +96,11 @@ CHIP_ERROR ExchangeManager::Shutdown()
 {
     mReliableMessageMgr.Shutdown();
 
-    for (auto & ec : mContextPool)
-    {
-        // ExchangeContext leaked
-        assert(ec.GetReferenceCount() == 0);
-    }
+    mContextPool.ForEachActiveObject([] (auto * ec) {
+        // There should be no active object in the pool
+        assert(false);
+        return true;
+    });
 
     if (mSessionMgr != nullptr)
     {
@@ -115,18 +113,23 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate)
+ExchangeContext * ExchangeManager::NewSecureContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
-    return AllocContext(mNextExchangeId++, session, true, delegate);
+    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegateBase * delegate)
+ExchangeContext * ExchangeManager::NewUnsecureContext(Transport::PeerAddress peerAddress, ExchangeDelegate * delegate)
+{
+    return mContextPool.CreateObject(this, mNextExchangeId++, peerAddress, true, delegate);
+}
+
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, kAnyMessageType, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType,
-                                                                     ExchangeDelegateBase * delegate)
+                                                                     ExchangeDelegate * delegate)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), delegate);
 }
@@ -146,24 +149,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                                ExchangeDelegateBase * delegate)
-{
-    CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
-
-    for (auto & ec : mContextPool)
-    {
-        if (ec.GetReferenceCount() == 0)
-        {
-            return ec.Alloc(this, ExchangeId, session, Initiator, delegate);
-        }
-    }
-
-    ChipLogError(ExchangeManager, "Alloc ctxt FAILED");
-    return nullptr;
-}
-
-CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate)
+CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
 {
     UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
@@ -211,7 +197,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
     return CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER;
 }
 
-void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+void ExchangeManager::OnSecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, const Transport::PeerAddress & source,
                                         System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
@@ -224,22 +210,26 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     payloadHeader.GetProtocolID());
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    for (auto & ec : mContextPool)
-    {
-        if (ec.GetReferenceCount() > 0 && ec.MatchExchange(session, packetHeader, payloadHeader))
-        {
+    bool found = false;
+    mContextPool.ForEachActiveObject([&] (auto * ec) {
+        if (ec->MatchSecureExchange(session, packetHeader, payloadHeader)) {
             // Found a matching exchange. Set flag for correct subsequent CRMP
             // retransmission timeout selection.
-            if (!ec.HasRcvdMsgFromPeer())
+            if (!ec->HasRcvdMsgFromPeer())
             {
-                ec.SetMsgRcvdFromPeer(true);
+                ec->SetMsgRcvdFromPeer(true);
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec.HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
-
-            ExitNow(err = CHIP_NO_ERROR);
+            ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+            found = true;
+            return false;
         }
+        return true;
+    });
+
+    if (found) {
+        ExitNow(err = CHIP_NO_ERROR);
     }
 
     // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
@@ -289,17 +279,16 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             // If rcvd msg is from initiator then this exchange is created as not Initiator.
             // If rcvd msg is not from initiator then this exchange is created as Initiator.
             // TODO: Figure out which channel to use for the received message
-            ec = AllocContext(payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
+            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, !payloadHeader.IsInitiator(), nullptr);
         }
         else
         {
-            ec = AllocContext(payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
+            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
         }
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogDetail(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
-                      ec->GetDelegate());
+        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%x", ec->GetExchangeId(), ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
 
@@ -330,66 +319,134 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         mDelegate->OnConnectionExpired(session, this);
     }
 
-    for (auto & ec : mContextPool)
-    {
-        if (ec.GetReferenceCount() > 0 && ec.mSecureSession == session)
+    mContextPool.ForEachActiveObject([&] (auto * ec) {
+        if (ec->IsSecure() && ec->GetSecureSession() == session)
         {
-            ec.Close();
+            ec->Close();
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
-    }
+        return true;
+    });
 }
 
-void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
-    PacketHeader header;
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    UnsolicitedMessageHandler * umh         = nullptr;
+    UnsolicitedMessageHandler * matchingUMH = nullptr;
+    bool sendAckAndCloseExchange            = false;
 
-    ReturnOnFailure(header.DecodeAndConsume(msgBuf));
+    ChipLogProgress(ExchangeManager, "Received unsecure message of type %d and protocolId %d", payloadHeader.GetMessageType(),
+                    payloadHeader.GetProtocolID());
 
-    Optional<NodeId> peer = header.GetSourceNodeId();
-    if (!peer.HasValue())
-    {
-        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
-        source.ToString(addrBuffer, sizeof(addrBuffer));
-        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
-                     addrBuffer);
-        return;
+    // Search for an existing exchange that the message applies to. If a match is found...
+    bool found = false;
+    mContextPool.ForEachActiveObject([&] (auto * ec) {
+        if (ec->MatchUnsecureExchange(source, payloadHeader)) {
+            // Found a matching exchange. Set flag for correct subsequent CRMP
+            // retransmission timeout selection.
+            if (!ec->HasRcvdMsgFromPeer())
+            {
+                ec->SetMsgRcvdFromPeer(true);
+            }
+
+            // Matched ExchangeContext; send to message handler.
+            ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+            found = true;
+            return false;
+        }
+        return true;
+    });
+
+    if (found) {
+        ExitNow(err = CHIP_NO_ERROR);
     }
-}
 
-void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate)
-{
-    for (auto & ec : mContextPool)
+    // Search for an unsolicited message handler if it marked as being sent by an initiator. Since we didn't
+    // find an existing exchange that matches the message, it must be an unsolicited message. However all
+    // unsolicited messages must be marked as being from an initiator.
+    if (payloadHeader.IsInitiator())
     {
-        if (ec.GetReferenceCount() == 0 || ec.GetDelegate() != delegate)
+        // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
+        // handle the message type over handlers that handle all messages for a profile.
+        umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+
+        matchingUMH = nullptr;
+
+        for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            continue;
+            if (umh->IsInUse() && payloadHeader.HasProtocol(umh->ProtocolId))
+            {
+                if (umh->MessageType == payloadHeader.GetMessageType())
+                {
+                    matchingUMH = umh;
+                    break;
+                }
+
+                if (umh->MessageType == kAnyMessageType)
+                    matchingUMH = umh;
+            }
+        }
+    }
+    // Discard the message if it isn't marked as being sent by an initiator and the message does not need to send
+    // an ack to the peer.
+    else if (!payloadHeader.NeedsAck())
+    {
+        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
+    }
+
+    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
+    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
+    sendAckAndCloseExchange = payloadHeader.NeedsAck() && (matchingUMH == nullptr);
+
+    // If we found a handler or we need to create a new exchange context (EC).
+    if (matchingUMH != nullptr || sendAckAndCloseExchange)
+    {
+        ExchangeContext * ec = nullptr;
+
+        if (sendAckAndCloseExchange)
+        {
+            // If rcvd msg is from initiator then this exchange is created as not Initiator.
+            // If rcvd msg is not from initiator then this exchange is created as Initiator.
+            // TODO: Figure out which channel to use for the received message
+            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), source, !payloadHeader.IsInitiator(), nullptr);
+        }
+        else
+        {
+            ec = mContextPool.CreateObject(this, payloadHeader.GetExchangeID(), source, false, matchingUMH->Delegate);
         }
 
-        // Make sure to null out the delegate before closing the context, so
-        // we don't notify the delegate that the context is closing.  We
-        // have to do this, because the delegate might be partially
-        // destroyed by this point.
-        ec.SetDelegate(nullptr);
-        ec.Close();
+        VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+        ChipLogDetail(ExchangeManager, "ec id: %d, Delegate: 0x%x", ec->GetExchangeId(), ec->GetDelegate());
+
+        ec->HandleMessage(packetHeader, payloadHeader, source, std::move(msgBuf));
+
+        // Close exchange if it was created only to send ack for a duplicate message.
+        if (sendAckAndCloseExchange)
+            ec->Close();
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(ExchangeManager, "OnUnsecureMessageReceived failed, err = %s", ErrorStr(err));
     }
 }
 
-void ExchangeManager::IncrementContextsInUse()
+void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
 {
-    mContextsInUse++;
-}
-
-void ExchangeManager::DecrementContextsInUse()
-{
-    if (mContextsInUse >= 1)
-    {
-        mContextsInUse--;
-    }
-    else
-    {
-        ChipLogError(ExchangeManager, "No context in use, decrement failed");
-    }
+    mContextPool.ForEachActiveObject([&] (auto * ec) {
+        if (ec->GetDelegate() == delegate) {
+            // Make sure to null out the delegate before closing the context, so
+            // we don't notify the delegate that the context is closing.  We
+            // have to do this, because the delegate might be partially
+            // destroyed by this point.
+            ec->SetDelegate(nullptr);
+            ec->Close();
+        }
+        return true;
+    });
 }
 
 } // namespace Messaging

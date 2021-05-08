@@ -318,7 +318,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
     {
         PayloadHeader payloadHeader;
         ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress, std::move(msg), this);
+        mCB->OnUnsecureMessageReceived(packetHeader, payloadHeader, peerAddress, std::move(msg), this);
     }
 }
 
@@ -469,7 +469,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     if (mCB != nullptr)
     {
         SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, std::move(msg), this);
+        mCB->OnSecureMessageReceived(packetHeader, payloadHeader, session, peerAddress, std::move(msg), this);
     }
 
 exit:

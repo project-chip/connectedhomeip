@@ -62,6 +62,7 @@ public:
     void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
 
     uint32_t GetMsgId() const;
+    bool IsNull() const { return PacketBufferHandle::IsNull(); }
 
     /**
      * Creates a copy of the data in this packet.
@@ -123,9 +124,23 @@ public:
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
-    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+    virtual void OnSecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                    SecureSessionHandle session, const Transport::PeerAddress & source,
                                    System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+    {}
+
+    /**
+     * @brief
+     *   Called when a new message is received. The function must internally release the
+     *   msgBuf after processing it.
+     *
+     * @param packetHeader  The message header
+     * @param payloadHeader The payload header
+     * @param source        The sender's address
+     * @param msgBuf        The received message
+     * @param mgr           A pointer to the SecureSessionMgr
+     */
+    virtual void OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
