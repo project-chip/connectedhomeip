@@ -1155,8 +1155,6 @@ void CASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & p
         SuccessOrExit(err);
     }
 
-    mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());
-
     switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
     case Protocols::SecureChannel::MsgType::CASE_SigmaR1:

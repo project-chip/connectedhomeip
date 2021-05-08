@@ -68,7 +68,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, co
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession, this);
+    mExchangeCtx = mExchangeMgr->NewSecureContext(mSecureSession, this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

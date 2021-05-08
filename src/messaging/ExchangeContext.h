@@ -31,6 +31,7 @@
 #include <protocols/Protocols.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
+#include <support/Variant.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -55,7 +56,7 @@ public:
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
 class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
-                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -63,12 +64,25 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
+    // Create a secure ExchangeContext
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+
+    // Create an unsecure ExchangeContext
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const Transport::PeerAddress & peerAddress, bool Initiator, ExchangeDelegate * delegate);
+
+    ~ExchangeContext();
+
     /**
      *  Determine whether the context is the initiator of the exchange.
      *
      *  @return Returns 'true' if it is the initiator, else 'false'.
      */
     bool IsInitiator() const;
+
+    /**
+     *  Determine whether the context is secure.
+     */
+    bool IsSecure() const { return mFlags.Has(Flags::kIsSecure); }
 
     /**
      *  Send a CHIP message on this exchange.
@@ -106,6 +120,11 @@ public:
     }
 
     /**
+     * Resend a message which is already encrypted, used by CRMP retrans
+     */
+    CHIP_ERROR ResendMessage(EncryptedPacketBufferHandle message, EncryptedPacketBufferHandle * retainedMessage);
+
+    /**
      *  Handle a received CHIP message on this exchange.
      *
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
@@ -124,30 +143,32 @@ public:
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                              const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
 
-    ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
-    void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }
+    ExchangeDelegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch * GetMessageDispatch();
-
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
-        if (mExchangeACL == nullptr)
-        {
-            Transport::AdminPairingInfo * admin = table.FindAdminWithId(mSecureSession.GetAdminId());
-            if (admin != nullptr)
+        if (IsSecure()) {
+            if (GetVariantSecure().mExchangeACL == nullptr)
             {
-                mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                Transport::AdminPairingInfo * admin = table.FindAdminWithId(GetVariantSecure().mSecureSession.GetAdminId());
+                if (admin != nullptr)
+                {
+                    GetVariantSecure().mExchangeACL = chip::Platform::New<CASEExchangeACL>(admin);
+                }
             }
-        }
 
-        return mExchangeACL;
+            return GetVariantSecure().mExchangeACL;
+        } else {
+            return nullptr;
+        }
     }
 
-    SecureSessionHandle GetSecureSession() { return mSecureSession; }
+    SecureSessionHandle GetSecureSession() { return GetVariantSecure().mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -163,17 +184,48 @@ public:
 
 private:
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeDelegateBase * mDelegate = nullptr;
+    ExchangeDelegate * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr   = nullptr;
-    ExchangeACL * mExchangeACL       = nullptr;
 
-    SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
 
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            ExchangeDelegateBase * delegate);
-    void Free();
-    void Reset();
+    struct SecureSession {
+        static constexpr const size_t VariantId = 1;
+
+        SecureSession(SecureSessionHandle session) : mExchangeACL(nullptr), mSecureSession(session) {}
+
+        ~SecureSession() {
+            if (mExchangeACL != nullptr)
+            {
+                chip::Platform::Delete(mExchangeACL);
+                mExchangeACL = nullptr;
+            }
+        }
+
+        ExchangeACL * mExchangeACL;
+        const SecureSessionHandle mSecureSession;
+    };
+
+    struct UnsecureSession {
+        static constexpr const size_t VariantId = 2;
+        UnsecureSession(const Transport::PeerAddress & peerAddress) : mPeerAddress(peerAddress) {}
+        const Transport::PeerAddress mPeerAddress;
+    };
+
+    Variant<SecureSession, UnsecureSession> mSession;
+
+    SecureSession & GetVariantSecure() {
+        assert(IsSecure());
+        return mSession.Get<SecureSession>();
+    }
+
+    UnsecureSession & GetVariantUnsecure() {
+        assert(!IsSecure());
+        return mSession.Get<UnsecureSession>();
+    }
+
+    // Base constructor
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, bool Initiator, ExchangeDelegate * delegate);
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -194,19 +246,9 @@ private:
      */
     void SetResponseExpected(bool inResponseExpected);
 
-    /**
-     *  Search for an existing exchange that the message applies to.
-     *
-     *  @param[in]    session       The secure session of the received message.
-     *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
-     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *
-     *  @retval  true                                       If a match is found.
-     *  @retval  false                                      If a match is not found.
-     */
-    bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(const PayloadHeader & payloadHeader);
+    bool MatchSecureExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchUnsecureExchange(const Transport::PeerAddress & peerAddress, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
 
@@ -215,11 +257,6 @@ private:
 
     void DoClose(bool clearRetransTable);
 };
-
-inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
-{
-    obj->Free();
-}
 
 } // namespace Messaging
 } // namespace chip

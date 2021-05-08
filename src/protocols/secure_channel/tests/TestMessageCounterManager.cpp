@@ -123,7 +123,7 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
     System::PacketBufferHandle msgBuf = MessagePacketBuffer::NewWithData(PAYLOAD, payload_len);
     NL_TEST_ASSERT(inSuite, !msgBuf.IsNull());
 
-    Messaging::ExchangeContext * ec = ctx.NewExchangeToPeer(nullptr);
+    Messaging::ExchangeContext * ec = ctx.NewSecureExchangeToPeer(nullptr);
     NL_TEST_ASSERT(inSuite, ec != nullptr);
 
     err = ec->SendMessage(chip::Protocols::Echo::MsgType::EchoRequest, std::move(msgBuf),

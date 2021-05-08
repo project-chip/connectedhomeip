@@ -178,7 +178,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
 
-    exchangeContext = mExchangeMgr->NewContext(session, this);
+    exchangeContext = mExchangeMgr->NewSecureContext(session, this);
     VerifyOrExit(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf = MessagePacketBuffer::New(kChallengeSize);
