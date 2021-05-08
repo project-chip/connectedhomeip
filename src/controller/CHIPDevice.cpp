@@ -41,6 +41,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
+#include <protocols/service_provisioning/ServiceProvisioning.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -313,7 +314,7 @@ CHIP_ERROR Device::OpenPairingWindow(uint32_t timeout, PairingWindowOption optio
     System::PacketBufferHandle outBuffer;
     ReturnErrorOnFailure(writer.Finalize(&outBuffer));
 
-    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::Id, 0, std::move(outBuffer)));
+    ReturnErrorOnFailure(SendMessage(Protocols::ServiceProvisioning::MsgType::ServiceProvisioningRequest, std::move(outBuffer)));
 
     setupPayload.version               = 0;
     setupPayload.rendezvousInformation = RendezvousInformationFlags(RendezvousInformationFlag::kBLE);

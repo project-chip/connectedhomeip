@@ -25,6 +25,7 @@
  */
 
 #include <controller/CHIPCluster.h>
+#include <protocols/temp_zcl/TempZCL.h>
 
 namespace chip {
 namespace Controller {
@@ -57,7 +58,7 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
         mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
     }
 
-    err = mDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(payload));
+    err = mDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(payload));
     SuccessOrExit(err);
 
 exit:
