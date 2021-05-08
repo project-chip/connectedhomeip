@@ -32,25 +32,30 @@ namespace {
 
 enum class AdvertisingMode
 {
-    kCommisioning,
+    kCommissionableNode,
     kOperational,
-    kCommisionable,
+    kCommissioner,
 };
 
 struct Options
 {
     bool enableIpV4                 = false;
-    AdvertisingMode advertisingMode = AdvertisingMode::kCommisioning;
+    AdvertisingMode advertisingMode = AdvertisingMode::kCommissionableNode;
 
-    // commisioning/commisionable params
-    uint8_t shortDiscriminator = 52;
-    uint16_t longDiscriminator = 840;
+    // commissionable node / commissioner params
     Optional<uint16_t> vendorId;
     Optional<uint16_t> productId;
+    Optional<uint16_t> deviceType;
+    Optional<const char *> deviceName;
 
-    // commisionable params
+    // commisionable node params
+    uint8_t shortDiscriminator       = 52;
+    uint16_t longDiscriminator       = 840;
+    bool commissioningMode           = false;
+    bool commissioningModeOpenWindow = false;
+    Optional<const char *> rotatingId;
     Optional<const char *> pairingInstr;
-    Optional<uint8_t> pairingHint;
+    Optional<uint16_t> pairingHint;
 
     // operational params
     uint64_t fabricId = 12345;
@@ -70,6 +75,11 @@ constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used b
 constexpr uint16_t kOptionCommisioningProductId          = 'p';
 constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
 constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
+constexpr uint16_t kOptionCommisioningDeviceType         = 0x400;
+constexpr uint16_t kOptionCommisioningDeviceName         = 0x500;
+constexpr uint16_t kOptionCommisioningMode               = 0x600;
+constexpr uint16_t kOptionCommisioningModeOpenWindow     = 0x700;
+constexpr uint16_t kOptionCommisioningRotatingId         = 0x800;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
@@ -86,13 +96,13 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         {
             gOptions.advertisingMode = AdvertisingMode::kOperational;
         }
-        else if (strcmp(aValue, "commisioning") == 0)
+        else if (strcmp(aValue, "commissionable-node") == 0)
         {
-            gOptions.advertisingMode = AdvertisingMode::kCommisioning;
+            gOptions.advertisingMode = AdvertisingMode::kCommissionableNode;
         }
-        else if (strcmp(aValue, "commisionable") == 0)
+        else if (strcmp(aValue, "commissioner") == 0)
         {
-            gOptions.advertisingMode = AdvertisingMode::kCommisionable;
+            gOptions.advertisingMode = AdvertisingMode::kCommissioner;
         }
         else
         {
@@ -113,11 +123,26 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionCommisioningProductId:
         gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
+    case kOptionCommisioningMode:
+        gOptions.commissioningMode = true;
+        return true;
+    case kOptionCommisioningModeOpenWindow:
+        gOptions.commissioningModeOpenWindow = true;
+        return true;
+    case kOptionCommisioningDeviceType:
+        gOptions.deviceType = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
+        return true;
+    case kOptionCommisioningDeviceName:
+        gOptions.deviceName = Optional<const char *>::Value(static_cast<const char *>(aValue));
+        return true;
+    case kOptionCommisioningRotatingId:
+        gOptions.rotatingId = Optional<const char *>::Value(static_cast<const char *>(aValue));
+        return true;
     case kOptionCommisioningPairingInstr:
         gOptions.pairingInstr = Optional<const char *>::Value(static_cast<const char *>(aValue));
         return true;
     case kOptionCommisioningPairingHint:
-        gOptions.pairingHint = Optional<uint8_t>::Value(static_cast<uint8_t>(atoi(aValue)));
+        gOptions.pairingHint = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
         if (sscanf(aValue, "%" SCNx64, &gOptions.fabricId) != 1)
@@ -149,6 +174,11 @@ OptionDef cmdLineOptionsDef[] = {
     { "long-discriminator", kArgumentRequired, kOptionCommisioningLongDiscriminaotr },
     { "vendor-id", kArgumentRequired, kOptionCommisioningVendorId },
     { "product-id", kArgumentRequired, kOptionCommisioningProductId },
+    { "commissioning-mode-enabled", kNoArgument, kOptionCommisioningMode },
+    { "commissioning-mode-open-window", kNoArgument, kOptionCommisioningModeOpenWindow },
+    { "device-type", kArgumentRequired, kOptionCommisioningDeviceType },
+    { "device-name", kArgumentRequired, kOptionCommisioningDeviceName },
+    { "rotating-id", kArgumentRequired, kOptionCommisioningRotatingId },
     { "pairing-instruction", kArgumentRequired, kOptionCommisioningPairingInstr },
     { "pairing-hint", kArgumentRequired, kOptionCommisioningPairingHint },
 
@@ -165,7 +195,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
 #endif
                              "  -m <mode>\n"
                              "  --advertising-mode <mode>\n"
-                             "        Advertise in this mode (operational or commisioning or commisionable).\n"
+                             "        Advertise in this mode (operational or commissionable-node or commissioner).\n"
                              "  --short-discriminator <value>\n"
                              "  -s <value>\n"
                              "        Commisioning/commisionable short discriminator.\n"
@@ -177,6 +207,16 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
                              "        Commisioning/commisionable product id.\n"
+                             "  --commissioning-mode-enabled\n"
+                             "        Commissioning Mode Enabled.\n"
+                             "  --commissioning-mode-open-window\n"
+                             "        Commissioning Mode as a result of Open Commissioning Window.\n"
+                             "  --device-type <value>\n"
+                             "        Device type id.\n"
+                             "  --device-name <value>\n"
+                             "        Name of device.\n"
+                             "  --rotating-id <value>\n"
+                             "        Rotating Id.\n"
                              "  --pairing-instruction <value>\n"
                              "        Commisionable pairing instruction.\n"
                              "  --pairing-hint <value>\n"
@@ -222,16 +262,24 @@ int main(int argc, char ** args)
 
     CHIP_ERROR err;
 
-    if (gOptions.advertisingMode == AdvertisingMode::kCommisioning)
+    if (gOptions.advertisingMode == AdvertisingMode::kCommissionableNode)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommissionAdvertisingParameters()
-                                                                      .EnableIpV4(gOptions.enableIpV4)
-                                                                      .SetPort(CHIP_PORT)
-                                                                      .SetShortDiscriminator(gOptions.shortDiscriminator)
-                                                                      .SetLongDiscrimininator(gOptions.longDiscriminator)
-                                                                      .SetMac(chip::ByteSpan(gOptions.mac, 6))
-                                                                      .SetVendorId(gOptions.vendorId)
-                                                                      .SetProductId(gOptions.productId));
+        printf("Advertise Commissionable Node\n");
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
+            chip::Mdns::CommissionAdvertisingParameters()
+                .EnableIpV4(gOptions.enableIpV4)
+                .SetPort(CHIP_PORT)
+                .SetShortDiscriminator(gOptions.shortDiscriminator)
+                .SetLongDiscrimininator(gOptions.longDiscriminator)
+                .SetMac(chip::ByteSpan(gOptions.mac, 6))
+                .SetVendorId(gOptions.vendorId)
+                .SetProductId(gOptions.productId)
+                .SetCommissioningMode(gOptions.commissioningMode, gOptions.commissioningModeOpenWindow)
+                .SetDeviceType(gOptions.deviceType)
+                .SetDeviceName(gOptions.deviceName)
+                .SetRotatingId(gOptions.rotatingId)
+                .SetPairingInstr(gOptions.pairingInstr)
+                .SetPairingHint(gOptions.pairingHint));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
     {
@@ -242,19 +290,19 @@ int main(int argc, char ** args)
                 .SetMac(chip::ByteSpan(gOptions.mac, 6))
                 .SetPeerId(PeerId().SetFabricId(gOptions.fabricId).SetNodeId(gOptions.nodeId)));
     }
-    else if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
+    else if (gOptions.advertisingMode == AdvertisingMode::kCommissioner)
     {
+        printf("Advertise Commissioner\n");
         err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(
             chip::Mdns::CommissionAdvertisingParameters()
                 .EnableIpV4(gOptions.enableIpV4)
                 .SetPort(CHIP_PORT)
-                .SetShortDiscriminator(gOptions.shortDiscriminator)
-                .SetLongDiscrimininator(gOptions.longDiscriminator)
+                .SetMac(chip::ByteSpan(gOptions.mac, 6))
                 .SetVendorId(gOptions.vendorId)
                 .SetProductId(gOptions.productId)
-                .SetPairingInstr(gOptions.pairingInstr)
-                .SetPairingHint(gOptions.pairingHint)
-                .SetCommissionAdvertiseMode(chip::Mdns::CommssionAdvertiseMode::kCommissionable));
+                .SetDeviceType(gOptions.deviceType)
+                .SetDeviceName(gOptions.deviceName)
+                .SetCommissionAdvertiseMode(chip::Mdns::CommssionAdvertiseMode::kCommissioner));
     }
     else
     {
@@ -264,7 +312,7 @@ int main(int argc, char ** args)
 
     if (err != CHIP_NO_ERROR)
     {
-        fprintf(stderr, "FAILED to setup advertisement parameters\n");
+        fprintf(stderr, "FAILED to setup advertisement parameters err=%s\n", chip::ErrorStr(err));
         return 1;
     }
 

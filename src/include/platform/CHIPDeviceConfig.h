@@ -620,6 +620,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+ *
+ * Enable MDNS commissionable node advertising when not yet provisioned.
+ *
+ * This should be 1 for WiFi SoftAP devices, ethernet devices, and (probably) bridge devices
+ *
+ * This should be 0 for Thread/BLE devices and WiFi/BLE devices
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
  *
  * Enable support to DNS-SD SRP client usage for service advertising and discovery in CHIP.
@@ -1052,4 +1065,126 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
+#endif
+
+// -------------------- Device DNS-SD Advertising Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+ *
+ * Enable or disable whether this device advertises as a commissioner.
+ *
+ * For Video Players, this value will be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+ *
+ * Enable or disable whether this device advertises when not in commissioning mode.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
+ *
+ * Enable or disable including device type in commissionable node discovery.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_TYPE
+ *
+ * Type of device using the CHIP Device Type Identifier.
+ *
+ * Examples:
+ * 0xFFFF = 65535 = Invalid Device Type
+ * 0x0051 = 81 = Smart Plug
+ * 0x0022 = 34 = Speaker
+ * 0x0023 = 35 = Video Player
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_TYPE
+#define CHIP_DEVICE_CONFIG_DEVICE_TYPE 65535 // 65535 = Invalid Device Type
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME
+ *
+ * Enable or disable including device name in commissionable node discovery.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_NAME
+ *
+ * Name of device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_NAME
+#define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test Kitchen"
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT
+ *
+ * Pairing Hint, bitmap value of methods to put device into pairing mode
+ * when it has not yet been commissioned.
+ *
+ * Bits:
+ * 0 - Power Cycle
+ * 5 - See Device Manual
+ */
+#ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT
+#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_HINT                                                                                    \
+    (1 << CHIP_COMMISSIONING_HINT_INDEX_POWER_CYCLE | 1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_MANUAL)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION
+ *
+ * Pairing Instruction, when device has not yet been commissioned
+ *
+ * Meaning is depedent upon pairing hint value.
+ */
+#ifndef CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION
+#define CHIP_DEVICE_CONFIG_PAIRING_INITIAL_INSTRUCTION ""
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT
+ *
+ * Pairing Hint, bitmap value of methods to put device into pairing mode
+ * when it has already been commissioned.
+ *
+ * Bits:
+ * 2 - Visit Administrator UX (always true for secondary)
+ * 5 - See Device Manual
+ */
+#ifndef CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT
+#define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_HINT                                                                                  \
+    (1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_ADMINISTRATOR_UX | 1 << CHIP_COMMISSIONING_HINT_INDEX_SEE_MANUAL)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION
+ *
+ * Pairing Instruction, when device has not yet been commissioned
+ *
+ * Meaning is depedent upon pairing hint value.
+ */
+#ifndef CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION
+#define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
