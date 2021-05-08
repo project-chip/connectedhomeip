@@ -91,7 +91,7 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 
     // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::EFR32Config::RepackNvm3Flash();
+    DeviceLayer::Internal::EFR32Config::RepackNvm3Flash();
 }
 
 // ================================================================================

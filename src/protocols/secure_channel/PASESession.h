@@ -32,9 +32,7 @@
 #endif
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
-#include <messaging/ExchangeMessageDispatch.h>
 #include <protocols/secure_channel/Constants.h>
-#include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PairingSession.h>
@@ -68,7 +66,7 @@ struct PASESessionSerializable
 
 typedef uint8_t PASEVerifier[2][kSpake2p_WS_Length];
 
-class DLL_EXPORT PASESession : public Messaging::ExchangeDelegateBase, public PairingSession
+class DLL_EXPORT PASESession : public Messaging::ExchangeDelegate, public PairingSession
 {
 public:
     PASESession();
@@ -199,8 +197,6 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     /**
      * @brief
@@ -227,12 +223,6 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SecureSessionMgr * sessionMgr) override
-    {
-        return &mMessageDispatch;
-    }
 
 private:
     enum Spake2pErrorType : uint8_t
@@ -287,8 +277,6 @@ private:
     uint8_t * mSalt          = nullptr;
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct Spake2pErrorMsg
     {

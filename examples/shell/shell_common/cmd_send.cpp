@@ -142,7 +142,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     }
 
     // Create a new exchange context.
-    gExchangeCtx = gExchangeManager.NewContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
+    gExchangeCtx = gExchangeManager.NewSecureContext({ kTestDeviceNodeId, 0, gAdminId }, &gMockAppDelegate);
     VerifyOrExit(gExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     size = gSendArguments.GetPayloadSize();

@@ -109,7 +109,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 
     err = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    Messaging::ExchangeContext * exchangeCtx = gExchangeManager.NewSecureContext({ 0, 0, 0 }, nullptr);
     TestExchangeDelegate delegate;
     exchangeCtx->SetDelegate(&delegate);
 

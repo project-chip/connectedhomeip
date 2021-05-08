@@ -94,7 +94,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToLocal(&mockAppDelegate);
+    ExchangeContext * ec1 = ctx.NewSecureExchangeToLocal(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
@@ -103,7 +103,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerKeyID() == ctx.GetLocalKeyId());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
-    ExchangeContext * ec2 = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * ec2 = ctx.NewSecureExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetPeerConnectionState(ec2->GetSecureSession());
@@ -148,7 +148,7 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 
     // create solicited exchange
     MockAppDelegate mockSolicitedAppDelegate;
-    ExchangeContext * ec1 = ctx.NewExchangeToPeer(&mockSolicitedAppDelegate);
+    ExchangeContext * ec1 = ctx.NewSecureExchangeToPeer(&mockSolicitedAppDelegate);
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;

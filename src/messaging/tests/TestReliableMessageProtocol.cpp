@@ -108,7 +108,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewSecureExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -133,7 +133,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewSecureExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -166,7 +166,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockSender;
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    ExchangeContext * exchange = ctx.NewSecureExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
@@ -205,7 +205,7 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
+    ExchangeContext * exchange = ctx.NewSecureExchangeToPeer(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();

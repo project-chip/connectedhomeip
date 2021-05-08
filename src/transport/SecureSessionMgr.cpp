@@ -302,18 +302,18 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
     }
     else
     {
-        MessageDispatch(packetHeader, peerAddress, std::move(msg));
+        UnsecureMessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
 }
 
-void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle && msg)
+void SecureSessionMgr::UnsecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                               System::PacketBufferHandle && msg)
 {
     if (mCB != nullptr)
     {
         PayloadHeader payloadHeader;
         ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
-        mCB->OnMessageReceived(packetHeader, payloadHeader, SecureSessionHandle(), peerAddress, std::move(msg), this);
+        mCB->OnUnsecureMessageReceived(packetHeader, payloadHeader, peerAddress, std::move(msg), this);
     }
 }
 
@@ -464,7 +464,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     if (mCB != nullptr)
     {
         SecureSessionHandle session(state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId());
-        mCB->OnMessageReceived(packetHeader, payloadHeader, session, peerAddress, std::move(msg), this);
+        mCB->OnSecureMessageReceived(packetHeader, payloadHeader, session, peerAddress, std::move(msg), this);
     }
 
 exit:

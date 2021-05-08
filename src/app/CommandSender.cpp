@@ -50,11 +50,11 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     // TODO: Hard code keyID to 0 to unblock IM end-to-end test. Complete solution is tracked in issue:4451
     if (secureSession == nullptr)
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, 0, aAdminId }, this);
+        mpExchangeCtx = mpExchangeMgr->NewSecureContext({ aNodeId, 0, aAdminId }, this);
     }
     else
     {
-        mpExchangeCtx = mpExchangeMgr->NewContext(*secureSession, this);
+        mpExchangeCtx = mpExchangeMgr->NewSecureContext(*secureSession, this);
     }
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeoutMsec);

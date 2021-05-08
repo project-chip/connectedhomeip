@@ -66,7 +66,7 @@ CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
 
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, nullptr);
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewSecureContext(mSecureSession, nullptr);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (!loadedSecureSession)
@@ -403,11 +403,8 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
 
 CHIP_ERROR Device::EstablishCASESession()
 {
-    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewUnsecureContext(mDeviceAddress, &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
-
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
-    mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
 
     ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, 0, exchange, this));
 

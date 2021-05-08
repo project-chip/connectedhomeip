@@ -38,7 +38,7 @@ void ChannelContext::Start(const ChannelBuilder & builder)
 ExchangeContext * ChannelContext::NewExchange(ExchangeDelegate * delegate)
 {
     assert(GetState() == ChannelState::kReady);
-    return mExchangeManager->NewContext(GetReadyVars().mSession, delegate);
+    return mExchangeManager->NewSecureContext(GetReadyVars().mSession, delegate);
 }
 
 bool ChannelContext::MatchNodeId(NodeId nodeId)
@@ -258,12 +258,13 @@ void ChannelContext::EnterCasePairingState()
     auto & prepare              = GetPrepareVars();
     prepare.mCasePairingSession = Platform::New<CASESession>();
 
-    ExchangeContext * ctxt = mExchangeManager->NewContext(SecureSessionHandle(), prepare.mCasePairingSession);
-    VerifyOrReturn(ctxt != nullptr);
-
     // TODO: currently only supports IP/UDP paring
     Transport::PeerAddress addr;
     addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(prepare.mAddress);
+
+    ExchangeContext * ctxt = mExchangeManager->NewUnsecureContext(addr, prepare.mCasePairingSession);
+    VerifyOrReturn(ctxt != nullptr);
+
     CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, &prepare.mBuilder.GetOperationalCredentialSet(),
                                                                    prepare.mBuilder.GetPeerNodeId(),
                                                                    mExchangeManager->GetNextKeyId(), ctxt, this);

@@ -219,6 +219,10 @@ protected:
 
         /// When set, signifies that at least one message has been received from peer on this exchange context.
         kFlagMsgRcvdFromPeer = 0x0080,
+
+        /// When set, the exchange context is handling secure messages, otherwise it is handling unsecure messages.
+        /// do not allow mixing secure and unsecure messaging in a single exchange
+        kIsSecure = 0x0100,
     };
 
     BitFlags<Flags> mFlags; // Internal state flags

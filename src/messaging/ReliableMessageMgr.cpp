@@ -26,7 +26,6 @@
 #include <messaging/ReliableMessageMgr.h>
 
 #include <messaging/ErrorCategory.h>
-#include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
@@ -351,11 +350,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     // over to someone else, and on failure it will no longer be available.
     msgId = entry->retainedBuf.GetMsgId();
 
-    const ExchangeMessageDispatch * dispatcher = rc->GetExchangeContext()->GetMessageDispatch();
-    VerifyOrExit(dispatcher != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err =
-        dispatcher->ResendMessage(rc->GetExchangeContext()->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
+    err = rc->GetExchangeContext()->ResendMessage(std::move(entry->retainedBuf), &entry->retainedBuf);
     SuccessOrExit(err);
 
     // Update the counters

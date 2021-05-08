@@ -59,7 +59,6 @@
 
 using namespace ::chip;
 using namespace ::chip::Inet;
-using namespace ::chip::DeviceLayer;
 
 #define UNUSED_PARAMETER(a) (a = a)
 
@@ -83,7 +82,7 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 
     // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::EFR32Config::RepackNvm3Flash();
+    DeviceLayer::Internal::EFR32Config::RepackNvm3Flash();
 }
 
 // ================================================================================
@@ -109,7 +108,7 @@ int main(void)
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    ret = PlatformMgr().InitChipStack();
+    ret = DeviceLayer::PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
@@ -118,14 +117,14 @@ int main(void)
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LOCK");
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
-    ret = ThreadStackMgr().InitThreadStack();
+    ret = DeviceLayer::ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("ThreadStackMgr().InitThreadStack() failed");
         appError(ret);
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+    ret = DeviceLayer::ConnectivityMgr().SetThreadDeviceType(DeviceLayer::ConnectivityManager::kThreadDeviceType_Router);
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -134,7 +133,7 @@ int main(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
     EFR32_LOG("Starting Platform Manager Event Loop");
-    ret = PlatformMgr().StartEventLoopTask();
+    ret = DeviceLayer::PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("PlatformMgr().StartEventLoopTask() failed");
@@ -145,7 +144,7 @@ int main(void)
     EFR32_LOG("Starting OpenThread task");
 
     // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
+    ret = DeviceLayer::ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("ThreadStackMgr().StartThreadTask() failed");
