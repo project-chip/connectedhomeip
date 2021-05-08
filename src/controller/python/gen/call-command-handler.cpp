@@ -1456,6 +1456,7 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
         case ZCL_OP_CSR_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             chip::ByteSpan CSR;
+            uint32_t CSRLen;
             chip::ByteSpan CSRNonce;
             chip::ByteSpan VendorReserved1;
             chip::ByteSpan VendorReserved2;
@@ -1471,6 +1472,12 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
                 CSR               = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
             }
             payloadOffset = static_cast<uint16_t>(payloadOffset + CSR.size() + 1u);
+            if (cmd->bufLen < payloadOffset + 4)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            CSRLen        = emberAfGetInt32u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 4);
             if (cmd->bufLen < payloadOffset + 1u)
             {
                 return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
@@ -1516,7 +1523,7 @@ EmberAfStatus emberAfOperationalCredentialsClusterClientCommandParse(EmberAfClus
                 Signature         = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
             }
 
-            wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(nullptr, CSR, CSRNonce, VendorReserved1,
+            wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(nullptr, CSR, CSRLen, CSRNonce, VendorReserved1,
                                                                                    VendorReserved2, VendorReserved3, Signature);
             break;
         }

@@ -2231,6 +2231,7 @@
  *
  * Command: OpCSRResponse
  * @param CSR OCTET_STRING
+ * @param CSRLen INT32U
  * @param CSRNonce OCTET_STRING
  * @param VendorReserved1 OCTET_STRING
  * @param VendorReserved2 OCTET_STRING
@@ -2238,11 +2239,11 @@
  * @param Signature OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
+    CredentialsClusterOpCSRResponse(CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)           \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
-                                  VendorReserved3, Signature);
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuuu", CSR, CSRLen, CSRNonce, VendorReserved1,               \
+                                  VendorReserved2, VendorReserved3, Signature);
 
 /** @brief Command description for AddOpCert
  *

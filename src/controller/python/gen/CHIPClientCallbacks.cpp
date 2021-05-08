@@ -1871,12 +1871,14 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, uint8_t * CSR, uint8_t * CSRNonce,
-                                                               uint8_t * VendorReserved1, uint8_t * VendorReserved2,
-                                                               uint8_t * VendorReserved3, uint8_t * Signature)
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, uint8_t * CSR, uint32_t CSRLen,
+                                                               uint8_t * CSRNonce, uint8_t * VendorReserved1,
+                                                               uint8_t * VendorReserved2, uint8_t * VendorReserved3,
+                                                               uint8_t * Signature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
     ChipLogProgress(Zcl, "  CSR: %s", CSR);
+    ChipLogProgress(Zcl, "  CSRLen: %" PRIu32 "", CSRLen);
     ChipLogProgress(Zcl, "  CSRNonce: %s", CSRNonce);
     ChipLogProgress(Zcl, "  VendorReserved1: %s", VendorReserved1);
     ChipLogProgress(Zcl, "  VendorReserved2: %s", VendorReserved2);
@@ -1887,7 +1889,7 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Comman
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+    cb->mCall(cb->mContext, CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
     return true;
 }
 

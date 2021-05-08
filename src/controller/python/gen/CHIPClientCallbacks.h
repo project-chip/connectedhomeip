@@ -110,9 +110,10 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
-typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, uint8_t * CSR, uint8_t * CSRNonce,
-                                                                   uint8_t * VendorReserved1, uint8_t * VendorReserved2,
-                                                                   uint8_t * VendorReserved3, uint8_t * Signature);
+typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, uint8_t * CSR, uint32_t CSRLen,
+                                                                   uint8_t * CSRNonce, uint8_t * VendorReserved1,
+                                                                   uint8_t * VendorReserved2, uint8_t * VendorReserved3,
+                                                                   uint8_t * Signature);
 typedef void (*OperationalCredentialsClusterOpCertResponseCallback)(void * context, uint8_t StatusCode, uint64_t FabricIndex,
                                                                     uint8_t * DebugText);
 typedef void (*OperationalCredentialsClusterSetFabricResponseCallback)(void * context, chip::FabricId FabricId);

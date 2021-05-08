@@ -2195,8 +2195,8 @@ public:
 
     ~CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * CSR, uint8_t * CSRNonce, uint8_t * VendorReserved1, uint8_t * VendorReserved2,
-        uint8_t * VendorReserved3, uint8_t * Signature)
+    static void CallbackFn(void * context, uint8_t * CSR, uint32_t CSRLen, uint8_t * CSRNonce, uint8_t * VendorReserved1,
+        uint8_t * VendorReserved2, uint8_t * VendorReserved3, uint8_t * Signature)
     {
         CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge *>(context);
@@ -2204,6 +2204,7 @@ public:
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
                     @"CSR" : [NSString stringWithFormat:@"%s", CSR],
+                    @"CSRLen" : [NSNumber numberWithUnsignedLong:CSRLen],
                     @"CSRNonce" : [NSString stringWithFormat:@"%s", CSRNonce],
                     @"VendorReserved1" : [NSString stringWithFormat:@"%s", VendorReserved1],
                     @"VendorReserved2" : [NSString stringWithFormat:@"%s", VendorReserved2],

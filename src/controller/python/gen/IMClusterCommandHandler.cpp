@@ -4780,6 +4780,8 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             CHIP_ERROR TLVUnpackError = CHIP_NO_ERROR;
             chip::ByteSpan CSR;
             bool CSRExists = false;
+            uint32_t CSRLen;
+            bool CSRLenExists = false;
             chip::ByteSpan CSRNonce;
             bool CSRNonceExists = false;
             chip::ByteSpan VendorReserved1;
@@ -4815,6 +4817,20 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     }
                     break;
                 case 1:
+                    if (CSRLenExists)
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    TLVUnpackError = aDataTlv.Get(CSRLen);
+                    if (CHIP_NO_ERROR == TLVUnpackError)
+                    {
+                        CSRLenExists = true;
+                        validArgumentCount++;
+                    }
+                    break;
+                case 2:
                     if (CSRNonceExists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
@@ -4832,7 +4848,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                         validArgumentCount++;
                     }
                     break;
-                case 2:
+                case 3:
                     if (VendorReserved1Exists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
@@ -4850,7 +4866,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                         validArgumentCount++;
                     }
                     break;
-                case 3:
+                case 4:
                     if (VendorReserved2Exists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
@@ -4868,7 +4884,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                         validArgumentCount++;
                     }
                     break;
-                case 4:
+                case 5:
                     if (VendorReserved3Exists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
@@ -4886,7 +4902,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                         validArgumentCount++;
                     }
                     break;
-                case 5:
+                case 6:
                     if (SignatureExists)
                     {
                         ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
@@ -4928,10 +4944,10 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
             }
 
             // TODO(#5590) We should encode a response of status code for invalid TLV.
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                emberAfOperationalCredentialsClusterOpCSRResponseCallback(apCommandObj, CSR, CSRNonce, VendorReserved1,
+                emberAfOperationalCredentialsClusterOpCSRResponseCallback(apCommandObj, CSR, CSRLen, CSRNonce, VendorReserved1,
                                                                           VendorReserved2, VendorReserved3, Signature);
             }
             else
@@ -4940,7 +4956,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                                             Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
                 ChipLogProgress(
                     Zcl, "Failed to dispatch command, %d/%" PRIu32 " arguments parsed, TLVError=%" PRIu32 ", UnpackError=%" PRIu32,
-                    6, validArgumentCount, TLVError, TLVUnpackError);
+                    7, validArgumentCount, TLVError, TLVUnpackError);
             }
             break;
         }

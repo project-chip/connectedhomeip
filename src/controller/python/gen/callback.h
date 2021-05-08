@@ -3095,6 +3095,7 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
 /**
  * @brief Operational Credentials Cluster OpCSRResponse Command callback
  * @param csr
+ * @param cSRLen
  * @param cSRNonce
  * @param vendorReserved1
  * @param vendorReserved2
@@ -3102,7 +3103,7 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
  * @param signature
  */
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR, uint32_t CSRLen,
                                                                chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
                                                                chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
                                                                chip::ByteSpan Signature);
