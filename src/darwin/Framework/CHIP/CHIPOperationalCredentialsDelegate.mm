@@ -201,11 +201,15 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNodeOperationalCertificat
     chip::Crypto::P256PublicKey pubkey;
     CHIP_ERROR err = chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey);
     if (err != CHIP_NO_ERROR) {
+        NSLog(@"VerifyCertificateSigningRequest returned error %d", err);
         return err;
     }
+    NSLog(@"VerifyCertificateSigningRequest returned %d", err);
 
-    return chip::Credentials::NewNodeOperationalX509Cert(
+    err = chip::Credentials::NewNodeOperationalX509Cert(
         request, chip::Credentials::CertificateIssuerLevel::kIssuerIsRootCA, pubkey, mIssuerKey, certBuf, certBufSize, outCertLen);
+    NSLog(@"NewNodeOperationalX509Cert returned %d", err);
+    return err;
 }
 
 CHIP_ERROR CHIPOperationalCredentialsDelegate::GetRootCACertificate(

@@ -23,6 +23,8 @@
 
 #include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -65,6 +67,14 @@ class DLL_EXPORT AdminPairingInfo
 public:
     AdminPairingInfo() { Reset(); }
 
+    ~AdminPairingInfo()
+    {
+        if (mOperationalKey != nullptr)
+        {
+            chip::Platform::Delete(mOperationalKey);
+        }
+    }
+
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
 
@@ -76,6 +86,9 @@ public:
 
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
+
+    Crypto::P256Keypair * GetOperationalKey() { return mOperationalKey; }
+    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
 
     const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
     OperationalCredentials & GetOperationalCreds() { return mOpCred; }
@@ -96,6 +109,11 @@ public:
         mAdmin    = kUndefinedAdminId;
         mFabricId = kUndefinedFabricId;
         mVendorId = kUndefinedVendorId;
+
+        if (mOperationalKey != nullptr)
+        {
+            mOperationalKey->Initialize();
+        }
     }
 
     friend class AdminPairingTable;
@@ -108,6 +126,8 @@ private:
 
     OperationalCredentials mOpCred;
     AccessControlList mACL;
+
+    Crypto::P256Keypair * mOperationalKey = nullptr;
 
     static constexpr size_t KeySize();
 
@@ -123,6 +143,8 @@ private:
         uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
+
+        Crypto::P256SerializedKeypair mOperationalKey;
     };
 };
 

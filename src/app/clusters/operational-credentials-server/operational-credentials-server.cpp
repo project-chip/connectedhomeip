@@ -27,6 +27,7 @@
 #include <lib/core/PeerId.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
 
@@ -316,14 +317,67 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
                                                            chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
-    emberAfSendImmediateDefaultResponse(status);
+    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    EmberStatus sendStatus = EMBER_SUCCESS;
+    CHIP_ERROR err;
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> csr;
+    size_t csrLength = Crypto::kMAX_CSR_Length;
+
+    uint8_t * csrBuf   = nullptr;
+    uint16_t nullValue = 0;
+
+    constexpr uint16_t zclOctetStringHeaderSize = 1;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
+
+    // Fetch current admin
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // 1 extra byte for length in ZCL data type
+    VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length + zclOctetStringHeaderSize), status = EMBER_ZCL_STATUS_FAILURE);
+
+    if (admin->GetOperationalKey() == nullptr)
+    {
+        Crypto::P256Keypair keypair;
+        keypair.Initialize();
+        VerifyOrExit(admin->SetOperationalKey(keypair) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    csrBuf = csr.Get();
+    err    = admin->GetOperationalKey()->NewCertificateSigningRequest(&csrBuf[zclOctetStringHeaderSize], csrLength);
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %d", err);
+    VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(csrLength <= UINT8_MAX, status = EMBER_ZCL_STATUS_FAILURE);
+
+    // Fill in the length as the first byte of the octet string
+    csrBuf[0] = (uint8_t) csrLength;
+
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
+                              ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_OP_CSR_RESPONSE_COMMAND_ID, "bwbbbbb", csr.Get(),
+                              csrLength + zclOctetStringHeaderSize, csrLength, CSRNonce.data(), CSRNonce.size(), &nullValue,
+                              sizeof(nullValue), &nullValue, sizeof(nullValue), &nullValue, sizeof(nullValue), &nullValue,
+                              sizeof(nullValue));
+    sendStatus = emberAfSendResponse();
+
+exit:
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed OpCSRRequest.");
+        emberAfSendImmediateDefaultResponse(status);
+    }
+    if (sendStatus != EMBER_SUCCESS)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to send OpCSRRequest: 0x%x", sendStatus);
+    }
     return true;
 }
 

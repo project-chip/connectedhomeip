@@ -27,8 +27,6 @@
 #include <app/Command.h>
 #include <lib/support/Span.h>
 
-extern "C" {
-
 /** @brief Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -3691,4 +3689,3 @@ EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, u
  *
  */
 bool emberAfStartMoveCallback();
-}

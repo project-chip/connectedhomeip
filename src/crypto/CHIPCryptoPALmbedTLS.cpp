@@ -649,7 +649,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
+CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
     size_t len                          = output.Length() == 0 ? output.Capacity() : output.Length();
@@ -758,6 +758,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     VerifyOrExit(result > 0, error = CHIP_ERROR_INTERNAL);
 
     out_length = (size_t) result;
+    result     = 0;
     VerifyOrExit(out_length <= csr_length, error = CHIP_ERROR_INTERNAL);
 
     if (csr_length != out_length)

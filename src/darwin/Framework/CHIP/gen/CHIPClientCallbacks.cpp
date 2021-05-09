@@ -1640,6 +1640,44 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR, uint32_t CSRLen,
+                                                               chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+                                                               chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
+                                                               chip::ByteSpan Signature)
+{
+    ChipLogProgress(Zcl, "OpCSRResponse:");
+    ChipLogProgress(Zcl, "  CSR: %s", CSR);
+    ChipLogProgress(Zcl, "  CSRLen: %" PRIu32 "", CSRLen);
+    ChipLogProgress(Zcl, "  CSRNonce: %s", CSRNonce);
+    ChipLogProgress(Zcl, "  VendorReserved1: %s", VendorReserved1);
+    ChipLogProgress(Zcl, "  VendorReserved2: %s", VendorReserved2);
+    ChipLogProgress(Zcl, "  VendorReserved3: %s", VendorReserved3);
+    ChipLogProgress(Zcl, "  Signature: %s", Signature);
+
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::Command * commandObj, uint8_t StatusCode,
+                                                                uint64_t FabricIndex, uint8_t * DebugText)
+{
+    ChipLogProgress(Zcl, "OpCertResponse:");
+    ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
+    ChipLogProgress(Zcl, "  FabricIndex: %" PRIu64 "", FabricIndex);
+    ChipLogProgress(Zcl, "  DebugText: %s", DebugText);
+
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCertResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, StatusCode, FabricIndex, DebugText);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
 {
     ChipLogProgress(Zcl, "SetFabricResponse:");

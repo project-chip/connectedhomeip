@@ -41,6 +41,17 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     info.mFabricId = Encoding::LittleEndian::HostSwap64(mFabricId);
     info.mVendorId = Encoding::LittleEndian::HostSwap16(mVendorId);
 
+    if (mOperationalKey != nullptr)
+    {
+        ReturnErrorOnFailure(mOperationalKey->Serialize(info.mOperationalKey));
+    }
+    else
+    {
+        Crypto::P256Keypair keypair;
+        ReturnErrorOnFailure(keypair.Initialize());
+        ReturnErrorOnFailure(keypair.Serialize(info.mOperationalKey));
+    }
+
     err = kvs->SyncSetKeyValue(key, &info, sizeof(info));
     if (err != CHIP_NO_ERROR)
     {
@@ -64,6 +75,15 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     AdminId id = Encoding::LittleEndian::HostSwap16(info.mAdmin);
     mFabricId  = Encoding::LittleEndian::HostSwap64(info.mFabricId);
     mVendorId  = Encoding::LittleEndian::HostSwap16(info.mVendorId);
+
+    if (mOperationalKey == nullptr)
+    {
+        mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+    }
+    VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(mOperationalKey->Deserialize(info.mOperationalKey));
+
+    ReturnErrorOnFailure(mOperationalKey->Deserialize(info.mOperationalKey));
     ReturnErrorCodeIf(mAdmin != id, CHIP_ERROR_INCORRECT_STATE);
 
     return CHIP_NO_ERROR;
@@ -96,6 +116,18 @@ CHIP_ERROR AdminPairingInfo::GenerateKey(AdminId id, char * key, size_t len)
     VerifyOrReturnError(keySize > 0, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(len > (size_t) keySize, CHIP_ERROR_INTERNAL);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AdminPairingInfo::SetOperationalKey(const Crypto::P256Keypair & key)
+{
+    Crypto::P256SerializedKeypair serialized;
+    ReturnErrorOnFailure(key.Serialize(serialized));
+    if (mOperationalKey == nullptr)
+    {
+        mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+    }
+    VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
+    return mOperationalKey->Deserialize(serialized);
 }
 
 AdminPairingInfo * AdminPairingTable::AssignAdminId(AdminId adminId)

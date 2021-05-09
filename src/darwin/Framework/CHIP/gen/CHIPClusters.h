@@ -640,6 +640,11 @@ public:
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR AddOpCert(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan noc,
+                         chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
+                         uint16_t adminVendorId);
+    CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            chip::ByteSpan cSRNonce);
     CHIP_ERROR RemoveAllFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId);
@@ -653,6 +658,8 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
+    static constexpr CommandId kAddOpCertCommandId         = 0x06;
+    static constexpr CommandId kOpCSRRequestCommandId      = 0x04;
     static constexpr CommandId kRemoveAllFabricsCommandId  = 0x0B;
     static constexpr CommandId kRemoveFabricCommandId      = 0x0A;
     static constexpr CommandId kSetFabricCommandId         = 0x00;

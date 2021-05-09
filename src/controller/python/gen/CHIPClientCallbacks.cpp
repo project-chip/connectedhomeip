@@ -94,8 +94,6 @@ using namespace ::chip;
         return true;                                                                                                               \
     }
 
-extern "C" {
-
 void LogStatus(uint8_t status)
 {
     switch (status)
@@ -1871,10 +1869,10 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, uint8_t * CSR, uint32_t CSRLen,
-                                                               uint8_t * CSRNonce, uint8_t * VendorReserved1,
-                                                               uint8_t * VendorReserved2, uint8_t * VendorReserved3,
-                                                               uint8_t * Signature)
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR, uint32_t CSRLen,
+                                                               chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+                                                               chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
+                                                               chip::ByteSpan Signature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
     ChipLogProgress(Zcl, "  CSR: %s", CSR);
@@ -2351,5 +2349,4 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     }
 
     return true;
-}
 }
