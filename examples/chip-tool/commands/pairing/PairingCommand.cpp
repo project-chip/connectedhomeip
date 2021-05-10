@@ -31,8 +31,9 @@ CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, Node
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::Controller::CommissionerInitParams params;
+    mOpCredsIssuer.Initialize();
 
+    chip::Controller::CommissionerInitParams params;
     params.storageDelegate                = &storage;
     params.mDeviceAddressUpdateDelegate   = this;
     params.pairingDelegate                = this;

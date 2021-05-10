@@ -18,6 +18,7 @@
 
 #include "ModelCommand.h"
 
+#include <app/InteractionModelEngine.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -29,9 +30,12 @@ constexpr uint16_t kWaitDurationInSeconds = 10;
 CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::CommissionerInitParams initParams;
 
-    initParams.storageDelegate = &storage;
+    mOpCredsIssuer.Initialize();
+
+    chip::Controller::CommissionerInitParams initParams;
+    initParams.storageDelegate                = &storage;
+    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));

@@ -45,6 +45,7 @@ static_library("framework") {
     "CHIPManualSetupPayloadParser.h",
     "CHIPManualSetupPayloadParser.mm",
     "CHIPOnboardingPayloadParser.m",
+    "CHIPOperationalCredentialsDelegate.mm",
     "CHIPPersistentStorageDelegate.h",
     "CHIPPersistentStorageDelegateBridge.h",
     "CHIPPersistentStorageDelegateBridge.mm",
@@ -63,6 +64,8 @@ static_library("framework") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+
+  frameworks = [ "Security.framework" ]
 
   public_configs = [ ":darwin_config" ]
 }
