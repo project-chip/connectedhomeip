@@ -131,7 +131,7 @@ CHIP_ERROR ConfigurationManagerImpl::_WritePersistedStorageValue(::chip::Platfor
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType & secType)
+CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(WiFiAuthSecurityType & secType)
 {
     CHIP_ERROR err;
     uint32_t secTypeInt;
@@ -139,22 +139,22 @@ CHIP_ERROR ConfigurationManagerImpl::GetWiFiStationSecurityType(Profiles::Networ
     err = ReadConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
     if (err == CHIP_NO_ERROR)
     {
-        secType = (Profiles::NetworkProvisioning::WiFiSecurityType) secTypeInt;
+        secType = static_cast<WiFiAuthSecurityType>(secTypeInt);
     }
     return err;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(Profiles::NetworkProvisioning::WiFiSecurityType secType)
+CHIP_ERROR ConfigurationManagerImpl::UpdateWiFiStationSecurityType(WiFiAuthSecurityType secType)
 {
     CHIP_ERROR err;
-    Profiles::NetworkProvisioning::WiFiSecurityType curSecType;
+    WiFiAuthSecurityType curSecType;
 
-    if (secType != Profiles::NetworkProvisioning::kWiFiSecurityType_NotSpecified)
+    if (secType != kWiFiSecurityType_NotSpecified)
     {
         err = GetWiFiStationSecurityType(curSecType);
         if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || (err == CHIP_NO_ERROR && secType != curSecType))
         {
-            uint32_t secTypeInt = secType;
+            uint32_t secTypeInt = static_cast<uint32_t>(secType);
             err                 = WriteConfigValue(kConfigKey_WiFiStationSecType, secTypeInt);
         }
         SuccessOrExit(err);
