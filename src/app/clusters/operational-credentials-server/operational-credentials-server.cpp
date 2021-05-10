@@ -232,7 +232,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
 
     // Fetch current admin
     AdminPairingInfo * admin = retrieveCurrentAdmin();
@@ -246,10 +246,27 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->SourceNodeId()) as
     // fabricId until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
-                              ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
-                              emberAfCurrentCommand()->SourceNodeId());
-    sendStatus = emberAfSendResponse();
+    if (commandObj == nullptr)
+    {
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
+                                  ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
+                                  emberAfCurrentCommand()->SourceNodeId());
+        sendStatus = emberAfSendResponse();
+    }
+    else
+    {
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                             ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+        TLV::TLVWriter * writer          = nullptr;
+
+        VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        writer = commandObj->GetCommandDataElementTLVWriter();
+        SuccessOrExit(
+            err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSessionHandle().GetPeerNodeId()));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
 
 exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)
@@ -260,6 +277,10 @@ exit:
     if (sendStatus != EMBER_SUCCESS)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to send %s response: 0x%x", "set_fabric", sendStatus);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
     }
 
     return true;
@@ -274,12 +295,19 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
     return true;
 }
 
+namespace {
+void DoRemoveAllFabrics(intptr_t)
+{
+    OpenDefaultPairingWindow(ResetAdmins::kYes);
+}
+} // namespace
+
 // Up for discussion in Multi-Admin TT: chip-spec:#2891
 bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Command * commandObj)
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
+    PlatformMgr().ScheduleWork(DoRemoveAllFabrics, 0);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    OpenDefaultPairingWindow(ResetAdmins::kYes);
     return true;
 }
 
