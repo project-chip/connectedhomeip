@@ -179,7 +179,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<CertDecodeF
     cert = new (&mCerts[mCertCount]) ChipCertificateData();
 
     cert->mCertificateBegin = chipCert;
-    cert->mCertificateLen   = static_cast<uint16_t>(chipCertLen);
+    cert->mCertificateLen   = chipCertLen;
 
     {
         TLVType containerType;
@@ -772,11 +772,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDN::GetCertChipVal(uint64_t & chipVal) const
+CHIP_ERROR ChipDN::GetCertChipId(uint64_t & chipId) const
 {
     uint8_t rdnCount = RDNCount();
 
-    chipVal = 0;
+    chipId = 0;
 
     for (uint8_t i = 0; i < rdnCount; i++)
     {
@@ -786,9 +786,9 @@ CHIP_ERROR ChipDN::GetCertChipVal(uint64_t & chipVal) const
         case kOID_AttributeType_ChipICAId:
         case kOID_AttributeType_ChipNodeId:
         case kOID_AttributeType_ChipFirmwareSigningId:
-            VerifyOrReturnError(chipVal == 0, CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrReturnError(chipId == 0, CHIP_ERROR_WRONG_CERT_TYPE);
 
-            chipVal = rdn[i].mAttrValue.mChipVal;
+            chipId = rdn[i].mAttrValue.mChipVal;
             break;
         default:
             break;

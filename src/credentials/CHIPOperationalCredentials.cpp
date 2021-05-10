@@ -30,9 +30,13 @@
 #include <credentials/CHIPOperationalCredentials.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 
 namespace chip {
 namespace Credentials {
+
+static constexpr size_t kOperationalCertificatesMax          = 3;
+static constexpr size_t kOperationalCertificateDecodeBufSize = 1024;
 
 using namespace chip::Crypto;
 
@@ -295,8 +299,9 @@ CHIP_ERROR OperationalCredentialSet::ToSerializable(const CertificateKeyId & tru
 
     for (uint8_t i = 0; i < certificateSet->GetCertCount(); ++i)
     {
+        VerifyOrReturnError(CanCastTo<uint16_t>(dataSet[i].mCertificateLen), CHIP_ERROR_INTERNAL);
         memcpy(ptrSerializableCerts[i], dataSet[i].mCertificateBegin, dataSet[i].mCertificateLen);
-        *ptrSerializableCertsLen[i] = dataSet[i].mCertificateLen;
+        *ptrSerializableCertsLen[i] = static_cast<uint16_t>(dataSet[i].mCertificateLen);
     }
 
     return CHIP_NO_ERROR;
@@ -311,8 +316,7 @@ CHIP_ERROR OperationalCredentialSet::FromSerializable(const OperationalCredentia
     ChipCertificateSet certificateSet;
     CertificateKeyId trustedRootId;
 
-    // TODO change constants
-    SuccessOrExit(err = certificateSet.Init(3, 1024));
+    SuccessOrExit(err = certificateSet.Init(kOperationalCertificatesMax, kOperationalCertificateDecodeBufSize));
 
     err = certificateSet.LoadCert(serializable.mRootCertificate, serializable.mRootCertificateLen,
                                   BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor));
