@@ -172,7 +172,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
-        writer = commandObj->GetCommandDataElementTLVWriter();
+        VerifyOrExit((writer = commandObj->GetCommandDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), identifyTime));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
