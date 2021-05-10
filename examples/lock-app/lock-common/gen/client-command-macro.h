@@ -2197,6 +2197,15 @@
                                                                                                                                    \
                                   ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID, "u", timeoutMs);
 
+/** @brief Command description for ResetCounts
+ *
+ * Command: ResetCounts
+ */
+#define emberAfFillCommandWiFi                                                                                                     \
+    Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_RESET_COUNTS_COMMAND_ID, "", );
+
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric
