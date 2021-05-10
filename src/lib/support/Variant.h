@@ -70,7 +70,7 @@ struct VariantCurry<>
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
 };
 
-} // namespace
+} // namespace Internal
 
 /**
  * @brief
@@ -100,7 +100,7 @@ private:
     static constexpr std::size_t kDataAlign   = std::max(alignof(Ts)...);
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
-    using Data   = typename std::aligned_storage<kDataSize, kDataAlign>::type;
+    using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
     using Curry = Internal::VariantCurry<Ts...>;
 
     std::size_t mTypeId;
