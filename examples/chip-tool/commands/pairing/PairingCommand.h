@@ -22,6 +22,7 @@
 #include "../common/Command.h"
 #include "gen/CHIPClientCallbacks.h"
 #include "gen/CHIPClusters.h"
+#include <lib/support/ThreadOperationalDataset.h>
 
 enum class PairingMode
 {
@@ -59,7 +60,7 @@ public:
             AddArgument("password", &mPassword);
             break;
         case PairingNetworkType::Thread:
-            AddArgument("operationalDataset", &mOperationalDataset);
+            AddArgument("operationalDataset", &mThreadOpDatasetArg);
             break;
         }
 
@@ -132,7 +133,8 @@ private:
     uint64_t mFabricId;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
-    char * mOperationalDataset;
+    char * mThreadOpDatasetArg;
+    chip::Thread::OperationalDataset mThreadOpDataset;
     char * mSSID;
     char * mPassword;
 
