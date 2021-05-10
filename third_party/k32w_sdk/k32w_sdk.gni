@@ -16,6 +16,7 @@ import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/K32W/args.gni")
 
 declare_args() {
   # Location of the k32w SDK.
@@ -124,7 +125,7 @@ template("k32w_sdk") {
       "gUsePdm_d=1",
       "gLEDSupported_d",
       "gKeyBoardSupported_d",
-      "gPdmNbSegments=32",
+      "gPdmNbSegments=63",
       "configFRTOS_MEMORY_SCHEME=4",
       "osCustomStartup=1",
       "OM15082=1",
@@ -155,6 +156,16 @@ template("k32w_sdk") {
       #TODO: move this define in a MBEDTLS specific GN file
       "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
     ]
+
+
+    if (chip_mdns == "platform")
+    {
+      defines += [
+        "OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE=1",
+        "OPENTHREAD_CONFIG_ECDSA_ENABLE=1",
+      ]
+    }
+
     if (chip_with_se05x == 1) {
       defines += [
         "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
@@ -174,6 +185,10 @@ template("k32w_sdk") {
       "-Wno-sign-compare",
       "-Wno-clobbered",
       "-Wno-implicit-fallthrough",
+      "-fno-optimize-strlen",
+      "-mthumb",
+      "-MMD",
+      "-MP",
     ]
 
     # Now add our "system-header" include dirs

@@ -364,6 +364,20 @@ exit:
 
 CHIP_ERROR K32WConfig::FactoryResetConfig(void)
 {
+	CHIP_ERROR err;
+
+    err = FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        err = FactoryResetConfigInternal(kMinConfigKey_KVS, kMaxConfigKey_KVS);
+    }
+
+    return err;
+}
+
+CHIP_ERROR K32WConfig::FactoryResetConfigInternal(Key firstKey, Key lastKey)
+{
     CHIP_ERROR err;
 
     // Iterate over all the CHIP Config PDM ID records and delete each one
@@ -413,7 +427,7 @@ bool K32WConfig::ValidConfigKey(Key key)
 {
     // Returns true if the key is in the valid CHIP Config PDM key range.
 
-    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_ChipCounter))
+    if ((key >= kMinConfigKey_ChipFactory) && (key <= kMaxConfigKey_KVS))
     {
         return true;
     }

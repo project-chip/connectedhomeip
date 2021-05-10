@@ -98,25 +98,10 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     if (ret != CHIP_NO_ERROR)
     {
         goto exit;
-    }
-
-    // Configure the Thread polling behavior for the device.
-    {
-        ConnectivityManager::ThreadPollingConfig pollingConfig;
-        pollingConfig.Clear();
-        pollingConfig.ActivePollingIntervalMS   = THREAD_ACTIVE_POLLING_INTERVAL_MS;
-        pollingConfig.InactivePollingIntervalMS = THREAD_INACTIVE_POLLING_INTERVAL_MS;
-
-        ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-        if (ret != CHIP_NO_ERROR)
-        {
-            K32W_LOG("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
-            goto exit;
-        }
     }
 
     ret = PlatformMgr().StartEventLoopTask();
