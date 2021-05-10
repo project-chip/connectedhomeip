@@ -96,7 +96,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 {
     mReliableMessageMgr.Shutdown();
 
-    mContextPool.ForEachActiveObject([] (auto * ec) {
+    mContextPool.ForEachActiveObject([](auto * ec) {
         // There should be no active object in the pool
         assert(false);
         return true;
@@ -198,8 +198,8 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnSecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                              SecureSessionHandle session, const Transport::PeerAddress & source,
+                                              System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -211,8 +211,9 @@ void ExchangeManager::OnSecureMessageReceived(const PacketHeader & packetHeader,
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
-    mContextPool.ForEachActiveObject([&] (auto * ec) {
-        if (ec->MatchSecureExchange(session, packetHeader, payloadHeader)) {
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->MatchSecureExchange(session, packetHeader, payloadHeader))
+        {
             // Found a matching exchange. Set flag for correct subsequent CRMP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
@@ -228,7 +229,8 @@ void ExchangeManager::OnSecureMessageReceived(const PacketHeader & packetHeader,
         return true;
     });
 
-    if (found) {
+    if (found)
+    {
         ExitNow(err = CHIP_NO_ERROR);
     }
 
@@ -319,7 +321,7 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         mDelegate->OnConnectionExpired(session, this);
     }
 
-    mContextPool.ForEachActiveObject([&] (auto * ec) {
+    mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->IsSecure() && ec->GetSecureSession() == session)
         {
             ec->Close();
@@ -329,7 +331,9 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     });
 }
 
-void ExchangeManager::OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+void ExchangeManager::OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                                const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                                                SecureSessionMgr * mgr)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -341,8 +345,9 @@ void ExchangeManager::OnUnsecureMessageReceived(const PacketHeader & packetHeade
 
     // Search for an existing exchange that the message applies to. If a match is found...
     bool found = false;
-    mContextPool.ForEachActiveObject([&] (auto * ec) {
-        if (ec->MatchUnsecureExchange(source, payloadHeader)) {
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->MatchUnsecureExchange(source, payloadHeader))
+        {
             // Found a matching exchange. Set flag for correct subsequent CRMP
             // retransmission timeout selection.
             if (!ec->HasRcvdMsgFromPeer())
@@ -358,7 +363,8 @@ void ExchangeManager::OnUnsecureMessageReceived(const PacketHeader & packetHeade
         return true;
     });
 
-    if (found) {
+    if (found)
+    {
         ExitNow(err = CHIP_NO_ERROR);
     }
 
@@ -436,8 +442,9 @@ exit:
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)
 {
-    mContextPool.ForEachActiveObject([&] (auto * ec) {
-        if (ec->GetDelegate() == delegate) {
+    mContextPool.ForEachActiveObject([&](auto * ec) {
+        if (ec->GetDelegate() == delegate)
+        {
             // Make sure to null out the delegate before closing the context, so
             // we don't notify the delegate that the context is closing.  We
             // have to do this, because the delegate might be partially
