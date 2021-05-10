@@ -58,18 +58,19 @@ sudo service openbsd-inetd restart
 netstat -a | less | grep "echo"
 
 # Build chip tools for network testing
-mkdir -p $HOME/NetTools
+mkdir -p $HOME/FunctionalTests
 
 source scripts/bootstrap.sh
 
 # Build CHIP main
 scripts/build/default.sh
 
-# Copy CLI tools to output directory (NetTools)
-cp out/default/chip-echo-requester out/default/chip-echo-responder out/default/chip-tool $HOME/NetTools
+# Copy CLI tools to output directory (FunctionalTests)
+cp out/default/chip-echo-requester out/default/chip-echo-responder out/default/chip-tool $HOME/FunctionalTests
 
 # Install Python Chip Device Controller
-virtualenv $HOME/NetTools/python_env
-source $HOME/NetTools/python_env/bin/activate
+virtualenv $HOME/FunctionalTests/python_env
+source $HOME/FunctionalTests/python_env/bin/activate
 pip install out/default/controller/python/chip*.whl
+pip install -r src/test_driver/mbed-functional/requirements.txt
 deactivate
