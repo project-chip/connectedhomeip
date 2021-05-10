@@ -71,7 +71,9 @@ has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console.
+the UART console and shared using an NFC tag. For security reasons, you must
+start NFC tag emulation manually after powering up the device by pressing
+Button 4.
 
 ### Thread Provisioning
 
@@ -127,7 +129,9 @@ being used if this button is pressed.
 The remaining two LEDs (D1/D2) and button (SW1) are unused.
 
 Directly on the development board, **Button USERINTERFACE** can be used for
-enabling Bluetooth LE advertising for a predefined period of time.
+enabling Bluetooth LE advertising for a predefined period of time. Also, pushing
+this button starts the NFC emulation by writing the onboarding information in
+the NTAG.
 
 <a name="building"></a>
 
@@ -136,18 +140,18 @@ enabling Bluetooth LE advertising for a predefined period of time.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download [K32W061 SDK 2.6.2 for Project CHIP](https://mcuxpresso.nxp.com/).
+-   Download [K32W061 SDK 2.6.3 for Project CHIP](https://mcuxpresso.nxp.com/).
     Creating an nxp.com account is required before being able to download the
     SDK. Once the account is created, login and follow the steps for downloading
-    SDK_2.6.2_K32W061DK6. The SDK Builder UI selection should be similar with
+    SDK_2.6.3_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.2_K32W061DK6/
-user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/mr2_fixes/patch_k32w_mr2_sdk.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
@@ -155,8 +159,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/d
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-Note that "patch_k32w_mr2_sdk.sh" script must be run for patching the K32W061
-SDK 2.6.2.
+Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
+2.6.3.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 install the recommanded packages (python version > 3, pip3, pycrypto,
@@ -198,3 +202,9 @@ The app can be deployed against any generic OpenThread Border Router. See the
 guide
 [Commissioning NXP K32W using Android CHIPTool](../../../docs/guides/nxp_k32w_android_commissioning.md)
 for step-by-step instructions.
+
+## Video demo
+
+See
+[Unlocking the Future of Project CHIP Webinar](https://www.nxp.com/design/training/unlocking-the-future-of-project-chip:TIP-EEE-UNLOCKING-THE-FUTURE-OF-PROJECT-CHIP)
+for an in-depth analysis of NXP capabilities for Project CHIP.

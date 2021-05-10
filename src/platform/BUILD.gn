@@ -446,6 +446,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/KeyValueStoreManagerImpl.cpp",
         "K32W/KeyValueStoreManagerImpl.h",
         "K32W/Logging.cpp",
+        "K32W/NFCManagerImpl.cpp",
+        "K32W/NFCManagerImpl.h",
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
         "K32W/SoftwareUpdateManagerImpl.h",

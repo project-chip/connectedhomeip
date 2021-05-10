@@ -141,6 +141,9 @@ struct fw_cfg
 
     // Controller behavior with invalid pdu
     uint32_t invalid_pdu_handling;
+
+    // DTM Default TX power
+    int8_t default_dtm_tx_pwr;
 };
 
 /* low power configuration for sleep and 32k clock housekeeping */
@@ -170,12 +173,21 @@ struct xcvr_api
     void (*xcvr_register_rf_activity_cb)(void *);
 };
 
+/* Coexistence model */
+typedef enum
+{
+    coex_status_priority,
+    coex_priority_only
+} coex_model_t;
+
 struct coex_api
 {
+    coex_model_t coex_model;
     uint32_t (*coex_register)(void * callback);
     uint32_t (*coex_request_access)(uint32_t newState);
     uint32_t (*coex_change_access)(uint32_t newState);
     void (*coex_release_access)(void);
+    void (*coex_set_priority)(uint32_t rxPrio, uint32_t txPrio);
     void (*coex_enable)(void);
     void (*coex_disable)(void);
 };
@@ -184,8 +196,8 @@ struct pdm_api
 {
     uint32_t (*get_local_name)(uint8_t * name);
     uint32_t (*set_local_name)(const uint8_t * name);
-    uint32_t (*get_class_of_device)(uint8_t * aclass);
-    uint32_t (*set_class_of_device)(const uint8_t * aclass);
+    uint32_t (*get_class_of_device)(uint8_t * dev_class);
+    uint32_t (*set_class_of_device)(const uint8_t * dev_class);
 };
 
 struct fwk_cfg
