@@ -98,6 +98,9 @@
 // Definitions for cluster: Network Commissioning
 #define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
 
+// Definitions for cluster: WiFi Network Diagnostics
+#define ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0036)
+
 // Definitions for cluster: Switch
 #define ZCL_SWITCH_CLUSTER_ID (0x003B)
 
