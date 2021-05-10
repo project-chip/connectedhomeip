@@ -106,11 +106,12 @@ bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 {
-    int err = pthread_mutex_unlock(&mChipStackLock);
-    assert(err == 0);
 #if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
     mChipStackIsLocked = false;
 #endif
+
+    int err = pthread_mutex_unlock(&mChipStackLock);
+    assert(err == 0);
 }
 
 #if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
