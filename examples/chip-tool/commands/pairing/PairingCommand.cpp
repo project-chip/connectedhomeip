@@ -23,9 +23,9 @@
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds     = 120;
-constexpr uint64_t kBreadcrumb                = 0;
-constexpr uint32_t kTimeoutMs                 = 6000;
+constexpr uint16_t kWaitDurationInSeconds = 120;
+constexpr uint64_t kBreadcrumb            = 0;
+constexpr uint32_t kTimeoutMs             = 6000;
 
 CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
@@ -211,7 +211,8 @@ CHIP_ERROR PairingCommand::AddThreadNetwork()
     Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
 
-    chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t)strlen(mThreadOpDatasetArg), opDataset, (uint32_t)sizeof(opDataset), opDatasetLen);
+    chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t) strlen(mThreadOpDatasetArg), opDataset,
+                                    (uint32_t) sizeof(opDataset), opDatasetLen);
     error = mThreadOpDataset.Init(ByteSpan(opDataset, opDatasetLen));
     if (error != CHIP_NO_ERROR)
     {

@@ -9849,13 +9849,13 @@ public:
 
         ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x06) on endpoint %" PRIu16, endpointId);
 
-        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t)strlen(mThreadOpDatasetArg), opDataset, (uint32_t)sizeof(opDataset), opDatasetLen);
+        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t) strlen(mThreadOpDatasetArg), opDataset,
+                                        (uint32_t) sizeof(opDataset), opDatasetLen);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.AddThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                        chip::ByteSpan(opDataset, opDatasetLen),
-                                        mBreadcrumb, mTimeoutMs);
+                                        chip::ByteSpan(opDataset, opDatasetLen), mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -10138,10 +10138,10 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t)strlen(mThreadOpDatasetArg), opDataset, (uint32_t)sizeof(opDataset), opDatasetLen);
+        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t) strlen(mThreadOpDatasetArg), opDataset,
+                                        (uint32_t) sizeof(opDataset), opDatasetLen);
         return cluster.UpdateThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                           chip::ByteSpan(opDataset, opDatasetLen),
-                                           mBreadcrumb, mTimeoutMs);
+                                           chip::ByteSpan(opDataset, opDatasetLen), mBreadcrumb, mTimeoutMs);
     }
 
 private:
