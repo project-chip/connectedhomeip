@@ -10133,7 +10133,7 @@ public:
     {
         uint8_t opDataset[chip::Thread::kSizeOperationalDataset];
         uint32_t opDatasetLen;
-        
+
         ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x08) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
