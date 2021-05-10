@@ -23,6 +23,8 @@
 #include "gen/CHIPClientCallbacks.h"
 #include "gen/CHIPClusters.h"
 
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+
 enum class PairingMode
 {
     None,
@@ -91,6 +93,7 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         }
+        mOpCredsIssuer.Initialize();
     }
 
     /////////// Command Interface /////////
@@ -144,4 +147,5 @@ private:
     ChipDevice * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

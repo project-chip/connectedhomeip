@@ -169,6 +169,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         params.mDeviceAddressUpdateDelegate = _pairingDelegateBridge;
         params.pairingDelegate = _pairingDelegateBridge;
 
+        params.operationalCredentialsDelegate = _operationalCredentialsDelegate;
+
         errorCode = _cppCommissioner->Init(_localDeviceId, params);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
             return;

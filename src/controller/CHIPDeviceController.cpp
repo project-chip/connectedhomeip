@@ -643,6 +643,8 @@ DeviceCommissioner::DeviceCommissioner()
 
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams params)
 {
+    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
 
     uint16_t size    = sizeof(mNextKeyId);
@@ -961,7 +963,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(N
 
 CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr)
 {
-    ReturnErrorCodeIf(mOperationalCredentialsDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
     ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
