@@ -131,7 +131,7 @@ public:
     reporting::Engine & GetReportingEngine() { return mReportingEngine; }
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
-    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfo, AttributePathParams & aAttributePathParams);
+    CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
 
 private:
     friend class reporting::Engine;
@@ -163,7 +163,7 @@ private:
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj);
-CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter);
-CHIP_ERROR WriteSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVReader & aReader);
+CHIP_ERROR ReadSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVWriter & aWriter);
+CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader);
 } // namespace app
 } // namespace chip

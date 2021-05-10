@@ -78,7 +78,6 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
-    CHIP_ERROR GetFactoryAssignedEUI64(uint8_t (&buf)[8]);
     CHIP_ERROR GetExternalIPv6Address(chip::Inet::IPAddress & addr);
     CHIP_ERROR GetPollPeriod(uint32_t & buf);
 
@@ -325,11 +324,6 @@ inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull()
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
-}
-
-inline CHIP_ERROR ThreadStackManager::GetFactoryAssignedEUI64(uint8_t (&buf)[8])
-{
-    return static_cast<ImplClass *>(this)->_GetFactoryAssignedEUI64(buf);
 }
 
 inline CHIP_ERROR ThreadStackManager::GetExternalIPv6Address(chip::Inet::IPAddress & addr)

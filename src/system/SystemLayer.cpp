@@ -574,7 +574,17 @@ void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
         // one-shot
         chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
         cb->Cancel();
-        cb->mCall(cb->mContext);
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+        if (mDispatchQueue != nullptr)
+        {
+            dispatch_sync(mDispatchQueue, ^{
+                cb->mCall(cb->mContext);
+            });
+        }
+        else
+#endif
+            cb->mCall(cb->mContext);
     }
 }
 
@@ -695,7 +705,16 @@ void Layer::HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteS
 
         if (lTimer != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, lTimer->mAwakenEpoch))
         {
-            lTimer->HandleComplete();
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+            if (mDispatchQueue != nullptr)
+            {
+                dispatch_sync(mDispatchQueue, ^{
+                    lTimer->HandleComplete();
+                });
+            }
+            else
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+                lTimer->HandleComplete();
         }
     }
 

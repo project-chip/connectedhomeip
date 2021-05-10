@@ -170,8 +170,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                  session->PeerConnection().GetPeerNodeId(), session,
-                                  SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+                                  session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
+                                  connection.GetAdminId(), nullptr);
             session->Clear();
         }
     }
@@ -427,7 +427,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
         uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
-        gNextAvailableAdminId = 0;
+        // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
+        // can continue sending messages to accessory as next available admin will also be 0.
+        // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
         gAdminPairings.Reset();
     }
 
@@ -593,7 +595,7 @@ CHIP_ERROR AddTestPairing()
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:

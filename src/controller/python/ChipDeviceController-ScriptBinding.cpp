@@ -49,6 +49,7 @@
 #include <app/InteractionModelEngine.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <inet/IPAddress.h>
 #include <mdns/Resolver.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
@@ -70,6 +71,7 @@ namespace {
 chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
+chip::Controller::ExampleOperationalCredentialsIssuer sOperationalCredentialsIssuer;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -141,9 +143,13 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
         localDeviceId = kDefaultLocalDeviceId;
     }
 
+    ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize());
+
     initParams.storageDelegate              = &sStorageDelegate;
     initParams.mDeviceAddressUpdateDelegate = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate              = &sPairingDelegate;
+
+    initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;
 
 #if CHIP_ENABLE_INTERACTION_MODEL
     initParams.imDelegate = &PythonInteractionModelDelegate::Instance();

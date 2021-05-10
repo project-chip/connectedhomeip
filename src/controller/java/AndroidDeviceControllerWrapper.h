@@ -22,6 +22,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 /**
@@ -38,6 +39,7 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
+    chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     // DevicePairingDelegate implementation
@@ -75,6 +77,7 @@ private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

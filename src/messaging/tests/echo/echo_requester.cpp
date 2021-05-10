@@ -138,7 +138,7 @@ CHIP_ERROR EstablishSecureSession()
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+                                     chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)

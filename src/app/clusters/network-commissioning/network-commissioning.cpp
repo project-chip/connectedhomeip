@@ -49,6 +49,11 @@
 #include DEVICENETWORKPROVISIONING_HEADER
 #endif
 
+// TODO: Configuration should move to build-time configuration
+#ifndef CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
+#define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 4
+#endif // CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::clusters;
@@ -63,7 +68,7 @@ constexpr uint8_t kMaxNetworkIDLen       = 32;
 constexpr uint8_t kMaxThreadDatasetLen   = 254; // As defined in Thread spec.
 constexpr uint8_t kMaxWiFiSSIDLen        = 32;
 constexpr uint8_t kMaxWiFiCredentialsLen = 64;
-constexpr uint8_t kMaxNetworks           = 4;
+constexpr uint8_t kMaxNetworks           = CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS;
 
 enum class NetworkType : uint8_t
 {
@@ -95,8 +100,12 @@ struct NetworkInfo
     NetworkType mNetworkType;
     union NetworkData
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         Thread::OperationalDataset mThread;
+#endif
+#if defined(CHIP_DEVICE_LAYER_TARGET)
         WiFiNetworkInfo mWiFi;
+#endif
     } mData;
 };
 
@@ -157,6 +166,7 @@ EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::Co
                                                                          ByteSpan credentials, uint64_t breadcrumb,
                                                                          uint32_t timeoutMs)
 {
+#if defined(CHIP_DEVICE_LAYER_TARGET)
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
     for (size_t i = 0; i < kMaxNetworks; i++)
@@ -203,6 +213,11 @@ exit:
 
     ChipLogDetail(Zcl, "AddWiFiNetwork: %d", err);
     return err;
+#else
+    // The target does not supports WiFiNetwork.
+    // return "Command not found" error.
+    return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+#endif
 }
 
 namespace {

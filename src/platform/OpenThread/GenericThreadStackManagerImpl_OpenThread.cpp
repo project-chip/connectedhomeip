@@ -757,15 +757,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetFactoryAssignedEUI64(uint8_t (&buf)[8])
-{
-    otExtAddress extendedAddr;
-    otLinkGetFactoryAssignedIeeeEui64(mOTInst, &extendedAddr);
-    memcpy(buf, extendedAddr.m8, sizeof(extendedAddr.m8));
-    return CHIP_NO_ERROR;
-}
-
-template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetExternalIPv6Address(chip::Inet::IPAddress & addr)
 {
     const otNetifAddress * otAddresses = otIp6GetUnicastAddresses(mOTInst);

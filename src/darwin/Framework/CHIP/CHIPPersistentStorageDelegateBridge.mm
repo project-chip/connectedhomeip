@@ -60,16 +60,13 @@ CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
 
-void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(
-    _Nullable id<CHIPPersistentStorageDelegate> delegate, _Nullable dispatch_queue_t queue)
+void CHIPPersistentStorageDelegateBridge::setFrameworkDelegate(_Nullable id<CHIPPersistentStorageDelegate> delegate)
 {
     dispatch_async(mWorkQueue, ^{
-        if (delegate && queue) {
+        if (delegate) {
             mDelegate = delegate;
-            mQueue = queue;
         } else {
             mDelegate = nil;
-            mQueue = nil;
         }
     });
 }
@@ -125,10 +122,8 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncSetKeyValue(const char * key
         NSLog(@"PersistentStorageDelegate Set Key %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
-        if (strongDelegate && mQueue) {
-            dispatch_sync(mQueue, ^{
-                [strongDelegate CHIPSetKeyValue:keyString value:valueString];
-            });
+        if (strongDelegate) {
+            [strongDelegate CHIPSetKeyValue:keyString value:valueString];
         } else {
             [mDefaultPersistentStorage setObject:valueString forKey:keyString];
         }
@@ -148,10 +143,8 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::SyncDeleteKeyValue(const char * 
         NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
-        if (strongDelegate && mQueue) {
-            dispatch_sync(mQueue, ^{
-                [strongDelegate CHIPDeleteKeyValue:keyString];
-            });
+        if (strongDelegate) {
+            [strongDelegate CHIPDeleteKeyValue:keyString];
         } else {
             [mDefaultPersistentStorage removeObjectForKey:keyString];
         }

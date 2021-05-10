@@ -2170,6 +2170,14 @@ CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device
 // End of Cluster OnOff
 // Cluster OperationalCredentials
 
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId, chip::GroupId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RemoveAllFabrics(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(chip::Controller::Device * device,
                                                                       chip::EndpointId ZCLendpointId, chip::GroupId,
                                                                       chip::FabricId fabricId, chip::NodeId nodeId,

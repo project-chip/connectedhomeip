@@ -66,18 +66,12 @@ public:
      *  until the corresponding InteractionModelDelegate::ReportProcessed or InteractionModelDelegate::ReportError
      *  call happens with guarantee.
      *
-     *  @param[in]    aNodeId    Node Id
-     *  @param[in]    aAdminId   Admin ID
-     *  @param[in]    apEventPathParamsList       a list of event paths the read client is interested in
-     *  @param[in]    aEventPathParamsListSize    Number of event paths in apEventPathParamsList
-     *  @param[in]    apAttributePathParamsList       a list of attribute paths the read client is interested in
-     *  @param[in]    aAttributePathParamsListSize    Number of attribute paths in apAttributePathParamsList
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendReadRequest(NodeId aNodeId, Transport::AdminId aAdminId, EventPathParams * apEventPathParamsList,
                                size_t aEventPathParamsListSize, AttributePathParams * apAttributePathParamsList,
-                               size_t aAttributePathParamsListSize);
+                               size_t aAttributePathParamsListSize, EventNumber aEventNumber);
 
 private:
     friend class TestReadInteraction;

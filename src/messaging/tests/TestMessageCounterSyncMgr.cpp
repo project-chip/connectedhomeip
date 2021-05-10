@@ -193,13 +193,13 @@ void CheckSendMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     SecurePairingUsingTestSecret pairingLocalToPeer(kTestPeerGroupKeyId, kTestLocalGroupKeyId);
 
     err = ctx.GetSecureSessionManager().NewPairing(peer, kDestinationNodeId, &pairingLocalToPeer,
-                                                   SecureSessionMgr::PairingDirection::kInitiator, 0);
+                                                   SecureSession::SessionRole::kInitiator, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairingPeerToLocal(kTestLocalGroupKeyId, kTestPeerGroupKeyId);
 
-    err = ctx.GetSecureSessionManager().NewPairing(peer, kSourceNodeId, &pairingPeerToLocal,
-                                                   SecureSessionMgr::PairingDirection::kResponder, 1);
+    err = ctx.GetSecureSessionManager().NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, SecureSession::SessionRole::kResponder,
+                                                   1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle session(kDestinationNodeId, 0x4000, 0);
@@ -239,13 +239,13 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     SecurePairingUsingTestSecret pairingLocalToPeer(kTestPeerGroupKeyId, kTestLocalGroupKeyId);
 
     err = ctx.GetSecureSessionManager().NewPairing(peer, kDestinationNodeId, &pairingLocalToPeer,
-                                                   SecureSessionMgr::PairingDirection::kInitiator, 0);
+                                                   SecureSession::SessionRole::kInitiator, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairingPeerToLocal(kTestLocalGroupKeyId, kTestPeerGroupKeyId);
 
-    err = ctx.GetSecureSessionManager().NewPairing(peer, kSourceNodeId, &pairingPeerToLocal,
-                                                   SecureSessionMgr::PairingDirection::kResponder, 1);
+    err = ctx.GetSecureSessionManager().NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, SecureSession::SessionRole::kResponder,
+                                                   1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle session(kDestinationNodeId, 0x4000, 0);
@@ -334,12 +334,11 @@ void CheckReceiveMessage(nlTestSuite * inSuite, void * inContext)
 
     SecurePairingUsingTestSecret pairingPeerToLocal(kTestLocalGroupKeyId, kTestPeerGroupKeyId);
 
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, SecureSessionMgr::PairingDirection::kInitiator, 1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairingPeerToLocal, SecureSession::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairingLocalToPeer(kTestPeerGroupKeyId, kTestLocalGroupKeyId);
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairingLocalToPeer, SecureSessionMgr::PairingDirection::kResponder,
-                                      0);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairingLocalToPeer, SecureSession::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecureSessionHandle localToRemoteSession = callback.mLocalToRemoteSession;

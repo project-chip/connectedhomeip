@@ -366,7 +366,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
     }
 
     err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &pairingSession,
-                                      SecureSessionMgr::PairingDirection::kInitiator, mAdminId);
+                                      SecureSession::SessionRole::kInitiator, mAdminId);
     SuccessOrExit(err);
 
 exit:

@@ -144,11 +144,7 @@ static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clu
 
 EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)
 {
-    if (delayMs == 0)
-    {
-        emberEventControlSetActive(control);
-    }
-    else if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
+    if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
     {
         control->status = EMBER_EVENT_MS_TIME;
         chip::DeviceLayer::SystemLayer.StartTimer(delayMs, EventControlHandler, control);

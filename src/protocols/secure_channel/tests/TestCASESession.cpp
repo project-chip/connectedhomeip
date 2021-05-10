@@ -228,7 +228,7 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
         SecureSession session1;
 
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession1->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
+                       testPairingSession1->DeriveSecureSession(session1, SecureSession::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
     }
@@ -236,7 +236,7 @@ void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     {
         SecureSession session2;
         NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(session2, SecureSession::SessionRole::kResponder) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);

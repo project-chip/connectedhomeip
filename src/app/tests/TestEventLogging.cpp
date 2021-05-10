@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/ClusterInfo.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
@@ -145,8 +146,9 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     size_t elementCount;
     writer.Init(backingStore, 1024);
-
-    err = alogMgmt.FetchEventsSince(writer, priority, startingEventNumber);
+    chip::app::ClusterInfo testClusterInfo;
+    testClusterInfo.mEventId = 1;
+    err                      = alogMgmt.FetchEventsSince(writer, &testClusterInfo, priority, startingEventNumber);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());
