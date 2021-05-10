@@ -49,6 +49,10 @@ template("chip_data_model") {
     }
   }
 
+  _use_default_im_dispatch =
+      !defined(invoker.use_default_im_dispatch) ||
+      invoker.use_default_im_dispatch
+
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
       invoker.use_default_client_callbacks
@@ -108,7 +112,6 @@ template("chip_data_model") {
       "${_app_root}/util/process-cluster-message.cpp",
       "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",
-      "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp",
     ]
 
     if (defined(invoker.cluster_sources)) {
@@ -146,12 +149,15 @@ template("chip_data_model") {
         "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
         "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
         "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
-        "${invoker.zap_pregenerated_dir}/call-command-handler.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
       ]
 
       if (_use_default_client_callbacks) {
         sources += [ "${invoker.zap_pregenerated_dir}/CHIPClientCallbacks.cpp" ]
+      }
+
+      if (_use_default_im_dispatch) {
+        sources += [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
       }
     }
 
