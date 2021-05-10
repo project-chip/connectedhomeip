@@ -122,6 +122,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
 | Switch                                                              | 0x003B |
@@ -302,6 +303,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_TOGGLE_COMMAND_ID (0x02)
 
 #define OPERATIONAL_CREDENTIALS_CLUSTER_ID 0x003E
+#define ZCL_ADD_OP_CERT_COMMAND_ID (0x06)
+#define ZCL_OP_CSR_REQUEST_COMMAND_ID (0x04)
 #define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
@@ -4143,6 +4146,8 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * AddOpCert                                                         |   0x06 |
+| * OpCSRRequest                                                      |   0x04 |
 | * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
 | * SetFabric                                                         |   0x00 |
@@ -4152,6 +4157,72 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | * FabricsList                                                       | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddOpCert
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterAddOpCertCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                       chip::ByteSpan noc, chip::ByteSpan iCACertificate,
+                                                                       chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
+                                                                       uint16_t adminVendorId)
+{
+    COMMAND_HEADER("AddOpCert", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    size_t nocStrLen = noc.size();
+    if (!CanCastTo<uint8_t>(nocStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, nocStrLen);
+        return PacketBufferHandle();
+    }
+
+    size_t iCACertificateStrLen = iCACertificate.size();
+    if (!CanCastTo<uint8_t>(iCACertificateStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, iCACertificateStrLen);
+        return PacketBufferHandle();
+    }
+
+    size_t iPKValueStrLen = iPKValue.size();
+    if (!CanCastTo<uint8_t>(iPKValueStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, iPKValueStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ADD_OP_CERT_COMMAND_ID)
+        .Put(static_cast<uint8_t>(nocStrLen))
+        .Put(noc.data(), noc.size())
+        .Put(static_cast<uint8_t>(iCACertificateStrLen))
+        .Put(iCACertificate.data(), iCACertificate.size())
+        .Put(static_cast<uint8_t>(iPKValueStrLen))
+        .Put(iPKValue.data(), iPKValue.size())
+        .Put64(caseAdminNode)
+        .Put16(adminVendorId);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command OpCSRRequest
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterOpCSRRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                          chip::ByteSpan cSRNonce)
+{
+    COMMAND_HEADER("OpCSRRequest", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    size_t cSRNonceStrLen = cSRNonce.size();
+    if (!CanCastTo<uint8_t>(cSRNonceStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, cSRNonceStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_OP_CSR_REQUEST_COMMAND_ID)
+        .Put(static_cast<uint8_t>(cSRNonceStrLen))
+        .Put(cSRNonce.data(), cSRNonce.size());
+    COMMAND_FOOTER();
+}
 
 /*
  * Command RemoveAllFabrics

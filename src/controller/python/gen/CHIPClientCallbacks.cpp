@@ -94,6 +94,8 @@ using namespace ::chip;
         return true;                                                                                                               \
     }
 
+extern "C" {
+
 void LogStatus(uint8_t status)
 {
     switch (status)
@@ -1869,6 +1871,44 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, uint8_t * CSR, uint32_t CSRLen,
+                                                               uint8_t * CSRNonce, uint8_t * VendorReserved1,
+                                                               uint8_t * VendorReserved2, uint8_t * VendorReserved3,
+                                                               uint8_t * Signature)
+{
+    ChipLogProgress(Zcl, "OpCSRResponse:");
+    ChipLogProgress(Zcl, "  CSR: %s", CSR);
+    ChipLogProgress(Zcl, "  CSRLen: %" PRIu32 "", CSRLen);
+    ChipLogProgress(Zcl, "  CSRNonce: %s", CSRNonce);
+    ChipLogProgress(Zcl, "  VendorReserved1: %s", VendorReserved1);
+    ChipLogProgress(Zcl, "  VendorReserved2: %s", VendorReserved2);
+    ChipLogProgress(Zcl, "  VendorReserved3: %s", VendorReserved3);
+    ChipLogProgress(Zcl, "  Signature: %s", Signature);
+
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::Command * commandObj, uint8_t StatusCode,
+                                                                uint64_t FabricIndex, uint8_t * DebugText)
+{
+    ChipLogProgress(Zcl, "OpCertResponse:");
+    ChipLogProgress(Zcl, "  StatusCode: %" PRIu8 "", StatusCode);
+    ChipLogProgress(Zcl, "  FabricIndex: %" PRIu64 "", FabricIndex);
+    ChipLogProgress(Zcl, "  DebugText: %s", DebugText);
+
+    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCertResponseCallback");
+
+    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * cb =
+        Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, StatusCode, FabricIndex, DebugText);
+    return true;
+}
+
 bool emberAfOperationalCredentialsClusterSetFabricResponseCallback(chip::app::Command * commandObj, chip::FabricId FabricId)
 {
     ChipLogProgress(Zcl, "SetFabricResponse:");
@@ -2311,4 +2351,5 @@ bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * message, uin
     }
 
     return true;
+}
 }

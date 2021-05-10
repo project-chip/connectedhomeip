@@ -2170,6 +2170,30 @@ CHIP_ERROR chip_ime_ReadAttribute_OnOff_ClusterRevision(chip::Controller::Device
 // End of Cluster OnOff
 // Cluster OperationalCredentials
 
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_AddOpCert(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                   const uint8_t * noc, uint32_t noc_Len,
+                                                                   const uint8_t * iCACertificate, uint32_t iCACertificate_Len,
+                                                                   const uint8_t * iPKValue, uint32_t iPKValue_Len,
+                                                                   chip::NodeId caseAdminNode, uint16_t adminVendorId)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AddOpCert(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(), chip::ByteSpan(noc, noc_Len),
+                             chip::ByteSpan(iCACertificate, iCACertificate_Len), chip::ByteSpan(iPKValue, iPKValue_Len),
+                             caseAdminNode, adminVendorId);
+}
+CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(chip::Controller::Device * device,
+                                                                      chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                      const uint8_t * cSRNonce, uint32_t cSRNonce_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::OperationalCredentialsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.OpCSRRequest(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                chip::ByteSpan(cSRNonce, cSRNonce_Len));
+}
 CHIP_ERROR chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics(chip::Controller::Device * device,
                                                                           chip::EndpointId ZCLendpointId, chip::GroupId)
 {
