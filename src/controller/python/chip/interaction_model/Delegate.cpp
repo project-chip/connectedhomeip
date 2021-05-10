@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+#include <cinttypes>
+
+#include <app/InteractionModelEngine.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
 
 #include <support/logging/CHIPLogging.h>
@@ -22,6 +25,21 @@
 using namespace chip::app;
 
 namespace chip {
+
+namespace app {
+
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+{
+    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
+                  aCommandId, aEndPointId);
+    ChipLogError(
+        Controller,
+        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
+}
+
+} // namespace app
+
 namespace Controller {
 
 PythonInteractionModelDelegate gPythonInteractionModelDelegate;
