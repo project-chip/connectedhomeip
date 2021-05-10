@@ -41,6 +41,8 @@
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY 4
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY 5
 
+#define CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS 1
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Darwin platforms.

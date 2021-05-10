@@ -55,6 +55,19 @@ std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
     return typeBuilder.str();
 }
 
+std::string GetFullTypeWithSubTypes(const char * type, MdnsServiceProtocol protocol, const char * subTypes[], size_t subTypeSize)
+{
+    std::ostringstream typeBuilder;
+    typeBuilder << type;
+    typeBuilder << (protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? kProtocolUdp : kProtocolTcp);
+    for (int i = 0; i < (int) subTypeSize; i++)
+    {
+        typeBuilder << ",";
+        typeBuilder << subTypes[i];
+    }
+    return typeBuilder.str();
+}
+
 } // namespace
 
 namespace chip {
@@ -143,7 +156,7 @@ CHIP_ERROR MdnsContexts::Removes(ContextType type)
     return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR MdnsContexts::Get(ContextType type, GenericContext * context)
+CHIP_ERROR MdnsContexts::Get(ContextType type, GenericContext ** context)
 {
     bool found = false;
     std::vector<GenericContext *>::iterator iter;
@@ -152,8 +165,26 @@ CHIP_ERROR MdnsContexts::Get(ContextType type, GenericContext * context)
     {
         if ((*iter)->type == type)
         {
-            context = *iter;
-            found   = true;
+            *context = *iter;
+            found    = true;
+            break;
+        }
+    }
+
+    return found ? CHIP_NO_ERROR : CHIP_ERROR_KEY_NOT_FOUND;
+}
+
+CHIP_ERROR MdnsContexts::GetRegisterType(const char * type, GenericContext ** context)
+{
+    bool found = false;
+    std::vector<GenericContext *>::iterator iter;
+
+    for (iter = mContexts.begin(); iter != mContexts.end(); iter++)
+    {
+        if ((*iter)->type == ContextType::Register && ((RegisterContext *) (*iter))->matches(type))
+        {
+            *context = *iter;
+            found    = true;
             break;
         }
     }
@@ -277,12 +308,12 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
 {
     DNSServiceErrorType err;
     DNSServiceRef sdRef;
-    RegisterContext * sdCtx = nullptr;
+    GenericContext * sdCtx = nullptr;
 
     uint16_t recordLen          = TXTRecordGetLength(recordRef);
     const void * recordBytesPtr = TXTRecordGetBytesPtr(recordRef);
 
-    if (CHIP_NO_ERROR == MdnsContexts::GetInstance().Get(ContextType::Register, sdCtx))
+    if (CHIP_NO_ERROR == MdnsContexts::GetInstance().GetRegisterType(type, &sdCtx))
     {
         err = DNSServiceUpdateRecord(sdCtx->serviceRef, NULL, 0 /* flags */, recordLen, recordBytesPtr, 0 /* ttl */);
         TXTRecordDeallocate(recordRef);
@@ -290,7 +321,7 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
         return CHIP_NO_ERROR;
     }
 
-    sdCtx = chip::Platform::New<RegisterContext>(nullptr);
+    sdCtx = chip::Platform::New<RegisterContext>(type, nullptr);
     err   = DNSServiceRegister(&sdRef, 0 /* flags */, interfaceId, name, type, kLocalDomain, NULL, port, recordLen, recordBytesPtr,
                              OnRegister, sdCtx);
     TXTRecordDeallocate(recordRef);
@@ -471,7 +502,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsSupportedProtocol(service->mProtocol), CHIP_ERROR_INVALID_ARGUMENT);
 
-    std::string regtype  = GetFullType(service->mType, service->mProtocol);
+    std::string regtype  = GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
     uint32_t interfaceId = GetInterfaceId(service->mInterface);
 
     TXTRecordRef record;
@@ -483,8 +514,8 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 
 CHIP_ERROR ChipMdnsStopPublish()
 {
-    RegisterContext * sdCtx = nullptr;
-    if (CHIP_ERROR_KEY_NOT_FOUND == MdnsContexts::GetInstance().Get(ContextType::Register, sdCtx))
+    GenericContext * sdCtx = nullptr;
+    if (CHIP_ERROR_KEY_NOT_FOUND == MdnsContexts::GetInstance().Get(ContextType::Register, &sdCtx))
     {
         return CHIP_NO_ERROR;
     }

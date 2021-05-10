@@ -18,6 +18,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <stddef.h>
 
 namespace chip {
 namespace app {
@@ -26,11 +27,20 @@ namespace Mdns {
 /// Start operational advertising
 CHIP_ERROR AdvertiseOperational();
 
-/// Start commisionable node advertising
-CHIP_ERROR AdvertiseCommisionable();
+/// Set MDNS commissioner advertisement
+CHIP_ERROR AdvertiseCommissioner();
+
+/// Set MDNS commissionable node advertisement
+CHIP_ERROR AdvertiseCommissionableNode();
+
+/// Set MDNS advertisement
+// CHIP_ERROR Advertise(chip::Mdns::CommssionAdvertiseMode mode);
+CHIP_ERROR Advertise(bool commissionableNode);
 
 /// (Re-)starts the minmdns server
 void StartServer();
+
+CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize);
 
 } // namespace Mdns
 } // namespace app

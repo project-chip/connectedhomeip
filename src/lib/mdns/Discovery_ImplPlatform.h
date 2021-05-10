@@ -24,6 +24,10 @@
 #include <lib/mdns/platform/Mdns.h>
 #include <platform/CHIPDeviceConfig.h>
 
+// Enable detailed mDNS logging for publish
+#undef DETAIL_LOGGING
+// #define DETAIL_LOGGING
+
 namespace chip {
 namespace Mdns {
 
@@ -38,11 +42,11 @@ public:
     /// Advertises the CHIP node as an operational node
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
 
-    /// Advertises the CHIP node as a commisioning/commissionable node
+    /// Advertises the CHIP node as a commissioner/commissionable node
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override;
 
     /// This function stops publishing the device on mDNS.
-    CHIP_ERROR StopPublishDevice();
+    CHIP_ERROR StopPublishDevice() override;
 
     /// Registers a resolver delegate if none has been registered before
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
@@ -66,12 +70,17 @@ private:
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
     CHIP_ERROR SetupHostname(chip::ByteSpan macOrEui64);
+#ifdef DETAIL_LOGGING
+    static void PrintEntries(const MdnsService * service);
+#endif
 
     OperationalAdvertisingParameters mOperationalAdvertisingParams;
-    bool mIsOperationalPublishing = false;
+    CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
+    CommissionAdvertisingParameters mCommissionerAdvertisingParams;
+    bool mIsOperationalPublishing        = false;
+    bool mIsCommissionableNodePublishing = false;
+    bool mIsCommissionerPublishing       = false;
     uint64_t mCommissionInstanceName;
-    CommissionAdvertisingParameters mCommissioningdvertisingParams;
-    bool mIsCommissionalPublishing = false;
 
     bool mMdnsInitialized                = false;
     ResolverDelegate * mResolverDelegate = nullptr;

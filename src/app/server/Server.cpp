@@ -170,8 +170,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                  session->PeerConnection().GetPeerNodeId(), session,
-                                  SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+                                  session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
+                                  connection.GetAdminId(), nullptr);
             session->Clear();
         }
     }
@@ -595,7 +595,7 @@ CHIP_ERROR AddTestPairing()
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:

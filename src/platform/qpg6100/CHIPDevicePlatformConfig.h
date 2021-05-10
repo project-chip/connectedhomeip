@@ -67,3 +67,7 @@
 // disabled for Locks and Barrier Access Devices.
 #define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 0
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
+
+// ========== Platform-specific Cluster Overrides =========
+#define CHIP_CLUSTER_NETWORK_COMMISSIONING_MAX_NETWORKS 1
+

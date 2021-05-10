@@ -338,7 +338,7 @@ public:
         }
         else if (i == 2)
         {
-            app::Mdns::AdvertiseCommisionable();
+            app::Mdns::AdvertiseCommissionableNode();
             OpenDefaultPairingWindow(ResetAdmins::kNo, PairingWindowAdvertisement::kMdns);
         }
     }
