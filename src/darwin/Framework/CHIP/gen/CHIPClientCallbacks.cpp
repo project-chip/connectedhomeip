@@ -26,12 +26,16 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
+#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPEncoding.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::List;
+
+constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 
 #define CHECK_MESSAGE_LENGTH(value)                                                                                                \
     if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
@@ -505,9 +509,9 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                             data[i].GroupKeyIndex = emberAfGetInt16u(message, 0, messageLen);
                             message += 2;
                             CHECK_MESSAGE_LENGTH(2);
-                            data[i].GroupKeyRoot = chip::ByteSpan(message, 16);
-                            message += 16;
-                            CHECK_MESSAGE_LENGTH(16);
+                            ReadByteSpan(message, messageLen, &data[i].GroupKeyRoot);
+                            message += 18;
+                            CHECK_MESSAGE_LENGTH(18);
                             data[i].GroupKeyEpochStartTime = emberAfGetInt64u(message, 0, messageLen);
                             message += 8;
                             CHECK_MESSAGE_LENGTH(8);
@@ -565,6 +569,45 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
 
                         Callback::Callback<TestClusterListInt8uListAttributeCallback> * cb =
                             Callback::Callback<TestClusterListInt8uListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x001B: // OCTET_STRING
+                    {
+                        chip::ByteSpan data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            uint16_t entryLength = 0;
+                            ReadByteSpanSize(message, &entryLength);
+                            message += kByteSpanSizeLengthInBytes;
+                            CHECK_MESSAGE_LENGTH(kByteSpanSizeLengthInBytes);
+
+                            data[i] = chip::ByteSpan(message, entryLength);
+                            message += entryLength;
+                            CHECK_MESSAGE_LENGTH(entryLength);
+                        }
+
+                        Callback::Callback<TestClusterListOctetStringListAttributeCallback> * cb =
+                            Callback::Callback<TestClusterListOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    case 0x001C: // TestListStructOctet
+                    {
+                        _TestListStructOctet data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            data[i].fabricIndex = emberAfGetInt64u(message, 0, messageLen);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(8);
+                            ReadByteSpan(message, messageLen, &data[i].operationalCert);
+                            message += 34;
+                            CHECK_MESSAGE_LENGTH(34);
+                        }
+
+                        Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> * cb =
+                            Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
                         cb->mCall(cb->mContext, count, data);
                         break;
                     }

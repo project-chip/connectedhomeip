@@ -123,3 +123,6 @@ typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, ui
 typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
 typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
+typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
+typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
+                                                                      _TestListStructOctet * entries);

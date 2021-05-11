@@ -484,6 +484,13 @@ typedef struct _SpecialDay
     uint8_t dayIdRef;
 } EmberAfSpecialDay;
 
+// Struct for TestListStructOctet
+typedef struct _TestListStructOctet
+{
+    uint64_t fabricIndex;
+    chip::ByteSpan operationalCert;
+} EmberAfTestListStructOctet;
+
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {

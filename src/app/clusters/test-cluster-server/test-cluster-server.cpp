@@ -34,7 +34,99 @@
 
 using namespace chip;
 
-void emberAfPluginTestClusterServerInitCallback(void) {}
+constexpr const char * kErrorStr = "Test Cluster: List Octet cluster (0x%02x) Error setting '%s' attribute: 0x%02x";
+
+namespace {
+EmberAfStatus writeAttribute(uint8_t endpoint, AttributeId attributeId, uint8_t * buffer, int32_t index = -1)
+{
+    EmberAfAttributeSearchRecord record;
+    record.endpoint         = endpoint;
+    record.clusterId        = ZCL_TEST_CLUSTER_ID;
+    record.clusterMask      = CLUSTER_MASK_SERVER;
+    record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
+    record.attributeId      = attributeId;
+
+    // When reading or writing a List attribute the 'index' value could have 3 types of values:
+    //  -1: Read/Write the whole list content, including the number of elements in the list
+    //   0: Read/Write the number of elements in the list, represented as a uint16_t
+    //   n: Read/Write the nth element of the list
+    //
+    // Since the first 2 bytes of the attribute are used to store the number of elements, elements indexing starts
+    // at 1. In order to hide this to the rest of the code of this file, the element index is incremented by 1 here.
+    // This also allows calling writeAttribute() with no index arg to mean "write the length".
+    return emAfReadOrWriteAttribute(&record, NULL, buffer, 0, true, index + 1);
+}
+
+EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    AttributeId attributeId = ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID;
+
+    uint16_t attributeCount = 4;
+    char * data = strdup("TestN");
+    chip::ByteSpan span = chip::ByteSpan(reinterpret_cast<uint8_t *>(data), strlen(data));
+
+    for (uint8_t index = 0; index < attributeCount; index++)
+    {
+        sprintf(data + strlen(data) - 1, "%d", index);
+
+        status = writeAttribute(endpoint, attributeId, (uint8_t *) &span, index);
+        VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+        ChipLogProgress(Zcl, "Written %d", index);
+    }
+
+    status = writeAttribute(endpoint, attributeId, (uint8_t *) &attributeCount);
+    VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    return status;
+}
+
+EmberAfStatus writeTestListStructOctetAttribute(uint8_t endpoint)
+{
+    EmberAfStatus status    = EMBER_ZCL_STATUS_SUCCESS;
+    AttributeId attributeId = ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID;
+
+    uint16_t attributeCount = 4;
+    char * data = strdup("TestN");
+    chip::ByteSpan span = chip::ByteSpan(reinterpret_cast<uint8_t *>(data), strlen(data));
+
+    for (uint8_t index = 0; index < attributeCount; index++)
+    {
+        sprintf(data + strlen(data) - 1, "%d", index);
+
+        _TestListStructOctet structOctet;
+        structOctet.fabricIndex = index;
+        structOctet.operationalCert = span;
+
+        status = writeAttribute(endpoint, attributeId, (uint8_t *) &structOctet, index);
+        VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    }
+
+    status = writeAttribute(endpoint, attributeId, (uint8_t *) &attributeCount);
+    VerifyOrReturnError(status == EMBER_ZCL_STATUS_SUCCESS, status);
+    ChipLogProgress(Zcl, "Written index", attributeCount);
+    return status;
+}
+}
+
+void emberAfPluginTestClusterServerInitCallback(void)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    for (uint8_t index = 0; index < emberAfEndpointCount(); index++)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(index);
+        if (!emberAfContainsCluster(endpoint, ZCL_TEST_CLUSTER_ID))
+        {
+            continue;
+        }
+
+        status = writeTestListOctetAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list octet", status));
+
+        status = writeTestListStructOctetAttribute(endpoint);
+        VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(Zcl, kErrorStr, endpoint, "test list strut octet", status));
+    }
+}
 
 bool emberAfTestClusterClusterTestCallback(chip::app::Command *)
 {

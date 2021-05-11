@@ -26,12 +26,16 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
+#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPEncoding.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::List;
+
+constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 
 #define CHECK_MESSAGE_LENGTH(value)                                                                                                \
     if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
