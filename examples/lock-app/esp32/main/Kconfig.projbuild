@@ -31,8 +31,6 @@ menu "Demo"
 
         config DEVICE_TYPE_ESP32_DEVKITC
             bool "ESP32-DevKitC"
-        config DEVICE_TYPE_M5STACK
-            bool "M5Stack"
     endchoice
 
     choice
