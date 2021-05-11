@@ -30,6 +30,7 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
+#include <controller/CHIPOperationalCredentialsProvisioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
@@ -327,7 +328,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEst
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() {}
+    ~DeviceCommissioner();
 
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
@@ -460,12 +461,25 @@ private:
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId);
-    CHIP_ERROR OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr);
-    CHIP_ERROR SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
-    CHIP_ERROR SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf);
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(Device * device);
+    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendTrustedRootCertificate(Device * device, const ByteSpan & certBuf);
+
+    static void OnCSRFailureResponse(void * context, uint8_t status);
+    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
+                                                       ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
+
+    static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+
+    CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
+                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
 
     uint16_t mNextKeyId = 0;
+
+    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * mOpCSRResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * mOpCertResponseCallback;
+    Callback::Callback<DefaultFailureCallback> * mOnFailureCallback;
 
     PASESession mPairingSession;
 };

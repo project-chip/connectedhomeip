@@ -23,7 +23,10 @@
 
 #include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -36,6 +39,8 @@ static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
 // platform. Keeping them short.
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
 constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
+
+constexpr uint16_t kMaxChipCertSize = 600;
 
 struct OperationalCredentials
 {
@@ -65,6 +70,22 @@ class DLL_EXPORT AdminPairingInfo
 public:
     AdminPairingInfo() { Reset(); }
 
+    ~AdminPairingInfo()
+    {
+        if (mOperationalKey != nullptr)
+        {
+            chip::Platform::Delete(mOperationalKey);
+        }
+        if (mRootCert != nullptr)
+        {
+            chip::Platform::MemoryFree(mRootCert);
+        }
+        if (mOperationalCert == nullptr)
+        {
+            chip::Platform::MemoryFree(mOperationalCert);
+        }
+    }
+
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
 
@@ -76,6 +97,12 @@ public:
 
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
+
+    Crypto::P256Keypair * GetOperationalKey() { return mOperationalKey; }
+    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
+
+    CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
+    CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
     const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
     OperationalCredentials & GetOperationalCreds() { return mOpCred; }
@@ -96,6 +123,23 @@ public:
         mAdmin    = kUndefinedAdminId;
         mFabricId = kUndefinedFabricId;
         mVendorId = kUndefinedVendorId;
+
+        if (mOperationalKey != nullptr)
+        {
+            mOperationalKey->Initialize();
+        }
+        if (mRootCert != nullptr)
+        {
+            chip::Platform::MemoryFree(mRootCert);
+            mRootCert    = nullptr;
+            mRootCertLen = 0;
+        }
+        if (mOperationalCert != nullptr)
+        {
+            chip::Platform::MemoryFree(mOperationalCert);
+            mOperationalCert = nullptr;
+            mOpCertLen       = 0;
+        }
     }
 
     friend class AdminPairingTable;
@@ -108,6 +152,13 @@ private:
 
     OperationalCredentials mOpCred;
     AccessControlList mACL;
+
+    Crypto::P256Keypair * mOperationalKey = nullptr;
+
+    uint8_t * mRootCert        = nullptr;
+    uint16_t mRootCertLen      = 0;
+    uint8_t * mOperationalCert = nullptr;
+    uint16_t mOpCertLen        = 0;
 
     static constexpr size_t KeySize();
 
@@ -123,6 +174,13 @@ private:
         uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
+
+        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
+        uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
+
+        Crypto::P256SerializedKeypair mOperationalKey;
+        uint8_t mRootCert[kMaxChipCertSize];
+        uint8_t mOperationalCert[kMaxChipCertSize];
     };
 };
 

@@ -36,11 +36,39 @@
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 
+using namespace chip;
+using namespace ::chip::Transport;
+
+static AdminPairingInfo * retrieveCurrentAdmin()
+{
+    uint64_t fabricId = emberAfCurrentCommand()->SourceNodeId();
+    return GetGlobalAdminPairingTable().FindAdminForNode(fabricId);
+}
+
 bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
                                                                             chip::ByteSpan RootCertificate)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
+
+    // Fetch current admin
+    AdminPairingInfo * admin = retrieveCurrentAdmin();
+    VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(admin->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
+exit:
     emberAfSendImmediateDefaultResponse(status);
+    if (status == EMBER_ZCL_STATUS_FAILURE)
+    {
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
+    }
+
     return true;
 }
 
