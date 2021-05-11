@@ -81,7 +81,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     }
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(MsgType::EchoResponse, std::move(response), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    ec->SendMessage(MsgType::EchoResponse, std::move(response));
 
     // Discard the exchange context.
     ec->Close();

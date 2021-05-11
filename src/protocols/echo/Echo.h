@@ -94,7 +94,8 @@ public:
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload, const Messaging::SendFlags & sendFlags);
+    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload,
+                               const Messaging::SendFlags & sendFlags = Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;

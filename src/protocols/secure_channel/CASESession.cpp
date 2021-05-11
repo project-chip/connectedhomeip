@@ -789,8 +789,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     SuccessOrExit(err);
 
     // Call delegate to send the Msg3 to peer
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaR3, std::move(msg_R3),
-                                     SendFlags(SendMessageFlags::kNone));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaR3, std::move(msg_R3));
     SuccessOrExit(err);
 
     ChipLogDetail(Inet, "Sent SigmaR3 msg");
@@ -921,8 +920,7 @@ void CASESession::SendErrorMsg(SigmaErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg),
-                                     SendFlags(SendMessageFlags::kNone));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_SigmaErr, std::move(msg));
     SuccessOrExit(err);
 
 exit:
