@@ -1684,20 +1684,20 @@ public:
 
     ~CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * CSR, uint8_t * CSRNonce, uint8_t * VendorReserved1, uint8_t * VendorReserved2,
-        uint8_t * VendorReserved3, uint8_t * Signature)
+    static void CallbackFn(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+        chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
     {
         CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge *>(context);
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"CSR" : [NSString stringWithFormat:@"%s", CSR],
-                    @"CSRNonce" : [NSString stringWithFormat:@"%s", CSRNonce],
-                    @"VendorReserved1" : [NSString stringWithFormat:@"%s", VendorReserved1],
-                    @"VendorReserved2" : [NSString stringWithFormat:@"%s", VendorReserved2],
-                    @"VendorReserved3" : [NSString stringWithFormat:@"%s", VendorReserved3],
-                    @"Signature" : [NSString stringWithFormat:@"%s", Signature],
+                    @"CSR" : [NSString stringWithFormat:@"%p", CSR.data()],
+                    @"CSRNonce" : [NSString stringWithFormat:@"%p", CSRNonce.data()],
+                    @"VendorReserved1" : [NSString stringWithFormat:@"%p", VendorReserved1.data()],
+                    @"VendorReserved2" : [NSString stringWithFormat:@"%p", VendorReserved2.data()],
+                    @"VendorReserved3" : [NSString stringWithFormat:@"%p", VendorReserved3.data()],
+                    @"Signature" : [NSString stringWithFormat:@"%p", Signature.data()],
                 });
                 callback->Cancel();
                 delete callback;
