@@ -362,7 +362,9 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                              "Message counter synchronization for received message, failed to "
                              "QueueReceivedMessageAndStartSync, err = %d",
                              err);
-            } else {
+            }
+            else
+            {
                 ChipLogDetail(Inet, "Received message have been queued due to peer counter is not synced");
             }
 

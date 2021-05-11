@@ -263,8 +263,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         writer = commandObj->GetCommandDataElementTLVWriter();
-        SuccessOrExit(
-            err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSession().GetPeerNodeId()));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSession().GetPeerNodeId()));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 
