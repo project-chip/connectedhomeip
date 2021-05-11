@@ -69,8 +69,8 @@ scripts/build/default.sh
 cp out/default/chip-echo-requester out/default/chip-echo-responder out/default/chip-tool $HOME/FunctionalTests
 
 # Install Python Chip Device Controller
-virtualenv $HOME/FunctionalTests/python_env
-source $HOME/FunctionalTests/python_env/bin/activate
+virtualenv $HOME/FunctionalTests/.venv
+source $HOME/FunctionalTests/.venv/bin/activate
 pip install out/default/controller/python/chip*.whl
 pip install -r src/test_driver/mbed-functional/requirements.txt
 deactivate
