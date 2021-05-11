@@ -29,7 +29,6 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/reporting                                \
   ../third_party/connectedhomeip/src/app/clusters/basic                           \
   ../third_party/connectedhomeip/src/app/clusters/bindings                        \
-  ../third_party/connectedhomeip/src/app/clusters/general-commissioning-server    \
   ../third_party/connectedhomeip/src/app/clusters/network-commissioning           \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server  \
 
