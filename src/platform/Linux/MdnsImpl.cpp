@@ -84,7 +84,7 @@ CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, 
 
     for (size_t i = 0; i < size; i++)
     {
-        uint8_t buf[kMdnsTextKeyMaxSize + 1 + 1];
+        uint8_t buf[chip::Mdns::kMdnsTextMaxSize];
         size_t offset = static_cast<size_t>(snprintf(reinterpret_cast<char *>(buf), sizeof(buf), "%s=", entries[i].mKey));
 
         if (offset + entries[i].mDataSize > sizeof(buf))
