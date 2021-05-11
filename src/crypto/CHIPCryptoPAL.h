@@ -400,6 +400,13 @@ private:
     HashSHA256OpaqueContext mContext;
 };
 
+
+class HKDF_sha
+{
+public:
+    HKDF_sha() {}
+    virtual ~HKDF_sha() {}
+
 /**
  * @brief A function that implements SHA-256 based HKDF
  * @param secret The secret to use as the key to the HKDF
@@ -413,8 +420,11 @@ private:
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
+virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
                        size_t info_length, uint8_t * out_buffer, size_t out_length);
+
+};
+
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A

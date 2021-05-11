@@ -27,6 +27,12 @@
 namespace chip {
 namespace Crypto {
 
+#ifdef ENABLE_HSM_HKDF
+using HKDF_sha_crypto = HKDF_shaHSM;
+#else
+using HKDF_sha_crypto = HKDF_sha;
+#endif
+
 CHIP_ERROR Spake2p::InternalHash(const uint8_t * in, size_t in_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
@@ -431,8 +437,9 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::KDF(const uint8_t * ikm, const size_t 
                                               size_t out_len)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    HKDF_sha_crypto mHKDF;
 
-    error = HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len);
+    error = mHKDF.HKDF_SHA256(ikm, ikm_len, salt, salt_len, info, info_len, out, out_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     error = CHIP_NO_ERROR;

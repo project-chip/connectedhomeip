@@ -89,6 +89,7 @@ static_library("crypto") {
     sources += [
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_P256.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_PBKDF.cpp",
+      "hsm/nxp/CHIPCryptoPALHsm_SE05X_HKDF.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_Spake2p.cpp",
       "hsm/nxp/CHIPCryptoPALHsm_SE05X_utils.cpp",
     ]
