@@ -49,4 +49,8 @@ limitations under the License.
      <item name="NodeId" type="NODE_ID"/>
      // TODO: Add Label once CHAR_STRING or OCTET_STRING works
    </struct>
+   <struct name="TestListStructOctet">
+     <item name="fabricIndex" type="INT64U"/>
+     <item name="operationalCert" type="OCTET_STRING" length="32"/>
+   </struct>
 </configurator>
