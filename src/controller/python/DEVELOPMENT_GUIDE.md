@@ -29,7 +29,7 @@ ninja -C out/debug
 * Copy this wheel file into the sample test client folder or into the test harness controller dockerfile folder.
 
 # Testing with a real accessory
-You need to map the the system dbus to the docker dbus and run the docker with --privileged to be able to communicate with the real accessory 
+* You need to map the the system dbus to the docker dbus and run the docker with --privileged to be able to communicate with the real accessory 
 * Launch the a Docker container for chip device controller
 Sample Docker File Used: https://docs.google.com/document/d/1-CMDrKEBGnHhSvAUMHH7ZSRDiKhuu2iwI-GYVUjI7DY/edit?resourcekey=0-VTKXbTk9YYQmdq10xa_f7g#heading=h.yzihj7w54f7a
 docker run --name docker-python-controller -v /var/run/dbus:/var/run/dbus --privileged -it <Docker Image>
@@ -71,17 +71,8 @@ emulator/btvirt -L -l<Number of Virtual BLE interfaces to be created> &
 * Check hciconfig to confirm the said number of Virtual BLE interfaces are created
 
 * Launch the a Docker container for chip Linux Lighting app
-Docker File used: https://docs.google.com/document/d/1-CMDrKEBGnHhSvAUMHH7ZSRDiKhuu2iwI-GYVUjI7DY/edit?resourcekey=0-VTKXbTk9YYQmdq10xa_f7g#heading=h.fhxz5ukwxfyz
+Sample Docker File used: https://docs.google.com/document/d/1xOizHV3ZeG_mu70CJWp-tN4xYoDxRhjEnwFKzhkIiC0/edit#heading=h.9hjqswbm7x50
 docker run --name docker-chip-lighting-app -v /var/run/dbus:/var/run/dbus --privileged -it <Docker Image>
-
-* Setup the chip environment in docker-chip-lighting-app Docker container and Build the Linux Lighting App
-```bash
-source scripts/activate.sh
-cd examples/lightint-app/linux
-gn gen out/debug
-ninja -C out/debug
-```
-#TODO: Eliminate the need to build linux lighting app inside the docker-chip-lighting-app Docker container and use pre built binaries instead.
 
 * Launch the Linux Lighting App in the docker-chip-lighting-app Docker container specifying the ble-device parameter as follows:
 ./chip-lighting-app --ble-device 1 --wifi
