@@ -434,6 +434,7 @@ static inline const mbedtls_ecp_keypair * to_const_keypair(const P256KeypairCont
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature)
 {
+#if defined(MBEDTLS_ECDSA_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
@@ -464,10 +465,14 @@ exit:
     mbedtls_ecdsa_free(&ecdsa_ctxt);
     _log_mbedTLS_error(result);
     return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature)
 {
+#if defined(MBEDTLS_ECDSA_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     size_t siglen    = out_signature.Capacity();
@@ -494,11 +499,15 @@ exit:
     mbedtls_ecdsa_free(&ecdsa_ctxt);
     _log_mbedTLS_error(result);
     return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
 {
+#if defined(MBEDTLS_ECDSA_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
     uint8_t hash[NUM_BYTES_IN_SHA256_HASH];
@@ -532,11 +541,15 @@ exit:
     mbedtls_ecdsa_free(&ecdsa_ctxt);
     _log_mbedTLS_error(result);
     return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
                                                         const P256ECDSASignature & signature) const
 {
+#if defined(MBEDTLS_ECDSA_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = 0;
 
@@ -566,6 +579,9 @@ exit:
     mbedtls_ecdsa_free(&ecdsa_ctxt);
     _log_mbedTLS_error(result);
     return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
