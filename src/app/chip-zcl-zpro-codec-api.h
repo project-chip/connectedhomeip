@@ -2902,6 +2902,8 @@ encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, 
 | * Enum16                                                            | 0x0016 |
 | * OctetString                                                       | 0x0019 |
 | * ListInt8u                                                         | 0x001A |
+| * ListOctetString                                                   | 0x001B |
+| * ListStructOctetString                                             | 0x001C |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3148,6 +3150,20 @@ encodeTestClusterClusterWriteOctetStringAttribute(uint8_t seqNum, chip::Endpoint
  */
 chip::System::PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(uint8_t seqNum,
                                                                                 chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the list_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the list_struct_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
 
 /**
  * @brief

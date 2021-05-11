@@ -777,6 +777,34 @@ static void OnTestClusterListInt8uListAttributeResponse(void * context, uint16_t
     command->SetCommandExitStatus(true);
 }
 
+static void OnTestClusterListOctetStringListAttributeResponse(void * context, uint16_t count, chip::ByteSpan * entries)
+{
+    ChipLogProgress(chipTool, "OnTestClusterListOctetStringListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "OCTET_STRING[%lu]: %s", i, entries[i]);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
+static void OnTestClusterListStructOctetStringListAttributeResponse(void * context, uint16_t count, _TestListStructOctet * entries)
+{
+    ChipLogProgress(chipTool, "OnTestClusterListStructOctetStringListAttributeResponse: %lu entries", count);
+
+    for (uint16_t i = 0; i < count; i++)
+    {
+        ChipLogProgress(chipTool, "TestListStructOctet[%lu]:", i);
+        ChipLogProgress(chipTool, "  fabricIndex: %" PRIu64 "", entries[i].fabricIndex);
+        ChipLogProgress(chipTool, "  operationalCert: %s", entries[i].operationalCert);
+    }
+
+    ModelCommand * command = reinterpret_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(true);
+}
+
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
@@ -12537,6 +12565,8 @@ private:
 | * Enum16                                                            | 0x0016 |
 | * OctetString                                                       | 0x0019 |
 | * ListInt8u                                                         | 0x001A |
+| * ListOctetString                                                   | 0x001B |
+| * ListStructOctetString                                             | 0x001C |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -13761,6 +13791,76 @@ public:
 private:
     chip::Callback::Callback<TestClusterListInt8uListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<TestClusterListInt8uListAttributeCallback>(OnTestClusterListInt8uListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ListOctetString
+ */
+class ReadTestClusterListOctetString : public ModelCommand
+{
+public:
+    ReadTestClusterListOctetString() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "list-octet-string");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterListOctetString()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeListOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback>(
+            OnTestClusterListOctetStringListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ListStructOctetString
+ */
+class ReadTestClusterListStructOctetString : public ModelCommand
+{
+public:
+    ReadTestClusterListStructOctetString() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "list-struct-octet-string");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterListStructOctetString()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeListStructOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>(
+            OnTestClusterListStructOctetStringListAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -15087,6 +15187,8 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterOctetString>(),
         make_unique<WriteTestClusterOctetString>(),
         make_unique<ReadTestClusterListInt8u>(),
+        make_unique<ReadTestClusterListOctetString>(),
+        make_unique<ReadTestClusterListStructOctetString>(),
         make_unique<ReadTestClusterClusterRevision>(),
     };
 

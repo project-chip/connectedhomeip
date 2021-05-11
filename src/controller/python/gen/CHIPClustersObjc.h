@@ -872,6 +872,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
