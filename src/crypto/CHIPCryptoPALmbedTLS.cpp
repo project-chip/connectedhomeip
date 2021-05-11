@@ -586,6 +586,7 @@ exit:
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
+#if defined(MBEDTLS_ECDH_C)
     CHIP_ERROR error     = CHIP_NO_ERROR;
     int result           = 0;
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
@@ -624,6 +625,9 @@ exit:
     mbedtls_ecp_point_free(&ecp_pubkey);
     _log_mbedTLS_error(result);
     return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 void ClearSecretData(uint8_t * buf, uint32_t len)
