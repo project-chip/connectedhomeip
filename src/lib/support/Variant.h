@@ -70,7 +70,7 @@ struct VariantCurry<>
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
 };
 
-} // namespace
+} // namespace Internal
 
 /**
  * @brief
@@ -100,7 +100,7 @@ private:
     static constexpr std::size_t kDataAlign   = std::max(alignof(Ts)...);
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
-    using Data   = typename std::aligned_storage<kDataSize, kDataAlign>::type;
+    using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
     using Curry = Internal::VariantCurry<Ts...>;
 
     std::size_t mTypeId;
@@ -153,9 +153,12 @@ public:
     template <typename T>
     T & Get()
     {
-        if (mTypeId == T::VariantId) {
+        if (mTypeId == T::VariantId)
+        {
             return *reinterpret_cast<T *>(&mData);
-        } else {
+        }
+        else
+        {
             assert(false);
             return *static_cast<T *>(nullptr);
         }
@@ -164,9 +167,12 @@ public:
     template <typename T>
     const T & Get() const
     {
-        if (mTypeId == T::VariantId) {
+        if (mTypeId == T::VariantId)
+        {
             return *reinterpret_cast<const T *>(&mData);
-        } else {
+        }
+        else
+        {
             assert(false);
             return *static_cast<const T *>(nullptr);
         }
