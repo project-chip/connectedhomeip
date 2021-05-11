@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file implements the CHIP Secure Channel protocol.
+ *      This file implements the CHIP message counter messages in secure channel protocol.
  *
  */
 
@@ -112,11 +112,7 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
         ChipLogError(SecureChannel, "Timed out! Failed to clear message counter synchronization status.");
     }
 
-    // Close the exchange if MsgCounterSyncRsp is not received before kSyncTimeoutMs.
-    if (exchangeContext != nullptr)
-    {
-        exchangeContext->Close();
-    }
+    exchangeContext->Close();
 }
 
 CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
@@ -127,7 +123,6 @@ CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Tra
 
     for (ReceiveTableEntry & entry : mReceiveTable)
     {
-        // Entries are in use if they have a message buffer.
         if (entry.peerNodeId == kUndefinedNodeId)
         {
             entry.peerNodeId  = peerNodeId;
@@ -183,12 +178,10 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
     System::PacketBufferHandle msgBuf;
     Messaging::SendFlags sendFlags;
 
-    // Create and initialize new exchange.
     exchangeContext = mExchangeMgr->NewContext(session, this);
     VerifyOrExit(exchangeContext != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    // Allocate a buffer for the reply message.
-    msgBuf = MessagePacketBuffer::New(kChallengeSize + MessagePacketBuffer::kMaxFooterSize);
+    msgBuf = MessagePacketBuffer::New(kChallengeSize);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Generate a 64-bit random number to uniquely identify the request.
@@ -199,7 +192,7 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncReq(SecureSessionHandle sess
     // Store generated Challenge value to message counter context to resolve synchronization response.
     state->GetSessionMessageCounter().GetPeerMessageCounter().SyncStarting(FixedByteSpan<kChallengeSize>(msgBuf->Start()));
 
-    sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck, true).Set(Messaging::SendMessageFlags::kExpectResponse, true);
+    sendFlags.Set(Messaging::SendMessageFlags::kNoAutoRequestAck).Set(Messaging::SendMessageFlags::kExpectResponse);
 
     // Arm a timer to enforce that a MsgCounterSyncRsp is received before kSyncTimeoutMs.
     exchangeContext->SetResponseTimeout(kSyncTimeoutMs);
@@ -230,28 +223,20 @@ CHIP_ERROR MessageCounterManager::SendMsgCounterSyncResp(Messaging::ExchangeCont
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // Allocate new buffer.
-    msgBuf = MessagePacketBuffer::New(kSyncRespMsgSize + MessagePacketBuffer::kMaxFooterSize);
+    msgBuf = MessagePacketBuffer::New(kSyncRespMsgSize);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     msg = msgBuf->Start();
 
-    // Let's construct the message using BufBound
     {
         Encoding::LittleEndian::BufferWriter bbuf(msg, kSyncRespMsgSize);
-
-        // Write the message id (counter) field.
         bbuf.Put32(state->GetSessionMessageCounter().GetLocalMessageCounter().Value());
-
-        // Fill in the random value
         bbuf.Put(challenge.data(), kChallengeSize);
-
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
-    // Set message length.
     msgBuf->SetDataLength(kSyncRespMsgSize);
 
-    // Send message counter synchronization response message.
     err = exchangeContext->SendMessage(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp, std::move(msgBuf),
                                        Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
 
@@ -311,7 +296,6 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
 
     VerifyOrExit(msgBuf->DataLength() == kSyncRespMsgSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    // Store the 64-bit value sent in the Challenge filed of the MsgCounterSyncReq.
     VerifyOrExit(resp != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(resplen == kSyncRespMsgSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -326,8 +310,7 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
     peerNodeId = packetHeader.GetSourceNodeId().Value();
 
-    // Process all queued ougoing and incomming group messages after message counter synchronization is completed.
-    // TODO: Notify ReliableMessageMgr to retrans all messages.
+    // Process all queued incomming messages after message counter synchronization is completed.
     ProcessPendingMessages(peerNodeId);
 
 exit:

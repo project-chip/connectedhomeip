@@ -101,6 +101,8 @@ void SecureSessionMgr::Shutdown()
 {
     CancelExpiryTimer();
 
+    mMessageCounterManager = nullptr;
+
     mState        = State::kNotReady;
     mLocalNodeId  = kUndefinedNodeId;
     mSystemLayer  = nullptr;
@@ -171,13 +173,6 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     if (IsControlMessage(payloadHeader))
     {
         packetHeader.SetSecureSessionControlMsg(true);
-    }
-
-    if (!IsControlMessage(payloadHeader))
-    {
-        // The peer counter should be already initialized during CASE session establishment
-        // It may not true for group messages. But this assert will quickly catch one's attention.
-        assert(state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized());
     }
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
@@ -345,42 +340,43 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    // Verify message counter
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
     {
-        // Verify message counter
-        if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
+        // TODO: control message counter is not implemented yet
+    }
+    else
+    {
+        if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
         {
-            // TODO: control message counter is not implemented yet
-        }
-        else
-        {
-            if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
-            {
-                err = packetHeader.EncodeBeforeData(msg);
-                SuccessOrExit(err);
+            err = packetHeader.EncodeBeforeData(msg);
+            SuccessOrExit(err);
 
-                // Queue and start message sync procedure
-                err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
-                    { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress, std::move(msg));
+            // Queue and start message sync procedure
+            err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
+                { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress, std::move(msg));
 
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Inet,
-                                 "Message counter synchronization for received message, failed to "
-                                 "QueueReceivedMessageAndStartSync, err = %d",
-                                 err);
-                }
-
-                SuccessOrExit(err);
-            }
-
-            err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Inet, "Message counter verify failed, err = %d", err);
+                ChipLogError(Inet,
+                             "Message counter synchronization for received message, failed to "
+                             "QueueReceivedMessageAndStartSync, err = %d",
+                             err);
             }
-            SuccessOrExit(err);
+            else
+            {
+                ChipLogDetail(Inet, "Received message have been queued due to peer counter is not synced");
+            }
+
+            return;
         }
+
+        err = state->GetSessionMessageCounter().GetPeerMessageCounter().Verify(packetHeader.GetMessageId());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Inet, "Message counter verify failed, err = %d", err);
+        }
+        SuccessOrExit(err);
     }
 
     admin = mAdmins->FindAdminWithId(state->GetAdminId());
@@ -403,16 +399,13 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
                  ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
 
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
     {
-        if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
-        {
-            // TODO: control message counter is not implemented yet
-        }
-        else
-        {
-            state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
-        }
+        // TODO: control message counter is not implemented yet
+    }
+    else
+    {
+        state->GetSessionMessageCounter().GetPeerMessageCounter().Commit(packetHeader.GetMessageId());
     }
 
     // See operational-credentials-server.cpp for explanation as to why fabricId is being set to commissioner node id
