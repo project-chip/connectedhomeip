@@ -1922,6 +1922,12 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Comman
                                                                chip::ByteSpan Signature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
+    ChipLogProgress(Zcl, "  CSR: %s", CSR);
+    ChipLogProgress(Zcl, "  CSRNonce: %s", CSRNonce);
+    ChipLogProgress(Zcl, "  VendorReserved1: %s", VendorReserved1);
+    ChipLogProgress(Zcl, "  VendorReserved2: %s", VendorReserved2);
+    ChipLogProgress(Zcl, "  VendorReserved3: %s", VendorReserved3);
+    ChipLogProgress(Zcl, "  Signature: %s", Signature);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
 

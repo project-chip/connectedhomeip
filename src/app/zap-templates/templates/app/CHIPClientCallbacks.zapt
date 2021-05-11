@@ -36,7 +36,7 @@ typedef void (*ReadReportingConfigurationReceivedCallback)(void* context, uint16
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
-typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
+typedef void (*{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback)(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}});
 {{/if}}
 {{/if}}
 {{/all_user_cluster_commands}}

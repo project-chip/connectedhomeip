@@ -2195,8 +2195,8 @@ public:
 
     ~CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge() {};
 
-    static void CallbackFn(void * context, uint8_t * CSR, uint8_t * CSRNonce, uint8_t * VendorReserved1, uint8_t * VendorReserved2,
-        uint8_t * VendorReserved3, uint8_t * Signature)
+    static void CallbackFn(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+        chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
     {
         CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge * callback
             = reinterpret_cast<CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge *>(context);
