@@ -19,13 +19,13 @@
 #include "PairingCommand.h"
 #include "gen/enums.h"
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CHIPArgParser.hpp>
 
 using namespace ::chip;
 
-constexpr uint16_t kWaitDurationInSeconds = 120;
-constexpr uint64_t kBreadcrumb            = 0;
-constexpr uint32_t kTimeoutMs             = 6000;
+constexpr uint16_t kWaitDurationInSeconds     = 120;
+constexpr uint64_t kBreadcrumb                = 0;
+constexpr uint32_t kTimeoutMs                 = 6000;
+constexpr uint8_t kTemporaryThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
 
 CHIP_ERROR PairingCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
@@ -206,22 +206,11 @@ CHIP_ERROR PairingCommand::AddNetwork(PairingNetworkType networkType)
 
 CHIP_ERROR PairingCommand::AddThreadNetwork()
 {
-    CHIP_ERROR error;
-    uint8_t opDataset[chip::Thread::kSizeOperationalDataset];
-    uint32_t opDatasetLen;
-
     Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
+    ByteSpan operationalDataset            = ByteSpan(Uint8::from_char(mOperationalDataset), strlen(mOperationalDataset));
 
-    chip::ArgParser::ParseHexString(mThreadOpDatasetArg, static_cast<uint32_t>(strlen(mThreadOpDatasetArg)), opDataset,
-                                    static_cast<uint32_t>(sizeof(opDataset)), opDatasetLen);
-    error = mThreadOpDataset.Init(ByteSpan(opDataset, opDatasetLen));
-    if (error != CHIP_NO_ERROR)
-    {
-        return error;
-    }
-
-    return mCluster.AddThreadNetwork(successCallback, failureCallback, mThreadOpDataset.AsByteSpan(), kBreadcrumb, kTimeoutMs);
+    return mCluster.AddThreadNetwork(successCallback, failureCallback, operationalDataset, kBreadcrumb, kTimeoutMs);
 }
 
 CHIP_ERROR PairingCommand::AddWiFiNetwork()
@@ -246,10 +235,7 @@ CHIP_ERROR PairingCommand::EnableNetwork()
     }
     else
     {
-        uint8_t extendedPanId[chip::Thread::kSizeExtendedPanId];
-
-        mThreadOpDataset.GetExtendedPanId(extendedPanId);
-        networkId = ByteSpan(extendedPanId, sizeof(extendedPanId));
+        networkId = ByteSpan(kTemporaryThreadNetworkId, sizeof(kTemporaryThreadNetworkId));
     }
 
     return mCluster.EnableNetwork(successCallback, failureCallback, networkId, kBreadcrumb, kTimeoutMs);

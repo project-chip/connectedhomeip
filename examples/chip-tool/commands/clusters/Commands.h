@@ -25,8 +25,6 @@
 #include "gen/CHIPClientCallbacks.h"
 #include "gen/CHIPClusters.h"
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CHIPArgParser.hpp>
-#include <lib/support/ThreadOperationalDataset.h>
 
 static void OnDefaultSuccessResponse(void * context)
 {
@@ -9831,7 +9829,7 @@ class NetworkCommissioningAddThreadNetwork : public ModelCommand
 public:
     NetworkCommissioningAddThreadNetwork() : ModelCommand("add-thread-network")
     {
-        AddArgument("operationalDataset", &mThreadOpDatasetArg);
+        AddArgument("operationalDataset", &mOperationalDataset);
         AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
         ModelCommand::AddArguments();
@@ -9844,18 +9842,13 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        uint8_t opDataset[chip::Thread::kSizeOperationalDataset];
-        uint32_t opDatasetLen;
-
         ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x06) on endpoint %" PRIu16, endpointId);
-
-        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, static_cast<uint32_t>(strlen(mThreadOpDatasetArg)), opDataset,
-                                        static_cast<uint32_t>(sizeof(opDataset)), opDatasetLen);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.AddThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                        chip::ByteSpan(opDataset, opDatasetLen), mBreadcrumb, mTimeoutMs);
+                                        chip::ByteSpan(chip::Uint8::from_char(mOperationalDataset), strlen(mOperationalDataset)),
+                                        mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -9864,7 +9857,7 @@ private:
             OnNetworkCommissioningClusterAddThreadNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mThreadOpDatasetArg;
+    char * mOperationalDataset;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -10117,7 +10110,7 @@ class NetworkCommissioningUpdateThreadNetwork : public ModelCommand
 public:
     NetworkCommissioningUpdateThreadNetwork() : ModelCommand("update-thread-network")
     {
-        AddArgument("operationalDataset", &mThreadOpDatasetArg);
+        AddArgument("operationalDataset", &mOperationalDataset);
         AddArgument("breadcrumb", 0, UINT64_MAX, &mBreadcrumb);
         AddArgument("timeoutMs", 0, UINT32_MAX, &mTimeoutMs);
         ModelCommand::AddArguments();
@@ -10130,17 +10123,13 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        uint8_t opDataset[chip::Thread::kSizeOperationalDataset];
-        uint32_t opDatasetLen;
-
         ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x08) on endpoint %" PRIu16, endpointId);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, static_cast<uint32_t>(strlen(mThreadOpDatasetArg)), opDataset,
-                                        static_cast<uint32_t>(sizeof(opDataset)), opDatasetLen);
         return cluster.UpdateThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
-                                           chip::ByteSpan(opDataset, opDatasetLen), mBreadcrumb, mTimeoutMs);
+                                           chip::ByteSpan(chip::Uint8::from_char(mOperationalDataset), strlen(mOperationalDataset)),
+                                           mBreadcrumb, mTimeoutMs);
     }
 
 private:
@@ -10149,7 +10138,7 @@ private:
             OnNetworkCommissioningClusterUpdateThreadNetworkResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    char * mThreadOpDatasetArg;
+    char * mOperationalDataset;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
