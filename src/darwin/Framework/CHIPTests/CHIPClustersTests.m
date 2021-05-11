@@ -3807,7 +3807,7 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
 
     CHIPDevice * device = GetPairedDevice(kDeviceId);
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTrustedRootCertificates * cluster = [[CHIPTrustedRootCertificates alloc] initWithDevice:device endpoint:1 queue:queue];
+    CHIPTrustedRootCertificates * cluster = [[CHIPTrustedRootCertificates alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
     [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
