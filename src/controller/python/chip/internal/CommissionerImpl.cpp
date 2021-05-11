@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
@@ -30,19 +31,6 @@ namespace {
 class ServerStorageDelegate : public chip::PersistentStorageDelegate
 {
 public:
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override { mAsyncDelegate = delegate; }
-
-    void AsyncSetKeyValue(const char * key, const char * value) override
-    {
-
-        CHIP_ERROR err = SyncSetKeyValue(key, value, strlen(value));
-
-        if (err != CHIP_NO_ERROR)
-        {
-            mAsyncDelegate->OnPersistentStorageStatus(key, chip::PersistentStorageResultDelegate::Operation::kSET, err);
-        }
-    }
-
     CHIP_ERROR
     SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
@@ -58,11 +46,6 @@ public:
     {
         return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key);
     }
-
-    void AsyncDeleteKeyValue(const char * key) override { chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(key); }
-
-private:
-    chip::PersistentStorageResultDelegate * mAsyncDelegate = nullptr;
 };
 
 // FIXME: implement this class
@@ -91,6 +74,7 @@ private:
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
+chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
 } // namespace
 
@@ -117,7 +101,18 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 
-        err = result->Init(localDeviceId, params);
+        err = gOperationalCredentialsIssuer.Initialize();
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));
+        }
+        else
+        {
+            params.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
+
+            err = result->Init(localDeviceId, params);
+        }
     });
 
     if (err != CHIP_NO_ERROR)

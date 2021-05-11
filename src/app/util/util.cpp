@@ -493,7 +493,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 }
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, NodeId source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, Messaging::ExchangeContext * exchange, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd)
 {
     uint8_t minLength =
@@ -508,7 +508,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
     // Populate the cluster command struct for processing.
     returnCmd->apsFrame        = apsFrame;
     returnCmd->type            = type;
-    returnCmd->source          = source;
+    returnCmd->source          = exchange;
     returnCmd->buffer          = message;
     returnCmd->bufLen          = messageLength;
     returnCmd->clusterSpecific = (message[0] & ZCL_CLUSTER_SPECIFIC_COMMAND);
@@ -539,12 +539,12 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 
 // a single call to process global and cluster-specific messages and callbacks.
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           NodeId source, InterPanHeader * interPanHeader)
+                           Messaging::ExchangeContext * exchange, InterPanHeader * interPanHeader)
 {
     bool msgHandled = false;
     // reset/reinitialize curCmd
     curCmd = staticCmd;
-    if (!emberAfProcessMessageIntoZclCmd(apsFrame, type, message, msgLen, source, interPanHeader, &curCmd))
+    if (!emberAfProcessMessageIntoZclCmd(apsFrame, type, message, msgLen, exchange, interPanHeader, &curCmd))
     {
         goto kickout;
     }
@@ -703,9 +703,9 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(NodeId responseDestination)
+static bool isBroadcastDestination(Messaging::ExchangeContext * responseDestination)
 {
-    // FIXME: Will need to actually figure out how to test for this!
+    // TODO: Will need to actually figure out how to test for this!
     return false;
 }
 
@@ -755,8 +755,8 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
-        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT, emberAfResponseDestination, &emberAfResponseApsFrame,
-                                                appResponseLength, appResponseData, callback);
+        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_VIA_EXCHANGE, MessageSendDestination(emberAfResponseDestination),
+                                                &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     else
     {

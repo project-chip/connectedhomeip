@@ -104,6 +104,10 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+    // Enable BLE advertisements
+    ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
+
     return err;
 }
 

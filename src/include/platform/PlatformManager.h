@@ -95,6 +95,7 @@ public:
     CHIP_ERROR Shutdown();
 
 private:
+    bool mInitialized = false;
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
@@ -181,7 +182,21 @@ namespace DeviceLayer {
 
 inline CHIP_ERROR PlatformManager::InitChipStack()
 {
-    return static_cast<ImplClass *>(this)->_InitChipStack();
+    // NOTE: this is NOT thread safe and cannot be as the chip stack lock is prepared by
+    // InitChipStack itself on many platforms.
+    //
+    // In the future, this could be moved into specific platform code (where it can
+    // be made thread safe). In general however, init twice
+    // is likely a logic error and we may want to avoid that path anyway. Likely to
+    // be done once code stabilizes a bit more.
+    if (mInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_InitChipStack();
+    mInitialized   = (err == CHIP_NO_ERROR);
+    return err;
 }
 
 inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, intptr_t arg)

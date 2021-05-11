@@ -1616,8 +1616,24 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "GetFabricId",
+              "name": "SetFabric",
               "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "OpCSRRequest",
+              "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "AddOpCert",
+              "code": 6,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -1634,6 +1650,14 @@
             {
               "name": "RemoveFabric",
               "code": 10,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "RemoveAllFabrics",
+              "code": 11,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -1667,8 +1691,24 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "GetFabricIdResponse",
+              "name": "SetFabricResponse",
               "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "OpCSRResponse",
+              "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "OpCertResponse",
+              "code": 8,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

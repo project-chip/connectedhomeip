@@ -56,8 +56,8 @@ qpg6100_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -33,10 +33,27 @@ static constexpr uint16_t kMdnsPort = 5353;
 // Need 8 bytes to fit a thread mac.
 static constexpr size_t kMaxMacSize = 8;
 
+static constexpr size_t kKeyDiscriminatorMaxLength      = 5;
+static constexpr size_t kKeyVendorProductMaxLength      = 11;
+static constexpr size_t kKeyAdditionalPairingMaxLength  = 1;
+static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength         = 5;
+static constexpr size_t kKeyDeviceNameMaxLength         = 32;
+static constexpr size_t kKeyRotatingIdMaxLength         = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength = 128;
+static constexpr size_t kKeyPairingHintMaxLength        = 10;
+
+static constexpr size_t kSubTypeShortDiscriminatorMaxLength = 3;
+static constexpr size_t kSubTypeLongDiscriminatorMaxLength  = 4;
+static constexpr size_t kSubTypeVendorMaxLength             = 5;
+static constexpr size_t kSubTypeDeviceTypeMaxLength         = 5;
+static constexpr size_t kSubTypeCommissioningModeMaxLength  = 1;
+static constexpr size_t kSubTypeAdditionalPairingMaxLength  = 1;
+
 enum class CommssionAdvertiseMode : uint8_t
 {
-    kCommissioning,
-    kCommissionable,
+    kCommissionableNode,
+    kCommissioner,
 };
 
 template <class Derived>
@@ -76,6 +93,11 @@ private:
 class OperationalAdvertisingParameters : public BaseAdvertisingParams<OperationalAdvertisingParameters>
 {
 public:
+    // Amount of mDNS text entries required for this advertising type
+    static constexpr uint8_t kNumAdvertisingTxtEntries = 2;
+    static constexpr uint8_t kTxtMaxKeySize            = 3 + 1; // "CRI"/"CRA" as possible keys
+    static constexpr uint8_t kTxtMaxValueSize          = 7 + 1; // Max for text representation of the 32-bit CRMP intervals
+
     OperationalAdvertisingParameters & SetPeerId(const PeerId & peerId)
     {
         mPeerId = peerId;
@@ -104,6 +126,11 @@ private:
 class CommissionAdvertisingParameters : public BaseAdvertisingParams<CommissionAdvertisingParameters>
 {
 public:
+    // Amount of mDNS text entries required for this advertising type
+    static constexpr uint8_t kNumAdvertisingTxtEntries = 8;     // Min 1 - Max 8
+    static constexpr uint8_t kTxtMaxKeySize            = 2 + 1; // "D"/"VP"/"CM"/"DT"/"DN"/"RI"/"PI"/"PH" as possible keys
+    static constexpr uint8_t kTxtMaxValueSize          = 128;   // Max from PI - Pairing Instruction
+
     CommissionAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {
         mShortDiscriminator = discriminator;
@@ -132,19 +159,61 @@ public:
     }
     Optional<uint16_t> GetProductId() const { return mProductId; }
 
+    CommissionAdvertisingParameters & SetCommissioningMode(bool modeEnabled, bool openWindow)
+    {
+        mCommissioningModeEnabled    = modeEnabled;
+        mOpenWindowCommissioningMode = openWindow;
+        return *this;
+    }
+    bool GetCommissioningMode() const { return mCommissioningModeEnabled; }
+    bool GetOpenWindowCommissioningMode() const { return mOpenWindowCommissioningMode; }
+
+    CommissionAdvertisingParameters & SetDeviceType(Optional<uint16_t> deviceType)
+    {
+        mDeviceType = deviceType;
+        return *this;
+    }
+    Optional<uint16_t> GetDeviceType() const { return mDeviceType; }
+
+    CommissionAdvertisingParameters & SetDeviceName(Optional<const char *> deviceName)
+    {
+        if (deviceName.HasValue())
+        {
+            strncpy(sDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(sDeviceName)));
+            mDeviceName = Optional<const char *>::Value(static_cast<const char *>(sDeviceName));
+        }
+        return *this;
+    }
+    Optional<const char *> GetDeviceName() const { return mDeviceName; }
+
+    CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
+    {
+        if (rotatingId.HasValue())
+        {
+            strncpy(sRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(sRotatingId)));
+            mRotatingId = Optional<const char *>::Value(static_cast<const char *>(sRotatingId));
+        }
+        return *this;
+    }
+    Optional<const char *> GetRotatingId() const { return mRotatingId; }
+
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
-        mPairingInstr = pairingInstr;
+        if (pairingInstr.HasValue())
+        {
+            strncpy(sPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(sPairingInstr)));
+            mPairingInstr = Optional<const char *>::Value(static_cast<const char *>(sPairingInstr));
+        }
         return *this;
     }
     Optional<const char *> GetPairingInstr() const { return mPairingInstr; }
 
-    CommissionAdvertisingParameters & SetPairingHint(Optional<uint8_t> pairingHint)
+    CommissionAdvertisingParameters & SetPairingHint(Optional<uint16_t> pairingHint)
     {
         mPairingHint = pairingHint;
         return *this;
     }
-    Optional<uint8_t> GetPairingHint() const { return mPairingHint; }
+    Optional<uint16_t> GetPairingHint() const { return mPairingHint; }
 
     CommissionAdvertisingParameters & SetCommissionAdvertiseMode(CommssionAdvertiseMode mode)
     {
@@ -154,13 +223,24 @@ public:
     CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
 
 private:
-    uint8_t mShortDiscriminator  = 0;
-    uint16_t mLongDiscriminator  = 0; // 12-bit according to spec
-    CommssionAdvertiseMode mMode = CommssionAdvertiseMode::kCommissioning;
+    uint8_t mShortDiscriminator       = 0;
+    uint16_t mLongDiscriminator       = 0; // 12-bit according to spec
+    CommssionAdvertiseMode mMode      = CommssionAdvertiseMode::kCommissionableNode;
+    bool mCommissioningModeEnabled    = false;
+    bool mOpenWindowCommissioningMode = false;
     chip::Optional<uint16_t> mVendorId;
     chip::Optional<uint16_t> mProductId;
+    chip::Optional<uint16_t> mDeviceType;
+    chip::Optional<uint16_t> mPairingHint;
+
+    char sDeviceName[kKeyDeviceNameMaxLength + 1];
+    chip::Optional<const char *> mDeviceName;
+
+    char sRotatingId[kKeyRotatingIdMaxLength + 1];
+    chip::Optional<const char *> mRotatingId;
+
+    char sPairingInstr[kKeyPairingInstructionMaxLength + 1];
     chip::Optional<const char *> mPairingInstr;
-    chip::Optional<uint8_t> mPairingHint;
 };
 
 /// Handles advertising of CHIP nodes
@@ -176,8 +256,11 @@ public:
     /// Advertises the CHIP node as an operational node
     virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
 
-    /// Advertises the CHIP node as a commisioning/commissionable node
+    /// Advertises the CHIP node as a commissioner/commissionable node
     virtual CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) = 0;
+
+    /// Stops the advertiser.
+    virtual CHIP_ERROR StopPublishDevice() = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();

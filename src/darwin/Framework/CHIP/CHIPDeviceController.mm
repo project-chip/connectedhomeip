@@ -20,6 +20,7 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
+#import "CHIPOperationalCredentialsDelegate.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 #import "CHIPSetupPayload.h"
 #import "gen/CHIPClustersObjc.h"
@@ -30,10 +31,11 @@
 #include <platform/PlatformManager.h>
 #include <support/CHIPMem.h>
 
-static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device.id";
+static const char * const CHIP_COMMISSIONER_DEVICE_ID_KEY = "com.zigbee.chip.commissioner.device_id";
 
 static NSString * const kErrorMemoryInit = @"Init Memory failure";
 static NSString * const kErrorCommissionerInit = @"Init failure while initializing a commissioner";
+static NSString * const kErrorOperationalCredentialsInit = @"Init failure while creating operational credentials delegate";
 static NSString * const kErrorPairingInit = @"Init failure while creating a pairing delegate";
 static NSString * const kErrorPersistentStorageInit = @"Init failure while creating a persistent storage delegate";
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
@@ -52,6 +54,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 @property (readonly) chip::Controller::DeviceCommissioner * cppCommissioner;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
+@property (readonly) CHIPOperationalCredentialsDelegate * operationalCredentialsDelegate;
 @property (readonly) chip::NodeId localDeviceId;
 @property (readonly) uint16_t listenPort;
 @end
@@ -90,6 +93,11 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         if ([self checkForInitError:(_persistentStorageDelegateBridge != nullptr) logMsg:kErrorPersistentStorageInit]) {
             return nil;
         }
+
+        _operationalCredentialsDelegate = new CHIPOperationalCredentialsDelegate();
+        if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
+            return nil;
+        }
     }
     return self;
 }
@@ -122,7 +130,7 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
     return YES;
 }
 
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate queue:(_Nullable dispatch_queue_t)queue
+- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate
 {
     __block BOOL commissionerInitialized = NO;
     dispatch_sync(_chipWorkQueue, ^{
@@ -133,7 +141,13 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
         CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
 
-        _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate, queue);
+        _persistentStorageDelegateBridge->setFrameworkDelegate(storageDelegate);
+
+        errorCode = _operationalCredentialsDelegate->init(_persistentStorageDelegateBridge);
+        if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorOperationalCredentialsInit]) {
+            return;
+        }
+
         // initialize NodeID if needed
         [self _getControllerNodeId];
 
@@ -154,6 +168,8 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
         params.storageDelegate = _persistentStorageDelegateBridge;
         params.mDeviceAddressUpdateDelegate = _pairingDelegateBridge;
         params.pairingDelegate = _pairingDelegateBridge;
+
+        params.operationalCredentialsDelegate = _operationalCredentialsDelegate;
 
         errorCode = _cppCommissioner->Init(_localDeviceId, params);
         if ([self checkForStartError:(CHIP_NO_ERROR == errorCode) logMsg:kErrorCommissionerInit]) {
@@ -178,18 +194,15 @@ static NSString * const kInfoStackShutdown = @"Shutting down the CHIP Stack";
 
 - (NSNumber *)_getControllerNodeId
 {
-    uint16_t idStringLen = 32;
-    char deviceIdString[idStringLen];
+    uint16_t deviceIdLength = sizeof(_localDeviceId);
     if (CHIP_NO_ERROR
-        != _persistentStorageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, deviceIdString, idStringLen)) {
+        != _persistentStorageDelegateBridge->SyncGetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, deviceIdLength)) {
         _localDeviceId = arc4random();
         _localDeviceId = _localDeviceId << 32 | arc4random();
         CHIP_LOG_ERROR("Assigned %llx node ID to the controller", _localDeviceId);
-        _persistentStorageDelegateBridge->AsyncSetKeyValue(
-            CHIP_COMMISSIONER_DEVICE_ID_KEY, [[NSString stringWithFormat:@"%llx", _localDeviceId] UTF8String]);
+
+        _persistentStorageDelegateBridge->SyncSetKeyValue(CHIP_COMMISSIONER_DEVICE_ID_KEY, &_localDeviceId, sizeof(_localDeviceId));
     } else {
-        NSScanner * scanner = [NSScanner scannerWithString:[NSString stringWithUTF8String:deviceIdString]];
-        [scanner scanHexLongLong:&_localDeviceId];
         CHIP_LOG_ERROR("Found %llx node ID for the controller", _localDeviceId);
     }
     return [NSNumber numberWithUnsignedLongLong:_localDeviceId];

@@ -115,7 +115,7 @@ void RendezvousServer::OnSessionEstablished()
     CHIP_ERROR err =
         mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
                                 mPairingSession.PeerConnection().GetPeerNodeId(), &mPairingSession,
-                                SecureSessionMgr::PairingDirection::kResponder, mAdmin->GetAdminId(), nullptr);
+                                SecureSession::SessionRole::kResponder, mAdmin->GetAdminId(), nullptr);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));

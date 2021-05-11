@@ -13,7 +13,7 @@ This application uses following buttons of the DK board:
 -   SW2: Used to perform a HW reset for the full board
 -   SW4: Used to toggle the Unlock/Lock the simulated lock
 -   SW5: Used to perform, depending on the time the button is kept pressed,
-    -   Software update - not yet supported (released before 3s)
+    -   Start BLE advertising (released before 3s)
     -   Trigger Thread joining (release after 3s)
     -   Factory reset (released after 6s)
 

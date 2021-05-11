@@ -147,6 +147,15 @@ public:
 
     void LogDeviceConfig();
 
+    bool IsCommissionableDeviceTypeEnabled();
+    CHIP_ERROR GetDeviceType(uint16_t & deviceType);
+    bool IsCommissionableDeviceNameEnabled();
+    CHIP_ERROR GetDeviceName(char * buf, size_t bufSize);
+    CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint);
+    CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize);
+    CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint);
+    CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize);
+
 private:
     // ===== Members for internal use by the following friends.
 
@@ -626,6 +635,70 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 inline void ConfigurationManager::LogDeviceConfig()
 {
     static_cast<ImplClass *>(this)->_LogDeviceConfig();
+}
+
+/**
+ * True if device type in DNS-SD advertisement is enabled
+ */
+inline bool ConfigurationManager::IsCommissionableDeviceTypeEnabled()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
+}
+
+/**
+ * Device type id.
+ */
+inline CHIP_ERROR ConfigurationManager::GetDeviceType(uint16_t & deviceType)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceType(deviceType);
+}
+
+/**
+ * True if device name in DNS-SD advertisement is enabled
+ */
+inline bool ConfigurationManager::IsCommissionableDeviceNameEnabled()
+{
+    return static_cast<ImplClass *>(this)->_IsCommissionableDeviceNameEnabled();
+}
+
+/**
+ * Name of the device.
+ */
+inline CHIP_ERROR ConfigurationManager::GetDeviceName(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetDeviceName(buf, bufSize);
+}
+
+/**
+ * Initial pairing hint.
+ */
+inline CHIP_ERROR ConfigurationManager::GetInitialPairingHint(uint16_t & pairingHint)
+{
+    return static_cast<ImplClass *>(this)->_GetInitialPairingHint(pairingHint);
+}
+
+/**
+ * Secondary pairing hint.
+ */
+inline CHIP_ERROR ConfigurationManager::GetSecondaryPairingHint(uint16_t & pairingHint)
+{
+    return static_cast<ImplClass *>(this)->_GetSecondaryPairingHint(pairingHint);
+}
+
+/**
+ * Initial pairing instruction.
+ */
+inline CHIP_ERROR ConfigurationManager::GetInitialPairingInstruction(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetInitialPairingInstruction(buf, bufSize);
+}
+
+/**
+ * Secondary pairing instruction.
+ */
+inline CHIP_ERROR ConfigurationManager::GetSecondaryPairingInstruction(char * buf, size_t bufSize)
+{
+    return static_cast<ImplClass *>(this)->_GetSecondaryPairingInstruction(buf, bufSize);
 }
 
 } // namespace DeviceLayer

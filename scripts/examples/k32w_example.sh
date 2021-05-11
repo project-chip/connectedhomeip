@@ -25,6 +25,7 @@ source "$(dirname "$0")/../../scripts/activate.sh"
 set -x
 env
 
-./third_party/k32w_sdk/mr2_fixes/patch_k32w_mr2_sdk.sh
+"$(dirname "$0")"/../../third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
+
 gn gen --root="$1" "$2" --args="k32w_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=true"
 ninja -C "$2"

@@ -46,6 +46,10 @@
 #include <pthread.h>
 #endif // CHIP_SYSTEM_CONFIG_POSIX_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+#include <dispatch/dispatch.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
 namespace chip {
 namespace System {
 
@@ -167,6 +171,11 @@ public:
     Error HandlePlatformTimer(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    void SetDispatchQueue(dispatch_queue_t dispatchQueue) { mDispatchQueue = dispatchQueue; };
+    dispatch_queue_t GetDispatchQueue() { return mDispatchQueue; };
+#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
+
     static uint64_t GetClock_Monotonic();
     static uint64_t GetClock_MonotonicMS();
     static uint64_t GetClock_MonotonicHiRes();
@@ -206,6 +215,10 @@ private:
     friend Error Platform::Layer::DispatchEvent(Layer & aLayer, void * aContext, Event aEvent);
     friend Error Platform::Layer::StartTimer(Layer & aLayer, void * aContext, uint32_t aMilliseconds);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
+    dispatch_queue_t mDispatchQueue;
+#endif
 
     // Copy and assignment NOT DEFINED
     Layer(const Layer &) = delete;

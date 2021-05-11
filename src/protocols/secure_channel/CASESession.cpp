@@ -258,7 +258,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     Clear();
 }
 
-CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+CHIP_ERROR CASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
 {
     System::PacketBufferHandle msg_salt;
     uint16_t saltlen;
@@ -266,8 +266,6 @@ CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_le
     (void) kKDFSEInfo;
     (void) kKDFSEInfoLength;
 
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
     // Generate Salt for Encryption keys
@@ -283,7 +281,9 @@ CHIP_ERROR CASESession::DeriveSecureSession(const uint8_t * info, size_t info_le
         VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
     }
 
-    ReturnErrorOnFailure(session.InitFromSecret(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, info, info_len));
+    ReturnErrorOnFailure(session.InitFromSecret(ByteSpan(mSharedSecret, mSharedSecret.Length()),
+                                                ByteSpan(msg_salt->Start(), saltlen),
+                                                SecureSession::SessionInfoType::kSessionEstablishment, role));
 
     return CHIP_NO_ERROR;
 }

@@ -147,7 +147,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
 
 AdminPairingInfo * retrieveCurrentAdmin()
 {
-    uint64_t fabricId = emberAfCurrentCommand()->source;
+    uint64_t fabricId = emberAfCurrentCommand()->SourceNodeId();
     // TODO: Figure out how to get device node id so we can do FindAdminForNode(fabricId, nodeId)...
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Finding admin with fabricId  %" PRIX64 ".", fabricId);
     return GetGlobalAdminPairingTable().FindAdminForNode(fabricId);
@@ -232,7 +232,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
     EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus = EMBER_SUCCESS;
-    CHIP_ERROR err;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
 
     // Fetch current admin
     AdminPairingInfo * admin = retrieveCurrentAdmin();
@@ -244,12 +244,29 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
     err = GetGlobalAdminPairingTable().Store(admin->GetAdminId());
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
-    // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->source) as fabricId
-    // until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
-                              ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
-                              emberAfCurrentCommand()->source);
-    sendStatus = emberAfSendResponse();
+    // Return FabricId - we are temporarily using commissioner nodeId (retrieved via emberAfCurrentCommand()->SourceNodeId()) as
+    // fabricId until addOptCert + fabricIndex are implemented. Once they are, this method and its response will go away.
+    if (commandObj == nullptr)
+    {
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
+                                  ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, "y",
+                                  emberAfCurrentCommand()->SourceNodeId());
+        sendStatus = emberAfSendResponse();
+    }
+    else
+    {
+        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                             ZCL_SET_FABRIC_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+        TLV::TLVWriter * writer          = nullptr;
+
+        VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+        writer = commandObj->GetCommandDataElementTLVWriter();
+        SuccessOrExit(
+            err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSessionHandle().GetPeerNodeId()));
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
 
 exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)
@@ -261,6 +278,10 @@ exit:
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed to send %s response: 0x%x", "set_fabric", sendStatus);
     }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
+    }
 
     return true;
 }
@@ -269,6 +290,46 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Co
 {
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: UpdateFabricLabel");
 
+    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+namespace {
+void DoRemoveAllFabrics(intptr_t)
+{
+    OpenDefaultPairingWindow(ResetAdmins::kYes);
+}
+} // namespace
+
+// Up for discussion in Multi-Admin TT: chip-spec:#2891
+bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Command * commandObj)
+{
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Remove all Fabrics");
+    PlatformMgr().ScheduleWork(DoRemoveAllFabrics, 0);
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
+                                                           chip::ByteSpan ICACertificate, chip::ByteSpan IPKValue,
+                                                           chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfOperationalCredentialsClusterUpdateOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
+                                                              chip::ByteSpan ICACertificate)
+{
     EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;

@@ -22,6 +22,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
 /**
@@ -38,6 +39,7 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
+    chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     // DevicePairingDelegate implementation
@@ -50,10 +52,9 @@ public:
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
-    void SetStorageDelegate(chip::PersistentStorageResultDelegate * delegate) override;
-    CHIP_ERROR SyncGetKeyValue(const char * key, char * value, uint16_t & size) override;
-    void AsyncSetKeyValue(const char * key, const char * value) override;
-    void AsyncDeleteKeyValue(const char * key) override;
+    CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
+    CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
+    CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
     jlong ToJNIHandle()
     {
@@ -76,7 +77,7 @@ private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
     ChipDeviceControllerPtr mController;
-    chip::PersistentStorageResultDelegate * mStorageResultDelegate = nullptr;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

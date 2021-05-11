@@ -26,7 +26,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app/server/DataModelHandler.h>
 #include <app/server/Server.h>
 
 #include <cmath>

@@ -30,6 +30,7 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
+#include <controller/OperationalCredentialsDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
@@ -118,6 +119,8 @@ public:
 struct CommissionerInitParams : public ControllerInitParams
 {
     DevicePairingDelegate * pairingDelegate = nullptr;
+
+    OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 };
 
 /**
@@ -130,7 +133,6 @@ struct CommissionerInitParams : public ControllerInitParams
  */
 class DLL_EXPORT DeviceController : public Messaging::ExchangeDelegate,
                                     public Messaging::ExchangeMgrDelegate,
-                                    public PersistentStorageResultDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
                                     public Mdns::ResolverDelegate,
 #endif
@@ -200,7 +202,7 @@ public:
     /**
      * @brief
      *   Allow the CHIP Stack to process any pending events
-     *   This can be called in an event handler loop to tigger callbacks within the CHIP stack
+     *   This can be called in an event handler loop to trigger callbacks within the CHIP stack
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR ServiceEventSignal();
@@ -260,9 +262,6 @@ private:
     void OnNewConnection(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, Messaging::ExchangeManager * mgr) override;
 
-    //////////// PersistentStorageResultDelegate Implementation ///////////////
-    void OnPersistentStorageStatus(const char * key, Operation op, CHIP_ERROR err) override;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
@@ -306,11 +305,9 @@ public:
     ~DeviceCommissioner() {}
 
     /**
-     * Commisioner-specific initialization, includes parameters such as the pairing delegate.
+     * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */
     CHIP_ERROR Init(NodeId localDeviceId, CommissionerInitParams params);
-
-    void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
     CHIP_ERROR Shutdown() override;
 
@@ -373,6 +370,7 @@ public:
 #endif
 
 private:
+    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
     DevicePairingDelegate * mPairingDelegate;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
@@ -404,6 +402,11 @@ private:
     void OnSessionEstablishmentTimeout();
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
+
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId);
+    CHIP_ERROR OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr);
+    CHIP_ERROR SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf);
 
     uint16_t mNextKeyId = 0;
 

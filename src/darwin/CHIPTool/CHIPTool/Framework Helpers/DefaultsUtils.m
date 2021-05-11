@@ -65,14 +65,12 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
 
 CHIPDeviceController * InitializeCHIP(void)
 {
-    static dispatch_queue_t callbackQueue;
     static CHIPToolPersistentStorageDelegate * storage = nil;
     static dispatch_once_t onceToken;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     dispatch_once(&onceToken, ^{
         storage = [[CHIPToolPersistentStorageDelegate alloc] init];
-        callbackQueue = dispatch_queue_create("com.chip.persistentstorage.callback", DISPATCH_QUEUE_SERIAL);
-        [controller startup:storage queue:callbackQueue];
+        [controller startup:storage];
     });
 
     return controller;
@@ -118,12 +116,6 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
 @implementation CHIPToolPersistentStorageDelegate
 
 // MARK: CHIPPersistentStorageDelegate
-- (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
-{
-    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
-    completionHandler(key, value);
-}
 
 - (NSString *)CHIPGetKeyValue:(NSString *)key
 {
@@ -132,16 +124,14 @@ void CHIPUnpairDeviceWithID(uint64_t deviceId)
     return value;
 }
 
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(CHIPSendSetStatus)completionHandler
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value
 {
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
-    completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
-- (void)CHIPDeleteKeyValue:(NSString *)key handler:(CHIPSendDeleteStatus)completionHandler
+- (void)CHIPDeleteKeyValue:(NSString *)key
 {
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
 @end

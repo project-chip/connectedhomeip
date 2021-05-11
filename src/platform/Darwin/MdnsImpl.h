@@ -42,11 +42,15 @@ struct GenericContext
 
 struct RegisterContext : public GenericContext
 {
-    RegisterContext(void * cbContext)
+    char mType[kMdnsTypeMaxSize + 1];
+    RegisterContext(const char * sType, void * cbContext)
     {
-        type    = ContextType::Register;
+        type = ContextType::Register;
+        strncpy(mType, sType, sizeof(mType));
         context = cbContext;
     }
+
+    bool matches(const char * sType) { return (strcmp(mType, sType) == 0); }
 };
 
 struct BrowseContext : public GenericContext
@@ -109,7 +113,8 @@ public:
     CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
     CHIP_ERROR Remove(GenericContext * context);
     CHIP_ERROR Removes(ContextType type);
-    CHIP_ERROR Get(ContextType type, GenericContext * context);
+    CHIP_ERROR Get(ContextType type, GenericContext ** context);
+    CHIP_ERROR GetRegisterType(const char * type, GenericContext ** context);
 
     void SetHostname(const char * name) { mHostname = name; }
     const char * GetHostname() { return mHostname.c_str(); }

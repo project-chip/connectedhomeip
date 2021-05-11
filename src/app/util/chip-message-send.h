@@ -25,6 +25,24 @@
 #pragma once
 
 #include <app/util/types_stub.h> // For EmberApsFrame, EmberStatus, node ids.
+#include <messaging/ExchangeContext.h>
+#include <messaging/Flags.h>
+
+/**
+ * @brief
+ *    Called to send a unicast message on the given exchange.  The message is
+ *    constructed by serializing the given APS frame followed by the actual
+ *    message buffer passed in.
+ *
+ * @param[in] exchange The exchange to send the message on.
+ * @param[in] apsFrame The APS frame to use for the message.
+ * @param[in] messageLength The length of the message to send after the APS
+ *                          frame.
+ * @param[in] message The message to send after the APS frame.
+ * @param[in] sendFlags The SendFlags needed, if any.
+ */
+EmberStatus chipSendUnicast(chip::Messaging::ExchangeContext * exchange, EmberApsFrame * apsFrame, uint16_t messageLength,
+                            uint8_t * message, chip::Messaging::SendFlags sendFlags = chip::Messaging::SendFlags());
 
 /**
  * @brief

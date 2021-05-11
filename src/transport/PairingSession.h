@@ -41,13 +41,12 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param info        Information string used for key derivation
-     * @param info_len    Length of info string
      * @param session     Referene to the secure session that will be
      *                    initialized once pairing is complete
+     * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    virtual CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) = 0;
+    virtual CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) = 0;
 
     /**
      * @brief

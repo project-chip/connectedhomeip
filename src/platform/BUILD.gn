@@ -198,7 +198,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
       "../include/platform/PlatformManager.h",
-      "../include/platform/SoftwareUpdateManager.h",
       "../include/platform/SoftwareUpdateManagerImpl.h",
       "../include/platform/ThreadStackManager.h",
       "../include/platform/TimeSyncManager.h",
@@ -447,6 +446,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/KeyValueStoreManagerImpl.cpp",
         "K32W/KeyValueStoreManagerImpl.h",
         "K32W/Logging.cpp",
+        "K32W/NFCManagerImpl.cpp",
+        "K32W/NFCManagerImpl.h",
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
         "K32W/SoftwareUpdateManagerImpl.h",
@@ -599,7 +600,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
 
       if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+        public_deps += [ "${openthread_root}:libopenthread-mtd" ]
 
         public_configs += [ "${chip_root}/third_party/openthread/platforms/qpg6100:openthread_qpg6100_config" ]
 

@@ -76,18 +76,6 @@ constexpr bool useTestPairing()
 
 class ServerStorageDelegate : public PersistentStorageDelegate
 {
-    void SetStorageDelegate(PersistentStorageResultDelegate * delegate) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
-    void AsyncSetKeyValue(const char * key, const char * value) override
-    {
-        ChipLogError(AppServer, "ServerStorageDelegate does not support async operations");
-        chipDie();
-    }
-
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
     {
         ChipLogProgress(AppServer, "Retrieved value from server storage.");
@@ -104,12 +92,6 @@ class ServerStorageDelegate : public PersistentStorageDelegate
     {
         ChipLogProgress(AppServer, "Delete value in server storage");
         return PersistedStorage::KeyValueStoreMgr().Delete(key);
-    }
-
-    void AsyncDeleteKeyValue(const char * key) override
-    {
-        ChipLogProgress(AppServer, "Delete value in server storage.");
-        PersistedStorage::KeyValueStoreMgr().Delete(key);
     }
 };
 
@@ -188,8 +170,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                  session->PeerConnection().GetPeerNodeId(), session,
-                                  SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+                                  session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
+                                  connection.GetAdminId(), nullptr);
             session->Clear();
         }
     }
@@ -391,7 +373,7 @@ public:
         }
         else
         {
-            HandleDataModelMessage(packetHeader.GetSourceNodeId().Value(), std::move(buffer));
+            HandleDataModelMessage(exchangeContext, std::move(buffer));
         }
 
     exit:
@@ -445,7 +427,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
         uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
-        gNextAvailableAdminId = 0;
+        // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
+        // can continue sending messages to accessory as next available admin will also be 0.
+        // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
         gAdminPairings.Reset();
     }
 
@@ -611,7 +595,7 @@ CHIP_ERROR AddTestPairing()
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:
