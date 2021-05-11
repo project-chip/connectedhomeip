@@ -197,6 +197,11 @@ enum PublicEventTypes
      * wifi/ethernet interface.
      */
     kInterfaceIpAddressChanged,
+
+    /**
+     * Commissioning has completed either through timer expiry or by a call to the general commissioning cluster command.
+     */
+    kCommissioningComplete,
 };
 
 /**
@@ -401,6 +406,11 @@ struct ChipDeviceEvent final
         {
             InterfaceIpChangeType Type;
         } InterfaceIpAddressChanged;
+
+        struct
+        {
+            CHIP_ERROR status;
+        } CommissioningComplete;
     };
 
     void Clear() { memset(this, 0, sizeof(*this)); }

@@ -49,6 +49,7 @@ class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
 namespace Internal {
+class DeviceControlServer;
 class FabricProvisioningServer;
 class ServiceProvisioningServer;
 class BLEManagerImpl;
@@ -104,6 +105,7 @@ private:
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
+    friend class Internal::DeviceControlServer;
     friend class Internal::FabricProvisioningServer;
     friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
