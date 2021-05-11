@@ -63,8 +63,8 @@ EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
     AttributeId attributeId = ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID;
 
     uint16_t attributeCount = 4;
-    char * data = strdup("TestN");
-    chip::ByteSpan span = chip::ByteSpan(reinterpret_cast<uint8_t *>(data), strlen(data));
+    char * data             = strdup("TestN");
+    chip::ByteSpan span     = chip::ByteSpan(reinterpret_cast<uint8_t *>(data), strlen(data));
 
     for (uint8_t index = 0; index < attributeCount; index++)
     {
@@ -86,15 +86,15 @@ EmberAfStatus writeTestListStructOctetAttribute(uint8_t endpoint)
     AttributeId attributeId = ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID;
 
     uint16_t attributeCount = 4;
-    char * data = strdup("TestN");
-    chip::ByteSpan span = chip::ByteSpan(reinterpret_cast<uint8_t *>(data), strlen(data));
+    char * data             = strdup("TestN");
+    chip::ByteSpan span     = chip::ByteSpan(reinterpret_cast<uint8_t *>(data), strlen(data));
 
     for (uint8_t index = 0; index < attributeCount; index++)
     {
         sprintf(data + strlen(data) - 1, "%d", index);
 
         _TestListStructOctet structOctet;
-        structOctet.fabricIndex = index;
+        structOctet.fabricIndex     = index;
         structOctet.operationalCert = span;
 
         status = writeAttribute(endpoint, attributeId, (uint8_t *) &structOctet, index);
@@ -106,7 +106,7 @@ EmberAfStatus writeTestListStructOctetAttribute(uint8_t endpoint)
     ChipLogProgress(Zcl, "Written index", attributeCount);
     return status;
 }
-}
+} // namespace
 
 void emberAfPluginTestClusterServerInitCallback(void)
 {
