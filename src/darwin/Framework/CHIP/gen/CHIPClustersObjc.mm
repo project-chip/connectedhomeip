@@ -1692,12 +1692,12 @@ public:
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"CSR" : [NSString stringWithFormat:@"%p", CSR.data()],
-                    @"CSRNonce" : [NSString stringWithFormat:@"%p", CSRNonce.data()],
-                    @"VendorReserved1" : [NSString stringWithFormat:@"%p", VendorReserved1.data()],
-                    @"VendorReserved2" : [NSString stringWithFormat:@"%p", VendorReserved2.data()],
-                    @"VendorReserved3" : [NSString stringWithFormat:@"%p", VendorReserved3.data()],
-                    @"Signature" : [NSString stringWithFormat:@"%p", Signature.data()],
+                    @"CSR" : [NSString stringWithFormat:@"%s", CSR],
+                    @"CSRNonce" : [NSString stringWithFormat:@"%s", CSRNonce],
+                    @"VendorReserved1" : [NSString stringWithFormat:@"%s", VendorReserved1],
+                    @"VendorReserved2" : [NSString stringWithFormat:@"%s", VendorReserved2],
+                    @"VendorReserved3" : [NSString stringWithFormat:@"%s", VendorReserved3],
+                    @"Signature" : [NSString stringWithFormat:@"%s", Signature],
                 });
                 callback->Cancel();
                 delete callback;

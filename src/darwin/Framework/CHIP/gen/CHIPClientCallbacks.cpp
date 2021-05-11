@@ -1693,14 +1693,8 @@ bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Comman
                                                                chip::ByteSpan Signature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
-    ChipLogProgress(Zcl, "  CSR: %p", CSR.data());
-    ChipLogProgress(Zcl, "  CSRNonce: %p", CSRNonce.data());
-    ChipLogProgress(Zcl, "  VendorReserved1: %p", VendorReserved1.data());
-    ChipLogProgress(Zcl, "  VendorReserved2: %p", VendorReserved2.data());
-    ChipLogProgress(Zcl, "  VendorReserved3: %p", VendorReserved3.data());
-    ChipLogProgress(Zcl, "  Signature: %p", Signature.data());
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
@@ -1716,7 +1710,7 @@ bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::Comma
     ChipLogProgress(Zcl, "  FabricIndex: %" PRIu64 "", FabricIndex);
     ChipLogProgress(Zcl, "  DebugText: %s", DebugText);
 
-    GET_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCertResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCertResponseCallback");
 
     Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>::FromCancelable(onSuccessCallback);
