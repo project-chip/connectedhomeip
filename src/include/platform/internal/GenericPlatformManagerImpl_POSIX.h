@@ -67,6 +67,12 @@ protected:
     pthread_attr_t mChipTaskAttr;
     struct sched_param mChipTaskSchedParam;
 
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    bool mMainLoopStarted   = false;
+    bool mChipStackIsLocked = false;
+    pthread_t mChipStackLockOwnerThread;
+#endif
+
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR
@@ -79,6 +85,10 @@ protected:
     CHIP_ERROR _StartEventLoopTask();
     CHIP_ERROR _StartChipTimer(int64_t durationMS);
     CHIP_ERROR _Shutdown();
+
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    bool _IsChipStackLockedByCurrentThread() const;
+#endif
 
     // ===== Methods available to the implementation subclass.
 

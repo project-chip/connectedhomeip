@@ -21,6 +21,7 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <core/CHIPEncoding.h>
 
 // Limits on endpoint values.
@@ -42,5 +43,6 @@ public:
 private:
     ChipDeviceController mCommissioner;
     ChipDevice * mDevice;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     uint8_t mEndPointId;
 };

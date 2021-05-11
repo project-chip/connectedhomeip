@@ -20,6 +20,7 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 
 class DiscoverCommand : public Command, public chip::Controller::DeviceAddressUpdateDelegate
 {
@@ -44,4 +45,5 @@ protected:
 private:
     chip::NodeId mNodeId;
     uint64_t mFabricId;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 };

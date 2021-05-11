@@ -633,8 +633,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
         // Call delegate to send the Msg3 to peer
-        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize(),
-                                         SendFlags(SendMessageFlags::kNone));
+        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -722,8 +721,7 @@ void PASESession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg),
-                                     SendFlags(SendMessageFlags::kNone));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg));
     SuccessOrExit(err);
 
 exit:

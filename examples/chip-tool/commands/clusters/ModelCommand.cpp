@@ -40,9 +40,12 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Controller::CommissionerInitParams initParams;
 
-    initParams.storageDelegate = &storage;
+    mOpCredsIssuer.Initialize();
+
+    chip::Controller::CommissionerInitParams initParams;
+    initParams.storageDelegate                = &storage;
+    initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", ErrorStr(err)));
