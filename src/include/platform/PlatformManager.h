@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
@@ -93,6 +94,10 @@ public:
     bool TryLockChipStack();
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
+
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    bool IsChipStackLockedByCurrentThread() const;
+#endif
 
 private:
     bool mInitialized = false;
@@ -179,6 +184,13 @@ extern PlatformManagerImpl & PlatformMgrImpl();
 
 namespace chip {
 namespace DeviceLayer {
+
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
+{
+    return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
+}
+#endif
 
 inline CHIP_ERROR PlatformManager::InitChipStack()
 {

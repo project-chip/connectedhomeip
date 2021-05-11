@@ -82,20 +82,45 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
 {
     int err = pthread_mutex_lock(&mChipStackLock);
     assert(err == 0);
+
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    mChipStackIsLocked        = true;
+    mChipStackLockOwnerThread = pthread_self();
+#endif
 }
 
 template <class ImplClass>
 bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 {
-    return pthread_mutex_trylock(&mChipStackLock) == 0;
+    bool locked = (pthread_mutex_trylock(&mChipStackLock) == 0);
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    if (locked)
+    {
+        mChipStackIsLocked        = true;
+        mChipStackLockOwnerThread = pthread_self();
+    }
+#endif
+    return locked;
 }
 
 template <class ImplClass>
 void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 {
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    mChipStackIsLocked = false;
+#endif
+
     int err = pthread_mutex_unlock(&mChipStackLock);
     assert(err == 0);
 }
+
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+template <class ImplClass>
+bool GenericPlatformManagerImpl_POSIX<ImplClass>::_IsChipStackLockedByCurrentThread() const
+{
+    return !mMainLoopStarted || (mChipStackIsLocked && (pthread_equal(pthread_self(), mChipStackLockOwnerThread)));
+}
+#endif
 
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartChipTimer(int64_t aMilliseconds)
@@ -210,7 +235,7 @@ template <class ImplClass>
 void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg)
 {
     ChipLogDetail(DeviceLayer, "CHIP task running");
-
+    static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->mMainLoopStarted = true;
     static_cast<GenericPlatformManagerImpl_POSIX<ImplClass> *>(arg)->Impl()->RunEventLoop();
     return nullptr;
 }
