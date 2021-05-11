@@ -50,7 +50,7 @@ public:
     virtual Type GetType()       = 0;
     virtual void Reset()         = 0;
     virtual uint32_t Value()     = 0; /** Get current value */
-    virtual CHIP_ERROR Advance() = 0; /** Advance the counter and get new value */
+    virtual CHIP_ERROR Advance() = 0; /** Advance the counter */
 };
 
 inline MessageCounter::~MessageCounter() {}

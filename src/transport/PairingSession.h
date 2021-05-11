@@ -70,7 +70,7 @@ public:
      */
     virtual uint32_t GetPeerCounter()
     {
-        // This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
+        // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
         return LocalSessionMessageCounter::kInitialValue;
     }
 

@@ -51,8 +51,7 @@ class FixedSpan
 {
 public:
     constexpr FixedSpan() : mDataBuf(nullptr) {}
-    constexpr FixedSpan(const T * databuf) : mDataBuf(databuf) {}
-    constexpr explicit FixedSpan(const T (&databuf)[N]) : FixedSpan(databuf) {}
+    constexpr explicit FixedSpan(const T * databuf) : mDataBuf(databuf) {}
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return N; }

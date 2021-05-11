@@ -61,7 +61,7 @@ public:
         assert(mStatus == Status::NotSynced);
         mStatus = Status::SyncInProcess;
         new (&mSyncInProcess) SyncInProcess();
-        mSyncInProcess.mChallenge = challenge.ToArray();
+        ::memcpy(mSyncInProcess.mChallenge.data(), challenge.data(), kChallengeSize);
     }
 
     void SyncFailed() { Reset(); }
@@ -72,11 +72,12 @@ public:
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        if (mSyncInProcess.mChallenge != challenge.ToArray())
+        if (::memcmp(mSyncInProcess.mChallenge.data(), challenge.data(), kChallengeSize) != 0)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
+        mSyncInProcess.~SyncInProcess();
         mStatus = Status::Synced;
         new (&mSynced) Synced();
         mSynced.mMaxCounter = counter;
@@ -109,7 +110,7 @@ public:
 
     /**
      * @brief
-     *    With the counter verified and the packet MAC also verified by the secure key, we can trust the packet and adjust
+     *    With the counter verified and the packet MIC also verified by the secure key, we can trust the packet and adjust
      *    counter states.
      *
      * @pre Verify(counter) == CHIP_NO_ERROR

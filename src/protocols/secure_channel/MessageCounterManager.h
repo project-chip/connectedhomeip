@@ -16,7 +16,7 @@
  */
 /**
  *    @file
- *      This file defines types and objects for CHIP Secure Channel protocol.
+ *      This file defines types and objects for CHIP message counter messages in secure channel protocol.
  *
  */
 
@@ -91,6 +91,7 @@ private:
     {
         ReceiveTableEntry() : peerNodeId(kUndefinedNodeId) {}
 
+        // TODO(#6340): peerNodeId may not needed if we can extract it from msgBuf
         NodeId peerNodeId;                  /**< The peerNodeId of the message. kUndefinedNodeId if is not in use. */
         Transport::PeerAddress peerAddress; /**< The peer address for the message*/
         System::PacketBufferHandle msgBuf;  /**< A handle to the PacketBuffer object holding the message data. */
