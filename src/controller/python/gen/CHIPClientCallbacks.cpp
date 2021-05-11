@@ -1916,9 +1916,10 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
-                                                               chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
-                                                               chip::ByteSpan VendorReserved3, chip::ByteSpan Signature)
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
+                                                               chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+                                                               chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
+                                                               chip::ByteSpan Signature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
 
