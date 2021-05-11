@@ -28,7 +28,7 @@ EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32
 
 CXXFLAGS += -std=gnu++14 -Os -DLWIP_IPV6_SCOPES=0
 CPPFLAGS += -Os -DLWIP_IPV6_SCOPES=0 -DCHIP_HAVE_CONFIG_H
-CFLAGS += -Os -DLWIP_IPV6_SCOPES=0
+CFLAGS += -Os -DLWIP_IPV6_SCOPES=0 -DMAXNAMLEN=255
 
 top: all flashing_script
 
