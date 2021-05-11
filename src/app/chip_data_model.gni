@@ -49,9 +49,8 @@ template("chip_data_model") {
     }
   }
 
-  _use_default_im_dispatch =
-      !defined(invoker.use_default_im_dispatch) ||
-      invoker.use_default_im_dispatch
+  _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
+                             invoker.use_default_im_dispatch
 
   _use_default_client_callbacks =
       defined(invoker.use_default_client_callbacks) &&
@@ -157,7 +156,8 @@ template("chip_data_model") {
       }
 
       if (_use_default_im_dispatch) {
-        sources += [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
+        sources +=
+            [ "${invoker.zap_pregenerated_dir}/IMClusterCommandHandler.cpp" ]
       }
     }
 
