@@ -152,6 +152,14 @@
  */
 #define CHIP_SYSTEM_ERROR_ACCESS_DENIED _CHIP_SYSTEM_ERROR(7)
 
+/**
+ *  @def CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND
+ *
+ *  @brief
+ *      The armed fail-safe timer is not found.
+ */
+#define CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND _CHIP_SYSTEM_ERROR(8)
+
 //                        !!!!! IMPORTANT !!!!!
 //
 // If you add new CHIP System Layer errors, please update the translation of error

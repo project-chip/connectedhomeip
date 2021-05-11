@@ -314,7 +314,7 @@ exit:
  *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
  *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
  *       the currently-running timer will be extended for a duration of specified period, otherwise,
- *       it will just start a new one.
+ *       return error CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND.
  *
  *   @param[in]  aMilliseconds Extension time in milliseconds.
  *   @param[in]  aComplete     A pointer to the function called when timer expires.
@@ -322,11 +322,12 @@ exit:
  *
  *   @return CHIP_SYSTEM_NO_ERROR On success.
  *   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
+ *   @return CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND If the timer cannot be found.
  *   @return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE If System Layer is not initialized.
  *   @return Other Value indicating timer failed to start or extend.
  *
  */
-Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aOnComplete, void * aAppState)
+Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aComplete, void * aAppState)
 {
     VerifyOrReturnError(this->State() == kLayerState_Initialized, CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
@@ -335,25 +336,24 @@ Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aOnCo
     {
         Timer * timer = Timer::sPool.Get(*this, i);
 
-        if (timer != nullptr && timer->OnComplete == aOnComplete && timer->AppState == aAppState)
+        if (timer != nullptr && timer->OnComplete == aComplete && timer->AppState == aAppState)
         {
             lTimer = timer;
             break;
         }
     }
 
-    if (lTimer)
-    {
-        Timer::Epoch currentEpoch = Timer::GetCurrentEpoch();
+    VerifyOrReturnError(lTimer != nullptr, CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND);
 
-        // Make sure the currently-running timer is not overdue. The platform timer API has MSEC resolution, we only extend
-        // the timer if it has more than 1 msec to expire.
-        VerifyOrReturnError(!Timer::IsEarlierEpoch(lTimer->mAwakenEpoch, currentEpoch + 1), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
+    Timer::Epoch currentEpoch = Timer::GetCurrentEpoch();
 
-        aMilliseconds += static_cast<uint32_t>(lTimer->mAwakenEpoch - currentEpoch);
-    }
+    // Make sure the currently-running timer is not overdue. The platform timer API has MSEC resolution, we only extend
+    // the timer if it has more than 1 msec to expire.
+    VerifyOrReturnError(!Timer::IsEarlierEpoch(lTimer->mAwakenEpoch, currentEpoch + 1), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
-    return StartTimer(aMilliseconds, aOnComplete, aAppState);
+    aMilliseconds += static_cast<uint32_t>(lTimer->mAwakenEpoch - currentEpoch);
+
+    return StartTimer(aMilliseconds, aComplete, aAppState);
 }
 
 /**

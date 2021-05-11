@@ -147,7 +147,7 @@ public:
 
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
-    Error ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aOnComplete, void * aAppState);
+    Error ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aComplete, void * aAppState);
     void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
 
     Error ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
