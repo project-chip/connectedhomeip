@@ -92,13 +92,14 @@ public:
      *                                                       network layer.
      */
     CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
-                           const SendFlags & sendFlags);
+                           const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone));
 
     /**
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
+                           const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),

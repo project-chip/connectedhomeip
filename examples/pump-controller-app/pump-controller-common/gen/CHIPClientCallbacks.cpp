@@ -19,6 +19,8 @@
 
 #include "gen/CHIPClientCallbacks.h"
 
+#include <cinttypes>
+
 #include "gen/enums.h"
 #include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
@@ -64,6 +66,28 @@ using namespace ::chip;
     NodeId sourceId                          = emberAfCurrentCommand()->SourceNodeId();                                            \
     uint8_t sequenceNumber                   = emberAfCurrentCommand()->seqNum;                                                    \
     CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceId, sequenceNumber, &onSuccessCallback, &onFailureCallback);             \
+                                                                                                                                   \
+    if (CHIP_NO_ERROR != err)                                                                                                      \
+    {                                                                                                                              \
+        if (onSuccessCallback == nullptr)                                                                                          \
+        {                                                                                                                          \
+            ChipLogDetail(Zcl, "%s: Missing success callback", name);                                                              \
+        }                                                                                                                          \
+                                                                                                                                   \
+        if (onFailureCallback == nullptr)                                                                                          \
+        {                                                                                                                          \
+            ChipLogDetail(Zcl, "%s: Missing failure callback", name);                                                              \
+        }                                                                                                                          \
+                                                                                                                                   \
+        return true;                                                                                                               \
+    }
+
+#define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                       \
+    Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
+    Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
+    NodeId sourceIdentifier                  = reinterpret_cast<NodeId>(commandObj);                                               \
+    /* #6559: Currently, we only have one commands for the IMInvokeCommands and to a device, so the seqNum is always set to 0. */  \
+    CHIP_ERROR err = gCallbacks.GetResponseCallback(sourceIdentifier, 0, &onSuccessCallback, &onFailureCallback);                  \
                                                                                                                                    \
     if (CHIP_NO_ERROR != err)                                                                                                      \
     {                                                                                                                              \
@@ -232,6 +256,29 @@ bool emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, Em
     LogStatus(status);
 
     GET_RESPONSE_CALLBACKS("emberAfDefaultResponseCallback");
+    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        Callback::Callback<DefaultSuccessCallback> * cb =
+            Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
+        cb->mCall(cb->mContext);
+    }
+    else
+    {
+        Callback::Callback<DefaultFailureCallback> * cb =
+            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
+    }
+
+    return true;
+}
+
+bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status)
+{
+    ChipLogProgress(Zcl, "DefaultResponse:");
+    ChipLogProgress(Zcl, "  Transaction: %p", commandObj);
+    LogStatus(status);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("emberAfDefaultResponseCallback");
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         Callback::Callback<DefaultSuccessCallback> * cb =

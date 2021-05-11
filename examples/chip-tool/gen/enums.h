@@ -2527,6 +2527,17 @@ typedef enum
     EMBER_ZCL_SATURATION_STEP_MODE_DOWN = 3,
 } EmberAfSaturationStepMode;
 
+// Enum for SecurityType
+typedef enum
+{
+    EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED = 0,
+    EMBER_ZCL_SECURITY_TYPE_NONE        = 1,
+    EMBER_ZCL_SECURITY_TYPE_WEP         = 2,
+    EMBER_ZCL_SECURITY_TYPE_WPA         = 3,
+    EMBER_ZCL_SECURITY_TYPE_WPA2        = 4,
+    EMBER_ZCL_SECURITY_TYPE_WPA3        = 5,
+} EmberAfSecurityType;
+
 // Enum for SensingLightSensorType
 typedef enum
 {
@@ -2824,6 +2835,17 @@ typedef enum
     EMBER_ZCL_WARNING_STOBE_NO_STROBE  = 0,
     EMBER_ZCL_WARNING_STOBE_USE_STROBE = 1,
 } EmberAfWarningStobe;
+
+// Enum for WiFiVersionType
+typedef enum
+{
+    EMBER_ZCL_WI_FI_VERSION_TYPE_802__11A  = 0,
+    EMBER_ZCL_WI_FI_VERSION_TYPE_802__11B  = 1,
+    EMBER_ZCL_WI_FI_VERSION_TYPE_802__11G  = 2,
+    EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N  = 3,
+    EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC = 4,
+    EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX = 5,
+} EmberAfWiFiVersionType;
 
 // Enum for WwahIasZoneEnrollmentMode
 typedef enum

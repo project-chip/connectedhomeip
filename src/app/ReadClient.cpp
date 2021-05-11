@@ -150,9 +150,13 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
                     err = CHIP_ERROR_INVALID_ARGUMENT;
                     ExitNow();
                 }
+                attributePathBuilder.EndOfAttributePath();
                 SuccessOrExit(err = attributePathBuilder.GetError());
             }
+            attributePathListBuilder.EndOfAttributePathList();
+            SuccessOrExit(err = attributePathListBuilder.GetError());
         }
+
         request.EndOfReadRequest();
         SuccessOrExit(err = request.GetError());
 

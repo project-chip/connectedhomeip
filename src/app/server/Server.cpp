@@ -513,10 +513,8 @@ void InitServer(AppDelegate * delegate)
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
     SuccessOrExit(err);
-#endif
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&gExchangeMgr);

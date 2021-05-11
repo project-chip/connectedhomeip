@@ -237,6 +237,11 @@ bool CHIPOperationalCredentialsDelegate::ToChipEpochTime(uint32_t offset, uint32
     NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents * components = [calendar components:units fromDate:date];
 
-    return chip::CalendarToChipEpochTime([components year], [components month], [components day], [components hour],
-        [components minute], [components second], epoch);
+    uint16_t year = static_cast<uint16_t>([components year]);
+    uint8_t month = static_cast<uint8_t>([components month]);
+    uint8_t day = static_cast<uint8_t>([components day]);
+    uint8_t hour = static_cast<uint8_t>([components hour]);
+    uint8_t minute = static_cast<uint8_t>([components minute]);
+    uint8_t second = static_cast<uint8_t>([components second]);
+    return chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, epoch);
 }
