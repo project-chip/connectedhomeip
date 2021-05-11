@@ -36,22 +36,19 @@ HKDF_shaHSM::HKDF_shaHSM()
 }
 HKDF_shaHSM::~HKDF_shaHSM() {}
 
-
-CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                           const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
+                                    const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
+                                    size_t out_length)
 {
     CHIP_ERROR error       = CHIP_ERROR_INTERNAL;
     sss_status_t status    = kStatus_SSS_Success;
     smStatus_t smstatus    = SM_NOT_OK;
     sss_object_t keyObject = { 0 };
 
-
-
     if (salt_length > 64 || info_length > 80 || secret_length > 256 || out_length > 768)
     {
         /* Length not supported by se05x. Rollback to SW */
-        return HKDF_sha::HKDF_SHA256(secret, secret_length, salt, salt_length,
-                        info, info_length, out_buffer, out_length);
+        return HKDF_sha::HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, out_buffer, out_length);
     }
 
     // Salt is optional
@@ -93,7 +90,6 @@ CHIP_ERROR HKDF_shaHSM::HKDF_SHA256(const uint8_t * secret, const size_t secret_
 exit:
     return error;
 }
-
 
 } // namespace Crypto
 } // namespace chip

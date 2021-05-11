@@ -464,7 +464,7 @@ CHIP_ERROR CASESession::SendSigmaR2()
     SuccessOrExit(err);
 
     err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
-                      kAEADKeySize);
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     // Step 6
@@ -642,7 +642,7 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     SuccessOrExit(err);
 
     err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
-                      kAEADKeySize);
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
@@ -729,7 +729,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     SuccessOrExit(err);
 
     err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
-                      kAEADKeySize);
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     // Step 2
@@ -868,7 +868,7 @@ CHIP_ERROR CASESession::HandleSigmaR3(const System::PacketBufferHandle & msg)
     SuccessOrExit(err);
 
     err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
-                      kAEADKeySize);
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
@@ -1062,7 +1062,7 @@ CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size
 {
     HKDF_sha_crypto mHKDF;
     ReturnErrorOnFailure(mHKDF.HKDF_SHA256(fabricSecret, fabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
-                                     sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+                                           sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;
 }

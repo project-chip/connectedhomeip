@@ -145,8 +145,9 @@ public:
     HKDF_shaHSM();
     ~HKDF_shaHSM();
 
-    virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                           const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length) override;
+    virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
+                                   const size_t salt_length, const uint8_t * info, const size_t info_length, uint8_t * out_buffer,
+                                   size_t out_length) override;
 
     void SetKeyId(uint32_t id) { keyid = id; }
 

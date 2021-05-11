@@ -80,7 +80,7 @@ using TestPBKDF2_sha256                 = PBKDF2_sha256;
 #ifdef ENABLE_HSM_HKDF
 using TestHKDF_sha = HKDF_shaHSM;
 #else
-using TestHKDF_sha = HKDF_sha;
+using TestHKDF_sha                      = HKDF_sha;
 #endif
 
 static uint32_t gs_test_entropy_source_called = 0;
@@ -659,7 +659,7 @@ static void TestHKDF_SHA256(nlTestSuite * inSuite, void * inContext)
         out_buffer.Alloc(out_length);
         NL_TEST_ASSERT(inSuite, out_buffer);
         mHKDF.HKDF_SHA256(v.initial_key_material, v.initial_key_material_length, v.salt, v.salt_length, v.info, v.info_length,
-                    out_buffer.Get(), v.output_key_material_length);
+                          out_buffer.Get(), v.output_key_material_length);
         bool success = memcmp(v.output_key_material, out_buffer.Get(), out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
     }
