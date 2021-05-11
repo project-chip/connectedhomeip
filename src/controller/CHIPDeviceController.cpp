@@ -848,7 +848,31 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     device->Serialize(serialized);
 
-    OnSessionEstablished();
+    err = mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(peerAddress), device->GetDeviceId(),
+                                  testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        OnSessionEstablishmentError(err);
+    }
+    SuccessOrExit(err);
+
+    mPairedDevices.Insert(device->GetDeviceId());
+    mPairedDevicesUpdated = true;
+
+    // Note - This assumes storage is synchronous, the device must be in storage before we can cleanup
+    // the rendezvous session and mark pairing success
+    PersistDevice(device);
+    // Also persist the device list at this time
+    // This makes sure that a newly added device is immediately available
+    PersistDeviceList();
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
+    }
+
+    RendezvousCleanup(CHIP_NO_ERROR);
 
 exit:
     if (testSecurePairingSecret != nullptr)
