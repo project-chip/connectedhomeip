@@ -44,7 +44,7 @@ bool emberAfOtaSoftwareUpdateClientClusterAnnounceOtaServerCallback(chip::app::C
                                                                     uint16_t vendorId, uint8_t announcementReason,
                                                                     chip::ByteSpan metadataForNode)
 {
-    ChipLogDetail(Zcl, "OTA Client Cluster received QueryImageResponse");
+    ChipLogDetail(Zcl, "OTA Client Cluster received AnnounceOtaServer");
     EmberAfStatus status = EMBER_ZCL_STATUS_UNSUP_COMMAND;
     emberAfSendImmediateDefaultResponse(status);
     return true;

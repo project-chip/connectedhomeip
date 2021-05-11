@@ -29,6 +29,7 @@
 #include <support/Span.h>
 
 #include "ota-server-delegate.h"
+#include "ota-server.h"
 
 using namespace chip;
 using namespace chip::app::clusters;
@@ -37,6 +38,19 @@ namespace {
 constexpr uint8_t kLocationParamLength   = 2;   // The expected length of the Location parameter in QueryImage
 constexpr size_t kMaxMetadataLen         = 512; // The maximum length of Metadata in any OTA Server command
 constexpr size_t kUpdateTokenParamLength = 32;  // The expected length of the Update Token parameter used in multiple commands
+
+chip::app::clusters::OTAServerDelegate * gServerDelegate = nullptr;
+
+bool SendStatusIfDelegateNull()
+{
+    if (gServerDelegate == nullptr)
+    {
+        ChipLogError(Zcl, "No OTAServerDelegate set");
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
+        return true;
+    }
+    return false;
+}
 } // namespace
 
 /**
@@ -61,7 +75,9 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(app::Comman
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
     }
 
-    status = OTAServerDelegate::HandleApplyUpdateRequest(updateToken, newVersion);
+    if (SendStatusIfDelegateNull())
+        return true;
+    status = gServerDelegate->HandleApplyUpdateRequest(updateToken, newVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -91,7 +107,9 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(app::Comma
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_FIELD);
     }
 
-    status = OTAServerDelegate::HandleNotifyUpdateApplied(updateToken, currentVersion);
+    if (SendStatusIfDelegateNull())
+        return true;
+    status = gServerDelegate->HandleNotifyUpdateApplied(updateToken, currentVersion);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
@@ -135,12 +153,19 @@ bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
 
     chip::ByteSpan locationSpan(location, locationLen);
 
-    status = OTAServerDelegate::HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion,
-                                                 protocolsSupported, locationSpan, clientCanConsent, metadataForServer);
+    if (SendStatusIfDelegateNull())
+        return true;
+    status = gServerDelegate->HandleQueryImage(vendorId, productId, imageType, hardwareVersion, currentVersion, protocolsSupported,
+                                               locationSpan, clientCanConsent, metadataForServer);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(status);
     }
 
     return true;
+}
+
+void chip::app::clusters::OTAServer::SetDelegate(OTAServerDelegate * delegate)
+{
+    gServerDelegate = delegate;
 }

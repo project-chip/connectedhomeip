@@ -53,4 +53,4 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       PRIV_REQUIRES chip QRCode tft spidriver bt screen-framework)
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 14)
-target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H" "-DOTA_SERVER_CLUSTER_EXAMPLE_IMPL=1")
+target_compile_options(${COMPONENT_LIB} PRIVATE "-DLWIP_IPV6_SCOPES=0" "-DCHIP_HAVE_CONFIG_H")

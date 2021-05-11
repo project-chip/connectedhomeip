@@ -28,7 +28,7 @@ EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32
                         $(PROJECT_PATH)/../../common/screen-framework \
 
 CXXFLAGS += -std=gnu++14 -Os -DLWIP_IPV6_SCOPES=0
-CPPFLAGS += -Os -DLWIP_IPV6_SCOPES=0 -DCHIP_HAVE_CONFIG_H -DOTA_SERVER_CLUSTER_EXAMPLE_IMPL=1
+CPPFLAGS += -Os -DLWIP_IPV6_SCOPES=0 -DCHIP_HAVE_CONFIG_H
 CFLAGS += -Os -DLWIP_IPV6_SCOPES=0
 
 top: all flashing_script
