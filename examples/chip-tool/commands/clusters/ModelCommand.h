@@ -40,7 +40,7 @@ public:
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 
 private:
-    ChipDeviceCommissioner mCommissioner;
+    ChipDeviceController mCommissioner;
     ChipDevice * mDevice;
     uint8_t mEndPointId;
 };
