@@ -256,6 +256,10 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
 
 void PacketDataReporter::OnCommissionableNodeIPAddress(const chip::Inet::IPAddress & addr)
 {
+    if (mCommissionableNodeData.numIPs >= CommissionableNodeData::kMaxIPAddresses)
+    {
+        return;
+    }
     mCommissionableNodeData.ipAddress[mCommissionableNodeData.numIPs++] = addr;
 }
 
