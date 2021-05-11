@@ -17,6 +17,7 @@
 
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
+#include "AppTask.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -67,6 +68,13 @@ extern "C" void app_main()
     }
 
     InitServer();
+
+    ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
+    err = GetAppTask().StartAppTask();
+    if (err != CHIP_NO_ERROR)
+    {   
+        ESP_LOGE(TAG,"GetAppTask().Init() failed");
+    }
 
     while (true)
     {
