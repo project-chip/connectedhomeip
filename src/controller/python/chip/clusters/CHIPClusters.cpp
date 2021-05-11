@@ -2903,8 +2903,7 @@ CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertific
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::TrustedRootCertificatesCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.AddTrustedRootCertificate(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                             chip::ByteSpan(rootCertificate, rootCertificate_Len));
+    return cluster.AddTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(rootCertificate, rootCertificate_Len));
 }
 CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate(chip::Controller::Device * device,
                                                                                        chip::EndpointId ZCLendpointId,
@@ -2915,8 +2914,7 @@ CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCerti
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::TrustedRootCertificatesCluster cluster;
     cluster.Associate(device, ZCLendpointId);
-    return cluster.RemoveTrustedRootCertificate(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
-                                                chip::ByteSpan(trustedRootIdentifier, trustedRootIdentifier_Len));
+    return cluster.RemoveTrustedRootCertificate(nullptr, nullptr, chip::ByteSpan(trustedRootIdentifier, trustedRootIdentifier_Len));
 }
 
 CHIP_ERROR chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision(chip::Controller::Device * device,

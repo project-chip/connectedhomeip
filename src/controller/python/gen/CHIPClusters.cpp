@@ -5349,10 +5349,7 @@ CHIP_ERROR TrustedRootCertificatesCluster::AddTrustedRootCertificate(Callback::C
                                                                      Callback::Cancelable * onFailureCallback,
                                                                      chip::ByteSpan rootCertificate)
 {
-#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onSuccessCallback;
-    (void) onFailureCallback;
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddTrustedRootCertificateCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -5367,23 +5364,17 @@ CHIP_ERROR TrustedRootCertificatesCluster::AddTrustedRootCertificate(Callback::C
 
     ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+
     return mDevice->SendCommands();
-#else
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeTrustedRootCertificatesClusterAddTrustedRootCertificateCommand(seqNum, mEndpoint, rootCertificate);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-#endif
 }
 
 CHIP_ERROR TrustedRootCertificatesCluster::RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
                                                                         Callback::Cancelable * onFailureCallback,
                                                                         chip::ByteSpan trustedRootIdentifier)
 {
-#if CHIP_ENABLE_INTERACTION_MODEL
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    (void) onSuccessCallback;
-    (void) onFailureCallback;
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveTrustedRootCertificateCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
@@ -5398,13 +5389,10 @@ CHIP_ERROR TrustedRootCertificatesCluster::RemoveTrustedRootCertificate(Callback
 
     ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+
     return mDevice->SendCommands();
-#else
-    uint8_t seqNum = mDevice->GetNextSequenceNumber();
-    System::PacketBufferHandle encodedCommand =
-        encodeTrustedRootCertificatesClusterRemoveTrustedRootCertificateCommand(seqNum, mEndpoint, trustedRootIdentifier);
-    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
-#endif
 }
 
 // TrustedRootCertificates Cluster Attributes
