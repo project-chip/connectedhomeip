@@ -72,9 +72,7 @@ struct ControllerInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-#if CHIP_ENABLE_INTERACTION_MODEL
     app::InteractionModelDelegate * imDelegate = nullptr;
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
@@ -121,6 +119,26 @@ struct CommissionerInitParams : public ControllerInitParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+};
+
+/**
+ * @brief
+ * Used for make current OnSuccessCallback & OnFailureCallback works when interaction model landed, it will be removed
+ * after #6308 is landed.
+ */
+class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate
+{
+public:
+    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
+                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
+                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
+
+    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
+
+    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+
+    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
 };
 
 /**
@@ -230,6 +248,7 @@ protected:
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
     PersistentStorageDelegate * mStorageDelegate;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
