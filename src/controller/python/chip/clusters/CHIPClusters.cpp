@@ -2893,6 +2893,43 @@ CHIP_ERROR chip_ime_ReadAttribute_Thermostat_ClusterRevision(chip::Controller::D
 }
 
 // End of Cluster Thermostat
+// Cluster TrustedRootCertificates
+
+CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate(chip::Controller::Device * device,
+                                                                                    chip::EndpointId ZCLendpointId, chip::GroupId,
+                                                                                    const uint8_t * rootCertificate,
+                                                                                    uint32_t rootCertificate_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TrustedRootCertificatesCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.AddTrustedRootCertificate(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                             chip::ByteSpan(rootCertificate, rootCertificate_Len));
+}
+CHIP_ERROR chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate(chip::Controller::Device * device,
+                                                                                       chip::EndpointId ZCLendpointId,
+                                                                                       chip::GroupId,
+                                                                                       const uint8_t * trustedRootIdentifier,
+                                                                                       uint32_t trustedRootIdentifier_Len)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TrustedRootCertificatesCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.RemoveTrustedRootCertificate(gDefaultSuccessCallback.Cancel(), gDefaultFailureCallback.Cancel(),
+                                                chip::ByteSpan(trustedRootIdentifier, trustedRootIdentifier_Len));
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision(chip::Controller::Device * device,
+                                                                          chip::EndpointId ZCLendpointId,
+                                                                          chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::TrustedRootCertificatesCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster TrustedRootCertificates
 // Cluster WakeOnLan
 
 CHIP_ERROR chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,

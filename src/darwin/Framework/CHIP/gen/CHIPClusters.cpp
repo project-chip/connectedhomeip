@@ -3288,6 +3288,75 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 }
 
 // OperationalCredentials Cluster Commands
+CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan noc,
+                                                    chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue,
+                                                    chip::NodeId caseAdminNode, uint16_t adminVendorId)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddOpCertCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // noc: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), noc));
+    // iCACertificate: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), iCACertificate));
+    // iPKValue: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), iPKValue));
+    // caseAdminNode: nodeId
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), caseAdminNode));
+    // adminVendorId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), adminVendorId));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOperationalCredentialsClusterAddOpCertCommand(
+        seqNum, mEndpoint, noc, iCACertificate, iPKValue, caseAdminNode, adminVendorId);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan cSRNonce)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOpCSRRequestCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // cSRNonce: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), cSRNonce));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOperationalCredentialsClusterOpCSRRequestCommand(seqNum, mEndpoint, cSRNonce);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
 CHIP_ERROR OperationalCredentialsCluster::RemoveAllFabrics(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {
@@ -4431,6 +4500,85 @@ CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable 
 {
     uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
     System::PacketBufferHandle encodedCommand = encodeThermostatClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+// TrustedRootCertificates Cluster Commands
+CHIP_ERROR TrustedRootCertificatesCluster::AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback,
+                                                                     chip::ByteSpan rootCertificate)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddTrustedRootCertificateCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // rootCertificate: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rootCertificate));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeTrustedRootCertificatesClusterAddTrustedRootCertificateCommand(seqNum, mEndpoint, rootCertificate);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+CHIP_ERROR TrustedRootCertificatesCluster::RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback,
+                                                                        chip::ByteSpan trustedRootIdentifier)
+{
+#if CHIP_ENABLE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    (void) onSuccessCallback;
+    (void) onFailureCallback;
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveTrustedRootCertificateCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // trustedRootIdentifier: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), trustedRootIdentifier));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    return mDevice->SendCommands();
+#else
+    uint8_t seqNum = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand =
+        encodeTrustedRootCertificatesClusterRemoveTrustedRootCertificateCommand(seqNum, mEndpoint, trustedRootIdentifier);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+#endif
+}
+
+// TrustedRootCertificates Cluster Attributes
+CHIP_ERROR TrustedRootCertificatesCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTrustedRootCertificatesClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR TrustedRootCertificatesCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 

@@ -1797,7 +1797,7 @@
           "mfgCode": null,
           "define": "TRUSTED_ROOT_CERTIFICATES_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
