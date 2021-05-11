@@ -9844,13 +9844,13 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        uint8_t opDataset[254];
+        uint8_t opDataset[chip::Thread::kSizeOperationalDataset];
         uint32_t opDatasetLen;
 
         ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x06) on endpoint %" PRIu16, endpointId);
 
-        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t) strlen(mThreadOpDatasetArg), opDataset,
-                                        (uint32_t) sizeof(opDataset), opDatasetLen);
+        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, static_cast<uint32_t>(strlen(mThreadOpDatasetArg)), opDataset,
+                                        static_cast<uint32_t>(sizeof(opDataset)), opDatasetLen);
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
@@ -9865,7 +9865,6 @@ private:
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     char * mThreadOpDatasetArg;
-    chip::Thread::OperationalDataset mThreadOpDataset;
     uint64_t mBreadcrumb;
     uint32_t mTimeoutMs;
 };
@@ -10138,8 +10137,8 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t) strlen(mThreadOpDatasetArg), opDataset,
-                                        (uint32_t) sizeof(opDataset), opDatasetLen);
+        chip::ArgParser::ParseHexString(mThreadOpDatasetArg, static_cast<uint32_t>(strlen(mThreadOpDatasetArg)), opDataset,
+                                        static_cast<uint32_t>(sizeof(opDataset)), opDatasetLen);
         return cluster.UpdateThreadNetwork(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
                                            chip::ByteSpan(opDataset, opDatasetLen), mBreadcrumb, mTimeoutMs);
     }

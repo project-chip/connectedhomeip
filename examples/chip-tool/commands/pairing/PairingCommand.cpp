@@ -211,8 +211,8 @@ CHIP_ERROR PairingCommand::AddThreadNetwork()
     Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
 
-    chip::ArgParser::ParseHexString(mThreadOpDatasetArg, (uint32_t) strlen(mThreadOpDatasetArg), opDataset,
-                                    (uint32_t) sizeof(opDataset), opDatasetLen);
+    chip::ArgParser::ParseHexString(mThreadOpDatasetArg, static_cast<uint32_t>(strlen(mThreadOpDatasetArg)), opDataset,
+                                    static_cast<uint32_t>(sizeof(opDataset)), opDatasetLen);
     error = mThreadOpDataset.Init(ByteSpan(opDataset, opDatasetLen));
     if (error != CHIP_NO_ERROR)
     {
