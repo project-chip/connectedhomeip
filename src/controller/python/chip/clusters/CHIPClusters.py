@@ -591,6 +591,14 @@ class ChipClusters:
                     "amount": "int",
                 },
             },
+            "TrustedRootCertificates": {
+                "AddTrustedRootCertificate": {
+                    "rootCertificate": "bytes",
+                },
+                "RemoveTrustedRootCertificate": {
+                    "trustedRootIdentifier": "bytes",
+                },
+            },
             "WakeOnLan": {
             },
             "WindowCovering": {
@@ -842,6 +850,9 @@ class ChipClusters:
                 "OccupiedHeatingSetpoint",
                 "ControlSequenceOfOperation",
                 "SystemMode",
+                "ClusterRevision",
+            ],
+            "TrustedRootCertificates": [
                 "ClusterRevision",
             ],
             "WakeOnLan": [
@@ -1395,6 +1406,14 @@ class ChipClusters:
         return self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower(
                 device, ZCLendpoint, ZCLgroupid, mode, amount
         )
+    def ClusterTrustedRootCertificates_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
+        return self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate(
+                device, ZCLendpoint, ZCLgroupid, rootCertificate, len(rootCertificate)
+        )
+    def ClusterTrustedRootCertificates_CommandRemoveTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, trustedRootIdentifier: bytes):
+        return self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate(
+                device, ZCLendpoint, ZCLgroupid, trustedRootIdentifier, len(trustedRootIdentifier)
+        )
     def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(
                 device, ZCLendpoint, ZCLgroupid
@@ -1780,6 +1799,8 @@ class ChipClusters:
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_SystemMode(device, ZCLendpoint, ZCLgroupid)
     def ClusterThermostat_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
+    def ClusterTrustedRootCertificates_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+        return self._chipLib.chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision(device, ZCLendpoint, ZCLgroupid)
     def ClusterWakeOnLan_ReadAttributeWakeOnLanMacAddress(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress(device, ZCLendpoint, ZCLgroupid)
     def ClusterWakeOnLan_ReadAttributeClusterRevision(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -2750,6 +2771,16 @@ class ChipClusters:
         # Cluster Thermostat ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
+        # Cluster TrustedRootCertificates
+        # Cluster TrustedRootCertificates Command AddTrustedRootCertificate
+        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate.restype = ctypes.c_uint32
+        # Cluster TrustedRootCertificates Command RemoveTrustedRootCertificate
+        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate.restype = ctypes.c_uint32
+        # Cluster TrustedRootCertificates ReadAttribute ClusterRevision
+        self._chipLib.chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WakeOnLan
         # Cluster WakeOnLan ReadAttribute WakeOnLanMacAddress
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_WakeOnLanMacAddress.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

@@ -1916,25 +1916,24 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
     return true;
 }
 
-bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, uint8_t * CSR, uint32_t CSRLen,
-                                                               uint8_t * CSRNonce, uint8_t * VendorReserved1,
-                                                               uint8_t * VendorReserved2, uint8_t * VendorReserved3,
-                                                               uint8_t * Signature)
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
+                                                               chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+                                                               chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
+                                                               chip::ByteSpan Signature)
 {
     ChipLogProgress(Zcl, "OpCSRResponse:");
-    ChipLogProgress(Zcl, "  CSR: %s", CSR);
-    ChipLogProgress(Zcl, "  CSRLen: %" PRIu32 "", CSRLen);
-    ChipLogProgress(Zcl, "  CSRNonce: %s", CSRNonce);
-    ChipLogProgress(Zcl, "  VendorReserved1: %s", VendorReserved1);
-    ChipLogProgress(Zcl, "  VendorReserved2: %s", VendorReserved2);
-    ChipLogProgress(Zcl, "  VendorReserved3: %s", VendorReserved3);
-    ChipLogProgress(Zcl, "  Signature: %s", Signature);
+    ChipLogProgress(Zcl, "  CSR: %p", CSR.data());
+    ChipLogProgress(Zcl, "  CSRNonce: %p", CSRNonce.data());
+    ChipLogProgress(Zcl, "  VendorReserved1: %p", VendorReserved1.data());
+    ChipLogProgress(Zcl, "  VendorReserved2: %p", VendorReserved2.data());
+    ChipLogProgress(Zcl, "  VendorReserved3: %p", VendorReserved3.data());
+    ChipLogProgress(Zcl, "  Signature: %p", Signature.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("OperationalCredentialsClusterOpCSRResponseCallback");
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * cb =
         Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+    cb->mCall(cb->mContext, CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
     return true;
 }
 
