@@ -75,8 +75,10 @@ class SerialDevice(Device):
         """
         log.info('Stopping "{}" runner...'.format(self.name))
         self.run = False
+        self.oq.put(None)
         self.it.join()
         self.ot.join()
+        log.info('"{}" runner stoped'.format(self.name))
 
     def _input_thread(self):
         while self.run:

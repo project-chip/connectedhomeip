@@ -24,6 +24,9 @@ from .device import Device
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 
+import logging
+log = logging.getLogger(__name__)
+
 
 @pytest.fixture(scope="session")
 def platforms(request):
@@ -43,6 +46,7 @@ def binaries(request):
         result = {}
         for pb in platform_and_binaries:
             pb = pb.split(':')
+            print(pb)
             result[pb[0]] = pb[1]
         return result
     return {}
@@ -93,6 +97,19 @@ class BoardAllocator:
     def allocate(self, name: str = None):
         for alloc in self.allocation:
             if alloc.device is None:
+
+                # Flash if a binary is provided and the board hasn't been flashed yet
+                platform = alloc.description['platform_name']
+                log.info('Start {} board allocation'.format(platform))
+                binary = self.binaries.get(platform)
+                if alloc.flashed is False and binary:
+                    if self.flasher is None:
+                        self.flasher = Flash()
+                    log.info('Flash {} board with {} ...'.format(platform, binary))
+                    self.flasher.flash(build=binary, target_id=alloc.description["target_id"])
+                    alloc.flashed = True
+                    log.info('Flashing completed')
+
                 # Create the serial connection
                 connection = SerialConnection(
                     port=alloc.description["serial_port"],
@@ -106,14 +123,7 @@ class BoardAllocator:
                 alloc.device.reset(duration=1)
                 alloc.device.flush(1)
 
-                # Flash if a binary is provided and the board hasn't been flashed yet
-                platform = alloc.description['platform_name']
-                binary = self.binaries.get(platform)
-                if alloc.flashed is False and binary:
-                    if self.flasher is None:
-                        self.flasher = Flash()
-                    self.flasher.flash(build=binary, target_id=alloc.description["target_id"])
-                    alloc.flashed = True
+                log.info('Allocate {} board as serial device'.format(platform))
 
                 return alloc.device
         return None
@@ -128,6 +138,8 @@ class BoardAllocator:
 
                 # Cleanup
                 alloc.device = None
+
+                log.info('Release {} board'.format(alloc.description['platform_name']))
 
 
 @pytest.fixture(scope="session")
