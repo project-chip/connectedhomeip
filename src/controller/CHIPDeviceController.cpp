@@ -1044,6 +1044,10 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
 void DeviceCommissioner::FreeRendezvousSession()
 {
+    mPairingSession.Clear();
+#if CONFIG_NETWORK_LAYER_BLE
+    mBleLayer->CancelBleIncompleteConnection();
+#endif
     PersistNextKeyId();
 }
 
