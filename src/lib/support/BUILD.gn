@@ -92,6 +92,7 @@ static_library("support") {
     "TimeUtils.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
+    "Variant.h",
     "logging/CHIPLogging.cpp",
     "logging/CHIPLogging.h",
     "verhoeff/Verhoeff.cpp",
