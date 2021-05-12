@@ -17,7 +17,7 @@ nRF52840 Dongle:
 
 1.  Clone the OpenThread repository into the current directory:
 
-        $ git clone https://github.com/openthread/openthread.git
+        $ git clone --recursive https://github.com/openthread/openthread.git
 
 2.  Enter the _openthread_ directory:
 
@@ -31,15 +31,23 @@ nRF52840 Dongle:
 
         $ ./bootstrap
 
-5.  Build OpenThread for the nRF52840 Dongle:
+5. Navigate back to the top directory and clone OpenThread nRF528xx platform repository:
 
-         $ make -f examples/Makefile-nrf52840 BOOTLOADER=USB USB=1 THREAD_VERSION=1.2
+        $ cd .. && git clone --recursive https://github.com/openthread/ot-nrf528xx.git
 
-    This creates an RCP image at `output/nrf52840/bin/ot-rcp`.
+6.  Enter the _ot-nrf528xx_ directory:
+
+        $ cd ot-nrf528xx
+
+7.  Build OpenThread for the nRF52840 Dongle:
+
+         $ script/build nrf52840 USB_trans -DOT_BOOTLOADER=USB -DOT_THREAD_VERSION=1.2
+
+    This creates an RCP image at `build/bin/ot-rcp`.
 
 6.  Convert the RCP image to the `.hex` format:
 
-        $ arm-none-eabi-objcopy -O ihex output/nrf52840/bin/ot-rcp output/nrf52840/bin/ot-rcp.hex
+        $ arm-none-eabi-objcopy -O ihex build/bin/ot-rcp build/bin/ot-rcp.hex
 
 7.  Install
     [nRF Util](https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Util):
@@ -49,8 +57,8 @@ nRF52840 Dongle:
 8.  Generate the RCP firmware package:
 
         $ nrfutil pkg generate --hw-version 52 --sd-req=0x00 \
-            --application output/nrf52840/bin/ot-rcp.hex \
-            --application-version 1 output/nrf52840/bin/ot-rcp.zip
+            --application build/bin/ot-rcp.hex \
+            --application-version 1 build/bin/ot-rcp.zip
 
 9.  Connect the nRF52840 Dongle to the USB port.
 
@@ -61,4 +69,4 @@ nRF52840 Dongle:
     command, with _/dev/ttyACM0_ replaced with the device node name of your
     nRF52840 Dongle:
 
-        $ nrfutil dfu usb-serial -pkg output/nrf52840/bin/ot-rcp.zip -p /dev/ttyACM0
+        $ nrfutil dfu usb-serial -pkg build/bin/ot-rcp.zip -p /dev/ttyACM0
