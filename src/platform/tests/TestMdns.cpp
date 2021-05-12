@@ -95,28 +95,55 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test Mdns::PubSub", TestMdnsPubSub
 int TestMdns()
 {
     std::mutex mtx;
-    std::condition_variable done;
+
+    std::condition_variable readyCondition;
+    bool ready = false;
+
+    std::condition_variable doneCondition;
+    bool done = false;
+
     int retVal = EXIT_FAILURE;
 
-    std::thread t([&mtx, &done, &retVal]() {
+    std::thread t([&]() {
         {
-            nlTestSuite theSuite = { "CHIP DeviceLayer mdns tests", &sTests[0], nullptr, nullptr };
-
-            nlTestRunner(&theSuite, nullptr);
-            retVal = nlTestRunnerStats(&theSuite);
+            std::lock_guard<std::mutex> lock(mtx);
+            ready = true;
+            readyCondition.notify_one();
         }
 
+        nlTestSuite theSuite = { "CHIP DeviceLayer mdns tests", &sTests[0], nullptr, nullptr };
+
+        nlTestRunner(&theSuite, nullptr);
+        retVal = nlTestRunnerStats(&theSuite);
+
         {
-            std::lock_guard<std::mutex> localLock(mtx);
-            done.notify_all();
+            std::lock_guard<std::mutex> lock(mtx);
+            done = true;
+            doneCondition.notify_all();
         }
     });
 
     {
         std::unique_lock<std::mutex> lock(mtx);
-        if (done.wait_for(lock, std::chrono::seconds(5)) == std::cv_status::timeout)
+        readyCondition.wait(lock, [&] { return ready; });
+
+        doneCondition.wait_for(lock, std::chrono::seconds(5));
+        if (!done)
         {
             fprintf(stderr, "mDNS test timeout, is avahi daemon running?\n");
+
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
+            chip::DeviceLayer::PlatformMgr().Shutdown();
+            chip::DeviceLayer::SystemLayer.WakeSelect();
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+            // TODO: the above does not seem to actually reliably shut down the chip
+            // Program will abort with core because chip thread will still run.
+            doneCondition.wait_for(lock, std::chrono::seconds(1));
+            if (!done)
+            {
+                fprintf(stderr, "Orderly shutdown of the platform main loop failed as well.\n");
+            }
             retVal = EXIT_FAILURE;
         }
     }
