@@ -829,6 +829,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     SecurePairingUsingTestSecret * testSecurePairingSecret = nullptr;
 
+    // Check that the caller has provided an IP address (instead of a BLE peer address)
     VerifyOrExit(peerAddress.GetTransportType() == Transport::Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(remoteDeviceId != kUndefinedNodeId && remoteDeviceId != kAnyNodeId, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -852,7 +853,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
                                   testSecurePairingSecret, SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
     }
     SuccessOrExit(err);
@@ -991,7 +992,7 @@ void DeviceCommissioner::OnSessionEstablished()
                                 SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed in setting up secure channel: err %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
         return;
     }
@@ -1002,7 +1003,7 @@ void DeviceCommissioner::OnSessionEstablished()
     err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Ble, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
         return;
     }
