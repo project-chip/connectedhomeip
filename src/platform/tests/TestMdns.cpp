@@ -95,25 +95,30 @@ static const nlTest sTests[] = { NL_TEST_DEF("Test Mdns::PubSub", TestMdnsPubSub
 int TestMdns()
 {
     std::mutex mtx;
-    std::unique_lock<std::mutex> lock(mtx);
     std::condition_variable done;
     int retVal = EXIT_FAILURE;
 
     std::thread t([&mtx, &done, &retVal]() {
         {
-            std::lock_guard<std::mutex> localLock(mtx);
             nlTestSuite theSuite = { "CHIP DeviceLayer mdns tests", &sTests[0], nullptr, nullptr };
 
             nlTestRunner(&theSuite, nullptr);
             retVal = nlTestRunnerStats(&theSuite);
         }
-        done.notify_all();
+
+        {
+            std::lock_guard<std::mutex> localLock(mtx);
+            done.notify_all();
+        }
     });
 
-    if (done.wait_for(lock, std::chrono::seconds(5)) == std::cv_status::timeout)
     {
-        fprintf(stderr, "mDNS test timeout, is avahi daemon running?");
-        retVal = EXIT_FAILURE;
+        std::unique_lock<std::mutex> lock(mtx);
+        if (done.wait_for(lock, std::chrono::seconds(5)) == std::cv_status::timeout)
+        {
+            fprintf(stderr, "mDNS test timeout, is avahi daemon running?\n");
+            retVal = EXIT_FAILURE;
+        }
     }
     return retVal;
 }
