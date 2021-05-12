@@ -458,6 +458,7 @@ static void ChipEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_
     {
     case DeviceLayer::DeviceEventType::kInternetConnectivityChange:
         VerifyOrReturn(event->InternetConnectivityChange.IPv4 == DeviceLayer::kConnectivity_Established);
+        // TODO : Need to check if we're properly commissioned.
         advertise();
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD

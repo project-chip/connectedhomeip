@@ -42,7 +42,7 @@ ENVIRONMENT_ROOT="$CHIP_ROOT/out/python_env"
 source "$CHIP_ROOT/scripts/activate.sh"
 
 # Generates ninja files
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=false"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="chip_detail_logging=false chip_use_clusters_for_ip_commissioning=1"
 
 # Compiles python files
 ninja -C "$OUTPUT_ROOT" python

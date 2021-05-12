@@ -27,6 +27,7 @@
  */
 
 #pragma once
+#include <memory>
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
@@ -67,6 +68,12 @@ namespace Controller {
 constexpr uint16_t kNumMaxActiveDevices = 64;
 constexpr uint16_t kNumMaxPairedDevices = 128;
 
+// Raw functions for cluster callbacks
+typedef void (*BasicSuccessCallback)(void * context, uint16_t val);
+typedef void (*BasicFailureCallback)(void * context, uint8_t status);
+void BasicSuccess(void * context, uint16_t val);
+void BasicFailure(void * context, uint8_t status);
+
 struct ControllerInitParams
 {
     PersistentStorageDelegate * storageDelegate = nullptr;
@@ -81,6 +88,25 @@ struct ControllerInitParams
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+};
+
+enum CommissioningStage : uint8_t
+{
+    kError,
+    kSecurePairing,
+    kArmFailsafe,
+    // kConfigTime,  // NOT YET IMPLEMENTED
+    // kConfigTimeZone,  // NOT YET IMPLEMENTED
+    // kConfigDST,  // NOT YET IMPLEMENTED
+    kConfigRegulatory,
+    kCheckCertificates,
+    kConfigACL,
+    kNetworkSetup,
+    kScanNetworks, // optional stage if network setup fails (not yet implemented)
+    kNetworkEnable,
+    kFindOperational,
+    kSendComplete,
+    kCleanup,
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -254,7 +280,10 @@ protected:
     PersistentStorageDelegate * mStorageDelegate;
     DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    static constexpr size_t kMaxAddrUpdateDelegates                                     = 2;
+    DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate[kMaxAddrUpdateDelegates] = {};
+    CHIP_ERROR RegisterAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate);
+    CHIP_ERROR UnregisterAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate);
     // TODO(cecille): Make this configuarable.
     static constexpr int kMaxCommissionableNodes = 10;
     Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
@@ -337,7 +366,12 @@ public:
  *   required to provide write access to the persistent storage, where the paired device information
  *   will be stored.
  */
-class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEstablishmentDelegate
+class DLL_EXPORT DeviceCommissioner : public DeviceController,
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+                                      public DeviceAddressUpdateDelegate,
+#endif
+                                      public SessionEstablishmentDelegate
+
 {
 public:
     DeviceCommissioner();
@@ -393,9 +427,16 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
+    //////////// DeviceAddressUpdateDelegate Implementation ///////////////
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
+#endif
+
     void RendezvousCleanup(CHIP_ERROR status);
 
     void ReleaseDevice(Device * device) override;
+
+    void AdvanceCommissioningStage(CHIP_ERROR err);
 
 #if CONFIG_NETWORK_LAYER_BLE
     /**
@@ -458,6 +499,8 @@ private:
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
     bool mPairedDevicesUpdated;
+
+    CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
 
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
@@ -533,6 +576,14 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+
+    // Cluster callbacks for advancing commissioning flows
+    std::unique_ptr<Callback::Callback<BasicSuccessCallback>> success =
+        std::make_unique<Callback::Callback<BasicSuccessCallback>>(BasicSuccess, this);
+    std::unique_ptr<Callback::Callback<BasicFailureCallback>> failure =
+        std::make_unique<Callback::Callback<BasicFailureCallback>>(BasicFailure, this);
+
+    CommissioningStage GetNextCommissioningStage();
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
