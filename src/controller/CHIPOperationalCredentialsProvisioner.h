@@ -37,9 +37,11 @@ typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * contex
 typedef void (*OperationalCredentialsClusterOpCertResponseCallback)(void * context, uint8_t StatusCode, uint64_t FabricIndex,
                                                                     uint8_t * DebugText);
 
+typedef void (*DefaultSuccessCallback)(void * context);
 typedef void (*DefaultFailureCallback)(void * context, uint8_t status);
 
-constexpr ClusterId kOperationalCredentialsClusterIdLocal = 0x003E;
+constexpr ClusterId kOperationalCredentialsClusterIdLocal  = 0x003E;
+constexpr ClusterId kTrustedRootCertificatesClusterIdLocal = 0x003F;
 
 class DLL_EXPORT OperationalCredentialsProvisioner : public ClusterBase
 {
@@ -72,6 +74,29 @@ private:
     static constexpr CommandId kRemoveFabricCommandId      = 0x0A;
     static constexpr CommandId kSetFabricCommandId         = 0x00;
     static constexpr CommandId kUpdateFabricLabelCommandId = 0x09;
+};
+
+// TODO - Remove TrustedRootCertificate cluster once it merges with OperationalCredentials cluster
+// Keeping the code in this file for time being, as it'll eventually be removed.
+class DLL_EXPORT TrustedRootCertificatesProvisioner : public ClusterBase
+{
+public:
+    TrustedRootCertificatesProvisioner() : ClusterBase(kTrustedRootCertificatesClusterIdLocal) {}
+    ~TrustedRootCertificatesProvisioner() {}
+
+    // Cluster Commands
+    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         chip::ByteSpan rootCertificate);
+    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            chip::ByteSpan trustedRootIdentifier);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0x00;
+    static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0x01;
 };
 
 } // namespace Controller

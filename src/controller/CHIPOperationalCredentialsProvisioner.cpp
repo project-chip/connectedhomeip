@@ -204,5 +204,74 @@ CHIP_ERROR OperationalCredentialsProvisioner::ReadAttributeClusterRevision(Callb
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// TrustedRootCertificates Cluster Commands
+CHIP_ERROR TrustedRootCertificatesProvisioner::AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback,
+                                                                         chip::ByteSpan rootCertificate)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddTrustedRootCertificateCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->Reset());
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // rootCertificate: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rootCertificate));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands();
+}
+
+CHIP_ERROR TrustedRootCertificatesProvisioner::RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback,
+                                                                            chip::ByteSpan trustedRootIdentifier)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveTrustedRootCertificateCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->Reset());
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // trustedRootIdentifier: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), trustedRootIdentifier));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands();
+}
+
+// TrustedRootCertificates Cluster Attributes
+CHIP_ERROR TrustedRootCertificatesProvisioner::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTrustedRootCertificatesClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR TrustedRootCertificatesProvisioner::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 } // namespace Controller
 } // namespace chip

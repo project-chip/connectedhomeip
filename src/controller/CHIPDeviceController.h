@@ -463,7 +463,9 @@ private:
 
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(Device * device);
     CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
-    CHIP_ERROR SendTrustedRootCertificate(Device * device, const ByteSpan & certBuf);
+    CHIP_ERROR SendTrustedRootCertificate(Device * device);
+
+    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(Device * device);
 
     static void OnCSRFailureResponse(void * context, uint8_t status);
     static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
@@ -472,6 +474,9 @@ private:
     static void OnAddOpCertFailureResponse(void * context, uint8_t status);
     static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
 
+    static void OnRootCertSuccessResponse(void * context);
+    static void OnRootCertFailureResponse(void * context, uint8_t status);
+
     CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
 
@@ -479,8 +484,10 @@ private:
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
+    Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
     Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
     Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
     PASESession mPairingSession;
 };
