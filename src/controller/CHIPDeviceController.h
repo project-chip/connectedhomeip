@@ -328,7 +328,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController, public SessionEst
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner();
+    ~DeviceCommissioner() {}
 
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
@@ -477,9 +477,10 @@ private:
 
     uint16_t mNextKeyId = 0;
 
-    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> * mOpCSRResponseCallback;
-    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> * mOpCertResponseCallback;
-    Callback::Callback<DefaultFailureCallback> * mOnFailureCallback;
+    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
 
     PASESession mPairingSession;
 };

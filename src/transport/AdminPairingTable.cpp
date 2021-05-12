@@ -61,7 +61,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     else
     {
         info->mRootCertLen = Encoding::LittleEndian::HostSwap16(mRootCertLen);
-        memmove(info->mRootCert, mRootCert, mRootCertLen);
+        memcpy(info->mRootCert, mRootCert, mRootCertLen);
     }
 
     if (mOperationalCert == nullptr || mOpCertLen == 0)
@@ -71,7 +71,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     else
     {
         info->mOpCertLen = Encoding::LittleEndian::HostSwap16(mOpCertLen);
-        memmove(info->mOperationalCert, mOperationalCert, mOpCertLen);
+        memcpy(info->mOperationalCert, mOperationalCert, mOpCertLen);
     }
 
     err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
@@ -100,15 +100,16 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     uint16_t infoSize = sizeof(StorableAdminPairingInfo);
 
     AdminId id;
+    uint16_t rootCertLen, opCertLen;
 
     SuccessOrExit(err = kvs->SyncGetKeyValue(key, info, infoSize));
 
-    mNodeId      = Encoding::LittleEndian::HostSwap64(info->mNodeId);
-    id           = Encoding::LittleEndian::HostSwap16(info->mAdmin);
-    mFabricId    = Encoding::LittleEndian::HostSwap64(info->mFabricId);
-    mVendorId    = Encoding::LittleEndian::HostSwap16(info->mVendorId);
-    mRootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
-    mOpCertLen   = Encoding::LittleEndian::HostSwap16(info->mOpCertLen);
+    mNodeId     = Encoding::LittleEndian::HostSwap64(info->mNodeId);
+    id          = Encoding::LittleEndian::HostSwap16(info->mAdmin);
+    mFabricId   = Encoding::LittleEndian::HostSwap64(info->mFabricId);
+    mVendorId   = Encoding::LittleEndian::HostSwap16(info->mVendorId);
+    rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
+    opCertLen   = Encoding::LittleEndian::HostSwap16(info->mOpCertLen);
 
     VerifyOrExit(mAdmin != id, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -119,25 +120,8 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
 
-    if (mRootCertLen != 0)
-    {
-        if (mRootCert == nullptr)
-        {
-            mRootCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(mRootCertLen));
-        }
-        VerifyOrExit(mRootCert != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        memmove(mRootCert, info->mRootCert, mRootCertLen);
-    }
-
-    if (mOpCertLen != 0)
-    {
-        if (mOperationalCert == nullptr)
-        {
-            mOperationalCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(mOpCertLen));
-        }
-        VerifyOrExit(mOperationalCert != nullptr, err = CHIP_ERROR_NO_MEMORY);
-        memmove(mOperationalCert, info->mOperationalCert, mOpCertLen);
-    }
+    SuccessOrExit(SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
+    SuccessOrExit(SetOperationalCert(ByteSpan(info->mOperationalCert, opCertLen)));
 
 exit:
     if (info != nullptr)
@@ -188,15 +172,29 @@ CHIP_ERROR AdminPairingInfo::SetOperationalKey(const Crypto::P256Keypair & key)
     return mOperationalKey->Deserialize(serialized);
 }
 
-CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
+void AdminPairingInfo::ReleaseRootCert()
 {
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mRootCertLen != 0 && mRootCertLen < cert.size())
+    if (mRootCert != nullptr)
     {
-        VerifyOrReturnError(mRootCert != nullptr, CHIP_ERROR_INCORRECT_STATE);
         chip::Platform::MemoryFree(mRootCert);
-        mRootCertLen = 0;
-        mRootCert    = nullptr;
+    }
+    mRootCertAllocatedLen = 0;
+    mRootCertLen          = 0;
+    mRootCert             = nullptr;
+}
+
+CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
+{
+    if (cert.size() == 0)
+    {
+        ReleaseRootCert();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mRootCertLen != 0 && mRootCertAllocatedLen < cert.size())
+    {
+        ReleaseRootCert();
     }
 
     if (mRootCert == nullptr)
@@ -205,21 +203,36 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
     }
     VerifyOrReturnError(mRootCert != nullptr, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    mRootCertLen = static_cast<uint16_t>(cert.size());
-    memmove(mRootCert, cert.data(), mRootCertLen);
+    mRootCertLen          = static_cast<uint16_t>(cert.size());
+    mRootCertAllocatedLen = (mRootCertLen > mRootCertAllocatedLen) ? mRootCertLen : mRootCertAllocatedLen;
+    memcpy(mRootCert, cert.data(), mRootCertLen);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
+void AdminPairingInfo::ReleaseOperationalCert()
 {
-    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mOpCertLen != 0 && mOpCertLen < cert.size())
+    if (mOperationalCert != nullptr)
     {
-        VerifyOrReturnError(mOperationalCert != nullptr, CHIP_ERROR_INCORRECT_STATE);
         chip::Platform::MemoryFree(mOperationalCert);
-        mOpCertLen       = 0;
-        mOperationalCert = nullptr;
+    }
+    mOpCertAllocatedLen = 0;
+    mOpCertLen          = 0;
+    mOperationalCert    = nullptr;
+}
+
+CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
+{
+    if (cert.size() == 0)
+    {
+        ReleaseOperationalCert();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(cert.size() <= kMaxChipCertSize, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mOpCertLen != 0 && mOpCertAllocatedLen < cert.size())
+    {
+        ReleaseOperationalCert();
     }
 
     if (mOperationalCert == nullptr)
@@ -228,8 +241,9 @@ CHIP_ERROR AdminPairingInfo::SetRootCert(const ByteSpan & cert)
     }
     VerifyOrReturnError(mOperationalCert != nullptr, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    mOpCertLen = static_cast<uint16_t>(cert.size());
-    memmove(mOperationalCert, cert.data(), mOpCertLen);
+    mOpCertLen          = static_cast<uint16_t>(cert.size());
+    mOpCertAllocatedLen = (mOpCertLen > mOpCertAllocatedLen) ? mOpCertLen : mOpCertAllocatedLen;
+    memcpy(mOperationalCert, cert.data(), mOpCertLen);
 
     return CHIP_NO_ERROR;
 }

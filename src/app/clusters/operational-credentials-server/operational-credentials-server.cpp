@@ -325,13 +325,12 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added an Op Cert");
 
     AdminPairingInfo * admin = retrieveCurrentAdmin();
-    // Fetch current admin
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
     VerifyOrExit(cert.Alloc(NOC.size() + ICACertificate.size()), status = EMBER_ZCL_STATUS_FAILURE);
     certBuf = cert.Get();
-    memmove(certBuf, NOC.data(), NOC.size());
-    memmove(&certBuf[NOC.size()], ICACertificate.data(), ICACertificate.size());
+    memcpy(certBuf, NOC.data(), NOC.size());
+    memcpy(&certBuf[NOC.size()], ICACertificate.data(), ICACertificate.size());
 
     VerifyOrExit(admin->SetOperationalCert(ByteSpan(certBuf, NOC.size() + ICACertificate.size())) == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);

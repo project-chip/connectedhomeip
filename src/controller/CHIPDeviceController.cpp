@@ -708,32 +708,14 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
     };
 }
 
-DeviceCommissioner::DeviceCommissioner()
+DeviceCommissioner::DeviceCommissioner() :
+    mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
+    mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
+    mOnCertFailureCallback(OnAddOpCertFailureResponse, this)
 {
-    mPairingDelegate        = nullptr;
-    mDeviceBeingPaired      = kNumMaxActiveDevices;
-    mPairedDevicesUpdated   = false;
-    mOpCSRResponseCallback  = nullptr;
-    mOpCertResponseCallback = nullptr;
-    mOnFailureCallback      = nullptr;
-}
-
-DeviceCommissioner::~DeviceCommissioner()
-{
-    if (mOpCSRResponseCallback != nullptr)
-    {
-        chip::Platform::Delete(mOpCSRResponseCallback);
-    }
-
-    if (mOpCertResponseCallback != nullptr)
-    {
-        chip::Platform::Delete(mOpCertResponseCallback);
-    }
-
-    if (mOnFailureCallback != nullptr)
-    {
-        chip::Platform::Delete(mOnFailureCallback);
-    }
+    mPairingDelegate      = nullptr;
+    mDeviceBeingPaired    = kNumMaxActiveDevices;
+    mPairedDevicesUpdated = false;
 }
 
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams params)
@@ -1061,21 +1043,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     chip::Controller::OperationalCredentialsProvisioner cluster;
     cluster.Associate(device, 0);
 
-    if (mOpCSRResponseCallback == nullptr)
-    {
-        mOpCSRResponseCallback = chip::Platform::New<Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback>>(
-            OnOperationalCertificateSigningRequest, this);
-    }
-    VerifyOrReturnError(mOpCSRResponseCallback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (mOnFailureCallback == nullptr)
-    {
-        mOnFailureCallback = chip::Platform::New<Callback::Callback<DefaultFailureCallback>>(OnCSRFailureResponse, this);
-    }
-    VerifyOrReturnError(mOnFailureCallback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    Callback::Cancelable * successCallback = mOpCSRResponseCallback->Cancel();
-    Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
+    Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
     uint8_t CSRNonce[kOpCSRNonceLength];
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
@@ -1175,21 +1144,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     chip::Controller::OperationalCredentialsProvisioner cluster;
     cluster.Associate(device, 0);
 
-    if (mOpCertResponseCallback == nullptr)
-    {
-        mOpCertResponseCallback = chip::Platform::New<Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback>>(
-            OnOperationalCertificateAddResponse, this);
-    }
-    VerifyOrReturnError(mOpCertResponseCallback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    if (mOnFailureCallback == nullptr)
-    {
-        mOnFailureCallback = chip::Platform::New<Callback::Callback<DefaultFailureCallback>>(OnAddOpCertFailureResponse, this);
-    }
-    VerifyOrReturnError(mOnFailureCallback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    Callback::Cancelable * successCallback = mOpCertResponseCallback->Cancel();
-    Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
+    Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
     // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
     // strings.

@@ -131,14 +131,16 @@ public:
         if (mRootCert != nullptr)
         {
             chip::Platform::MemoryFree(mRootCert);
-            mRootCert    = nullptr;
-            mRootCertLen = 0;
+            mRootCert             = nullptr;
+            mRootCertLen          = 0;
+            mRootCertAllocatedLen = 0;
         }
         if (mOperationalCert != nullptr)
         {
             chip::Platform::MemoryFree(mOperationalCert);
-            mOperationalCert = nullptr;
-            mOpCertLen       = 0;
+            mOperationalCert    = nullptr;
+            mOpCertLen          = 0;
+            mOpCertAllocatedLen = 0;
         }
     }
 
@@ -155,10 +157,12 @@ private:
 
     Crypto::P256Keypair * mOperationalKey = nullptr;
 
-    uint8_t * mRootCert        = nullptr;
-    uint16_t mRootCertLen      = 0;
-    uint8_t * mOperationalCert = nullptr;
-    uint16_t mOpCertLen        = 0;
+    uint8_t * mRootCert            = nullptr;
+    uint16_t mRootCertLen          = 0;
+    uint16_t mRootCertAllocatedLen = 0;
+    uint8_t * mOperationalCert     = nullptr;
+    uint16_t mOpCertLen            = 0;
+    uint16_t mOpCertAllocatedLen   = 0;
 
     static constexpr size_t KeySize();
 
@@ -167,6 +171,9 @@ private:
     CHIP_ERROR StoreIntoKVS(PersistentStorageDelegate * kvs);
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
+
+    void ReleaseOperationalCert();
+    void ReleaseRootCert();
 
     struct StorableAdminPairingInfo
     {
