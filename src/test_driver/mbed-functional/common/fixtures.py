@@ -17,6 +17,7 @@ from typing import List, Optional, Any, Mapping
 
 import mbed_lstools
 import pytest
+from time import sleep
 from mbed_flasher.flash import Flash
 
 from .device import Device
@@ -104,7 +105,7 @@ class BoardAllocator:
                 binary = self.binaries.get(platform)
                 if alloc.flashed is False and binary:
                     if self.flasher is None:
-                        self.flasher = Flash()
+                        self.flasher = Flash(log)
                     log.info('Flash {} board with {} ...'.format(platform, binary))
                     self.flasher.flash(build=binary, target_id=alloc.description["target_id"])
                     alloc.flashed = True
@@ -122,6 +123,8 @@ class BoardAllocator:
                 alloc.device = SerialDevice(connection, name)
                 alloc.device.reset(duration=1)
                 alloc.device.flush(1)
+
+                sleep(2)
 
                 log.info('Allocate {} board as serial device'.format(platform))
 

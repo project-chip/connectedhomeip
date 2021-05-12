@@ -108,6 +108,6 @@ class SerialDevice(Device):
             if line:
                 log.info('-->|{}| {}'.format(self.name, line.strip()))
                 data = line + '\n'
-                self.serial.write(data.encode('utf8'))
+                self.serial.write(data.encode('utf-8'))
             else:
                 log.debug('Nothing sent')
