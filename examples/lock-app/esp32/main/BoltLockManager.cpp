@@ -3,8 +3,8 @@
 
 #include "AppConfig.h"
 #include "AppTask.h"
-#include <freertos/FreeRTOS.h>
 #include "esp_log.h"
+#include <freertos/FreeRTOS.h>
 static const char * TAG = "BoltLockManager";
 BoltLockManager BoltLockManager::sLock;
 
@@ -60,7 +60,7 @@ void BoltLockManager::SetAutoLockDuration(uint32_t aDurationInSecs)
     mAutoLockDuration = aDurationInSecs;
 }
 
-//On off command send jhali ki action initiate hote
+// On off command send jhali ki action initiate hote
 bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
 {
     printf("BoltLockManager::InitiateAction\n");
@@ -120,7 +120,7 @@ void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
     {
         ESP_LOGI(TAG, "sLockTimer timer start() failed");
-        return; //CHIP_ERROR_MAX
+        return; // CHIP_ERROR_MAX
     }
 }
 
@@ -130,7 +130,7 @@ void BoltLockManager::CancelTimer(void)
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
     {
         ESP_LOGI(TAG, "Lock timer timer stop() failed");
-        return;//CHIP_ERROR_MAX
+        return; // CHIP_ERROR_MAX
     }
 }
 void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)

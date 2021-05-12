@@ -1,19 +1,18 @@
 #include "AppTask.h"
-#include "AppEvent.h"
 #include "AppConfig.h"
+#include "AppEvent.h"
 #include "LEDWidget.h"
 #include "esp_log.h"
 #include "gen/attribute-id.h"
 #include "gen/attribute-type.h"
 #include "gen/cluster-id.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af-enums.h>
 #include <app/util/attribute-storage.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <support/CodeUtils.h>
-
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -37,7 +36,7 @@ bool sHaveServiceConnectivity = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-}//namespace
+} // namespace
 
 using namespace ::chip::DeviceLayer;
 AppTask AppTask::sAppTask;
@@ -69,7 +68,7 @@ int AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     printf("AppTask::Init\n");
-    //Initialize timer
+    // Initialize timer
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
                                   1,                // == default timer period (mS)
@@ -77,10 +76,10 @@ int AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
-    err = BoltLockMgr().Init();    //Initialize BoltLockManager
+    err            = BoltLockMgr().Init(); // Initialize BoltLockManager
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
-    sStatusLED.Init(SYSTEM_STATE_LED);//Initialize buttons
+    sStatusLED.Init(SYSTEM_STATE_LED); // Initialize buttons
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
 
@@ -103,7 +102,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGI(TAG, "AppTask.Init() failed");
-        return; //CHIP_MAX_ERROR
+        return; // CHIP_MAX_ERROR
     }
 
     ESP_LOGI(TAG, "App Task started");
@@ -127,7 +126,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
-
 
         // Update the status LED if factory reset has not been initiated.
         //
@@ -167,12 +165,11 @@ void AppTask::AppTaskMain(void * pvParameter)
 
         if (nowUS > nextChangeTimeUS)
         {
-//            PublishService();/NOT In ESP32
+            //            PublishService();/NOT In ESP32
             mLastChangeTimeUS = nowUS;
         }
     }
 }
-
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
@@ -223,10 +220,10 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
         return;
     }
 
-    AppEvent button_event              = {};
-    button_event.Type                  = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.PinNo = btnIdx;
-    button_event.ButtonEvent.Action    = btnAction;
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.PinNo  = btnIdx;
+    button_event.ButtonEvent.Action = btnAction;
 
     if (btnIdx == APP_LOCK_BUTTON && btnAction == APP_BUTTON_PRESSED)
     {
@@ -350,7 +347,7 @@ void AppTask::CancelTimer()
     if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
     {
         ESP_LOGI(TAG, "app timer stop() failed");
-        return;//CHIP_ERROR_MAX;
+        return; // CHIP_ERROR_MAX;
     }
 
     mFunctionTimerActive = false;
@@ -416,7 +413,6 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
         sLockLED.Set(false);
     }
 }
-
 
 void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction)
 {

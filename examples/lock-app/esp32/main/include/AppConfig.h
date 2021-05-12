@@ -11,7 +11,6 @@
 #define PB0 0
 #define PB1 1
 
-
 #define APP_LOCK_BUTTON PB1
 #define APP_FUNCTION_BUTTON PB0
 #define APP_BUTTON_DEBOUNCE_PERIOD_MS 50

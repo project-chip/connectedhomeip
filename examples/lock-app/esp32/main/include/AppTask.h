@@ -8,8 +8,8 @@
 
 #include "freertos/FreeRTOS.h"
 #include <ble/BLEEndPoint.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 class AppTask
 {

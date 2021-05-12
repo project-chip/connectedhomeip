@@ -10,13 +10,12 @@ void LEDWidget::Init(gpio_num_t gpioNum)
     mLastChangeTimeUS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
-    mGPIONum           = gpioNum;
+    mGPIONum          = gpioNum;
 
     if (gpioNum < GPIO_NUM_MAX)
     {
         gpio_set_direction(gpioNum, GPIO_MODE_OUTPUT);
     }
-
 }
 
 void LEDWidget::Invert(void)
@@ -41,7 +40,7 @@ void LEDWidget::Blink(uint32_t changeRateMS)
 
 void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 {
-//    printf("LEDWidget::Blink(uint32_t\n");
+    //    printf("LEDWidget::Blink(uint32_t\n");
     mBlinkOnTimeMS  = onTimeMS;
     mBlinkOffTimeMS = offTimeMS;
     Animate();
@@ -49,7 +48,7 @@ void LEDWidget::Blink(uint32_t onTimeMS, uint32_t offTimeMS)
 
 void LEDWidget::Animate()
 {
-//    printf("LEDWidget::Animate\n");
+    //    printf("LEDWidget::Animate\n");
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
         int64_t nowUS            = GetClock_MonotonicHiRes();
@@ -58,7 +57,7 @@ void LEDWidget::Animate()
 
         if (nowUS > nextChangeTimeUS)
         {
-//            DoSet(!mState);
+            //            DoSet(!mState);
             mLastChangeTimeUS = nowUS;
         }
     }

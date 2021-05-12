@@ -24,8 +24,8 @@
  **/
 
 #include "DeviceCallbacks.h"
-#include "BoltLockManager.h"
 #include "AppConfig.h"
+#include "BoltLockManager.h"
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
