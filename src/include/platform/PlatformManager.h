@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
@@ -49,6 +50,7 @@ class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
 namespace Internal {
+class DeviceControlServer;
 class FabricProvisioningServer;
 class ServiceProvisioningServer;
 class BLEManagerImpl;
@@ -94,7 +96,12 @@ public:
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
 
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    bool IsChipStackLockedByCurrentThread() const;
+#endif
+
 private:
+    bool mInitialized = false;
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
@@ -103,6 +110,7 @@ private:
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
+    friend class Internal::DeviceControlServer;
     friend class Internal::FabricProvisioningServer;
     friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
@@ -179,9 +187,30 @@ extern PlatformManagerImpl & PlatformMgrImpl();
 namespace chip {
 namespace DeviceLayer {
 
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
+{
+    return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
+}
+#endif
+
 inline CHIP_ERROR PlatformManager::InitChipStack()
 {
-    return static_cast<ImplClass *>(this)->_InitChipStack();
+    // NOTE: this is NOT thread safe and cannot be as the chip stack lock is prepared by
+    // InitChipStack itself on many platforms.
+    //
+    // In the future, this could be moved into specific platform code (where it can
+    // be made thread safe). In general however, init twice
+    // is likely a logic error and we may want to avoid that path anyway. Likely to
+    // be done once code stabilizes a bit more.
+    if (mInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_InitChipStack();
+    mInitialized   = (err == CHIP_NO_ERROR);
+    return err;
 }
 
 inline CHIP_ERROR PlatformManager::AddEventHandler(EventHandlerFunct handler, intptr_t arg)

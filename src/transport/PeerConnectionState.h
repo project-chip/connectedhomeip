@@ -23,6 +23,7 @@
 
 #include <transport/AdminPairingTable.h>
 #include <transport/SecureSession.h>
+#include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
@@ -48,7 +49,7 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
 class PeerConnectionState
 {
 public:
-    PeerConnectionState() : mMsgCounterSynStatus(MsgCounterSyncStatus::NotSync), mPeerAddress(PeerAddress::Uninitialized()) {}
+    PeerConnectionState() : mPeerAddress(PeerAddress::Uninitialized()) {}
     PeerConnectionState(const PeerAddress & addr) : mPeerAddress(addr) {}
     PeerConnectionState(PeerAddress && addr) : mPeerAddress(addr) {}
 
@@ -64,14 +65,8 @@ public:
     void SetTransport(Transport::Base * transport) { mTransport = transport; }
     Transport::Base * GetTransport() { return mTransport; }
 
-    bool IsPeerMsgCounterSynced() { return (mPeerMessageIndex != kUndefinedMessageIndex); }
-    void SetPeerMessageIndex(uint32_t id) { mPeerMessageIndex = id; }
-
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-
-    uint32_t GetSendMessageIndex() const { return mSendMessageIndex; }
-    void IncrementSendMessageIndex() { mSendMessageIndex++; }
 
     uint16_t GetPeerKeyID() const { return mPeerKeyID; }
     void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
@@ -82,24 +77,16 @@ public:
     uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
 
-    SecureSession & GetSenderSecureSession() { return mSenderSecureSession; }
-    SecureSession & GetReceiverSecureSession() { return mReceiverSecureSession; }
+    SecureSession & GetSecureSession() { return mSecureSession; }
 
     Transport::AdminId GetAdminId() const { return mAdmin; }
     void SetAdminId(Transport::AdminId admin) { mAdmin = admin; }
-
-    void SetMsgCounterSyncInProgress(bool value)
-    {
-        mMsgCounterSynStatus = value ? MsgCounterSyncStatus::SyncInProcess : MsgCounterSyncStatus::Synced;
-    }
 
     bool IsInitialized()
     {
         return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
                 mLocalKeyID != UINT16_MAX);
     }
-
-    bool IsMsgCounterSyncInProgress() { return mMsgCounterSynStatus == MsgCounterSyncStatus::SyncInProcess; }
 
     /**
      *  Reset the connection state to a completely uninitialized status.
@@ -108,43 +95,34 @@ public:
     {
         mPeerAddress        = PeerAddress::Uninitialized();
         mPeerNodeId         = kUndefinedNodeId;
-        mSendMessageIndex   = 0;
         mLastActivityTimeMs = 0;
-        mSenderSecureSession.Reset();
-        mReceiverSecureSession.Reset();
-        mMsgCounterSynStatus = MsgCounterSyncStatus::NotSync;
+        mSecureSession.Reset();
+        mSessionMessageCounter.Reset();
     }
 
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                  MessageAuthenticationCode & mac) const
     {
-        return mSenderSecureSession.Encrypt(input, input_length, output, header, mac);
+        return mSecureSession.Encrypt(input, input_length, output, header, mac);
     }
 
     CHIP_ERROR DecryptOnReceive(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
                                 const MessageAuthenticationCode & mac) const
     {
-        return mReceiverSecureSession.Decrypt(input, input_length, output, header, mac);
+        return mSecureSession.Decrypt(input, input_length, output, header, mac);
     }
 
-private:
-    enum class MsgCounterSyncStatus
-    {
-        NotSync,
-        SyncInProcess,
-        Synced,
-    } mMsgCounterSynStatus;
+    SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
+private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId           = kUndefinedNodeId;
-    uint32_t mSendMessageIndex   = 0;
-    uint32_t mPeerMessageIndex   = kUndefinedMessageIndex;
     uint16_t mPeerKeyID          = UINT16_MAX;
     uint16_t mLocalKeyID         = UINT16_MAX;
     uint64_t mLastActivityTimeMs = 0;
     Transport::Base * mTransport = nullptr;
-    SecureSession mSenderSecureSession;
-    SecureSession mReceiverSecureSession;
+    SecureSession mSecureSession;
+    SessionMessageCounter mSessionMessageCounter;
     Transport::AdminId mAdmin = kUndefinedAdminId;
 };
 

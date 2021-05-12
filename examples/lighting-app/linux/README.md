@@ -35,7 +35,7 @@ Raspberry Pi Desktop 20.10 (aarch64)**
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ rm -rf out/
 
--   Build the example with pigweed RCP
+-   Build the example with pigweed RPC
 
           $ cd ~/connectedhomeip/examples/lighting-app/linux
           $ git submodule update --init

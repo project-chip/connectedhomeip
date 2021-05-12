@@ -332,13 +332,11 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR PASESession::DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session)
+CHIP_ERROR PASESession::DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role)
 {
-    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
-
-    return session.InitFromSecret(mKe, mKeLen, nullptr, 0, info, info_len);
+    return session.InitFromSecret(ByteSpan(mKe, mKeLen), ByteSpan(nullptr, 0),
+                                  SecureSession::SessionInfoType::kSessionEstablishment, role);
 }
 
 CHIP_ERROR PASESession::SendPBKDFParamRequest()
@@ -635,8 +633,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
 
         // Call delegate to send the Msg3 to peer
-        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize(),
-                                         SendFlags(SendMessageFlags::kNone));
+        err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2p3, bbuf.Finalize());
         SuccessOrExit(err);
     }
 
@@ -724,8 +721,7 @@ void PASESession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg),
-                                     SendFlags(SendMessageFlags::kNone));
+    err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg));
     SuccessOrExit(err);
 
 exit:

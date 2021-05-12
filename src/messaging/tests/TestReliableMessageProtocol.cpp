@@ -181,8 +181,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     gSendMessageCount = 0;
 
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
-                                Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
@@ -262,8 +261,14 @@ int Initialize(void * aContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr);
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    auto * ctx = reinterpret_cast<TestContext *>(aContext);
+    err        = ctx->Init(&sSuite, &gTransportMgr);
+    if (err != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
+    return SUCCESS;
 }
 
 /**

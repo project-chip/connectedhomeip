@@ -31,6 +31,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -45,6 +46,7 @@ namespace {
 static chip::System::Layer gSystemLayer;
 static chip::SecureSessionMgr gSessionManager;
 static chip::Messaging::ExchangeManager gExchangeManager;
+static chip::secure_channel::MessageCounterManager gMessageCounterManager;
 static chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 static const chip::Transport::AdminId gAdminId = 0;
 } // namespace
@@ -76,20 +78,24 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
     err            = InteractionModelEngine::GetInstance()->Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ClusterInfo * clusterInfoList = nullptr;
-    AttributePathParams attributePathParams1(1, 2, 3, 4, 5, AttributePathFlags::kFieldIdValid);
-    AttributePathParams attributePathParams2(2, 3, 4, 5, 6, AttributePathFlags::kFieldIdValid);
-    AttributePathParams attributePathParams3(3, 4, 5, 6, 7, AttributePathFlags::kFieldIdValid);
+    ClusterInfo clusterInfo1;
+    ClusterInfo clusterInfo2;
+    ClusterInfo clusterInfo3;
 
-    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, attributePathParams1);
-    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfoList->mAttributePathParams.IsSamePath(attributePathParams1));
+    clusterInfo1.mEndpointId = 1;
+    clusterInfo2.mEndpointId = 2;
+    clusterInfo3.mEndpointId = 3;
+
+    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo1);
+    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo1.mEndpointId == clusterInfoList->mEndpointId);
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 1);
 
-    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, attributePathParams2);
-    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfoList->mAttributePathParams.IsSamePath(attributePathParams2));
+    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo2);
+    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo2.mEndpointId == clusterInfoList->mEndpointId);
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 2);
 
-    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, attributePathParams3);
-    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfoList->mAttributePathParams.IsSamePath(attributePathParams3));
+    InteractionModelEngine::GetInstance()->PushFront(clusterInfoList, clusterInfo3);
+    NL_TEST_ASSERT(apSuite, clusterInfoList != nullptr && clusterInfo3.mEndpointId == clusterInfoList->mEndpointId);
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 3);
 
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(clusterInfoList);
@@ -113,10 +119,13 @@ void InitializeChip(nlTestSuite * apSuite)
 
     gSystemLayer.Init(nullptr);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <support/CodeUtils.h>
@@ -73,6 +74,7 @@ private:
 
 ServerStorageDelegate gServerStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
+chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
 } // namespace
 
@@ -99,7 +101,18 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 
-        err = result->Init(localDeviceId, params);
+        err = gOperationalCredentialsIssuer.Initialize();
+
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));
+        }
+        else
+        {
+            params.operationalCredentialsDelegate = &gOperationalCredentialsIssuer;
+
+            err = result->Init(localDeviceId, params);
+        }
     });
 
     if (err != CHIP_NO_ERROR)

@@ -85,7 +85,7 @@ public:
      *
      * @param mySetUpPINCode  Setup PIN code of the local device
      * @param pbkdf2IterCount Iteration count for PBKDF2 function
-     * @param salt            Salt to be used for SPAKE2P opertation
+     * @param salt            Salt to be used for SPAKE2P operation
      * @param saltLen         Length of salt
      * @param myKeyId         Key ID to be assigned to the secure session on the peer node
      * @param delegate        Callback object
@@ -142,13 +142,12 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param info        Information string used for key derivation
-     * @param info_len    Length of info string
-     * @param session     Referene to the sescure session that will be
+     * @param session     Referene to the secure session that will be
      *                    initialized once pairing is complete
+     * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override;
+    CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override;
 
     /**
      * @brief
@@ -327,14 +326,11 @@ public:
 
     SecurePairingUsingTestSecret(uint16_t peerKeyId, uint16_t localKeyId) : mPeerKeyID(peerKeyId), mLocalKeyID(localKeyId) {}
 
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override
+    CHIP_ERROR DeriveSecureSession(SecureSession & session, SecureSession::SessionRole role) override
     {
-        VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(info_len > 0, CHIP_ERROR_INVALID_ARGUMENT);
-
         size_t secretLen = strlen(kTestSecret);
-
-        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen, nullptr, 0, info, info_len);
+        return session.InitFromSecret(ByteSpan(reinterpret_cast<const uint8_t *>(kTestSecret), secretLen), ByteSpan(nullptr, 0),
+                                      SecureSession::SessionInfoType::kSessionEstablishment, role);
     }
 
     CHIP_ERROR ToSerializable(PASESessionSerializable & serializable)

@@ -25,6 +25,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <protocols/secure_channel/PASESession.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <support/Span.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/AdminPairingTable.h>
@@ -64,9 +65,9 @@ chip::ByteSpan FillMAC(uint8_t (&mac)[8])
 {
     memset(mac, 0, 8);
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (chip::DeviceLayer::ThreadStackMgr().GetFactoryAssignedEUI64(mac) == CHIP_NO_ERROR)
+    if (chip::DeviceLayer::ThreadStackMgr().GetPrimary802154MACAddress(mac) == CHIP_NO_ERROR)
     {
-        ChipLogDetail(Discovery, "Using Thread MAC for hostname.");
+        ChipLogDetail(Discovery, "Using Thread extended MAC for hostname.");
         return chip::ByteSpan(mac, 8);
     }
 #endif
@@ -114,10 +115,33 @@ CHIP_ERROR AdvertiseOperational()
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
-/// Set MDNS commisioning advertisement
-CHIP_ERROR AdvertiseCommisionable()
+/// Set MDNS commissioner advertisement
+CHIP_ERROR AdvertiseCommisioner()
+{
+    return Advertise(false);
+}
+
+/// Set MDNS commissionable node advertisement
+CHIP_ERROR AdvertiseCommissionableNode()
+{
+    return Advertise(true);
+}
+
+/// commissionableNode
+// CHIP_ERROR Advertise(chip::Mdns::CommssionAdvertiseMode mode)
+CHIP_ERROR Advertise(bool commissionableNode)
 {
     auto advertiseParameters = chip::Mdns::CommissionAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+    advertiseParameters.SetCommissionAdvertiseMode(commissionableNode ? chip::Mdns::CommssionAdvertiseMode::kCommissionableNode
+                                                                      : chip::Mdns::CommssionAdvertiseMode::kCommissioner);
+
+    // TODO: device can re-enter commissioning mode after being fully provisioned
+    // (additionalPairing == true)
+    bool notYetCommissioned = !DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
+    bool additionalPairing  = false;
+    advertiseParameters.SetCommissioningMode(notYetCommissioned, additionalPairing);
+
+    char pairingInst[chip::Mdns::kKeyPairingInstructionMaxLength + 1];
 
     uint8_t mac[8];
     advertiseParameters.SetMac(FillMAC(mac));
@@ -148,6 +172,66 @@ CHIP_ERROR AdvertiseCommisionable()
     }
     advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
 
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
+        DeviceLayer::ConfigurationMgr().GetDeviceType(value) == CHIP_NO_ERROR)
+    {
+        advertiseParameters.SetDeviceType(chip::Optional<uint16_t>::Value(value));
+    }
+
+    char deviceName[chip::Mdns::kKeyDeviceNameMaxLength + 1];
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
+        DeviceLayer::ConfigurationMgr().GetDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
+    {
+        advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
+    }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
+    ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, ArraySize(rotatingDeviceIdHexBuffer)));
+    advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
+#endif
+
+    if (notYetCommissioned)
+    {
+        if (DeviceLayer::ConfigurationMgr().GetInitialPairingHint(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Hint not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+        }
+
+        if (DeviceLayer::ConfigurationMgr().GetInitialPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
+        }
+    }
+    else
+    {
+        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingHint(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Hint not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingHint(chip::Optional<uint16_t>::Value(value));
+        }
+
+        if (DeviceLayer::ConfigurationMgr().GetSecondaryPairingInstruction(pairingInst, sizeof(pairingInst)) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "DNS-SD Pairing Instruction not set");
+        }
+        else
+        {
+            advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
+        }
+    }
+
     auto & mdnsAdvertiser = chip::Mdns::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
@@ -167,22 +251,49 @@ void StartServer()
     if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
     {
         err = app::Mdns::AdvertiseOperational();
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+        err = app::Mdns::AdvertiseCommissionableNode();
+#endif
     }
     else
     {
 // TODO: Thread devices are not able to advertise using mDNS before being provisioned,
 // so configuraton should be added to enable commissioning advertising based on supported
 // Rendezvous methods.
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        err = app::Mdns::AdvertiseCommisionable();
+#if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD || CHIP_DEVICE_CONFIG_ENABLE_UNPROVISIONED_MDNS)
+        err = app::Mdns::AdvertiseCommissionableNode();
 #endif
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+    err = app::Mdns::AdvertiseCommisioner();
+#endif
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to start mDNS server: %s", chip::ErrorStr(err));
     }
 }
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t rotatingDeviceIdHexBufferSize)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize                = 0;
+    uint16_t lifetimeCounter               = 0;
+    size_t rotatingDeviceIdValueOutputSize = 0;
+
+    SuccessOrExit(error =
+                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
+    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
+                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
+                      rotatingDeviceIdValueOutputSize));
+exit:
+    return error;
+}
+#endif
 
 } // namespace Mdns
 } // namespace app

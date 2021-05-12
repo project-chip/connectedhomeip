@@ -47,9 +47,11 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TARGET_NAVIGATOR_CLUSTER': ['target-navigator-server'],
     'TEMP_MEASUREMENT_CLUSTER': ['temperature-measurement-server'],
     'TEST_CLUSTER': ['test-cluster-server'],
+    'TRUSTED_ROOT_CERTIFICATES_CLUSTER': ['trusted-root-certificates-server'],
     'TV_CHANNEL_CLUSTER': ['tv-channel-server'],
     'THERMOSTAT_CLUSTER': [],
     'WINDOW_COVERING_CLUSTER': [],
+    'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],    
     'WAKE_ON_LAN_CLUSTER':[],
     'ZLL_COMMISSIONING_CLUSTER': []
 }
@@ -94,9 +96,11 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TARGET_NAVIGATOR_CLUSTER': [],
     'TEMP_MEASUREMENT_CLUSTER': [],
     'TEST_CLUSTER': [],
+    'TRUSTED_ROOT_CERTIFICATES_CLUSTER': [],
     'TV_CHANNEL_CLUSTER': [],
     'THERMOSTAT_CLUSTER': ['thermostat-client'],
     'WINDOW_COVERING_CLUSTER': [],
+    'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],    
     'WAKE_ON_LAN_CLUSTER':[],
     'ZLL_COMMISSIONING_CLUSTER': []
 }

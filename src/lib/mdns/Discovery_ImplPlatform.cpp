@@ -87,9 +87,13 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
         {
             publisher->Advertise(publisher->mOperationalAdvertisingParams);
         }
-        if (publisher->mIsCommissionalPublishing)
+        if (publisher->mIsCommissionableNodePublishing)
         {
-            publisher->Advertise(publisher->mCommissioningdvertisingParams);
+            publisher->Advertise(publisher->mCommissionableNodeAdvertisingParams);
+        }
+        if (publisher->mIsCommissionerPublishing)
+        {
+            publisher->Advertise(publisher->mCommissionerAdvertisingParams);
         }
     }
     else
@@ -97,24 +101,6 @@ void DiscoveryImplPlatform::HandleMdnsError(void * context, CHIP_ERROR error)
         ChipLogError(Discovery, "mDNS error: %s", chip::ErrorStr(error));
     }
 }
-
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-CHIP_ERROR DiscoveryImplPlatform::GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
-    size_t serialNumberSize  = 0;
-    uint16_t lifetimeCounter = 0;
-    SuccessOrExit(error =
-                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetLifetimeCounter(lifetimeCounter));
-    SuccessOrExit(error = AdditionalDataPayloadGenerator().generateRotatingDeviceId(
-                      lifetimeCounter, serialNumber, serialNumberSize, rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize,
-                      rotatingDeviceIdHexBufferSize));
-exit:
-    return error;
-}
-#endif
 
 CHIP_ERROR DiscoveryImplPlatform::SetupHostname(chip::ByteSpan macOrEui64)
 {
@@ -138,20 +124,29 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
-    char discriminatorBuf[6];
-    char vendorProductBuf[12];
-    char pairingInstrBuf[128];
-    TextEntry textEntries[4];
+    // add newline to lengths for TXT entries
+    char discriminatorBuf[kKeyDiscriminatorMaxLength + 1];
+    char vendorProductBuf[kKeyVendorProductMaxLength + 1];
+    char commissioningModeBuf[kKeyCommissioningModeMaxLength + 1];
+    char additionalPairingBuf[kKeyAdditionalPairingMaxLength + 1];
+    char deviceTypeBuf[kKeyDeviceTypeMaxLength + 1];
+    char deviceNameBuf[kKeyDeviceNameMaxLength + 1];
+    char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
+    char pairingHintBuf[kKeyPairingHintMaxLength + 1];
+    char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
+    // size of textEntries array should be count of Bufs above
+    TextEntry textEntries[9];
     size_t textEntrySize = 0;
-    char shortDiscriminatorSubtype[6];
-    char longDiscriminatorSubtype[8];
-    char vendorSubType[8];
-    const char * subTypes[3];
+    // add underscore, character and newline to lengths for sub types (ex. _S<ddd>)
+    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 3];
+    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 4];
+    char vendorSubType[kSubTypeVendorMaxLength + 3];
+    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 3];
+    char openWindowSubType[kSubTypeAdditionalPairingMaxLength + 3];
+    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 3];
+    // size of subTypes array should be count of SubTypes above
+    const char * subTypes[6];
     size_t subTypeSize = 0;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    char rotatingDeviceIdHexBuffer[RotatingDeviceId::kHexMaxLength];
-    size_t rotatingDeviceIdHexBufferSize = 0;
-#endif
 
     if (!mMdnsInitialized)
     {
@@ -162,7 +157,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     snprintf(service.mName, sizeof(service.mName), "%08" PRIX32 "%08" PRIX32, static_cast<uint32_t>(mCommissionInstanceName >> 32),
              static_cast<uint32_t>(mCommissionInstanceName));
-    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         strncpy(service.mType, "_chipc", sizeof(service.mType));
     }
@@ -172,9 +167,6 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     }
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
 
-    snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
-    textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
-                                     strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
     if (params.GetVendorId().HasValue())
     {
         if (params.GetProductId().HasValue())
@@ -189,35 +181,82 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         textEntries[textEntrySize++] = { "VP", reinterpret_cast<const uint8_t *>(vendorProductBuf),
                                          strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
     }
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
-    if (textEntrySize < ArraySize(textEntries))
-    {
-        ReturnErrorOnFailure(GenerateRotatingDeviceId(rotatingDeviceIdHexBuffer, rotatingDeviceIdHexBufferSize));
-        // Rotating Device ID
 
-        textEntries[textEntrySize++] = { "RI", Uint8::from_const_char(rotatingDeviceIdHexBuffer), rotatingDeviceIdHexBufferSize };
-    }
-    else
+    if (params.GetDeviceType().HasValue())
     {
-        return CHIP_ERROR_INVALID_LIST_LENGTH;
-    }
-#endif
-    if (params.GetPairingHint().HasValue() && params.GetPairingInstr().HasValue())
-    {
-        snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s+%u", params.GetPairingInstr().Value(),
-                 params.GetPairingHint().Value());
-        textEntries[textEntrySize++] = { "P", reinterpret_cast<const uint8_t *>(pairingInstrBuf),
-                                         strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
+        snprintf(deviceTypeBuf, sizeof(deviceTypeBuf), "%u", params.GetDeviceType().Value());
+        textEntries[textEntrySize++] = { "DT", reinterpret_cast<const uint8_t *>(deviceTypeBuf),
+                                         strnlen(deviceTypeBuf, sizeof(deviceTypeBuf)) };
     }
 
-    snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
-    subTypes[subTypeSize++] = shortDiscriminatorSubtype;
-    snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
-    subTypes[subTypeSize++] = longDiscriminatorSubtype;
+    if (params.GetDeviceName().HasValue())
+    {
+        snprintf(deviceNameBuf, sizeof(deviceNameBuf), "%s", params.GetDeviceName().Value());
+        textEntries[textEntrySize++] = { "DN", reinterpret_cast<const uint8_t *>(deviceNameBuf),
+                                         strnlen(deviceNameBuf, sizeof(deviceNameBuf)) };
+    }
+
+    // Following fields are for nodes and not for commissioners
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+    {
+        snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
+        textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
+                                         strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
+
+        snprintf(commissioningModeBuf, sizeof(commissioningModeBuf), "%u", params.GetCommissioningMode() ? 1 : 0);
+        textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
+                                         strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
+
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        {
+            snprintf(additionalPairingBuf, sizeof(additionalPairingBuf), "1");
+            textEntries[textEntrySize++] = { "AP", reinterpret_cast<const uint8_t *>(additionalPairingBuf),
+                                             strnlen(additionalPairingBuf, sizeof(additionalPairingBuf)) };
+        }
+
+        if (params.GetRotatingId().HasValue())
+        {
+            snprintf(rotatingIdBuf, sizeof(rotatingIdBuf), "%s", params.GetRotatingId().Value());
+            textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingIdBuf),
+                                             strnlen(rotatingIdBuf, sizeof(rotatingIdBuf)) };
+        }
+
+        if (params.GetPairingHint().HasValue())
+        {
+            snprintf(pairingHintBuf, sizeof(pairingHintBuf), "%u", params.GetPairingHint().Value());
+            textEntries[textEntrySize++] = { "PH", reinterpret_cast<const uint8_t *>(pairingHintBuf),
+                                             strnlen(pairingHintBuf, sizeof(pairingHintBuf)) };
+        }
+
+        if (params.GetPairingInstr().HasValue())
+        {
+            snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s", params.GetPairingInstr().Value());
+            textEntries[textEntrySize++] = { "PI", reinterpret_cast<const uint8_t *>(pairingInstrBuf),
+                                             strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
+        }
+
+        snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
+        subTypes[subTypeSize++] = shortDiscriminatorSubtype;
+        snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
+        subTypes[subTypeSize++] = longDiscriminatorSubtype;
+        snprintf(commissioningModeSubType, sizeof(commissioningModeSubType), "_C%u", params.GetCommissioningMode() ? 1 : 0);
+        subTypes[subTypeSize++] = commissioningModeSubType;
+        if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
+        {
+            snprintf(openWindowSubType, sizeof(openWindowSubType), "_A1");
+            subTypes[subTypeSize++] = openWindowSubType;
+        }
+    }
+
     if (params.GetVendorId().HasValue())
     {
         snprintf(vendorSubType, sizeof(vendorSubType), "_V%u", params.GetVendorId().Value());
         subTypes[subTypeSize++] = vendorSubType;
+    }
+    if (params.GetDeviceType().HasValue())
+    {
+        snprintf(deviceTypeSubType, sizeof(deviceTypeSubType), "_T%u", params.GetDeviceType().Value());
+        subTypes[subTypeSize++] = deviceTypeSubType;
     }
 
     service.mTextEntries   = textEntries;
@@ -229,8 +268,42 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     service.mAddressType   = Inet::kIPAddressType_Any;
     error                  = ChipMdnsPublishService(&service);
 
+    if (error == CHIP_NO_ERROR)
+    {
+        if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
+        {
+            mCommissionableNodeAdvertisingParams = params;
+            mIsCommissionableNodePublishing      = true;
+        }
+        else
+        {
+            mCommissionerAdvertisingParams = params;
+            mIsCommissionerPublishing      = true;
+        }
+    }
+
+#ifdef DETAIL_LOGGING
+    PrintEntries(&service);
+#endif
     return error;
 }
+
+#ifdef DETAIL_LOGGING
+void DiscoveryImplPlatform::PrintEntries(const MdnsService * service)
+{
+    printf("printEntries port=%d, mTextEntrySize=%d, mSubTypeSize=%d\n", (int) (service->mPort), (int) (service->mTextEntrySize),
+           (int) (service->mSubTypeSize));
+    for (int i = 0; i < (int) service->mTextEntrySize; i++)
+    {
+        printf(" entry [%d] : %s %s\n", i, service->mTextEntries[i].mKey, (char *) (service->mTextEntries[i].mData));
+    }
+
+    for (int i = 0; i < (int) service->mSubTypeSize; i++)
+    {
+        printf(" type [%d] : %s\n", i, service->mSubTypes[i]);
+    }
+}
+#endif
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
 {
@@ -250,7 +323,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     constexpr uint8_t kMaxCRMPRetryBufferSize = 7 + 1;
     char crmpRetryIntervalIdleBuf[kMaxCRMPRetryBufferSize];
     char crmpRetryIntervalActiveBuf[kMaxCRMPRetryBufferSize];
-    TextEntry crmpRetryIntervalEntries[2];
+    TextEntry crmpRetryIntervalEntries[OperationalAdvertisingParameters::kNumAdvertisingTxtEntries];
     size_t textEntrySize = 0;
     uint32_t crmpRetryIntervalIdle, crmpRetryIntervalActive;
     int writtenCharactersNumber;
@@ -306,16 +379,28 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mSubTypeSize   = 0;
     error                  = ChipMdnsPublishService(&service);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        mIsOperationalPublishing = true;
+    }
 
     return error;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::StopPublishDevice()
 {
-    mIsOperationalPublishing  = false;
-    mIsCommissionalPublishing = false;
-    return ChipMdnsStopPublish();
+    CHIP_ERROR error = ChipMdnsStopPublish();
+
+    if (error == CHIP_NO_ERROR)
+    {
+        mIsOperationalPublishing        = false;
+        mIsCommissionableNodePublishing = false;
+        mIsCommissionerPublishing       = false;
+    }
+    return error;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::SetResolverDelegate(ResolverDelegate * delegate)

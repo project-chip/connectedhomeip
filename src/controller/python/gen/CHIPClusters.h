@@ -58,6 +58,7 @@ constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
 constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 constexpr ClusterId kTestClusterClusterId                 = 0x050F;
 constexpr ClusterId kThermostatClusterId                  = 0x0201;
+constexpr ClusterId kTrustedRootCertificatesClusterId     = 0x003F;
 constexpr ClusterId kWakeOnLanClusterId                   = 0x0503;
 constexpr ClusterId kWindowCoveringClusterId              = 0x0102;
 
@@ -818,6 +819,12 @@ public:
     ~OperationalCredentialsCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR AddOpCert(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan noc,
+                         chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
+                         uint16_t adminVendorId);
+    CHIP_ERROR OpCSRRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            chip::ByteSpan cSRNonce);
+    CHIP_ERROR RemoveAllFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             chip::FabricId fabricId, chip::NodeId nodeId, uint16_t vendorId);
     CHIP_ERROR SetFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t vendorId);
@@ -830,6 +837,9 @@ public:
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
 private:
+    static constexpr CommandId kAddOpCertCommandId         = 0x06;
+    static constexpr CommandId kOpCSRRequestCommandId      = 0x04;
+    static constexpr CommandId kRemoveAllFabricsCommandId  = 0x0B;
     static constexpr CommandId kRemoveFabricCommandId      = 0x0A;
     static constexpr CommandId kSetFabricCommandId         = 0x00;
     static constexpr CommandId kUpdateFabricLabelCommandId = 0x09;
@@ -1097,6 +1107,27 @@ private:
     static constexpr CommandId kGetWeeklyScheduleCommandId   = 0x02;
     static constexpr CommandId kSetWeeklyScheduleCommandId   = 0x01;
     static constexpr CommandId kSetpointRaiseLowerCommandId  = 0x00;
+};
+
+class DLL_EXPORT TrustedRootCertificatesCluster : public ClusterBase
+{
+public:
+    TrustedRootCertificatesCluster() : ClusterBase(kTrustedRootCertificatesClusterId) {}
+    ~TrustedRootCertificatesCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         chip::ByteSpan rootCertificate);
+    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            chip::ByteSpan trustedRootIdentifier);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0x00;
+    static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0x01;
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase

@@ -122,6 +122,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | NetworkCommissioning                                                | 0x0031 |
 | OnOff                                                               | 0x0006 |
 | OperationalCredentials                                              | 0x003E |
+| OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
 | Switch                                                              | 0x003B |
@@ -130,6 +131,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
+| TrustedRootCertificates                                             | 0x003F |
+| TrustedRootCertificates                                             | 0x003F |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -302,6 +305,9 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_TOGGLE_COMMAND_ID (0x02)
 
 #define OPERATIONAL_CREDENTIALS_CLUSTER_ID 0x003E
+#define ZCL_ADD_OP_CERT_COMMAND_ID (0x06)
+#define ZCL_OP_CSR_REQUEST_COMMAND_ID (0x04)
+#define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
@@ -340,6 +346,10 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_GET_WEEKLY_SCHEDULE_COMMAND_ID (0x02)
 #define ZCL_SET_WEEKLY_SCHEDULE_COMMAND_ID (0x01)
 #define ZCL_SETPOINT_RAISE_LOWER_COMMAND_ID (0x00)
+
+#define TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID 0x003F
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
 
 #define WAKE_ON_LAN_CLUSTER_ID 0x0503
 
@@ -4142,6 +4152,9 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * AddOpCert                                                         |   0x06 |
+| * OpCSRRequest                                                      |   0x04 |
+| * RemoveAllFabrics                                                  |   0x0B |
 | * RemoveFabric                                                      |   0x0A |
 | * SetFabric                                                         |   0x00 |
 | * UpdateFabricLabel                                                 |   0x09 |
@@ -4150,6 +4163,82 @@ PacketBufferHandle encodeOnOffClusterReadClusterRevisionAttribute(uint8_t seqNum
 | * FabricsList                                                       | 0x0001 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddOpCert
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterAddOpCertCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                       chip::ByteSpan noc, chip::ByteSpan iCACertificate,
+                                                                       chip::ByteSpan iPKValue, chip::NodeId caseAdminNode,
+                                                                       uint16_t adminVendorId)
+{
+    COMMAND_HEADER("AddOpCert", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    size_t nocStrLen = noc.size();
+    if (!CanCastTo<uint8_t>(nocStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, nocStrLen);
+        return PacketBufferHandle();
+    }
+
+    size_t iCACertificateStrLen = iCACertificate.size();
+    if (!CanCastTo<uint8_t>(iCACertificateStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, iCACertificateStrLen);
+        return PacketBufferHandle();
+    }
+
+    size_t iPKValueStrLen = iPKValue.size();
+    if (!CanCastTo<uint8_t>(iPKValueStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, iPKValueStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ADD_OP_CERT_COMMAND_ID)
+        .Put(static_cast<uint8_t>(nocStrLen))
+        .Put(noc.data(), noc.size())
+        .Put(static_cast<uint8_t>(iCACertificateStrLen))
+        .Put(iCACertificate.data(), iCACertificate.size())
+        .Put(static_cast<uint8_t>(iPKValueStrLen))
+        .Put(iPKValue.data(), iPKValue.size())
+        .Put64(caseAdminNode)
+        .Put16(adminVendorId);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command OpCSRRequest
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterOpCSRRequestCommand(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                          chip::ByteSpan cSRNonce)
+{
+    COMMAND_HEADER("OpCSRRequest", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    size_t cSRNonceStrLen = cSRNonce.size();
+    if (!CanCastTo<uint8_t>(cSRNonceStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, cSRNonceStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_OP_CSR_REQUEST_COMMAND_ID)
+        .Put(static_cast<uint8_t>(cSRNonceStrLen))
+        .Put(cSRNonce.data(), cSRNonce.size());
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command RemoveAllFabrics
+ */
+PacketBufferHandle encodeOperationalCredentialsClusterRemoveAllFabricsCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("RemoveAllFabrics", OPERATIONAL_CREDENTIALS_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_REMOVE_ALL_FABRICS_COMMAND_ID);
+    COMMAND_FOOTER();
+}
 
 /*
  * Command RemoveFabric
@@ -5545,6 +5634,80 @@ PacketBufferHandle encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNu
 PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadThermostatClusterRevision", THERMOSTAT_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster TrustedRootCertificates                                     | 0x003F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddTrustedRootCertificate                                         |   0x00 |
+| * RemoveTrustedRootCertificate                                      |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command AddTrustedRootCertificate
+ */
+PacketBufferHandle encodeTrustedRootCertificatesClusterAddTrustedRootCertificateCommand(uint8_t seqNum,
+                                                                                        EndpointId destinationEndpoint,
+                                                                                        chip::ByteSpan rootCertificate)
+{
+    COMMAND_HEADER("AddTrustedRootCertificate", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
+    size_t rootCertificateStrLen = rootCertificate.size();
+    if (!CanCastTo<uint8_t>(rootCertificateStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, rootCertificateStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID)
+        .Put(static_cast<uint8_t>(rootCertificateStrLen))
+        .Put(rootCertificate.data(), rootCertificate.size());
+    COMMAND_FOOTER();
+}
+
+/*
+ * Command RemoveTrustedRootCertificate
+ */
+PacketBufferHandle encodeTrustedRootCertificatesClusterRemoveTrustedRootCertificateCommand(uint8_t seqNum,
+                                                                                           EndpointId destinationEndpoint,
+                                                                                           chip::ByteSpan trustedRootIdentifier)
+{
+    COMMAND_HEADER("RemoveTrustedRootCertificate", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
+    size_t trustedRootIdentifierStrLen = trustedRootIdentifier.size();
+    if (!CanCastTo<uint8_t>(trustedRootIdentifierStrLen))
+    {
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, trustedRootIdentifierStrLen);
+        return PacketBufferHandle();
+    }
+
+    buf.Put8(kFrameControlClusterSpecificCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID)
+        .Put(static_cast<uint8_t>(trustedRootIdentifierStrLen))
+        .Put(trustedRootIdentifier.data(), trustedRootIdentifier.size());
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverTrustedRootCertificatesAttributes", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTrustedRootCertificatesClusterRevision", TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

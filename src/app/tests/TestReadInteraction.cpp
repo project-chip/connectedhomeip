@@ -31,6 +31,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -47,6 +48,7 @@ SecureSessionMgr gSessionManager;
 Messaging::ExchangeManager gExchangeManager;
 TransportMgr<Transport::UDP> gTransportManager;
 const Transport::AdminId gAdminId = 0;
+secure_channel::MessageCounterManager gMessageCounterManager;
 
 namespace app {
 class TestReadInteraction
@@ -88,13 +90,15 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     app::ReadClient readClient;
+    EventNumber eventNumber = 0;
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     err                            = readClient.Init(&gExchangeManager, nullptr);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = readClient.SendReadRequest(kTestDeviceNodeId, gAdminId, nullptr /*apEventPathParamsList*/, 0 /*aEventPathParamsListSize*/,
-                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/);
+                                     nullptr /*apAttributePathParamsList*/, 0 /*aAttributePathParamsListSize*/,
+                                     eventNumber /*aEventNumber*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     GenerateReportData(apSuite, apContext, buf);
@@ -155,10 +159,14 @@ void InitializeChip(nlTestSuite * apSuite)
 
     chip::gSystemLayer.Init(nullptr);
 
-    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins);
+    err = chip::gSessionManager.Init(chip::kTestDeviceNodeId, &chip::gSystemLayer, &chip::gTransportManager, &admins,
+                                     &chip::gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = chip::gExchangeManager.Init(&chip::gSessionManager);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = chip::gMessageCounterManager.Init(&chip::gExchangeManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

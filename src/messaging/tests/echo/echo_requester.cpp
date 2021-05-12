@@ -103,7 +103,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(std::move(payloadBuf), chip::Messaging::SendFlags(chip::Messaging::SendMessageFlags::kNone));
+    err = gEchoClient.SendEchoRequest(std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -138,7 +138,7 @@ CHIP_ERROR EstablishSecureSession()
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
-                                     chip::SecureSessionMgr::PairingDirection::kInitiator, gAdminId);
+                                     chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -241,7 +241,8 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager, &admins,
+                                   &gMessageCounterManager);
         SuccessOrExit(err);
     }
     else
@@ -251,11 +252,15 @@ int main(int argc, char * argv[])
                                    .SetListenPort(ECHO_CLIENT_PORT));
         SuccessOrExit(err);
 
-        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager, &admins,
+                                   &gMessageCounterManager);
         SuccessOrExit(err);
     }
 
     err = gExchangeManager.Init(&gSessionManager);
+    SuccessOrExit(err);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.

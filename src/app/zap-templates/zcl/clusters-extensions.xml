@@ -18,7 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
   <clusterExtension code="0x0028">
     <command source="client" code="0x00" name="MfgSpecificPing" optional="true" manufacturerCode="0x1002">
-      <description></description>
+      <description>        <!-- #6486: MfgSpecificPing won't work until we support MEI prefix in ZAP --></description>
     </command>
   </clusterExtension>
 </configurator>

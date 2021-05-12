@@ -22,6 +22,7 @@
  *
  */
 
+#include <app/ClusterInfo.h>
 #include <app/EventLoggingDelegate.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventManagement.h>
@@ -34,6 +35,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -62,6 +64,7 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 chip::SecureSessionMgr gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 void InitializeChip(nlTestSuite * apSuite)
 {
@@ -77,10 +80,13 @@ void InitializeChip(nlTestSuite * apSuite)
 
     gSystemLayer.Init(nullptr);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -145,8 +151,9 @@ static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & 
     uint8_t backingStore[1024];
     size_t elementCount;
     writer.Init(backingStore, 1024);
-
-    err = alogMgmt.FetchEventsSince(writer, priority, startingEventNumber);
+    chip::app::ClusterInfo testClusterInfo;
+    testClusterInfo.mEventId = 1;
+    err                      = alogMgmt.FetchEventsSince(writer, &testClusterInfo, priority, startingEventNumber);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR || err == CHIP_END_OF_TLV);
 
     reader.Init(backingStore, writer.GetLengthWritten());

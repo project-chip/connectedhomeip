@@ -33,6 +33,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -170,8 +171,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
                             static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
-                                  session->PeerConnection().GetPeerNodeId(), session,
-                                  SecureSessionMgr::PairingDirection::kResponder, connection.GetAdminId(), nullptr);
+                                  session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
+                                  connection.GetAdminId(), nullptr);
             session->Clear();
         }
     }
@@ -397,6 +398,7 @@ private:
     SecureSessionMgr * mSessionMgr = nullptr;
 };
 
+secure_channel::MessageCounterManager gMessageCounterManager;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 
@@ -427,7 +429,9 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
         uint16_t nextKeyId = gRendezvousServer.GetNextKeyId();
         EraseAllAdminPairingsUpTo(gNextAvailableAdminId);
         EraseAllSessionsUpTo(nextKeyId);
-        gNextAvailableAdminId = 0;
+        // Only resetting gNextAvailableAdminId at reboot otherwise previously paired device with adminID 0
+        // can continue sending messages to accessory as next available admin will also be 0.
+        // This logic is not up to spec, will be implemented up to spec once AddOptCert is implemented.
         gAdminPairings.Reset();
     }
 
@@ -505,16 +509,17 @@ void InitServer(AppDelegate * delegate)
 
     SuccessOrExit(err);
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
+    err =
+        gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeMgr.Init(&gSessions);
     SuccessOrExit(err);
+    err = gMessageCounterManager.Init(&gExchangeMgr);
+    SuccessOrExit(err);
 
-#if CHIP_ENABLE_INTERACTION_MODEL
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeMgr, nullptr);
     SuccessOrExit(err);
-#endif
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&gExchangeMgr);
@@ -593,7 +598,7 @@ CHIP_ERROR AddTestPairing()
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
     SuccessOrExit(err = gSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSessionMgr::PairingDirection::kResponder, gNextAvailableAdminId));
+                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:

@@ -51,6 +51,7 @@
 #define EMBER_AF_TEMP_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_TEST_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_THERMOSTAT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
 
@@ -141,3 +142,7 @@
 // Use this macro to check if the client side of the Thermostat cluster is included
 #define ZCL_USING_THERMOSTAT_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_THERMOSTAT_CLIENT
+
+// Use this macro to check if the client side of the Trusted Root Certificates cluster is included
+#define ZCL_USING_TRUSTED_ROOT_CERTIFICATES_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_TRUSTED_ROOT_CERTIFICATES_CLIENT

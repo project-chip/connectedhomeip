@@ -21,6 +21,7 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <core/CHIPEncoding.h>
 
 // Limits on endpoint values.
@@ -40,7 +41,8 @@ public:
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 
 private:
-    ChipDeviceCommissioner mCommissioner;
+    ChipDeviceController mCommissioner;
     ChipDevice * mDevice;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
     uint8_t mEndPointId;
 };
