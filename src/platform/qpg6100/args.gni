@@ -21,6 +21,7 @@ arm_platform_config = "${qpg6100_sdk_build_root}/qpg6100_arm.gni"
 mbedtls_target = "${qpg6100_sdk_build_root}:qpg6100_sdk"
 
 chip_device_platform = "qpg6100"
+chip_mdns = "platform"
 
 lwip_platform = "qpg6100"
 lwip_ipv6 = true
