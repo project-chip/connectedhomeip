@@ -58,6 +58,7 @@ declare_args() {
   } else {
     chip_mdns = "none"
   }
+  chip_use_clusters_for_ip_commissioning = 0
 }
 
 _chip_device_layer = "none"

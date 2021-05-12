@@ -132,6 +132,7 @@ public:
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
     CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
+    void SetDelegate(InteractionModelDelegate * apDelegate) { mpDelegate = apDelegate; }
 
 private:
     friend class reporting::Engine;

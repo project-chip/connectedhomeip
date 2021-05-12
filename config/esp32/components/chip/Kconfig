@@ -654,6 +654,18 @@ menu "CHIP Device Layer"
 
     endmenu
 
+    menu "Commissioning options"
+        config RENDEZVOUS_WAIT_FOR_COMMISSIONING_COMPLETE
+            int "Use full IP-based commissioning (expect cluster commands)"
+            default 0
+            help
+                Setting this to y will cause the commissioner to send commissioning commands to the
+                various clusters after establishing a PASE session.
+
+    endmenu
+
+
+
     menu "Testing Options"
 
         config ENABLE_TEST_DEVICE_IDENTITY

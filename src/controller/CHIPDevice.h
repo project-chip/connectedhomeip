@@ -354,6 +354,13 @@ public:
     void AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     void CancelIMResponseHandler();
 
+    /**
+     * @brief
+     *   Initialize internal command sender, required for sending commands over interaction model.
+     *   It's safe to call InitCommandSender multiple times, but only one will be available.
+     */
+    void InitCommandSender();
+
 private:
     enum class ConnectionState
     {
@@ -420,13 +427,6 @@ private:
      * @param[out] didLoad   Were the secure session params loaded by the call to this function.
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     *   It's safe to call InitCommandSender multiple times, but only one will be available.
-     */
-    void InitCommandSender();
 
     uint16_t mListenPort;
 
