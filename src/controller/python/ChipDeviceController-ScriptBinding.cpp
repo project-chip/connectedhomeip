@@ -41,9 +41,9 @@
 
 #include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
-#include "ChipDeviceController-StorageDelegate.h"
 
 #include "chip/interaction_model/Delegate.h"
+#include "chip/storage/Delegate.h"
 
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
@@ -68,7 +68,6 @@ typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * mod
 }
 
 namespace {
-chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
 chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer sOperationalCredentialsIssuer;
@@ -145,7 +144,7 @@ CHIP_ERROR pychip_DeviceController_NewDeviceController(chip::Controller::DeviceC
 
     ReturnErrorOnFailure(sOperationalCredentialsIssuer.Initialize());
 
-    initParams.storageDelegate                = &sStorageDelegate;
+    initParams.storageDelegate                = &PythonPersistentStorageDelegate::Instance();
     initParams.mDeviceAddressUpdateDelegate   = &sDeviceAddressUpdateDelegate;
     initParams.pairingDelegate                = &sPairingDelegate;
     initParams.operationalCredentialsDelegate = &sOperationalCredentialsIssuer;

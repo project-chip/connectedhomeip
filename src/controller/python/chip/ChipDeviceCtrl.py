@@ -33,6 +33,7 @@ from ctypes import *
 from .ChipStack import *
 from .clusters.CHIPClusters import *
 from .interaction_model import delegate as im
+from .storage import delegate as storage
 from .exceptions import *
 import enum
 
@@ -67,7 +68,7 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None):
+    def __init__(self, startNetworkThread=True, controllerNodeId=0, bluetoothAdapter=None, persistentStorage=":memory:"):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         if bluetoothAdapter is None:
@@ -110,6 +111,7 @@ class ChipDeviceController(object):
             self._ChipStack.completeEvent.set()
 
         im.InitIMDelegate()
+        storage.InitControllerStorage(persistentStorage)
 
         self.cbHandleKeyExchangeCompleteFunct = _DevicePairingDelegate_OnPairingCompleteFunct(
             HandleKeyExchangeComplete)

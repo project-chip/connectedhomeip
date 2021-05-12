@@ -17,63 +17,66 @@
  *    limitations under the License.
  */
 
-#include "controller/python/ChipDeviceController-StorageDelegate.h"
+#include "Delegate.h"
 
 #include <cstring>
 #include <map>
 #include <string>
 
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+
+using namespace chip::Controller;
 
 namespace chip {
 namespace Controller {
 
+PythonPersistentStorageDelegate PythonPersistentStorageDelegate::mInstance;
+
 CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {
-    auto val = mStorage.find(key);
-    if (val == mStorage.end())
+    VerifyOrReturnError(mGetKeyValueFunc != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    uint16_t readSize = size;
+    mGetKeyValueFunc(key, strlen(key), value, &readSize);
+
+    if (readSize == UINT16_MAX)
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    if (value == nullptr)
+    if (readSize > size)
     {
-        size = 0;
-    }
-
-    uint16_t neededSize = val->second.size();
-    if (size == 0)
-    {
-        size = neededSize;
+        size = readSize;
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (size < neededSize)
-    {
-        memcpy(value, val->second.data(), size);
-        size = neededSize;
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    memcpy(value, val->second.data(), neededSize);
-    size = neededSize;
+    size = readSize;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PythonPersistentStorageDelegate::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
 {
-    mStorage[key] = std::string(static_cast<const char *>(value), size);
-    ChipLogDetail(Controller, "SyncSetKeyValue on %s", key);
-
+    VerifyOrReturnError(mSetKeyValueFunc != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mSetKeyValueFunc(key, strlen(key), value, size);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
 {
-    mStorage.erase(key);
+    VerifyOrReturnError(mDeleteKeyValueFunc != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mDeleteKeyValueFunc(key, strlen(key));
     return CHIP_NO_ERROR;
 }
 
 } // namespace Controller
 } // namespace chip
+
+extern "C" {
+
+void pychip_PythonPersistentStorageDelegate_SetCallbacks(GetKeyValueFunct getKeyValueFunc, SetKeyValueFunct setKeyValueFunc,
+                                                         DeleteKeyValueFunct deleteKeyValueFunc)
+{
+    PythonPersistentStorageDelegate::Instance().SetCallbacks(getKeyValueFunc, setKeyValueFunc, deleteKeyValueFunc);
+}
+}

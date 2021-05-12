@@ -129,7 +129,7 @@ def FormatZCLArguments(args, command):
 
 
 class DeviceMgrCmd(Cmd):
-    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=None):
+    def __init__(self, rendezvousAddr=None, controllerNodeId=0, bluetoothAdapter=None, persistentStorage=None):
         self.lastNetworkId = None
 
         Cmd.__init__(self)
@@ -147,7 +147,7 @@ class DeviceMgrCmd(Cmd):
         self.bleMgr = None
 
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
-            controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter)
+            controllerNodeId=controllerNodeId, bluetoothAdapter=bluetoothAdapter, persistentStorage=persistentStorage)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
@@ -734,6 +734,16 @@ def main():
         help="Controller node ID",
         metavar="<nodeid>",
     )
+    optParser.add_option(
+        "-s",
+        "--storage",
+        action="store",
+        dest="persistentStorage",
+        default="sqlite3::memory:",
+        type='str',
+        help="Controller persistent storage path",
+        metavar="<nodeid>",
+    )
 
     if sys.platform.startswith("linux"):
         optParser.add_option(
@@ -767,7 +777,7 @@ def main():
                 sys.exit(-1)
 
     devMgrCmd = DeviceMgrCmd(rendezvousAddr=options.rendezvousAddr,
-                             controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId)
+                             controllerNodeId=options.controllerNodeId, bluetoothAdapter=adapterId, persistentStorage=options.persistentStorage)
     print("Chip Device Controller Shell")
     if options.rendezvousAddr:
         print("Rendezvous address set to %s" % options.rendezvousAddr)

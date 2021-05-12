@@ -23,11 +23,9 @@
 
 #include <core/CHIPPersistentStorageDelegate.h>
 
-class PythonPersistentStorageDelegate;
-
-typedef void (*GetKeyValueFunct)(const uint8_t * key, uint8_t * value, uint16_t * size);
-typedef void (*SetKeyValueFunct)(const uint8_t * key, const uint8_t * value);
-typedef void (*DeleteKeyValueFunct)(const uint8_t * key);
+typedef void (*GetKeyValueFunct)(const char * key, size_t keyLen, void * value, uint16_t * size);
+typedef void (*SetKeyValueFunct)(const char * key, size_t keyLen, const void * value, uint16_t size);
+typedef void (*DeleteKeyValueFunct)(const char * key, size_t keyLen);
 
 namespace chip {
 namespace Controller {
@@ -35,13 +33,26 @@ namespace Controller {
 class PythonPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
-    PythonPersistentStorageDelegate() {}
+    static PythonPersistentStorageDelegate & Instance() { return mInstance; }
+
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
+    void SetCallbacks(GetKeyValueFunct getKeyValueFunc, SetKeyValueFunct setKeyValueFunc, DeleteKeyValueFunct deleteKeyValueFunc)
+    {
+        mGetKeyValueFunc    = getKeyValueFunc;
+        mSetKeyValueFunc    = setKeyValueFunc;
+        mDeleteKeyValueFunc = deleteKeyValueFunc;
+    }
+
 private:
-    std::map<std::string, std::string> mStorage;
+    PythonPersistentStorageDelegate() {}
+    GetKeyValueFunct mGetKeyValueFunc       = nullptr;
+    SetKeyValueFunct mSetKeyValueFunc       = nullptr;
+    DeleteKeyValueFunct mDeleteKeyValueFunc = nullptr;
+
+    static PythonPersistentStorageDelegate mInstance;
 };
 
 } // namespace Controller

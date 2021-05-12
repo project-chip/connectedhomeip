@@ -111,6 +111,23 @@ listed above.
 chip-device-ctrl --bluetooth-adapter=hci2
 ```
 
+## Persist paired device
+
+By default, the paired device list is stored in memory, and you need to run
+another pair when you run a new chip-device-ctrl instance.
+
+You can specify the URI of paired device database by using the `-s` option,
+currently, the storage backend is a sqlite3 database file, for example:
+
+```
+chip-device-ctrl -s sqlite3:///home/chip/paired-device.db
+```
+
+Will store the paired device to a database located at
+`/home/chip/paired-device.db`
+
+_Default value_: Paired device is stored in memory.
+
 ## Usage / BLE Secure Session Establishment
 
 1. Run CHIP Device Controller
