@@ -76,14 +76,8 @@ public:
         {
             chip::Platform::Delete(mOperationalKey);
         }
-        if (mRootCert != nullptr)
-        {
-            chip::Platform::MemoryFree(mRootCert);
-        }
-        if (mOperationalCert != nullptr)
-        {
-            chip::Platform::MemoryFree(mOperationalCert);
-        }
+        ReleaseRootCert();
+        ReleaseOperationalCert();
     }
 
     NodeId GetNodeId() const { return mNodeId; }
@@ -128,20 +122,8 @@ public:
         {
             mOperationalKey->Initialize();
         }
-        if (mRootCert != nullptr)
-        {
-            chip::Platform::MemoryFree(mRootCert);
-            mRootCert             = nullptr;
-            mRootCertLen          = 0;
-            mRootCertAllocatedLen = 0;
-        }
-        if (mOperationalCert != nullptr)
-        {
-            chip::Platform::MemoryFree(mOperationalCert);
-            mOperationalCert    = nullptr;
-            mOpCertLen          = 0;
-            mOpCertAllocatedLen = 0;
-        }
+        ReleaseRootCert();
+        ReleaseOperationalCert();
     }
 
     friend class AdminPairingTable;
