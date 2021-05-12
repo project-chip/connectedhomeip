@@ -88,7 +88,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
             dbus_connection_read_write_dispatch(dispatchConnection, kDBusConnectionPollingTimeoutMS);
         }
     });
-        mDBusEventLoop.detach();
+    mDBusEventLoop.detach();
 exit:
     dbus_error_free(&dbusError);
     LogClientError(error);
