@@ -45,6 +45,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <messaging/ExchangeContext.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -211,6 +212,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
         mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
     }
+    Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     InitDataModelHandler(mExchangeMgr);
@@ -380,8 +382,6 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    ReturnErrorOnFailure(Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort));
-
     return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
 #else
@@ -648,6 +648,33 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
+
+void DeviceController::OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData)
+{
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        if (!mCommissionableNodes[i].IsValid())
+        {
+            continue;
+        }
+        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0)
+        {
+            mCommissionableNodes[i] = nodeData;
+            return;
+        }
+    }
+    // Didn't find the host name already in our list, return an invalid
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        if (!mCommissionableNodes[i].IsValid())
+        {
+            mCommissionableNodes[i] = nodeData;
+            return;
+        }
+    }
+    ChipLogError(Discovery, "Failed to add discovered commisisonable node - Insufficient space");
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
@@ -676,7 +703,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     {
         mNextKeyId = 0;
     }
-
     mPairingDelegate = params.pairingDelegate;
 
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
@@ -1097,6 +1123,37 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
+{
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
+    return Mdns::Resolver::Instance().FindCommissionableNodes();
+}
+
+CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
+{
+    // TODO(cecille): Add assertion about main loop.
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
+    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::kLong, long_discriminator);
+    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
+{
+    // TODO(cecille): Add assertion about main loop.
+    if (mCommissionableNodes[idx].IsValid())
+    {
+        return &mCommissionableNodes[idx];
+    }
+    return nullptr;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
     const app::CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
