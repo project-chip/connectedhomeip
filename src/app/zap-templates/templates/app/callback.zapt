@@ -113,11 +113,6 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}TickCal
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource)}}
 /**
 * @brief {{parent.name}} Cluster {{name}} Command callback
-{{#if (zcl_command_arguments_count this.id)}}
-{{#zcl_command_arguments}}
-* @param {{asCamelCased label}}
-{{/zcl_command_arguments}}
-{{/if}}
 */
 
 bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(chip::app::Command * commandObj{{#zcl_command_arguments}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/zcl_command_arguments}});
