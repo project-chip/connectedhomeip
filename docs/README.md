@@ -10,6 +10,8 @@
 -   Documentation about standard build & development flows using
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
+-   Documentation overviewing building the various platforms and example apps
+    [the quickstart guide](./QUICK_START.md)
 
 ## Project Flow
 
