@@ -46,13 +46,12 @@ config("mbedtls_k32w_config") {
     "MBEDTLS_PKCS5_C",
   ]
 
-  if (chip_mdns == "none")
-  {
-      defines += [
-        "MBEDTLS_PK_WRITE_C",
-        "MBEDTLS_OID_C",
-        "MBEDTLS_BASE64_C",
-      ]
+  if (chip_mdns == "none") {
+    defines += [
+      "MBEDTLS_PK_WRITE_C",
+      "MBEDTLS_OID_C",
+      "MBEDTLS_BASE64_C",
+    ]
   }
 
   include_dirs = [ chip_root ]

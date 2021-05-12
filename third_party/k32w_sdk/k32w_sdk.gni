@@ -157,9 +157,7 @@ template("k32w_sdk") {
       "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
     ]
 
-
-    if (chip_mdns == "platform")
-    {
+    if (chip_mdns == "platform") {
       defines += [
         "OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE=1",
         "OPENTHREAD_CONFIG_ECDSA_ENABLE=1",
