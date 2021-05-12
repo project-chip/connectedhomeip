@@ -64,7 +64,7 @@ EmberAfStatus writeTestListOctetAttribute(uint8_t endpoint)
     AttributeId attributeId = ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID;
 
     uint16_t attributeCount = 4;
-    char data[6]            = {'T', 'e', 's', 't', 'N', '\0'};
+    char data[6]            = { 'T', 'e', 's', 't', 'N', '\0' };
     chip::ByteSpan span     = chip::ByteSpan(Uint8::from_char(data), strlen(data));
 
     for (uint8_t index = 0; index < attributeCount; index++)
@@ -86,7 +86,7 @@ EmberAfStatus writeTestListStructOctetAttribute(uint8_t endpoint)
     AttributeId attributeId = ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID;
 
     uint16_t attributeCount = 4;
-    char data[6]            = {'T', 'e', 's', 't', 'N', '\0'};
+    char data[6]            = { 'T', 'e', 's', 't', 'N', '\0' };
     chip::ByteSpan span     = chip::ByteSpan(Uint8::from_char(data), strlen(data));
 
     for (uint8_t index = 0; index < attributeCount; index++)
