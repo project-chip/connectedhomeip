@@ -80,7 +80,7 @@ public:
         {
             chip::Platform::MemoryFree(mRootCert);
         }
-        if (mOperationalCert == nullptr)
+        if (mOperationalCert != nullptr)
         {
             chip::Platform::MemoryFree(mOperationalCert);
         }
