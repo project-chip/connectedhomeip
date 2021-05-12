@@ -5344,6 +5344,73 @@ CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable 
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// TrustedRootCertificates Cluster Commands
+CHIP_ERROR TrustedRootCertificatesCluster::AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback,
+                                                                     chip::ByteSpan rootCertificate)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddTrustedRootCertificateCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // rootCertificate: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rootCertificate));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands();
+}
+
+CHIP_ERROR TrustedRootCertificatesCluster::RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback,
+                                                                        chip::ByteSpan trustedRootIdentifier)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveTrustedRootCertificateCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+
+    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // trustedRootIdentifier: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), trustedRootIdentifier));
+
+    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands();
+}
+
+// TrustedRootCertificates Cluster Attributes
+CHIP_ERROR TrustedRootCertificatesCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTrustedRootCertificatesClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR TrustedRootCertificatesCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // WakeOnLan Cluster Commands
 // WakeOnLan Cluster Attributes
 CHIP_ERROR WakeOnLanCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)

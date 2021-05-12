@@ -911,6 +911,19 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Trusted Root Certificates
+ *
+ */
+@interface CHIPTrustedRootCertificates : CHIPCluster
+
+- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
+- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Wake on LAN
  *
  */

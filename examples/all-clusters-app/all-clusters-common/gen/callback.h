@@ -240,6 +240,14 @@ void emberAfTestClusterClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfThermostatClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Trusted Root Certificates Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTrustedRootCertificatesClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief WiFi Network Diagnostics Cluster Init
  *
  * Cluster Init
@@ -2013,6 +2021,78 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::En
 void emberAfThermostatClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
+// Trusted Root Certificates Cluster server
+//
+
+/** @brief Trusted Root Certificates Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfTrustedRootCertificatesClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Trusted Root Certificates Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfTrustedRootCertificatesClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief Trusted Root Certificates Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfTrustedRootCertificatesClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                             chip::AttributeId attributeId,
+                                                                                             uint16_t manufacturerCode);
+
+/** @brief Trusted Root Certificates Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfTrustedRootCertificatesClusterServerMessageSentCallback(EmberOutgoingMessageType type,
+                                                                    chip::MessageSendDestination destination,
+                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                                    EmberStatus status);
+
+/** @brief Trusted Root Certificates Cluster Server Pre Attribute Changed
+ *
+ * server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfTrustedRootCertificatesClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
+                                                                                     EmberAfAttributeType attributeType,
+                                                                                     uint16_t size, uint8_t * value);
+
+/** @brief Trusted Root Certificates Cluster Server Tick
+ *
+ * server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfTrustedRootCertificatesClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
 // WiFi Network Diagnostics Cluster server
 //
 
@@ -2931,6 +3011,22 @@ bool emberAfTestClusterClusterTestNotHandledCallback(chip::app::Command * comman
  */
 
 bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * commandObj);
+
+/**
+ * @brief Trusted Root Certificates Cluster AddTrustedRootCertificate Command callback
+ * @param rootCertificate
+ */
+
+bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
+                                                                            chip::ByteSpan RootCertificate);
+
+/**
+ * @brief Trusted Root Certificates Cluster RemoveTrustedRootCertificate Command callback
+ * @param trustedRootIdentifier
+ */
+
+bool emberAfTrustedRootCertificatesClusterRemoveTrustedRootCertificateCallback(chip::app::Command * commandObj,
+                                                                               chip::ByteSpan TrustedRootIdentifier);
 
 //
 // Non-Cluster Related Callbacks
