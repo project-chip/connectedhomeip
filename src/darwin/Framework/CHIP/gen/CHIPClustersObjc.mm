@@ -1692,12 +1692,12 @@ public:
         if (callback && callback->mQueue) {
             dispatch_async(callback->mQueue, ^{
                 callback->mHandler(nil, @ {
-                    @"CSR" : [NSString stringWithFormat:@"%s", CSR],
-                    @"CSRNonce" : [NSString stringWithFormat:@"%s", CSRNonce],
-                    @"VendorReserved1" : [NSString stringWithFormat:@"%s", VendorReserved1],
-                    @"VendorReserved2" : [NSString stringWithFormat:@"%s", VendorReserved2],
-                    @"VendorReserved3" : [NSString stringWithFormat:@"%s", VendorReserved3],
-                    @"Signature" : [NSString stringWithFormat:@"%s", Signature],
+                    @"CSR" : [[NSString alloc] initWithData:[NSData dataWithBytes:CSR.data() length:CSR.size()] encoding:NSUTF8StringEncoding],
+                    @"CSRNonce" : [[NSString alloc] initWithData:[NSData dataWithBytes:CSRNonce.data() length: CSRNonce.size()] encoding:NSUTF8StringEncoding],
+                    @"VendorReserved1" : [[NSString alloc] initWithData:[NSData dataWithBytes:VendorReserved1.data() length: VendorReserved1.size()] encoding:NSUTF8StringEncoding],
+                    @"VendorReserved2" : [[NSString alloc] initWithData:[NSData dataWithBytes:VendorReserved2.data() length: VendorReserved2.size()] encoding:NSUTF8StringEncoding],
+                    @"VendorReserved3" : [[NSString alloc] initWithData:[NSData dataWithBytes:VendorReserved3.data() length: VendorReserved3.size()] encoding:NSUTF8StringEncoding],
+                    @"Signature" : [[NSString alloc] initWithData:[NSData dataWithBytes:Signature.data() length: Signature.size()] encoding:NSUTF8StringEncoding],
                 });
                 callback->Cancel();
                 delete callback;
