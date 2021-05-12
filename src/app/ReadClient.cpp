@@ -34,12 +34,12 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     // Error if already initialized.
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
-    mpExchangeCtx = nullptr;
     mpDelegate    = apDelegate;
     mState        = ClientState::Initialized;
+
+    ClearExistingExchangeContext();
 
 exit:
     ChipLogFunctError(err);
@@ -88,7 +88,10 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
                   InteractionModelEngine::GetInstance()->GetReadClientArrayIndex(this), GetStateStr());
     VerifyOrExit(ClientState::Initialized == mState, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    // Discard any existing exchange context. Effectively we can only have one exchange per ReadClient
+    // at any one time.
+    ClearExistingExchangeContext();
 
     {
         System::PacketBufferTLVWriter writer;
@@ -175,6 +178,12 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
 exit:
     ChipLogFunctError(err);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ClearExistingExchangeContext();
+    }
+
     return err;
 }
 
@@ -182,16 +191,20 @@ void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContex
                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData),
                  err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
-    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
     err = ProcessReportData(std::move(aPayload));
 
 exit:
     ChipLogFunctError(err);
 
-    ClearExistingExchangeContext();
+    // We shall close the exchange instead of abort to allow the ExchangeMgr complete ack if there is any.
+    mpExchangeCtx->Close();
+    mpExchangeCtx = nullptr;
     MoveToState(ClientState::Initialized);
+
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
