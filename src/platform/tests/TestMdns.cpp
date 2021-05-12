@@ -137,7 +137,7 @@ int TestMdns()
             chip::DeviceLayer::SystemLayer.WakeSelect();
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-            // TODO: the above does not seem to actually reliably shut down the chip
+            // TODO: the above does not seem to actually reliably shut down the chip stack.
             // Program will abort with core because chip thread will still run.
             doneCondition.wait_for(lock, std::chrono::seconds(1));
             if (!done)
