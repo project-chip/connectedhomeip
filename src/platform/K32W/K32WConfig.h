@@ -56,11 +56,11 @@ public:
     // PDM ids used by the CHIP Device Layer
     static constexpr uint8_t kPDMId_ChipFactory = 0x01; /**< PDM id for settings containing persistent config values set at
                                                          * manufacturing time. Retained during factory reset. */
-    static constexpr uint8_t kPDMId_ChipConfig  = 0x02;  /**< PDM id for settings containing dynamic config values set at runtime.
+    static constexpr uint8_t kPDMId_ChipConfig = 0x02;  /**< PDM id for settings containing dynamic config values set at runtime.
                                                          *   Cleared during factory reset. */
     static constexpr uint8_t kPDMId_ChipCounter = 0x03; /**< PDM id for settings containing dynamic counter values set at runtime.
                                                          *   Retained during factory reset. */
-    static constexpr uint8_t kPDMId_KVS         = 0x04;  /**< PDM id for settings containing KVS set at runtime.
+    static constexpr uint8_t kPDMId_KVS = 0x04;         /**< PDM id for settings containing KVS set at runtime.
                                                          *   Cleared during factory reset. */
 
     using Key = uint32_t;

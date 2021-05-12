@@ -23,9 +23,9 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/KeyValueStoreManager.h>
-#include <platform/K32W/K32WConfig.h>
 #include "support/CHIPMem.h"
+#include <platform/K32W/K32WConfig.h>
+#include <platform/KeyValueStoreManager.h>
 #include <string>
 
 #include "PDM.h"
@@ -54,8 +54,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     ChipLogProgress(DeviceLayer, "KVS, get key id:: %i", key_id);
 
     err = chip::DeviceLayer::Internal::K32WConfig::ReadConfigValueBin(
-		    chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id),
-			    (uint8_t*)value, value_size, read_bytes);
+        chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id), (uint8_t *) value, value_size, read_bytes);
 
     *read_bytes_size = read_bytes;
 
@@ -76,7 +75,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     ChipLogProgress(DeviceLayer, "KVS, put key id:: %i", key_id);
 
     err = chip::DeviceLayer::Internal::K32WConfig::WriteConfigValueBin(
-		    chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id), (uint8_t*)value, value_size);
+        chip::DeviceLayer::Internal::K32WConfigKey(pdm_id_kvs, key_id), (uint8_t *) value, value_size);
 
 exit:
     return err;

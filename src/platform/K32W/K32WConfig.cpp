@@ -364,7 +364,7 @@ exit:
 
 CHIP_ERROR K32WConfig::FactoryResetConfig(void)
 {
-	CHIP_ERROR err;
+    CHIP_ERROR err;
 
     err = FactoryResetConfigInternal(kMinConfigKey_ChipConfig, kMaxConfigKey_ChipConfig);
 
