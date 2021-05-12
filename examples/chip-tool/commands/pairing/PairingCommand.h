@@ -22,7 +22,6 @@
 #include "../common/Command.h"
 #include "gen/CHIPClientCallbacks.h"
 #include "gen/CHIPClusters.h"
-#include <lib/support/ThreadOperationalDataset.h>
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 
@@ -62,7 +61,7 @@ public:
             AddArgument("password", &mPassword);
             break;
         case PairingNetworkType::Thread:
-            AddArgument("operationalDataset", &mThreadOpDatasetArg);
+            AddArgument("operationalDataset", &mOperationalDataset);
             break;
         }
 
@@ -136,8 +135,7 @@ private:
     uint64_t mFabricId;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
-    char * mThreadOpDatasetArg;
-    chip::Thread::OperationalDataset mThreadOpDataset;
+    char * mOperationalDataset;
     char * mSSID;
     char * mPassword;
 
