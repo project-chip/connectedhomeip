@@ -262,6 +262,8 @@ CHIP_ERROR DeviceController::Shutdown()
     mInetLayer       = nullptr;
     mStorageDelegate = nullptr;
 
+    ReleaseAllDevices();
+
     if (mMessageCounterManager != nullptr)
     {
         chip::Platform::Delete(mMessageCounterManager);
@@ -302,7 +304,6 @@ CHIP_ERROR DeviceController::Shutdown()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
-    ReleaseAllDevices();
     return CHIP_NO_ERROR;
 }
 
@@ -735,6 +736,8 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
+
+    mPairingSession.Clear();
 
     PersistDeviceList();
 
