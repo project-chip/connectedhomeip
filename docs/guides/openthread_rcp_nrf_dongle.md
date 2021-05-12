@@ -15,7 +15,8 @@ Once programmed, the dongle can be used for
 Run the following commands to build and program the RCP firmware onto an
 nRF52840 Dongle:
 
-1.  Clone the OpenThread nRF528xx platform repository into the current directory:
+1.  Clone the OpenThread nRF528xx platform repository into the current
+    directory:
 
         $ git clone --recursive https://github.com/openthread/ot-nrf528xx.git
 
@@ -42,15 +43,15 @@ nRF52840 Dongle:
 
         $ python3 -m pip install -U nrfutil
 
-7. Generate the RCP firmware package:
+7.  Generate the RCP firmware package:
 
         $ nrfutil pkg generate --hw-version 52 --sd-req=0x00 \
             --application build/bin/ot-rcp.hex \
             --application-version 1 build/bin/ot-rcp.zip
 
-8. Connect the nRF52840 Dongle to the USB port.
+8.  Connect the nRF52840 Dongle to the USB port.
 
-9. Press the **Reset** button on the dongle to put it into the DFU mode. Red
+9.  Press the **Reset** button on the dongle to put it into the DFU mode. Red
     LED on the dongle starts blinking.
 
 10. To install the RCP firmware package onto the dongle, run the following
