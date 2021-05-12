@@ -88,7 +88,7 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
             dbus_connection_read_write_dispatch(dispatchConnection, kDBusConnectionPollingTimeoutMS);
         }
     });
-    mDBusEventLoop.detach();
+        mDBusEventLoop.detach();
 exit:
     dbus_error_free(&dbusError);
     LogClientError(error);
@@ -384,6 +384,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
     uint64_t extAddr;
     ClientError error;
+    VerifyOrReturnError(mThreadApi != nullptr, CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(error = mThreadApi->GetExtendedAddress(extAddr));
 
     for (size_t i = 0; i < sizeof(extAddr); i++)
