@@ -37,6 +37,7 @@
 #include <jni.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
+#include <protocols/temp_zcl/TempZCL.h>
 #include <pthread.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -439,7 +440,7 @@ JNI_METHOD(void, sendMessage)(JNIEnv * env, jobject self, jlong handle, jlong de
         }
         else
         {
-            err = chipDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(buffer));
+            err = chipDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(buffer));
         }
     }
 
