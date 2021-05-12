@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include <algorithm>
-#include <array>
 #include <cstdint>
 #include <cstdlib>
 
@@ -55,13 +53,6 @@ public:
 
     const T * data() const { return mDataBuf; }
     size_t size() const { return N; }
-
-    std::array<T, N> ToArray()
-    {
-        std::array<T, N> result;
-        std::copy(mDataBuf, mDataBuf + N, std::begin(result));
-        return result;
-    }
 
 private:
     const T * mDataBuf;
