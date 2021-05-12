@@ -726,7 +726,7 @@ DeviceCommissioner::~DeviceCommissioner()
 
     if (mOpCertResponseCallback != nullptr)
     {
-        chip::Platform::Delete(mOpCSRResponseCallback);
+        chip::Platform::Delete(mOpCertResponseCallback);
     }
 
     if (mOnFailureCallback != nullptr)
