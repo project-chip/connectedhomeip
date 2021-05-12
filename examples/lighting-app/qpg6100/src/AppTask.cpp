@@ -105,7 +105,7 @@ int AppTask::Init()
     // Enable BLE advertisements
     OpenDefaultPairingWindow(chip::ResetAdmins::kNo);
     ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
-  
+
     return err;
 }
 
