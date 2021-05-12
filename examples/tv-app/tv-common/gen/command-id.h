@@ -279,6 +279,10 @@
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
 
+// Commands for cluster: Trusted Root Certificates
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
+
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)
 #define ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID (0x00)

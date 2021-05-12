@@ -45,6 +45,8 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <messaging/ExchangeContext.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <support/Base64.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -161,9 +163,10 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 #endif
 
-    mTransportMgr = chip::Platform::New<DeviceTransportMgr>();
-    mSessionMgr   = chip::Platform::New<SecureSessionMgr>();
-    mExchangeMgr  = chip::Platform::New<Messaging::ExchangeManager>();
+    mTransportMgr          = chip::Platform::New<DeviceTransportMgr>();
+    mSessionMgr            = chip::Platform::New<SecureSessionMgr>();
+    mExchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
+    mMessageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
@@ -181,10 +184,13 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
+    err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager);
     SuccessOrExit(err);
 
     err = mExchangeMgr->Init(mSessionMgr);
+    SuccessOrExit(err);
+
+    err = mMessageCounterManager->Init(mExchangeMgr);
     SuccessOrExit(err);
 
     err = mExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
@@ -211,6 +217,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
 
         mDeviceAddressUpdateDelegate = params.mDeviceAddressUpdateDelegate;
     }
+    Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     InitDataModelHandler(mExchangeMgr);
@@ -232,6 +239,16 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
+    // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
+    // if (mExchangeMgr != nullptr)
+    // {
+    //     mExchangeMgr->Shutdown();
+    // }
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->Shutdown();
+    }
+
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
 #else
@@ -244,6 +261,12 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemLayer     = nullptr;
     mInetLayer       = nullptr;
     mStorageDelegate = nullptr;
+
+    if (mMessageCounterManager != nullptr)
+    {
+        chip::Platform::Delete(mMessageCounterManager);
+        mMessageCounterManager = nullptr;
+    }
 
     if (mExchangeMgr != nullptr)
     {
@@ -380,8 +403,6 @@ exit:
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
-    ReturnErrorOnFailure(Mdns::Resolver::Instance().StartResolver(mInetLayer, kMdnsPort));
-
     return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
 #else
@@ -648,6 +669,33 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
         mDeviceAddressUpdateDelegate->OnAddressUpdateComplete(peer.GetNodeId(), error);
     }
 };
+
+void DeviceController::OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData)
+{
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        if (!mCommissionableNodes[i].IsValid())
+        {
+            continue;
+        }
+        if (strcmp(mCommissionableNodes[i].hostName, nodeData.hostName) == 0)
+        {
+            mCommissionableNodes[i] = nodeData;
+            return;
+        }
+    }
+    // Didn't find the host name already in our list, return an invalid
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        if (!mCommissionableNodes[i].IsValid())
+        {
+            mCommissionableNodes[i] = nodeData;
+            return;
+        }
+    }
+    ChipLogError(Discovery, "Failed to add discovered commisisonable node - Insufficient space");
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
@@ -676,7 +724,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     {
         mNextKeyId = 0;
     }
-
     mPairingDelegate = params.pairingDelegate;
 
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
@@ -1097,6 +1144,37 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 {
     reinterpret_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
 }
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+CHIP_ERROR DeviceCommissioner::DiscoverAllCommissioning()
+{
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
+    return Mdns::Resolver::Instance().FindCommissionableNodes();
+}
+
+CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator)
+{
+    // TODO(cecille): Add assertion about main loop.
+    for (int i = 0; i < kMaxCommissionableNodes; ++i)
+    {
+        mCommissionableNodes[i].Reset();
+    }
+    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::kLong, long_discriminator);
+    return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
+{
+    // TODO(cecille): Add assertion about main loop.
+    if (mCommissionableNodes[idx].IsValid())
+    {
+        return &mCommissionableNodes[idx];
+    }
+    return nullptr;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
     const app::CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,

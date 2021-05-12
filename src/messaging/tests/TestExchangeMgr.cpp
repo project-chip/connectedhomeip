@@ -211,8 +211,14 @@ int Initialize(void * aContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr);
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    auto * ctx = reinterpret_cast<TestContext *>(aContext);
+    err        = ctx->Init(&sSuite, &gTransportMgr);
+    if (err != CHIP_NO_ERROR)
+    {
+        return FAILURE;
+    }
+
+    return SUCCESS;
 }
 
 /**

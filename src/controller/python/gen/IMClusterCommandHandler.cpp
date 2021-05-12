@@ -4025,15 +4025,14 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
         switch (aCommandId)
         {
         case ZCL_OP_CSR_RESPONSE_COMMAND_ID: {
-            expectArgumentCount = 7;
+            expectArgumentCount = 6;
             chip::ByteSpan CSR;
-            uint32_t CSRLen;
             chip::ByteSpan CSRNonce;
             chip::ByteSpan VendorReserved1;
             chip::ByteSpan VendorReserved2;
             chip::ByteSpan VendorReserved3;
             chip::ByteSpan Signature;
-            bool argExists[7];
+            bool argExists[6];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -4046,7 +4045,7 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 7)
+                if (currentDecodeTagId < 6)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -4068,34 +4067,31 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                     CSR                  = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(CSRLen);
-                    break;
-                case 2: {
+                case 1: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
                     CSRNonce             = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
-                case 3: {
+                case 2: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
                     VendorReserved1      = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
-                case 4: {
+                case 3: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
                     VendorReserved2      = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
-                case 5: {
+                case 4: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
                     VendorReserved3      = chip::ByteSpan(data, aDataTlv.GetLength());
                 }
                 break;
-                case 6: {
+                case 5: {
                     const uint8_t * data = nullptr;
                     TLVUnpackError       = aDataTlv.GetDataPtr(data);
                     Signature            = chip::ByteSpan(data, aDataTlv.GetLength());
@@ -4118,11 +4114,11 @@ void DispatchClientCommand(app::Command * apCommandObj, CommandId aCommandId, En
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 6 == validArgumentCount)
             {
                 // TODO(#5098) We should pass the Command Object and EndpointId to the cluster callbacks.
-                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(
-                    apCommandObj, CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature);
+                wasHandled = emberAfOperationalCredentialsClusterOpCSRResponseCallback(apCommandObj, CSR, CSRNonce, VendorReserved1,
+                                                                                       VendorReserved2, VendorReserved3, Signature);
             }
             break;
         }

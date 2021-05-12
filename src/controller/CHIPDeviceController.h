@@ -36,6 +36,7 @@
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
@@ -247,10 +248,14 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
+    secure_channel::MessageCounterManager * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
     DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    // TODO(cecille): Make this configuarable.
+    static constexpr int kMaxCommissionableNodes = 10;
+    Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
     Inet::InetLayer * mInetLayer;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -285,6 +290,7 @@ private:
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
@@ -386,6 +392,38 @@ public:
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR CloseBleConnection();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    /**
+     * @brief
+     *   Discover devices advertising as commissionable that match the long discriminator.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator);
+
+    /**
+     * @brief
+     *   Discover all devices advertising as commissionable.
+     *   Should be called on main loop thread.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverAllCommissioning();
+
+    /**
+     * @brief
+     *   Returns information about discovered devices.
+     *   Should be called on main loop thread.
+     * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
+     */
+    const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
+
+    /**
+     * @brief
+     *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
+     * @return int  The max number of commissionable nodes supported
+     */
+    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+
 #endif
 
 private:
