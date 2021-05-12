@@ -310,7 +310,7 @@ void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext 
     VerifyOrExit(packetHeader.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
     peerNodeId = packetHeader.GetSourceNodeId().Value();
 
-    // Process all queued incomming messages after message counter synchronization is completed.
+    // Process all queued incoming messages after message counter synchronization is completed.
     ProcessPendingMessages(peerNodeId);
 
 exit:

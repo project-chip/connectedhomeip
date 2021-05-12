@@ -240,8 +240,14 @@ CHIP_ERROR DeviceController::Shutdown()
     mState = State::NotInitialized;
 
     // TODO(#6668): Some exchange has leak, shutting down ExchangeManager will cause a assert fail.
-    // mExchangeMgr->Shutdown();
-    mSessionMgr->Shutdown();
+    // if (mExchangeMgr != nullptr)
+    // {
+    //     mExchangeMgr->Shutdown();
+    // }
+    if (mSessionMgr != nullptr)
+    {
+        mSessionMgr->Shutdown();
+    }
 
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().Shutdown());
