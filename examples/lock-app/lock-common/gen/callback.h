@@ -436,9 +436,6 @@ void emberAfWiFiNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId end
 
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback
- * @param expiryLengthSeconds
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
@@ -452,10 +449,6 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
 
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback
- * @param location
- * @param countryCode
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
@@ -463,9 +456,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Co
 
 /**
  * @brief Network Commissioning Cluster AddThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
@@ -473,10 +463,6 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Comma
 
 /**
  * @brief Network Commissioning Cluster AddWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -484,9 +470,6 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster DisableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -494,9 +477,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster EnableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -504,7 +484,6 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
@@ -512,9 +491,6 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
 
 /**
  * @brief Network Commissioning Cluster RemoveNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID,
@@ -522,9 +498,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback
- * @param ssid
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -532,9 +505,6 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command *
 
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
@@ -543,10 +513,6 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Co
 
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,

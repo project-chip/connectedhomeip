@@ -2168,7 +2168,6 @@ void emberAfWiFiNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId end
 
 /**
  * @brief Barrier Control Cluster BarrierControlGoToPercent Command callback
- * @param percentOpen
  */
 
 bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(chip::app::Command * commandObj, uint8_t percentOpen);
@@ -2187,10 +2186,6 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 
 /**
  * @brief Binding Cluster Bind Command callback
- * @param nodeId
- * @param groupId
- * @param endpointId
- * @param clusterId
  */
 
 bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
@@ -2198,10 +2193,6 @@ bool emberAfBindingClusterBindCallback(chip::app::Command * commandObj, chip::No
 
 /**
  * @brief Binding Cluster Unbind Command callback
- * @param nodeId
- * @param groupId
- * @param endpointId
- * @param clusterId
  */
 
 bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, chip::NodeId nodeId, chip::GroupId groupId,
@@ -2209,10 +2200,6 @@ bool emberAfBindingClusterUnbindCallback(chip::app::Command * commandObj, chip::
 
 /**
  * @brief Color Control Cluster MoveColor Command callback
- * @param rateX
- * @param rateY
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj, int16_t rateX, int16_t rateY, uint8_t optionsMask,
@@ -2220,12 +2207,6 @@ bool emberAfColorControlClusterMoveColorCallback(chip::app::Command * commandObj
 
 /**
  * @brief Color Control Cluster MoveColorTemperature Command callback
- * @param moveMode
- * @param rate
- * @param colorTemperatureMinimum
- * @param colorTemperatureMaximum
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::Command * commandObj, uint8_t moveMode, uint16_t rate,
@@ -2234,10 +2215,6 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(chip::app::Command *
 
 /**
  * @brief Color Control Cluster MoveHue Command callback
- * @param moveMode
- * @param rate
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
@@ -2245,10 +2222,6 @@ bool emberAfColorControlClusterMoveHueCallback(chip::app::Command * commandObj, 
 
 /**
  * @brief Color Control Cluster MoveSaturation Command callback
- * @param moveMode
- * @param rate
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate,
@@ -2256,11 +2229,6 @@ bool emberAfColorControlClusterMoveSaturationCallback(chip::app::Command * comma
 
 /**
  * @brief Color Control Cluster MoveToColor Command callback
- * @param colorX
- * @param colorY
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveToColorCallback(chip::app::Command * commandObj, uint16_t colorX, uint16_t colorY,
@@ -2268,10 +2236,6 @@ bool emberAfColorControlClusterMoveToColorCallback(chip::app::Command * commandO
 
 /**
  * @brief Color Control Cluster MoveToColorTemperature Command callback
- * @param colorTemperature
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command * commandObj, uint16_t colorTemperature,
@@ -2280,11 +2244,6 @@ bool emberAfColorControlClusterMoveToColorTemperatureCallback(chip::app::Command
 
 /**
  * @brief Color Control Cluster MoveToHue Command callback
- * @param hue
- * @param direction
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t direction,
@@ -2292,11 +2251,6 @@ bool emberAfColorControlClusterMoveToHueCallback(chip::app::Command * commandObj
 
 /**
  * @brief Color Control Cluster MoveToHueAndSaturation Command callback
- * @param hue
- * @param saturation
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command * commandObj, uint8_t hue, uint8_t saturation,
@@ -2305,10 +2259,6 @@ bool emberAfColorControlClusterMoveToHueAndSaturationCallback(chip::app::Command
 
 /**
  * @brief Color Control Cluster MoveToSaturation Command callback
- * @param saturation
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * commandObj, uint8_t saturation,
@@ -2316,11 +2266,6 @@ bool emberAfColorControlClusterMoveToSaturationCallback(chip::app::Command * com
 
 /**
  * @brief Color Control Cluster StepColor Command callback
- * @param stepX
- * @param stepY
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterStepColorCallback(chip::app::Command * commandObj, int16_t stepX, int16_t stepY,
@@ -2328,13 +2273,6 @@ bool emberAfColorControlClusterStepColorCallback(chip::app::Command * commandObj
 
 /**
  * @brief Color Control Cluster StepColorTemperature Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
- * @param colorTemperatureMinimum
- * @param colorTemperatureMaximum
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::Command * commandObj, uint8_t stepMode, uint16_t stepSize,
@@ -2344,11 +2282,6 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(chip::app::Command *
 
 /**
  * @brief Color Control Cluster StepHue Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterStepHueCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
@@ -2356,11 +2289,6 @@ bool emberAfColorControlClusterStepHueCallback(chip::app::Command * commandObj, 
 
 /**
  * @brief Color Control Cluster StepSaturation Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterStepSaturationCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
@@ -2368,8 +2296,6 @@ bool emberAfColorControlClusterStepSaturationCallback(chip::app::Command * comma
 
 /**
  * @brief Color Control Cluster StopMoveStep Command callback
- * @param optionsMask
- * @param optionsOverride
  */
 
 bool emberAfColorControlClusterStopMoveStepCallback(chip::app::Command * commandObj, uint8_t optionsMask, uint8_t optionsOverride);
@@ -2388,105 +2314,84 @@ bool emberAfDoorLockClusterClearAllRfidsCallback(chip::app::Command * commandObj
 
 /**
  * @brief Door Lock Cluster ClearHolidaySchedule Command callback
- * @param scheduleId
  */
 
 bool emberAfDoorLockClusterClearHolidayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId);
 
 /**
  * @brief Door Lock Cluster ClearPin Command callback
- * @param userId
  */
 
 bool emberAfDoorLockClusterClearPinCallback(chip::app::Command * commandObj, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster ClearRfid Command callback
- * @param userId
  */
 
 bool emberAfDoorLockClusterClearRfidCallback(chip::app::Command * commandObj, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster ClearWeekdaySchedule Command callback
- * @param scheduleId
- * @param userId
  */
 
 bool emberAfDoorLockClusterClearWeekdayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster ClearYeardaySchedule Command callback
- * @param scheduleId
- * @param userId
  */
 
 bool emberAfDoorLockClusterClearYeardayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster GetHolidaySchedule Command callback
- * @param scheduleId
  */
 
 bool emberAfDoorLockClusterGetHolidayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId);
 
 /**
  * @brief Door Lock Cluster GetLogRecord Command callback
- * @param logIndex
  */
 
 bool emberAfDoorLockClusterGetLogRecordCallback(chip::app::Command * commandObj, uint16_t logIndex);
 
 /**
  * @brief Door Lock Cluster GetPin Command callback
- * @param userId
  */
 
 bool emberAfDoorLockClusterGetPinCallback(chip::app::Command * commandObj, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster GetRfid Command callback
- * @param userId
  */
 
 bool emberAfDoorLockClusterGetRfidCallback(chip::app::Command * commandObj, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster GetUserType Command callback
- * @param userId
  */
 
 bool emberAfDoorLockClusterGetUserTypeCallback(chip::app::Command * commandObj, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster GetWeekdaySchedule Command callback
- * @param scheduleId
- * @param userId
  */
 
 bool emberAfDoorLockClusterGetWeekdayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster GetYeardaySchedule Command callback
- * @param scheduleId
- * @param userId
  */
 
 bool emberAfDoorLockClusterGetYeardayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId);
 
 /**
  * @brief Door Lock Cluster LockDoor Command callback
- * @param pin
  */
 
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN);
 
 /**
  * @brief Door Lock Cluster SetHolidaySchedule Command callback
- * @param scheduleId
- * @param localStartTime
- * @param localEndTime
- * @param operatingModeDuringHoliday
  */
 
 bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint32_t localStartTime,
@@ -2494,10 +2399,6 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(chip::app::Command * comma
 
 /**
  * @brief Door Lock Cluster SetPin Command callback
- * @param userId
- * @param userStatus
- * @param userType
- * @param pin
  */
 
 bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
@@ -2505,10 +2406,6 @@ bool emberAfDoorLockClusterSetPinCallback(chip::app::Command * commandObj, uint1
 
 /**
  * @brief Door Lock Cluster SetRfid Command callback
- * @param userId
- * @param userStatus
- * @param userType
- * @param id
  */
 
 bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userStatus, uint8_t userType,
@@ -2516,21 +2413,12 @@ bool emberAfDoorLockClusterSetRfidCallback(chip::app::Command * commandObj, uint
 
 /**
  * @brief Door Lock Cluster SetUserType Command callback
- * @param userId
- * @param userType
  */
 
 bool emberAfDoorLockClusterSetUserTypeCallback(chip::app::Command * commandObj, uint16_t userId, uint8_t userType);
 
 /**
  * @brief Door Lock Cluster SetWeekdaySchedule Command callback
- * @param scheduleId
- * @param userId
- * @param daysMask
- * @param startHour
- * @param startMinute
- * @param endHour
- * @param endMinute
  */
 
 bool emberAfDoorLockClusterSetWeekdayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId,
@@ -2539,10 +2427,6 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(chip::app::Command * comma
 
 /**
  * @brief Door Lock Cluster SetYeardaySchedule Command callback
- * @param scheduleId
- * @param userId
- * @param localStartTime
- * @param localEndTime
  */
 
 bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::Command * commandObj, uint8_t scheduleId, uint16_t userId,
@@ -2550,24 +2434,18 @@ bool emberAfDoorLockClusterSetYeardayScheduleCallback(chip::app::Command * comma
 
 /**
  * @brief Door Lock Cluster UnlockDoor Command callback
- * @param pin
  */
 
 bool emberAfDoorLockClusterUnlockDoorCallback(chip::app::Command * commandObj, uint8_t * PIN);
 
 /**
  * @brief Door Lock Cluster UnlockWithTimeout Command callback
- * @param timeoutInSeconds
- * @param pin
  */
 
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(chip::app::Command * commandObj, uint16_t timeoutInSeconds, uint8_t * pin);
 
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback
- * @param expiryLengthSeconds
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
@@ -2581,10 +2459,6 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
 
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback
- * @param location
- * @param countryCode
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
@@ -2592,24 +2466,18 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Co
 
 /**
  * @brief Groups Cluster AddGroup Command callback
- * @param groupId
- * @param groupName
  */
 
 bool emberAfGroupsClusterAddGroupCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
 
 /**
  * @brief Groups Cluster AddGroupIfIdentifying Command callback
- * @param groupId
- * @param groupName
  */
 
 bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t * groupName);
 
 /**
  * @brief Groups Cluster GetGroupMembership Command callback
- * @param groupCount
- * @param groupList
  */
 
 bool emberAfGroupsClusterGetGroupMembershipCallback(chip::app::Command * commandObj, uint8_t groupCount,
@@ -2623,29 +2491,24 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(chip::app::Command * commandObj
 
 /**
  * @brief Groups Cluster RemoveGroup Command callback
- * @param groupId
  */
 
 bool emberAfGroupsClusterRemoveGroupCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Groups Cluster ViewGroup Command callback
- * @param groupId
  */
 
 bool emberAfGroupsClusterViewGroupCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief IAS Zone Cluster ZoneEnrollResponse Command callback
- * @param enrollResponseCode
- * @param zoneId
  */
 
 bool emberAfIasZoneClusterZoneEnrollResponseCallback(chip::app::Command * commandObj, uint8_t enrollResponseCode, uint8_t zoneId);
 
 /**
  * @brief Identify Cluster Identify Command callback
- * @param identifyTime
  */
 
 bool emberAfIdentifyClusterIdentifyCallback(chip::app::Command * commandObj, uint16_t identifyTime);
@@ -2658,10 +2521,6 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(chip::app::Command * commandObj
 
 /**
  * @brief Level Control Cluster Move Command callback
- * @param moveMode
- * @param rate
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterMoveCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
@@ -2669,10 +2528,6 @@ bool emberAfLevelControlClusterMoveCallback(chip::app::Command * commandObj, uin
 
 /**
  * @brief Level Control Cluster MoveToLevel Command callback
- * @param level
- * @param transitionTime
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::Command * commandObj, uint8_t level, uint16_t transitionTime,
@@ -2680,8 +2535,6 @@ bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::Command * commandO
 
 /**
  * @brief Level Control Cluster MoveToLevelWithOnOff Command callback
- * @param level
- * @param transitionTime
  */
 
 bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::Command * commandObj, uint8_t level,
@@ -2689,19 +2542,12 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::Command *
 
 /**
  * @brief Level Control Cluster MoveWithOnOff Command callback
- * @param moveMode
- * @param rate
  */
 
 bool emberAfLevelControlClusterMoveWithOnOffCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate);
 
 /**
  * @brief Level Control Cluster Step Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterStepCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
@@ -2709,9 +2555,6 @@ bool emberAfLevelControlClusterStepCallback(chip::app::Command * commandObj, uin
 
 /**
  * @brief Level Control Cluster StepWithOnOff Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
  */
 
 bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
@@ -2719,8 +2562,6 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::Command * comman
 
 /**
  * @brief Level Control Cluster Stop Command callback
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterStopCallback(chip::app::Command * commandObj, uint8_t optionMask, uint8_t optionOverride);
@@ -2739,9 +2580,6 @@ bool emberAfLowPowerClusterSleepCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Network Commissioning Cluster AddThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
@@ -2749,10 +2587,6 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Comma
 
 /**
  * @brief Network Commissioning Cluster AddWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -2760,9 +2594,6 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster DisableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -2770,9 +2601,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster EnableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -2780,7 +2608,6 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
@@ -2788,9 +2615,6 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
 
 /**
  * @brief Network Commissioning Cluster RemoveNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID,
@@ -2798,9 +2622,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback
- * @param ssid
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -2808,9 +2629,6 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command *
 
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
@@ -2819,10 +2637,6 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Co
 
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -2831,8 +2645,6 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Comm
 
 /**
  * @brief OTA Software Update Server Cluster ApplyUpdateRequest Command callback
- * @param updateToken
- * @param newVersion
  */
 
 bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(chip::app::Command * commandObj, chip::ByteSpan updateToken,
@@ -2840,8 +2652,6 @@ bool emberAfOtaSoftwareUpdateServerClusterApplyUpdateRequestCallback(chip::app::
 
 /**
  * @brief OTA Software Update Server Cluster NotifyUpdateApplied Command callback
- * @param updateToken
- * @param currentVersion
  */
 
 bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::app::Command * commandObj, chip::ByteSpan updateToken,
@@ -2849,15 +2659,6 @@ bool emberAfOtaSoftwareUpdateServerClusterNotifyUpdateAppliedCallback(chip::app:
 
 /**
  * @brief OTA Software Update Server Cluster QueryImage Command callback
- * @param vendorId
- * @param productId
- * @param imageType
- * @param hardwareVersion
- * @param currentVersion
- * @param protocolsSupported
- * @param location
- * @param clientCanConsent
- * @param metadataForServer
  */
 
 bool emberAfOtaSoftwareUpdateServerClusterQueryImageCallback(
@@ -2885,11 +2686,6 @@ bool emberAfOnOffClusterToggleCallback(chip::app::Command * commandObj);
 
 /**
  * @brief Operational Credentials Cluster AddOpCert Command callback
- * @param noc
- * @param iCACertificate
- * @param iPKValue
- * @param caseAdminNode
- * @param adminVendorId
  */
 
 bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * commandObj, chip::ByteSpan NOC,
@@ -2898,7 +2694,6 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
 
 /**
  * @brief Operational Credentials Cluster OpCSRRequest Command callback
- * @param cSRNonce
  */
 
 bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command * commandObj, chip::ByteSpan CSRNonce);
@@ -2911,9 +2706,6 @@ bool emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(chip::app::Com
 
 /**
  * @brief Operational Credentials Cluster RemoveFabric Command callback
- * @param fabricId
- * @param nodeId
- * @param vendorId
  */
 
 bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command * commandObj, chip::FabricId FabricId,
@@ -2921,25 +2713,18 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
 
 /**
  * @brief Operational Credentials Cluster SetFabric Command callback
- * @param vendorId
  */
 
 bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * commandObj, uint16_t VendorId);
 
 /**
  * @brief Operational Credentials Cluster UpdateFabricLabel Command callback
- * @param label
  */
 
 bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(chip::app::Command * commandObj, uint8_t * Label);
 
 /**
  * @brief Scenes Cluster AddScene Command callback
- * @param groupId
- * @param sceneId
- * @param transitionTime
- * @param sceneName
- * @param extensionFieldSets
  */
 
 bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
@@ -2948,16 +2733,12 @@ bool emberAfScenesClusterAddSceneCallback(chip::app::Command * commandObj, uint1
 
 /**
  * @brief Scenes Cluster GetSceneMembership Command callback
- * @param groupId
  */
 
 bool emberAfScenesClusterGetSceneMembershipCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Scenes Cluster RecallScene Command callback
- * @param groupId
- * @param sceneId
- * @param transitionTime
  */
 
 bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId,
@@ -2965,31 +2746,24 @@ bool emberAfScenesClusterRecallSceneCallback(chip::app::Command * commandObj, ui
 
 /**
  * @brief Scenes Cluster RemoveAllScenes Command callback
- * @param groupId
  */
 
 bool emberAfScenesClusterRemoveAllScenesCallback(chip::app::Command * commandObj, uint16_t groupId);
 
 /**
  * @brief Scenes Cluster RemoveScene Command callback
- * @param groupId
- * @param sceneId
  */
 
 bool emberAfScenesClusterRemoveSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster StoreScene Command callback
- * @param groupId
- * @param sceneId
  */
 
 bool emberAfScenesClusterStoreSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
 
 /**
  * @brief Scenes Cluster ViewScene Command callback
- * @param groupId
- * @param sceneId
  */
 
 bool emberAfScenesClusterViewSceneCallback(chip::app::Command * commandObj, uint16_t groupId, uint8_t sceneId);
@@ -3014,7 +2788,6 @@ bool emberAfTestClusterClusterTestSpecificCallback(chip::app::Command * commandO
 
 /**
  * @brief Trusted Root Certificates Cluster AddTrustedRootCertificate Command callback
- * @param rootCertificate
  */
 
 bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip::app::Command * commandObj,
@@ -3022,7 +2795,6 @@ bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip
 
 /**
  * @brief Trusted Root Certificates Cluster RemoveTrustedRootCertificate Command callback
- * @param trustedRootIdentifier
  */
 
 bool emberAfTrustedRootCertificatesClusterRemoveTrustedRootCertificateCallback(chip::app::Command * commandObj,

@@ -280,9 +280,6 @@ void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
 
 /**
  * @brief Network Commissioning Cluster AddThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
@@ -290,10 +287,6 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Comma
 
 /**
  * @brief Network Commissioning Cluster AddWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -301,9 +294,6 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster DisableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -311,9 +301,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster EnableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -321,7 +308,6 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
@@ -329,9 +315,6 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
 
 /**
  * @brief Network Commissioning Cluster RemoveNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID,
@@ -339,9 +322,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback
- * @param ssid
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -349,9 +329,6 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command *
 
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
@@ -360,10 +337,6 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Co
 
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -378,7 +351,6 @@ bool emberAfWindowCoveringClusterWindowCoveringDownCloseCallback(chip::app::Comm
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToLiftPercentage Command callback
- * @param percentageLiftValue
  */
 
 bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::app::Command * commandObj,
@@ -386,14 +358,12 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToLiftPercentageCallback(chip::
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToLiftValue Command callback
- * @param liftValue
  */
 
 bool emberAfWindowCoveringClusterWindowCoveringGoToLiftValueCallback(chip::app::Command * commandObj, uint16_t liftValue);
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToTiltPercentage Command callback
- * @param percentageTiltValue
  */
 
 bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::app::Command * commandObj,
@@ -401,7 +371,6 @@ bool emberAfWindowCoveringClusterWindowCoveringGoToTiltPercentageCallback(chip::
 
 /**
  * @brief Window Covering Cluster WindowCoveringGoToTiltValue Command callback
- * @param tiltValue
  */
 
 bool emberAfWindowCoveringClusterWindowCoveringGoToTiltValueCallback(chip::app::Command * commandObj, uint16_t tiltValue);
