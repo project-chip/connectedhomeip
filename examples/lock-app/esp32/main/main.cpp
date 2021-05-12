@@ -72,7 +72,7 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "------------------------Starting App Task---------------------------");
     err = GetAppTask().StartAppTask();
     if (err != CHIP_NO_ERROR)
-    {   
+    {
         ESP_LOGE(TAG,"GetAppTask().Init() failed");
     }
 

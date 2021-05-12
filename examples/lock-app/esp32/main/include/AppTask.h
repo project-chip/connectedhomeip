@@ -42,8 +42,8 @@ private:
 
     static void UpdateClusterState(void);
 
-    void StartTimer(uint32_t aTimeoutMs);    
-    
+    void StartTimer(uint32_t aTimeoutMs);
+
     enum Function_t
     {
         kFunction_NoneSelected   = 0,

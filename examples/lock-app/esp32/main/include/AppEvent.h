@@ -1,17 +1,17 @@
 #pragma once
 
 struct AppEvent;
-typedef void (*EventHandler)(AppEvent *); 
+typedef void (*EventHandler)(AppEvent *);
 
 struct AppEvent
 {
     enum AppEventTypes
-    {   
+    {
         kEventType_Button = 0,
         kEventType_Timer,
         kEventType_Lock,
         kEventType_Install,
-    };  
+    };
 
     uint16_t Type;
 
@@ -35,4 +35,3 @@ struct AppEvent
 
     EventHandler Handler;
 };
-

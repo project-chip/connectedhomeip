@@ -79,15 +79,15 @@ int AppTask::Init()
     );
     err = BoltLockMgr().Init();    //Initialize BoltLockManager
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
- 
+
     sStatusLED.Init(SYSTEM_STATE_LED);//Initialize buttons
     sLockLED.Init(LOCK_STATE_LED);
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
- 
+
     UpdateClusterState();
- 
+
     ConfigurationMgr().LogDeviceConfig();
- 
+
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     return err;
 }
@@ -107,7 +107,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     ESP_LOGI(TAG, "App Task started");
-   
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
@@ -148,7 +148,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (sHaveServiceConnectivity)
             {
                 sStatusLED.Set(true);
-            } 
+            }
             else if (sHaveBLEConnections)
             {
                 sStatusLED.Blink(100, 100);
@@ -359,19 +359,19 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
 {
     printf("AppTask::StartTimer\n");
     if (xTimerIsTimerActive(sFunctionTimer))
-    {   
+    {
         ESP_LOGI(TAG, "app timer already started!");
         CancelTimer();
-    }   
+    }
 
     // timer is not active, change its period to required value (== restart).
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
-    {   
+    {
         ESP_LOGI(TAG, "app timer start() failed");
         return;
-    }   
+    }
 
     mFunctionTimerActive = true;
 }
@@ -390,9 +390,9 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
         ESP_LOGI(TAG, "Unlock Action has been initiated");
     }
     if (aActor == AppEvent::kEventType_Button)
-    {   
+    {
         sAppTask.mSyncClusterToButtonAction = true;
-    } 
+    }
 
     sLockLED.Blink(50, 50);
 }

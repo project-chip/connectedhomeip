@@ -62,7 +62,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
              endpointId, attributeId);
 
     switch (clusterId)
-    {   
+    {
     case ZCL_ON_OFF_CLUSTER_ID:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
@@ -70,7 +70,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
         break;
-    }   
+    }
 
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
@@ -109,13 +109,13 @@ void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, 
     VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
     if (*value)
-    {   
+    {
         BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::LOCK_ACTION);
-    }   
+    }
     else
-    {   
+    {
         BoltLockMgr().InitiateAction(AppEvent::kEventType_Lock, BoltLockManager::UNLOCK_ACTION);
-    }   
+    }
 exit:
     return;
 }

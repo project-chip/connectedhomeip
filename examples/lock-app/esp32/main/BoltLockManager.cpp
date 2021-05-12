@@ -109,29 +109,29 @@ void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
 {
     printf("BoltLockManager::StartTimer\n");
     if (xTimerIsTimerActive(sLockTimer))
-    {   
+    {
         ESP_LOGI(TAG, "app timer already started!");
         CancelTimer();
-    }   
+    }
 
     // timer is not active, change its period to required value (== restart).
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
-    {   
+    {
         ESP_LOGI(TAG, "sLockTimer timer start() failed");
         return; //CHIP_ERROR_MAX
-    }   
+    }
 }
 
 void BoltLockManager::CancelTimer(void)
 {
     printf("BoltLockManager::CancelTimer\n");
     if (xTimerStop(sLockTimer, 0) == pdFAIL)
-    {   
+    {
         ESP_LOGI(TAG, "Lock timer timer stop() failed");
         return;//CHIP_ERROR_MAX
-    }   
+    }
 }
 void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
 {
@@ -211,4 +211,3 @@ void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
         }
     }
 }
-
