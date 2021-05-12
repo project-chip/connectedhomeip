@@ -31,7 +31,7 @@ def getGlobalTemplatesTargets():
     targets = []
     targets.extend([[str(filepath)] for filepath in Path('./examples').rglob('*.zap')])
     targets.extend([[str(filepath)] for filepath in Path('./src/darwin').rglob('*.zap')])
-    targets.extend([[str(filepath)] for filepath in Path('./src/controller/python').rglob('*.zap')])
+    targets.extend([[str(filepath)] for filepath in Path('./src/controller/controller_clusters').rglob('*.zap')])
     return targets
 
 def getSpecificTemplatesTargets():

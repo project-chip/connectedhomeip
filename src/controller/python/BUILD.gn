@@ -31,15 +31,6 @@ config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
 }
 
-chip_data_model("python_data_model") {
-  cluster_sources = []
-
-  zap_pregenerated_dir = "gen"
-
-  use_default_client_callbacks = true
-  use_default_im_dispatch = false
-}
-
 shared_library("ChipDeviceCtrl") {
   output_name = "_ChipDeviceCtrl"
   output_dir = "${target_out_dir}/chip"
@@ -79,9 +70,9 @@ shared_library("ChipDeviceCtrl") {
   }
 
   public_deps = [
-    ":python_data_model",
     "${chip_root}/src/app",
     "${chip_root}/src/controller",
+    "${chip_root}/src/controller/controller_clusters",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns",
