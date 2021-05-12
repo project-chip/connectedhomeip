@@ -100,6 +100,7 @@ constexpr uint16_t kMdnsPort = 5353;
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
 constexpr uint32_t kMaxCHIPOpCertLength = 1024;
+constexpr uint32_t kOpCSRNonceLength    = 32;
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
@@ -1076,7 +1077,10 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     Callback::Cancelable * successCallback = mOpCSRResponseCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
 
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, ByteSpan(nullptr, 0)));
+    uint8_t CSRNonce[kOpCSRNonceLength];
+    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
+
+    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, ByteSpan(CSRNonce, sizeof(CSRNonce))));
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for CSR response");
     return CHIP_NO_ERROR;
 }
@@ -1084,6 +1088,9 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
 void DeviceCommissioner::OnCSRFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "DeviceCommissioner::OnCSRFailureResponse Response: 0x%02x", status);
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    // TODO: Map error status to correct error code
+    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
 }
 
 void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce,
@@ -1097,6 +1104,8 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
     {
         // Handle error, and notify session failure to the commissioner application.
         ChipLogError(Controller, "Failed to process OperationalCertificateSigningRequest");
+        // TODO: Map error status to correct error code
+        commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
     }
 }
 
@@ -1111,6 +1120,8 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
     ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    // TODO: Validate CSR Nonce and signature
 
     uint32_t opCertLen = 0;
     ChipLogProgress(Controller, "Generating operational certificate for %llx", device->GetDeviceId());
@@ -1180,7 +1191,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mOpCertResponseCallback->Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
 
-    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as it only supports 8 bit strings
+    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
+    // strings.
     if (opCertBuf.size() >= UINT8_MAX)
     {
         ByteSpan tempCertFragment(&opCertBuf.data()[UINT8_MAX], opCertBuf.size() - UINT8_MAX);
@@ -1221,6 +1233,9 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
 void DeviceCommissioner::OnAddOpCertFailureResponse(void * context, uint8_t status)
 {
     ChipLogProgress(Controller, "DeviceCommissioner::OnAddOpCertFailureResponse Response: 0x%02x", status);
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    // TODO: Map error status to correct error code
+    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
 }
 
 void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex,
