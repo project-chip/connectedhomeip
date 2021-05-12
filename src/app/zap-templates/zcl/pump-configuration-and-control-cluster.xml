@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2008,2020 Silicon Labs.
+Copyright (c) 2021 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ limitations under the License.
     <attribute side="server" code="0x0016" define="PUMP_POWER" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" optional="true">power</attribute>
     <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0x00000000" optional="true">lifetime energy consumed</attribute>
     <attribute side="server" code="0x0020" define="OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="false">operation mode</attribute>
-    <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFe" writable="true" default="0x00" optional="true">control mode</attribute>
+    <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">control mode</attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">alarm mask</attribute>
   </cluster>
 
