@@ -44,6 +44,22 @@ private:
     size_t mDataLen;
 };
 
+template <class T, size_t N>
+class FixedSpan
+{
+public:
+    constexpr FixedSpan() : mDataBuf(nullptr) {}
+    constexpr explicit FixedSpan(const T * databuf) : mDataBuf(databuf) {}
+
+    const T * data() const { return mDataBuf; }
+    size_t size() const { return N; }
+
+private:
+    const T * mDataBuf;
+};
+
 using ByteSpan = Span<uint8_t>;
+template <size_t N>
+using FixedByteSpan = FixedSpan<uint8_t, N>;
 
 } // namespace chip
