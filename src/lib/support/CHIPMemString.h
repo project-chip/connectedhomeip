@@ -82,7 +82,9 @@ inline void CopyString(char (&dest)[N], const char * source)
  */
 inline char * MemoryAllocString(const char * string, size_t length)
 {
-    return CopyString(static_cast<char *>(MemoryAlloc(length + 1)), length + 1, string);
+    char * result = static_cast<char *>(MemoryAlloc(length + 1));
+    CopyString(result, length + 1, string);
+    return result;
 }
 
 /**
