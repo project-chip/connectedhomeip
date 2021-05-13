@@ -41,7 +41,8 @@ from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
 from xmlrpc.server import SimpleXMLRPCServer
-
+from enum import Enum
+from typing import Any, Dict,Optional
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
 # possible to run the device manager shell from a non-standard install location,
@@ -70,7 +71,9 @@ elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
 # The exceptions for CHIP Device Controller CLI
-
+class StatusCodeEnum(Enum):
+    SUCCESS = 0
+    FAILED =  1
 
 class ChipDevCtrlException(exceptions.ChipStackException):
     pass
@@ -622,6 +625,21 @@ def echo_alive(message):
     print(message)
     return message
 
+def resolve(fabric_id: int, node_id: int) -> str:
+    try:
+        __check_supported_os()
+        err = device_manager.devCtrl.ResolveNode(fabric_id, node_id)
+        if err == 0:
+            address = device_manager.devCtrl.GetAddressAndPort(int(args[1]))
+            address = "{}:{}".format(
+                *address) if address else "unknown"
+            
+            return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = {'address': address})
+    except exceptions.ChipStackException as ex:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(ex))
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
+
 def ble_scan():
     device_manager.do_blescan("")
     #TODO: Return a list of available devices
@@ -631,6 +649,7 @@ def start_rpc_server():
     with SimpleXMLRPCServer(("0.0.0.0", 5000)) as server:
         server.register_function(echo_alive)
         server.register_function(ble_scan)
+        server.register_function(resolve)
         server.register_multicall_functions()
         print('Serving XML-RPC on localhost port 5000')
         try:
@@ -639,6 +658,22 @@ def start_rpc_server():
             print("\nKeyboard interrupt received, exiting.")
             sys.exit(0)
 
+def __get_response_dict(status: StatusCodeEnum, result: Optional[Dict[Any, Any]] = None, error:Optional[str] = None) -> Dict [Any, Any]:
+    if error is not None:
+        return { "status" : status.value, "error" :f'Unable to connect due to exception {error}' }
+    else:
+        if result is not None:
+            return { "status" : status.value, "result": result}
+        else:
+            return { "status" : status.value}
+
+def __check_supported_os()-> bool:
+    if platform.system() == 'Darwin':
+        raise Exception(platform.system() + " not supported")
+    elif sys.platform.startswith('linux'):
+        return True
+
+    raise Exception("OS Not Supported")
 ######--------------------------------------------------######
 
 def main():
