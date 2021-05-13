@@ -112,11 +112,11 @@
     }
 #define ZAP_EMPTY_DEFAULT()                                                                                                        \
     {                                                                                                                              \
-        (uint8_t *) 0                                                                                                              \
+        (uint16_t) 0                                                                                                               \
     }
 #define ZAP_SIMPLE_DEFAULT(x)                                                                                                      \
     {                                                                                                                              \
-        (uint8_t *) x                                                                                                              \
+        (uint16_t) x                                                                                                               \
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
