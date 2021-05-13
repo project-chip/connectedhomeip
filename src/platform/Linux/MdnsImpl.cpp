@@ -564,13 +564,18 @@ MdnsServiceProtocol GetProtocolInType(const char * type)
     return MdnsServiceProtocol::kMdnsProtocolUnknown;
 }
 
+/// Copies the type from a string containing both type and protocol
+///
+/// e.g. if input is "foo.bar", output is "foo", input is 'a.b._tcp", oputput is "a.b"
 template <size_t N>
-void CopyWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
+void TypeFromTypeAndProtocol(char (&dest)[N], const char * typeAndProtocol)
 {
     const char * dotPos          = strrchr(typeAndProtocol, '.');
     size_t lengthWithoutProtocol = (dotPos != nullptr) ? static_cast<size_t>(dotPos - typeAndProtocol) : N;
 
     Platform::CopyString(dest, typeAndProtocol);
+
+    /// above copied everything including the protocol. Truncate the protocol away.
     if (lengthWithoutProtocol < N)
     {
         dest[lengthWithoutProtocol] = 0;
@@ -597,7 +602,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             MdnsService service = {};
 
             Platform::CopyString(service.mName, name);
-            CopyWithoutProtocol(service.mType, type);
+            TypeFromTypeAndProtocol(service.mType, type);
             service.mProtocol               = GetProtocolInType(type);
             service.mAddressType            = ToAddressType(protocol);
             service.mType[kMdnsTypeMaxSize] = 0;
@@ -675,7 +680,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         ChipLogError(DeviceLayer, "Avahi resolve found");
 
         Platform::CopyString(result.mName, name);
-        CopyWithoutProtocol(result.mType, type);
+        TypeFromTypeAndProtocol(result.mType, type);
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
