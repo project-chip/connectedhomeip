@@ -57,7 +57,7 @@ public:
     /**
      *  @brief Get the TLV Reader
      *
-     *  @param [in] aReader A pointer to a TLVReader
+     *  @param [in] apReader A pointer to a TLVReader
      *
      */
     void GetReader(chip::TLV::TLVReader * const apReader);

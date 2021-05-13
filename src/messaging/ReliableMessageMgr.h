@@ -75,7 +75,7 @@ public:
     /**
      * Return a tick counter value given a time period.
      *
-     * @param[in]  newTime        Timestamp value of in milliseconds.
+     * @param[in]  period        Timestamp value of in milliseconds.
      *
      * @return Tick count for the time period.
      */
@@ -137,9 +137,9 @@ public:
     void PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
 
     /**
-     *  Re-start retranmisttion of cached encryped packet for current entry.
+     *  Re-start retranmisttion of cached encryped packets for the given ReliableMessageContext.
      *
-     *  @param[in]   entry    A pointer to a retransmission table entry added into the table.
+     *  @param[in] rc The ReliableMessageContext to resume retransmission for.
      *
      *  @retval  #CHIP_NO_ERROR On success.
      */

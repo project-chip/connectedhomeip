@@ -117,9 +117,9 @@ public:
 private:
     enum class HandlerState
     {
-        Uninitialized = 0, //< The handler has not been initialized
-        Initialized,       //< The handler has been initialized and is ready
-        Reportable,        //< The handler has received read request and is waiting for the data to send to be available
+        Uninitialized = 0, ///< The handler has not been initialized
+        Initialized,       ///< The handler has been initialized and is ready
+        Reportable,        ///< The handler has received read request and is waiting for the data to send to be available
     };
 
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle aPayload);

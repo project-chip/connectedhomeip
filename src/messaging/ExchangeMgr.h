@@ -89,9 +89,11 @@ public:
     /**
      *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier.
      *
-     *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
+     *  @param[in]    session    The identifier of the secure session (possibly
+     *                           the empty session for a non-secure exchange)
+     *                           for which the ExchangeContext is being set up.
      *
-     *  @param[in]    delegate      A pointer to ExchangeDelegate.
+     *  @param[in]    delegate   A pointer to ExchangeDelegate.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
@@ -103,8 +105,6 @@ public:
      *  invoked for all messages of the given protocol.
      *
      *  @param[in]    protocolId      The protocol identifier of the received message.
-     *
-     *  @param[in]    handler         The unsolicited message handler.
      *
      *  @param[in]    delegate        A pointer to ExchangeDelegate.
      *
