@@ -83,6 +83,7 @@ set(CHIP_TESTS
     -lMinimalMdnstests
     -lMinimalMdnsRecordsTests
     -lMinimalMdnsRespondersTests
+    -lBDXTests
 )
 
 # Link the *whole-archives* to keep the static test objects.
