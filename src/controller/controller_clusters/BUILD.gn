@@ -25,4 +25,3 @@ chip_data_model("controller_clusters") {
 
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
-
