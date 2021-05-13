@@ -66,6 +66,24 @@
                                                                                                                                    \
             /* 252 - Breadcrumb, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: General Diagnostics (server), big-endian */                                                   \
+                                                                                                                                   \
+            /* 260 - NetworkInterfaces, */                                                                                         \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
     }
 
 #else // !BIGENDIAN_CPU
@@ -111,11 +129,29 @@
                                                                                                                                    \
             /* 252 - Breadcrumb, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: General Diagnostics (server), little-endian */                                                \
+                                                                                                                                   \
+            /* 260 - NetworkInterfaces, */                                                                                         \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (9)
+#define GENERATED_DEFAULTS_COUNT (10)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -143,7 +179,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 26
+#define GENERATED_ATTRIBUTE_COUNT 29
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -177,6 +213,11 @@
             /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* cluster revision */                                 \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: General Diagnostics (server) */                                                               \
+            { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(260) }, /* NetworkInterfaces */                             \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },    /* RebootCount */                                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* cluster revision */                              \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                    \
             { 0x0000, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },                                /* max pressure */             \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                /* max speed */                \
@@ -201,7 +242,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 5
+#define GENERATED_CLUSTER_COUNT 6
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -225,7 +266,10 @@
                 0x0031, ZAP_ATTRIBUTE_INDEX(17), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x0200, ZAP_ATTRIBUTE_INDEX(18), 8, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0033, ZAP_ATTRIBUTE_INDEX(18), 3, 258, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+            }, /* Endpoint: 1, Cluster: General Diagnostics (server) */                                                            \
+            {                                                                                                                      \
+                0x0200, ZAP_ATTRIBUTE_INDEX(21), 8, 13, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
     }
 
@@ -234,17 +278,17 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 5, 290 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 6, 548 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
-#define ATTRIBUTE_LARGEST (65)
+#define ATTRIBUTE_LARGEST (255)
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE (254)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (290)
+#define ATTRIBUTE_MAX_SIZE (548)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)

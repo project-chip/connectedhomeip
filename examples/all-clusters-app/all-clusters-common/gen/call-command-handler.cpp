@@ -36,6 +36,7 @@ EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand
 EmberAfStatus emberAfDescriptorClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfDoorLockClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfGeneralDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGroupKeyManagementClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -120,6 +121,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
             result = emberAfGeneralCommissioningClusterServerCommandParse(cmd);
+            break;
+        case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster General Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID:
             // No commands are enabled for cluster Group Key Management
