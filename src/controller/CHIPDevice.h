@@ -324,6 +324,14 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = nullptr;
 #endif
+        if (mExchangeMgr)
+        {
+            // Ensure that any exchange contexts we have open get closed now,
+            // because we don't want them to call back in to us after this
+            // point.
+            mExchangeMgr->CloseAllContextsForDelegate(this);
+        }
+        mExchangeMgr = nullptr;
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
