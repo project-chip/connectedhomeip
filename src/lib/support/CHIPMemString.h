@@ -82,8 +82,9 @@ inline void CopyString(char (&dest)[N], const char * source)
  */
 inline char * MemoryAllocString(const char * string, size_t length)
 {
-    char * result = static_cast<char *>(MemoryAlloc(length + 1));
-    CopyString(result, length + 1, string);
+    size_t lengthWithNull = length + 1;
+    char * result         = static_cast<char *>(MemoryAlloc(lengthWithNull));
+    CopyString(result, lengthWithNull, string);
     return result;
 }
 
@@ -103,7 +104,11 @@ public:
      *                              `length`, then the remaining space will be filled with null bytes. Like
      *                              `strndup()` but unlike `strncpy()`, the result is always null-terminated.
      */
-    ScopedMemoryString(const char * string, size_t length) { CopyString(Alloc(length + 1).Get(), length + 1, string); }
+    ScopedMemoryString(const char * string, size_t length)
+    {
+        size_t lengthWithNull = length + 1;
+        CopyString(Alloc(lengthWithNull).Get(), lengthWithNull, string);
+    }
 };
 
 } // namespace Platform
