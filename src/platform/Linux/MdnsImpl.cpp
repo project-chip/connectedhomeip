@@ -568,7 +568,7 @@ MdnsServiceProtocol GetProtocolInType(const char * type)
 ///
 /// e.g. if input is "foo.bar", output is "foo", input is 'a.b._tcp", oputput is "a.b"
 template <size_t N>
-void TypeFromTypeAndProtocol(char (&dest)[N], const char * typeAndProtocol)
+void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
 {
     const char * dotPos          = strrchr(typeAndProtocol, '.');
     size_t lengthWithoutProtocol = (dotPos != nullptr) ? static_cast<size_t>(dotPos - typeAndProtocol) : N;
@@ -602,7 +602,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             MdnsService service = {};
 
             Platform::CopyString(service.mName, name);
-            TypeFromTypeAndProtocol(service.mType, type);
+            CopyTypeWithoutProtocol(service.mType, type);
             service.mProtocol               = GetProtocolInType(type);
             service.mAddressType            = ToAddressType(protocol);
             service.mType[kMdnsTypeMaxSize] = 0;
@@ -680,7 +680,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         ChipLogError(DeviceLayer, "Avahi resolve found");
 
         Platform::CopyString(result.mName, name);
-        TypeFromTypeAndProtocol(result.mType, type);
+        CopyTypeWithoutProtocol(result.mType, type);
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
