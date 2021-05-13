@@ -40,19 +40,19 @@ namespace Platform {
  *
  * @param[in]  dest             Destination string buffer or nullptr.
  *
- * @param[in]  source           String to be copied.
- *
- * @param[in]  length           Maximum length to be copied. Will need space for null terminator as
+ * @param[in]  destLength       Maximum length to be copied. Will need space for null terminator as
  *                              well (string will be truncated if it does not fit)
+ *
+ * @param[in]  source           String to be copied.
  *
  * @retval  Same as `dest`.
  */
-inline char * CopyString(char * dest, const char * source, size_t length)
+inline char * CopyString(char * dest, size_t destLength, const char * source)
 {
     if (dest)
     {
-        strncpy(dest, source, length);
-        dest[length - 1] = 0;
+        strncpy(dest, source, destLength);
+        dest[destLength - 1] = 0;
     }
     return dest;
 }
@@ -63,7 +63,7 @@ inline char * CopyString(char * dest, const char * source, size_t length)
 template <size_t N>
 inline char * CopyString(char (&dest)[N], const char * source)
 {
-    return CopyString(dest, source, N);
+    return CopyString(dest, N, source);
 }
 
 /**
@@ -82,7 +82,7 @@ inline char * CopyString(char (&dest)[N], const char * source)
  */
 inline char * MemoryAllocString(const char * string, size_t length)
 {
-    return CopyString(static_cast<char *>(MemoryAlloc(length + 1)), string, length);
+    return CopyString(static_cast<char *>(MemoryAlloc(length + 1)), length + 1, string);
 }
 
 /**
@@ -101,7 +101,7 @@ public:
      *                              `length`, then the remaining space will be filled with null bytes. Like
      *                              `strndup()` but unlike `strncpy()`, the result is always null-terminated.
      */
-    ScopedMemoryString(const char * string, size_t length) { CopyString(Alloc(length + 1).Get(), string, length); }
+    ScopedMemoryString(const char * string, size_t length) { CopyString(Alloc(length + 1).Get(), length + 1, string); }
 };
 
 } // namespace Platform
