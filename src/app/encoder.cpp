@@ -4990,6 +4990,8 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * Enum16                                                            | 0x0016 |
 | * OctetString                                                       | 0x0019 |
 | * ListInt8u                                                         | 0x001A |
+| * ListOctetString                                                   | 0x001B |
+| * ListStructOctetString                                             | 0x001C |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5398,6 +5400,26 @@ PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(uint8_t seqNum
 {
     COMMAND_HEADER("ReadTestClusterListInt8u", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001A);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ListOctetString
+ */
+PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterListOctetString", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001B);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ListStructOctetString
+ */
+PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadTestClusterListStructOctetString", TEST_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
     COMMAND_FOOTER();
 }
 

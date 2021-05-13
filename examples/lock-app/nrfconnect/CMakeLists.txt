@@ -60,6 +60,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.cpp
                ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
                ${CHIP_ROOT}/src/app/util/attribute-table.cpp

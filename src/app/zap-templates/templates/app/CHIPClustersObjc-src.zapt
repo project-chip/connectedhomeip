@@ -441,7 +441,9 @@ public:
                   {{#if isArray}}
                   // {{asSymbol label}}: {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}}
                   // Conversion from this type to Objc is not properly implemented yet
-                  {{else if (isShortString type)}}
+                  {{else if (isOctetString type)}}
+                  @"{{asSymbol label}}": [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
+                  {{else if (isCharString type)}}
                   @"{{asSymbol label}}": [NSString stringWithFormat:@"%s", {{asSymbol label}}],
                   {{else}}
                   @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type}}:{{asSymbol label}}],
