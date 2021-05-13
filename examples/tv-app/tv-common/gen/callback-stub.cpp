@@ -77,6 +77,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
         emberAfTargetNavigatorClusterInitCallback(endpoint);
         break;
+    case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+        emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+        break;
     case ZCL_WAKE_ON_LAN_CLUSTER_ID:
         emberAfWakeOnLanClusterInitCallback(endpoint);
         break;
@@ -165,6 +168,11 @@ void __attribute__((weak)) emberAfTvChannelClusterInitCallback(EndpointId endpoi
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

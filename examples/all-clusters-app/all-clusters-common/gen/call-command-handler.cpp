@@ -54,6 +54,7 @@ EmberAfStatus emberAfSwitchClusterServerCommandParse(EmberAfClusterCommand * cmd
 EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTestClusterClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThermostatClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTrustedRootCertificatesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
@@ -181,6 +182,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_THERMOSTAT_CLUSTER_ID:
             // No commands are enabled for cluster Thermostat
+            result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Thread Network Diagnostics
             result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID:

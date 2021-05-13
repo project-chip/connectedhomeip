@@ -59,6 +59,7 @@ EmberAfStatus emberAfTargetNavigatorClusterClientCommandParse(EmberAfClusterComm
 EmberAfStatus emberAfTemperatureMeasurementClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTestClusterClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThermostatClusterClientCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfThreadNetworkDiagnosticsClusterClientCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWakeOnLanClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
@@ -197,6 +198,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_THERMOSTAT_CLUSTER_ID:
             result = emberAfThermostatClusterClientCommandParse(cmd);
+            break;
+        case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Thread Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_WAKE_ON_LAN_CLUSTER_ID:
             // No commands are enabled for cluster Wake on LAN

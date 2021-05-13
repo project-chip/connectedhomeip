@@ -186,6 +186,13 @@
 #define CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER
 #endif
 
+#if defined(ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                       \
+    { ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID, 53, "Thread Network Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     { ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID, 54, "WiFi Network Diagnostics" },
@@ -927,6 +934,7 @@
     CHIP_PRINTCLUSTER_GENERAL_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_NETWORK_COMMISSIONING_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
