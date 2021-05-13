@@ -43,7 +43,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
 
     // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
     // at any one time.
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
     // Create a new exchange context.
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
@@ -61,7 +61,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ClearExistingExchangeContext();
+        AbortExistingExchangeContext();
     }
     ChipLogFunctError(err);
 

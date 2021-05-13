@@ -39,7 +39,7 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Interact
     mpDelegate    = apDelegate;
     mState        = ClientState::Initialized;
 
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
 exit:
     ChipLogFunctError(err);
@@ -48,7 +48,7 @@ exit:
 
 void ReadClient::Shutdown()
 {
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
     mpExchangeMgr = nullptr;
     mpDelegate    = nullptr;
     MoveToState(ClientState::Uninitialized);
@@ -91,7 +91,7 @@ CHIP_ERROR ReadClient::SendReadRequest(NodeId aNodeId, Transport::AdminId aAdmin
 
     // Discard any existing exchange context. Effectively we can only have one exchange per ReadClient
     // at any one time.
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
     {
         System::PacketBufferTLVWriter writer;
@@ -181,7 +181,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ClearExistingExchangeContext();
+        AbortExistingExchangeContext();
     }
 
     return err;
@@ -220,7 +220,7 @@ exit:
     return;
 }
 
-CHIP_ERROR ReadClient::ClearExistingExchangeContext()
+CHIP_ERROR ReadClient::AbortExistingExchangeContext()
 {
     if (mpExchangeCtx != nullptr)
     {
@@ -315,7 +315,7 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive report data from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
     MoveToState(ClientState::Initialized);
     if (nullptr != mpDelegate)
     {

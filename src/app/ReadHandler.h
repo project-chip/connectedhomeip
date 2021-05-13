@@ -128,7 +128,7 @@ private:
     void MoveToState(const HandlerState aTargetState);
 
     const char * GetStateStr() const;
-    CHIP_ERROR ClearExistingExchangeContext();
+    CHIP_ERROR AbortExistingExchangeContext();
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;

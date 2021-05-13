@@ -115,7 +115,7 @@ private:
 
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle aPayload);
-    CHIP_ERROR ClearExistingExchangeContext();
+    CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
