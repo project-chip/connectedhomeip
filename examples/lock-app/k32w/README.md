@@ -148,19 +148,19 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application either with Secure Element or without
-    -  with Secure Element
+    -   with Secure Element
 
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
-user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
-```
+        ```
+        user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
+        user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
+        user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
+        user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
+        user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
+        user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
+        user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
+        ```
 
-    -  without Secure element
+    -   without Secure element
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
