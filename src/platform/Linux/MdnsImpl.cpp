@@ -579,13 +579,16 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         if (strcmp("local", domain) == 0)
         {
             MdnsService service = {};
+            char typeAndProtocol[kMdnsTypeAndProtocolMaxSize + 1];
 
             strncpy(service.mName, name, sizeof(service.mName));
-            strncpy(service.mType, type, sizeof(service.mType));
             service.mName[kMdnsNameMaxSize] = 0;
+            strncpy(typeAndProtocol, type, sizeof(typeAndProtocol));
+            typeAndProtocol[kMdnsTypeAndProtocolMaxSize] = 0;
+            service.mProtocol    = TruncateProtocolInType(typeAndProtocol);
+            service.mAddressType = ToAddressType(protocol);
+            strncpy(service.mType, typeAndProtocol, sizeof(service.mType));
             service.mType[kMdnsTypeMaxSize] = 0;
-            service.mProtocol               = TruncateProtocolInType(service.mType);
-            service.mAddressType            = ToAddressType(protocol);
             context->mServices.push_back(service);
         }
         break;
@@ -655,16 +658,19 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         break;
     case AVAHI_RESOLVER_FOUND:
         MdnsService result = {};
+        char typeAndProtocol[kMdnsTypeAndProtocolMaxSize + 1];
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
         strncpy(result.mName, name, sizeof(result.mName));
-        strncpy(result.mType, type, sizeof(result.mType));
         result.mName[kMdnsNameMaxSize] = 0;
+        strncpy(typeAndProtocol, type, sizeof(typeAndProtocol));
+        typeAndProtocol[kMdnsTypeAndProtocolMaxSize] = 0;
+        result.mProtocol    = TruncateProtocolInType(typeAndProtocol);
+        result.mPort        = port;
+        result.mAddressType = ToAddressType(protocol);
+        strncpy(result.mType, typeAndProtocol, sizeof(result.mType));
         result.mType[kMdnsTypeMaxSize] = 0;
-        result.mProtocol               = TruncateProtocolInType(result.mType);
-        result.mPort                   = port;
-        result.mAddressType            = ToAddressType(protocol);
 
         if (address)
         {
