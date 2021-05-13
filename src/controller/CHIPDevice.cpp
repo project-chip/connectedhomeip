@@ -145,7 +145,9 @@ CHIP_ERROR Device::SendCommands()
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(mSecureSession, mCommandSender);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_NO_MEMORY);
+    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId, exchange);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
