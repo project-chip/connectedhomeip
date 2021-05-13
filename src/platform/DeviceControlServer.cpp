@@ -28,6 +28,12 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+void CommissioningTimerFunction(System::Layer * layer, void * aAppState, System::Error aError)
+{
+    DeviceControlServer * server = reinterpret_cast<DeviceControlServer *>(aAppState);
+    server->CommissioningFailedTimerComplete(aError);
+}
+
 DeviceControlServer DeviceControlServer::sInstance;
 
 DeviceControlServer & DeviceControlServer::DeviceControlSvr()
@@ -35,10 +41,19 @@ DeviceControlServer & DeviceControlServer::DeviceControlSvr()
     return sInstance;
 }
 
+void DeviceControlServer::CommissioningFailedTimerComplete(System::Error aError)
+{
+    ChipDeviceEvent event;
+    event.Type                         = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.status = CHIP_ERROR_TIMEOUT;
+    PlatformMgr().PostEvent(&event);
+}
+
 CHIP_ERROR DeviceControlServer::ArmFailSafe(uint16_t expiryLengthSeconds)
 {
-    // TODO
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    uint32_t timerMs = expiryLengthSeconds * 1000;
+    SystemLayer.StartTimer(timerMs, CommissioningTimerFunction, this);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::DisarmFailSafe()
@@ -49,8 +64,12 @@ CHIP_ERROR DeviceControlServer::DisarmFailSafe()
 
 CHIP_ERROR DeviceControlServer::CommissioningComplete()
 {
-    // TODO
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    SystemLayer.CancelTimer(CommissioningTimerFunction, this);
+    ChipDeviceEvent event;
+    event.Type                         = DeviceEventType::kCommissioningComplete;
+    event.CommissioningComplete.status = CHIP_NO_ERROR;
+    PlatformMgr().PostEvent(&event);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceControlServer::SetRegulatoryConfig(uint8_t location, const char * countryCode, uint64_t breadcrumb)

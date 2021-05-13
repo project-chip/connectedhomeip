@@ -429,7 +429,7 @@ public:
 
     ~CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge() {};
 
-    static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
+    static void CallbackFn(void * context{{#zcl_command_arguments}}{{#unless (isStrEqual label "status")}}, {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}} {{asSymbol label}}{{/unless}}{{/zcl_command_arguments}})
     {
         CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge * callback = reinterpret_cast<CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}CallbackBridge *>(context);
         if (callback && callback->mQueue)
@@ -439,9 +439,11 @@ public:
                   {{#zcl_command_arguments}}
                   {{#unless (isStrEqual label "status")}}
                   {{#if isArray}}
-                  // {{asSymbol label}}: {{asUnderlyingZclType type}}
+                  // {{asSymbol label}}: {{#if (isOctetString type)}}chip::ByteSpan{{else}}{{asUnderlyingZclType type}}{{/if}}
                   // Conversion from this type to Objc is not properly implemented yet
-                  {{else if (isShortString type)}}
+                  {{else if (isOctetString type)}}
+                  @"{{asSymbol label}}": [NSData dataWithBytes:{{asSymbol label}}.data() length:{{asSymbol label}}.size()],
+                  {{else if (isCharString type)}}
                   @"{{asSymbol label}}": [NSString stringWithFormat:@"%s", {{asSymbol label}}],
                   {{else}}
                   @"{{asSymbol label}}": [NSNumber numberWith{{asObjectiveCNumberType label type}}:{{asSymbol label}}],

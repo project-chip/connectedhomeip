@@ -79,9 +79,9 @@ private:
 
     enum class ClientState
     {
-        Uninitialized = 0, //< The client has not been initialized
-        Initialized,       //< The client has been initialized and is ready for a SendReadRequest
-        AwaitingResponse,  //< The client has sent out the read request message
+        Uninitialized = 0, ///< The client has not been initialized
+        Initialized,       ///< The client has been initialized and is ready for a SendReadRequest
+        AwaitingResponse,  ///< The client has sent out the read request message
     };
 
     /**

@@ -456,6 +456,12 @@
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
 
+// Attribute ids for cluster: Trusted Root Certificates
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Shade Configuration
 
 // Client attributes
@@ -1281,6 +1287,8 @@
 #define ZCL_ENUM16_ATTRIBUTE_ID (0x0016)
 #define ZCL_OCTET_STRING_ATTRIBUTE_ID (0x0019)
 #define ZCL_LIST_ATTRIBUTE_ID (0x001A)
+#define ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID (0x001B)
+#define ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID (0x001C)
 
 // Attribute ids for cluster: Generic Tunnel
 

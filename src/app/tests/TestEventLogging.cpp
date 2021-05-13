@@ -35,6 +35,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <support/ErrorStr.h>
 #include <support/UnitTestRegistration.h>
@@ -63,6 +64,7 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 chip::SecureSessionMgr gSessionManager;
 chip::Messaging::ExchangeManager gExchangeManager;
+chip::secure_channel::MessageCounterManager gMessageCounterManager;
 
 void InitializeChip(nlTestSuite * apSuite)
 {
@@ -78,10 +80,13 @@ void InitializeChip(nlTestSuite * apSuite)
 
     gSystemLayer.Init(nullptr);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &gSystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = gExchangeManager.Init(&gSessionManager);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

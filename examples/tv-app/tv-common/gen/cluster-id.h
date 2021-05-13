@@ -107,6 +107,9 @@
 // Definitions for cluster: Operational Credentials
 #define ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID (0x003E)
 
+// Definitions for cluster: Trusted Root Certificates
+#define ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID (0x003F)
+
 // Definitions for cluster: Shade Configuration
 #define ZCL_SHADE_CONFIG_CLUSTER_ID (0x0100)
 

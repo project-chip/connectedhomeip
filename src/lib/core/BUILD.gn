@@ -56,7 +56,6 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MEMORY_DEBUG_CHECKS=${chip_config_memory_debug_checks}",
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
-    "CHIP_ENABLE_INTERACTION_MODEL=${chip_enable_interaction_model}",
   ]
 }
 

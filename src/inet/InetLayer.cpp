@@ -48,6 +48,8 @@
 
 #include "InetFaultInjection.h"
 
+#include <platform/LockTracker.h>
+
 #include <system/SystemTimer.h>
 
 #include <support/CodeUtils.h>
@@ -535,6 +537,8 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
  */
 INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEndPoint ** retEndPoint)
 {
+    assertChipStackLockedByCurrentThread();
+
     *retEndPoint = nullptr;
 
     VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
@@ -573,6 +577,8 @@ INET_ERROR InetLayer::NewRawEndPoint(IPVersion ipVer, IPProtocol ipProto, RawEnd
  */
 INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
 {
+    assertChipStackLockedByCurrentThread();
+
     *retEndPoint = nullptr;
 
     VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
@@ -611,6 +617,8 @@ INET_ERROR InetLayer::NewTCPEndPoint(TCPEndPoint ** retEndPoint)
  */
 INET_ERROR InetLayer::NewUDPEndPoint(UDPEndPoint ** retEndPoint)
 {
+    assertChipStackLockedByCurrentThread();
+
     *retEndPoint = nullptr;
 
     VerifyOrReturnError(State == kState_Initialized, INET_ERROR_INCORRECT_STATE);
@@ -777,6 +785,8 @@ INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNam
 INET_ERROR InetLayer::ResolveHostAddress(const char * hostName, uint16_t hostNameLen, uint8_t options, uint8_t maxAddrs,
                                          IPAddress * addrArray, DNSResolveCompleteFunct onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     INET_ERROR err         = INET_NO_ERROR;
     DNSResolver * resolver = nullptr;
 
@@ -867,6 +877,8 @@ exit:
  */
 void InetLayer::CancelResolveHostAddress(DNSResolveCompleteFunct onComplete, void * appState)
 {
+    assertChipStackLockedByCurrentThread();
+
     if (State != kState_Initialized)
         return;
 
@@ -1016,6 +1028,8 @@ void InetLayer::HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, voi
 chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarget, chip::System::EventType aEventType,
                                                     uintptr_t aArgument)
 {
+    assertChipStackLockedByCurrentThread();
+
     VerifyOrReturnError(INET_IsInetEvent(aEventType), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
     // Dispatch the event according to its type.
@@ -1100,6 +1114,8 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
  */
 void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfds, struct timeval & sleepTimeTV)
 {
+    assertChipStackLockedByCurrentThread();
+
     if (State != kState_Initialized)
         return;
 
@@ -1160,6 +1176,8 @@ void InetLayer::PrepareSelect(int & nfds, fd_set * readfds, fd_set * writefds, f
  */
 void InetLayer::HandleSelectResult(int selectRes, fd_set * readfds, fd_set * writefds, fd_set * exceptfds)
 {
+    assertChipStackLockedByCurrentThread();
+
     if (State != kState_Initialized)
         return;
 

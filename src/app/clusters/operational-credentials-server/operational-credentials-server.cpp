@@ -208,7 +208,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(chip::app::Command
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     AdminPairingInfo * admin;
     AdminId adminId;
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Fetch matching admin
     admin = GetGlobalAdminPairingTable().FindAdminForNode(fabricId, nodeId, vendorId);
@@ -263,8 +263,7 @@ bool emberAfOperationalCredentialsClusterSetFabricCallback(chip::app::Command * 
 
         SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
         writer = commandObj->GetCommandDataElementTLVWriter();
-        SuccessOrExit(
-            err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSessionHandle().GetPeerNodeId()));
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), commandObj->GetExchangeContext()->GetSecureSession().GetPeerNodeId()));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 

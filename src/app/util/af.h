@@ -82,8 +82,8 @@
  * or NULL if attribute was not found.
  *
  * @param endpoint Zigbee endpoint number.
- * @param cluster Cluster ID of the sought cluster.
- * @param attribute Attribute ID of the sought attribute.
+ * @param clusterId Cluster ID of the sought cluster.
+ * @param attributeId Attribute ID of the sought attribute.
  * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
  *
  * @return Returns pointer to the attribute metadata location.
@@ -261,9 +261,9 @@ EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(chip::EndpointId e
  *
  * @param endpoint Zigbee endpoint number
  * @param cluster Cluster ID of the sought cluster.
- * @param attribute Attribute ID of the sought attribute.
+ * @param attributeID Attribute ID of the sought attribute.
  * @param mask CLUSTER_MASK_SERVER or CLUSTER_MASK_CLIENT
- * @param buffer Location where attribute will be written from.
+ * @param dataPtr Location where attribute will be written from.
  * @param dataType ZCL attribute type.
  */
 EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
@@ -1162,8 +1162,8 @@ EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * contr
  * @brief A function used to retrieve the number of milliseconds until
  * the next event scheduled in the application framework's event
  * mechanism.
- * @param maxMs, the maximum number of milliseconds until the next
- *        event.
+ * @param maxMs the maximum number of milliseconds until the next
+ *              event.
  * @return The number of milliseconds until the next event or
  * maxMs if no event is scheduled before then.
  */

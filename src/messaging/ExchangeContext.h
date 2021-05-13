@@ -59,7 +59,6 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
-    friend class MessageCounterSyncMgr;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -92,13 +91,14 @@ public:
      *                                                       network layer.
      */
     CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
-                           const SendFlags & sendFlags);
+                           const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone));
 
     /**
      * A strongly-message-typed version of SendMessage.
      */
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload, const SendFlags & sendFlags)
+    CHIP_ERROR SendMessage(MessageType msgType, System::PacketBufferHandle && msgPayload,
+                           const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone))
     {
         static_assert(std::is_same<std::underlying_type_t<MessageType>, uint8_t>::value, "Enum is wrong size; cast is not safe");
         return SendMessage(Protocols::MessageTypeTraits<MessageType>::ProtocolId(), static_cast<uint8_t>(msgType),
@@ -151,12 +151,6 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void SetAppState(void * state) { mAppState = state; }
-
-    void * GetAppState() const { return mAppState; }
-
-    SecureSessionHandle GetSecureSessionHandle() const { return mSecureSession; }
-
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
@@ -172,7 +166,6 @@ private:
     ExchangeDelegateBase * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr   = nullptr;
     ExchangeACL * mExchangeACL       = nullptr;
-    void * mAppState                 = nullptr;
 
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
@@ -217,12 +210,6 @@ private:
 
     CHIP_ERROR StartResponseTimer();
 
-    /**
-     * A subset of SendMessage functionality that does not perform message
-     * counter sync for group keys.
-     */
-    CHIP_ERROR SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgBuf,
-                               const SendFlags & sendFlags, Transport::PeerConnectionState * state = nullptr);
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 

@@ -28,7 +28,6 @@
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
-#include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
@@ -90,9 +89,11 @@ public:
     /**
      *  Creates a new ExchangeContext with a given peer CHIP node specified by the peer node identifier.
      *
-     *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
+     *  @param[in]    session    The identifier of the secure session (possibly
+     *                           the empty session for a non-secure exchange)
+     *                           for which the ExchangeContext is being set up.
      *
-     *  @param[in]    delegate      A pointer to ExchangeDelegate.
+     *  @param[in]    delegate   A pointer to ExchangeDelegate.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
@@ -104,8 +105,6 @@ public:
      *  invoked for all messages of the given protocol.
      *
      *  @param[in]    protocolId      The protocol identifier of the received message.
-     *
-     *  @param[in]    handler         The unsolicited message handler.
      *
      *  @param[in]    delegate        A pointer to ExchangeDelegate.
      *
@@ -192,7 +191,6 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
     Transport::AdminId GetAdminId() { return mAdminId; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
@@ -233,7 +231,6 @@ private:
     ExchangeMgrDelegate * mDelegate;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
-    MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     Transport::AdminId mAdminId = 0;
 
@@ -259,8 +256,6 @@ private:
 
     // TransportMgrDelegate interface for rendezvous sessions
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf) override;
-
-    CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf) override;
 };
 
 } // namespace Messaging

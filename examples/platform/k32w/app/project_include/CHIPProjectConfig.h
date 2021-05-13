@@ -27,14 +27,6 @@
 
 #pragma once
 
-#if BUILD_RELEASE // release build
-
-// Security and Authentication enabled for release build.
-#define CHIP_CONFIG_SECURITY_TEST_MODE 0
-#define CHIP_CONFIG_REQUIRE_AUTH 1
-
-#else // development build
-
 // Security and Authentication disabled for development build.
 // For convenience, enable CHIP Security Test Mode and disable the requirement for
 // authentication in various protocols.
@@ -51,7 +43,7 @@
  *
  * This option is for testing only and should be disabled in production releases.
  */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
+//#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
 
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -67,8 +59,6 @@
  * is found in CHIP NV storage.
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-#endif // BUILD_RELEASE
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
@@ -92,7 +82,11 @@
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
  * This value is generally *not* incremented for device software revisions.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 100
+
+#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING "v0.1.0"
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
@@ -102,8 +96,21 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "04-2020-te2"
 #endif
+
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 42020
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "NXP Semiconductors"
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "NXP Demo App"
+#endif
+
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *

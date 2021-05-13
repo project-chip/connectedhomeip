@@ -41,6 +41,10 @@
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY 4
 #define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY 5
 
+#define CHIP_DEVICE_CONFIG_ENABLE_MDNS 1
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
+#define CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES 1
+
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to the platform.

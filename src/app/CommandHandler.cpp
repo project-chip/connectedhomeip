@@ -62,7 +62,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     SuccessOrExit(err);
 
     MoveToState(CommandState::Sending);

@@ -84,37 +84,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
-
-    // If a group message is to be transmitted to a destination node whose message counter is unknown.
-    if (state != nullptr && ChipKeyId::IsAppGroupKey(state->GetLocalKeyID()) && !state->IsPeerMsgCounterSynced())
-    {
-        MessageCounterSyncMgr * messageCounterSyncMgr = mExchangeMgr->GetMessageCounterSyncMgr();
-        VerifyOrReturnError(messageCounterSyncMgr != nullptr, CHIP_ERROR_INTERNAL);
-
-        // Queue the message as needed for sync with destination node.
-        err = messageCounterSyncMgr->AddToRetransmissionTable(protocolId, msgType, sendFlags, std::move(msgBuf), this);
-        ReturnErrorOnFailure(err);
-
-        // Initiate message counter synchronization if no message counter synchronization is in progress.
-        if (!state->IsMsgCounterSyncInProgress())
-        {
-            err = mExchangeMgr->GetMessageCounterSyncMgr()->SendMsgCounterSyncReq(mSecureSession);
-        }
-    }
-    else
-    {
-        err = SendMessageImpl(protocolId, msgType, std::move(msgBuf), sendFlags, state);
-    }
-
-    return err;
-}
-
-CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
-                                            const SendFlags & sendFlags, Transport::PeerConnectionState * state)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
@@ -125,8 +94,9 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = true;
 
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    if (state && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
+    if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
         reliableTransmissionRequested = false;
     }
@@ -297,7 +267,6 @@ void ExchangeContext::Free()
 
     DoClose(false);
     mExchangeMgr = nullptr;
-    mAppState    = nullptr;
 
     em->DecrementContextsInUse();
 

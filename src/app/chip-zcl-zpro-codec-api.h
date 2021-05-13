@@ -60,6 +60,8 @@
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
 | Thermostat                                                          | 0x0201 |
+| TrustedRootCertificates                                             | 0x003F |
+| TrustedRootCertificates                                             | 0x003F |
 | WakeOnLan                                                           | 0x0503 |
 | WindowCovering                                                      | 0x0102 |
 \*----------------------------------------------------------------------------*/
@@ -2900,6 +2902,8 @@ encodeTemperatureMeasurementClusterReadClusterRevisionAttribute(uint8_t seqNum, 
 | * Enum16                                                            | 0x0016 |
 | * OctetString                                                       | 0x0019 |
 | * ListInt8u                                                         | 0x001A |
+| * ListOctetString                                                   | 0x001B |
+| * ListStructOctetString                                             | 0x001C |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3149,6 +3153,20 @@ chip::System::PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(
 
 /**
  * @brief
+ *    Encode a Test Cluster server read command for the list_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttribute(uint8_t seqNum,
+                                                                                      chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Test Cluster server read command for the list_struct_octet_string attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(uint8_t seqNum,
+                                                                                            chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
  *    Encode a Test Cluster server read command for the cluster revision attribute into buffer including the APS frame
  */
 chip::System::PacketBufferHandle encodeTestClusterClusterReadClusterRevisionAttribute(uint8_t seqNum,
@@ -3299,6 +3317,47 @@ encodeThermostatClusterWriteSystemModeAttribute(uint8_t seqNum, chip::EndpointId
  */
 chip::System::PacketBufferHandle encodeThermostatClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                      chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster TrustedRootCertificates                                     | 0x003F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * AddTrustedRootCertificate                                         |   0x00 |
+| * RemoveTrustedRootCertificate                                      |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an AddTrustedRootCertificate command for Trusted Root Certificates server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTrustedRootCertificatesClusterAddTrustedRootCertificateCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                     chip::ByteSpan rootCertificate);
+
+/**
+ * @brief
+ *    Encode an RemoveTrustedRootCertificate command for Trusted Root Certificates server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTrustedRootCertificatesClusterRemoveTrustedRootCertificateCommand(uint8_t seqNum, chip::EndpointId destinationEndpoint,
+                                                                        chip::ByteSpan trustedRootIdentifier);
+
+/**
+ * @brief
+ *    Encode a Trusted Root Certificates server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeTrustedRootCertificatesClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                        chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Trusted Root Certificates server read command for the cluster revision attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeTrustedRootCertificatesClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |

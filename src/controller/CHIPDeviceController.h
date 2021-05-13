@@ -36,6 +36,7 @@
 #include <core/CHIPTLV.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
@@ -72,9 +73,7 @@ struct ControllerInitParams
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
-#if CHIP_ENABLE_INTERACTION_MODEL
     app::InteractionModelDelegate * imDelegate = nullptr;
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
@@ -121,6 +120,26 @@ struct CommissionerInitParams : public ControllerInitParams
     DevicePairingDelegate * pairingDelegate = nullptr;
 
     OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
+};
+
+/**
+ * @brief
+ * Used for make current OnSuccessCallback & OnFailureCallback works when interaction model landed, it will be removed
+ * after #6308 is landed.
+ */
+class DeviceControllerInteractionModelDelegate : public chip::app::InteractionModelDelegate
+{
+public:
+    CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
+                                     const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
+                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
+                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
+
+    CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
+
+    CHIP_ERROR CommandResponseError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+
+    CHIP_ERROR CommandResponseProcessed(const app::CommandSender * apCommandSender) override;
 };
 
 /**
@@ -229,9 +248,14 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
+    secure_channel::MessageCounterManager * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
+    DeviceControllerInteractionModelDelegate * mDefaultIMDelegate;
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
+    // TODO(cecille): Make this configuarable.
+    static constexpr int kMaxCommissionableNodes = 10;
+    Mdns::CommissionableNodeData mCommissionableNodes[kMaxCommissionableNodes];
 #endif
     Inet::InetLayer * mInetLayer;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -266,6 +290,7 @@ private:
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData) override;
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
+    void OnCommissionableNodeFound(const chip::Mdns::CommissionableNodeData & nodeData) override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
@@ -367,6 +392,38 @@ public:
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR CloseBleConnection();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_MDNS
+    /**
+     * @brief
+     *   Discover devices advertising as commissionable that match the long discriminator.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverCommissioningLongDiscriminator(uint16_t long_discriminator);
+
+    /**
+     * @brief
+     *   Discover all devices advertising as commissionable.
+     *   Should be called on main loop thread.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR DiscoverAllCommissioning();
+
+    /**
+     * @brief
+     *   Returns information about discovered devices.
+     *   Should be called on main loop thread.
+     * @return const CommissionableNodeData* info about the selected device. May be nullptr if no information has been returned yet.
+     */
+    const Mdns::CommissionableNodeData * GetDiscoveredDevice(int idx);
+
+    /**
+     * @brief
+     *   Returns the max number of commissionable nodes this commissioner can track mdns information for.
+     * @return int  The max number of commissionable nodes supported
+     */
+    int GetMaxCommissionableNodesSupported() { return kMaxCommissionableNodes; }
+
 #endif
 
 private:

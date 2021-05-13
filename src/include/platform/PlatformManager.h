@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
@@ -49,6 +50,7 @@ class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
 namespace Internal {
+class DeviceControlServer;
 class FabricProvisioningServer;
 class ServiceProvisioningServer;
 class BLEManagerImpl;
@@ -94,6 +96,10 @@ public:
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
 
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+    bool IsChipStackLockedByCurrentThread() const;
+#endif
+
 private:
     bool mInitialized = false;
     // ===== Members for internal use by the following friends.
@@ -104,6 +110,7 @@ private:
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
+    friend class Internal::DeviceControlServer;
     friend class Internal::FabricProvisioningServer;
     friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
@@ -179,6 +186,13 @@ extern PlatformManagerImpl & PlatformMgrImpl();
 
 namespace chip {
 namespace DeviceLayer {
+
+#if defined(CHIP_STACK_LOCK_TRACKING_ENABLED)
+inline bool PlatformManager::IsChipStackLockedByCurrentThread() const
+{
+    return static_cast<const ImplClass *>(this)->_IsChipStackLockedByCurrentThread();
+}
+#endif
 
 inline CHIP_ERROR PlatformManager::InitChipStack()
 {

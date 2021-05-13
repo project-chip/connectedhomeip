@@ -19,9 +19,16 @@
 
 #pragma once
 
+#include <app/Command.h>
+#include <app/util/af-enums.h>
 #include <gen/af-structs.h>
 #include <inttypes.h>
 #include <lib/support/Span.h>
+
+// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+// instead of IM status code.
+// #6308 should handle IM error code on the application side, either modify this function or remove this.
+bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
 
 // Global Response Callbacks
 typedef void (*DefaultSuccessCallback)(void * context);
@@ -94,6 +101,11 @@ typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(v
                                                                                uint8_t * debugText);
 typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
                                                                              uint8_t * debugText);
+typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan CSR, chip::ByteSpan CSRNonce,
+                                                                   chip::ByteSpan VendorReserved1, chip::ByteSpan VendorReserved2,
+                                                                   chip::ByteSpan VendorReserved3, chip::ByteSpan Signature);
+typedef void (*OperationalCredentialsClusterOpCertResponseCallback)(void * context, uint8_t StatusCode, uint64_t FabricIndex,
+                                                                    uint8_t * DebugText);
 typedef void (*OperationalCredentialsClusterSetFabricResponseCallback)(void * context, chip::FabricId FabricId);
 typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint16_t groupId, uint8_t sceneId);
 typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t capacity, uint16_t groupId,
@@ -116,3 +128,6 @@ typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, ui
 typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);
 typedef void (*OperationalCredentialsFabricsListListAttributeCallback)(void * context, uint16_t count, _FabricDescriptor * entries);
 typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
+typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
+typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
+                                                                      _TestListStructOctet * entries);

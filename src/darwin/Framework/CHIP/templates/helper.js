@@ -34,6 +34,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
   case 'OperationalCredentials':
+  case 'TrustedRootCertificates':
     return 0;
   }
 

@@ -35,10 +35,11 @@
 namespace chip {
 namespace Mdns {
 
-static constexpr uint8_t kMdnsNameMaxSize         = 33;    // [Node]-[Fabric] ID in hex - 16+1+16
-static constexpr uint8_t kMdnsProtocolTextMaxSize = 4 + 1; // "_tcp" or "_udp"
-static constexpr uint8_t kMdnsTypeMaxSize         = 10;    // "_chip", "_chipc" or "_chipd"
-static constexpr uint16_t kMdnsTextMaxSize        = 64;
+static constexpr uint8_t kMdnsNameMaxSize            = 33; // [Node]-[Fabric] ID in hex - 16+1+16
+static constexpr uint8_t kMdnsProtocolTextMaxSize    = 4;  // "_tcp" or "_udp"
+static constexpr uint8_t kMdnsTypeMaxSize            = 6;  // "_chip", "_chipc" or "_chipd"
+static constexpr uint8_t kMdnsTypeAndProtocolMaxSize = kMdnsTypeMaxSize + kMdnsProtocolTextMaxSize + 1; // <type>.<protocol>
+static constexpr uint16_t kMdnsTextMaxSize           = 64;
 
 enum class MdnsServiceProtocol : uint8_t
 {

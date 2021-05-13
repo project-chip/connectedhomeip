@@ -27,6 +27,16 @@ namespace {
 constexpr uint16_t kWaitDurationInSeconds = 10;
 } // namespace
 
+void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
+                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
+{
+    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
+                  aCommandId, aEndPointId);
+    ChipLogError(
+        Controller,
+        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
+}
+
 CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -49,10 +59,9 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
     err = mCommissioner.GetDevice(remoteId, &mDevice);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init failure! No pairing for device: %" PRIu64, localId));
 
+    UpdateWaitForResponse(true);
     err = SendCommand(mDevice, mEndPointId);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
-
-    UpdateWaitForResponse(true);
     WaitForResponse(kWaitDurationInSeconds);
 
     VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);

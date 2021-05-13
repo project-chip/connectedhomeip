@@ -723,9 +723,9 @@ typedef enum
 typedef enum
 {
     EMBER_AF_OK_TO_SLEEP,
-    /** @deprecated. */
+    /** deprecated. */
     EMBER_AF_OK_TO_HIBERNATE = EMBER_AF_OK_TO_SLEEP,
-    /** @deprecated. */
+    /** deprecated. */
     EMBER_AF_OK_TO_NAP,
     EMBER_AF_STAY_AWAKE,
 } EmberAfEventSleepControl;

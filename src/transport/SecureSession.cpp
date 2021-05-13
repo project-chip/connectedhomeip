@@ -48,11 +48,17 @@ constexpr uint8_t RSEKeysInfo[] = { 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x
 
 using namespace Crypto;
 
+#ifdef ENABLE_HSM_HKDF
+using HKDF_sha_crypto = HKDF_shaHSM;
+#else
+using HKDF_sha_crypto = HKDF_sha;
+#endif
+
 SecureSession::SecureSession() : mKeyAvailable(false) {}
 
 CHIP_ERROR SecureSession::InitFromSecret(const ByteSpan & secret, const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
-
+    HKDF_sha_crypto mHKDF;
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(secret.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secret.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -68,7 +74,7 @@ CHIP_ERROR SecureSession::InitFromSecret(const ByteSpan & secret, const ByteSpan
     }
 
     ReturnErrorOnFailure(
-        HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info, infoLen, &mKeys[0][0], sizeof(mKeys)));
+        mHKDF.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info, infoLen, &mKeys[0][0], sizeof(mKeys)));
 
     mKeyAvailable = true;
     mSessionRole  = role;

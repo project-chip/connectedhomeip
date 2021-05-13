@@ -421,6 +421,25 @@
 
 // Server attributes
 
+// Attribute ids for cluster: WiFi Network Diagnostics
+
+// Client attributes
+
+// Server attributes
+#define ZCL_BSSID_ATTRIBUTE_ID (0x0000)
+#define ZCL_SECURITY_TYPE_ATTRIBUTE_ID (0x0001)
+#define ZCL_WIFI_VERSION_ATTRIBUTE_ID (0x0002)
+#define ZCL_CHANNEL_NUMBER_ATTRIBUTE_ID (0x0003)
+#define ZCL_RSSI_ATTRIBUTE_ID (0x0004)
+#define ZCL_BEACON_LOST_COUNT_ATTRIBUTE_ID (0x0005)
+#define ZCL_BEACON_RX_COUNT_ATTRIBUTE_ID (0x0006)
+#define ZCL_PACKET_MULTICAST_RX_COUNT_ATTRIBUTE_ID (0x0007)
+#define ZCL_PACKET_MULTICAST_TX_COUNT_ATTRIBUTE_ID (0x0008)
+#define ZCL_PACKET_UNICAST_RX_COUNT_ATTRIBUTE_ID (0x0009)
+#define ZCL_PACKET_UNICAST_TX_COUNT_ATTRIBUTE_ID (0x000A)
+#define ZCL_CURRENT_MAX_RATE_ATTRIBUTE_ID (0x000B)
+#define ZCL_OVERRUN_COUNT_ATTRIBUTE_ID (0x000C)
+
 // Attribute ids for cluster: Switch
 
 // Client attributes
@@ -436,6 +455,12 @@
 
 // Server attributes
 #define ZCL_FABRICS_ATTRIBUTE_ID (0x0001)
+
+// Attribute ids for cluster: Trusted Root Certificates
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Shade Configuration
 
@@ -1262,6 +1287,8 @@
 #define ZCL_ENUM16_ATTRIBUTE_ID (0x0016)
 #define ZCL_OCTET_STRING_ATTRIBUTE_ID (0x0019)
 #define ZCL_LIST_ATTRIBUTE_ID (0x001A)
+#define ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID (0x001B)
+#define ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID (0x001C)
 
 // Attribute ids for cluster: Generic Tunnel
 

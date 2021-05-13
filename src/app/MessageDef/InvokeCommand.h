@@ -72,9 +72,9 @@ public:
 #endif
 
     /**
-     *  @brief Get a TLVReader for the CommandList. Next() must be called before accessing them.
+     *  @brief Get a parser for a CommandList.
      *
-     *  @param [in] apWriter    A pointer to TLVWriter
+     *  @param [in] apCommandList    A pointer to the command list parser.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element

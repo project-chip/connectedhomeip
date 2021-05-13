@@ -872,6 +872,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -906,6 +908,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeControlSequenceOfOperationWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeSystemModeWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeSystemModeWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
+ * Cluster Trusted Root Certificates
+ *
+ */
+@interface CHIPTrustedRootCertificates : CHIPCluster
+
+- (void)addTrustedRootCertificate:(NSData *)rootCertificate responseHandler:(ResponseHandler)responseHandler;
+- (void)removeTrustedRootCertificate:(NSData *)trustedRootIdentifier responseHandler:(ResponseHandler)responseHandler;
+
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
