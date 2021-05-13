@@ -676,7 +676,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         Platform::CopyString(result.mName, name);
         CopyWithoutProtocol(result.mType, type);
-
         result.mProtocol    = GetProtocolInType(type);
         result.mPort        = port;
         result.mAddressType = ToAddressType(protocol);
