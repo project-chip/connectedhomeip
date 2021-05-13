@@ -48,7 +48,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 
     VerifyOrExit(service, result = CHIP_ERROR_INVALID_ARGUMENT);
 
-    char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
+    char serviceType[chip::Mdns::kMdnsTypeMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
     // Try to remove service before adding it, as SRP doesn't allow to update existing services.
@@ -74,7 +74,7 @@ CHIP_ERROR ChipMdnsStopPublishService(const MdnsService * service)
     if (service == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    char serviceType[chip::Mdns::kMdnsTypeAndProtocolMaxSize + 1];
+    char serviceType[chip::Mdns::kMdnsTypeMaxSize + 1];
     snprintf(serviceType, sizeof(serviceType), "%s.%s", service->mType, GetProtocolString(service->mProtocol));
 
     return ThreadStackMgr().RemoveSrpService(service->mName, serviceType);

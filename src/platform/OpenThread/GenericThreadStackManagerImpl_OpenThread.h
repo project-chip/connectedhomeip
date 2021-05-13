@@ -121,7 +121,7 @@ private:
     {
         static constexpr uint8_t kMaxServicesNumber   = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
         static constexpr uint8_t kMaxInstanceNameSize = chip::Mdns::kMdnsNameMaxSize;
-        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeAndProtocolMaxSize;
+        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeMaxSize;
         static constexpr uint8_t kMaxHostNameSize     = 16;
         // Thread only supports operational discovery
         static constexpr uint8_t kMaxTxtEntriesNumber = chip::Mdns::OperationalAdvertisingParameters::kNumAdvertisingTxtEntries;
