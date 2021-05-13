@@ -41,7 +41,8 @@ namespace Platform {
  * @param[in]  dest             Destination string buffer or nullptr.
  *
  * @param[in]  destLength       Maximum length to be copied. Will need space for null terminator as
- *                              well (string will be truncated if it does not fit)
+ *                              well (string will be truncated if it does not fit). If 0 this method
+ *                              is a noop.
  *
  * @param[in]  source           String to be copied.
  *
@@ -49,7 +50,7 @@ namespace Platform {
  */
 inline char * CopyString(char * dest, size_t destLength, const char * source)
 {
-    if (dest)
+    if (dest && destLength)
     {
         strncpy(dest, source, destLength);
         dest[destLength - 1] = 0;
