@@ -566,7 +566,7 @@ MdnsServiceProtocol GetProtocolInType(const char * type)
 
 /// Copies the type from a string containing both type and protocol
 ///
-/// e.g. if input is "foo.bar", output is "foo", input is 'a.b._tcp", oputput is "a.b"
+/// e.g. if input is "foo.bar", output is "foo", input is 'a.b._tcp", output is "a.b"
 template <size_t N>
 void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
 {
