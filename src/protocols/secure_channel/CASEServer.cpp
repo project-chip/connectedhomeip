@@ -27,8 +27,8 @@ using namespace ::chip::Transport;
 
 namespace chip {
 
-CHIP_ERROR CASEServer::WaitForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                                   SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins)
+CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
+                                                     SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins)
 {
     VerifyOrReturnError(transportMgr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(exchangeManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -65,7 +65,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     ReturnErrorOnFailure(mCredentials.Init(&mCertificates, mCertificates.GetCertCount()));
 
     // Setup CASE state machine using the credentials for the current admin.
-    ReturnErrorOnFailure(mPairingSession.WaitForSessionEstablishment(&mCredentials, mNextKeyId++, this));
+    ReturnErrorOnFailure(mPairingSession.ListenForSessionEstablishment(&mCredentials, mNextKeyId++, this));
 
     // Hand over the exchange context to the CASE session.
     ec->SetDelegate(&mPairingSession);

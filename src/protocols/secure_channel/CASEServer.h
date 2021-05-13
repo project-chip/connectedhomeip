@@ -37,8 +37,8 @@ public:
         mCredentials.Release();
     }
 
-    CHIP_ERROR WaitForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
-                                           SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins);
+    CHIP_ERROR ListenForSessionEstablishment(Messaging::ExchangeManager * exchangeManager, TransportMgrBase * transportMgr,
+                                             SecureSessionMgr * sessionMgr, Transport::AdminPairingTable * admins);
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
