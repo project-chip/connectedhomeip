@@ -41,6 +41,7 @@ from cmd import Cmd
 from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 from chip.setup_payload import SetupPayload
 from xmlrpc.server import SimpleXMLRPCServer
+
 from enum import Enum
 from typing import Any, Dict,Optional
 # Extend sys.path with one or more directories, relative to the location of the
@@ -70,10 +71,16 @@ if platform.system() == 'Darwin':
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
-# The exceptions for CHIP Device Controller CLI
 class StatusCodeEnum(Enum):
     SUCCESS = 0
     FAILED =  1
+
+class RPCResponseKeyEnum(Enum):
+    STATUS = "status"
+    RESULT = "result"
+    ERROR  = "error"
+
+# The exceptions for CHIP Device Controller CLI
 
 class ChipDevCtrlException(exceptions.ChipStackException):
     pass
@@ -625,7 +632,7 @@ def echo_alive(message):
     print(message)
     return message
 
-def resolve(fabric_id: int, node_id: int) -> str:
+def resolve(fabric_id: int, node_id: int) -> Dict[str, Any]:
     try:
         __check_supported_os()
         err = device_manager.devCtrl.ResolveNode(fabric_id, node_id)
@@ -658,19 +665,13 @@ def start_rpc_server():
             print("\nKeyboard interrupt received, exiting.")
             sys.exit(0)
 
-def __get_response_dict(status: StatusCodeEnum, result: Optional[Dict[Any, Any]] = None, error:Optional[str] = None) -> Dict [Any, Any]:
-    if error is not None:
-        return { "status" : status.value, "error" :f'Unable to connect due to exception {error}' }
-    else:
-        if result is not None:
-            return { "status" : status.value, "result": result}
-        else:
-            return { "status" : status.value}
+def __get_response_dict(status: StatusCodeEnum, result: Optional[Dict[Any, Any]] = None, error:Optional[str] = None) -> Dict [str, Any]:
+    return { RPCResponseKeyEnum.STATUS.value : status.value, RPCResponseKeyEnum.RESULT.value : result, RPCResponseKeyEnum.ERROR.value : error }
 
 def __check_supported_os()-> bool:
-    if platform.system() == 'Darwin':
+    if platform.system().lower() == 'darwin':
         raise Exception(platform.system() + " not supported")
-    elif sys.platform.startswith('linux'):
+    elif sys.platform.lower().startswith('linux'):
         return True
 
     raise Exception("OS Not Supported")
