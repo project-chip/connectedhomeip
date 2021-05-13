@@ -230,7 +230,7 @@ void ProcessCommand(streamer_t * stream, char * destination)
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
 
-    if (!Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);

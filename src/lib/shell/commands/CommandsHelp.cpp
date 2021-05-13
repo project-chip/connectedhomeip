@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,12 +20,18 @@
  *      Header that defines default shell commands for CHIP examples
  */
 
-#pragma once
-
-#include "shell_core.h"
+#include <lib/shell/commands/CommandsHelp.h>
+#include <lib/shell/shell_core.h>
+#include <lib/shell/streamer.h>
 
 namespace chip {
 namespace Shell {
+
+int PrintCommandHelp(shell_command_t * command, void * arg)
+{
+    streamer_printf(streamer_get(), "  %-15s %s\r\n", command->cmd_name, command->cmd_help);
+    return 0;
+}
 
 } // namespace Shell
 } // namespace chip

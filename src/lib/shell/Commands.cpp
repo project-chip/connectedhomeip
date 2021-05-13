@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +15,27 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <lib/shell/Commands.h>
+#include <lib/shell/shell_core.h>
+#include <platform/CHIPDeviceLayer.h>
 
-extern "C" {
-// A list of shell commands provided by ChipShell
-void cmd_misc_init(void);
-void cmd_otcli_init(void);
-void cmd_ping_init(void);
-void cmd_send_init(void);
+namespace chip {
+namespace Shell {
+
+void Shell::RegisterDefaultCommands()
+{
+    CommandBase64Init();
+    CommandCommonInit();
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    CommandBLEInit();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    CommandWifiInit();
+#endif
+#if CONFIG_DEVICE_LAYER
+    CommandConfigInit();
+#endif
 }
+
+} // namespace Shell
+} // namespace chip

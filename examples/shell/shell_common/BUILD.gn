@@ -32,9 +32,6 @@ config("shell_common_config") {
 
 static_library("shell_common") {
   sources = [
-    "cmd_base64.cpp",
-    "cmd_btp.cpp",
-    "cmd_device.cpp",
     "cmd_misc.cpp",
     "cmd_otcli.cpp",
     "cmd_ping.cpp",

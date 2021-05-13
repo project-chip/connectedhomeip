@@ -43,6 +43,7 @@ static void chip_shell_task(void * args)
     {
         const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;
         char * line         = linenoise(prompt);
+        printf("\r\n");
         if (line == NULL || strlen(line) == 0)
         {
             continue;

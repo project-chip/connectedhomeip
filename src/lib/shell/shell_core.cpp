@@ -22,7 +22,6 @@
  */
 
 #include "shell_core.h"
-#include "commands.h"
 
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
@@ -130,6 +129,7 @@ int Shell::ExecCommand(int argc, char * argv[])
 {
     int retval = CHIP_ERROR_INVALID_ARGUMENT;
 
+    VerifyOrReturnError(argc > 0, retval);
     // Find the command
     for (unsigned i = 0; i < _commandSetCount; i++)
     {
@@ -242,6 +242,30 @@ void Shell::TaskLoop(void * arg)
             // Empty input has no output -- just display prompt
         }
     }
+}
+
+/** Utility function for running ForEachCommand on root shell. */
+void shell_command_foreach(shell_command_iterator_t * on_command, void * arg)
+{
+    return Shell::Root().ForEachCommand(on_command, arg);
+}
+
+/** Utility function for running ForEachCommand on Root shell. */
+void shell_register(shell_command_t * command_set, unsigned count)
+{
+    return Shell::Root().RegisterCommands(command_set, count);
+}
+
+/** Utility function for to tokenize an input line. */
+int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens)
+{
+    return Shell::TokenizeLine(buffer, tokens, max_tokens);
+}
+
+/** Utility function to run main shell task loop. */
+void shell_task(void * arg)
+{
+    return Shell::TaskLoop(arg);
 }
 
 } // namespace Shell

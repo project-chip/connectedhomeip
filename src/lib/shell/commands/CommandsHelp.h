@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +15,19 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      Header that defines default shell commands for CHIP examples
+ */
+
 #pragma once
 
-extern "C" {
-// A list of shell commands provided by ChipShell
-void cmd_misc_init(void);
-void cmd_otcli_init(void);
-void cmd_ping_init(void);
-void cmd_send_init(void);
-}
+#include <lib/shell/shell_core.h>
+
+namespace chip {
+namespace Shell {
+
+int PrintCommandHelp(shell_command_t * command, void * arg);
+
+} // namespace Shell
+} // namespace chip

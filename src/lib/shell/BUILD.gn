@@ -17,18 +17,27 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
-static_library("shell") {
-  output_name = "libCHIPShell"
-  output_dir = "${root_out_dir}/lib"
-
+source_set("shell_core") {
   sources = [
-    "commands.cpp",
-    "commands.h",
+    "Commands.h",
     "shell_core.cpp",
     "shell_core.h",
     "streamer.cpp",
     "streamer.h",
   ]
+
+  public_deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+  ]
+}
+
+static_library("shell") {
+  output_name = "libCHIPShell"
+  output_dir = "${root_out_dir}/lib"
+
+  sources = [ "Commands.cpp" ]
 
   if (chip_target_style == "unix") {
     sources += [ "streamer_stdio.cpp" ]
@@ -45,7 +54,7 @@ static_library("shell") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
+    ":shell_core",
+    "${chip_root}/src/lib/shell/commands",
   ]
 }

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,10 +17,38 @@
 
 #pragma once
 
-extern "C" {
-// A list of shell commands provided by ChipShell
-void cmd_misc_init(void);
-void cmd_otcli_init(void);
-void cmd_ping_init(void);
-void cmd_send_init(void);
-}
+namespace chip {
+namespace Shell {
+
+/**
+ * This function registers the base64 encode/decode commands.
+ *
+ */
+void CommandBase64Init();
+
+/**
+ * This function registers the BLE commands.
+ *
+ */
+void CommandBLEInit();
+
+/**
+ * This function registers the common commands.
+ *
+ */
+void CommandCommonInit();
+
+/**
+ * This function registers the device configuration commands.
+ *
+ */
+void CommandConfigInit();
+
+/**
+ * This function registers the wifi commands.
+ *
+ */
+void CommandWifiInit();
+
+} // namespace Shell
+} // namespace chip

@@ -20,11 +20,6 @@
  *      Source implementation of default shell commands for CHIP examples.
  */
 
-#include "CHIPVersion.h"
-
-#include "shell_core.h"
-#include <support/CodeUtils.h>
-
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
@@ -32,43 +27,43 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <CHIPVersion.h>
+#include <lib/shell/Commands.h>
+#include <lib/shell/commands/CommandsHelp.h>
+#include <lib/shell/shell_core.h>
+#include <support/CodeUtils.h>
+
 namespace chip {
 namespace Shell {
 
-int cmd_exit(int argc, char ** argv)
+static int CommandExit(int argc, char ** argv)
 {
-    streamer_printf(streamer_get(), "Goodbye\n\r");
+    streamer_printf(streamer_get(), "Goodbye\r\n");
     exit(0);
     return 0;
 }
 
-int cmd_help_iterator(shell_command_t * command, void * arg)
+static int CommandHelp(int argc, char ** argv)
 {
-    streamer_printf(streamer_get(), "  %-15s %s\n\r", command->cmd_name, command->cmd_help);
+    shell_command_foreach(PrintCommandHelp, nullptr);
     return 0;
 }
 
-int cmd_help(int argc, char ** argv)
+static int CommandVersion(int argc, char ** argv)
 {
-    shell_command_foreach(cmd_help_iterator, nullptr);
+    streamer_printf(streamer_get(), "CHIP %s\r\n", CHIP_VERSION_STRING);
     return 0;
 }
 
-int cmd_version(int argc, char ** argv)
+void CommandCommonInit()
 {
-    streamer_printf(streamer_get(), "CHIP %s\n\r", CHIP_VERSION_STRING);
-    return 0;
-}
+    static shell_command_t sCmds[] = {
+        { &CommandExit, "exit", "Exit the shell application" },
+        { &CommandHelp, "help", "List out all top level commands" },
+        { &CommandVersion, "version", "Output the software version" },
+    };
 
-static shell_command_t cmds[] = {
-    { &cmd_exit, "exit", "Exit the shell application" },
-    { &cmd_help, "help", "List out all top level commands" },
-    { &cmd_version, "version", "Output the software version" },
-};
-
-void Shell::RegisterDefaultCommands()
-{
-    RegisterCommands(cmds, ArraySize(cmds));
+    shell_register(sCmds, ArraySize(sCmds));
 }
 
 } // namespace Shell
