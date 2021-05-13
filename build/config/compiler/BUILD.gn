@@ -158,8 +158,6 @@ config("disabled_warnings") {
       "-Wno-psabi",
       "-Wno-cast-function-type",
     ]
-  } else {
-    cflags += [ "-Wno-unknown-warning-option" ]
   }
 }
 
