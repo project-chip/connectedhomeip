@@ -585,8 +585,8 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             service.mName[kMdnsNameMaxSize] = 0;
             strncpy(typeAndProtocol, type, sizeof(typeAndProtocol));
             typeAndProtocol[kMdnsTypeAndProtocolMaxSize] = 0;
-            service.mProtocol    = TruncateProtocolInType(typeAndProtocol);
-            service.mAddressType = ToAddressType(protocol);
+            service.mProtocol                            = TruncateProtocolInType(typeAndProtocol);
+            service.mAddressType                         = ToAddressType(protocol);
             strncpy(service.mType, typeAndProtocol, sizeof(service.mType));
             service.mType[kMdnsTypeMaxSize] = 0;
             context->mServices.push_back(service);
@@ -666,9 +666,9 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mName[kMdnsNameMaxSize] = 0;
         strncpy(typeAndProtocol, type, sizeof(typeAndProtocol));
         typeAndProtocol[kMdnsTypeAndProtocolMaxSize] = 0;
-        result.mProtocol    = TruncateProtocolInType(typeAndProtocol);
-        result.mPort        = port;
-        result.mAddressType = ToAddressType(protocol);
+        result.mProtocol                             = TruncateProtocolInType(typeAndProtocol);
+        result.mPort                                 = port;
+        result.mAddressType                          = ToAddressType(protocol);
         strncpy(result.mType, typeAndProtocol, sizeof(result.mType));
         result.mType[kMdnsTypeMaxSize] = 0;
 
