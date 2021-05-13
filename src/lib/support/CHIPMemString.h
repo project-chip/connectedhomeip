@@ -38,12 +38,12 @@ namespace Platform {
  *  - `dest` can be nullptr, in which case no copy is attempted, and the function returns nullptr.
  *  - A non-nullptr result is always null-terminated.
  *
- * @param[in]  dest             Destination string buffer (which must be at least `length`+1 bytes)
- *                              or nullptr.
+ * @param[in]  dest             Destination string buffer or nullptr.
  *
  * @param[in]  source           String to be copied.
  *
- * @param[in]  length           Length to be copied.
+ * @param[in]  length           Maximum length to be copied. Will need space for null terminator as
+ *                              well (string will be truncated if it does not fit)
  *
  * @retval  Same as `dest`.
  */
