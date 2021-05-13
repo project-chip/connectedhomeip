@@ -159,6 +159,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/deb
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
+
     -  without Secure element
 
 ```
