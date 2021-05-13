@@ -553,9 +553,9 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
     }
 
     char txtDeviceName[chip::Mdns::kKeyDeviceNameMaxLength + 4];
-    if (params.GetDeviceName().HasValue())
+    if (params.HasValueDeviceName())
     {
-        sprintf(txtDeviceName, "DN=%s", params.GetDeviceName().Value());
+        sprintf(txtDeviceName, "DN=%s", params.GetDeviceName());
     }
     else
     {
@@ -588,9 +588,9 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         }
 
         char txtRotatingDeviceId[chip::Mdns::kKeyRotatingIdMaxLength + 4];
-        if (params.GetRotatingId().HasValue())
+        if (params.HasValueRotatingId())
         {
-            sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId().Value());
+            sprintf(txtRotatingDeviceId, "RI=%s", params.GetRotatingId());
         }
         else
         {
@@ -608,9 +608,9 @@ FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommissionAdvertis
         }
 
         char txtPairingInstr[chip::Mdns::kKeyPairingInstructionMaxLength + 4];
-        if (params.GetPairingInstr().HasValue())
+        if (params.HasValuePairingInstr())
         {
-            sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr().Value());
+            sprintf(txtPairingInstr, "PI=%s", params.GetPairingInstr());
         }
         else
         {

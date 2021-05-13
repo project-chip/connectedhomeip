@@ -179,34 +179,37 @@ public:
     {
         if (deviceName.HasValue())
         {
-            strncpy(sDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(sDeviceName)));
-            mDeviceName = Optional<const char *>::Value(static_cast<const char *>(sDeviceName));
+            strncpy(mDeviceName, deviceName.Value(), min(strlen(deviceName.Value()) + 1, sizeof(mDeviceName)));
+            mDeviceNameHasValue = true;
         }
         return *this;
     }
-    Optional<const char *> GetDeviceName() const { return mDeviceName; }
+    bool HasValueDeviceName() const { return mDeviceNameHasValue; }
+    const char * GetDeviceName() const { return mDeviceName; }
 
     CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
     {
         if (rotatingId.HasValue())
         {
-            strncpy(sRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(sRotatingId)));
-            mRotatingId = Optional<const char *>::Value(static_cast<const char *>(sRotatingId));
+            strncpy(mRotatingId, rotatingId.Value(), min(strlen(rotatingId.Value()) + 1, sizeof(mRotatingId)));
+            mRotatingIdHasValue = true;
         }
         return *this;
     }
-    Optional<const char *> GetRotatingId() const { return mRotatingId; }
+    bool HasValueRotatingId() const { return mRotatingIdHasValue; }
+    const char * GetRotatingId() const { return mRotatingId; }
 
     CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
     {
         if (pairingInstr.HasValue())
         {
-            strncpy(sPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(sPairingInstr)));
-            mPairingInstr = Optional<const char *>::Value(static_cast<const char *>(sPairingInstr));
+            strncpy(mPairingInstr, pairingInstr.Value(), min(strlen(pairingInstr.Value()) + 1, sizeof(mPairingInstr)));
+            mPairingInstrHasValue = true;
         }
         return *this;
     }
-    Optional<const char *> GetPairingInstr() const { return mPairingInstr; }
+    bool HasValuePairingInstr() const { return mPairingInstrHasValue; }
+    const char * GetPairingInstr() const { return mPairingInstr; }
 
     CommissionAdvertisingParameters & SetPairingHint(Optional<uint16_t> pairingHint)
     {
@@ -233,14 +236,14 @@ private:
     chip::Optional<uint16_t> mDeviceType;
     chip::Optional<uint16_t> mPairingHint;
 
-    char sDeviceName[kKeyDeviceNameMaxLength + 1];
-    chip::Optional<const char *> mDeviceName;
+    char mDeviceName[kKeyDeviceNameMaxLength + 1];
+    bool mDeviceNameHasValue = false;
 
-    char sRotatingId[kKeyRotatingIdMaxLength + 1];
-    chip::Optional<const char *> mRotatingId;
+    char mRotatingId[kKeyRotatingIdMaxLength + 1];
+    bool mRotatingIdHasValue = false;
 
-    char sPairingInstr[kKeyPairingInstructionMaxLength + 1];
-    chip::Optional<const char *> mPairingInstr;
+    char mPairingInstr[kKeyPairingInstructionMaxLength + 1];
+    bool mPairingInstrHasValue = false;
 };
 
 /// Handles advertising of CHIP nodes
