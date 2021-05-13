@@ -25,8 +25,9 @@
 
 #include <netinet/in.h>
 
-#include "support/CHIPMem.h"
-#include "support/CodeUtils.h"
+#include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
+#include <support/CodeUtils.h>
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;
@@ -540,25 +541,40 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
 }
 
-MdnsServiceProtocol TruncateProtocolInType(char * type)
+MdnsServiceProtocol GetProtocolInType(const char * type)
 {
-    char * deliminator           = strrchr(type, '.');
-    MdnsServiceProtocol protocol = MdnsServiceProtocol::kMdnsProtocolUnknown;
+    const char * deliminator = strrchr(type, '.');
 
-    if (deliminator != NULL)
+    if (deliminator == NULL)
     {
-        if (strcmp("._tcp", deliminator) == 0)
-        {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolTcp;
-            *deliminator = 0;
-        }
-        else if (strcmp("._udp", deliminator) == 0)
-        {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolUdp;
-            *deliminator = 0;
-        }
+        ChipLogError(Discovery, "Failed to find protocol in type: %s", type);
+        return MdnsServiceProtocol::kMdnsProtocolUnknown;
     }
-    return protocol;
+
+    if (strcmp("._tcp", deliminator) == 0)
+    {
+        return MdnsServiceProtocol::kMdnsProtocolTcp;
+    }
+    if (strcmp("._udp", deliminator) == 0)
+    {
+        return MdnsServiceProtocol::kMdnsProtocolUdp;
+    }
+
+    ChipLogError(Discovery, "Unknown protocol in type: %s", type);
+    return MdnsServiceProtocol::kMdnsProtocolUnknown;
+}
+
+template <size_t N>
+void CopyWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
+{
+    const char * dotPos          = strrchr(typeAndProtocol, '.');
+    size_t lengthWithoutProtocol = (dotPos != nullptr) ? static_cast<size_t>(dotPos - typeAndProtocol) : N;
+
+    Platform::CopyString(dest, typeAndProtocol);
+    if (lengthWithoutProtocol < N)
+    {
+        dest[lengthWithoutProtocol] = 0;
+    }
 }
 
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
@@ -579,15 +595,11 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         if (strcmp("local", domain) == 0)
         {
             MdnsService service = {};
-            char typeAndProtocol[kMdnsTypeAndProtocolMaxSize + 1];
 
-            strncpy(service.mName, name, sizeof(service.mName));
-            service.mName[kMdnsNameMaxSize] = 0;
-            strncpy(typeAndProtocol, type, sizeof(typeAndProtocol));
-            typeAndProtocol[kMdnsTypeAndProtocolMaxSize] = 0;
-            service.mProtocol                            = TruncateProtocolInType(typeAndProtocol);
-            service.mAddressType                         = ToAddressType(protocol);
-            strncpy(service.mType, typeAndProtocol, sizeof(service.mType));
+            Platform::CopyString(service.mName, name);
+            CopyWithoutProtocol(service.mType, type);
+            service.mProtocol               = GetProtocolInType(type);
+            service.mAddressType            = ToAddressType(protocol);
             service.mType[kMdnsTypeMaxSize] = 0;
             context->mServices.push_back(service);
         }
@@ -658,19 +670,16 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         break;
     case AVAHI_RESOLVER_FOUND:
         MdnsService result = {};
-        char typeAndProtocol[kMdnsTypeAndProtocolMaxSize + 1];
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
-        strncpy(result.mName, name, sizeof(result.mName));
-        result.mName[kMdnsNameMaxSize] = 0;
-        strncpy(typeAndProtocol, type, sizeof(typeAndProtocol));
-        typeAndProtocol[kMdnsTypeAndProtocolMaxSize] = 0;
-        result.mProtocol                             = TruncateProtocolInType(typeAndProtocol);
-        result.mPort                                 = port;
-        result.mAddressType                          = ToAddressType(protocol);
-        strncpy(result.mType, typeAndProtocol, sizeof(result.mType));
-        result.mType[kMdnsTypeMaxSize] = 0;
+
+        Platform::CopyString(result.mName, name);
+        CopyWithoutProtocol(result.mType, type);
+
+        result.mProtocol    = GetProtocolInType(type);
+        result.mPort        = port;
+        result.mAddressType = ToAddressType(protocol);
 
         if (address)
         {
