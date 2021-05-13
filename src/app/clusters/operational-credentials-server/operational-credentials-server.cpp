@@ -316,7 +316,6 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
                                                            chip::NodeId CaseAdminNode, uint16_t AdminVendorId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = CHIP_NO_ERROR;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> cert;
 
@@ -327,6 +326,8 @@ bool emberAfOperationalCredentialsClusterAddOpCertCallback(chip::app::Command * 
     AdminPairingInfo * admin = retrieveCurrentAdmin();
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
+    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
+    // strings. We are currently spilling over NOC into ICACertificate argument.
     VerifyOrExit(cert.Alloc(NOC.size() + ICACertificate.size()), status = EMBER_ZCL_STATUS_FAILURE);
     certBuf = cert.Get();
     memcpy(certBuf, NOC.data(), NOC.size());
@@ -341,10 +342,6 @@ exit:
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddOpCert request.");
     }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
-    }
 
     return true;
 }
@@ -358,18 +355,18 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command
     chip::Platform::ScopedMemoryBuffer<uint8_t> csr;
     size_t csrLength = Crypto::kMAX_CSR_Length;
 
-    uint8_t * csrBuf = nullptr;
-
-    constexpr uint16_t zclOctetStringHeaderSize = 1;
-
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has requested an OpCSR");
+
+    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
+                                         ZCL_OP_CSR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
+
+    TLV::TLVWriter * writer = nullptr;
 
     // Fetch current admin
     AdminPairingInfo * admin = retrieveCurrentAdmin();
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
 
-    // 1 extra byte for length in ZCL data type
-    VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length + zclOctetStringHeaderSize), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(csr.Alloc(Crypto::kMAX_CSR_Length), status = EMBER_ZCL_STATUS_FAILURE);
 
     if (admin->GetOperationalKey() == nullptr)
     {
@@ -378,44 +375,22 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(chip::app::Command
         VerifyOrExit(admin->SetOperationalKey(keypair) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
     }
 
-    csrBuf = csr.Get();
-    err    = admin->GetOperationalKey()->NewCertificateSigningRequest(&csrBuf[zclOctetStringHeaderSize], csrLength);
+    err = admin->GetOperationalKey()->NewCertificateSigningRequest(csr.Get(), csrLength);
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: NewCertificateSigningRequest returned %d", err);
     VerifyOrExit(err == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(csrLength <= UINT8_MAX, status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(csrLength < UINT8_MAX, status = EMBER_ZCL_STATUS_FAILURE);
 
-    // Fill in the length as the first byte of the octet string
-    csrBuf[0] = (uint8_t) csrLength;
+    VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (commandObj == nullptr)
-    {
-        uint16_t nullValue = 0;
-        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT),
-                                  ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID, ZCL_OP_CSR_RESPONSE_COMMAND_ID, "bbbbbb", csr.Get(),
-                                  csrLength + zclOctetStringHeaderSize, CSRNonce.data(), CSRNonce.size(), &nullValue,
-                                  sizeof(nullValue), &nullValue, sizeof(nullValue), &nullValue, sizeof(nullValue), &nullValue,
-                                  sizeof(nullValue));
-        sendStatus = emberAfSendResponse();
-    }
-    else
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID,
-                                             ZCL_OP_CSR_RESPONSE_COMMAND_ID, (chip::app::CommandPathFlags::kEndpointIdValid) };
-
-        TLV::TLVWriter * writer = nullptr;
-
-        VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-        SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
-        writer = commandObj->GetCommandDataElementTLVWriter();
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(&csrBuf[1], csrLength)));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(1), CSRNonce));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(2), ByteSpan(nullptr, 0)));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(3), ByteSpan(nullptr, 0)));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(4), ByteSpan(nullptr, 0)));
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(5), ByteSpan(nullptr, 0)));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
+    SuccessOrExit(err = commandObj->PrepareCommand(&cmdParams));
+    writer = commandObj->GetCommandDataElementTLVWriter();
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), ByteSpan(csr.Get(), csrLength)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(1), CSRNonce));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(2), ByteSpan(nullptr, 0)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(3), ByteSpan(nullptr, 0)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(4), ByteSpan(nullptr, 0)));
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(5), ByteSpan(nullptr, 0)));
+    SuccessOrExit(err = commandObj->FinishCommand());
 
 exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)

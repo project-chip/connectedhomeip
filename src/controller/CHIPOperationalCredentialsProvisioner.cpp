@@ -58,7 +58,7 @@ CHIP_ERROR OperationalCredentialsProvisioner::AddOpCert(Callback::Cancelable * o
 }
 
 CHIP_ERROR OperationalCredentialsProvisioner::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, chip::ByteSpan cSRNonce)
+                                                           Callback::Cancelable * onFailureCallback, chip::ByteSpan CSRNonce)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -71,8 +71,8 @@ CHIP_ERROR OperationalCredentialsProvisioner::OpCSRRequest(Callback::Cancelable 
 
     TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
-    // cSRNonce: octetString
-    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), cSRNonce));
+    // CSRNonce: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), CSRNonce));
 
     ReturnErrorOnFailure(ZCLcommand->FinishCommand());
 

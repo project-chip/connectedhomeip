@@ -95,6 +95,8 @@ public:
     Crypto::P256Keypair * GetOperationalKey() { return mOperationalKey; }
     CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
 
+    // TODO - Update these APIs to take ownership of the buffer, instead of copying
+    //        internally.
     CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 

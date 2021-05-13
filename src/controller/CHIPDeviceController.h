@@ -461,22 +461,55 @@ private:
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
+    /* This function sends an OpCSR request to the device */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(Device * device);
+    /* This function sends the operational credentials to the device */
     CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
+    /* This function sends the trusted root certificate to the device */
     CHIP_ERROR SendTrustedRootCertificate(Device * device);
 
+    /* This function is called when the device completes the operational credential provisioning process */
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(Device * device);
 
+    /* This function is called when the previously sent CSR request results in failure */
     static void OnCSRFailureResponse(void * context, uint8_t status);
+
+    /**
+     * @brief
+     *   This function is called by the IM layer when the commissioner receives the CSR from the device.
+     *
+     * @param[in] context         The context provided while registering the callback.
+     * @param[in] CSR             The Certificate Signing Request.
+     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
+     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
+     * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
+     */
     static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
                                                        ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
 
+    /* This function is called when the adding operational certs to device results in failure */
     static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    /* This function is called when the device confirms that it has added the operational certificates */
     static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
 
+    /* This function is called when the device confirms that it has added the root certificate */
     static void OnRootCertSuccessResponse(void * context);
+    /* This function is called when the adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
+    /**
+     * @brief
+     *   This function processes the CSR sent by the device.
+     *
+     * @param[in] CSR             The Certificate Signing Request.
+     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
+     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
+     * @param[in] Signature       Cryptographic signature generated for all the above fields.
+     */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
 

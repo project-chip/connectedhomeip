@@ -49,7 +49,6 @@ bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip
                                                                             chip::ByteSpan RootCertificate)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    CHIP_ERROR err       = CHIP_NO_ERROR;
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: commissioner has added a trusted root Cert");
 
@@ -63,10 +62,6 @@ exit:
     if (status == EMBER_ZCL_STATUS_FAILURE)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Failed AddTrustedRootCert request.");
-    }
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to encode response command: %s", ErrorStr(err));
     }
 
     return true;
