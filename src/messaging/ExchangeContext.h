@@ -55,8 +55,7 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
-                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -65,10 +64,12 @@ public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
     // Create a secure ExchangeContext
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                    ExchangeDelegate * delegate);
 
     // Create an unsecure ExchangeContext
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const Transport::PeerAddress & peerAddress, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const Transport::PeerAddress & peerAddress, bool Initiator,
+                    ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -152,7 +153,8 @@ public:
 
     ExchangeACL * GetExchangeACL(Transport::AdminPairingTable & table)
     {
-        if (IsSecure()) {
+        if (IsSecure())
+        {
             if (GetVariantSecure().mExchangeACL == nullptr)
             {
                 Transport::AdminPairingInfo * admin = table.FindAdminWithId(GetVariantSecure().mSecureSession.GetAdminId());
@@ -163,7 +165,9 @@ public:
             }
 
             return GetVariantSecure().mExchangeACL;
-        } else {
+        }
+        else
+        {
             return nullptr;
         }
     }
@@ -184,17 +188,19 @@ public:
 
 private:
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeDelegate * mDelegate = nullptr;
-    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeDelegate * mDelegate   = nullptr;
+    ExchangeManager * mExchangeMgr = nullptr;
 
-    uint16_t mExchangeId;               // Assigned exchange ID.
+    uint16_t mExchangeId; // Assigned exchange ID.
 
-    struct SecureSession {
+    struct SecureSession
+    {
         static constexpr const size_t VariantId = 1;
 
         SecureSession(SecureSessionHandle session) : mExchangeACL(nullptr), mSecureSession(session) {}
 
-        ~SecureSession() {
+        ~SecureSession()
+        {
             if (mExchangeACL != nullptr)
             {
                 chip::Platform::Delete(mExchangeACL);
@@ -206,7 +212,8 @@ private:
         const SecureSessionHandle mSecureSession;
     };
 
-    struct UnsecureSession {
+    struct UnsecureSession
+    {
         static constexpr const size_t VariantId = 2;
         UnsecureSession(const Transport::PeerAddress & peerAddress) : mPeerAddress(peerAddress) {}
         const Transport::PeerAddress mPeerAddress;
@@ -214,12 +221,14 @@ private:
 
     Variant<SecureSession, UnsecureSession> mSession;
 
-    SecureSession & GetVariantSecure() {
+    SecureSession & GetVariantSecure()
+    {
         assert(IsSecure());
         return mSession.Get<SecureSession>();
     }
 
-    UnsecureSession & GetVariantUnsecure() {
+    UnsecureSession & GetVariantUnsecure()
+    {
         assert(!IsSecure());
         return mSession.Get<UnsecureSession>();
     }

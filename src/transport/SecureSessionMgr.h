@@ -125,8 +125,8 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnSecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, const Transport::PeerAddress & source,
-                                   System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+                                         SecureSessionHandle session, const Transport::PeerAddress & source,
+                                         System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -140,7 +140,9 @@ public:
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
-    virtual void OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+    virtual void OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                           const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                                           SecureSessionMgr * mgr)
     {}
 
     /**

@@ -41,10 +41,11 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>(mPeer), GetDestinationNodeId(), &mPairingLocalToPeer,
-                                                      SecureSession::SessionRole::kInitiator, mSrcAdminId));
+    ReturnErrorOnFailure(mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>(mPeer), GetDestinationNodeId(),
+                                                      &mPairingLocalToPeer, SecureSession::SessionRole::kInitiator, mSrcAdminId));
 
-    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>(mPeer), GetSourceNodeId(), &mPairingPeerToLocal, SecureSession::SessionRole::kResponder, mDestAdminId);
+    return mSecureSessionMgr.NewPairing(Optional<Transport::PeerAddress>(mPeer), GetSourceNodeId(), &mPairingPeerToLocal,
+                                        SecureSession::SessionRole::kResponder, mDestAdminId);
 }
 
 // Shutdown all layers, finalize operations

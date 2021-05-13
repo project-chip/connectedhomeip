@@ -76,11 +76,12 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
     mResponseTimeout = timeout;
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf, const SendFlags & sendFlags)
+CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+                                        const SendFlags & sendFlags)
 {
     CHIP_ERROR err                         = CHIP_NO_ERROR;
     Transport::PeerConnectionState * state = nullptr;
-    bool reliableTransmissionRequested = true;
+    bool reliableTransmissionRequested     = true;
     PayloadHeader payloadHeader;
     ReliableMessageContext * reliableMessageContext = GetReliableMessageContext();
 
@@ -96,11 +97,14 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     {
         Transport::Type transportType;
-        if (IsSecure()) {
+        if (IsSecure())
+        {
             state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(GetVariantSecure().mSecureSession);
             VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
             transportType = state->GetPeerAddress().GetTransportType();
-        } else {
+        }
+        else
+        {
             transportType = GetVariantUnsecure().mPeerAddress.GetTransportType();
         }
 
@@ -150,7 +154,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #endif
     }
 
-    if (IsSecure()) {
+    if (IsSecure())
+    {
         // TODO: CRMP is only enabled for secure messages, it should be enabled for all messages in the future.
         if (reliableMessageContext->AutoRequestAck() && reliableTransmissionRequested)
         {
@@ -161,7 +166,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
             // Add to Table for subsequent sending
             ReturnErrorOnFailure(mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(reliableMessageContext, &entry));
 
-            err = mExchangeMgr->GetSessionMgr()->SendMessage(GetVariantSecure().mSecureSession, payloadHeader, std::move(msgBuf), &entry->retainedBuf);
+            err = mExchangeMgr->GetSessionMgr()->SendMessage(GetVariantSecure().mSecureSession, payloadHeader, std::move(msgBuf),
+                                                             &entry->retainedBuf);
 
             if (err != CHIP_NO_ERROR)
             {
@@ -180,15 +186,19 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         {
             // If the channel itself is providing reliability, let's not request CRMP acks
             payloadHeader.SetNeedsAck(false);
-            err = mExchangeMgr->GetSessionMgr()->SendMessage(GetVariantSecure().mSecureSession, payloadHeader, std::move(msgBuf), nullptr);
+            err = mExchangeMgr->GetSessionMgr()->SendMessage(GetVariantSecure().mSecureSession, payloadHeader, std::move(msgBuf),
+                                                             nullptr);
         }
-    } else {
+    }
+    else
+    {
         PacketHeader packetHeader;
 
         ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
         ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
 
-        err = mExchangeMgr->GetSessionMgr()->GetTransportManager()->SendMessage(GetVariantUnsecure().mPeerAddress, std::move(msgBuf));
+        err =
+            mExchangeMgr->GetSessionMgr()->GetTransportManager()->SendMessage(GetVariantUnsecure().mPeerAddress, std::move(msgBuf));
     }
 
 exit:
@@ -210,9 +220,13 @@ exit:
 
 CHIP_ERROR ExchangeContext::ResendMessage(EncryptedPacketBufferHandle message, EncryptedPacketBufferHandle * retainedMessage)
 {
-    if (IsSecure()) {
-        return mExchangeMgr->GetSessionMgr()->SendEncryptedMessage(GetVariantSecure().mSecureSession, std::move(message), retainedMessage);
-    } else {
+    if (IsSecure())
+    {
+        return mExchangeMgr->GetSessionMgr()->SendEncryptedMessage(GetVariantSecure().mSecureSession, std::move(message),
+                                                                   retainedMessage);
+    }
+    else
+    {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 }
@@ -289,10 +303,9 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, bool
     VerifyOrDie(mExchangeMgr == nullptr);
 
     mExchangeMgr = em;
-    mExchangeId    = ExchangeId;
+    mExchangeId  = ExchangeId;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
-
 
     SetDropAckDebug(false);
     SetAckPending(false);
@@ -306,13 +319,17 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, bool
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate) : ExchangeContext(em, ExchangeId, Initiator, delegate)
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                 ExchangeDelegate * delegate) :
+    ExchangeContext(em, ExchangeId, Initiator, delegate)
 {
     mFlags.Set(Flags::kIsSecure, true);
     mSession.Set<SecureSession>(session);
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const Transport::PeerAddress & peerAddress, bool Initiator, ExchangeDelegate * delegate) : ExchangeContext(em, ExchangeId, Initiator, delegate)
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const Transport::PeerAddress & peerAddress,
+                                 bool Initiator, ExchangeDelegate * delegate) :
+    ExchangeContext(em, ExchangeId, Initiator, delegate)
 {
     mFlags.Set(Flags::kIsSecure, false);
     mSession.Set<UnsecureSession>(peerAddress);
@@ -351,11 +368,10 @@ bool ExchangeContext::MatchExchange(const PayloadHeader & payloadHeader)
 }
 
 bool ExchangeContext::MatchSecureExchange(SecureSessionHandle session, const PacketHeader & packetHeader,
-                                    const PayloadHeader & payloadHeader)
+                                          const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
-    return
-        MatchExchange(payloadHeader)
+    return MatchExchange(payloadHeader)
 
         && IsSecure()
 
@@ -365,14 +381,14 @@ bool ExchangeContext::MatchSecureExchange(SecureSessionHandle session, const Pac
         // AND The message's source Node ID matches the peer Node ID associated with the exchange, or the peer Node ID of the
         // exchange is 'any'.
         && ((GetSecureSession().GetPeerNodeId() == kAnyNodeId) ||
-            (packetHeader.GetSourceNodeId().HasValue() && GetSecureSession().GetPeerNodeId() == packetHeader.GetSourceNodeId().Value()));
+            (packetHeader.GetSourceNodeId().HasValue() &&
+             GetSecureSession().GetPeerNodeId() == packetHeader.GetSourceNodeId().Value()));
 }
 
 bool ExchangeContext::MatchUnsecureExchange(const Transport::PeerAddress & peerAddress, const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
-    return
-        MatchExchange(payloadHeader)
+    return MatchExchange(payloadHeader)
 
         && !IsSecure()
 

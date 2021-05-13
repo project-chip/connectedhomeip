@@ -265,9 +265,9 @@ void ChannelContext::EnterCasePairingState()
     ExchangeContext * ctxt = mExchangeManager->NewUnsecureContext(addr, prepare.mCasePairingSession);
     VerifyOrReturn(ctxt != nullptr);
 
-    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(
-        addr, &prepare.mBuilder.GetOperationalCredentialSet(), prepare.mBuilder.GetPeerNodeId(),
-        mExchangeManager->GetNextKeyId(), ctxt, this);
+    CHIP_ERROR err = prepare.mCasePairingSession->EstablishSession(addr, &prepare.mBuilder.GetOperationalCredentialSet(),
+                                                                   prepare.mBuilder.GetPeerNodeId(),
+                                                                   mExchangeManager->GetNextKeyId(), ctxt, this);
     if (err != CHIP_NO_ERROR)
     {
         ExitCasePairingState();

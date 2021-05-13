@@ -251,8 +251,12 @@ private:
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
-    void OnSecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
-    void OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override;
+    void OnSecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                 SecureSessionHandle session, const Transport::PeerAddress & source,
+                                 System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
+    void OnUnsecureMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                   const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                                   SecureSessionMgr * mgr) override;
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
