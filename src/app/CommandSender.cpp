@@ -41,7 +41,9 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
     err = FinalizeCommandsMessage();
     SuccessOrExit(err);
 
-    ClearExistingExchangeContext();
+    // Discard any existing exchange context. Effectively we can only have one exchange per CommandSender
+    // at any one time.
+    AbortExistingExchangeContext();
 
     // Create a new exchange context.
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
@@ -59,7 +61,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId, Transport::AdminId 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ClearExistingExchangeContext();
+        AbortExistingExchangeContext();
     }
     ChipLogFunctError(err);
 
@@ -70,27 +72,23 @@ void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeCon
                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // Assert that the exchange context matches the client's current context.
-    // This should never fail because even if SendCommandRequest is called
-    // back-to-back, the second call will call Close() on the first exchange,
-    // which clears the OnMessageReceived callback.
 
-    VerifyOrDie(apExchangeContext == mpExchangeCtx);
-
-    // Verify that the message is an Invoke Command Response.
-    // If not, close the exchange and free the payload.
-    if (!aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
-    {
-        apExchangeContext->Close();
-        mpExchangeCtx = nullptr;
-        goto exit;
-    }
+    VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
+                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     err = ProcessCommandMessage(std::move(aPayload), CommandRoleId::SenderId);
     SuccessOrExit(err);
 
 exit:
+    ChipLogFunctError(err);
+
+    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
+    // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
+    mpExchangeCtx->Close();
+    mpExchangeCtx = nullptr;
     Reset();
+
     if (mpDelegate != nullptr)
     {
         if (err != CHIP_NO_ERROR)
