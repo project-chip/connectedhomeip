@@ -25,11 +25,43 @@
 #include "linenoise/linenoise.h"
 #include "nvs_flash.h"
 #include "support/CHIPMem.h"
+#include "support/ErrorStr.h"
 
 #include <ChipShellCollection.h>
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
+
+class ShellLineArgs
+{
+public:
+    ShellLineArgs(char * line, TaskHandle_t source_task) : m_line(line), m_source_task(source_task) {}
+    char * GetLine() { return m_line; }
+    void WaitShellProcessDone() { ulTaskNotifyTake(pdTRUE, portMAX_DELAY); }
+    void NotifyShellProcessDone() { xTaskNotifyGive(m_source_task); }
+
+private:
+    char * m_line;
+    TaskHandle_t m_source_task;
+};
+
+static void process_shell_line(intptr_t context)
+{
+    ShellLineArgs * shellArgs = reinterpret_cast<ShellLineArgs *>(context);
+    int ret;
+    esp_console_run(shellArgs->GetLine(), &ret);
+    if (ret)
+    {
+        printf("Error: %s\r\n", chip::ErrorStr(ret));
+    }
+    else
+    {
+        printf("Done\r\n");
+    }
+
+    linenoiseFree(shellArgs->GetLine());
+    shellArgs->NotifyShellProcessDone();
+}
 
 static void chip_shell_task(void * args)
 {
@@ -43,34 +75,20 @@ static void chip_shell_task(void * args)
     {
         const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;
         char * line         = linenoise(prompt);
+        printf("\r\n");
         if (line == NULL || strlen(line) == 0)
         {
             continue;
         }
+        ShellLineArgs shellArgs(line, xTaskGetCurrentTaskHandle());
         linenoiseHistoryAdd(line);
-        int ret;
-        esp_console_run(line, &ret);
-        if (ret)
-        {
-            char errorStr[160];
-            bool errorStrFound = chip::FormatCHIPError(errorStr, sizeof(errorStr), ret);
-            if (!errorStrFound)
-            {
-                errorStr[0] = 0;
-            }
-            printf("Error: %s\n", errorStr);
-        }
-        else
-        {
-            printf("Done\n");
-        }
-
-        linenoiseFree(line);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(process_shell_line, reinterpret_cast<intptr_t>(&shellArgs));
+        shellArgs.WaitShellProcessDone();
     }
 }
 
 extern "C" void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
-    xTaskCreate(&chip_shell_task, "chip_shell", 8192, NULL, 5, NULL);
+    xTaskCreate(&chip_shell_task, "chip_shell", 4096, NULL, 5, NULL);
 }

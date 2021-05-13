@@ -161,31 +161,22 @@ public:
      * @param arg                   Unused context block for shell task to comply with task function syntax.
      */
     static void TaskLoop(void * arg);
+
+private:
+    static void ProcessShellLineTask(intptr_t context);
 };
 
-/** Utility macro for running ForEachCommand on root shell. */
-static inline void shell_command_foreach(shell_command_iterator_t * on_command, void * arg)
-{
-    return Shell::Root().ForEachCommand(on_command, arg);
-}
+/** Utility function for running ForEachCommand on root shell. */
+void shell_command_foreach(shell_command_iterator_t * on_command, void * arg);
 
-/** Utility macro for running ForEachCommand on Root shell. */
-static inline void shell_register(shell_command_t * command_set, unsigned count)
-{
-    return Shell::Root().RegisterCommands(command_set, count);
-}
+/** Utility function for running ForEachCommand on Root shell. */
+void shell_register(shell_command_t * command_set, unsigned count);
 
-/** Utility macro for to tokenize an input line. */
-static inline int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens)
-{
-    return Shell::TokenizeLine(buffer, tokens, max_tokens);
-}
+/** Utility function for to tokenize an input line. */
+int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens);
 
-/** Utility macro to run main shell task loop. */
-static inline void shell_task(void * arg)
-{
-    return Shell::TaskLoop(arg);
-}
+/** Utility function to run main shell task loop. */
+void shell_task(void * arg);
 
 } // namespace Shell
 } // namespace chip

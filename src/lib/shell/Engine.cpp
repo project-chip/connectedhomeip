@@ -21,10 +21,11 @@
  *      Source implementation for a generic shell API for CHIP examples.
  */
 
-#include "shell_core.h"
-#include "commands.h"
+#include <lib/shell/Engine.h>
 
 #include <core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -130,6 +131,7 @@ int Shell::ExecCommand(int argc, char * argv[])
 {
     int retval = CHIP_ERROR_INVALID_ARGUMENT;
 
+    VerifyOrReturnError(argc > 0, retval);
     // Find the command
     for (unsigned i = 0; i < _commandSetCount; i++)
     {
@@ -202,46 +204,83 @@ exit:
     return cursor;
 }
 
-void Shell::TaskLoop(void * arg)
+void Shell::ProcessShellLineTask(intptr_t context)
 {
+    char * line = reinterpret_cast<char *>(context);
     int retval;
     int argc;
     char * argv[CHIP_SHELL_MAX_TOKENS];
-    char line[CHIP_SHELL_MAX_LINE_SIZE];
 
-    theShellRoot.RegisterDefaultCommands();
+    argc = shell_line_tokenize(line, argv, CHIP_SHELL_MAX_TOKENS);
 
-    while (true)
+    if (argc > 0)
     {
-        streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
+        retval = theShellRoot.ExecCommand(argc, argv);
 
-        shell_line_read(line, sizeof(line));
-        argc = shell_line_tokenize(line, argv, CHIP_SHELL_MAX_TOKENS);
-
-        if (argc > 0)
+        if (retval)
         {
-            retval = theShellRoot.ExecCommand(argc, argv);
-
-            if (retval)
+            char errorStr[160];
+            bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), retval);
+            if (!errorStrFound)
             {
-                char errorStr[160];
-                bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), retval);
-                if (!errorStrFound)
-                {
-                    errorStr[0] = 0;
-                }
-                streamer_printf(streamer_get(), "Error %s: %s\r\n", argv[0], errorStr);
+                errorStr[0] = 0;
             }
-            else
-            {
-                streamer_printf(streamer_get(), "Done\r\n", argv[0]);
-            }
+            streamer_printf(streamer_get(), "Error %s: %s\r\n", argv[0], errorStr);
         }
         else
         {
-            // Empty input has no output -- just display prompt
+            streamer_printf(streamer_get(), "Done\r\n", argv[0]);
         }
     }
+    else
+    {
+        // Empty input has no output -- just display prompt
+    }
+    Platform::MemoryFree(line);
+    streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
+}
+
+void Shell::TaskLoop(void * arg)
+{
+    // char line[CHIP_SHELL_MAX_LINE_SIZE];
+
+    theShellRoot.RegisterDefaultCommands();
+    streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
+
+    while (true)
+    {
+        char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
+        shell_line_read(line, CHIP_SHELL_MAX_LINE_SIZE);
+#if CONFIG_DEVICE_LAYER
+        DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLineTask, reinterpret_cast<intptr_t>(line));
+#else
+        ProcessShellLineTask(reinterpret_cast<intptr_t>(line));
+#endif
+    }
+}
+
+/** Utility function for running ForEachCommand on root shell. */
+void shell_command_foreach(shell_command_iterator_t * on_command, void * arg)
+{
+    return Shell::Root().ForEachCommand(on_command, arg);
+}
+
+/** Utility function for running ForEachCommand on Root shell. */
+void shell_register(shell_command_t * command_set, unsigned count)
+{
+    return Shell::Root().RegisterCommands(command_set, count);
+}
+
+/** Utility function for to tokenize an input line. */
+int shell_line_tokenize(char * buffer, char ** tokens, int max_tokens)
+{
+    return Shell::TokenizeLine(buffer, tokens, max_tokens);
+}
+
+/** Utility function to run main shell task loop. */
+void shell_task(void * arg)
+{
+    return Shell::TaskLoop(arg);
 }
 
 } // namespace Shell

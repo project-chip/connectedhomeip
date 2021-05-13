@@ -17,7 +17,7 @@
 
 #include "TestShell.h"
 
-#include <shell/shell_core.h>
+#include <shell/Engine.h>
 #include <support/CodeUtils.h>
 #include <support/UnitTestRegistration.h>
 
