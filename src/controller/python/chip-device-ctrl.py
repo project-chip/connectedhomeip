@@ -627,10 +627,14 @@ def ble_scan():
     #TODO: Return a list of available devices
     return "Scan started"
 
+def qr_code_parse(qr_code):
+    return SetupPayload().ParseQrCode(qr_code).Dictionary()
+
 def start_rpc_server():
     with SimpleXMLRPCServer(("0.0.0.0", 5000)) as server:
         server.register_function(echo_alive)
         server.register_function(ble_scan)
+        server.register_function(qr_code_parse)
         server.register_multicall_functions()
         print('Serving XML-RPC on localhost port 5000')
         try:
