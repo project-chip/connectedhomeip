@@ -1199,8 +1199,7 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
     device->GetCommandSender()->Reset();
 
-    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
-//    err = commissioner->SendTrustedRootCertificate(device);
+    err = commissioner->SendTrustedRootCertificate(device);
 
 exit:
     if (err != CHIP_NO_ERROR)

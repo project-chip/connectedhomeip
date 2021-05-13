@@ -380,7 +380,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         //        We are now using IM messages in commissioner class to provision op creds and
         //        other device commissioning steps. This is somehow causing issues with message counter
         //        verification. Disabling this check for now. Enable it after debugging the cause.
-        //SuccessOrExit(err);
+        // SuccessOrExit(err);
     }
 
     admin = mAdmins->FindAdminWithId(state->GetAdminId());
