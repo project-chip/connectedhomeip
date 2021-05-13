@@ -152,12 +152,3 @@ typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16
 typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
 typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
                                                                       _TestListStructOctet * entries);
-typedef void (*ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback)(void * context, uint16_t count,
-                                                                               _NeighborTable * entries);
-typedef void (*ThreadNetworkDiagnosticsRouteTableListListAttributeCallback)(void * context, uint16_t count, _RouteTable * entries);
-typedef void (*ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback)(void * context, uint16_t count,
-                                                                            _SecurityPolicy * entries);
-typedef void (*ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback)(void * context, uint16_t count,
-                                                                                          _OperationalDatasetComponents * entries);
-typedef void (*ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback)(void * context, uint16_t count,
-                                                                                     uint8_t * entries);
