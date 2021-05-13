@@ -200,7 +200,7 @@ void ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContex
 exit:
     ChipLogFunctError(err);
 
-    // We shall close the exchange instead of abort to allow the ExchangeMgr complete ack if there is any.
+    // Close the exchange cleanly so that the ExchangeManager will send an ack for the message we just received.
     mpExchangeCtx->Close();
     mpExchangeCtx = nullptr;
     MoveToState(ClientState::Initialized);
