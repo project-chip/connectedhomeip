@@ -426,12 +426,15 @@ class DeviceMgrCmd(Cmd):
                     return 0
                 else:
                     print("Unable to connect")
+                    return 1
             else:
                 print("Unable to locate device on network")
 
         if int(setupPayload.attributes["RendezvousInformation"]) & ble:
             print("Attempting to connect via BLE")
-            if self.devCtrl.ConnectBLE(setupPayload.discriminator, setupPayload.setUpPINCode, nodeid):
+            longDiscriminator = ctypes.c_uint16(int(setupPayload.attributes['Discriminator']))
+            pincode = ctypes.c_uint32(int(setupPayload.attributes['SetUpPINCode']))
+            if self.devCtrl.ConnectBLE(longDiscriminator, pincode, nodeid):
                 print("Connected")
                 return 0
             else:
