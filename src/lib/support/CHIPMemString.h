@@ -48,23 +48,22 @@ namespace Platform {
  *
  * @retval  Same as `dest`.
  */
-inline char * CopyString(char * dest, size_t destLength, const char * source)
+inline void CopyString(char * dest, size_t destLength, const char * source)
 {
     if (dest && destLength)
     {
         strncpy(dest, source, destLength);
         dest[destLength - 1] = 0;
     }
-    return dest;
 }
 
 /**
  * Convenience method for CopyString to auto-detect destination size.
  */
 template <size_t N>
-inline char * CopyString(char (&dest)[N], const char * source)
+inline void CopyString(char (&dest)[N], const char * source)
 {
-    return CopyString(dest, N, source);
+    CopyString(dest, N, source);
 }
 
 /**
