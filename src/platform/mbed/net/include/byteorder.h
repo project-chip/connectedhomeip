@@ -205,8 +205,8 @@ extern "C" {
  */
 static inline void sys_put_be16(uint16_t val, uint8_t dst[2])
 {
-    dst[0] = val >> 8;
-    dst[1] = val;
+    dst[0] = (uint8_t)(val >> 8);
+    dst[1] = (uint8_t) val;
 }
 
 /**
@@ -220,8 +220,8 @@ static inline void sys_put_be16(uint16_t val, uint8_t dst[2])
  */
 static inline void sys_put_be24(uint32_t val, uint8_t dst[3])
 {
-    dst[0] = val >> 16;
-    sys_put_be16(val, &dst[1]);
+    dst[0] = (uint8_t)(val >> 16);
+    sys_put_be16((uint16_t) val, &dst[1]);
 }
 
 /**
@@ -235,8 +235,8 @@ static inline void sys_put_be24(uint32_t val, uint8_t dst[3])
  */
 static inline void sys_put_be32(uint32_t val, uint8_t dst[4])
 {
-    sys_put_be16(val >> 16, dst);
-    sys_put_be16(val, &dst[2]);
+    sys_put_be16((uint16_t)(val >> 16), dst);
+    sys_put_be16((uint16_t) val, &dst[2]);
 }
 
 /**
@@ -250,8 +250,8 @@ static inline void sys_put_be32(uint32_t val, uint8_t dst[4])
  */
 static inline void sys_put_be48(uint64_t val, uint8_t dst[6])
 {
-    sys_put_be16(val >> 32, dst);
-    sys_put_be32(val, &dst[2]);
+    sys_put_be16((uint16_t)(val >> 32), dst);
+    sys_put_be32((uint32_t) val, &dst[2]);
 }
 
 /**
@@ -265,8 +265,8 @@ static inline void sys_put_be48(uint64_t val, uint8_t dst[6])
  */
 static inline void sys_put_be64(uint64_t val, uint8_t dst[8])
 {
-    sys_put_be32(val >> 32, dst);
-    sys_put_be32(val, &dst[4]);
+    sys_put_be32((uint32_t)(val >> 32), dst);
+    sys_put_be32((uint32_t) val, &dst[4]);
 }
 
 /**
@@ -280,8 +280,8 @@ static inline void sys_put_be64(uint64_t val, uint8_t dst[8])
  */
 static inline void sys_put_le16(uint16_t val, uint8_t dst[2])
 {
-    dst[0] = val;
-    dst[1] = val >> 8;
+    dst[0] = (uint8_t) val;
+    dst[1] = (uint8_t)(val >> 8);
 }
 
 /**
@@ -295,8 +295,8 @@ static inline void sys_put_le16(uint16_t val, uint8_t dst[2])
  */
 static inline void sys_put_le24(uint32_t val, uint8_t dst[3])
 {
-    sys_put_le16(val, dst);
-    dst[2] = val >> 16;
+    sys_put_le16((uint16_t) val, dst);
+    dst[2] = (uint8_t)(val >> 16);
 }
 
 /**
@@ -310,8 +310,8 @@ static inline void sys_put_le24(uint32_t val, uint8_t dst[3])
  */
 static inline void sys_put_le32(uint32_t val, uint8_t dst[4])
 {
-    sys_put_le16(val, dst);
-    sys_put_le16(val >> 16, &dst[2]);
+    sys_put_le16((uint16_t) val, dst);
+    sys_put_le16((uint16_t)(val >> 16), &dst[2]);
 }
 
 /**
@@ -325,8 +325,8 @@ static inline void sys_put_le32(uint32_t val, uint8_t dst[4])
  */
 static inline void sys_put_le48(uint64_t val, uint8_t dst[6])
 {
-    sys_put_le32(val, dst);
-    sys_put_le16(val >> 32, &dst[4]);
+    sys_put_le32((uint32_t) val, dst);
+    sys_put_le16((uint16_t)(val >> 32), &dst[4]);
 }
 
 /**
@@ -340,8 +340,8 @@ static inline void sys_put_le48(uint64_t val, uint8_t dst[6])
  */
 static inline void sys_put_le64(uint64_t val, uint8_t dst[8])
 {
-    sys_put_le32(val, dst);
-    sys_put_le32(val >> 32, &dst[4]);
+    sys_put_le32((uint32_t) val, dst);
+    sys_put_le32((uint32_t)(val >> 32), &dst[4]);
 }
 
 /**
@@ -356,7 +356,8 @@ static inline void sys_put_le64(uint64_t val, uint8_t dst[8])
  */
 static inline uint16_t sys_get_be16(const uint8_t src[2])
 {
-    return ((uint16_t) src[0] << 8) | src[1];
+    return (uint16_t)((src[0] << 8) | src[1]);
+    // return (uint16_t)(((uint16_t)(src[0] << 8)) | ((uint16_t) src[1]));
 }
 
 /**
@@ -371,7 +372,7 @@ static inline uint16_t sys_get_be16(const uint8_t src[2])
  */
 static inline uint32_t sys_get_be24(const uint8_t src[3])
 {
-    return ((uint32_t) src[0] << 16) | sys_get_be16(&src[1]);
+    return (uint32_t)((src[0] << 16) | sys_get_be16(&src[1]));
 }
 
 /**
@@ -386,7 +387,7 @@ static inline uint32_t sys_get_be24(const uint8_t src[3])
  */
 static inline uint32_t sys_get_be32(const uint8_t src[4])
 {
-    return ((uint32_t) sys_get_be16(&src[0]) << 16) | sys_get_be16(&src[2]);
+    return (uint32_t)((sys_get_be16(&src[0]) << 16) | sys_get_be16(&src[2]));
 }
 
 /**
@@ -431,7 +432,7 @@ static inline uint64_t sys_get_be64(const uint8_t src[8])
  */
 static inline uint16_t sys_get_le16(const uint8_t src[2])
 {
-    return ((uint16_t) src[1] << 8) | src[0];
+    return (uint16_t)((src[1] << 8) | src[0]);
 }
 
 /**

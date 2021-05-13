@@ -37,6 +37,8 @@ struct if_nameindex
     char * if_name;        /* Null-terminated name ("eth0", etc.) */
 };
 
+// Suppress the warning, this is normally a system header
+#pragma GCC diagnostic ignored "-Wshadow"
 struct if_nameindex * if_nameindex(void);
 char * if_indextoname(unsigned int ifindex, char * ifname);
 unsigned int if_nametoindex(const char * ifname);

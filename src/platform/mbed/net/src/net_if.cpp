@@ -315,7 +315,9 @@ static char * inet_ntop6(const void * src, char * dst, size_t size)
     for (i = 0; i < IN6ADDRSZ; i++)
         words[i / 2] |= (buf[i] << ((1 - (i % 2)) << 3));
     best.base = -1;
+    best.len  = 0;
     cur.base  = -1;
+    cur.len   = 0;
     for (i = 0; i < (IN6ADDRSZ / INT16SZ); i++)
     {
         if (words[i] == 0)

@@ -727,6 +727,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     }
     mFlags.Set(Flags::kFlag_AdvertisingRefreshNeeded);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return CHIP_NO_ERROR;
 }
 
 /* Build the advertising data and start advertising.

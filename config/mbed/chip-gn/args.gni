@@ -27,10 +27,7 @@ chip_inet_config_enable_dns_resolver = true
 chip_inet_config_enable_async_dns_sockets = false
 
 chip_custom_build_cflags = [
-  "-Wno-shadow",
-  "-Wno-conversion",
-  "-Wno-maybe-uninitialized",
-  "-Wno-return-type",
+
 ]
 
 custom_toolchain = "//toolchain:mbed"

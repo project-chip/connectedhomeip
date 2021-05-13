@@ -102,7 +102,7 @@ struct sockaddr_in6
     uint16_t sin6_port;        /* Port number            */
     uint32_t sin6_flowinfo;    /* IPv6 flow information  */
     struct in6_addr sin6_addr; /* IPv6 address           */
-    uint8_t sin6_scope_id;     /* interfaces for a scope */
+    uint32_t sin6_scope_id;    /* interfaces for a scope */
 };
 
 struct sockaddr_in6_ptr
@@ -110,7 +110,7 @@ struct sockaddr_in6_ptr
     sa_family_t sin6_family;     /* AF_INET6               */
     uint16_t sin6_port;          /* Port number            */
     struct in6_addr * sin6_addr; /* IPv6 address           */
-    uint8_t sin6_scope_id;       /* interfaces for a scope */
+    uint32_t sin6_scope_id;      /* interfaces for a scope */
 };
 
 /** Socket address struct for IPv4. */

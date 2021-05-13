@@ -131,6 +131,7 @@ int BSDSocket::close()
     {
         socketName.set_ip_bytes(nullptr, NSAPI_UNSPEC);
     }
+    return 0;
 }
 
 ssize_t BSDSocket::read(void * buffer, size_t size)

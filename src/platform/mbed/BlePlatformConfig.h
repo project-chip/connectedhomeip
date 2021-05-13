@@ -27,8 +27,8 @@
 
 // ==================== Platform Adaptations ====================
 
-#define BLE_CONNECTION_OBJECT uint8_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint8_t) -1)
+#define BLE_CONNECTION_OBJECT uintptr_t
+#define BLE_CONNECTION_UNINITIALIZED ((uintptr_t) -1)
 #define BLE_MAX_RECEIVE_WINDOW_SIZE 5
 
 #define BLE_CONFIG_ERROR_TYPE int32_t
