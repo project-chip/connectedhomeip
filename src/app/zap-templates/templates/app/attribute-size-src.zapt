@@ -86,7 +86,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 {{chipType}} * entry = reinterpret_cast<{{chipType}} *>(write ? src : dest);
                 {{#chip_attribute_list_entryTypes}}
                 {{#if (isString type)}}
-                chip::ByteSpan * {{name}}Span = &entry->{{name}}; // {{type}}
+                chip::ByteSpan * {{name}}Span = reinterpret_cast<chip::ByteSpan *>(&entry->{{name}}); // {{type}}
                 if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{size}}, {{name}}Span) : ReadByteSpan(src + entryOffset, {{size}}, {{name}}Span)))
                 {
                     ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
