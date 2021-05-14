@@ -265,6 +265,9 @@
 #define ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID (0x0F)
 #define ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID (0x10)
 
+// Commands for cluster: Thread Network Diagnostics
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
 // Commands for cluster: WiFi Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 

@@ -44,6 +44,7 @@ EmberAfStatus emberAfMediaPlaybackClusterServerCommandParse(EmberAfClusterComman
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTvChannelClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfTargetNavigatorClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWakeOnLanClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
@@ -136,6 +137,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
             result = emberAfTargetNavigatorClusterServerCommandParse(cmd);
+            break;
+        case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster Thread Network Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_WAKE_ON_LAN_CLUSTER_ID:
             // No commands are enabled for cluster Wake on LAN
