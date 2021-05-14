@@ -96,6 +96,8 @@ class SetupPayload:
                    c_int32,
                    [c_char_p, SetupPayload.AttributeVisitor, SetupPayload.VendorAttributeVisitor])
 
+######----------------------------------------------------------------------------------------######
+
     def Dictionary(self):
         payload_dict = {}
         attributes_array = self.attributes + self.vendor_attributes
