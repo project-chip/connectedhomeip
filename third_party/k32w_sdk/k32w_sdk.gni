@@ -21,6 +21,7 @@ import("${chip_root}/src/platform/K32W/args.gni")
 declare_args() {
   # Location of the k32w SDK.
   k32w_sdk_root = getenv("K32W_SDK_ROOT")
+  chip_with_OM15082 = 0
 }
 
 assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
@@ -128,8 +129,6 @@ template("k32w_sdk") {
       "gPdmNbSegments=63",
       "configFRTOS_MEMORY_SCHEME=4",
       "osCustomStartup=1",
-      "OM15082=1",
-      "gKBD_KeysCount_c=4",
       "gLEDsOnTargetBoardCnt_c=2",
       "gLED_InvertedMode_d=1",
       "ENABLE_RAM_VECTOR_TABLE=1",
@@ -171,6 +170,14 @@ template("k32w_sdk") {
       ]
     } else {
       defines += [ "gMainThreadStackSize_c=6024" ]
+    }
+    if (chip_with_OM15082 == 1) {
+      defines += [
+        "gKBD_KeysCount_c=4",
+        "OM15082=1",
+      ]
+    } else {
+      defines += [ "gKBD_KeysCount_c=1" ]
     }
 
     if (defined(invoker.defines)) {
