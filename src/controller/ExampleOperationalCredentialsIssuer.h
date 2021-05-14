@@ -22,6 +22,9 @@
  *    issuer for CHIP devices. The class can be used as a guideline on how to
  *    construct your own certificate issuer. It can also be used in tests and tools
  *    if a specific signing authority is not required.
+ *
+ *    NOTE: This class stores the encryption key in clear storage. This is not suited
+ *          for production use. This should only be used in test tools.
  */
 
 #pragma once
@@ -55,7 +58,8 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize(PersistentStorageDelegate & storage);
+    [[deprecated("This class stores the encryption key in clear storage. Don't use it for production code.")]] CHIP_ERROR
+    Initialize(PersistentStorageDelegate & storage);
 
     void SetIssuerId(uint32_t id) { mIssuerId = id; }
 
