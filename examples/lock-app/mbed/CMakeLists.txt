@@ -37,30 +37,35 @@ target_include_directories(${APP_TARGET} PRIVATE
 )
 
 target_sources(${APP_TARGET} PRIVATE
-               ${LOCK_COMMON}/gen/attribute-size.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/BoltLockManager.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp               
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
+               ${LOCK_COMMON}/gen/attribute-size.cpp
                ${APP_ROOT}/lock-common/gen/call-command-handler.cpp
                ${APP_ROOT}/lock-common/gen/callback-stub.cpp
+               ${LOCK_COMMON}/gen/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
+               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.cpp
                ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
                ${CHIP_ROOT}/src/app/util/attribute-table.cpp
                ${CHIP_ROOT}/src/app/util/binding-table.cpp
                ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
                ${CHIP_ROOT}/src/app/util/client-api.cpp
+               ${CHIP_ROOT}/src/app/util/ember-compatibility-functions.cpp
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
+               ${CHIP_ROOT}/src/app/server/Mdns.cpp
                ${CHIP_ROOT}/src/app/server/OnboardingCodesUtil.cpp
                ${CHIP_ROOT}/src/app/server/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/server/Server.cpp
