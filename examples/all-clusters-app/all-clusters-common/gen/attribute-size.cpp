@@ -156,7 +156,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _NetworkInterfaceType
             _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-            chip::ByteSpan * NameSpan     = reinterpret_cast<chip::ByteSpan *>(&entry->Name); // CHAR_STRING
+            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
             {
@@ -219,8 +219,8 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
                            &entryOffset, sizeof(entry->VendorId)); // INT16U
             copyListMember(write ? dest : (uint8_t *) &entry->GroupKeyIndex, write ? (uint8_t *) &entry->GroupKeyIndex : src, write,
-                           &entryOffset, sizeof(entry->GroupKeyIndex));                                   // INT16U
-            chip::ByteSpan * GroupKeyRootSpan = reinterpret_cast<chip::ByteSpan *>(&entry->GroupKeyRoot); // OCTET_STRING
+                           &entryOffset, sizeof(entry->GroupKeyIndex)); // INT16U
+            chip::ByteSpan * GroupKeyRootSpan = &entry->GroupKeyRoot;   // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 18, GroupKeyRootSpan)
                        : ReadByteSpan(src + entryOffset, 18, GroupKeyRootSpan)))
@@ -318,8 +318,8 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             // Struct _TestListStructOctet
             _TestListStructOctet * entry = reinterpret_cast<_TestListStructOctet *>(write ? src : dest);
             copyListMember(write ? dest : (uint8_t *) &entry->fabricIndex, write ? (uint8_t *) &entry->fabricIndex : src, write,
-                           &entryOffset, sizeof(entry->fabricIndex));                                           // INT64U
-            chip::ByteSpan * operationalCertSpan = reinterpret_cast<chip::ByteSpan *>(&entry->operationalCert); // OCTET_STRING
+                           &entryOffset, sizeof(entry->fabricIndex));       // INT64U
+            chip::ByteSpan * operationalCertSpan = &entry->operationalCert; // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, operationalCertSpan)
                        : ReadByteSpan(src + entryOffset, 34, operationalCertSpan)))
