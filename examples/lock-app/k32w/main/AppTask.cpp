@@ -158,7 +158,7 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
         while (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
@@ -244,15 +244,14 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     }
     else if (pin_no == BLE_BUTTON)
     {
-    	button_event.Handler = BleHandler;
+        button_event.Handler = BleHandler;
 
 #if !(defined OM15082)
-	if (button_action == RESET_BUTTON_PUSH)
-	{
-		button_event.Handler = ResetActionEventHandler;
-	}
+        if (button_action == RESET_BUTTON_PUSH)
+        {
+            button_event.Handler = ResetActionEventHandler;
+        }
 #endif
-
     }
     sAppTask.PostEvent(&button_event);
 }
@@ -300,13 +299,12 @@ void AppTask::HandleKeyboard(void)
             break;
 #if !(defined OM15082)
         case gKBD_EventLongPB1_c:
-			ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
-			break;
+            ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+            break;
 #endif
         default:
             break;
         }
-
     }
 }
 

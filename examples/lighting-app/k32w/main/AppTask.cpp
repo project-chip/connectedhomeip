@@ -242,10 +242,10 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = BleHandler;
 #if !(defined OM15082)
-	if (button_action == RESET_BUTTON_PUSH)
-	{
-		button_event.Handler = ResetActionEventHandler;
-	}
+        if (button_action == RESET_BUTTON_PUSH)
+        {
+            button_event.Handler = ResetActionEventHandler;
+        }
 #endif
     }
 
@@ -295,8 +295,8 @@ void AppTask::HandleKeyboard(void)
             break;
 #if !(defined OM15082)
         case gKBD_EventLongPB1_c:
-			ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
-			break;
+            ButtonEventHandler(BLE_BUTTON, RESET_BUTTON_PUSH);
+            break;
 #endif
         default:
             break;
