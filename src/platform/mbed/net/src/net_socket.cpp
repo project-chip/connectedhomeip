@@ -991,6 +991,11 @@ int mbed_select(int nfds, fd_set * readfds, fd_set * writefds, fd_set * exceptfd
         {
             // No timeout value set and no file descriptor ready, return
             // immediately, no fd processed
+            for (size_t i = 0; i < fd_count; ++i)
+            {
+                auto & cb = control_blocks[i];
+                cb.handle->sigio(nullptr);
+            }
             return fd_processed;
         }
     }

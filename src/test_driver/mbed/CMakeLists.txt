@@ -77,13 +77,14 @@ set(CHIP_TESTS
     # # -lRawTransportTests
     -lRetransmitTests
     # -lSupportTests
-    # -lSystemLayerTests
+    -lSystemLayerTests
     -lTransportLayerTests
     -lMinimalMdnsCoreTests
     -lMinimalMdnstests
     -lMinimalMdnsRecordsTests
     -lMinimalMdnsRespondersTests
     -lBDXTests
+    #-lSetupPayloadTests
 )
 
 # Link the *whole-archives* to keep the static test objects.
