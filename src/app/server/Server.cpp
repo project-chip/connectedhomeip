@@ -486,6 +486,8 @@ void InitServer(AppDelegate * delegate)
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
     err = PersistedStorage::KeyValueStoreMgrImpl().Init("chip.store");
     SuccessOrExit(err);
+#elif CHIP_DEVICE_LAYER_TARGET_LINUX
+    PersistedStorage::KeyValueStoreMgrImpl().Init("/tmp/chip_server_kvs");
 #endif
 
     err = gRendezvousServer.Init(delegate, &gServerStorage);
