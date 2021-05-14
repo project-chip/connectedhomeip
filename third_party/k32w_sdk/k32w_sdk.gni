@@ -20,7 +20,7 @@ import("${chip_root}/src/crypto/crypto.gni")
 declare_args() {
   # Location of the k32w SDK.
   k32w_sdk_root = getenv("K32W_SDK_ROOT")
-  chip_with_OM15082=0
+  chip_with_OM15082 = 0
 }
 
 assert(k32w_sdk_root != "", "k32w_sdk_root must be specified")
@@ -165,7 +165,7 @@ template("k32w_sdk") {
     if (chip_with_OM15082 == 1) {
       defines += [
         "gKBD_KeysCount_c=4",
-        "OM15082=1"
+        "OM15082=1",
       ]
     } else {
       defines += [ "gKBD_KeysCount_c=1" ]
