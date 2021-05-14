@@ -232,7 +232,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
-    mExchangeMgr = em;
+    mExchangeMgr   = em;
     mExchangeId    = ExchangeId;
     mSecureSession = session;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
