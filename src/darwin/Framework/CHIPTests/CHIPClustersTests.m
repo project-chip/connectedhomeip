@@ -2258,6 +2258,63 @@ CHIPDevice * GetPairedDevice(uint64_t deviceId)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterGeneralDiagnosticsReadAttributeNetworkInterfacesWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralDiagnosticsReadAttributeNetworkInterfacesWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNetworkInterfacesWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralDiagnostics NetworkInterfaces Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterGeneralDiagnosticsReadAttributeRebootCountWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralDiagnosticsReadAttributeRebootCountWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeRebootCountWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralDiagnostics RebootCount Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterGeneralDiagnosticsReadAttributeClusterRevisionWithResponseHandler
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralDiagnosticsReadAttributeClusterRevisionWithResponseHandler"];
+
+    CHIPDevice * device = GetPairedDevice(kDeviceId);
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPGeneralDiagnostics * cluster = [[CHIPGeneralDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithResponseHandler:^(NSError * err, NSDictionary * values) {
+        NSLog(@"GeneralDiagnostics ClusterRevision Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterGroupKeyManagementReadAttributeGroupsWithResponseHandler
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"GroupKeyManagementReadAttributeGroupsWithResponseHandler"];

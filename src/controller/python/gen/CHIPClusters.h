@@ -39,6 +39,7 @@ constexpr ClusterId kContentLaunchClusterId               = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
+constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
 constexpr ClusterId kGroupsClusterId                      = 0x0004;
 constexpr ClusterId kIdentifyClusterId                    = 0x0003;
@@ -537,6 +538,19 @@ private:
     static constexpr CommandId kArmFailSafeCommandId           = 0x00;
     static constexpr CommandId kCommissioningCompleteCommandId = 0x04;
     static constexpr CommandId kSetRegulatoryConfigCommandId   = 0x02;
+};
+
+class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
+{
+public:
+    GeneralDiagnosticsCluster() : ClusterBase(kGeneralDiagnosticsClusterId) {}
+    ~GeneralDiagnosticsCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNetworkInterfaces(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRebootCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase

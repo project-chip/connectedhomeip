@@ -95,7 +95,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             // Struct _NetworkInterfaceType
             _NetworkInterfaceType * entry = reinterpret_cast<_NetworkInterfaceType *>(write ? src : dest);
-            chip::ByteSpan * NameSpan     = reinterpret_cast<chip::ByteSpan *>(&entry->Name); // CHAR_STRING
+            chip::ByteSpan * NameSpan     = &entry->Name; // OCTET_STRING
             if (CHIP_NO_ERROR !=
                 (write ? WriteByteSpan(dest + entryOffset, 34, NameSpan) : ReadByteSpan(src + entryOffset, 34, NameSpan)))
             {

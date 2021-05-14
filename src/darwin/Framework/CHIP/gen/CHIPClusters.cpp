@@ -2336,6 +2336,39 @@ CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::C
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// GeneralDiagnostics Cluster Commands
+// GeneralDiagnostics Cluster Attributes
+CHIP_ERROR GeneralDiagnosticsCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeGeneralDiagnosticsClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeNetworkInterfaces(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeGeneralDiagnosticsClusterReadNetworkInterfacesAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeRebootCount(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeGeneralDiagnosticsClusterReadRebootCountAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeGeneralDiagnosticsClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // GroupKeyManagement Cluster Commands
 // GroupKeyManagement Cluster Attributes
 CHIP_ERROR GroupKeyManagementCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,

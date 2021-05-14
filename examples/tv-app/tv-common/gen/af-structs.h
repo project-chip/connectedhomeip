@@ -333,7 +333,7 @@ typedef struct _NeighborTable
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
-    uint8_t * Name;
+    chip::ByteSpan Name;
     uint8_t FabricConnected;
     uint8_t OffPremiseServicesReachableIPv4;
     uint8_t OffPremiseServicesReachableIPv6;

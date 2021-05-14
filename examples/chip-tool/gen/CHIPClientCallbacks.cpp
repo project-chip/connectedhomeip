@@ -487,6 +487,42 @@ bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * messag
                     }
                     }
                     break;
+                case 0x0033:
+                    switch (attributeId)
+                    {
+                    case 0x0000: // NetworkInterfaceType
+                    {
+                        _NetworkInterfaceType data[count];
+                        for (size_t i = 0; i < count; i++)
+                        {
+                            CHECK_STATUS(ReadByteSpan(message, 34, &data[i].Name));
+                            messageLen -= 34;
+                            message += 34;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].FabricConnected = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].OffPremiseServicesReachableIPv4 = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].OffPremiseServicesReachableIPv6 = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                            CHECK_MESSAGE_LENGTH(8);
+                            data[i].HardwareAddress = emberAfGetInt64u(message, 0, 8);
+                            message += 8;
+                            CHECK_MESSAGE_LENGTH(1);
+                            data[i].Type = emberAfGetInt8u(message, 0, 1);
+                            message += 1;
+                        }
+
+                        Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback> * cb =
+                            Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>::FromCancelable(
+                                onSuccessCallback);
+                        cb->mCall(cb->mContext, count, data);
+                        break;
+                    }
+                    }
+                    break;
                 case 0xF004:
                     switch (attributeId)
                     {

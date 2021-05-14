@@ -111,6 +111,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
 | GeneralCommissioning                                                | 0x0030 |
+| GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
@@ -238,6 +239,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x00)
 #define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x04)
 #define ZCL_SET_REGULATORY_CONFIG_COMMAND_ID (0x02)
+
+#define GENERAL_DIAGNOSTICS_CLUSTER_ID 0x0033
 
 #define GROUP_KEY_MANAGEMENT_CLUSTER_ID 0xF004
 
@@ -3016,6 +3019,54 @@ PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uin
 PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralCommissioningClusterRevision", GENERAL_COMMISSIONING_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster GeneralDiagnostics                                          | 0x0033 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * NetworkInterfaces                                                 | 0x0000 |
+| * RebootCount                                                       | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeGeneralDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverGeneralDiagnosticsAttributes", GENERAL_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute NetworkInterfaces
+ */
+PacketBufferHandle encodeGeneralDiagnosticsClusterReadNetworkInterfacesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralDiagnosticsNetworkInterfaces", GENERAL_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute RebootCount
+ */
+PacketBufferHandle encodeGeneralDiagnosticsClusterReadRebootCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralDiagnosticsRebootCount", GENERAL_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeGeneralDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadGeneralDiagnosticsClusterRevision", GENERAL_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

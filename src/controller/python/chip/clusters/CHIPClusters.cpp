@@ -1552,6 +1552,27 @@ CHIP_ERROR chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(chip::Con
 }
 
 // End of Cluster GeneralCommissioning
+// Cluster GeneralDiagnostics
+
+CHIP_ERROR chip_ime_ReadAttribute_GeneralDiagnostics_RebootCount(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                 chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeRebootCount(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::GeneralDiagnosticsCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster GeneralDiagnostics
 // Cluster GroupKeyManagement
 
 CHIP_ERROR chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision(chip::Controller::Device * device,

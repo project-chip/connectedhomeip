@@ -61,7 +61,8 @@ limitations under the License.
      <item name="operationalCert" type="OCTET_STRING" length="32"/>
    </struct>
   <struct name="NetworkInterfaceType">
-    <item name="Name" type="CHAR_STRING" length="32"/>
+    // TODO: CHAR_STRING not supported yet in structs.
+    <item name="Name" type="OCTET_STRING" length="32"/>
     <item name="FabricConnected" type="BOOLEAN"/>
     <item name="OffPremiseServicesReachableIPv4" type="BOOLEAN"/>
     <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN"/>
