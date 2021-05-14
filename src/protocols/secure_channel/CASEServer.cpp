@@ -82,7 +82,6 @@ void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
     ReturnOnFailure(InitCASEHandshake(ec));
 
-    ChipLogProgress(Inet, "CASE Server handing over SigmaR1 message to state machine");
     mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
 
     // TODO - Enable multiple concurrent CASE session establishment

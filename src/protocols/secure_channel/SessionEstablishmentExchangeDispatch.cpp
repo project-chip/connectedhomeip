@@ -80,7 +80,6 @@ bool SessionEstablishmentExchangeDispatch::MessagePermitted(uint16_t protocol, u
     default:
         break;
     }
-    ChipLogDetail(ExchangeManager, "SessionEstablishmentExchangeDispatch: message is not permitted");
     return false;
 }
 

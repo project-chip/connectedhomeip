@@ -241,7 +241,6 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
     if (mOperationalCert == nullptr)
     {
         mOperationalCert = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(cert.size()));
-        ChipLogProgress(Inet, "Allocated memory for cert %p", mOperationalCert);
     }
     VerifyOrReturnError(mOperationalCert != nullptr, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(CanCastTo<uint16_t>(cert.size()), CHIP_ERROR_INVALID_ARGUMENT);
@@ -393,7 +392,6 @@ CHIP_ERROR AdminPairingTable::LoadFromStorage(AdminId id)
         didCreateAdmin = true;
     }
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogProgress(Discovery, "Fetching admin (%d) from storage", id);
     err = admin->FetchFromKVS(mStorage);
 
 exit:
