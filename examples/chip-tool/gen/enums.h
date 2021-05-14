@@ -2161,6 +2161,15 @@ typedef enum
     EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR            = 19,
 } EmberAfNetworkCommissioningError;
 
+// Enum for NetworkFault
+typedef enum
+{
+    EMBER_ZCL_NETWORK_FAULT_UNSPECIFIED      = 0,
+    EMBER_ZCL_NETWORK_FAULT_LINK_DOWN        = 1,
+    EMBER_ZCL_NETWORK_FAULT_HARDWARE_FAILURE = 2,
+    EMBER_ZCL_NETWORK_FAULT_NETWORK_JAMMED   = 3,
+} EmberAfNetworkFault;
+
 // Enum for NetworkFaultType
 typedef enum
 {
@@ -2564,6 +2573,18 @@ typedef enum
     EMBER_ZCL_RESULT_TYPE_ACCEPTED_SUPPLY_DISABLED        = 17,
     EMBER_ZCL_RESULT_TYPE_ACCEPTED_SUPPLY_ARMED           = 18,
 } EmberAfResultType;
+
+// Enum for RoutingRole
+typedef enum
+{
+    EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED       = 0,
+    EMBER_ZCL_ROUTING_ROLE_UNASSIGNED        = 1,
+    EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE = 2,
+    EMBER_ZCL_ROUTING_ROLE_END_DEVICE        = 3,
+    EMBER_ZCL_ROUTING_ROLE_REED              = 4,
+    EMBER_ZCL_ROUTING_ROLE_ROUTER            = 5,
+    EMBER_ZCL_ROUTING_ROLE_LEADER            = 6,
+} EmberAfRoutingRole;
 
 // Enum for SampleType
 typedef enum
