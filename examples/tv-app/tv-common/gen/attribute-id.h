@@ -421,6 +421,20 @@
 
 // Server attributes
 
+// Attribute ids for cluster: General Diagnostics
+
+// Client attributes
+
+// Server attributes
+#define ZCL_NETWORK_INTERFACES_ATTRIBUTE_ID (0x0000)
+#define ZCL_REBOOT_COUNT_ATTRIBUTE_ID (0x0001)
+#define ZCL_UPTIME_ATTRIBUTE_ID (0x0002)
+#define ZCL_TOTAL_OPERATIONAL_HOURS_ATTRIBUTE_ID (0x0003)
+#define ZCL_BOOT_REASONS_ATTRIBUTE_ID (0x0004)
+#define ZCL_ACTIVE_HARDWARE_FAULTS_ATTRIBUTE_ID (0x0005)
+#define ZCL_ACTIVE_RADIO_FAULTS_ATTRIBUTE_ID (0x0006)
+#define ZCL_ACTIVE_NETWORK_FAULTS_ATTRIBUTE_ID (0x0007)
+
 // Attribute ids for cluster: WiFi Network Diagnostics
 
 // Client attributes
@@ -1287,6 +1301,8 @@
 #define ZCL_ENUM16_ATTRIBUTE_ID (0x0016)
 #define ZCL_OCTET_STRING_ATTRIBUTE_ID (0x0019)
 #define ZCL_LIST_ATTRIBUTE_ID (0x001A)
+#define ZCL_LIST_OCTET_STRING_ATTRIBUTE_ID (0x001B)
+#define ZCL_LIST_STRUCT_OCTET_STRING_ATTRIBUTE_ID (0x001C)
 
 // Attribute ids for cluster: Generic Tunnel
 

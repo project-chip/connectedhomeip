@@ -27,6 +27,7 @@
         "operational-credentials-cluster.xml",
         "trusted-root-certificates-cluster.xml",
         "general-commissioning-cluster.xml",
+        "general-diagnostics-cluster.xml",
         "group-key-mgmt-cluster.xml",
         "ha.xml",
         "ha-devices.xml",

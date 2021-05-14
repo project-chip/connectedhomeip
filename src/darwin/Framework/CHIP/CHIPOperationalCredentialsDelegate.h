@@ -55,6 +55,7 @@ private:
 
     const uint32_t kCertificateValiditySecs = 365 * 24 * 60 * 60;
     const NSString * kCHIPCAKeyLabel = @"chip.nodeopcerts.CA:0";
+    const NSData * kCHIPCAKeyTag = [@"com.zigbee.chip.commissioner.ca.issuer.id" dataUsingEncoding:NSUTF8StringEncoding];
 
     id mKeyType = (id) kSecAttrKeyTypeECSECPrimeRandom;
     id mKeySize = @256;

@@ -35,11 +35,8 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
         emberAfGeneralCommissioningClusterInitCallback(endpoint);
         break;
-    case ZCL_GROUPS_CLUSTER_ID:
-        emberAfGroupsClusterInitCallback(endpoint);
-        break;
-    case ZCL_IDENTIFY_CLUSTER_ID:
-        emberAfIdentifyClusterInitCallback(endpoint);
+    case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+        emberAfGeneralDiagnosticsClusterInitCallback(endpoint);
         break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
@@ -49,9 +46,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_PUMP_CONFIG_CONTROL_CLUSTER_ID:
         emberAfPumpConfigurationAndControlClusterInitCallback(endpoint);
-        break;
-    case ZCL_SCENES_CLUSTER_ID:
-        emberAfScenesClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -69,12 +63,7 @@ void __attribute__((weak)) emberAfGeneralCommissioningClusterInitCallback(Endpoi
     // To prevent warning
     (void) endpoint;
 }
-void __attribute__((weak)) emberAfGroupsClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfIdentifyClusterInitCallback(EndpointId endpoint)
+void __attribute__((weak)) emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -90,11 +79,6 @@ void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -376,7 +360,7 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * be handled by the application framework.
  *
  * @param type   Ver.: always
- * @param indexOrDestination   Ver.: always
+ * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
  * @param message   Ver.: always

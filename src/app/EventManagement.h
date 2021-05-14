@@ -71,7 +71,7 @@ public:
      * @param[in] apNext         The pointer to CircularEventBuffer storing
      *                           events of greater priority.
      *
-     * @param[in] apNext         CircularEventBuffer prioty level
+     * @param[in] aPriorityLevel CircularEventBuffer priority level
      */
     void Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev, CircularEventBuffer * apNext,
               PriorityLevel aPriorityLevel);
@@ -144,12 +144,11 @@ public:
     virtual ~CircularEventBuffer() = default;
 
 private:
-    CircularEventBuffer * mpPrev = nullptr; //< A pointer CircularEventBuffer storing events less important events
-    CircularEventBuffer * mpNext = nullptr; //< A pointer CircularEventBuffer storing events more important events
+    CircularEventBuffer * mpPrev = nullptr; ///< A pointer CircularEventBuffer storing events less important events
+    CircularEventBuffer * mpNext = nullptr; ///< A pointer CircularEventBuffer storing events more important events
 
-    PriorityLevel mPriority =
-        PriorityLevel::Invalid; //< The buffer is the final bucket for events of this priority.  Events of lesser priority are
-    //< dropped when they get bumped out of this buffer
+    PriorityLevel mPriority = PriorityLevel::Invalid; ///< The buffer is the final bucket for events of this priority.  Events of
+                                                      ///< lesser priority are dropped when they get bumped out of this buffer
 
     // The counter we're going to actually use.
     MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
@@ -157,11 +156,11 @@ private:
     // The backup counter to use if no counter is provided for us.
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
-    size_t mRequiredSpaceForEvicted = 0;  //< Required space for previous buffer to evict event to new buffer
-    EventNumber mFirstEventNumber   = 0;  //< First event Number stored in the logging subsystem for this priority
-    EventNumber mLastEventNumber    = 0;  //< Last event Number vended for this priority
-    Timestamp mFirstEventSystemTimestamp; //< The timestamp of the first event in this buffer
-    Timestamp mLastEventSystemTimestamp;  //< The timestamp of the last event in this buffer
+    size_t mRequiredSpaceForEvicted = 0;  ///< Required space for previous buffer to evict event to new buffer
+    EventNumber mFirstEventNumber   = 0;  ///< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber    = 0;  ///< Last event Number vended for this priority
+    Timestamp mFirstEventSystemTimestamp; ///< The timestamp of the first event in this buffer
+    Timestamp mLastEventSystemTimestamp;  ///< The timestamp of the last event in this buffer
 };
 
 class CircularEventReader;
@@ -184,9 +183,9 @@ private:
 
 enum class EventManagementStates
 {
-    Idle       = 1, //< No log offload in progress, log offload can begin without any constraints
-    InProgress = 2, //< Log offload in progress
-    Shutdown   = 3  //< Not capable of performing any logging operation
+    Idle       = 1, // No log offload in progress, log offload can begin without any constraints
+    InProgress = 2, // Log offload in progress
+    Shutdown   = 3  // Not capable of performing any logging operation
 };
 
 /**
@@ -206,7 +205,7 @@ struct LogStorageResources
     uint8_t * mpBuffer =
         nullptr; // Buffer to be used as a storage at the particular priority level and shared with more important events.
                  // Must not be nullptr.  Must be large enough to accommodate the largest event emitted by the system.
-    uint32_t mBufferSize = 0; //< The size, in bytes, of the `mBuffer`.
+    uint32_t mBufferSize = 0; ///< The size, in bytes, of the `mBuffer`.
     Platform::PersistedStorage::Key * mCounterKey =
         nullptr;                // Name of the key naming persistent counter for events of this priority.  When NULL, the persistent
                                 // counters will not be used for this priority level.
@@ -268,9 +267,6 @@ public:
     /**
      * @brief
      *   EventManagement default constructor. Provided primarily to make the compiler happy.
-     *
-
-     * @return EventManagement
      */
     EventManagement(){};
 
@@ -344,7 +340,7 @@ public:
      * @brief
      *   A helper method to get tlv reader along with buffer has data from particular priority
      *
-     * @param[inout] aReader A reference to the reader that will be
+     * @param[in,out] aReader A reference to the reader that will be
      *                        initialized with the backing storage from
      *                        the event log
      *
@@ -374,10 +370,10 @@ public:
      * will terminate the event writing on event boundary.
      *
      * @param[in] aWriter     The writer to use for event storage
-     * @param[in] apEventClusterInfolist  the interested cluster info list with event path inside
+     * @param[in] apClusterInfolist the interested cluster info list with event path inside
      * @param[in] aPriority The priority of events to be fetched
      *
-     * @param[inout] aEventNumber On input, the Event number immediately
+     * @param[in,out] aEventNumber On input, the Event number immediately
      *                         prior to the one we're fetching.  On
      *                         completion, the event number of the last event
      *                         fetched.
@@ -468,7 +464,7 @@ private:
      * @brief Helper function for writing event header and data according to event
      *   logging protocol.
      *
-     * @param[inout] apContext   EventLoadOutContext, initialized with stateful
+     * @param[in,out] apContext EventLoadOutContext, initialized with stateful
      *                          information for the buffer. State is updated
      *                          and preserved by ConstructEvent using this context.
      *

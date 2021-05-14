@@ -37,7 +37,6 @@ CHIP_ERROR Command::Init(Messaging::ExchangeManager * apExchangeMgr, Interaction
     // Error if already initialized.
     VerifyOrExit(apExchangeMgr != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpExchangeMgr == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mpExchangeCtx == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     mpExchangeMgr = apExchangeMgr;
     mpDelegate    = apDelegate;
@@ -53,7 +52,7 @@ CHIP_ERROR Command::Reset()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandList::Builder commandListBuilder;
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
     if (mCommandMessageBuf.IsNull())
     {
@@ -133,7 +132,7 @@ void Command::Shutdown()
     mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
 
     mpExchangeMgr = nullptr;
     mpDelegate    = nullptr;
@@ -213,7 +212,7 @@ CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathP
     return commandPath.GetError();
 }
 
-CHIP_ERROR Command::ClearExistingExchangeContext()
+CHIP_ERROR Command::AbortExistingExchangeContext()
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.

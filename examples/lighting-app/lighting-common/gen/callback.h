@@ -56,6 +56,14 @@ void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfGeneralCommissioningClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief General Diagnostics Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGeneralDiagnosticsClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Level Control Cluster Init
  *
  * Cluster Init
@@ -228,6 +236,77 @@ EmberAfStatus emberAfGeneralCommissioningClusterServerPreAttributeChangedCallbac
  * @param endpoint  Endpoint that is being served
  */
 void emberAfGeneralCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// General Diagnostics Cluster server
+//
+
+/** @brief General Diagnostics Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGeneralDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief General Diagnostics Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAfGeneralDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
+
+/** @brief General Diagnostics Cluster Server Manufacturer Specific Attribute Changed
+ *
+ * Server Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAfGeneralDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                        chip::AttributeId attributeId,
+                                                                                        uint16_t manufacturerCode);
+
+/** @brief General Diagnostics Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param type               The type of message sent
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfGeneralDiagnosticsClusterServerMessageSentCallback(EmberOutgoingMessageType type,
+                                                               chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
+                                                               uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief General Diagnostics Cluster Server Pre Attribute Changed
+ *
+ * server Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAfGeneralDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
+                                                                                EmberAfAttributeType attributeType, uint16_t size,
+                                                                                uint8_t * value);
+
+/** @brief General Diagnostics Cluster Server Tick
+ *
+ * server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfGeneralDiagnosticsClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // Level Control Cluster server
@@ -514,9 +593,6 @@ void emberAfWiFiNetworkDiagnosticsClusterServerTickCallback(chip::EndpointId end
 
 /**
  * @brief General Commissioning Cluster ArmFailSafe Command callback
- * @param expiryLengthSeconds
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(chip::app::Command * commandObj, uint16_t expiryLengthSeconds,
@@ -530,10 +606,6 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(chip::app::
 
 /**
  * @brief General Commissioning Cluster SetRegulatoryConfig Command callback
- * @param location
- * @param countryCode
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Command * commandObj, uint8_t location,
@@ -541,10 +613,6 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(chip::app::Co
 
 /**
  * @brief Level Control Cluster Move Command callback
- * @param moveMode
- * @param rate
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterMoveCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
@@ -552,10 +620,6 @@ bool emberAfLevelControlClusterMoveCallback(chip::app::Command * commandObj, uin
 
 /**
  * @brief Level Control Cluster MoveToLevel Command callback
- * @param level
- * @param transitionTime
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::Command * commandObj, uint8_t level, uint16_t transitionTime,
@@ -563,8 +627,6 @@ bool emberAfLevelControlClusterMoveToLevelCallback(chip::app::Command * commandO
 
 /**
  * @brief Level Control Cluster MoveToLevelWithOnOff Command callback
- * @param level
- * @param transitionTime
  */
 
 bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::Command * commandObj, uint8_t level,
@@ -572,19 +634,12 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(chip::app::Command *
 
 /**
  * @brief Level Control Cluster MoveWithOnOff Command callback
- * @param moveMode
- * @param rate
  */
 
 bool emberAfLevelControlClusterMoveWithOnOffCallback(chip::app::Command * commandObj, uint8_t moveMode, uint8_t rate);
 
 /**
  * @brief Level Control Cluster Step Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterStepCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
@@ -592,9 +647,6 @@ bool emberAfLevelControlClusterStepCallback(chip::app::Command * commandObj, uin
 
 /**
  * @brief Level Control Cluster StepWithOnOff Command callback
- * @param stepMode
- * @param stepSize
- * @param transitionTime
  */
 
 bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::Command * commandObj, uint8_t stepMode, uint8_t stepSize,
@@ -602,8 +654,6 @@ bool emberAfLevelControlClusterStepWithOnOffCallback(chip::app::Command * comman
 
 /**
  * @brief Level Control Cluster Stop Command callback
- * @param optionMask
- * @param optionOverride
  */
 
 bool emberAfLevelControlClusterStopCallback(chip::app::Command * commandObj, uint8_t optionMask, uint8_t optionOverride);
@@ -616,9 +666,6 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(chip::app::Command * comman
 
 /**
  * @brief Network Commissioning Cluster AddThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan operationalDataset,
@@ -626,10 +673,6 @@ bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(chip::app::Comma
 
 /**
  * @brief Network Commissioning Cluster AddWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -637,9 +680,6 @@ bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster DisableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -647,9 +687,6 @@ bool emberAfNetworkCommissioningClusterDisableNetworkCallback(chip::app::Command
 
 /**
  * @brief Network Commissioning Cluster EnableNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan networkID,
@@ -657,7 +694,6 @@ bool emberAfNetworkCommissioningClusterEnableNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster GetLastNetworkCommissioningResult Command callback
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback(chip::app::Command * commandObj,
@@ -665,9 +701,6 @@ bool emberAfNetworkCommissioningClusterGetLastNetworkCommissioningResultCallback
 
 /**
  * @brief Network Commissioning Cluster RemoveNetwork Command callback
- * @param networkID
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan NetworkID,
@@ -675,9 +708,6 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(chip::app::Command 
 
 /**
  * @brief Network Commissioning Cluster ScanNetworks Command callback
- * @param ssid
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,
@@ -685,9 +715,6 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(chip::app::Command *
 
 /**
  * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback
- * @param operationalDataset
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Command * commandObj,
@@ -696,10 +723,6 @@ bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(chip::app::Co
 
 /**
  * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback
- * @param ssid
- * @param credentials
- * @param breadcrumb
- * @param timeoutMs
  */
 
 bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(chip::app::Command * commandObj, chip::ByteSpan ssid,

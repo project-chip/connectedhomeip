@@ -117,8 +117,8 @@ void emberAfPrintDateln(const EmberAfDate * date);
  * which will update the time. Otherwise the emberAfSetTimeCallback
  * is called, which in the case of the stub does nothing.
  *
- * @param utcTime: A ZigBee time, the number of seconds since the
- *                 year 2000.
+ * @param utcTime A ZigBee time, the number of seconds since the
+ *                year 2000.
  */
 void emberAfSetTime(uint32_t utcTime);
 
@@ -145,8 +145,8 @@ uint32_t emberAfGetCurrentTime(void);
  * a human readable time from the passed value. If not, this
  * function will print nothing.
  *
- * @param utcTime: A ZigBee time, the number of seconds since the
- *                 year 2000.
+ * @param utcTime A ZigBee time, the number of seconds since the
+ *                year 2000.
  */
 void emberAfPrintTime(uint32_t utcTime);
 
@@ -154,7 +154,7 @@ void emberAfPrintTime(uint32_t utcTime);
  * @brief Prints the time in ISO 8601 format
  * yyyy-mm-dd hh:mm:ss
  *
- * @param utcTime: A ZigBee time, the number of seconds since the
- *                 year 2000.
+ * @param utcTime A ZigBee time, the number of seconds since the
+ *                year 2000.
  */
 void emberAfPrintTimeIsoFormat(uint32_t utcTime);

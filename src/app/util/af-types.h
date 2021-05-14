@@ -97,19 +97,23 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  * or a pointer to the value itself, if attribute type is longer than
  * 2 bytes.
  */
-typedef union
+union EmberAfDefaultAttributeValue
 {
+    constexpr EmberAfDefaultAttributeValue(uint8_t * ptr) : ptrToDefaultValue(ptr) {}
+    constexpr EmberAfDefaultAttributeValue(uint16_t val) : defaultValue(val) {}
+
     /**
      * Points to data if size is more than 2 bytes.
      * If size is more than 2 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
     uint8_t * ptrToDefaultValue;
+
     /**
      * Actual default value if the attribute size is 2 bytes or less.
      */
     uint16_t defaultValue;
-} EmberAfDefaultAttributeValue;
+};
 
 /**
  * @brief Type describing the attribute default, min and max values.
@@ -136,8 +140,11 @@ typedef struct
 /**
  * @brief Union describing the attribute default/min/max values.
  */
-typedef union
+union EmberAfDefaultOrMinMaxAttributeValue
 {
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint8_t * ptr) : ptrToDefaultValue(ptr) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(val) {}
+
     /**
      * Points to data if size is more than 2 bytes.
      * If size is more than 2 bytes, and this value is NULL,
@@ -153,7 +160,7 @@ typedef union
      * supported for this attribute.
      */
     EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
-} EmberAfDefaultOrMinMaxAttributeValue;
+};
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
@@ -723,9 +730,9 @@ typedef enum
 typedef enum
 {
     EMBER_AF_OK_TO_SLEEP,
-    /** @deprecated. */
+    /** deprecated. */
     EMBER_AF_OK_TO_HIBERNATE = EMBER_AF_OK_TO_SLEEP,
-    /** @deprecated. */
+    /** deprecated. */
     EMBER_AF_OK_TO_NAP,
     EMBER_AF_STAY_AWAKE,
 } EmberAfEventSleepControl;

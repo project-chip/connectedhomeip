@@ -25,8 +25,9 @@
 
 #include <netinet/in.h>
 
-#include "support/CHIPMem.h"
-#include "support/CodeUtils.h"
+#include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
+#include <support/CodeUtils.h>
 
 using chip::Mdns::kMdnsTypeMaxSize;
 using chip::Mdns::MdnsServiceProtocol;
@@ -84,7 +85,7 @@ CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, 
 
     for (size_t i = 0; i < size; i++)
     {
-        uint8_t buf[kMdnsTypeMaxSize];
+        uint8_t buf[chip::Mdns::kMdnsTextMaxSize];
         size_t offset = static_cast<size_t>(snprintf(reinterpret_cast<char *>(buf), sizeof(buf), "%s=", entries[i].mKey));
 
         if (offset + entries[i].mDataSize > sizeof(buf))
@@ -540,25 +541,45 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
 }
 
-MdnsServiceProtocol TruncateProtocolInType(char * type)
+MdnsServiceProtocol GetProtocolInType(const char * type)
 {
-    char * deliminator           = strrchr(type, '.');
-    MdnsServiceProtocol protocol = MdnsServiceProtocol::kMdnsProtocolUnknown;
+    const char * deliminator = strrchr(type, '.');
 
-    if (deliminator != NULL)
+    if (deliminator == NULL)
     {
-        if (strcmp("._tcp", deliminator) == 0)
-        {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolTcp;
-            *deliminator = 0;
-        }
-        else if (strcmp("._udp", deliminator) == 0)
-        {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolUdp;
-            *deliminator = 0;
-        }
+        ChipLogError(Discovery, "Failed to find protocol in type: %s", type);
+        return MdnsServiceProtocol::kMdnsProtocolUnknown;
     }
-    return protocol;
+
+    if (strcmp("._tcp", deliminator) == 0)
+    {
+        return MdnsServiceProtocol::kMdnsProtocolTcp;
+    }
+    if (strcmp("._udp", deliminator) == 0)
+    {
+        return MdnsServiceProtocol::kMdnsProtocolUdp;
+    }
+
+    ChipLogError(Discovery, "Unknown protocol in type: %s", type);
+    return MdnsServiceProtocol::kMdnsProtocolUnknown;
+}
+
+/// Copies the type from a string containing both type and protocol
+///
+/// e.g. if input is "foo.bar", output is "foo", input is 'a.b._tcp", output is "a.b"
+template <size_t N>
+void CopyTypeWithoutProtocol(char (&dest)[N], const char * typeAndProtocol)
+{
+    const char * dotPos          = strrchr(typeAndProtocol, '.');
+    size_t lengthWithoutProtocol = (dotPos != nullptr) ? static_cast<size_t>(dotPos - typeAndProtocol) : N;
+
+    Platform::CopyString(dest, typeAndProtocol);
+
+    /// above copied everything including the protocol. Truncate the protocol away.
+    if (lengthWithoutProtocol < N)
+    {
+        dest[lengthWithoutProtocol] = 0;
+    }
 }
 
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
@@ -580,12 +601,11 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         {
             MdnsService service = {};
 
-            strncpy(service.mName, name, sizeof(service.mName));
-            strncpy(service.mType, type, sizeof(service.mType));
-            service.mName[kMdnsNameMaxSize] = 0;
-            service.mType[kMdnsTypeMaxSize] = 0;
-            service.mProtocol               = TruncateProtocolInType(service.mType);
+            Platform::CopyString(service.mName, name);
+            CopyTypeWithoutProtocol(service.mType, type);
+            service.mProtocol               = GetProtocolInType(type);
             service.mAddressType            = ToAddressType(protocol);
+            service.mType[kMdnsTypeMaxSize] = 0;
             context->mServices.push_back(service);
         }
         break;
@@ -658,13 +678,12 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
-        strncpy(result.mName, name, sizeof(result.mName));
-        strncpy(result.mType, type, sizeof(result.mType));
-        result.mName[kMdnsNameMaxSize] = 0;
-        result.mType[kMdnsTypeMaxSize] = 0;
-        result.mProtocol               = TruncateProtocolInType(result.mType);
-        result.mPort                   = port;
-        result.mAddressType            = ToAddressType(protocol);
+
+        Platform::CopyString(result.mName, name);
+        CopyTypeWithoutProtocol(result.mType, type);
+        result.mProtocol    = GetProtocolInType(type);
+        result.mPort        = port;
+        result.mAddressType = ToAddressType(protocol);
 
         if (address)
         {

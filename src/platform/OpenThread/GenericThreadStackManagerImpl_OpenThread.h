@@ -121,8 +121,8 @@ private:
     {
         static constexpr uint8_t kMaxServicesNumber   = CHIP_DEVICE_CONFIG_THREAD_SRP_MAX_SERVICES;
         static constexpr uint8_t kMaxInstanceNameSize = chip::Mdns::kMdnsNameMaxSize;
-        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeMaxSize + chip::Mdns::kMdnsProtocolTextMaxSize + 1;
-        static constexpr uint8_t kMaxHostNameSize     = 32;
+        static constexpr uint8_t kMaxNameSize         = chip::Mdns::kMdnsTypeAndProtocolMaxSize;
+        static constexpr uint8_t kMaxHostNameSize     = 16;
         // Thread only supports operational discovery
         static constexpr uint8_t kMaxTxtEntriesNumber = chip::Mdns::OperationalAdvertisingParameters::kNumAdvertisingTxtEntries;
         static constexpr uint8_t kMaxTxtValueSize     = chip::Mdns::OperationalAdvertisingParameters::kTxtMaxValueSize;
@@ -131,14 +131,14 @@ private:
         struct Service
         {
             otSrpClientService mService;
-            char mInstanceName[kMaxInstanceNameSize];
-            char mName[kMaxNameSize];
+            char mInstanceName[kMaxInstanceNameSize + 1];
+            char mName[kMaxNameSize + 1];
             otDnsTxtEntry mTxtEntries[kMaxTxtEntriesNumber];
             uint8_t mTxtValueBuffers[kMaxTxtEntriesNumber][kMaxTxtValueSize];
             char mTxtKeyBuffers[kMaxTxtEntriesNumber][kMaxTxtKeySize];
         };
 
-        char mHostName[kMaxHostNameSize];
+        char mHostName[kMaxHostNameSize + 1];
         otIp6Address mHostAddress;
         Service mServices[kMaxServicesNumber];
     };

@@ -311,6 +311,17 @@ typedef struct _NeighborInfo
     uint8_t numberRssiMeasurements;
 } EmberAfNeighborInfo;
 
+// Struct for NetworkInterfaceType
+typedef struct _NetworkInterfaceType
+{
+    uint8_t * Name;
+    uint8_t FabricConnected;
+    uint8_t OffPremiseServicesReachableIPv4;
+    uint8_t OffPremiseServicesReachableIPv6;
+    uint64_t HardwareAddress;
+    uint8_t Type;
+} EmberAfNetworkInterfaceType;
+
 // Struct for NodeInformation
 typedef struct _NodeInformation
 {
@@ -483,6 +494,13 @@ typedef struct _SpecialDay
     uint32_t specialDayDate;
     uint8_t dayIdRef;
 } EmberAfSpecialDay;
+
+// Struct for TestListStructOctet
+typedef struct _TestListStructOctet
+{
+    uint64_t fabricIndex;
+    chip::ByteSpan operationalCert;
+} EmberAfTestListStructOctet;
 
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult

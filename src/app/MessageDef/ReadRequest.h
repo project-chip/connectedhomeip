@@ -77,7 +77,7 @@ public:
     /**
      *  @brief Get a TLVReader for the AttributePathList. Next() must be called before accessing them.
      *
-     *  @param [in] apAttributePath    A pointer to apAttributePath
+     *  @param [in] apAttributePathList    A pointer to an attribute path list parser.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element

@@ -35,6 +35,7 @@ EmberAfStatus emberAfAudioOutputClusterServerCommandParse(EmberAfClusterCommand 
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfContentLaunchClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfGeneralCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfGeneralDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfKeypadInputClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfLowPowerClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -107,6 +108,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_GENERAL_COMMISSIONING_CLUSTER_ID:
             result = emberAfGeneralCommissioningClusterServerCommandParse(cmd);
+            break;
+        case ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID:
+            // No commands are enabled for cluster General Diagnostics
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_KEYPAD_INPUT_CLUSTER_ID:
             result = emberAfKeypadInputClusterServerCommandParse(cmd);

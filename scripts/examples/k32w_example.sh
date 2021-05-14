@@ -27,5 +27,5 @@ env
 
 "$(dirname "$0")"/../../third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
 
-gn gen --root="$1" "$2" --args="k32w_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=true"
+gn gen --root="$1" "$2" --args="k32w_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=false"
 ninja -C "$2"

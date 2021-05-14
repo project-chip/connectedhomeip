@@ -21,7 +21,7 @@ Build system features:
 
 ### Checking out the Code
 
-To check out the CHIP repostiory:
+To check out the CHIP repository:
 
 ```
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 26,
+  "featureLevel": 29,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -18,13 +18,13 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
+      "path": "../../../src/app/zap-templates/app-templates.json",
       "version": "chip-v1",
       "type": "gen-templates-json"
     }
@@ -191,7 +191,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "client",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "Identify",
@@ -234,7 +234,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "IdentifyQueryResponse",
@@ -359,7 +359,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -516,7 +516,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddSceneResponse",
@@ -1842,6 +1842,88 @@
           ]
         },
         {
+          "name": "General Diagnostics",
+          "code": 51,
+          "mfgCode": null,
+          "define": "GENERAL_DIAGNOSTICS_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "General Diagnostics",
+          "code": 51,
+          "mfgCode": null,
+          "define": "GENERAL_DIAGNOSTICS_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "NetworkInterfaces",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "RebootCount",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0000",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Pump Configuration and Control",
           "code": 512,
           "mfgCode": null,
@@ -1876,21 +1958,6 @@
           "enabled": 1,
           "commands": [],
           "attributes": [
-            {
-              "name": "cluster revision",
-              "code": 65533,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x0001",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
             {
               "name": "max pressure",
               "code": 0,
@@ -2010,6 +2077,21 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            },
+            {
+              "name": "cluster revision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x0001",
+              "reportable": 0,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ]
         }
@@ -2022,7 +2104,10 @@
       "endpointTypeIndex": 0,
       "profileId": 260,
       "endpointId": 1,
-      "networkId": 0
+      "networkId": 0,
+      "endpointVersion": null,
+      "deviceIdentifier": null
     }
-  ]
+  ],
+  "log": []
 }

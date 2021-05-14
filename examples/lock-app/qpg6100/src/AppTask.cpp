@@ -31,8 +31,6 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
-#include "Service.h"
-
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -114,7 +112,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     int err;
     AppEvent event;
-    uint64_t mLastChangeTimeUS = 0;
 
     err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
@@ -124,7 +121,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 
     ChipLogProgress(NotSpecified, "App Task started");
-    SetDeviceName("QPG6100LockDemo._chip._udp.local.");
 
     while (true)
     {
@@ -181,15 +177,6 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 qvCHIP_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
-        }
-
-        uint64_t nowUS            = chip::System::Layer::GetClock_Monotonic();
-        uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
-
-        if (nowUS > nextChangeTimeUS)
-        {
-            PublishService();
-            mLastChangeTimeUS = nowUS;
         }
     }
 }
@@ -347,15 +334,24 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            if (!ConnectivityMgr().IsThreadProvisioned())
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                // Enable BLE advertisements
-                ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-                ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
+                ChipLogProgress(NotSpecified, "BLE advertising already in progress.");
             }
             else
             {
-                ChipLogError(NotSpecified, "Network is already provisioned, BLE advertisement not enabled");
+                if (!ConnectivityMgr().IsThreadProvisioned())
+                {
+                    // Enable BLE advertisements and pairing window
+                    if (OpenDefaultPairingWindow(chip::ResetAdmins::kNo) == CHIP_NO_ERROR)
+                    {
+                        ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+                    }
+                }
+                else
+                {
+                    ChipLogError(NotSpecified, "Network is already provisioned, BLE advertisement not enabled");
+                }
             }
         }
 #if CHIP_ENABLE_OPENTHREAD

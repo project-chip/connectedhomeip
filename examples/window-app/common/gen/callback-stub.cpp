@@ -336,7 +336,7 @@ bool __attribute__((weak)) emberAfPreMessageSendCallback(EmberAfMessageStruct * 
  * be handled by the application framework.
  *
  * @param type   Ver.: always
- * @param indexOrDestination   Ver.: always
+ * @param destination   Ver.: always
  * @param apsFrame   Ver.: always
  * @param msgLen   Ver.: always
  * @param message   Ver.: always
