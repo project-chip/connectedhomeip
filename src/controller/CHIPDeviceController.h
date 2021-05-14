@@ -35,6 +35,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -271,7 +272,7 @@ protected:
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR InitializePairedDeviceList();
-    CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+    CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
     Transport::AdminId mAdminId = 0;

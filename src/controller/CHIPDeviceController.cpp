@@ -582,15 +582,15 @@ uint16_t DeviceController::FindDeviceIndex(NodeId id)
 
 CHIP_ERROR DeviceController::InitializePairedDeviceList()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    char * buffer  = nullptr;
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    uint8_t * buffer = nullptr;
 
     VerifyOrExit(mStorageDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (!mPairedDevicesInitialized)
     {
-        constexpr uint16_t max_size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
-        buffer                      = static_cast<char *>(chip::Platform::MemoryCalloc(max_size, 1));
+        constexpr uint16_t max_size = sizeof(uint64_t) * kNumMaxPairedDevices;
+        buffer                      = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(max_size));
         uint16_t size               = max_size;
 
         VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -603,7 +603,7 @@ CHIP_ERROR DeviceController::InitializePairedDeviceList()
         if (lookupError != CHIP_ERROR_KEY_NOT_FOUND)
         {
             VerifyOrExit(size <= max_size, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-            err = SetPairedDeviceList(buffer);
+            err = SetPairedDeviceList(ByteSpan(buffer, size));
             SuccessOrExit(err);
         }
     }
@@ -621,15 +621,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceController::SetPairedDeviceList(const char * serialized)
+CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    size_t len      = strlen(serialized) + 1;
-    uint16_t lenU16 = static_cast<uint16_t>(len);
-    VerifyOrExit(CanCastTo<uint16_t>(len), err = CHIP_ERROR_INVALID_ARGUMENT);
-    err = mPairedDevices.DeserializeBase64(serialized, lenU16);
+    CHIP_ERROR err = mPairedDevices.Deserialize(serialized);
 
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed to recreate the device list with buffer %s\n", serialized);
@@ -1316,21 +1311,13 @@ void DeviceCommissioner::PersistDeviceList()
 {
     if (mStorageDelegate != nullptr && mPairedDevicesUpdated && mState == State::Initialized)
     {
-        constexpr uint16_t size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
-        char * serialized       = static_cast<char *>(chip::Platform::MemoryAlloc(size));
-        uint16_t requiredSize   = size;
-        if (serialized != nullptr)
-        {
-            const char * value = mPairedDevices.SerializeBase64(serialized, requiredSize);
-            if (value != nullptr && requiredSize <= size)
-            {
-                // TODO: no need to base64 again the value
-                PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
-                                  mStorageDelegate->SyncSetKeyValue(key, value, requiredSize));
-                mPairedDevicesUpdated = false;
-            }
-            chip::Platform::MemoryFree(serialized);
-        }
+        mPairedDevices.Serialize([&](ByteSpan data) -> CHIP_ERROR {
+            VerifyOrReturnError(data.size() <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+            PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
+                              mStorageDelegate->SyncSetKeyValue(key, data.data(), static_cast<uint16_t>(data.size())));
+            mPairedDevicesUpdated = false;
+            return CHIP_NO_ERROR;
+        });
     }
 }
 
