@@ -145,7 +145,7 @@ CHIP_ERROR Device::SendCommands()
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId);
+    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId, &mSecureSession);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
