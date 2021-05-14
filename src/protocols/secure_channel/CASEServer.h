@@ -44,11 +44,6 @@ public:
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
     void OnSessionEstablished() override;
 
-    void Cleanup();
-
-    uint16_t GetNextKeyId() const { return mNextKeyId; }
-    void SetNextKeyId(uint16_t id) { mNextKeyId = id; }
-
     //// ExchangeDelegate Implementation ////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            System::PacketBufferHandle payload) override;
@@ -73,6 +68,7 @@ private:
     OperationalCredentialSet mCredentials;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
+    void Cleanup();
 };
 
 } // namespace chip
