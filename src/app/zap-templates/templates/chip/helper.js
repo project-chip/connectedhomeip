@@ -26,16 +26,14 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 
 function asBlocks(promise, options)
 {
-  function fn(pkgId)
-  {
-    return Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
-  }
-  return templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
 }
 
 function asPromise(promise)
 {
-  return templateUtil.templatePromise(this.global, promise);
+  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
+  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => console.log(err));
 }
 
 function throwErrorIfUndefined(item, errorMsg, conditions)
