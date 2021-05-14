@@ -35,6 +35,7 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
@@ -79,6 +80,7 @@ struct ControllerInitParams
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
+    OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -120,8 +122,6 @@ public:
 struct CommissionerInitParams : public ControllerInitParams
 {
     DevicePairingDelegate * pairingDelegate = nullptr;
-
-    OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 };
 
 /**
@@ -275,8 +275,18 @@ protected:
     CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
 
+    void PersistNextKeyId();
+
     Transport::AdminId mAdminId = 0;
     Transport::AdminPairingTable mAdmins;
+
+    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
+
+    Credentials::ChipCertificateSet mCertificates;
+    Credentials::OperationalCredentialSet mCredentials;
+    Credentials::CertificateKeyId mRootKeyId;
+
+    uint16_t mNextKeyId = 0;
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
@@ -296,6 +306,8 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
+
+    CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
 };
 
 /**
@@ -429,7 +441,6 @@ public:
 #endif
 
 private:
-    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
     DevicePairingDelegate * mPairingDelegate;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
@@ -451,8 +462,6 @@ private:
     DeviceCommissionerRendezvousAdvertisementDelegate mRendezvousAdvDelegate;
 
     void PersistDeviceList();
-
-    void PersistNextKeyId();
 
     void FreeRendezvousSession();
 
@@ -524,8 +533,6 @@ private:
      */
     CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
                             const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
-
-    uint16_t mNextKeyId = 0;
 
     Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
     Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;

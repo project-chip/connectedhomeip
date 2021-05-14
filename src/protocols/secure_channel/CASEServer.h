@@ -64,10 +64,12 @@ private:
     Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
 
     Transport::AdminPairingTable * mAdmins = nullptr;
-    ChipCertificateSet mCertificates;
-    OperationalCredentialSet mCredentials;
+    Credentials::ChipCertificateSet mCertificates;
+    Credentials::OperationalCredentialSet mCredentials;
+    Credentials::CertificateKeyId mRootKeyId;
 
     CHIP_ERROR InitCASEHandshake(Messaging::ExchangeContext * ec);
+
     void Cleanup();
 };
 

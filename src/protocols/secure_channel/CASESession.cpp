@@ -193,6 +193,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
                              SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(operationalCredentialSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(operationalCredentialSet->GetCertCount() > 0, CHIP_ERROR_CERT_NOT_FOUND);
 
     Clear();
@@ -325,7 +326,10 @@ CHIP_ERROR CASESession::SendSigmaR1()
         bbuf.Put16(n_trusted_roots);
         for (uint16_t i = 0; i < n_trusted_roots; ++i)
         {
-            bbuf.Put(mOpCredSet->GetTrustedRootId(i)->mId, kTrustedRootIdSize);
+            if (mOpCredSet->GetTrustedRootId(i) != nullptr && mOpCredSet->GetTrustedRootId(i)->mId != nullptr)
+            {
+                bbuf.Put(mOpCredSet->GetTrustedRootId(i)->mId, kTrustedRootIdSize);
+            }
         }
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
         VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
@@ -721,6 +725,7 @@ CHIP_ERROR CASESession::SendSigmaR3()
     // Step 1
     saltlen = kIPKSize + kSHA256_Hash_Length;
 
+    ChipLogDetail(Inet, "Sending SigmaR3");
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
     msg_salt->SetDataLength(saltlen);
@@ -971,6 +976,7 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & 
                                              const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt)
 {
     uint8_t md[kSHA256_Hash_Length];
+    memset(salt->Start(), 0, salt->DataLength());
     Encoding::LittleEndian::BufferWriter bbuf(salt->Start(), salt->DataLength());
 
     bbuf.Put(ipk, ipkLen);
@@ -978,6 +984,7 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & 
     bbuf.Put(pubkey, pubkey.Length());
     ReturnErrorOnFailure(mCommissioningHash.Finish(md));
     bbuf.Put(md, kSHA256_Hash_Length);
+    ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
@@ -987,11 +994,13 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & 
 CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt)
 {
     uint8_t md[kSHA256_Hash_Length];
+    memset(salt->Start(), 0, salt->DataLength());
     Encoding::LittleEndian::BufferWriter bbuf(salt->Start(), salt->DataLength());
 
     bbuf.Put(ipk, ipkLen);
     ReturnErrorOnFailure(mCommissioningHash.Finish(md));
     bbuf.Put(md, kSHA256_Hash_Length);
+    ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 

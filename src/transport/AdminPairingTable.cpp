@@ -113,7 +113,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     rootCertLen = Encoding::LittleEndian::HostSwap16(info->mRootCertLen);
     opCertLen   = Encoding::LittleEndian::HostSwap16(info->mOpCertLen);
 
-    VerifyOrExit(mAdmin != id, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mAdmin == id, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (mOperationalKey == nullptr)
     {
@@ -122,6 +122,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
 
+    ChipLogProgress(Inet, "Loading certs from KVS");
     SuccessOrExit(SetRootCert(ByteSpan(info->mRootCert, rootCertLen)));
     SuccessOrExit(SetOperationalCert(ByteSpan(info->mOperationalCert, opCertLen)));
 
@@ -250,17 +251,28 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::GetOperationalCertificateSet(ChipCertificateSet & certSet)
+CHIP_ERROR AdminPairingInfo::GetCredentials(OperationalCredentialSet & credentials, ChipCertificateSet & certificates,
+                                            CertificateKeyId & rootKeyId)
 {
     constexpr uint8_t kMaxNumCertsInOpCreds = 3;
-    ReturnErrorOnFailure(certSet.Init(kMaxNumCertsInOpCreds, kMaxChipCertSize * kMaxNumCertsInOpCreds));
+    ReturnErrorOnFailure(certificates.Init(kMaxNumCertsInOpCreds, kMaxChipCertSize * kMaxNumCertsInOpCreds));
 
     ReturnErrorOnFailure(
-        certSet.LoadCert(mRootCert, mRootCertLen,
-                         BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
+        certificates.LoadCert(mRootCert, mRootCertLen,
+                              BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
+
     // TODO - Add support of ICA certificates
-    ReturnErrorOnFailure(
-        certSet.LoadCert(mOperationalCert, mOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
+
+    credentials.Release();
+    ReturnErrorOnFailure(credentials.Init(&certificates, certificates.GetCertCount()));
+
+    const CertificateKeyId * id = credentials.GetTrustedRootId(0);
+    rootKeyId.mId               = id->mId;
+    rootKeyId.mLen              = id->mLen;
+
+    ReturnErrorOnFailure(credentials.SetDevOpCred(rootKeyId, mOperationalCert, mOpCertLen));
+    ReturnErrorOnFailure(credentials.SetDevOpCredKeypair(rootKeyId, mOperationalKey));
+
     return CHIP_NO_ERROR;
 }
 
