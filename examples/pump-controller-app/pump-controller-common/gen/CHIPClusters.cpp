@@ -35,60 +35,69 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
-
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
-
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
-
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 // OnOff Cluster Attributes
