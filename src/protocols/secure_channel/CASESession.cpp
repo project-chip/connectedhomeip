@@ -211,8 +211,8 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 }
 
 CHIP_ERROR
-CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                                         SessionEstablishmentDelegate * delegate)
+CASESession::ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                           SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorOnFailure(Init(operationalCredentialSet, myKeyId, delegate));
 

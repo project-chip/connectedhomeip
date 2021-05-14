@@ -23,6 +23,7 @@
 
 #include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
@@ -41,11 +42,6 @@ constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
 constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
 
 constexpr uint16_t kMaxChipCertSize = 600;
-
-struct OperationalCredentials
-{
-    uint32_t placeholder;
-};
 
 struct AccessControlList
 {
@@ -100,9 +96,7 @@ public:
     CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
-    const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
-    OperationalCredentials & GetOperationalCreds() { return mOpCred; }
-    void SetOperationalCreds(const OperationalCredentials & creds) { mOpCred = creds; }
+    CHIP_ERROR GetOperationalCertificateSet(Credentials::ChipCertificateSet & certSet);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
@@ -131,12 +125,11 @@ public:
     friend class AdminPairingTable;
 
 private:
-    AdminId mAdmin     = kUndefinedAdminId;
     NodeId mNodeId     = kUndefinedNodeId;
     FabricId mFabricId = kUndefinedFabricId;
+    AdminId mAdmin     = kUndefinedAdminId;
     uint16_t mVendorId = kUndefinedVendorId;
 
-    OperationalCredentials mOpCred;
     AccessControlList mACL;
 
     Crypto::P256Keypair * mOperationalKey = nullptr;

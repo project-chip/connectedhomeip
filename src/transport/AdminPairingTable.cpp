@@ -25,6 +25,8 @@
 #include <transport/AdminPairingTable.h>
 
 namespace chip {
+using namespace Credentials;
+using namespace Crypto;
 
 namespace Transport {
 
@@ -49,7 +51,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     }
     else
     {
-        Crypto::P256Keypair keypair;
+        P256Keypair keypair;
         SuccessOrExit(err = keypair.Initialize());
         SuccessOrExit(err = keypair.Serialize(info->mOperationalKey));
     }
@@ -115,7 +117,7 @@ CHIP_ERROR AdminPairingInfo::FetchFromKVS(PersistentStorageDelegate * kvs)
 
     if (mOperationalKey == nullptr)
     {
-        mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+        mOperationalKey = chip::Platform::New<P256Keypair>();
     }
     VerifyOrExit(mOperationalKey != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = mOperationalKey->Deserialize(info->mOperationalKey));
@@ -160,13 +162,13 @@ CHIP_ERROR AdminPairingInfo::GenerateKey(AdminId id, char * key, size_t len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdminPairingInfo::SetOperationalKey(const Crypto::P256Keypair & key)
+CHIP_ERROR AdminPairingInfo::SetOperationalKey(const P256Keypair & key)
 {
-    Crypto::P256SerializedKeypair serialized;
+    P256SerializedKeypair serialized;
     ReturnErrorOnFailure(key.Serialize(serialized));
     if (mOperationalKey == nullptr)
     {
-        mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+        mOperationalKey = chip::Platform::New<P256Keypair>();
     }
     VerifyOrReturnError(mOperationalKey != nullptr, CHIP_ERROR_NO_MEMORY);
     return mOperationalKey->Deserialize(serialized);
@@ -245,6 +247,20 @@ CHIP_ERROR AdminPairingInfo::SetOperationalCert(const ByteSpan & cert)
     mOpCertAllocatedLen = (mOpCertLen > mOpCertAllocatedLen) ? mOpCertLen : mOpCertAllocatedLen;
     memcpy(mOperationalCert, cert.data(), mOpCertLen);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AdminPairingInfo::GetOperationalCertificateSet(ChipCertificateSet & certSet)
+{
+    constexpr uint8_t kMaxNumCertsInOpCreds = 3;
+    ReturnErrorOnFailure(certSet.Init(kMaxNumCertsInOpCreds, kMaxChipCertSize * kMaxNumCertsInOpCreds));
+
+    ReturnErrorOnFailure(
+        certSet.LoadCert(mRootCert, mRootCertLen,
+                         BitFlags<CertDecodeFlags>(CertDecodeFlags::kIsTrustAnchor).Set(CertDecodeFlags::kGenerateTBSHash)));
+    // TODO - Add support of ICA certificates
+    ReturnErrorOnFailure(
+        certSet.LoadCert(mOperationalCert, mOpCertLen, BitFlags<CertDecodeFlags>(CertDecodeFlags::kGenerateTBSHash)));
     return CHIP_NO_ERROR;
 }
 
