@@ -31,12 +31,8 @@
 
 #pragma once
 
-#include <support/Base64.h>
 #include <support/CodeUtils.h>
-
-// BASE64_ENCODED_LEN doesn't account for null termination of the string.
-// So, we are adding 1 extra byte to the size requirement.
-#define CHIP_MAX_SERIALIZED_SIZE_U64(count) static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * (count)) + 1)
+#include <support/Span.h>
 
 namespace chip {
 
@@ -55,40 +51,50 @@ public:
 
     /**
      * @brief
-     *   Serialize the sparse array into a base 64 encoded string.
+     *   Serialize the sparse array by calling a callback with a ByteSpan to
+     *   serialize.  We ensure that this ByteSpan is architecture-agnostic, so
+     *   it can be deserialized anywhere later.
+     *
      *   Only the values till mNextAvailable index are encoded.
      *   The empty indexes between 0, and mNextAvailable, are also
      *   encoded.
      *
-     * @param[in] buf Buffer where serialized string is written
-     * @param[in] buflen Length of buf
-     * @return pointer to buf, or nullptr in case of error
+     * @param[in] callback the serialization callback to call.
      */
-    const char * SerializeBase64(char * buf, uint16_t & buflen);
+    template <typename F>
+    CHIP_ERROR Serialize(F callback)
+    {
+        // Ensure that we are holding little-endian data while the serialization
+        // callback runs.
+        SwapByteOrderIfNeeded();
+
+        CHIP_ERROR err = callback(ByteSpan(reinterpret_cast<uint8_t *>(mData), SerializedSize()));
+
+        SwapByteOrderIfNeeded();
+        return err;
+    }
 
     /**
      * @brief
-     *   Deserialize a base64 encoded string into the sparse array.
+     *   Deserialize a previously serialized byte buffer into the sparse array.
      *   The mNextAvailable index is calculated based on how many
      *   values are in the deserialized array.
      *
      * @param[in] serialized Serialized buffer
-     * @param[in] buflen Length of buffer
-     * @return CHIP_NO_ERROR in case of success, or the error code
      */
-    CHIP_ERROR DeserializeBase64(const char * serialized, uint16_t buflen);
+    CHIP_ERROR Deserialize(ByteSpan serialized);
 
     /**
      * @brief
-     *   Get the length of string if the array is serialized.
+     *   Get the length of the byte data if the array is serialized.
      */
-    uint16_t SerializedSize() { return CHIP_MAX_SERIALIZED_SIZE_U64(mNextAvailable); }
+    size_t SerializedSize() { return sizeof(uint64_t) * mNextAvailable; }
 
     /**
      * @brief
-     *   Get the maximum length of string if the array were full and serialized.
+     *   Get the maximum length of the byte data if the array were full and serialized.
      */
-    uint16_t MaxSerializedSize() { return CHIP_MAX_SERIALIZED_SIZE_U64(mCapacity); }
+    size_t MaxSerializedSize() { return sizeof(uint64_t) * mCapacity; }
 
     /**
      * @brief
