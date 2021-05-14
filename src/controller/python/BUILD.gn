@@ -37,7 +37,6 @@ chip_data_model("python_data_model") {
   zap_pregenerated_dir = "gen"
 
   use_default_client_callbacks = true
-  use_default_im_dispatch = false
 }
 
 shared_library("ChipDeviceCtrl") {

@@ -140,12 +140,12 @@ CHIP_ERROR Device::LoadSecureSessionParametersIfNeeded(bool & didLoad)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Device::SendCommands()
+CHIP_ERROR Device::SendCommands(app::CommandSender * commandObj)
 {
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
-    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mCommandSender->SendCommandRequest(mDeviceId, mAdminId, &mSecureSession);
+    VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    return commandObj->SendCommandRequest(mDeviceId, mAdminId, &mSecureSession);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -442,24 +442,25 @@ void Device::CancelResponseHandler(uint8_t seqNum)
     mCallbacksMgr.CancelResponseCallback(mDeviceId, seqNum);
 }
 
-void Device::AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+void Device::AddIMResponseHandler(app::Command * commandObj, Callback::Cancelable * onSuccessCallback,
+                                  Callback::Cancelable * onFailureCallback)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
     // chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(static_cast<app::Command *>(mCommandSender));
+    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(commandObj);
     mCallbacksMgr.AddResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */, onSuccessCallback,
                                       onFailureCallback);
 }
 
-void Device::CancelIMResponseHandler()
+void Device::CancelIMResponseHandler(app::Command * commandObj)
 {
     // We are using the pointer to command sender object as the identifier of command transactions. This makes sense as long as
     // there are only one active command transaction on one command sender object. This is a bit tricky, we try to assume that
     // chip::NodeId is uint64_t so the pointer can be used as a NodeId for CallbackMgr.
     static_assert(std::is_same<chip::NodeId, uint64_t>::value, "chip::NodeId is not uint64_t");
-    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(static_cast<app::Command *>(mCommandSender));
+    chip::NodeId transactionId = reinterpret_cast<chip::NodeId>(commandObj);
     mCallbacksMgr.CancelResponseCallback(transactionId, 0 /* seqNum, always 0 for IM before #6559 */);
 }
 
@@ -467,17 +468,6 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeI
                               Callback::Cancelable * onReportCallback)
 {
     mCallbacksMgr.AddReportCallback(mDeviceId, endpoint, cluster, attribute, onReportCallback);
-}
-
-void Device::InitCommandSender()
-{
-    if (mCommandSender != nullptr)
-    {
-        mCommandSender->Shutdown();
-        mCommandSender = nullptr;
-    }
-    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
-    ChipLogFunctError(err);
 }
 
 } // namespace Controller

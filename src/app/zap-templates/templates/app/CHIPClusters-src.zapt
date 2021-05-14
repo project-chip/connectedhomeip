@@ -21,15 +21,18 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 {
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand = mDevice->GetCommandSender();
-
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
 {{#chip_server_cluster_command_arguments}}
 {{#first}}
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
 {{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
@@ -38,12 +41,12 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
     // Command takes no arguments.
 {{/chip_server_cluster_command_arguments}}
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 {{/chip_server_cluster_commands}}

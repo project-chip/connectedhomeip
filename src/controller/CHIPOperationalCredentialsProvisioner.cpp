@@ -31,12 +31,14 @@ CHIP_ERROR OperationalCredentialsProvisioner::AddOpCert(Callback::Cancelable * o
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddOpCertCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    ReturnErrorOnFailure(ZCLcommand->Reset());
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // noc: octetString
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), noc));
@@ -49,12 +51,12 @@ CHIP_ERROR OperationalCredentialsProvisioner::AddOpCert(Callback::Cancelable * o
     // adminVendorId: int16u
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), adminVendorId));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OperationalCredentialsProvisioner::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
@@ -64,22 +66,24 @@ CHIP_ERROR OperationalCredentialsProvisioner::OpCSRRequest(Callback::Cancelable 
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOpCSRRequestCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    ReturnErrorOnFailure(ZCLcommand->Reset());
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // CSRNonce: octetString
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), CSRNonce));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OperationalCredentialsProvisioner::RemoveAllFabrics(Callback::Cancelable * onSuccessCallback,
@@ -89,18 +93,21 @@ CHIP_ERROR OperationalCredentialsProvisioner::RemoveAllFabrics(Callback::Cancela
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllFabricsCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
     // Command takes no arguments.
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OperationalCredentialsProvisioner::RemoveFabric(Callback::Cancelable * onSuccessCallback,
@@ -111,11 +118,15 @@ CHIP_ERROR OperationalCredentialsProvisioner::RemoveFabric(Callback::Cancelable 
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveFabricCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // fabricId: fabricId
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), fabricId));
@@ -124,12 +135,12 @@ CHIP_ERROR OperationalCredentialsProvisioner::RemoveFabric(Callback::Cancelable 
     // vendorId: int16u
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OperationalCredentialsProvisioner::SetFabric(Callback::Cancelable * onSuccessCallback,
@@ -139,21 +150,25 @@ CHIP_ERROR OperationalCredentialsProvisioner::SetFabric(Callback::Cancelable * o
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
 
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // vendorId: int16u
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR OperationalCredentialsProvisioner::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
@@ -163,21 +178,24 @@ CHIP_ERROR OperationalCredentialsProvisioner::UpdateFabricLabel(Callback::Cancel
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateFabricLabelCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // label: charString
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), label));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 // OperationalCredentials Cluster Attributes
@@ -213,22 +231,24 @@ CHIP_ERROR TrustedRootCertificatesProvisioner::AddTrustedRootCertificate(Callbac
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddTrustedRootCertificateCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    ReturnErrorOnFailure(ZCLcommand->Reset());
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // rootCertificate: octetString
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), rootCertificate));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 CHIP_ERROR TrustedRootCertificatesProvisioner::RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
@@ -239,22 +259,24 @@ CHIP_ERROR TrustedRootCertificatesProvisioner::RemoveTrustedRootCertificate(Call
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveTrustedRootCertificateCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    app::Command * ZCLcommand        = mDevice->GetCommandSender();
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
 
-    ReturnErrorOnFailure(ZCLcommand->Reset());
-    ReturnErrorOnFailure(ZCLcommand->PrepareCommand(&cmdParams));
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
 
-    TLV::TLVWriter * writer = ZCLcommand->GetCommandDataElementTLVWriter();
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // trustedRootIdentifier: octetString
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), trustedRootIdentifier));
 
-    ReturnErrorOnFailure(ZCLcommand->FinishCommand());
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(onSuccessCallback, onFailureCallback);
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
 
-    return mDevice->SendCommands();
+    return mDevice->SendCommands(mpCommandSender);
 }
 
 // TrustedRootCertificates Cluster Attributes

@@ -47,8 +47,9 @@
 #include <app/reporting/Engine.h>
 #include <app/util/basic-types.h>
 
-#define CHIP_MAX_NUM_COMMAND_HANDLER 1
-#define CHIP_MAX_NUM_COMMAND_SENDER 1
+// TODO: Make number of command handler and command sender configurable
+#define CHIP_MAX_NUM_COMMAND_HANDLER 2
+#define CHIP_MAX_NUM_COMMAND_SENDER 2
 #define CHIP_MAX_NUM_READ_CLIENT 1
 #define CHIP_MAX_NUM_READ_HANDLER 1
 #define CHIP_MAX_REPORTS_IN_FLIGHT 1

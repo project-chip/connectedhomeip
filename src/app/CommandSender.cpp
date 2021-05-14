@@ -94,7 +94,6 @@ exit:
     // This needs to be done before the Reset() call, because Reset() aborts mpExchangeCtx if its not null.
     mpExchangeCtx->Close();
     mpExchangeCtx = nullptr;
-    Reset();
 
     if (mpDelegate != nullptr)
     {
@@ -107,18 +106,21 @@ exit:
             mpDelegate->CommandResponseProcessed(this);
         }
     }
+
+    Shutdown();
 }
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d",
                     apExchangeContext->GetExchangeId());
-    Reset();
 
     if (mpDelegate != nullptr)
     {
         mpDelegate->CommandResponseError(this, CHIP_ERROR_TIMEOUT);
     }
+
+    Shutdown();
 }
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
