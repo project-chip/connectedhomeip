@@ -132,11 +132,11 @@ the NTAG.
 
 ### No expansion board
 
-In case the **OM15082** Expansion board is not attached to the DK6 board,
-the functionality of LED D2 and LED D3 is taken over by LED DS2, respectively 
-LED DS3, which can be found on the DK6 board.
+In case the **OM15082** Expansion board is not attached to the DK6 board, the
+functionality of LED D2 and LED D3 is taken over by LED DS2, respectively LED
+DS3, which can be found on the DK6 board.
 
-Also, by long pressing the **USERINTERFACE** button, the factory reset action 
+Also, by long pressing the **USERINTERFACE** button, the factory reset action
 will be initiated.
 
 <a name="building"></a>
@@ -168,9 +168,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ $K32W061_S
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.3.
 
-Also, in case the OM15082 Expansion Board is not attached to the DK6 board,
-the build argument (chip_with_OM15082) inside the gn build instruction should be set to zero.
-The argument chip_with_OM15082 is set to zero by default.
+Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
+build argument (chip_with_OM15082) inside the gn build instruction should be set
+to zero. The argument chip_with_OM15082 is set to zero by default.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 install the recommanded packages (python version > 3, pip3, pycrypto,
