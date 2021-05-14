@@ -56,7 +56,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
     // TODO - Use PK of the root CA for the initiator to figure out the admin.
     mAdminId = ec->GetSecureSession().GetAdminId();
 
-    // TODO - Use section [4.368] to find admin ID for CASE SigmaR1 message
+    // TODO - Use section [4.368] and definition of `Destination Identifier` to find admin ID for CASE SigmaR1 message
     //    ReturnErrorCodeIf(mAdminId == Transport::kUndefinedAdminId, CHIP_ERROR_INVALID_ARGUMENT);
     mAdminId = 0;
 
