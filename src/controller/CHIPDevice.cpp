@@ -164,6 +164,9 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDeviceAddress.GetPort());
     serializable.mAdminId    = Encoding::LittleEndian::HostSwap16(mAdminId);
 
+    serializable.mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(mCASESessionKeyId);
+    serializable.mDeviceProvisioningComplete = (mDeviceProvisioningComplete) ? 1 : 0;
+
     static_assert(std::is_same<std::underlying_type<decltype(mDeviceAddress.GetTransportType())>::type, uint8_t>::value,
                   "The underlying type of Transport::Type is not uint8_t.");
     serializable.mDeviceTransport = static_cast<uint8_t>(mDeviceAddress.GetTransportType());
@@ -216,6 +219,9 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     port      = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
     mAdminId  = Encoding::LittleEndian::HostSwap16(serializable.mAdminId);
+
+    mCASESessionKeyId           = Encoding::LittleEndian::HostSwap16(serializable.mCASESessionKeyId);
+    mDeviceProvisioningComplete = (serializable.mDeviceProvisioningComplete != 0);
 
     // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
     // LwIP stack.
@@ -370,6 +376,12 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
                                       SecureSession::SessionRole::kInitiator, mAdminId);
     SuccessOrExit(err);
 
+    if (IsProvisioningComplete())
+    {
+        err = EstablishCASESession();
+        SuccessOrExit(err);
+    }
+
 exit:
 
     if (err != CHIP_NO_ERROR)
@@ -387,6 +399,37 @@ bool Device::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
     addr = mDeviceAddress.GetIPAddress();
     port = mDeviceAddress.GetPort();
     return true;
+}
+
+CHIP_ERROR Device::EstablishCASESession()
+{
+    Messaging::ExchangeContext * exchange = mExchangeMgr->NewContext(SecureSessionHandle(), &mCASESession);
+    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
+
+    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mSessionManager->GetTransportManager()));
+    mCASESession.MessageDispatch().SetPeerAddress(mDeviceAddress);
+
+    ReturnErrorOnFailure(mCASESession.EstablishSession(mDeviceAddress, mCredentials, mDeviceId, 0, exchange, this));
+
+    return CHIP_NO_ERROR;
+}
+
+void Device::OnSessionEstablishmentError(CHIP_ERROR error) {}
+
+void Device::OnSessionEstablished()
+{
+    mCASESession.PeerConnection().SetPeerNodeId(mDeviceId);
+
+    // TODO - Enable keys derived from CASE Session
+    // CHIP_ERROR err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId,
+    // &mCASESession,
+    //                                              SecureSession::SessionRole::kInitiator, mAdminId, nullptr);
+    // if (err != CHIP_NO_ERROR)
+    // {
+    //     ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
+    //     OnSessionEstablishmentError(err);
+    //     return;
+    // }
 }
 
 void Device::AddResponseHandler(uint8_t seqNum, Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)

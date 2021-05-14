@@ -184,8 +184,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     );
     SuccessOrExit(err);
 
+    err = mAdmins.Init(mStorageDelegate);
+    SuccessOrExit(err);
+
     admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    err = mAdmins.LoadFromStorage(mAdminId);
+    SuccessOrExit(err);
 
     err = mSessionMgr->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager);
     SuccessOrExit(err);
@@ -228,10 +234,66 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
 
+    VerifyOrExit(params.operationalCredentialsDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
+
+    err = LoadLocalCredentials(admin);
+    SuccessOrExit(err);
+
     ReleaseAllDevices();
 
 exit:
     return err;
+}
+
+CHIP_ERROR DeviceController::LoadLocalCredentials(Transport::AdminPairingInfo * admin)
+{
+    ChipLogProgress(Controller, "Getting operational keys");
+    Crypto::P256Keypair * keypair = admin->GetOperationalKey();
+
+    ReturnErrorCodeIf(keypair == nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (!admin->AreCredentialsAvailable())
+    {
+        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer1;
+        ReturnErrorCodeIf(!buffer1.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer2;
+        ReturnErrorCodeIf(!buffer2.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+        uint8_t * CSR    = buffer1.Get();
+        size_t csrLength = kMaxCHIPOpCertLength;
+        ReturnErrorOnFailure(keypair->NewCertificateSigningRequest(CSR, csrLength));
+
+        uint8_t * cert   = buffer2.Get();
+        uint32_t certLen = 0;
+
+        ChipLogProgress(Controller, "Generating operational certificate for the controller");
+        ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
+            PeerId().SetNodeId(mLocalDeviceId), ByteSpan(CSR, csrLength), 1, cert, kMaxCHIPOpCertLength, certLen));
+
+        uint8_t * chipCert   = buffer1.Get();
+        uint32_t chipCertLen = 0;
+        ReturnErrorOnFailure(ConvertX509CertToChipCert(cert, certLen, chipCert, kMaxCHIPOpCertLength, chipCertLen));
+
+        ReturnErrorOnFailure(admin->SetOperationalCert(ByteSpan(chipCert, chipCertLen)));
+
+        ChipLogProgress(Controller, "Getting root certificate for the controller from the issuer");
+        ReturnErrorOnFailure(mOperationalCredentialsDelegate->GetRootCACertificate(0, cert, kMaxCHIPOpCertLength, certLen));
+
+        chipCertLen = 0;
+        ReturnErrorOnFailure(ConvertX509CertToChipCert(cert, certLen, chipCert, kMaxCHIPOpCertLength, chipCertLen));
+
+        ReturnErrorOnFailure(admin->SetRootCert(ByteSpan(chipCert, chipCertLen)));
+
+        ReturnErrorOnFailure(mAdmins.Store(admin->GetAdminId()));
+    }
+
+    ChipLogProgress(Controller, "Generating credentials");
+    ReturnErrorOnFailure(admin->GetCredentials(mCredentials, mCertificates, mRootKeyId));
+
+    ChipLogProgress(Controller, "Loaded credentials successfully");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceController::Shutdown()
@@ -406,6 +468,10 @@ exit:
 
 CHIP_ERROR DeviceController::UpdateDevice(Device * device, uint64_t fabricId)
 {
+    // TODO - Detect when the device is fully provisioned, instead of relying on UpdateDevice()
+    device->ProvisioningComplete(mNextKeyId++);
+    PersistDevice(device);
+    PersistNextKeyId();
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     return Mdns::Resolver::Instance().ResolveNodeId(chip::PeerId().SetNodeId(device->GetDeviceId()).SetFabricId(fabricId),
                                                     chip::Inet::kIPAddressType_Any);
@@ -637,6 +703,14 @@ CHIP_ERROR DeviceController::SetPairedDeviceList(ByteSpan serialized)
     return err;
 }
 
+void DeviceController::PersistNextKeyId()
+{
+    if (mStorageDelegate != nullptr && mState == State::Initialized)
+    {
+        mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &mNextKeyId, sizeof(mNextKeyId));
+    }
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 void DeviceController::OnNodeIdResolved(const chip::Mdns::ResolvedNodeData & nodeData)
 {
@@ -699,9 +773,11 @@ void DeviceController::OnCommissionableNodeFound(const chip::Mdns::Commissionabl
 
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
-    return ControllerDeviceInitParams{
-        .transportMgr = mTransportMgr, .sessionMgr = mSessionMgr, .exchangeMgr = mExchangeMgr, .inetLayer = mInetLayer
-    };
+    return ControllerDeviceInitParams{ .transportMgr = mTransportMgr,
+                                       .sessionMgr   = mSessionMgr,
+                                       .exchangeMgr  = mExchangeMgr,
+                                       .inetLayer    = mInetLayer,
+                                       .credentials  = &mCredentials };
 }
 
 DeviceCommissioner::DeviceCommissioner() :
@@ -717,8 +793,6 @@ DeviceCommissioner::DeviceCommissioner() :
 
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams params)
 {
-    VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
     ReturnErrorOnFailure(DeviceController::Init(localDeviceId, params));
 
     uint16_t size    = sizeof(mNextKeyId);
@@ -729,7 +803,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, CommissionerInitParams
     }
     mPairingDelegate = params.pairingDelegate;
 
-    mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
     return CHIP_NO_ERROR;
 }
 
@@ -1210,20 +1283,12 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
 {
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
-    ReturnErrorCodeIf(!signingCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-    uint32_t signingCertLen = 0;
+    Transport::AdminPairingInfo * admin = mAdmins.FindAdminWithId(mAdminId);
+    VerifyOrReturnError(admin != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogProgress(Controller, "Getting root certificate from the issuer");
-    ReturnErrorOnFailure(
-        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-
-    ReturnErrorCodeIf(!chipCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(
-        ConvertX509CertToChipCert(signingCert.Get(), signingCertLen, chipCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
+    uint16_t signingCertLen     = 0;
+    const uint8_t * signingCert = admin->GetTrustedRoot(signingCertLen);
+    VerifyOrReturnError(signingCert != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
@@ -1234,7 +1299,7 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
     Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
 
     ReturnErrorOnFailure(
-        cluster.AddTrustedRootCertificate(successCallback, failureCallback, ByteSpan(chipCert.Get(), signingCertLen)));
+        cluster.AddTrustedRootCertificate(successCallback, failureCallback, ByteSpan(signingCert, signingCertLen)));
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
@@ -1318,14 +1383,6 @@ void DeviceCommissioner::PersistDeviceList()
             mPairedDevicesUpdated = false;
             return CHIP_NO_ERROR;
         });
-    }
-}
-
-void DeviceCommissioner::PersistNextKeyId()
-{
-    if (mStorageDelegate != nullptr && mState == State::Initialized)
-    {
-        mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &mNextKeyId, sizeof(mNextKeyId));
     }
 }
 

@@ -57,6 +57,8 @@ bool emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(chip
     VerifyOrExit(admin != nullptr, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(admin->SetRootCert(RootCertificate) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
 
+    VerifyOrExit(GetGlobalAdminPairingTable().Store(admin->GetAdminId()) == CHIP_NO_ERROR, status = EMBER_ZCL_STATUS_FAILURE);
+
 exit:
     emberAfSendImmediateDefaultResponse(status);
     if (status == EMBER_ZCL_STATUS_FAILURE)

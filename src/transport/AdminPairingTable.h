@@ -23,7 +23,7 @@
 
 #include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
-#include <credentials/CHIPCert.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
@@ -88,15 +88,35 @@ public:
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    Crypto::P256Keypair * GetOperationalKey() { return mOperationalKey; }
+    Crypto::P256Keypair * GetOperationalKey()
+    {
+        if (mOperationalKey == nullptr)
+        {
+            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+            mOperationalKey->Initialize();
+        }
+        return mOperationalKey;
+    }
     CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
+
+    bool AreCredentialsAvailable() const
+    {
+        return (mRootCert != nullptr && mOperationalCert != nullptr && mRootCertLen != 0 && mOpCertLen != 0);
+    }
+
+    CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
+                              Credentials::CertificateKeyId & rootKeyId);
+
+    const uint8_t * GetTrustedRoot(uint16_t & size)
+    {
+        size = mRootCertLen;
+        return mRootCert;
+    }
 
     // TODO - Update these APIs to take ownership of the buffer, instead of copying
     //        internally.
     CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
     CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
-
-    CHIP_ERROR GetOperationalCertificateSet(Credentials::ChipCertificateSet & certSet);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
