@@ -321,46 +321,6 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
-function asPythonType(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return 'int';
-  case 'char *':
-    return 'str';
-  case 'uint8_t *':
-  case 'chip::ByteSpan':
-    return 'bytes'
-  }
-}
-
-function asPythonCType(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return 'c_' + type.replace('_t', '');
-  case 'char *':
-  case 'uint8_t *':
-    return 'c_char_p';
-  }
-}
-
 function hasSpecificResponse(commandName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'has_specific_response');
@@ -521,7 +481,5 @@ exports.chip_client_has_list_attributes       = chip_client_has_list_attributes;
 exports.isWritableAttribute                   = isWritableAttribute;
 exports.isReportableAttribute                 = isReportableAttribute;
 exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
-exports.asPythonType                          = asPythonType;
-exports.asPythonCType                         = asPythonCType;
 exports.asCallbackAttributeType               = asCallbackAttributeType;
 exports.hasSpecificResponse                   = hasSpecificResponse;
