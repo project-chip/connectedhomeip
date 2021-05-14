@@ -971,7 +971,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
+CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 

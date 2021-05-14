@@ -44,7 +44,6 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
-#include <credentials/CHIPCert.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
@@ -74,7 +73,6 @@
 
 using namespace chip::Inet;
 using namespace chip::System;
-using namespace chip::Credentials;
 
 // For some applications those does not implement IMDelegate, the DeviceControllerInteractionModelDelegate will dispatch the
 // response to IMDefaultResponseCallback CHIPClientCallbacks, for the applications those implemented IMDelegate, this function will
@@ -99,8 +97,7 @@ constexpr uint16_t kMdnsPort = 5353;
 
 constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 
-constexpr uint32_t kMaxCHIPOpCertLength = 1024;
-constexpr uint32_t kOpCSRNonceLength    = 32;
+constexpr uint32_t kMaxCHIPOpCertLength = 600;
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
@@ -709,11 +706,7 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
     };
 }
 
-DeviceCommissioner::DeviceCommissioner() :
-    mOpCSRResponseCallback(OnOperationalCertificateSigningRequest, this),
-    mOpCertResponseCallback(OnOperationalCertificateAddResponse, this), mRootCertResponseCallback(OnRootCertSuccessResponse, this),
-    mOnCSRFailureCallback(OnCSRFailureResponse, this), mOnCertFailureCallback(OnAddOpCertFailureResponse, this),
-    mOnRootCertFailureCallback(OnRootCertFailureResponse, this)
+DeviceCommissioner::DeviceCommissioner()
 {
     mPairingDelegate      = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
@@ -1031,263 +1024,13 @@ void DeviceCommissioner::OnSessionEstablished()
     ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
 
     // TODO: Add code to receive OpCSR from the device, and process the signing request
-    err = SendOperationalCertificateSigningRequestCommand(device);
+    err = SendOperationalCertificateSigningRequestCommand(device->GetDeviceId());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in sending the CSR request to the device: err %s", ErrorStr(err));
+        ChipLogError(Controller, "Failed in sending opcsr request command to the device: err %s", ErrorStr(err));
         OnSessionEstablishmentError(err);
         return;
     }
-}
-
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(Device * device)
-{
-    ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsProvisioner cluster;
-    cluster.Associate(device, 0);
-
-    Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
-
-    uint8_t CSRNonce[kOpCSRNonceLength];
-    ReturnErrorOnFailure(Crypto::DRBG_get_bytes(CSRNonce, sizeof(CSRNonce)));
-
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, ByteSpan(CSRNonce, sizeof(CSRNonce))));
-    ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
-    return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::OnCSRFailureResponse(void * context, uint8_t status)
-{
-    ChipLogProgress(Controller, "Device failed to receive the CSR request Response: 0x%02x", status);
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-    commissioner->mOpCSRResponseCallback.Cancel();
-    commissioner->mOnCSRFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-}
-
-void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce,
-                                                                ByteSpan VendorReserved1, ByteSpan VendorReserved2,
-                                                                ByteSpan VendorReserved3, ByteSpan Signature)
-{
-    ChipLogProgress(Controller, "Received certificate signing request from the device");
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-
-    commissioner->mOpCSRResponseCallback.Cancel();
-    commissioner->mOnCSRFailureCallback.Cancel();
-
-    if (commissioner->ProcessOpCSR(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature) != CHIP_NO_ERROR)
-    {
-        // Handle error, and notify session failure to the commissioner application.
-        ChipLogError(Controller, "Failed to process the certificate signing request");
-        // TODO: Map error status to correct error code
-        commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-    }
-}
-
-CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
-                                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3,
-                                            const ByteSpan & Signature)
-{
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mDeviceBeingPaired < kNumMaxActiveDevices, CHIP_ERROR_INCORRECT_STATE);
-
-    Device * device = &mActiveDevices[mDeviceBeingPaired];
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
-    ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    // TODO: Validate CSR Nonce and signature
-
-    uint32_t opCertLen = 0;
-    ChipLogProgress(Controller, "Generating operational certificate for device %llx", device->GetDeviceId());
-    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
-        PeerId().SetNodeId(device->GetDeviceId()), CSR, 1, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
-    ReturnErrorCodeIf(!signingCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    ChipLogProgress(Controller, "Getting intermediate CA certificate from the issuer");
-    uint32_t signingCertLen = 0;
-    CHIP_ERROR err =
-        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen);
-    ChipLogProgress(Controller, "GetIntermediateCACertificate returned %d", err);
-    if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
-    {
-        // This implies that the commissioner application uses root CA to sign the operational
-        // certificates, and an intermediate CA is not needed. It's not an error condition, so
-        // let's just send operational certificate and root CA certificate to the device.
-        err            = CHIP_NO_ERROR;
-        signingCertLen = 0;
-        ChipLogProgress(Controller, "Intermediate CA is not needed");
-    }
-    ReturnErrorOnFailure(err);
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-
-    ReturnErrorCodeIf(!chipCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(ConvertX509CertToChipCert(opCert.Get(), opCertLen, chipCert.Get(), kMaxCHIPOpCertLength, opCertLen));
-
-    // TODO - convert ICA cert to ChipCert format and send it to the device.
-
-    ChipLogProgress(Controller, "Sending operational certificate to the device. Op Cert Len %d, ICA Cert Len %d", opCertLen,
-                    signingCertLen);
-    ReturnErrorOnFailure(
-        SendOperationalCertificate(device, ByteSpan(chipCert.Get(), opCertLen), ByteSpan(signingCert.Get(), signingCertLen)));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::OperationalCredentialsProvisioner cluster;
-    cluster.Associate(device, 0);
-
-    Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
-
-    device->GetCommandSender()->Reset();
-
-    // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
-    // strings.
-    if (opCertBuf.size() >= UINT8_MAX)
-    {
-        ByteSpan tempCertFragment(&opCertBuf.data()[UINT8_MAX], opCertBuf.size() - UINT8_MAX);
-        ByteSpan opCertFragment(opCertBuf.data(), UINT8_MAX);
-
-        ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertFragment, tempCertFragment,
-                                               ByteSpan(nullptr, 0), mLocalDeviceId, 0));
-    }
-    else
-    {
-        ReturnErrorOnFailure(cluster.AddOpCert(successCallback, failureCallback, opCertBuf, ByteSpan(nullptr, 0),
-                                               ByteSpan(nullptr, 0), mLocalDeviceId, 0));
-    }
-
-    ChipLogProgress(Controller, "Sent operational certificate to the device");
-
-    return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::OnAddOpCertFailureResponse(void * context, uint8_t status)
-{
-    ChipLogProgress(Controller, "Device failed to receive the operational certificate Response: 0x%02x", status);
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-    commissioner->mOpCSRResponseCallback.Cancel();
-    commissioner->mOnCertFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-}
-
-void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex,
-                                                             uint8_t * DebugText)
-{
-    ChipLogProgress(Controller, "Device confirmed that it has received the operational certificate");
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    commissioner->mOpCSRResponseCallback.Cancel();
-    commissioner->mOnCertFailureCallback.Cancel();
-
-    VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
-    device->GetCommandSender()->Reset();
-
-    err = commissioner->SendTrustedRootCertificate(device);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        commissioner->OnSessionEstablishmentError(err);
-    }
-}
-
-CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(Device * device)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
-    ReturnErrorCodeIf(!signingCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-    uint32_t signingCertLen = 0;
-
-    ChipLogProgress(Controller, "Getting root certificate from the issuer");
-    ReturnErrorOnFailure(
-        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
-
-    chip::Platform::ScopedMemoryBuffer<uint8_t> chipCert;
-
-    ReturnErrorCodeIf(!chipCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
-
-    ReturnErrorOnFailure(
-        ConvertX509CertToChipCert(signingCert.Get(), signingCertLen, chipCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
-
-    ChipLogProgress(Controller, "Sending root certificate to the device");
-
-    chip::Controller::TrustedRootCertificatesProvisioner cluster;
-    cluster.Associate(device, 0);
-
-    Callback::Cancelable * successCallback = mRootCertResponseCallback.Cancel();
-    Callback::Cancelable * failureCallback = mOnRootCertFailureCallback.Cancel();
-
-    ReturnErrorOnFailure(
-        cluster.AddTrustedRootCertificate(successCallback, failureCallback, ByteSpan(chipCert.Get(), signingCertLen)));
-
-    ChipLogProgress(Controller, "Sent root certificate to the device");
-
-    return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::OnRootCertSuccessResponse(void * context)
-{
-    ChipLogProgress(Controller, "Device confirmed that it has received the root certificate");
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    Device * device = nullptr;
-
-    VerifyOrExit(commissioner->mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    commissioner->mRootCertResponseCallback.Cancel();
-    commissioner->mOnRootCertFailureCallback.Cancel();
-
-    VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-
-    device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
-
-    err = commissioner->OnOperationalCredentialsProvisioningCompletion(device);
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        commissioner->OnSessionEstablishmentError(err);
-    }
-}
-
-void DeviceCommissioner::OnRootCertFailureResponse(void * context, uint8_t status)
-{
-    ChipLogProgress(Controller, "Device failed to receive the root certificate Response: 0x%02x", status);
-    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
-    commissioner->mRootCertResponseCallback.Cancel();
-    commissioner->mOnRootCertFailureCallback.Cancel();
-    // TODO: Map error status to correct error code
-    commissioner->OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
-}
-
-CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Device * device)
-{
-    ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    device->GetCommandSender()->Reset();
 
     mPairingSession.ToSerializable(device->GetPairing());
     mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);
@@ -1308,7 +1051,60 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
     }
 
     RendezvousCleanup(CHIP_NO_ERROR);
+}
 
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId)
+{
+    // TODO: Call OperationalCredentials cluster API to send command
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> opCert;
+    ReturnErrorCodeIf(!opCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t opCertLen = 0;
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNodeOperationalCertificate(
+        PeerId().SetNodeId(node), csr, 0, opCert.Get(), kMaxCHIPOpCertLength, opCertLen));
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> signingCert;
+    ReturnErrorCodeIf(!signingCert.Alloc(kMaxCHIPOpCertLength), CHIP_ERROR_NO_MEMORY);
+
+    uint32_t signingCertLen = 0;
+    CHIP_ERROR err =
+        mOperationalCredentialsDelegate->GetIntermediateCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen);
+    if (err == CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED)
+    {
+        // This implies that the commissioner application uses root CA to sign the operational
+        // certificates, and an intermediate CA is not needed. It's not an error condition, so
+        // let's just send operational certificate and root CA certificate to the device.
+        err            = CHIP_NO_ERROR;
+        signingCertLen = 0;
+    }
+    ReturnErrorOnFailure(err);
+
+    ReturnErrorOnFailure(
+        SendOperationalCertificate(node, ByteSpan(opCert.Get(), opCertLen), ByteSpan(signingCert.Get(), signingCertLen)));
+
+    ReturnErrorOnFailure(
+        mOperationalCredentialsDelegate->GetRootCACertificate(0, signingCert.Get(), kMaxCHIPOpCertLength, signingCertLen));
+
+    return SendTrustedRootCertificate(node, ByteSpan(signingCert.Get(), signingCertLen));
+}
+
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf,
+                                                          const ByteSpan & icaCertBuf)
+{
+    // TODO: Call OperationalCredentials cluster API to add operational credentials on the device
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf)
+{
+    // TODO: Call TrustedRootCertificate cluster API to add root certificate on the device
     return CHIP_NO_ERROR;
 }
 
