@@ -178,6 +178,9 @@ if(NOT CONFIG_USE_MINIMAL_MDNS)
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
+idf_component_get_property(main_lib main COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
+
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group 
                                                 ${chip_libraries}
                                                 $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}> 
