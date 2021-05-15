@@ -120,6 +120,33 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x003E: // Operational Credentials Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // fabrics list
+        {
+            entryLength = 18;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _FabricDescriptor
+            _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
+                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
+                           sizeof(entry->NodeId)); // NODE_ID
+            break;
+        }
+        }
+        break;
+    }
     case 0x0035: // Thread Network Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -300,6 +327,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0000: // NetworkInterfaces
             // Struct _NetworkInterfaceType
             entryLength = 46;
+            break;
+        }
+        break;
+    case 0x003E: // Operational Credentials Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // fabrics list
+            // Struct _FabricDescriptor
+            entryLength = 18;
             break;
         }
         break;

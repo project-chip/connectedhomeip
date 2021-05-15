@@ -34,7 +34,9 @@ EmberAfStatus emberAfGeneralDiagnosticsClusterServerCommandParse(EmberAfClusterC
 EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfThreadNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfTrustedRootCertificatesClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfWiFiNetworkDiagnosticsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
@@ -96,9 +98,15 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_ON_OFF_CLUSTER_ID:
             result = emberAfOnOffClusterServerCommandParse(cmd);
             break;
+        case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+            result = emberAfOperationalCredentialsClusterServerCommandParse(cmd);
+            break;
         case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
             // No commands are enabled for cluster Thread Network Diagnostics
             result = status(false, true, cmd->mfgSpecific);
+            break;
+        case ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID:
+            result = emberAfTrustedRootCertificatesClusterServerCommandParse(cmd);
             break;
         case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
             // No commands are enabled for cluster WiFi Network Diagnostics
@@ -724,6 +732,194 @@ EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
         }
         case ZCL_TOGGLE_COMMAND_ID: {
             wasHandled = emberAfOnOffClusterToggleCallback(nullptr);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_ADD_OP_CERT_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            chip::ByteSpan NOC;
+            chip::ByteSpan ICACertificate;
+            chip::ByteSpan IPKValue;
+            chip::NodeId CaseAdminNode;
+            uint16_t AdminVendorId;
+
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                NOC               = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+            payloadOffset = static_cast<uint16_t>(payloadOffset + NOC.size() + 1u);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                ICACertificate    = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+            payloadOffset = static_cast<uint16_t>(payloadOffset + ICACertificate.size() + 1u);
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                IPKValue          = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+            payloadOffset = static_cast<uint16_t>(payloadOffset + IPKValue.size() + 1u);
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            CaseAdminNode = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 8);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            AdminVendorId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfOperationalCredentialsClusterAddOpCertCallback(nullptr, NOC, ICACertificate, IPKValue,
+                                                                               CaseAdminNode, AdminVendorId);
+            break;
+        }
+        case ZCL_OP_CSR_REQUEST_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            chip::ByteSpan CSRNonce;
+
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                CSRNonce          = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+
+            wasHandled = emberAfOperationalCredentialsClusterOpCSRRequestCallback(nullptr, CSRNonce);
+            break;
+        }
+        case ZCL_REMOVE_ALL_FABRICS_COMMAND_ID: {
+            wasHandled = emberAfOperationalCredentialsClusterRemoveAllFabricsCallback(nullptr);
+            break;
+        }
+        case ZCL_REMOVE_FABRIC_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            chip::FabricId FabricId;
+            chip::NodeId NodeId;
+            uint16_t VendorId;
+
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            FabricId      = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 8);
+            if (cmd->bufLen < payloadOffset + 8)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            NodeId        = emberAfGetInt64u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset = static_cast<uint16_t>(payloadOffset + 8);
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            VendorId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfOperationalCredentialsClusterRemoveFabricCallback(nullptr, FabricId, NodeId, VendorId);
+            break;
+        }
+        case ZCL_SET_FABRIC_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint16_t VendorId;
+
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            VendorId = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfOperationalCredentialsClusterSetFabricCallback(nullptr, VendorId);
+            break;
+        }
+        case ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t * Label;
+
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            Label = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+
+            wasHandled = emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(nullptr, Label);
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+EmberAfStatus emberAfTrustedRootCertificatesClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            chip::ByteSpan RootCertificate;
+
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                RootCertificate   = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+
+            wasHandled = emberAfTrustedRootCertificatesClusterAddTrustedRootCertificateCallback(nullptr, RootCertificate);
+            break;
+        }
+        case ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            chip::ByteSpan TrustedRootIdentifier;
+
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            {
+                uint8_t * rawData     = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+                TrustedRootIdentifier = chip::ByteSpan(rawData + 1u, emberAfStringLength(rawData));
+            }
+
+            wasHandled = emberAfTrustedRootCertificatesClusterRemoveTrustedRootCertificateCallback(nullptr, TrustedRootIdentifier);
             break;
         }
         default: {
