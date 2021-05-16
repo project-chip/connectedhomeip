@@ -36,8 +36,8 @@ The Zigbee Alliance officially opened the Project Connected Home over IP
 (Project CHIP) Working Group on January 17, 2020 and is in the process of
 drafting the specification.
 
-Visit [connectedhomeip.com](https://connectedhomeip.com) to learn more and read
-the latest news and updates about the project.
+Visit [buildwithmatter.com](https://buildwithmatter.com) to learn more and
+read the latest news and updates about the project.
 
 # Project Overview
 
