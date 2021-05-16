@@ -30,16 +30,14 @@ using namespace Crypto;
 CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage)
 {
     Crypto::P256SerializedKeypair serializedKey;
-    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
+    uint16_t keySize = static_cast<uint16_t>(sizeof(serializedKey));
 
-    if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, serializedKey, keySize) != CHIP_NO_ERROR)
+    if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize) != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
-
-        keySize = static_cast<uint16_t>(serializedKey.Length());
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, serializedKey, keySize));
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
     }
     else
     {
