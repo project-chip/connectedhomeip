@@ -81,11 +81,10 @@ public:
 #if ENABLE_HSM_GENERATE_EC_KEY
 /* Nist256 Key pair HSM class */
 
-
 class P256PublicKeyHSM : public P256PublicKey
 {
 public:
-    P256PublicKeyHSM() { PublicKeyid = 0;}
+    P256PublicKeyHSM() { PublicKeyid = 0; }
 
     size_t Length() const override { return kP256_PublicKey_Length; }
     operator uint8_t *() override { return bytes; }
