@@ -24,7 +24,7 @@ jobs:
             fail-fast: False
             matrix:
                 EXAMPLE_APP:    [shell, lock-app]
-                EXAMPLE_TARGET: [DISCO_L475VG_IOT01A, NRF52840_DK]
+                EXAMPLE_TARGET: [DISCO_L475VG_IOT01A, CY8CPROTO_062_4343W]
         
         name: "${{matrix.EXAMPLE_APP}}: ${{matrix.EXAMPLE_TARGET}}"
         
