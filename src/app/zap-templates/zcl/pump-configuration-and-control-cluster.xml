@@ -62,14 +62,14 @@ limitations under the License.
     <field name="remoteTemperature" mask="0x100"/>
   </bitmap>
 
-  <enum name="OperationMode" type="ENUM8">
+  <enum name="PumpOperationMode" type="ENUM8">
     <item name="Normal" value="0x0"/>
     <item name="Minimum" value="0x1"/>
     <item name="Maximum" value="0x2"/>
     <item name="Local" value="0x3"/>
   </enum>
 
-  <enum name="ControlMode" type="ENUM8">
+  <enum name="PumpControlMode" type="ENUM8">
     <item name="ConstantSpeed" value="0x0"/>
     <item name="ConstantPressure" value="0x1"/>
     <item name="ProportionalPressure" value="0x2"/>
@@ -78,7 +78,7 @@ limitations under the License.
     <item name="Automatic" value="0x7"/>
   </enum>
 
-  <bitmap name="AlarmMask" type="BITMAP16">
+  <bitmap name="PumpAlarmMask" type="BITMAP16">
     <field name="SupplyVoltageLow" mask="0x1"/>
     <field name="SupplyVoltageHigh" mask="0x2"/>
     <field name="PowerMissingPhase" mask="0x4"/>
