@@ -31,7 +31,6 @@
 
 #include <core/CHIPError.h>
 #include <support/BitFlags.h>
-#include <support/Pool.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/SystemTimer.h>
@@ -67,7 +66,7 @@ public:
     };
 
 public:
-    ReliableMessageMgr(BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
+    ReliableMessageMgr(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageMgr();
 
     void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
@@ -224,7 +223,7 @@ public:
     void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
 
 private:
-    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
     SecureSessionMgr * mSessionMgr;
     uint64_t mTimeStampBase;                  // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
@@ -235,10 +234,10 @@ private:
     template <typename Function>
     void ExecuteForAllContext(Function function)
     {
-        mContextPool.ForEachActiveObject([&](auto * ec) {
-            function(ec->GetReliableMessageContext());
-            return true;
-        });
+        for (auto & ec : mContextPool)
+        {
+            function(ec.GetReliableMessageContext());
+        }
     }
 
     void TicklessDebugDumpRetransTable(const char * log);

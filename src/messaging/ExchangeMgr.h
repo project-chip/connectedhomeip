@@ -31,7 +31,6 @@
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
-#include <support/Pool.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -100,8 +99,6 @@ public:
      *            can be allocated or is available.
      */
     ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegateBase * delegate);
-
-    void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -185,6 +182,9 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegateBase * delegate);
 
+    void IncrementContextsInUse();
+    void DecrementContextsInUse();
+
     void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
@@ -194,6 +194,7 @@ public:
     Transport::AdminId GetAdminId() { return mAdminId; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
+    size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
     enum class State
@@ -233,9 +234,13 @@ private:
 
     Transport::AdminId mAdminId = 0;
 
-    BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
+    size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
+
+    ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                   ExchangeDelegateBase * delegate);
 
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);

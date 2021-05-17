@@ -54,18 +54,14 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
 
 public:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
-
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                    ExchangeDelegateBase * delegate);
-
-    ~ExchangeContext();
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -174,6 +170,11 @@ private:
     SecureSessionHandle mSecureSession; // The connection state
     uint16_t mExchangeId;               // Assigned exchange ID.
 
+    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                            ExchangeDelegateBase * delegate);
+    void Free();
+    void Reset();
+
     /**
      *  Determine whether a response is currently expected for a message that was sent over
      *  this exchange.  While this is true, attempts to send other messages that expect a response
@@ -214,6 +215,11 @@ private:
 
     void DoClose(bool clearRetransTable);
 };
+
+inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
+{
+    obj->Free();
+}
 
 } // namespace Messaging
 } // namespace chip

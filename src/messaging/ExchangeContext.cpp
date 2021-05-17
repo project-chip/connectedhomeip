@@ -212,9 +212,9 @@ void ExchangeContext::Abort()
     Release();
 }
 
-void ExchangeContextDeletor::Release(ExchangeContext * ec)
+void ExchangeContext::Reset()
 {
-    ec->mExchangeMgr->ReleaseContext(ec);
+    *this = ExchangeContext();
 }
 
 ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
@@ -227,12 +227,15 @@ ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
     return nullptr;
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                 ExchangeDelegateBase * delegate)
+ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                         ExchangeDelegateBase * delegate)
 {
-    VerifyOrDie(mExchangeMgr == nullptr);
+    VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
-    mExchangeMgr   = em;
+    Reset();
+    Retain();
+    mExchangeMgr = em;
+    em->IncrementContextsInUse();
     mExchangeId    = ExchangeId;
     mSecureSession = session;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
@@ -245,21 +248,27 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Secu
     SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec++ id: %d", ExchangeId);
+    ChipLogDetail(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()), em->GetContextsInUse(),
+                  this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
+
+    return this;
 }
 
-ExchangeContext::~ExchangeContext()
+void ExchangeContext::Free()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
     // the boolean parameter passed to DoClose() should not matter.
+    ExchangeManager * em = mExchangeMgr;
 
     DoClose(false);
     mExchangeMgr = nullptr;
+
+    em->DecrementContextsInUse();
 
     if (mExchangeACL != nullptr)
     {
@@ -268,7 +277,8 @@ ExchangeContext::~ExchangeContext()
     }
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
+    ChipLogDetail(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
+                  mExchangeId, em->GetContextsInUse(), this);
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
