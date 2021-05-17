@@ -137,7 +137,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0000: // acceptsHeaderList
+        case 0x0000: // accepts header list
         {
             entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, index - 1);
             if (entryOffset == 0)
@@ -169,6 +169,67 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             }
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             copyListMember(dest, src, write, &entryOffset, entryLength); // ContentLaunchStreamingType
+            break;
+        }
+        }
+        break;
+    }
+    case 0x001D: // Descriptor Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // device list
+        {
+            entryLength = 6;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _DeviceType
+            _DeviceType * entry = reinterpret_cast<_DeviceType *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->type, write ? (uint8_t *) &entry->type : src, write, &entryOffset,
+                           sizeof(entry->type)); // DEVICE_TYPE_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->revision, write ? (uint8_t *) &entry->revision : src, write,
+                           &entryOffset, sizeof(entry->revision)); // INT16U
+            break;
+        }
+        case 0x0001: // server list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0002: // client list
+        {
+            entryLength = 2;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // CLUSTER_ID
+            break;
+        }
+        case 0x0003: // parts list
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENDPOINT_ID
             break;
         }
         }
@@ -252,6 +313,33 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryOffset = static_cast<uint16_t>(entryOffset + 34);
+            break;
+        }
+        }
+        break;
+    }
+    case 0x003E: // Operational Credentials Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0001: // fabrics list
+        {
+            entryLength = 18;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %l is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _FabricDescriptor
+            _FabricDescriptor * entry = reinterpret_cast<_FabricDescriptor *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricId, write ? (uint8_t *) &entry->FabricId : src, write,
+                           &entryOffset, sizeof(entry->FabricId)); // FABRIC_ID
+            copyListMember(write ? dest : (uint8_t *) &entry->VendorId, write ? (uint8_t *) &entry->VendorId : src, write,
+                           &entryOffset, sizeof(entry->VendorId)); // INT16U
+            copyListMember(write ? dest : (uint8_t *) &entry->NodeId, write ? (uint8_t *) &entry->NodeId : src, write, &entryOffset,
+                           sizeof(entry->NodeId)); // NODE_ID
             break;
         }
         }
@@ -533,12 +621,33 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x050A: // Content Launch Cluster
         switch (attributeId)
         {
-        case 0x0000: // acceptsHeaderList
+        case 0x0000: // accepts header list
             // chip::ByteSpan
             return GetByteSpanOffsetFromIndex(buffer, 256, entryCount);
             break;
         case 0x0001: // supported streaming types
             // uint8_t
+            entryLength = 1;
+            break;
+        }
+        break;
+    case 0x001D: // Descriptor Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // device list
+            // Struct _DeviceType
+            entryLength = 6;
+            break;
+        case 0x0001: // server list
+            // chip::ClusterId
+            entryLength = 2;
+            break;
+        case 0x0002: // client list
+            // chip::ClusterId
+            entryLength = 2;
+            break;
+        case 0x0003: // parts list
+            // chip::EndpointId
             entryLength = 1;
             break;
         }
@@ -558,6 +667,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0000: // media input list
             // Struct _MediaInputInfo
             entryLength = 70;
+            break;
+        }
+        break;
+    case 0x003E: // Operational Credentials Cluster
+        switch (attributeId)
+        {
+        case 0x0001: // fabrics list
+            // Struct _FabricDescriptor
+            entryLength = 18;
             break;
         }
         break;
