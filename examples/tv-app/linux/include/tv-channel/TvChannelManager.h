@@ -29,4 +29,5 @@ public:
     EmberAfTvChannelInfo proxyChangeChannelRequest(std::string match);
     bool proxyChangeChannelByNumberRequest(uint16_t majorNumer, uint16_t minorNumber);
     bool proxySkipChannelRequest(uint16_t count);
+    std::vector<EmberAfTvChannelInfo> proxyGetTvChannelList();
 };
