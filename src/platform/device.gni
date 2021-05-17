@@ -39,7 +39,8 @@ declare_args() {
 
   # Enable wifi support.
   chip_enable_wifi =
-      chip_device_platform == "linux" || chip_device_platform == "esp32" || chip_device_platform == "mbed"
+      chip_device_platform == "linux" || chip_device_platform == "esp32" ||
+      chip_device_platform == "mbed"
 
   # Enable ble support.
   chip_enable_ble = chip_config_network_layer_ble
