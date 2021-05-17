@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <string.h>
+#include <memory>
 
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
@@ -32,7 +33,7 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 namespace {
 
-constexpr size_t kMaxKvsValueBytes        = 1024;
+constexpr size_t kMaxKvsValueBytes        = 4096;
 constexpr size_t kMaxKvsValueEncodedChars = BASE64_ENCODED_LEN(kMaxKvsValueBytes) + 1;
 
 } // namespace
@@ -65,14 +66,16 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     }
 
     JniUtfString utfValue(env, (jstring) javaValue);
-    if (strlen(utfValue.c_str()) > kMaxKvsValueEncodedChars)
+    const size_t utfValueLen = strlen(utfValue.c_str());
+
+    if (utfValueLen > kMaxKvsValueEncodedChars)
     {
         ChipLogError(DeviceLayer, "Unexpected large value received from KVS");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    uint8_t buffer[kMaxKvsValueBytes];
-    uint16_t decodedLength = chip::Base64Decode(utfValue.c_str(), strlen(utfValue.c_str()), buffer);
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[BASE64_MAX_DECODED_LEN(utfValueLen)]);
+    uint16_t decodedLength = chip::Base64Decode(utfValue.c_str(), utfValueLen, buffer.get());
     if (decodedLength == UINT16_MAX)
     {
         ChipLogError(DeviceLayer, "KVS base64 decoding failed");
@@ -86,7 +89,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     if (value != nullptr)
     {
-        memcpy(value, buffer, std::min<size_t>(value_size, decodedLength));
+        memcpy(value, buffer.get(), std::min<size_t>(value_size, decodedLength));
     }
 
     return CHIP_NO_ERROR;
@@ -124,14 +127,13 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     JNIEnv * env = GetEnvForCurrentThread();
     ReturnErrorCodeIf(env == nullptr, CHIP_ERROR_INTERNAL);
 
-    char base64Buffer[kMaxKvsValueEncodedChars];
+    std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
 
-    size_t length = chip::Base64Encode(static_cast<const uint8_t *>(value), value_size, base64Buffer);
-
-    base64Buffer[length] = 0;
+    size_t length = chip::Base64Encode(static_cast<const uint8_t *>(value), value_size, buffer.get());
+    buffer.get()[length] = 0;
 
     UtfString utfKey(env, key);
-    UtfString utfBase64Value(env, base64Buffer);
+    UtfString utfBase64Value(env, buffer.get());
 
     env->CallStaticVoidMethod(mKeyValueStoreManagerClass, mSetMethod, utfKey.jniValue(), utfBase64Value.jniValue());
 
