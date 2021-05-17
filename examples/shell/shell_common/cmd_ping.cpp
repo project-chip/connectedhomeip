@@ -220,7 +220,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(Messaging::ExchangeContext * ec, System::PacketBufferHandle && payload)
 {
     uint32_t respTime    = System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gPingArguments.GetLastEchoTime();

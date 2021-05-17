@@ -748,7 +748,7 @@ exit:
 }
 
 void PASESession::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                    System::PacketBufferHandle msg)
+                                    System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

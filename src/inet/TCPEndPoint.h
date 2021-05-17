@@ -445,7 +445,7 @@ public:
      *  If this function returns an error, the connection will be closed, since higher layers
      *  are not able to process the data for a better response.
      */
-    typedef INET_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
+    typedef INET_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle && data);
 
     /**
      * The endpoint's message text reception event handling function delegate.

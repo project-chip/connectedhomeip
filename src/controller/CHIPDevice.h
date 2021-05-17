@@ -269,7 +269,7 @@ public:
      * @param[in] msgBuf        The message buffer
      */
     void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle msgBuf) override;
+                           System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.

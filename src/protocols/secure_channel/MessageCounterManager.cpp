@@ -86,7 +86,7 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSession
 }
 
 void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {

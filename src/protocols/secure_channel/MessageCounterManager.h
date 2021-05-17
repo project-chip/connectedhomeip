@@ -113,7 +113,7 @@ private:
                                   System::PacketBufferHandle msgBuf);
 
     void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                           const PayloadHeader & payloadHeader, System::PacketBufferHandle payload) override;
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
 
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };
