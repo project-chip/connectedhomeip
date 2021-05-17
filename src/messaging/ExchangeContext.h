@@ -94,7 +94,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload,
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && msgPayload,
                            const SendFlags & sendFlags = SendFlags(SendMessageFlags::kNone));
 
     /**
@@ -126,7 +126,7 @@ public:
      *                                                       protocol layer.
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
+                             const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msgBuf);
 
     ExchangeDelegateBase * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegateBase * delegate) { mDelegate = delegate; }

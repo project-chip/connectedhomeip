@@ -126,7 +126,7 @@ public:
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle message);
+    CHIP_ERROR SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && message);
 
     /**
      * A strongly-message-typed version of SendMessage.
@@ -259,7 +259,7 @@ public:
      * @param[in] msgBuf        The message buffer
      */
     void OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle msgBuf) override;
+                           System::PacketBufferHandle && msgBuf) override;
 
     /**
      * @brief ExchangeDelegate implementation of OnResponseTimeout.
@@ -459,7 +459,7 @@ public:
      *
      * @param[in] msg Received message buffer.
      */
-    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
+    virtual void OnMessage(System::PacketBufferHandle && msg) = 0;
 
     /**
      * @brief

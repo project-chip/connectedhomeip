@@ -445,7 +445,7 @@ BLE_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OB
 }
 
 // Handle remote central's initiation of CHIP over BLE protocol handshake.
-BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBufferHandle pBuf)
+BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, PacketBufferHandle && pBuf)
 {
     BLE_ERROR err             = BLE_NO_ERROR;
     BLEEndPoint * newEndPoint = nullptr;
@@ -477,7 +477,7 @@ exit:
 }
 
 bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                   PacketBufferHandle pBuf)
+                                   PacketBufferHandle && pBuf)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {
@@ -523,7 +523,7 @@ exit:
 }
 
 bool BleLayer::HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                        PacketBufferHandle pBuf)
+                                        PacketBufferHandle && pBuf)
 {
     if (!UUIDsMatch(&CHIP_BLE_SVC_ID, svcId))
     {

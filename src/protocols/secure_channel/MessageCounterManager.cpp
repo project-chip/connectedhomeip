@@ -72,7 +72,7 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
 CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSessionHandle session,
                                                                    Transport::PeerConnectionState * state,
                                                                    const Transport::PeerAddress & peerAddress,
-                                                                   System::PacketBufferHandle msgBuf)
+                                                                   System::PacketBufferHandle && msgBuf)
 {
     // Queue the message to be reprocessed when sync completes.
     ReturnErrorOnFailure(AddToReceiveTable(state->GetPeerNodeId(), peerAddress, std::move(msgBuf)));
@@ -86,7 +86,7 @@ CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSession
 }
 
 void MessageCounterManager::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+                                              const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq))
     {
@@ -116,7 +116,7 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
 }
 
 CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
-                                                    System::PacketBufferHandle msgBuf)
+                                                    System::PacketBufferHandle && msgBuf)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -250,7 +250,7 @@ exit:
 }
 
 void MessageCounterManager::HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                                    System::PacketBufferHandle msgBuf)
+                                                    System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -277,7 +277,7 @@ exit:
 }
 
 void MessageCounterManager::HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext,
-                                                     const PacketHeader & packetHeader, System::PacketBufferHandle msgBuf)
+                                                     const PacketHeader & packetHeader, System::PacketBufferHandle && msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

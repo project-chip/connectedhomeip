@@ -194,7 +194,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         SecureSessionHandle session, const Transport::PeerAddress & source,
-                                        System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
+                                        System::PacketBufferHandle && msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -326,7 +326,7 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
     });
 }
 
-void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf)
+void ExchangeManager::OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf)
 {
     PacketHeader header;
 

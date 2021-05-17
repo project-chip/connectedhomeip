@@ -291,7 +291,7 @@ protected:
 private:
     //////////// ExchangeDelegate Implementation ///////////////
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle msgBuf) override;
+                           System::PacketBufferHandle && msgBuf) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     //////////// ExchangeMgrDelegate Implementation ///////////////

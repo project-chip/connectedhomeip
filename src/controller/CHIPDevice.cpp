@@ -56,7 +56,7 @@ using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
-CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle buffer)
+CHIP_ERROR Device::SendMessage(Protocols::Id protocolId, uint8_t msgType, System::PacketBufferHandle && buffer)
 {
     System::PacketBufferHandle resend;
     bool loadedSecureSession = false;
@@ -271,7 +271,7 @@ void Device::OnConnectionExpired(SecureSessionHandle session)
 }
 
 void Device::OnMessageReceived(Messaging::ExchangeContext * exchange, const PacketHeader & header,
-                               const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+                               const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     if (mState == ConnectionState::SecureConnected)
     {

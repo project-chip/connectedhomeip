@@ -183,7 +183,7 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
     CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
 }
 
-void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle msg) {}
+void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle && msg) {}
 
 void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 
