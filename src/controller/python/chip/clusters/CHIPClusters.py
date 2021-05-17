@@ -879,12 +879,12 @@ class ChipClusters:
             ],
         }
 
-    def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
+    def SendCommand(self, device: ctypes.c_void_p, commandSender: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
         funcCaller = self._ChipStack.Call if imEnabled else self._ChipStack.CallAsync
-        funcCaller(lambda: func(device, endpoint, groupid, **args))
+        funcCaller(lambda: func(device, commandSender, endpoint, groupid, **args))
 
     def ReadAttribute(self, device: ctypes.c_void_p, cluster: str, attribute: str, endpoint: int, groupid: int, imEnabled):
         func = getattr(self, "Cluster{}_ReadAttribute{}".format(cluster, attribute), None)
@@ -902,551 +902,551 @@ class ChipClusters:
 
     # Cluster commands
 
-    def ClusterAccountLogin_CommandGetSetupPIN(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: bytes):
+    def ClusterAccountLogin_CommandGetSetupPIN(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: bytes):
         tempAccountIdentifier = tempAccountIdentifier.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_AccountLogin_GetSetupPIN(
-                device, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(tempAccountIdentifier)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(tempAccountIdentifier)
         )
-    def ClusterAccountLogin_CommandLogin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: bytes, setupPIN: bytes):
+    def ClusterAccountLogin_CommandLogin(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, tempAccountIdentifier: bytes, setupPIN: bytes):
         tempAccountIdentifier = tempAccountIdentifier.encode("utf-8") + b'\x00'
         setupPIN = setupPIN.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_AccountLogin_Login(
-                device, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(tempAccountIdentifier), setupPIN, len(setupPIN)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, tempAccountIdentifier, len(tempAccountIdentifier), setupPIN, len(setupPIN)
         )
-    def ClusterApplicationLauncher_CommandLaunchApp(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, data: bytes, catalogVendorId: int, applicationId: bytes):
+    def ClusterApplicationLauncher_CommandLaunchApp(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, data: bytes, catalogVendorId: int, applicationId: bytes):
         data = data.encode("utf-8") + b'\x00'
         applicationId = applicationId.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp(
-                device, ZCLendpoint, ZCLgroupid, data, len(data), catalogVendorId, applicationId, len(applicationId)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, data, len(data), catalogVendorId, applicationId, len(applicationId)
         )
-    def ClusterAudioOutput_CommandRenameOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: bytes):
+    def ClusterAudioOutput_CommandRenameOutput(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, index: int, name: bytes):
         name = name.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput(
-                device, ZCLendpoint, ZCLgroupid, index, name, len(name)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, index, name, len(name)
         )
-    def ClusterAudioOutput_CommandSelectOutput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int):
+    def ClusterAudioOutput_CommandSelectOutput(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, index: int):
         return self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput(
-                device, ZCLendpoint, ZCLgroupid, index
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, index
         )
-    def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
+    def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
         return self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(
-                device, ZCLendpoint, ZCLgroupid, percentOpen
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, percentOpen
         )
-    def ClusterBarrierControl_CommandBarrierControlStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterBarrierControl_CommandBarrierControlStop(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterBasic_CommandMfgSpecificPing(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterBasic_CommandMfgSpecificPing(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterBinding_CommandBind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
+    def ClusterBinding_CommandBind(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
         return self._chipLib.chip_ime_AppendCommand_Binding_Bind(
-                device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
         )
-    def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
+    def ClusterBinding_CommandUnbind(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, nodeId: int, groupId: int, endpointId: int, clusterId: int):
         return self._chipLib.chip_ime_AppendCommand_Binding_Unbind(
-                device, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, nodeId, groupId, endpointId, clusterId
         )
-    def ClusterColorControl_CommandMoveColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveColor(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor(
-                device, ZCLendpoint, ZCLgroupid, rateX, rateY, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, rateX, rateY, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveColorTemperature(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature(
-                device, ZCLendpoint, ZCLgroupid, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveHue(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue(
-                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveSaturation(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation(
-                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveToColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, colorX: int, colorY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToColor(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, colorX: int, colorY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor(
-                device, ZCLendpoint, ZCLgroupid, colorX, colorY, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, colorX, colorY, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveToColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, colorTemperature: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToColorTemperature(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, colorTemperature: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature(
-                device, ZCLendpoint, ZCLgroupid, colorTemperature, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, colorTemperature, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveToHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, hue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToHue(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, hue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue(
-                device, ZCLendpoint, ZCLgroupid, hue, direction, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, hue, direction, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveToHueAndSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, hue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToHueAndSaturation(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, hue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation(
-                device, ZCLendpoint, ZCLgroupid, hue, saturation, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, hue, saturation, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandMoveToSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToSaturation(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation(
-                device, ZCLendpoint, ZCLgroupid, saturation, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, saturation, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandStepColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepX: int, stepY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepColor(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, stepX: int, stepY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor(
-                device, ZCLendpoint, ZCLgroupid, stepX, stepY, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, stepX, stepY, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandStepColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepColorTemperature(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature(
-                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandStepHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepHue(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue(
-                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandStepSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepSaturation(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation(
-                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
         )
-    def ClusterColorControl_CommandStopMoveStep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStopMoveStep(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, optionsMask: int, optionsOverride: int):
         return self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep(
-                device, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
         )
-    def ClusterContentLaunch_CommandLaunchContent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, autoPlay: int, data: bytes):
+    def ClusterContentLaunch_CommandLaunchContent(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, autoPlay: int, data: bytes):
         data = data.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent(
-                device, ZCLendpoint, ZCLgroupid, autoPlay, data, len(data)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, autoPlay, data, len(data)
         )
-    def ClusterContentLaunch_CommandLaunchURL(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, contentURL: bytes, displayString: bytes):
+    def ClusterContentLaunch_CommandLaunchURL(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, contentURL: bytes, displayString: bytes):
         contentURL = contentURL.encode("utf-8") + b'\x00'
         displayString = displayString.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL(
-                device, ZCLendpoint, ZCLgroupid, contentURL, len(contentURL), displayString, len(displayString)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, contentURL, len(contentURL), displayString, len(displayString)
         )
-    def ClusterDoorLock_CommandClearAllPins(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterDoorLock_CommandClearAllPins(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterDoorLock_CommandClearAllRfids(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterDoorLock_CommandClearAllRfids(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterDoorLock_CommandClearHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
+    def ClusterDoorLock_CommandClearHolidaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId
         )
-    def ClusterDoorLock_CommandClearPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandClearPin(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin(
-                device, ZCLendpoint, ZCLgroupid, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId
         )
-    def ClusterDoorLock_CommandClearRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandClearRfid(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid(
-                device, ZCLendpoint, ZCLgroupid, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId
         )
-    def ClusterDoorLock_CommandClearWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandClearWeekdaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, userId
         )
-    def ClusterDoorLock_CommandClearYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandClearYeardaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, userId
         )
-    def ClusterDoorLock_CommandGetHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
+    def ClusterDoorLock_CommandGetHolidaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId
         )
-    def ClusterDoorLock_CommandGetLogRecord(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, logIndex: int):
+    def ClusterDoorLock_CommandGetLogRecord(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, logIndex: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord(
-                device, ZCLendpoint, ZCLgroupid, logIndex
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, logIndex
         )
-    def ClusterDoorLock_CommandGetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandGetPin(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin(
-                device, ZCLendpoint, ZCLgroupid, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId
         )
-    def ClusterDoorLock_CommandGetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandGetRfid(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid(
-                device, ZCLendpoint, ZCLgroupid, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId
         )
-    def ClusterDoorLock_CommandGetUserType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandGetUserType(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType(
-                device, ZCLendpoint, ZCLgroupid, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId
         )
-    def ClusterDoorLock_CommandGetWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandGetWeekdaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, userId
         )
-    def ClusterDoorLock_CommandGetYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandGetYeardaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, userId
         )
-    def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
+    def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
-                device, ZCLendpoint, ZCLgroupid, pin, len(pin)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, pin, len(pin)
         )
-    def ClusterDoorLock_CommandSetHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, localStartTime: int, localEndTime: int, operatingModeDuringHoliday: int):
+    def ClusterDoorLock_CommandSetHolidaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, localStartTime: int, localEndTime: int, operatingModeDuringHoliday: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
         )
-    def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: bytes):
+    def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
-                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin, len(pin)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin, len(pin)
         )
-    def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: bytes):
+    def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: bytes):
         id = id.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
-                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id, len(id)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id, len(id)
         )
-    def ClusterDoorLock_CommandSetUserType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userType: int):
+    def ClusterDoorLock_CommandSetUserType(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, userId: int, userType: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType(
-                device, ZCLendpoint, ZCLgroupid, userId, userType
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, userId, userType
         )
-    def ClusterDoorLock_CommandSetWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, daysMask: int, startHour: int, startMinute: int, endHour: int, endMinute: int):
+    def ClusterDoorLock_CommandSetWeekdaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, daysMask: int, startHour: int, startMinute: int, endHour: int, endMinute: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute
         )
-    def ClusterDoorLock_CommandSetYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, localStartTime: int, localEndTime: int):
+    def ClusterDoorLock_CommandSetYeardaySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, localStartTime: int, localEndTime: int):
         return self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(
-                device, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
         )
-    def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
+    def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
-                device, ZCLendpoint, ZCLgroupid, pin, len(pin)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, pin, len(pin)
         )
-    def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: bytes):
+    def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: bytes):
         pin = pin.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
-                device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin, len(pin)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin, len(pin)
         )
-    def ClusterGeneralCommissioning_CommandArmFailSafe(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, expiryLengthSeconds: int, breadcrumb: int, timeoutMs: int):
+    def ClusterGeneralCommissioning_CommandArmFailSafe(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, expiryLengthSeconds: int, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(
-                device, ZCLendpoint, ZCLgroupid, expiryLengthSeconds, breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, expiryLengthSeconds, breadcrumb, timeoutMs
         )
-    def ClusterGeneralCommissioning_CommandCommissioningComplete(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterGeneralCommissioning_CommandCommissioningComplete(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterGeneralCommissioning_CommandSetRegulatoryConfig(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, location: int, countryCode: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterGeneralCommissioning_CommandSetRegulatoryConfig(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, location: int, countryCode: bytes, breadcrumb: int, timeoutMs: int):
         countryCode = countryCode.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig(
-                device, ZCLendpoint, ZCLgroupid, location, countryCode, len(countryCode), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, location, countryCode, len(countryCode), breadcrumb, timeoutMs
         )
-    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
+    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_Groups_AddGroup(
-                device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
         )
-    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
+    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: bytes):
         groupName = groupName.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(
-                device, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, groupName, len(groupName)
         )
-    def ClusterGroups_CommandGetGroupMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupCount: int, groupList: int):
+    def ClusterGroups_CommandGetGroupMembership(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupCount: int, groupList: int):
         return self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership(
-                device, ZCLendpoint, ZCLgroupid, groupCount, groupList
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupCount, groupList
         )
-    def ClusterGroups_CommandRemoveAllGroups(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterGroups_CommandRemoveAllGroups(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterGroups_CommandRemoveGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterGroups_CommandRemoveGroup(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         return self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup(
-                device, ZCLendpoint, ZCLgroupid, groupId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId
         )
-    def ClusterGroups_CommandViewGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterGroups_CommandViewGroup(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         return self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup(
-                device, ZCLendpoint, ZCLgroupid, groupId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId
         )
-    def ClusterIdentify_CommandIdentify(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, identifyTime: int):
+    def ClusterIdentify_CommandIdentify(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, identifyTime: int):
         return self._chipLib.chip_ime_AppendCommand_Identify_Identify(
-                device, ZCLendpoint, ZCLgroupid, identifyTime
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, identifyTime
         )
-    def ClusterIdentify_CommandIdentifyQuery(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterIdentify_CommandIdentifyQuery(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterKeypadInput_CommandSendKey(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, keyCode: int):
+    def ClusterKeypadInput_CommandSendKey(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, keyCode: int):
         return self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey(
-                device, ZCLendpoint, ZCLgroupid, keyCode
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, keyCode
         )
-    def ClusterLevelControl_CommandMove(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandMove(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionMask: int, optionOverride: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_Move(
-                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionMask, optionOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, moveMode, rate, optionMask, optionOverride
         )
-    def ClusterLevelControl_CommandMoveToLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandMoveToLevel(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int, optionMask: int, optionOverride: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel(
-                device, ZCLendpoint, ZCLgroupid, level, transitionTime, optionMask, optionOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, level, transitionTime, optionMask, optionOverride
         )
-    def ClusterLevelControl_CommandMoveToLevelWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int):
+    def ClusterLevelControl_CommandMoveToLevelWithOnOff(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff(
-                device, ZCLendpoint, ZCLgroupid, level, transitionTime
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, level, transitionTime
         )
-    def ClusterLevelControl_CommandMoveWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int):
+    def ClusterLevelControl_CommandMoveWithOnOff(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff(
-                device, ZCLendpoint, ZCLgroupid, moveMode, rate
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, moveMode, rate
         )
-    def ClusterLevelControl_CommandStep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandStep(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_Step(
-                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionMask, optionOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionMask, optionOverride
         )
-    def ClusterLevelControl_CommandStepWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int):
+    def ClusterLevelControl_CommandStepWithOnOff(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff(
-                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime
         )
-    def ClusterLevelControl_CommandStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandStop(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, optionMask: int, optionOverride: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_Stop(
-                device, ZCLendpoint, ZCLgroupid, optionMask, optionOverride
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, optionMask, optionOverride
         )
-    def ClusterLevelControl_CommandStopWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterLevelControl_CommandStopWithOnOff(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterLowPower_CommandSleep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterLowPower_CommandSleep(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_LowPower_Sleep(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaInput_CommandHideInputStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaInput_CommandHideInputStatus(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaInput_CommandRenameInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int, name: bytes):
+    def ClusterMediaInput_CommandRenameInput(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, index: int, name: bytes):
         name = name.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput(
-                device, ZCLendpoint, ZCLgroupid, index, name, len(name)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, index, name, len(name)
         )
-    def ClusterMediaInput_CommandSelectInput(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, index: int):
+    def ClusterMediaInput_CommandSelectInput(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, index: int):
         return self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput(
-                device, ZCLendpoint, ZCLgroupid, index
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, index
         )
-    def ClusterMediaInput_CommandShowInputStatus(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaInput_CommandShowInputStatus(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaFastForward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaFastForward(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaFastForward(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaNext(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaNext(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaNext(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaPause(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaPause(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPause(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaPlay(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaPlay(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPlay(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaPrevious(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaPrevious(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPrevious(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaRewind(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaRewind(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaSkipBackward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
+    def ClusterMediaPlayback_CommandMediaSkipBackward(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward(
-                device, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
         )
-    def ClusterMediaPlayback_CommandMediaSkipForward(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
+    def ClusterMediaPlayback_CommandMediaSkipForward(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, deltaPositionMilliseconds: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward(
-                device, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, deltaPositionMilliseconds
         )
-    def ClusterMediaPlayback_CommandMediaSkipSeek(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, position: int):
+    def ClusterMediaPlayback_CommandMediaSkipSeek(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, position: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek(
-                device, ZCLendpoint, ZCLgroupid, position
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, position
         )
-    def ClusterMediaPlayback_CommandMediaStartOver(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaStartOver(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterMediaPlayback_CommandMediaStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterMediaPlayback_CommandMediaStop(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterNetworkCommissioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandAddThreadNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork(
-                device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandAddWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandAddWiFiNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork(
-                device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandDisableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandDisableNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork(
-                device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandEnableNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandEnableNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork(
-                device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandGetLastNetworkCommissioningResult(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandGetLastNetworkCommissioningResult(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult(
-                device, ZCLendpoint, ZCLgroupid, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandRemoveNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, networkID: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork(
-                device, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, networkID, len(networkID), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandScanNetworks(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandScanNetworks(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks(
-                device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, ssid, len(ssid), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandUpdateThreadNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandUpdateThreadNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, operationalDataset: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork(
-                device, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, operationalDataset, len(operationalDataset), breadcrumb, timeoutMs
         )
-    def ClusterNetworkCommissioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
+    def ClusterNetworkCommissioning_CommandUpdateWiFiNetwork(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, ssid: bytes, credentials: bytes, breadcrumb: int, timeoutMs: int):
         return self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork(
-                device, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, ssid, len(ssid), credentials, len(credentials), breadcrumb, timeoutMs
         )
-    def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Off(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOnOff_CommandOn(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOnOff_CommandOn(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_On(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandAddOpCert(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, noc: bytes, iCACertificate: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
+    def ClusterOperationalCredentials_CommandAddOpCert(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, noc: bytes, iCACertificate: bytes, iPKValue: bytes, caseAdminNode: int, adminVendorId: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert(
-                device, ZCLendpoint, ZCLgroupid, noc, len(noc), iCACertificate, len(iCACertificate), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, noc, len(noc), iCACertificate, len(iCACertificate), iPKValue, len(iPKValue), caseAdminNode, adminVendorId
         )
-    def ClusterOperationalCredentials_CommandOpCSRRequest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, cSRNonce: bytes):
+    def ClusterOperationalCredentials_CommandOpCSRRequest(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, cSRNonce: bytes):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest(
-                device, ZCLendpoint, ZCLgroupid, cSRNonce, len(cSRNonce)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, cSRNonce, len(cSRNonce)
         )
-    def ClusterOperationalCredentials_CommandRemoveAllFabrics(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOperationalCredentials_CommandRemoveAllFabrics(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, fabricId: int, nodeId: int, vendorId: int):
+    def ClusterOperationalCredentials_CommandRemoveFabric(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, fabricId: int, nodeId: int, vendorId: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric(
-                device, ZCLendpoint, ZCLgroupid, fabricId, nodeId, vendorId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, fabricId, nodeId, vendorId
         )
-    def ClusterOperationalCredentials_CommandSetFabric(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, vendorId: int):
+    def ClusterOperationalCredentials_CommandSetFabric(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, vendorId: int):
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric(
-                device, ZCLendpoint, ZCLgroupid, vendorId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, vendorId
         )
-    def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, label: bytes):
+    def ClusterOperationalCredentials_CommandUpdateFabricLabel(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, label: bytes):
         label = label.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel(
-                device, ZCLendpoint, ZCLgroupid, label, len(label)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, label, len(label)
         )
-    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
+    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: bytes, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_Scenes_AddScene(
-                device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, len(sceneName), clusterId, length, value
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, len(sceneName), clusterId, length, value
         )
-    def ClusterScenes_CommandGetSceneMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterScenes_CommandGetSceneMembership(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         return self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership(
-                device, ZCLendpoint, ZCLgroupid, groupId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId
         )
-    def ClusterScenes_CommandRecallScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int):
+    def ClusterScenes_CommandRecallScene(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int):
         return self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene(
-                device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime
         )
-    def ClusterScenes_CommandRemoveAllScenes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterScenes_CommandRemoveAllScenes(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         return self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes(
-                device, ZCLendpoint, ZCLgroupid, groupId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId
         )
-    def ClusterScenes_CommandRemoveScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
+    def ClusterScenes_CommandRemoveScene(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
         return self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene(
-                device, ZCLendpoint, ZCLgroupid, groupId, sceneId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, sceneId
         )
-    def ClusterScenes_CommandStoreScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
+    def ClusterScenes_CommandStoreScene(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
         return self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene(
-                device, ZCLendpoint, ZCLgroupid, groupId, sceneId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, sceneId
         )
-    def ClusterScenes_CommandViewScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
+    def ClusterScenes_CommandViewScene(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
         return self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene(
-                device, ZCLendpoint, ZCLgroupid, groupId, sceneId
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, groupId, sceneId
         )
-    def ClusterTvChannel_CommandChangeChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, match: bytes):
+    def ClusterTvChannel_CommandChangeChannel(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, match: bytes):
         match = match.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel(
-                device, ZCLendpoint, ZCLgroupid, match, len(match)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, match, len(match)
         )
-    def ClusterTvChannel_CommandChangeChannelByNumber(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, majorNumber: int, minorNumber: int):
+    def ClusterTvChannel_CommandChangeChannelByNumber(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, majorNumber: int, minorNumber: int):
         return self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber(
-                device, ZCLendpoint, ZCLgroupid, majorNumber, minorNumber
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, majorNumber, minorNumber
         )
-    def ClusterTvChannel_CommandSkipChannel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, count: int):
+    def ClusterTvChannel_CommandSkipChannel(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, count: int):
         return self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel(
-                device, ZCLendpoint, ZCLgroupid, count
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, count
         )
-    def ClusterTargetNavigator_CommandNavigateTarget(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, target: int, data: bytes):
+    def ClusterTargetNavigator_CommandNavigateTarget(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, target: int, data: bytes):
         data = data.encode("utf-8") + b'\x00'
         return self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget(
-                device, ZCLendpoint, ZCLgroupid, target, data, len(data)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, target, data, len(data)
         )
-    def ClusterTestCluster_CommandTest(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterTestCluster_CommandTest(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_Test(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterTestCluster_CommandTestNotHandled(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterTestCluster_CommandTestSpecific(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterTestCluster_CommandTestSpecific(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterThermostat_CommandClearWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterThermostat_CommandClearWeeklySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterThermostat_CommandGetRelayStatusLog(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterThermostat_CommandGetRelayStatusLog(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterThermostat_CommandGetWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, daysToReturn: int, modeToReturn: int):
+    def ClusterThermostat_CommandGetWeeklySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, daysToReturn: int, modeToReturn: int):
         return self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule(
-                device, ZCLendpoint, ZCLgroupid, daysToReturn, modeToReturn
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, daysToReturn, modeToReturn
         )
-    def ClusterThermostat_CommandSetWeeklySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, numberOfTransitionsForSequence: int, dayOfWeekForSequence: int, modeForSequence: int, payload: int):
+    def ClusterThermostat_CommandSetWeeklySchedule(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, numberOfTransitionsForSequence: int, dayOfWeekForSequence: int, modeForSequence: int, payload: int):
         return self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule(
-                device, ZCLendpoint, ZCLgroupid, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload
         )
-    def ClusterThermostat_CommandSetpointRaiseLower(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, mode: int, amount: int):
+    def ClusterThermostat_CommandSetpointRaiseLower(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, mode: int, amount: int):
         return self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower(
-                device, ZCLendpoint, ZCLgroupid, mode, amount
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, mode, amount
         )
-    def ClusterTrustedRootCertificates_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
+    def ClusterTrustedRootCertificates_CommandAddTrustedRootCertificate(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, rootCertificate: bytes):
         return self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate(
-                device, ZCLendpoint, ZCLgroupid, rootCertificate, len(rootCertificate)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, rootCertificate, len(rootCertificate)
         )
-    def ClusterTrustedRootCertificates_CommandRemoveTrustedRootCertificate(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, trustedRootIdentifier: bytes):
+    def ClusterTrustedRootCertificates_CommandRemoveTrustedRootCertificate(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, trustedRootIdentifier: bytes):
         return self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate(
-                device, ZCLendpoint, ZCLgroupid, trustedRootIdentifier, len(trustedRootIdentifier)
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, trustedRootIdentifier, len(trustedRootIdentifier)
         )
-    def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterWindowCovering_CommandWindowCoveringDownClose(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToLiftPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentageLiftValue: int):
+    def ClusterWindowCovering_CommandWindowCoveringGoToLiftPercentage(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, percentageLiftValue: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage(
-                device, ZCLendpoint, ZCLgroupid, percentageLiftValue
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, percentageLiftValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToLiftValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, liftValue: int):
+    def ClusterWindowCovering_CommandWindowCoveringGoToLiftValue(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, liftValue: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue(
-                device, ZCLendpoint, ZCLgroupid, liftValue
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, liftValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToTiltPercentage(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentageTiltValue: int):
+    def ClusterWindowCovering_CommandWindowCoveringGoToTiltPercentage(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, percentageTiltValue: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage(
-                device, ZCLendpoint, ZCLgroupid, percentageTiltValue
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, percentageTiltValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringGoToTiltValue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, tiltValue: int):
+    def ClusterWindowCovering_CommandWindowCoveringGoToTiltValue(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int, tiltValue: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue(
-                device, ZCLendpoint, ZCLgroupid, tiltValue
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid, tiltValue
         )
-    def ClusterWindowCovering_CommandWindowCoveringStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterWindowCovering_CommandWindowCoveringStop(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
-    def ClusterWindowCovering_CommandWindowCoveringUpOpen(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterWindowCovering_CommandWindowCoveringUpOpen(self, device: ctypes.c_void_p, commandSenderHandle: int, ZCLendpoint: int, ZCLgroupid: int):
         return self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen(
-                device, ZCLendpoint, ZCLgroupid
+                device, commandSenderHandle, ZCLendpoint, ZCLgroupid
         )
 
     # Cluster attributes
@@ -1855,10 +1855,10 @@ class ChipClusters:
         self._chipLib.chip_ime_SetFailureResponseDelegate.res = None
         # Cluster AccountLogin
         # Cluster AccountLogin Command GetSetupPIN
-        self._chipLib.chip_ime_AppendCommand_AccountLogin_GetSetupPIN.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_AccountLogin_GetSetupPIN.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_AccountLogin_GetSetupPIN.restype = ctypes.c_uint32
         # Cluster AccountLogin Command Login
-        self._chipLib.chip_ime_AppendCommand_AccountLogin_Login.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_AccountLogin_Login.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_AccountLogin_Login.restype = ctypes.c_uint32
         # Cluster AccountLogin ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_AccountLogin_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1890,7 +1890,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_ApplicationBasic_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ApplicationLauncher
         # Cluster ApplicationLauncher Command LaunchApp
-        self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_ApplicationLauncher_LaunchApp.restype = ctypes.c_uint32
         # Cluster ApplicationLauncher ReadAttribute ApplicationLauncherList
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ApplicationLauncherList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1900,10 +1900,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_ApplicationLauncher_ClusterRevision.restype = ctypes.c_uint32
         # Cluster AudioOutput
         # Cluster AudioOutput Command RenameOutput
-        self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_AudioOutput_RenameOutput.restype = ctypes.c_uint32
         # Cluster AudioOutput Command SelectOutput
-        self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_AudioOutput_SelectOutput.restype = ctypes.c_uint32
         # Cluster AudioOutput ReadAttribute AudioOutputList
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_AudioOutputList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1913,10 +1913,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_AudioOutput_ClusterRevision.restype = ctypes.c_uint32
         # Cluster BarrierControl
         # Cluster BarrierControl Command BarrierControlGoToPercent
-        self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent.restype = ctypes.c_uint32
         # Cluster BarrierControl Command BarrierControlStop
-        self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop.restype = ctypes.c_uint32
         # Cluster BarrierControl ReadAttribute BarrierMovingState
         self._chipLib.chip_ime_ReadAttribute_BarrierControl_BarrierMovingState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1935,7 +1935,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_BarrierControl_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Basic
         # Cluster Basic Command MfgSpecificPing
-        self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Basic_MfgSpecificPing.restype = ctypes.c_uint32
         # Cluster Basic ReadAttribute InteractionModelVersion
         self._chipLib.chip_ime_ReadAttribute_Basic_InteractionModelVersion.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -1993,56 +1993,56 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Basic_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Binding
         # Cluster Binding Command Bind
-        self._chipLib.chip_ime_AppendCommand_Binding_Bind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Binding_Bind.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Binding_Bind.restype = ctypes.c_uint32
         # Cluster Binding Command Unbind
-        self._chipLib.chip_ime_AppendCommand_Binding_Unbind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Binding_Unbind.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Binding_Unbind.restype = ctypes.c_uint32
         # Cluster Binding ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_Binding_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ColorControl
         # Cluster ColorControl Command MoveColor
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16, ctypes.c_int16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16, ctypes.c_int16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveColorTemperature
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveSaturation
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveToColor
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveToColorTemperature
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveToHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveToHueAndSaturation
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl Command MoveToSaturation
-        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl Command StepColor
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16, ctypes.c_int16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_int16, ctypes.c_int16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor.restype = ctypes.c_uint32
         # Cluster ColorControl Command StepColorTemperature
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature.restype = ctypes.c_uint32
         # Cluster ColorControl Command StepHue
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue.restype = ctypes.c_uint32
         # Cluster ColorControl Command StepSaturation
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation.restype = ctypes.c_uint32
         # Cluster ColorControl Command StopMoveStep
-        self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep.restype = ctypes.c_uint32
         # Cluster ColorControl ReadAttribute CurrentHue
         self._chipLib.chip_ime_ReadAttribute_ColorControl_CurrentHue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2214,10 +2214,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_ColorControl_ClusterRevision.restype = ctypes.c_uint32
         # Cluster ContentLaunch
         # Cluster ContentLaunch Command LaunchContent
-        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchContent.restype = ctypes.c_uint32
         # Cluster ContentLaunch Command LaunchURL
-        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_ContentLaunch_LaunchURL.restype = ctypes.c_uint32
         # Cluster ContentLaunch ReadAttribute AcceptsHeaderList
         self._chipLib.chip_ime_ReadAttribute_ContentLaunch_AcceptsHeaderList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2234,73 +2234,73 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Descriptor_ClusterRevision.restype = ctypes.c_uint32
         # Cluster DoorLock
         # Cluster DoorLock Command ClearAllPins
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins.restype = ctypes.c_uint32
         # Cluster DoorLock Command ClearAllRfids
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids.restype = ctypes.c_uint32
         # Cluster DoorLock Command ClearHolidaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command ClearPin
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin.restype = ctypes.c_uint32
         # Cluster DoorLock Command ClearRfid
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid.restype = ctypes.c_uint32
         # Cluster DoorLock Command ClearWeekdaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command ClearYeardaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetHolidaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetLogRecord
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetPin
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetRfid
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetUserType
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetWeekdaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command GetYeardaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command LockDoor
-        self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetHolidaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint32, ctypes.c_uint32, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetPin
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetRfid
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetUserType
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetWeekdaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command SetYeardaySchedule
-        self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule.restype = ctypes.c_uint32
         # Cluster DoorLock Command UnlockDoor
-        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor.restype = ctypes.c_uint32
         # Cluster DoorLock Command UnlockWithTimeout
-        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout.restype = ctypes.c_uint32
         # Cluster DoorLock ReadAttribute LockState
         self._chipLib.chip_ime_ReadAttribute_DoorLock_LockState.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2319,13 +2319,13 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_DoorLock_ClusterRevision.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning
         # Cluster GeneralCommissioning Command ArmFailSafe
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning Command CommissioningComplete
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_CommissioningComplete.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning Command SetRegulatoryConfig
-        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_GeneralCommissioning_SetRegulatoryConfig.restype = ctypes.c_uint32
         # Cluster GeneralCommissioning ReadAttribute FabricId
         self._chipLib.chip_ime_ReadAttribute_GeneralCommissioning_FabricId.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2349,22 +2349,22 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Groups
         # Cluster Groups Command AddGroup
-        self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroup.restype = ctypes.c_uint32
         # Cluster Groups Command AddGroupIfIdentifying
-        self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying.restype = ctypes.c_uint32
         # Cluster Groups Command GetGroupMembership
-        self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership.restype = ctypes.c_uint32
         # Cluster Groups Command RemoveAllGroups
-        self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups.restype = ctypes.c_uint32
         # Cluster Groups Command RemoveGroup
-        self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup.restype = ctypes.c_uint32
         # Cluster Groups Command ViewGroup
-        self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup.restype = ctypes.c_uint32
         # Cluster Groups ReadAttribute NameSupport
         self._chipLib.chip_ime_ReadAttribute_Groups_NameSupport.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2374,10 +2374,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Groups_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Identify
         # Cluster Identify Command Identify
-        self._chipLib.chip_ime_AppendCommand_Identify_Identify.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Identify_Identify.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Identify_Identify.restype = ctypes.c_uint32
         # Cluster Identify Command IdentifyQuery
-        self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery.restype = ctypes.c_uint32
         # Cluster Identify ReadAttribute IdentifyTime
         self._chipLib.chip_ime_ReadAttribute_Identify_IdentifyTime.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2387,35 +2387,35 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Identify_ClusterRevision.restype = ctypes.c_uint32
         # Cluster KeypadInput
         # Cluster KeypadInput Command SendKey
-        self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_KeypadInput_SendKey.restype = ctypes.c_uint32
         # Cluster KeypadInput ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_KeypadInput_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_KeypadInput_ClusterRevision.restype = ctypes.c_uint32
         # Cluster LevelControl
         # Cluster LevelControl Command Move
-        self._chipLib.chip_ime_AppendCommand_LevelControl_Move.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_Move.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_LevelControl_Move.restype = ctypes.c_uint32
         # Cluster LevelControl Command MoveToLevel
-        self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel.restype = ctypes.c_uint32
         # Cluster LevelControl Command MoveToLevelWithOnOff
-        self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff.restype = ctypes.c_uint32
         # Cluster LevelControl Command MoveWithOnOff
-        self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff.restype = ctypes.c_uint32
         # Cluster LevelControl Command Step
-        self._chipLib.chip_ime_AppendCommand_LevelControl_Step.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_Step.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_LevelControl_Step.restype = ctypes.c_uint32
         # Cluster LevelControl Command StepWithOnOff
-        self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff.restype = ctypes.c_uint32
         # Cluster LevelControl Command Stop
-        self._chipLib.chip_ime_AppendCommand_LevelControl_Stop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_Stop.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_LevelControl_Stop.restype = ctypes.c_uint32
         # Cluster LevelControl Command StopWithOnOff
-        self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff.restype = ctypes.c_uint32
         # Cluster LevelControl ReadAttribute CurrentLevel
         self._chipLib.chip_ime_ReadAttribute_LevelControl_CurrentLevel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2428,23 +2428,23 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_LevelControl_ClusterRevision.restype = ctypes.c_uint32
         # Cluster LowPower
         # Cluster LowPower Command Sleep
-        self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_LowPower_Sleep.restype = ctypes.c_uint32
         # Cluster LowPower ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_LowPower_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_LowPower_ClusterRevision.restype = ctypes.c_uint32
         # Cluster MediaInput
         # Cluster MediaInput Command HideInputStatus
-        self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaInput_HideInputStatus.restype = ctypes.c_uint32
         # Cluster MediaInput Command RenameInput
-        self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_MediaInput_RenameInput.restype = ctypes.c_uint32
         # Cluster MediaInput Command SelectInput
-        self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_MediaInput_SelectInput.restype = ctypes.c_uint32
         # Cluster MediaInput Command ShowInputStatus
-        self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaInput_ShowInputStatus.restype = ctypes.c_uint32
         # Cluster MediaInput ReadAttribute MediaInputList
         self._chipLib.chip_ime_ReadAttribute_MediaInput_MediaInputList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2454,81 +2454,81 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_MediaInput_ClusterRevision.restype = ctypes.c_uint32
         # Cluster MediaPlayback
         # Cluster MediaPlayback Command MediaFastForward
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaFastForward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaFastForward.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaFastForward.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaNext
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaNext.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaNext.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaNext.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaPause
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPause.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPause.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPause.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaPlay
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPlay.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPlay.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPlay.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaPrevious
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPrevious.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPrevious.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaPrevious.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaRewind
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaRewind.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipBackward
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipBackward.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipForward
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipForward.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaSkipSeek
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaSkipSeek.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaStartOver
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStartOver.restype = ctypes.c_uint32
         # Cluster MediaPlayback Command MediaStop
-        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_MediaPlayback_MediaStop.restype = ctypes.c_uint32
         # Cluster MediaPlayback ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_MediaPlayback_ClusterRevision.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning
         # Cluster NetworkCommissioning Command AddThreadNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddThreadNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command AddWiFiNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_AddWiFiNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command DisableNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_DisableNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command EnableNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_EnableNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command GetLastNetworkCommissioningResult
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_GetLastNetworkCommissioningResult.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command RemoveNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_RemoveNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command ScanNetworks
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_ScanNetworks.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command UpdateThreadNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateThreadNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning Command UpdateWiFiNetwork
-        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_NetworkCommissioning_UpdateWiFiNetwork.restype = ctypes.c_uint32
         # Cluster NetworkCommissioning ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_ReadAttribute_NetworkCommissioning_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OnOff
         # Cluster OnOff Command Off
-        self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_Off.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_Off.restype = ctypes.c_uint32
         # Cluster OnOff Command On
-        self._chipLib.chip_ime_AppendCommand_OnOff_On.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_On.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_On.restype = ctypes.c_uint32
         # Cluster OnOff Command Toggle
-        self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OnOff_Toggle.restype = ctypes.c_uint32
         # Cluster OnOff ReadAttribute OnOff
         self._chipLib.chip_ime_ReadAttribute_OnOff_OnOff.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2541,22 +2541,22 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_OnOff_ClusterRevision.restype = ctypes.c_uint32
         # Cluster OperationalCredentials
         # Cluster OperationalCredentials Command AddOpCert
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint64, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_AddOpCert.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command OpCSRRequest
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_OpCSRRequest.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command RemoveAllFabrics
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveAllFabrics.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command RemoveFabric
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint64, ctypes.c_uint64, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_RemoveFabric.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command SetFabric
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_SetFabric.restype = ctypes.c_uint32
         # Cluster OperationalCredentials Command UpdateFabricLabel
-        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_OperationalCredentials_UpdateFabricLabel.restype = ctypes.c_uint32
         # Cluster OperationalCredentials ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_OperationalCredentials_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2591,25 +2591,25 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_PumpConfigurationAndControl_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Scenes
         # Cluster Scenes Command AddScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_AddScene.restype = ctypes.c_uint32
         # Cluster Scenes Command GetSceneMembership
-        self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership.restype = ctypes.c_uint32
         # Cluster Scenes Command RecallScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene.restype = ctypes.c_uint32
         # Cluster Scenes Command RemoveAllScenes
-        self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes.restype = ctypes.c_uint32
         # Cluster Scenes Command RemoveScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene.restype = ctypes.c_uint32
         # Cluster Scenes Command StoreScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene.restype = ctypes.c_uint32
         # Cluster Scenes Command ViewScene
-        self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene.restype = ctypes.c_uint32
         # Cluster Scenes ReadAttribute SceneCount
         self._chipLib.chip_ime_ReadAttribute_Scenes_SceneCount.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2644,13 +2644,13 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Switch_ClusterRevision.restype = ctypes.c_uint32
         # Cluster TvChannel
         # Cluster TvChannel Command ChangeChannel
-        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannel.restype = ctypes.c_uint32
         # Cluster TvChannel Command ChangeChannelByNumber
-        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TvChannel_ChangeChannelByNumber.restype = ctypes.c_uint32
         # Cluster TvChannel Command SkipChannel
-        self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TvChannel_SkipChannel.restype = ctypes.c_uint32
         # Cluster TvChannel ReadAttribute TvChannelList
         self._chipLib.chip_ime_ReadAttribute_TvChannel_TvChannelList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2666,7 +2666,7 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TvChannel_ClusterRevision.restype = ctypes.c_uint32
         # Cluster TargetNavigator
         # Cluster TargetNavigator Command NavigateTarget
-        self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_TargetNavigator_NavigateTarget.restype = ctypes.c_uint32
         # Cluster TargetNavigator ReadAttribute TargetNavigatorList
         self._chipLib.chip_ime_ReadAttribute_TargetNavigator_TargetNavigatorList.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2692,13 +2692,13 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TemperatureMeasurement_ClusterRevision.restype = ctypes.c_uint32
         # Cluster TestCluster
         # Cluster TestCluster Command Test
-        self._chipLib.chip_ime_AppendCommand_TestCluster_Test.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_Test.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_Test.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestNotHandled
-        self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestNotHandled.restype = ctypes.c_uint32
         # Cluster TestCluster Command TestSpecific
-        self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_TestCluster_TestSpecific.restype = ctypes.c_uint32
         # Cluster TestCluster ReadAttribute Boolean
         self._chipLib.chip_ime_ReadAttribute_TestCluster_Boolean.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2753,19 +2753,19 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_TestCluster_ClusterRevision.restype = ctypes.c_uint32
         # Cluster Thermostat
         # Cluster Thermostat Command ClearWeeklySchedule
-        self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Thermostat_ClearWeeklySchedule.restype = ctypes.c_uint32
         # Cluster Thermostat Command GetRelayStatusLog
-        self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_Thermostat_GetRelayStatusLog.restype = ctypes.c_uint32
         # Cluster Thermostat Command GetWeeklySchedule
-        self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Thermostat_GetWeeklySchedule.restype = ctypes.c_uint32
         # Cluster Thermostat Command SetWeeklySchedule
-        self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_Thermostat_SetWeeklySchedule.restype = ctypes.c_uint32
         # Cluster Thermostat Command SetpointRaiseLower
-        self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_int8]
+        self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8, ctypes.c_int8]
         self._chipLib.chip_ime_AppendCommand_Thermostat_SetpointRaiseLower.restype = ctypes.c_uint32
         # Cluster Thermostat ReadAttribute LocalTemperature
         self._chipLib.chip_ime_ReadAttribute_Thermostat_LocalTemperature.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2790,10 +2790,10 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_Thermostat_ClusterRevision.restype = ctypes.c_uint32
         # Cluster TrustedRootCertificates
         # Cluster TrustedRootCertificates Command AddTrustedRootCertificate
-        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_AddTrustedRootCertificate.restype = ctypes.c_uint32
         # Cluster TrustedRootCertificates Command RemoveTrustedRootCertificate
-        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
+        self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_char_p, ctypes.c_uint32]
         self._chipLib.chip_ime_AppendCommand_TrustedRootCertificates_RemoveTrustedRootCertificate.restype = ctypes.c_uint32
         # Cluster TrustedRootCertificates ReadAttribute ClusterRevision
         self._chipLib.chip_ime_ReadAttribute_TrustedRootCertificates_ClusterRevision.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
@@ -2807,25 +2807,25 @@ class ChipClusters:
         self._chipLib.chip_ime_ReadAttribute_WakeOnLan_ClusterRevision.restype = ctypes.c_uint32
         # Cluster WindowCovering
         # Cluster WindowCovering Command WindowCoveringDownClose
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringDownClose.restype = ctypes.c_uint32
         # Cluster WindowCovering Command WindowCoveringGoToLiftPercentage
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftPercentage.restype = ctypes.c_uint32
         # Cluster WindowCovering Command WindowCoveringGoToLiftValue
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToLiftValue.restype = ctypes.c_uint32
         # Cluster WindowCovering Command WindowCoveringGoToTiltPercentage
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltPercentage.restype = ctypes.c_uint32
         # Cluster WindowCovering Command WindowCoveringGoToTiltValue
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringGoToTiltValue.restype = ctypes.c_uint32
         # Cluster WindowCovering Command WindowCoveringStop
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringStop.restype = ctypes.c_uint32
         # Cluster WindowCovering Command WindowCoveringUpOpen
-        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]
+        self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_uint8, ctypes.c_uint16]
         self._chipLib.chip_ime_AppendCommand_WindowCovering_WindowCoveringUpOpen.restype = ctypes.c_uint32
         # Cluster WindowCovering ReadAttribute WindowCoveringType
         self._chipLib.chip_ime_ReadAttribute_WindowCovering_WindowCoveringType.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16]

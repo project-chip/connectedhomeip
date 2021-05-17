@@ -17,28 +17,15 @@
 
 #include <cinttypes>
 
+#include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <controller/python/chip/interaction_model/Delegate.h>
-
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip::app;
+using namespace chip::Controller;
 
 namespace chip {
-
-namespace app {
-
-void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
-                                  chip::TLV::TLVReader & aReader, Command * apCommandObj)
-{
-    ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
-                  aCommandId, aEndPointId);
-    ChipLogError(
-        Controller,
-        "Default DispatchSingleClusterCommand is called, this should be replaced by actual dispatched for cluster commands");
-}
-
-} // namespace app
 
 namespace Controller {
 
@@ -55,6 +42,9 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseStatus(const CommandSe
     {
         commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
     }
+    // For OpCred callbacks.
+    DeviceControllerInteractionModelDelegate::CommandResponseStatus(apCommandSender, aGeneralCode, aProtocolId, aProtocolCode,
+                                                                    aEndpointId, aClusterId, aCommandId, aCommandIndex);
     return CHIP_NO_ERROR;
 }
 
@@ -65,6 +55,7 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseProtocolError(const Co
     {
         commandResponseProtocolErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aCommandIndex);
     }
+    DeviceControllerInteractionModelDelegate::CommandResponseProtocolError(apCommandSender, aCommandIndex);
     return CHIP_NO_ERROR;
 }
 
@@ -74,12 +65,18 @@ CHIP_ERROR PythonInteractionModelDelegate::CommandResponseError(const CommandSen
     {
         commandResponseErrorFunct(reinterpret_cast<uint64_t>(apCommandSender), aError);
     }
+    if (aError != CHIP_NO_ERROR)
+    {
+        DeviceControllerInteractionModelDelegate::CommandResponseError(apCommandSender, aError);
+    }
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PythonInteractionModelDelegate::CommandResponseProcessed(const app::CommandSender * apCommandSender)
 {
-    return this->CommandResponseError(apCommandSender, CHIP_NO_ERROR);
+    this->CommandResponseError(apCommandSender, CHIP_NO_ERROR);
+    DeviceControllerInteractionModelDelegate::CommandResponseProcessed(apCommandSender);
+    return CHIP_NO_ERROR;
 }
 
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
@@ -106,3 +103,15 @@ PythonInteractionModelDelegate & PythonInteractionModelDelegate::Instance()
 
 } // namespace Controller
 } // namespace chip
+
+extern "C" {
+
+CHIP_ERROR pychip_InteractionModel_GetCommandSenderHandle(uint64_t * commandSender)
+{
+    chip::app::CommandSender * commandSenderObj = nullptr;
+    VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&commandSenderObj));
+    *commandSender = reinterpret_cast<uint64_t>(commandSenderObj);
+    return CHIP_NO_ERROR;
+}
+}

@@ -212,10 +212,9 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        commandSenderHandle = self._dmLib.pychip_GetCommandSenderHandle(device)
-        im.ClearCommandStatus(commandSenderHandle)
+        commandSenderHandle = im.GetCommandSenderHandle()
         self._Cluster.SendCommand(
-            device, cluster, command, endpoint, groupid, args, commandSenderHandle != 0)
+            device, commandSenderHandle, cluster, command, endpoint, groupid, args, True)
         if blocking:
             # We only send 1 command by this function, so index is always 0
             return im.WaitCommandIndexStatus(commandSenderHandle, 1)
