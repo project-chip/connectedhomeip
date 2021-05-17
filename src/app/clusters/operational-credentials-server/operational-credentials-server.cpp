@@ -20,6 +20,8 @@
  * @brief Implementation for the Operational Credentials Cluster
  ***************************************************************************/
 
+#include <inttypes.h>
+
 #include <app/Command.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
