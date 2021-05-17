@@ -38,6 +38,9 @@ async def container_ready(container: Container) -> None:
 def run_new_container(docker_image_tag: str, port: int) -> Container:
     # Create containers
     try:
+        # Note: These options are different from test harness, because the network topology is different
+        # Test Harness has dedicated network on which we can find containers by hostname
+        # This container is launched from the host directly and is bridged, hence we can easily use ports to connect
         mount_volumes = {"/var/run/dbus" : {'bind': '/var/run/dbus', 'mode': 'rw'}}
         return client.containers.run(
             docker_image_tag, detach=True, ports={5000:port}, volumes=mount_volumes, privileged=True

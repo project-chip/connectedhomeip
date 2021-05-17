@@ -10,4 +10,4 @@ Setup:
 5. Run the python script using `python rpc_client.py`
 
 Note:
- The script may emit warnings if the previous run did not cleanup the container properly 
+ - The script may emit warnings if the previous run did not cleanup the container properly.
