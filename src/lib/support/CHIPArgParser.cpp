@@ -85,7 +85,11 @@ static bool HelpTextContainsShortOption(char optChar, const char * helpText);
 
 static inline bool IsShortOptionChar(int ch)
 {
-    return isgraph(ch);
+    // According to 'std::isgraph(int ch)' documentation, its behavior is
+    // undefined if the value of |ch| is not representable as unsigned char
+    // and is not equal to EOF. To prevent from this, additional condition
+    // has to be used here.
+    return ch > 255 ? false : isgraph(ch);
 }
 
 /**
