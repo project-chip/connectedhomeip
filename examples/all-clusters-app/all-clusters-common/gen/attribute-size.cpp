@@ -293,17 +293,17 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
 
-            chip::ByteSpan * list_octet_stringSpan   = reinterpret_cast<chip::ByteSpan *>(write ? src : dest); // OCTET_STRING
-            uint16_t list_octet_stringRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            chip::ByteSpan * listOctetStringSpan   = reinterpret_cast<chip::ByteSpan *>(write ? src : dest); // OCTET_STRING
+            uint16_t listOctetStringRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
             if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, list_octet_stringRemainingSpace, list_octet_stringSpan)
-                       : ReadByteSpan(src + entryOffset, list_octet_stringRemainingSpace, list_octet_stringSpan)))
+                (write ? WriteByteSpan(dest + entryOffset, listOctetStringRemainingSpace, listOctetStringSpan)
+                       : ReadByteSpan(src + entryOffset, listOctetStringRemainingSpace, listOctetStringSpan)))
             {
                 ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
                 return 0;
             }
 
-            entryLength = list_octet_stringSpan->size();
+            entryLength = listOctetStringSpan->size();
             break;
         }
         case 0x001C: // list_struct_octet_string
