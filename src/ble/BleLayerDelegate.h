@@ -40,9 +40,9 @@ public:
     virtual void OnBleConnectionComplete(BLEEndPoint * endpoint) = 0;
     virtual void OnBleConnectionError(BLE_ERROR err)             = 0;
 
-    virtual void OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)                  = 0;
+    virtual void OnEndPointConnectComplete(BLEEndPoint * endPoint, BLE_ERROR err)                     = 0;
     virtual void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) = 0;
-    virtual void OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)                 = 0;
+    virtual void OnEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err)                    = 0;
 
     virtual CHIP_ERROR SetEndPoint(BLEEndPoint * endPoint) = 0;
 };
