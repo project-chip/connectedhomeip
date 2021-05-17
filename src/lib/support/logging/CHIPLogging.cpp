@@ -91,6 +91,8 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "SPL"   // SetupPayload
                                   "SVR"   // AppServer
                                   "DIS"   // Discovery
+                                  "PAS"   // PASE
+                                  "CAS"   // CASE
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
