@@ -29,4 +29,3 @@ env
 
 gn gen --root="$1" "$2" --args="k32w_sdk_root=\"$K32W061_SDK_ROOT\" is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
 ninja -C "$2"
-

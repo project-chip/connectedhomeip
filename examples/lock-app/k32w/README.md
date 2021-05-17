@@ -57,12 +57,20 @@ that the device will be able to communicate with the CHIP controller and other
 devices.
 
 ### SE051H Secure Element
-Deployment of this firmware configuration requires the K32W061 board setups using the K32W0/JN5189 module board, SE051 Expansion board and Generic Expansion board as shown below:
+
+Deployment of this firmware configuration requires the K32W061 board setups
+using the K32W0/JN5189 module board, SE051 Expansion board and Generic Expansion
+board as shown below:
 
 ![SE051H  + K32W061 DK6](../../platform/k32w/doc/images/k32w-se.jpg)
 
-The SE051H Secure Element extension may be used for best in class security and offloading some of the Project CHIP cryptographic operations. Depending on your hardware configuration, choose one of the options below (building with or without Secure Element).
-NOTE: the SE051H is a derivative of the SE051 product family (see http://www.nxp.com/SE051) including dedicated CHIP support in addition to the SE051 feature set. See the material provided separately by NXP for more details on SE051H.
+The SE051H Secure Element extension may be used for best in class security and
+offloading some of the Project CHIP cryptographic operations. Depending on your
+hardware configuration, choose one of the options below (building with or
+without Secure Element). NOTE: the SE051H is a derivative of the SE051 product
+family (see http://www.nxp.com/SE051) including dedicated CHIP support in
+addition to the SE051 feature set. See the material provided separately by NXP
+for more details on SE051H.
 
 ### Bluetooth LE Advertising
 
@@ -156,6 +164,7 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application either with Secure Element or without
+
     -   with Secure Element
 
         ```
@@ -168,9 +177,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
         user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
         ```
 
-    -   without Secure element
-        Exaactly the same steps as above but set chip_with_se05x=0 in the gn command
-
+    -   without Secure element Exaactly the same steps as above but set
+        chip_with_se05x=0 in the gn command
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.3.
