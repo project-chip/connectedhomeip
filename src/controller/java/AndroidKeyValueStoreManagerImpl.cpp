@@ -17,8 +17,8 @@
 #include <platform/KeyValueStoreManager.h>
 
 #include <algorithm>
-#include <string.h>
 #include <memory>
+#include <string.h>
 
 #include "CHIPJNIError.h"
 #include "JniReferences.h"
@@ -129,7 +129,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
     std::unique_ptr<char[]> buffer(new char[BASE64_ENCODED_LEN(value_size) + 1]);
 
-    size_t length = chip::Base64Encode(static_cast<const uint8_t *>(value), value_size, buffer.get());
+    size_t length        = chip::Base64Encode(static_cast<const uint8_t *>(value), value_size, buffer.get());
     buffer.get()[length] = 0;
 
     UtfString utfKey(env, key);
