@@ -19,7 +19,6 @@ import("//${chip_root}/build/chip/tests.gni")
 assert(current_os == "mbed")
 
 declare_args() {
-  chip_build_libshell = false
   chip_custom_build_cflags = []
 }
 
@@ -29,10 +28,6 @@ config("chip_custom_cflags_config") {
 
 group("mbed") {
   deps = [ "${chip_root}/src/lib" ]
-
-  if (chip_build_libshell) {
-    deps += [ "${chip_root}/src/lib/shell" ]
-  }
 }
 
 group("default") {
