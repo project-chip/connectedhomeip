@@ -61,7 +61,7 @@ Deployment of this firmware configuration requires the K32W061 board setups usin
 
 ![SE051H  + K32W061 DK6](../../platform/k32w/doc/images/k32w-se.jpg)
 
-The SE051H Secure Element extension may be used for best in class security and offloading some of the Project CHIP cryptographic operations. Depending on your hardware configuration, choose one of the options below (building with or without Secure Element). 
+The SE051H Secure Element extension may be used for best in class security and offloading some of the Project CHIP cryptographic operations. Depending on your hardware configuration, choose one of the options below (building with or without Secure Element).
 NOTE: the SE051H is a derivative of the SE051 product family (see http://www.nxp.com/SE051) including dedicated CHIP support in addition to the SE051 feature set. See the material provided separately by NXP for more details on SE051H.
 
 ### Bluetooth LE Advertising
@@ -169,16 +169,8 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
         ```
 
     -   without Secure element
+        Exaactly the same steps as above but set chip_with_se05x=0 in the gn command
 
-        ```
-        user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2.6.3_K32W061DK6/
-        user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
-        user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-        user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
-        user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
-        user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
-        user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
-        ```
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.3.
