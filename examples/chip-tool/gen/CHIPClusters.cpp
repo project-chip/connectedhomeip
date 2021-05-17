@@ -4298,6 +4298,70 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onS
 }
 
 // OperationalCredentials Cluster Commands
+CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan noc,
+                                                    chip::ByteSpan iCACertificate, chip::ByteSpan iPKValue,
+                                                    chip::NodeId caseAdminNode, uint16_t adminVendorId)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddOpCertCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // noc: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), noc));
+    // iCACertificate: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), iCACertificate));
+    // iPKValue: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), iPKValue));
+    // caseAdminNode: nodeId
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), caseAdminNode));
+    // adminVendorId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), adminVendorId));
+
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands(mpCommandSender);
+}
+
+CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan cSRNonce)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOpCSRRequestCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // cSRNonce: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), cSRNonce));
+
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands(mpCommandSender);
+}
+
 CHIP_ERROR OperationalCredentialsCluster::RemoveAllFabrics(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback)
 {

@@ -2986,6 +2986,22 @@ bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::a
                                                                          uint8_t * debugText);
 
 /**
+ * @brief Operational Credentials Cluster OpCSRResponse Command callback
+ */
+
+bool emberAfOperationalCredentialsClusterOpCSRResponseCallback(chip::app::Command * commandObj, chip::ByteSpan CSR,
+                                                               chip::ByteSpan CSRNonce, chip::ByteSpan VendorReserved1,
+                                                               chip::ByteSpan VendorReserved2, chip::ByteSpan VendorReserved3,
+                                                               chip::ByteSpan Signature);
+
+/**
+ * @brief Operational Credentials Cluster OpCertResponse Command callback
+ */
+
+bool emberAfOperationalCredentialsClusterOpCertResponseCallback(chip::app::Command * commandObj, uint8_t StatusCode,
+                                                                uint64_t FabricIndex, uint8_t * DebugText);
+
+/**
  * @brief Operational Credentials Cluster SetFabricResponse Command callback
  */
 
