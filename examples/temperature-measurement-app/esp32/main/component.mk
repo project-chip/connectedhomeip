@@ -21,17 +21,19 @@
 
 COMPONENT_DEPENDS := chip QRCode tft spidriver
 
-COMPONENT_SRCDIRS :=                                                              \
-  .                                                                               \
-  gen                                                                             \
-  ../third_party/connectedhomeip/src/app/server                                   \
-  ../third_party/connectedhomeip/src/app/util                                     \
-  ../third_party/connectedhomeip/src/app/reporting                                \
-  ../third_party/connectedhomeip/src/app/clusters/basic                           \
-  ../third_party/connectedhomeip/src/app/clusters/bindings                        \
-  ../third_party/connectedhomeip/src/app/clusters/general-commissioning-server    \
-  ../third_party/connectedhomeip/src/app/clusters/network-commissioning           \
-  ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server  \
+COMPONENT_SRCDIRS :=                                                               \
+  .                                                                                \
+  gen                                                                              \
+  ../third_party/connectedhomeip/src/app/server                                    \
+  ../third_party/connectedhomeip/src/app/util                                      \
+  ../third_party/connectedhomeip/src/app/reporting                                 \
+  ../third_party/connectedhomeip/src/app/clusters/basic                            \
+  ../third_party/connectedhomeip/src/app/clusters/bindings                         \
+  ../third_party/connectedhomeip/src/app/clusters/general-commissioning-server     \
+  ../third_party/connectedhomeip/src/app/clusters/network-commissioning            \
+  ../third_party/connectedhomeip/src/app/clusters/operational-credentials-server   \
+  ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server   \
+  ../third_party/connectedhomeip/src/app/clusters/trusted-root-certificates-server \
 
 
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util                            \
