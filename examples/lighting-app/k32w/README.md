@@ -173,7 +173,7 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/k32w$ $K32W061_S
 ```
 
     -   without Secure element
-        Exaactly the same steps as above but set chip_with_se05x=0 in the gn command
+        Exactly the same steps as above but set chip_with_se05x=0 in the gn command
 
 Note that "patch_k32w_sdk.sh" script must be run for patching the K32W061 SDK
 2.6.3.
