@@ -43,13 +43,13 @@ namespace rpc {
 
 namespace {
 
-void reboot_timer_handler(struct k_timer *dummy)
+void reboot_timer_handler(struct k_timer * dummy)
 {
     NVIC_SystemReset();
 }
 K_TIMER_DEFINE(reboot_timer, reboot_timer_handler, NULL);
 
-}
+} // namespace
 
 class Lighting final : public generated::Lighting<Lighting>
 {
