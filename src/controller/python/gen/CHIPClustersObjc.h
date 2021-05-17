@@ -466,6 +466,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster General Diagnostics
+ *
+ */
+@interface CHIPGeneralDiagnostics : CHIPCluster
+
+- (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Group Key Management
  *
  */

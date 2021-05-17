@@ -131,6 +131,8 @@ public:
         Curry::Destroy(mTypeId, &mData);
         mTypeId = that.mTypeId;
         Curry::Move(that.mTypeId, &that.mData, &mData);
+        Curry::Destroy(that.mTypeId, &that.mData);
+        that.mTypeId = kInvalidType;
         return *this;
     }
 

@@ -31,6 +31,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'Basic':
   case 'Descriptor':
   case 'GeneralCommissioning':
+  case 'GeneralDiagnostics':
   case 'GroupKeyManagement':
   case 'NetworkCommissioning':
   case 'OperationalCredentials':
@@ -52,8 +53,56 @@ function asTestValue()
   }
 }
 
+function asObjectiveCBasicType(type)
+{
+  if (StringHelper.isOctetString(type)) {
+    return 'NSData *';
+  } else if (StringHelper.isCharString(type)) {
+    return 'NSString *';
+  } else {
+    return ChipTypesHelper.asBasicType(this.chipType);
+  }
+}
+
+function asObjectiveCNumberType(label, type)
+{
+  function fn(pkgId)
+  {
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+      const basicType = ChipTypesHelper.asBasicType(zclType);
+      switch (basicType) {
+      case 'uint8_t':
+        return 'UnsignedChar';
+      case 'uint16_t':
+        return 'UnsignedShort';
+      case 'uint32_t':
+        return 'UnsignedLong';
+      case 'uint64_t':
+        return 'UnsignedLongLong';
+      case 'int8_t':
+        return 'Char';
+      case 'int16_t':
+        return 'Short';
+      case 'int32_t':
+        return 'Long';
+      case 'int64_t':
+        return 'LongLong';
+      default:
+        error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
+        throw error;
+      }
+    })
+  }
+
+  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
+exports.asObjectiveCBasicType        = asObjectiveCBasicType;
+exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestValue                  = asTestValue;

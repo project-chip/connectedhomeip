@@ -36,7 +36,7 @@ OT_SIMULATION_CACHE="$CIRQUE_CACHE_PATH/ot-simulation.tgz"
 CIRQUE_TESTS=(
     "EchoTest"
     "MobileDeviceTest"
-    "InteractionModel"
+    "InteractionModelTest"
 )
 
 BOLD_GREEN_TEXT="\033[1;32m"

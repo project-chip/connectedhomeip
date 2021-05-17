@@ -250,7 +250,7 @@ public:
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output);
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const;
 
     /**
      * @brief Deserialize the keypair.

@@ -32,9 +32,11 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <credentials/CHIPOperationalCredentials.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/Base64.h>
@@ -75,12 +77,14 @@ struct ControllerDeviceInitParams
     SecureSessionMgr * sessionMgr            = nullptr;
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     Inet::InetLayer * inetLayer              = nullptr;
+
+    Credentials::OperationalCredentialSet * credentials = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
 };
 
-class DLL_EXPORT Device : public Messaging::ExchangeDelegate
+class DLL_EXPORT Device : public Messaging::ExchangeDelegate, public SessionEstablishmentDelegate
 {
 public:
     ~Device()
@@ -183,6 +187,7 @@ public:
         mInetLayer      = params.inetLayer;
         mListenPort     = listenPort;
         mAdminId        = admin;
+        mCredentials    = params.credentials;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -198,7 +203,7 @@ public:
      *   all device specifc parameters (address, port, interface etc).
      *
      *   This is not done as part of constructor so that the controller can have a list of
-     *   uninitialzed/unpaired device objects. The object is initialized only when the device
+     *   uninitialized/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
      * @param[in] params       Wrapper object for transport manager etc.
@@ -354,6 +359,19 @@ public:
     void AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     void CancelIMResponseHandler();
 
+    void ProvisioningComplete(uint16_t caseKeyId)
+    {
+        mDeviceProvisioningComplete = true;
+        mCASESessionKeyId           = caseKeyId;
+    }
+    bool IsProvisioningComplete() const { return mDeviceProvisioningComplete; }
+
+    //////////// SessionEstablishmentDelegate Implementation ///////////////
+    void OnSessionEstablishmentError(CHIP_ERROR error) override;
+    void OnSessionEstablished() override;
+
+    CASESession & GetCASESession() { return mCASESession; }
+
 private:
     enum class ConnectionState
     {
@@ -428,9 +446,18 @@ private:
      */
     void InitCommandSender();
 
+    CHIP_ERROR EstablishCASESession();
+
     uint16_t mListenPort;
 
     Transport::AdminId mAdminId = Transport::kUndefinedAdminId;
+
+    bool mDeviceProvisioningComplete = false;
+
+    CASESession mCASESession;
+    uint16_t mCASESessionKeyId = 0;
+
+    Credentials::OperationalCredentialSet * mCredentials = nullptr;
 };
 
 /**
@@ -479,9 +506,11 @@ typedef struct SerializableDevice
     PASESessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serialized in LittleEndian byte order */
-    uint16_t mAdminId;    /* This field is serialized in LittleEndian byte order */
+    uint16_t mDevicePort;       /* This field is serialized in LittleEndian byte order */
+    uint16_t mAdminId;          /* This field is serialized in LittleEndian byte order */
+    uint16_t mCASESessionKeyId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceTransport;
+    uint8_t mDeviceProvisioningComplete;
     uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 

@@ -93,7 +93,6 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         }
-        mOpCredsIssuer.Initialize();
     }
 
     /////////// Command Interface /////////

@@ -311,6 +311,36 @@ typedef struct _NeighborInfo
     uint8_t numberRssiMeasurements;
 } EmberAfNeighborInfo;
 
+// Struct for NeighborTable
+typedef struct _NeighborTable
+{
+    uint64_t ExtAddress;
+    uint32_t Age;
+    uint16_t Rloc16;
+    uint32_t LinkFrameCounter;
+    uint32_t MleFrameCounter;
+    uint8_t LQI;
+    int8_t AverageRssi;
+    int8_t LastRssi;
+    uint8_t FrameErrorRate;
+    uint8_t MessageErrorRate;
+    uint8_t RxOnWhenIdle;
+    uint8_t FullThreadDevice;
+    uint8_t FullNetworkData;
+    uint8_t IsChild;
+} EmberAfNeighborTable;
+
+// Struct for NetworkInterfaceType
+typedef struct _NetworkInterfaceType
+{
+    chip::ByteSpan Name;
+    uint8_t FabricConnected;
+    uint8_t OffPremiseServicesReachableIPv4;
+    uint8_t OffPremiseServicesReachableIPv6;
+    uint64_t HardwareAddress;
+    uint8_t Type;
+} EmberAfNetworkInterfaceType;
+
 // Struct for NodeInformation
 typedef struct _NodeInformation
 {
@@ -326,6 +356,23 @@ typedef struct _Notification
     uint16_t contentId;
     uint8_t statusFeedback;
 } EmberAfNotification;
+
+// Struct for OperationalDatasetComponents
+typedef struct _OperationalDatasetComponents
+{
+    uint8_t ActiveTimestampPresent;
+    uint8_t PendingTimestampPresent;
+    uint8_t MasterKeyPresent;
+    uint8_t NetworkNamePresent;
+    uint8_t ExtendedPanIdPresent;
+    uint8_t MeshLocalPrefixPresent;
+    uint8_t DelayPresent;
+    uint8_t PanIdPresent;
+    uint8_t ChannelPresent;
+    uint8_t PskcPresent;
+    uint8_t SecurityPolicyPresent;
+    uint8_t ChannelMaskPresent;
+} EmberAfOperationalDatasetComponents;
 
 // Struct for PowerProfileRecord
 typedef struct _PowerProfileRecord
@@ -395,6 +442,21 @@ typedef struct _ReportAttributeRecord
     uint8_t * attributeLocation;
 } EmberAfReportAttributeRecord;
 
+// Struct for RouteTable
+typedef struct _RouteTable
+{
+    uint64_t ExtAddress;
+    uint16_t Rloc16;
+    uint8_t RouterId;
+    uint8_t NextHop;
+    uint8_t PathCost;
+    uint8_t LQIIn;
+    uint8_t LQIOut;
+    uint8_t Age;
+    uint8_t Allocated;
+    uint8_t LinkEstablished;
+} EmberAfRouteTable;
+
 // Struct for SceneExtensionAttributeInfo
 typedef struct _SceneExtensionAttributeInfo
 {
@@ -451,6 +513,13 @@ typedef struct _SeasonEntry
     uint32_t seasonStartDate;
     uint8_t weekIdRef;
 } EmberAfSeasonEntry;
+
+// Struct for SecurityPolicy
+typedef struct _SecurityPolicy
+{
+    uint16_t RotationTime;
+    uint8_t Flags;
+} EmberAfSecurityPolicy;
 
 // Void typedef for EmberAfSignature which is empty.
 // this will result in all the references to the data being as uint8_t*
