@@ -47,8 +47,8 @@ public:
 
     // Implement MessageCounterManagerInterface
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override;
-    CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
-                                                const Transport::PeerAddress & peerAddress,
+    CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SecureSessionHandle session,
+                                                Transport::PeerConnectionState * state, const Transport::PeerAddress & peerAddress,
                                                 System::PacketBufferHandle && msgBuf) override;
 
     /**
@@ -74,7 +74,7 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
+    CHIP_ERROR AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                  System::PacketBufferHandle && msgBuf);
 
 private:
@@ -90,10 +90,6 @@ private:
      */
     struct ReceiveTableEntry
     {
-        ReceiveTableEntry() : peerNodeId(kUndefinedNodeId) {}
-
-        // TODO(#6340): peerNodeId may not needed if we can extract it from msgBuf
-        NodeId peerNodeId;                  /**< The peerNodeId of the message. kUndefinedNodeId if is not in use. */
         Transport::PeerAddress peerAddress; /**< The peer address for the message*/
         System::PacketBufferHandle msgBuf;  /**< A handle to the PacketBuffer object holding the message data. */
     };
