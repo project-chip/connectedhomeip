@@ -61,6 +61,12 @@ struct Count
     Count() { ++created; }
     ~Count() { ++destroyed; }
 
+    Count(const Count &) { ++created; }
+    Count & operator=(Count &) = default;
+
+    Count(Count &&) { ++created; }
+    Count & operator=(Count &&) = default;
+
     static int created;
     static int destroyed;
 };
@@ -123,6 +129,38 @@ void TestVariantCtorDtor(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, Count::destroyed == 1);
     }
     NL_TEST_ASSERT(inSuite, Count::destroyed == 2);
+
+    {
+        Variant<Simple, Count> v1;
+        v1.Set<Count>();
+        Variant<Simple, Count> v2(v1);
+    }
+    NL_TEST_ASSERT(inSuite, Count::created == 4);
+    NL_TEST_ASSERT(inSuite, Count::destroyed == 4);
+
+    {
+        Variant<Simple, Count> v1;
+        v1.Set<Count>();
+        Variant<Simple, Count> v2(std::move(v1));
+    }
+    NL_TEST_ASSERT(inSuite, Count::created == 6);
+    NL_TEST_ASSERT(inSuite, Count::destroyed == 6);
+
+    {
+        Variant<Simple, Count> v1, v2;
+        v1.Set<Count>();
+        v2 = v1;
+    }
+    NL_TEST_ASSERT(inSuite, Count::created == 8);
+    NL_TEST_ASSERT(inSuite, Count::destroyed == 8);
+
+    {
+        Variant<Simple, Count> v1, v2;
+        v1.Set<Count>();
+        v2 = std::move(v1);
+    }
+    NL_TEST_ASSERT(inSuite, Count::created == 10);
+    NL_TEST_ASSERT(inSuite, Count::destroyed == 10);
 }
 
 void TestVariantCopy(nlTestSuite * inSuite, void * inContext)
@@ -130,8 +168,10 @@ void TestVariantCopy(nlTestSuite * inSuite, void * inContext)
     Variant<Simple, Pod> v1;
     v1.Set<Pod>(5, 10);
     Variant<Simple, Pod> v2 = v1;
+    NL_TEST_ASSERT(inSuite, v1.Valid());
     NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m1 == 5);
     NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m2 == 10);
+    NL_TEST_ASSERT(inSuite, v2.Valid());
     NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
     NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
 }
@@ -142,8 +182,35 @@ void TestVariantMove(nlTestSuite * inSuite, void * inContext)
     v1.Set<Movable>(5, 10);
     Variant<Simple, Movable> v2 = std::move(v1);
     NL_TEST_ASSERT(inSuite, !v1.Valid());
+    NL_TEST_ASSERT(inSuite, v2.Valid());
     NL_TEST_ASSERT(inSuite, v2.Get<Movable>().m1 == 5);
     NL_TEST_ASSERT(inSuite, v2.Get<Movable>().m2 == 10);
+}
+
+void TestVariantCopyAssign(nlTestSuite * inSuite, void * inContext)
+{
+    Variant<Simple, Pod> v1;
+    Variant<Simple, Pod> v2;
+    v1.Set<Pod>(5, 10);
+    v2 = v1;
+    NL_TEST_ASSERT(inSuite, v1.Valid());
+    NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m1 == 5);
+    NL_TEST_ASSERT(inSuite, v1.Get<Pod>().m2 == 10);
+    NL_TEST_ASSERT(inSuite, v2.Valid());
+    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
+    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
+}
+
+void TestVariantMoveAssign(nlTestSuite * inSuite, void * inContext)
+{
+    Variant<Simple, Pod> v1;
+    Variant<Simple, Pod> v2;
+    v1.Set<Pod>(5, 10);
+    v2 = std::move(v1);
+    NL_TEST_ASSERT(inSuite, !v1.Valid());
+    NL_TEST_ASSERT(inSuite, v2.Valid());
+    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m1 == 5);
+    NL_TEST_ASSERT(inSuite, v2.Get<Pod>().m2 == 10);
 }
 
 int Setup(void * inContext)
@@ -162,9 +229,10 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestVariantSimple),   NL_TEST_DEF_FN(TestVariantMovable),
-                                 NL_TEST_DEF_FN(TestVariantCtorDtor), NL_TEST_DEF_FN(TestVariantCopy),
-                                 NL_TEST_DEF_FN(TestVariantMove),     NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestVariantSimple),     NL_TEST_DEF_FN(TestVariantMovable),
+                                 NL_TEST_DEF_FN(TestVariantCtorDtor),   NL_TEST_DEF_FN(TestVariantCopy),
+                                 NL_TEST_DEF_FN(TestVariantMove),       NL_TEST_DEF_FN(TestVariantCopyAssign),
+                                 NL_TEST_DEF_FN(TestVariantMoveAssign), NL_TEST_SENTINEL() };
 
 int TestVariant()
 {

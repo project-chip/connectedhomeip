@@ -201,8 +201,6 @@ void Layer::SetPlatformData(void * aPlatformData)
 
 Error Layer::NewTimer(Timer *& aTimerPtr)
 {
-    assertChipStackLockedByCurrentThread();
-
     Timer * lTimer = nullptr;
 
     if (this->State() != kLayerState_Initialized)

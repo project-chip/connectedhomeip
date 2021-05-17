@@ -22,8 +22,34 @@
 namespace chip {
 namespace Controller {
 
+constexpr const char kOperationalCredentialsIssuerKeypairStorage[] = "ExampleOpCredsCAKey";
+
 using namespace Credentials;
 using namespace Crypto;
+
+CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDelegate & storage)
+{
+    Crypto::P256SerializedKeypair serializedKey;
+    uint16_t keySize = static_cast<uint16_t>(serializedKey.Capacity());
+
+    if (storage.SyncGetKeyValue(kOperationalCredentialsIssuerKeypairStorage, serializedKey, keySize) != CHIP_NO_ERROR)
+    {
+        // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
+        ReturnErrorOnFailure(mIssuer.Initialize());
+        ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+
+        keySize = static_cast<uint16_t>(serializedKey.Length());
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, serializedKey, keySize));
+    }
+    else
+    {
+        // Use the keypair from the storage
+        ReturnErrorOnFailure(mIssuer.Deserialize(serializedKey));
+    }
+
+    mInitialized = true;
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNodeOperationalCertificate(const PeerId & peerId, const ByteSpan & csr,
                                                                                    int64_t serialNumber, uint8_t * certBuf,

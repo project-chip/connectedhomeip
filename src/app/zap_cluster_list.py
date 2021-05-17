@@ -24,6 +24,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'DEVICE_TEMP_CLUSTER': [],
     'DOOR_LOCK_CLUSTER': ['door-lock-server'],
     'GENERAL_COMMISSIONING_CLUSTER': ['general-commissioning-server'],
+    'GENERAL_DIAGNOSTICS_CLUSTER': [],   
     'GROUPS_CLUSTER': ['groups-server'],
     'GROUP_KEY_MANAGEMENT_CLUSTER': [],
     'IAS_ZONE_CLUSTER': ['ias-zone-server'],
@@ -50,9 +51,10 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TRUSTED_ROOT_CERTIFICATES_CLUSTER': ['trusted-root-certificates-server'],
     'TV_CHANNEL_CLUSTER': ['tv-channel-server'],
     'THERMOSTAT_CLUSTER': [],
+    'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': [],
     'WINDOW_COVERING_CLUSTER': [],
-    'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],    
-    'WAKE_ON_LAN_CLUSTER':[],
+    'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],
+    'WAKE_ON_LAN_CLUSTER': [],
     'ZLL_COMMISSIONING_CLUSTER': []
 }
 
@@ -73,6 +75,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'DESCRIPTOR_CLUSTER': [],
     'DOOR_LOCK_CLUSTER': [],
     'GENERAL_COMMISSIONING_CLUSTER': [],
+    'GENERAL_DIAGNOSTICS_CLUSTER': [],    
     'GROUPS_CLUSTER': [],
     'GROUP_KEY_MANAGEMENT_CLUSTER': [],
     'IAS_ZONE_CLUSTER': ['ias-zone-client'],
@@ -99,9 +102,10 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TRUSTED_ROOT_CERTIFICATES_CLUSTER': [],
     'TV_CHANNEL_CLUSTER': [],
     'THERMOSTAT_CLUSTER': ['thermostat-client'],
+    'THREAD_NETWORK_DIAGNOSTICS_CLUSTER': [],
     'WINDOW_COVERING_CLUSTER': [],
-    'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],    
-    'WAKE_ON_LAN_CLUSTER':[],
+    'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': [],
+    'WAKE_ON_LAN_CLUSTER': [],
     'ZLL_COMMISSIONING_CLUSTER': []
 }
 
@@ -119,8 +123,8 @@ def get_cluster_sources(clusters: typing.Set[str],
 
     for cluster in clusters:
         if not cluster in source_map:
-          raise ValueError("Unhandled %s cluster: %s"
-              " (hint: add to src/app/zap_cluster_list.py)" % (side, cluster))
+            raise ValueError("Unhandled %s cluster: %s"
+                             " (hint: add to src/app/zap_cluster_list.py)" % (side, cluster))
 
         cluster_sources.update(source_map[cluster])
 
@@ -151,7 +155,7 @@ def dump_zapfile_clusters(zap_file_path: pathlib.Path):
                     raise ValueError("Invalid side for cluster: %s" % side)
 
                 if cluster.get('enabled') == 1:
-                  clusters_set.add(cluster.get('define'))
+                    clusters_set.add(cluster.get('define'))
 
     cluster_sources: typing.Set[str] = set()
 

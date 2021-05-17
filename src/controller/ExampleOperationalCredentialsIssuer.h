@@ -22,12 +22,16 @@
  *    issuer for CHIP devices. The class can be used as a guideline on how to
  *    construct your own certificate issuer. It can also be used in tests and tools
  *    if a specific signing authority is not required.
+ *
+ *    NOTE: This class stores the encryption key in clear storage. This is not suited
+ *          for production use. This should only be used in test tools.
  */
 
 #pragma once
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <core/CHIPError.h>
+#include <core/CHIPPersistentStorageDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/CodeUtils.h>
 
@@ -45,36 +49,17 @@ public:
     CHIP_ERROR GetRootCACertificate(FabricId fabricId, uint8_t * certBuf, uint32_t certBufSize, uint32_t & outCertLen) override;
 
     /**
-     * @brief Serialize the issuer's keypair.
+     * @brief Initialize the issuer with the keypair in the storage.
+     *        If the storage doesn't have one, it'll create one, and it to the storage.
+     *
+     * @param[in] storage  A reference to the storage, where the keypair is stored.
+     *                     The object of ExampleOperationalCredentialsIssuer doesn't hold
+     *                     on the reference of storage.
+     *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Serialize(Crypto::P256SerializedKeypair & issuer)
-    {
-        VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-        return mIssuer.Serialize(issuer);
-    }
-
-    /**
-     * @brief Deserialize the keypair as issuer's keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Deserialize(Crypto::P256SerializedKeypair & issuer)
-    {
-        ReturnErrorOnFailure(mIssuer.Deserialize(issuer));
-        mInitialized = true;
-        return CHIP_NO_ERROR;
-    }
-
-    /**
-     * @brief Initialize the issuer with a new keypair.
-     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
-     **/
-    CHIP_ERROR Initialize()
-    {
-        ReturnErrorOnFailure(mIssuer.Initialize());
-        mInitialized = true;
-        return CHIP_NO_ERROR;
-    }
+    [[deprecated("This class stores the encryption key in clear storage. Don't use it for production code.")]] CHIP_ERROR
+    Initialize(PersistentStorageDelegate & storage);
 
     void SetIssuerId(uint32_t id) { mIssuerId = id; }
 

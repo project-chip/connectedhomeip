@@ -21,7 +21,7 @@ class ChipClusters:
 
     def ListClusterCommands(self):
         return {
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
             "{{asCamelCased name false}}": {
 {{#chip_server_cluster_commands}}
                 "{{asCamelCased name false}}": {
@@ -31,12 +31,12 @@ class ChipClusters:
                 },
 {{/chip_server_cluster_commands}}
             },
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
         }
 
     def ListClusterAttributes(self):
         return {
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
             "{{asCamelCased name false}}": [
 {{#chip_server_cluster_attributes}}
 {{#unless isList}}
@@ -44,7 +44,7 @@ class ChipClusters:
 {{/unless}}
 {{/chip_server_cluster_attributes}}
             ],
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
         }
 
     def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args, imEnabled):
@@ -70,7 +70,7 @@ class ChipClusters:
 
     # Cluster commands
 
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
 {{#chip_server_cluster_commands}}
     def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_server_cluster_command_arguments}}):
 {{#chip_server_cluster_command_arguments}}
@@ -82,11 +82,11 @@ class ChipClusters:
                 device, ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
         )
 {{/chip_server_cluster_commands}}
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
 
     # Cluster attributes
 
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#unless isList}}
     def Cluster{{asCamelCased parent.name false}}_ReadAttribute{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
@@ -97,7 +97,7 @@ class ChipClusters:
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
 
     # Init native functions
 
@@ -108,7 +108,7 @@ class ChipClusters:
         self._chipLib.chip_ime_SetSuccessResponseDelegate.restype = None
         self._chipLib.chip_ime_SetFailureResponseDelegate.argtypes = [ChipClusters.FAILURE_DELEGATE]
         self._chipLib.chip_ime_SetFailureResponseDelegate.res = None
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
         # Cluster {{asCamelCased name false}}
 {{#chip_server_cluster_commands}}
         # Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
@@ -127,7 +127,7 @@ class ChipClusters:
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
         # Init response delegates
         def HandleSuccess():
             self._ChipStack.callbackRes = 0
