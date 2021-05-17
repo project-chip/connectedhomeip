@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/shell/shell_core.h>
+#include <lib/shell/Engine.h>
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -38,6 +38,9 @@
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
+#include <messaging/ExchangeContext.h>
+
+#include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <rtos/EventFlags.h>
 
@@ -800,7 +803,8 @@ int cmd_server_on(int argc, char ** argv)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     INET_ERROR err;
-    const AdminId gAdminId       = 0;
+    const AdminId gAdminId = 0;
+    secure_channel::MessageCounterManager gMessageCounterManager;
     AdminPairingInfo * adminInfo = nullptr;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
@@ -860,7 +864,8 @@ int cmd_server_on(int argc, char ** argv)
             ExitNow(error = err;);
         }
 
-        err = gChipServer.sessionManager->Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, gChipServer.udp, &gAdmin);
+        err = gChipServer.sessionManager->Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, gChipServer.udp, &gAdmin,
+                                               &gMessageCounterManager);
         if (err != INET_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
@@ -884,7 +889,8 @@ int cmd_server_on(int argc, char ** argv)
             ExitNow(error = err;);
         }
 
-        err = gChipServer.sessionManager->Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, gChipServer.tcp, &gAdmin);
+        err = gChipServer.sessionManager->Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, gChipServer.tcp, &gAdmin,
+                                               &gMessageCounterManager);
         if (err != INET_NO_ERROR)
         {
             streamer_printf(sout, "ERROR: Session manager intialization failed\r\n");
@@ -895,7 +901,7 @@ int cmd_server_on(int argc, char ** argv)
     gChipServer.sessionManager->SetDelegate(&gCallbacks);
 
     err = gChipServer.sessionManager->NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
-                                                 chip::SecureSessionMgr::PairingDirection::kResponder, gAdminId);
+                                                 chip::SecureSession::SessionRole::kResponder, gAdminId);
     if (err != INET_NO_ERROR)
     {
         streamer_printf(sout, "ERROR: set new pairing failed\r\n");

@@ -30,11 +30,8 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${APP_ROOT}/shell_common/include)
 
 target_sources(${APP_TARGET} PRIVATE
-    ${APP_ROOT}/shell_common/cmd_base64.cpp
-    ${APP_ROOT}/shell_common/cmd_device.cpp
     ${APP_ROOT}/shell_common/cmd_misc.cpp
     ${APP_ROOT}/shell_common/cmd_otcli.cpp
-    ${APP_ROOT}/shell_common/cmd_btp.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/cmd_mbed_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 )
