@@ -26,12 +26,29 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
+#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPEncoding.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
+using namespace ::chip::app::List;
+
+constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+
+#define CHECK_STATUS(error)                                                                                                        \
+    if (CHIP_NO_ERROR != error)                                                                                                    \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
+        if (onFailureCallback != nullptr)                                                                                          \
+        {                                                                                                                          \
+            Callback::Callback<DefaultFailureCallback> * cb =                                                                      \
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);                                     \
+            cb->mCall(cb->mContext, static_cast<uint8_t>(EMBER_ZCL_STATUS_INVALID_VALUE));                                         \
+        }                                                                                                                          \
+        return true;                                                                                                               \
+    }
 
 #define CHECK_MESSAGE_LENGTH(value)                                                                                                \
     if (!chip::CanCastTo<uint16_t>(value))                                                                                         \

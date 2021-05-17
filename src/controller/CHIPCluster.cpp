@@ -24,24 +24,30 @@
  *    the CHIP device.
  */
 
+#include <app/InteractionModelEngine.h>
 #include <controller/CHIPCluster.h>
+#include <protocols/temp_zcl/TempZCL.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
+CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint, app::CommandSender * commandSender)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Check if the device supports mCluster at the requested endpoint
 
-    mDevice   = device;
-    mEndpoint = endpoint;
+    mDevice         = device;
+    mEndpoint       = endpoint;
+    mpCommandSender = commandSender;
+
     return err;
 }
 
 void ClusterBase::Dissociate()
 {
-    mDevice = nullptr;
+    mDevice         = nullptr;
+    mpCommandSender = nullptr;
 }
 
 CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle payload,
@@ -57,7 +63,7 @@ CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHa
         mDevice->AddResponseHandler(seqNum, onSuccessCallback, onFailureCallback);
     }
 
-    err = mDevice->SendMessage(Protocols::TempZCL::Id, 0, std::move(payload));
+    err = mDevice->SendMessage(Protocols::TempZCL::MsgType::TempZCLRequest, std::move(payload));
     SuccessOrExit(err);
 
 exit:

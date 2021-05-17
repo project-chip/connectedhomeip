@@ -2589,6 +2589,153 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge
+    : public Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback> {
+public:
+    CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, uint16_t * entries)
+    {
+        CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedShort:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPAudioOutputAudioOutputListAttributeCallbackBridge
+    : public Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> {
+public:
+    CHIPAudioOutputAudioOutputListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPAudioOutputAudioOutputListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _AudioOutputInfo * entries)
+    {
+        CHIPAudioOutputAudioOutputListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPAudioOutputAudioOutputListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].index],
+                                                  @"index", [NSNumber numberWithUnsignedChar:entries[i].outputType], @"outputType",
+                                                  [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()],
+                                                  @"name", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge
+    : public Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback> {
+public:
+    CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLaunchAcceptsHeaderListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::ByteSpan * entries)
+    {
+        CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge
+    : public Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback> {
+public:
+    CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<ContentLaunchSupportedStreamingTypesListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, uint8_t * entries)
+    {
+        CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPDescriptorDeviceListAttributeCallbackBridge : public Callback::Callback<DescriptorDeviceListListAttributeCallback> {
 public:
     CHIPDescriptorDeviceListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
@@ -2730,6 +2877,49 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge
+    : public Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback> {
+public:
+    CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _NetworkInterfaceType * entries)
+    {
+        CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSData dataWithBytes:entries[i].Name.data() length:entries[i].Name.size()], @"Name",
+                    [NSNumber numberWithUnsignedChar:entries[i].FabricConnected], @"FabricConnected",
+                    [NSNumber numberWithUnsignedChar:entries[i].OffPremiseServicesReachableIPv4],
+                    @"OffPremiseServicesReachableIPv4",
+                    [NSNumber numberWithUnsignedChar:entries[i].OffPremiseServicesReachableIPv6],
+                    @"OffPremiseServicesReachableIPv6", [NSNumber numberWithUnsignedLongLong:entries[i].HardwareAddress],
+                    @"HardwareAddress", [NSNumber numberWithUnsignedChar:entries[i].Type], @"Type", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPGroupKeyManagementGroupsAttributeCallbackBridge
     : public Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> {
 public:
@@ -2810,6 +3000,46 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPMediaInputMediaInputListAttributeCallbackBridge
+    : public Callback::Callback<MediaInputMediaInputListListAttributeCallback> {
+public:
+    CHIPMediaInputMediaInputListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<MediaInputMediaInputListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPMediaInputMediaInputListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _MediaInputInfo * entries)
+    {
+        CHIPMediaInputMediaInputListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPMediaInputMediaInputListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].index], @"index",
+                    [NSNumber numberWithUnsignedChar:entries[i].inputType], @"inputType",
+                    [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()], @"name",
+                    [NSData dataWithBytes:entries[i].description.data() length:entries[i].description.size()], @"description", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPOperationalCredentialsFabricsListAttributeCallbackBridge
     : public Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> {
 public:
@@ -2848,6 +3078,85 @@ private:
     dispatch_queue_t mQueue;
 };
 
+class CHIPTvChannelTvChannelListAttributeCallbackBridge : public Callback::Callback<TvChannelTvChannelListListAttributeCallback> {
+public:
+    CHIPTvChannelTvChannelListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<TvChannelTvChannelListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPTvChannelTvChannelListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _TvChannelInfo * entries)
+    {
+        CHIPTvChannelTvChannelListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPTvChannelTvChannelListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:entries[i].majorNumber], @"majorNumber",
+                    [NSNumber numberWithUnsignedShort:entries[i].minorNumber], @"minorNumber",
+                    [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()], @"name",
+                    [NSData dataWithBytes:entries[i].callSign.data() length:entries[i].callSign.size()], @"callSign",
+                    [NSData dataWithBytes:entries[i].affiliateCallSign.data() length:entries[i].affiliateCallSign.size()],
+                    @"affiliateCallSign", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge
+    : public Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> {
+public:
+    CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _NavigateTargetTargetInfo * entries)
+    {
+        CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedChar:entries[i].identifier], @"identifier",
+                    [NSData dataWithBytes:entries[i].name.data() length:entries[i].name.size()], @"name", nil];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
 class CHIPTestClusterListInt8uAttributeCallbackBridge : public Callback::Callback<TestClusterListInt8uListAttributeCallback> {
 public:
     CHIPTestClusterListInt8uAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
@@ -2867,6 +3176,81 @@ public:
             id values[count];
             for (uint16_t i = 0; i < count; i++) {
                 values[i] = [NSNumber numberWithUnsignedChar:entries[i]];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPTestClusterListOctetStringAttributeCallbackBridge
+    : public Callback::Callback<TestClusterListOctetStringListAttributeCallback> {
+public:
+    CHIPTestClusterListOctetStringAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<TestClusterListOctetStringListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPTestClusterListOctetStringAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, chip::ByteSpan * entries)
+    {
+        CHIPTestClusterListOctetStringAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPTestClusterListOctetStringAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [NSData dataWithBytes:entries[i].data() length:entries[i].size()];
+            }
+
+            id array = [NSArray arrayWithObjects:values count:count];
+            dispatch_async(callback->mQueue, ^{
+                callback->mHandler(nil, @ { @"value" : array });
+                callback->Cancel();
+                delete callback;
+            });
+        }
+    }
+
+private:
+    ResponseHandler mHandler;
+    dispatch_queue_t mQueue;
+};
+
+class CHIPTestClusterListStructOctetStringAttributeCallbackBridge
+    : public Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> {
+public:
+    CHIPTestClusterListStructOctetStringAttributeCallbackBridge(ResponseHandler handler, dispatch_queue_t queue)
+        : Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>(CallbackFn, this)
+        , mHandler(handler)
+        , mQueue(queue)
+    {
+    }
+
+    ~CHIPTestClusterListStructOctetStringAttributeCallbackBridge() {};
+
+    static void CallbackFn(void * context, uint16_t count, _TestListStructOctet * entries)
+    {
+        CHIPTestClusterListStructOctetStringAttributeCallbackBridge * callback
+            = reinterpret_cast<CHIPTestClusterListStructOctetStringAttributeCallbackBridge *>(context);
+        if (callback && callback->mQueue) {
+            id values[count];
+            for (uint16_t i = 0; i < count; i++) {
+                values[i] = [[NSDictionary alloc]
+                    initWithObjectsAndKeys:[NSNumber numberWithUnsignedLongLong:entries[i].fabricIndex], @"fabricIndex",
+                    [NSData dataWithBytes:entries[i].operationalCert.data() length:entries[i].operationalCert.size()],
+                    @"operationalCert", nil];
             }
 
             id array = [NSArray arrayWithObjects:values count:count];
@@ -3304,8 +3688,8 @@ private:
 
 - (void)readAttributeApplicationLauncherListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge * onSuccess
+        = new CHIPApplicationLauncherApplicationLauncherListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -3427,8 +3811,8 @@ private:
 
 - (void)readAttributeAudioOutputListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPAudioOutputAudioOutputListAttributeCallbackBridge * onSuccess
+        = new CHIPAudioOutputAudioOutputListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6911,8 +7295,8 @@ private:
 
 - (void)readAttributeAcceptsHeaderListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge * onSuccess
+        = new CHIPContentLaunchAcceptsHeaderListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -6939,8 +7323,8 @@ private:
 
 - (void)readAttributeSupportedStreamingTypesWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge * onSuccess
+        = new CHIPContentLaunchSupportedStreamingTypesAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -8187,6 +8571,101 @@ private:
 
 @end
 
+@interface CHIPGeneralDiagnostics ()
+@property (readonly) Controller::GeneralDiagnosticsCluster cppCluster;
+@end
+
+@implementation CHIPGeneralDiagnostics
+
+- (Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge * onSuccess
+        = new CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeNetworkInterfaces(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeRebootCount(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPInt16uAttributeCallbackBridge * onSuccess = new CHIPInt16uAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeClusterRevision(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+@end
+
 @interface CHIPGroupKeyManagement ()
 @property (readonly) Controller::GroupKeyManagementCluster cppCluster;
 @end
@@ -9262,8 +9741,8 @@ private:
 
 - (void)readAttributeMediaInputListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPMediaInputMediaInputListAttributeCallbackBridge * onSuccess
+        = new CHIPMediaInputMediaInputListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -11272,8 +11751,8 @@ private:
 
 - (void)readAttributeTvChannelListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPTvChannelTvChannelListAttributeCallbackBridge * onSuccess
+        = new CHIPTvChannelTvChannelListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -11426,8 +11905,8 @@ private:
 
 - (void)readAttributeTargetNavigatorListWithResponseHandler:(ResponseHandler)responseHandler
 {
-    CHIPStringAttributeCallbackBridge * onSuccess
-        = new CHIPStringAttributeCallbackBridge(responseHandler, [self callbackQueue], true);
+    CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge * onSuccess
+        = new CHIPTargetNavigatorTargetNavigatorListAttributeCallbackBridge(responseHandler, [self callbackQueue]);
     if (!onSuccess) {
         responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
         return;
@@ -12628,6 +13107,62 @@ private:
     __block CHIP_ERROR err;
     dispatch_sync([self chipWorkQueue], ^{
         err = self.cppCluster.ReadAttributeListInt8u(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPTestClusterListOctetStringAttributeCallbackBridge * onSuccess
+        = new CHIPTestClusterListOctetStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeListOctetString(onSuccess->Cancel(), onFailure->Cancel());
+    });
+
+    if (err != CHIP_NO_ERROR) {
+        delete onSuccess;
+        delete onFailure;
+        responseHandler([CHIPError errorForCHIPErrorCode:err], nil);
+    }
+}
+
+- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler
+{
+    CHIPTestClusterListStructOctetStringAttributeCallbackBridge * onSuccess
+        = new CHIPTestClusterListStructOctetStringAttributeCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onSuccess) {
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    CHIPDefaultFailureCallbackBridge * onFailure = new CHIPDefaultFailureCallbackBridge(responseHandler, [self callbackQueue]);
+    if (!onFailure) {
+        delete onSuccess;
+        responseHandler([CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE], nil);
+        return;
+    }
+
+    __block CHIP_ERROR err;
+    dispatch_sync([self chipWorkQueue], ^{
+        err = self.cppCluster.ReadAttributeListStructOctetString(onSuccess->Cancel(), onFailure->Cancel());
     });
 
     if (err != CHIP_NO_ERROR) {

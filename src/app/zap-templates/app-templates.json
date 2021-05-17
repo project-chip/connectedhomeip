@@ -145,16 +145,6 @@
             "path": "templates/app/CHIPClusters-src.zapt",
             "name": "C++ ZCL API",
             "output": "CHIPClusters.cpp"
-        },
-        {
-            "path": "templates/app/CHIPClustersObjc.zapt",
-            "name": "Objc ZCL API Header",
-            "output": "CHIPClustersObjc.h"
-        },
-        {
-            "path": "templates/app/CHIPClustersObjc-src.zapt",
-            "name": "Objc ZCL API",
-            "output": "CHIPClustersObjc.mm"
         }
     ]
 }

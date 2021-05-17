@@ -379,6 +379,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     service.mTextEntrySize = textEntrySize;
     service.mInterface     = INET_NULL_INTERFACEID;
     service.mAddressType   = Inet::kIPAddressType_Any;
+    service.mSubTypeSize   = 0;
     error                  = ChipMdnsPublishService(&service);
 
     if (error == CHIP_NO_ERROR)

@@ -198,9 +198,11 @@ function handleString(item, [ atomics, enums, bitmaps, structs ])
     return false;
   }
 
+  const kLengthSizeInBytes = 2;
+
   item.atomicTypeId = atomic.atomicId;
   item.chipType     = 'chip::ByteSpan';
-  item.size         = item.maxLength;
+  item.size         = kLengthSizeInBytes + item.maxLength;
   item.name         = item.name || item.label;
   return true;
 }

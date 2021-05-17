@@ -37,7 +37,6 @@ chip_data_model("python_data_model") {
   zap_pregenerated_dir = "gen"
 
   use_default_client_callbacks = true
-  use_default_im_dispatch = false
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -84,8 +83,10 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/controller",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
   allow_circular_includes_from = [ "${chip_root}/src/controller" ]

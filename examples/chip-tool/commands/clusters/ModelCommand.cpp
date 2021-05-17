@@ -41,10 +41,12 @@ CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mOpCredsIssuer.Initialize();
-
     chip::Controller::CommissionerInitParams initParams;
-    initParams.storageDelegate                = &storage;
+    initParams.storageDelegate = &storage;
+
+    err = mOpCredsIssuer.Initialize(storage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Operational Cred Issuer: %s", ErrorStr(err)));
+
     initParams.operationalCredentialsDelegate = &mOpCredsIssuer;
 
     err = mCommissioner.SetUdpListenPort(storage.GetListenPort());

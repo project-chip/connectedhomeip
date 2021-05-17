@@ -265,6 +265,9 @@
 #define ZCL_DISABLE_NETWORK_RESPONSE_COMMAND_ID (0x0F)
 #define ZCL_GET_LAST_NETWORK_COMMISSIONING_RESULT_COMMAND_ID (0x10)
 
+// Commands for cluster: Thread Network Diagnostics
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
 // Commands for cluster: WiFi Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
@@ -278,6 +281,10 @@
 #define ZCL_UPDATE_FABRIC_LABEL_COMMAND_ID (0x09)
 #define ZCL_REMOVE_FABRIC_COMMAND_ID (0x0A)
 #define ZCL_REMOVE_ALL_FABRICS_COMMAND_ID (0x0B)
+
+// Commands for cluster: Trusted Root Certificates
+#define ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x00)
+#define ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID (0x01)
 
 // Commands for cluster: Door Lock
 #define ZCL_LOCK_DOOR_COMMAND_ID (0x00)

@@ -361,8 +361,8 @@ void Hash_SHA256_stream::Clear()
     memset(this, 0, sizeof(*this));
 }
 
-CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                       const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
+CHIP_ERROR HKDF_sha::HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
+                                 const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length)
 {
     EVP_PKEY_CTX * context;
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -971,7 +971,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
+CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 

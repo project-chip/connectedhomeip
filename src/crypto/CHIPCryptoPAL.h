@@ -250,7 +250,7 @@ public:
      * @brief Serialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output);
+    virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const;
 
     /**
      * @brief Deserialize the keypair.
@@ -400,21 +400,28 @@ private:
     HashSHA256OpaqueContext mContext;
 };
 
-/**
- * @brief A function that implements SHA-256 based HKDF
- * @param secret The secret to use as the key to the HKDF
- * @param secret_length Length of the secret
- * @param salt Optional salt to use as input to the HKDF
- * @param salt_length Length of the salt
- * @param info Optional info to use as input to the HKDF
- * @param info_length Length of the info
- * @param out_buffer Pointer to buffer to write output into.
- * @param out_length Resulting length of out_buffer
- * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
- **/
+class HKDF_sha
+{
+public:
+    HKDF_sha() {}
+    virtual ~HKDF_sha() {}
 
-CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
-                       size_t info_length, uint8_t * out_buffer, size_t out_length);
+    /**
+     * @brief A function that implements SHA-256 based HKDF
+     * @param secret The secret to use as the key to the HKDF
+     * @param secret_length Length of the secret
+     * @param salt Optional salt to use as input to the HKDF
+     * @param salt_length Length of the salt
+     * @param info Optional info to use as input to the HKDF
+     * @param info_length Length of the info
+     * @param out_buffer Pointer to buffer to write output into.
+     * @param out_length Resulting length of out_buffer
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+
+    virtual CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
+                                   const uint8_t * info, size_t info_length, uint8_t * out_buffer, size_t out_length);
+};
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A

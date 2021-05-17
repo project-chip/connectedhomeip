@@ -84,37 +84,6 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
 
-    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
-
-    // If a group message is to be transmitted to a destination node whose message counter is unknown.
-    if (state != nullptr && ChipKeyId::IsAppGroupKey(state->GetLocalKeyID()) && !state->IsPeerMsgCounterSynced())
-    {
-        MessageCounterSyncMgr * messageCounterSyncMgr = mExchangeMgr->GetMessageCounterSyncMgr();
-        VerifyOrReturnError(messageCounterSyncMgr != nullptr, CHIP_ERROR_INTERNAL);
-
-        // Queue the message as needed for sync with destination node.
-        err = messageCounterSyncMgr->AddToRetransmissionTable(protocolId, msgType, sendFlags, std::move(msgBuf), this);
-        ReturnErrorOnFailure(err);
-
-        // Initiate message counter synchronization if no message counter synchronization is in progress.
-        if (!state->IsMsgCounterSyncInProgress())
-        {
-            err = mExchangeMgr->GetMessageCounterSyncMgr()->SendMsgCounterSyncReq(mSecureSession);
-        }
-    }
-    else
-    {
-        err = SendMessageImpl(protocolId, msgType, std::move(msgBuf), sendFlags, state);
-    }
-
-    return err;
-}
-
-CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
-                                            const SendFlags & sendFlags, Transport::PeerConnectionState * state)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
@@ -125,8 +94,9 @@ CHIP_ERROR ExchangeContext::SendMessageImpl(Protocols::Id protocolId, uint8_t ms
 
     bool reliableTransmissionRequested = true;
 
+    state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
     // If sending via UDP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
-    if (state && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
+    if (state != nullptr && state->GetPeerAddress().GetTransportType() != Transport::Type::kUdp)
     {
         reliableTransmissionRequested = false;
     }
@@ -242,9 +212,9 @@ void ExchangeContext::Abort()
     Release();
 }
 
-void ExchangeContext::Reset()
+void ExchangeContextDeletor::Release(ExchangeContext * ec)
 {
-    *this = ExchangeContext();
+    ec->mExchangeMgr->ReleaseContext(ec);
 }
 
 ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
@@ -257,15 +227,12 @@ ExchangeMessageDispatch * ExchangeContext::GetMessageDispatch()
     return nullptr;
 }
 
-ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                         ExchangeDelegateBase * delegate)
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                 ExchangeDelegateBase * delegate)
 {
-    VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
+    VerifyOrDie(mExchangeMgr == nullptr);
 
-    Reset();
-    Retain();
-    mExchangeMgr = em;
-    em->IncrementContextsInUse();
+    mExchangeMgr   = em;
     mExchangeId    = ExchangeId;
     mSecureSession = session;
     mFlags.Set(Flags::kFlagInitiator, Initiator);
@@ -278,28 +245,21 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     SetAutoRequestAck(true);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()), em->GetContextsInUse(),
-                  this);
+    ChipLogDetail(ExchangeManager, "ec++ id: %d", ExchangeId);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
-
-    return this;
 }
 
-void ExchangeContext::Free()
+ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and
     // the boolean parameter passed to DoClose() should not matter.
-    ExchangeManager * em = mExchangeMgr;
 
     DoClose(false);
     mExchangeMgr = nullptr;
-    mAppState    = nullptr;
-
-    em->DecrementContextsInUse();
 
     if (mExchangeACL != nullptr)
     {
@@ -308,8 +268,7 @@ void ExchangeContext::Free()
     }
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogDetail(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->mContextPool.begin()),
-                  mExchangeId, em->GetContextsInUse(), this);
+    ChipLogDetail(ExchangeManager, "ec-- id: %d", mExchangeId);
 #endif
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }

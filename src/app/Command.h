@@ -55,10 +55,10 @@ public:
 
     enum class CommandState
     {
-        Uninitialized = 0, //< The invoke command message has not been initialized
-        Initialized,       //< The invoke command message has been initialized and is ready
-        AddCommand,        //< The invoke command message has added Command
-        Sending,           //< The invoke command message  has sent out the invoke command
+        Uninitialized = 0, ///< The invoke command message has not been initialized
+        Initialized,       ///< The invoke command message has been initialized and is ready
+        AddCommand,        ///< The invoke command message has added Command
+        Sending,           ///< The invoke command message has sent out the invoke command
     };
 
     /**
@@ -119,7 +119,7 @@ public:
     virtual CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) = 0;
 
 protected:
-    CHIP_ERROR ClearExistingExchangeContext();
+    CHIP_ERROR AbortExistingExchangeContext();
     void MoveToState(const CommandState aTargetState);
     CHIP_ERROR ProcessCommandMessage(System::PacketBufferHandle && payload, CommandRoleId aCommandRoleId);
     CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandDataElement::Builder aCommandDataElement);

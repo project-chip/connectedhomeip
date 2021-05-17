@@ -61,6 +61,12 @@ using namespace Crypto;
 using namespace Credentials;
 using namespace Messaging;
 
+#ifdef ENABLE_HSM_HKDF
+using HKDF_sha_crypto = HKDF_shaHSM;
+#else
+using HKDF_sha_crypto = HKDF_sha;
+#endif
+
 // Wait at most 30 seconds for the response from the peer.
 // This timeout value assumes the underlying transport is reliable.
 // The session establishment fails if the response is not received within timeout window.
@@ -187,6 +193,7 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
                              SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(operationalCredentialSet != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(operationalCredentialSet->GetCertCount() > 0, CHIP_ERROR_CERT_NOT_FOUND);
 
     Clear();
@@ -205,8 +212,8 @@ CHIP_ERROR CASESession::Init(OperationalCredentialSet * operationalCredentialSet
 }
 
 CHIP_ERROR
-CASESession::WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                                         SessionEstablishmentDelegate * delegate)
+CASESession::ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                           SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorOnFailure(Init(operationalCredentialSet, myKeyId, delegate));
 
@@ -319,7 +326,10 @@ CHIP_ERROR CASESession::SendSigmaR1()
         bbuf.Put16(n_trusted_roots);
         for (uint16_t i = 0; i < n_trusted_roots; ++i)
         {
-            bbuf.Put(mOpCredSet->GetTrustedRootId(i)->mId, kTrustedRootIdSize);
+            if (mOpCredSet->GetTrustedRootId(i) != nullptr && mOpCredSet->GetTrustedRootId(i)->mId != nullptr)
+            {
+                bbuf.Put(mOpCredSet->GetTrustedRootId(i)->mId, kTrustedRootIdSize);
+            }
         }
         bbuf.Put(mEphemeralKey.Pubkey(), mEphemeralKey.Pubkey().Length());
         VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
@@ -423,6 +433,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
 
     uint8_t tag[kTAGSize];
 
+    HKDF_sha_crypto mHKDF;
+
     saltlen = kIPKSize + kSigmaParamRandomNumberSize + kP256_PublicKey_Length + kSHA256_Hash_Length;
 
     msg_salt = System::PacketBufferHandle::New(saltlen);
@@ -455,8 +467,8 @@ CHIP_ERROR CASESession::SendSigmaR2()
     err = ConstructSaltSigmaR2(msg_rand, mEphemeralKey.Pubkey(), mIPK, sizeof(mIPK), msg_salt);
     SuccessOrExit(err);
 
-    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
-                      kAEADKeySize);
+    err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     // Step 6
@@ -589,6 +601,8 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
 
     uint16_t encryptionKeyId = 0;
 
+    HKDF_sha_crypto mHKDF;
+
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
 
     ChipLogDetail(Inet, "Received SigmaR2 msg");
@@ -631,8 +645,8 @@ CHIP_ERROR CASESession::HandleSigmaR2(const System::PacketBufferHandle & msg)
     err = ConstructSaltSigmaR2(msg, mRemotePubKey, mRemoteIPK, sizeof(mRemoteIPK), msg_salt);
     SuccessOrExit(err);
 
-    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
-                      kAEADKeySize);
+    err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR2Info, kKDFInfoLength, sr2k,
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
@@ -706,9 +720,12 @@ CHIP_ERROR CASESession::SendSigmaR3()
 
     uint8_t tag[kTAGSize];
 
+    HKDF_sha_crypto mHKDF;
+
     // Step 1
     saltlen = kIPKSize + kSHA256_Hash_Length;
 
+    ChipLogDetail(Inet, "Sending SigmaR3");
     msg_salt = System::PacketBufferHandle::New(saltlen);
     VerifyOrExit(!msg_salt.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
     msg_salt->SetDataLength(saltlen);
@@ -716,8 +733,8 @@ CHIP_ERROR CASESession::SendSigmaR3()
     err = ConstructSaltSigmaR3(mIPK, sizeof(mIPK), msg_salt);
     SuccessOrExit(err);
 
-    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
-                      kAEADKeySize);
+    err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     // Step 2
@@ -835,6 +852,8 @@ CHIP_ERROR CASESession::HandleSigmaR3(const System::PacketBufferHandle & msg)
 
     uint8_t * tag = msg->Start() + msg->DataLength() - kTAGSize;
 
+    HKDF_sha_crypto mHKDF;
+
     ChipLogDetail(Inet, "Received SigmaR3 msg");
 
     mNextExpectedMsg = Protocols::SecureChannel::MsgType::CASE_SigmaErr;
@@ -852,8 +871,8 @@ CHIP_ERROR CASESession::HandleSigmaR3(const System::PacketBufferHandle & msg)
     err = ConstructSaltSigmaR3(mRemoteIPK, sizeof(mRemoteIPK), msg_salt);
     SuccessOrExit(err);
 
-    err = HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
-                      kAEADKeySize);
+    err = mHKDF.HKDF_SHA256(mSharedSecret, mSharedSecret.Length(), msg_salt->Start(), saltlen, kKDFSR3Info, kKDFInfoLength, sr3k,
+                            kAEADKeySize);
     SuccessOrExit(err);
 
     err = mCommissioningHash.AddData(msg->Start(), msg->DataLength());
@@ -957,6 +976,7 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & 
                                              const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt)
 {
     uint8_t md[kSHA256_Hash_Length];
+    memset(salt->Start(), 0, salt->DataLength());
     Encoding::LittleEndian::BufferWriter bbuf(salt->Start(), salt->DataLength());
 
     bbuf.Put(ipk, ipkLen);
@@ -964,6 +984,7 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & 
     bbuf.Put(pubkey, pubkey.Length());
     ReturnErrorOnFailure(mCommissioningHash.Finish(md));
     bbuf.Put(md, kSHA256_Hash_Length);
+    ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
@@ -973,11 +994,13 @@ CHIP_ERROR CASESession::ConstructSaltSigmaR2(const System::PacketBufferHandle & 
 CHIP_ERROR CASESession::ConstructSaltSigmaR3(const uint8_t * ipk, size_t ipkLen, System::PacketBufferHandle & salt)
 {
     uint8_t md[kSHA256_Hash_Length];
+    memset(salt->Start(), 0, salt->DataLength());
     Encoding::LittleEndian::BufferWriter bbuf(salt->Start(), salt->DataLength());
 
     bbuf.Put(ipk, ipkLen);
     ReturnErrorOnFailure(mCommissioningHash.Finish(md));
     bbuf.Put(md, kSHA256_Hash_Length);
+    ReturnErrorOnFailure(mCommissioningHash.Begin());
 
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
 
@@ -1044,8 +1067,9 @@ CHIP_ERROR CASESession::ConstructSignedCredentials(const uint8_t ** msgIterator,
 
 CHIP_ERROR CASESession::ComputeIPK(const uint16_t sessionID, uint8_t * ipk, size_t ipkLen)
 {
-    ReturnErrorOnFailure(HKDF_SHA256(fabricSecret, fabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
-                                     sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
+    HKDF_sha_crypto mHKDF;
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(fabricSecret, fabricSecret.Length(), reinterpret_cast<const uint8_t *>(&sessionID),
+                                           sizeof(sessionID), kIPKInfo, sizeof(kIPKInfo), ipk, ipkLen));
 
     return CHIP_NO_ERROR;
 }

@@ -2201,6 +2201,15 @@
  *
  * Command: ResetCounts
  */
+#define emberAfFillCommandThread                                                                                                   \
+    Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_RESET_COUNTS_COMMAND_ID, "", );
+
+/** @brief Command description for ResetCounts
+ *
+ * Command: ResetCounts
+ */
 #define emberAfFillCommandWiFi                                                                                                     \
     Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
                                                                                                                                    \
@@ -2240,7 +2249,6 @@
  *
  * Command: OpCSRResponse
  * @param CSR OCTET_STRING
- * @param CSRLen INT32U
  * @param CSRNonce OCTET_STRING
  * @param VendorReserved1 OCTET_STRING
  * @param VendorReserved2 OCTET_STRING
@@ -2248,11 +2256,11 @@
  * @param Signature OCTET_STRING
  */
 #define emberAfFillCommandOperational                                                                                              \
-    CredentialsClusterOpCSRResponse(CSR, CSRLen, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)           \
+    CredentialsClusterOpCSRResponse(CSR, CSRNonce, VendorReserved1, VendorReserved2, VendorReserved3, Signature)                   \
         emberAfFillExternalBuffer(mask,                                                                                            \
                                                                                                                                    \
-                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuuu", CSR, CSRLen, CSRNonce, VendorReserved1,               \
-                                  VendorReserved2, VendorReserved3, Signature);
+                                  ZCL_OP_CSR_RESPONSE_COMMAND_ID, "uuuuuu", CSR, CSRNonce, VendorReserved1, VendorReserved2,       \
+                                  VendorReserved3, Signature);
 
 /** @brief Command description for AddOpCert
  *
@@ -2313,6 +2321,28 @@
     CredentialsClusterRemoveAllFabrics() emberAfFillExternalBuffer(mask,                                                           \
                                                                                                                                    \
                                                                    ZCL_REMOVE_ALL_FABRICS_COMMAND_ID, "", );
+
+/** @brief Command description for AddTrustedRootCertificate
+ *
+ * Command: AddTrustedRootCertificate
+ * @param RootCertificate OCTET_STRING
+ */
+#define emberAfFillCommandTrusted                                                                                                  \
+    Root CertificatesClusterAddTrustedRootCertificate(RootCertificate)                                                             \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_ADD_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", RootCertificate);
+
+/** @brief Command description for RemoveTrustedRootCertificate
+ *
+ * Command: RemoveTrustedRootCertificate
+ * @param TrustedRootIdentifier OCTET_STRING
+ */
+#define emberAfFillCommandTrusted                                                                                                  \
+    Root CertificatesClusterRemoveTrustedRootCertificate(TrustedRootIdentifier)                                                    \
+        emberAfFillExternalBuffer(mask,                                                                                            \
+                                                                                                                                   \
+                                  ZCL_REMOVE_TRUSTED_ROOT_CERTIFICATE_COMMAND_ID, "u", TrustedRootIdentifier);
 
 /** @brief Command description for LockDoor
  *

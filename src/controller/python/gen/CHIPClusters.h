@@ -39,6 +39,7 @@ constexpr ClusterId kContentLaunchClusterId               = 0x050A;
 constexpr ClusterId kDescriptorClusterId                  = 0x001D;
 constexpr ClusterId kDoorLockClusterId                    = 0x0101;
 constexpr ClusterId kGeneralCommissioningClusterId        = 0x0030;
+constexpr ClusterId kGeneralDiagnosticsClusterId          = 0x0033;
 constexpr ClusterId kGroupKeyManagementClusterId          = 0xF004;
 constexpr ClusterId kGroupsClusterId                      = 0x0004;
 constexpr ClusterId kIdentifyClusterId                    = 0x0003;
@@ -58,6 +59,7 @@ constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
 constexpr ClusterId kTemperatureMeasurementClusterId      = 0x0402;
 constexpr ClusterId kTestClusterClusterId                 = 0x050F;
 constexpr ClusterId kThermostatClusterId                  = 0x0201;
+constexpr ClusterId kTrustedRootCertificatesClusterId     = 0x003F;
 constexpr ClusterId kWakeOnLanClusterId                   = 0x0503;
 constexpr ClusterId kWindowCoveringClusterId              = 0x0102;
 
@@ -536,6 +538,19 @@ private:
     static constexpr CommandId kArmFailSafeCommandId           = 0x00;
     static constexpr CommandId kCommissioningCompleteCommandId = 0x04;
     static constexpr CommandId kSetRegulatoryConfigCommandId   = 0x02;
+};
+
+class DLL_EXPORT GeneralDiagnosticsCluster : public ClusterBase
+{
+public:
+    GeneralDiagnosticsCluster() : ClusterBase(kGeneralDiagnosticsClusterId) {}
+    ~GeneralDiagnosticsCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeNetworkInterfaces(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeRebootCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT GroupKeyManagementCluster : public ClusterBase
@@ -1019,6 +1034,9 @@ public:
     CHIP_ERROR ReadAttributeEnum16(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeListInt8u(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeListOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeListStructOctetString(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint8_t value);
@@ -1106,6 +1124,27 @@ private:
     static constexpr CommandId kGetWeeklyScheduleCommandId   = 0x02;
     static constexpr CommandId kSetWeeklyScheduleCommandId   = 0x01;
     static constexpr CommandId kSetpointRaiseLowerCommandId  = 0x00;
+};
+
+class DLL_EXPORT TrustedRootCertificatesCluster : public ClusterBase
+{
+public:
+    TrustedRootCertificatesCluster() : ClusterBase(kTrustedRootCertificatesClusterId) {}
+    ~TrustedRootCertificatesCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         chip::ByteSpan rootCertificate);
+    CHIP_ERROR RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            chip::ByteSpan trustedRootIdentifier);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kAddTrustedRootCertificateCommandId    = 0x00;
+    static constexpr CommandId kRemoveTrustedRootCertificateCommandId = 0x01;
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase

@@ -44,6 +44,7 @@ enum keyid_values
 {
     kKeyId_NotInitialized           = 0,
     kKeyId_pbkdf2_sha256_hmac_keyid = 0xBCBCBCBC,
+    kKeyId_hkdf_sha256_hmac_keyid,
 };
 
 // Enable the below macro to make spake HSM imlementation reentrant.

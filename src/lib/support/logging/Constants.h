@@ -30,6 +30,7 @@ enum LogModule
     kLogModule_Crypto,
     kLogModule_Controller,
     kLogModule_Alarm,
+    kLogModule_SecureChannel,
     kLogModule_BDX,
     kLogModule_DataManagement,
     kLogModule_DeviceControl,
@@ -53,6 +54,8 @@ enum LogModule
     kLogModule_SetupPayload,
     kLogModule_AppServer,
     kLogModule_Discovery,
+    kLogModule_PASE,
+    kLogModule_CASE,
 
     kLogModule_Max
 };

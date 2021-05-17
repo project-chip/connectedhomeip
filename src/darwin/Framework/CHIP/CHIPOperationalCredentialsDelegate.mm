@@ -49,7 +49,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
 
     if (err == CHIP_NO_ERROR) {
         // If keys were loaded, or generated, let's get the certificate issuer ID
-        err = SetIssuerID(storage);
+
+        // TODO - enable generating a random issuer ID and saving it in persistent storage
+        // err = SetIssuerID(storage);
     }
 
     CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init returning %d", err);
@@ -106,6 +108,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::LoadKeysFromKeyChain()
         (id) kSecAttrKeyType : mKeyType,
         (id) kSecAttrKeySizeInBits : mKeySize,
         (id) kSecAttrLabel : kCHIPCAKeyLabel,
+        (id) kSecAttrApplicationTag : kCHIPCAKeyTag,
         (id) kSecReturnRef : (id) kCFBooleanTrue
     };
 
@@ -131,6 +134,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
         (id) kSecAttrKeyType : mKeyType,
         (id) kSecAttrKeySizeInBits : mKeySize,
         (id) kSecAttrLabel : kCHIPCAKeyLabel,
+        (id) kSecAttrApplicationTag : kCHIPCAKeyTag,
     };
 
     status = SecKeyGeneratePair((__bridge CFDictionaryRef) keygenParams, &publicKey, &privateKey);
@@ -144,6 +148,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateKeys()
         (id) kSecAttrKeyType : mKeyType,
         (id) kSecAttrKeySizeInBits : mKeySize,
         (id) kSecAttrLabel : kCHIPCAKeyLabel,
+        (id) kSecAttrApplicationTag : kCHIPCAKeyTag,
         (id) kSecValueRef : (__bridge id) privateKey,
     };
 
@@ -168,6 +173,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::DeleteKeys()
         (id) kSecAttrKeyType : mKeyType,
         (id) kSecAttrKeySizeInBits : mKeySize,
         (id) kSecAttrLabel : kCHIPCAKeyLabel,
+        (id) kSecAttrApplicationTag : kCHIPCAKeyTag,
     };
 
     status = SecItemDelete((__bridge CFDictionaryRef) deleteParams);

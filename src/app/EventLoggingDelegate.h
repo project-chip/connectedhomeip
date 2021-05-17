@@ -56,7 +56,7 @@ public:
      *  be structured using context tags.
      *
      *
-     *  @param[inout] aWriter A reference to the chip::TLV::TLVWriter object to be
+     *  @param[in,out] aWriter A reference to the chip::TLV::TLVWriter object to be
      *                         used for event data serialization.
      *
      *  @retval #CHIP_NO_ERROR  On success.

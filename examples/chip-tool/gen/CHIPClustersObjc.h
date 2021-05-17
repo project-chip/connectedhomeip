@@ -466,6 +466,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster General Diagnostics
+ *
+ */
+@interface CHIPGeneralDiagnostics : CHIPCluster
+
+- (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Group Key Management
  *
  */
@@ -865,6 +877,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

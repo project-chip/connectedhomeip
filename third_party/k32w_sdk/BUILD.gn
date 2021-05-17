@@ -40,14 +40,19 @@ config("mbedtls_k32w_config") {
     "MBEDTLS_THREADING_ALT=1",
     "MBEDTLS_X509_CSR_WRITE_C",
     "MBEDTLS_X509_CREATE_C",
-    "MBEDTLS_PK_WRITE_C",
-    "MBEDTLS_OID_C",
     "MBEDTLS_PEM_WRITE_C",
-    "MBEDTLS_BASE64_C",
     "MBEDTLS_HKDF_C",
     "MBEDTLS_ERROR_C",
     "MBEDTLS_PKCS5_C",
   ]
+
+  if (chip_mdns == "none") {
+    defines += [
+      "MBEDTLS_PK_WRITE_C",
+      "MBEDTLS_OID_C",
+      "MBEDTLS_BASE64_C",
+    ]
+  }
 
   include_dirs = [ chip_root ]
 }
