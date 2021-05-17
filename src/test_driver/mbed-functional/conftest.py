@@ -29,3 +29,5 @@ def pytest_addoption(parser):
     parser.addoption('--serial_inter_byte_delay', action='store', help='Time in second between two bytes sent on the serial line (accepts floats)')
     parser.addoption('--serial_baudrate', action='store', help='Baudrate of the serial port used', default='115200')
     parser.addoption('--command_delay', action='store', help='Delay in seconds before sending a command', default='0')
+    parser.addoption('--network', action='store', help='WiFi network credentials to which we want to connect device. Format network_ssid:network_password')
+    parser.addoption('--echo_server', action='store', help='Address and port of echo server. Format server_ip:server_port')

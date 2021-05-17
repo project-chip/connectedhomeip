@@ -17,18 +17,18 @@ import pytest
 
 @pytest.mark.smoketest
 def test_echo_check(device):
-    ret = device.send(command="echo Hello", expected_output="Done", wait_before_read=1, wait_for_response=10)
+    ret = device.send(command="echo Hello", expected_output="Done")
     assert ret != None and len(ret) > 1
     assert "Hello" in ret[-2]
 
 @pytest.mark.smoketest
 def test_log_check(device):
-    ret = device.send(command="log Hello", expected_output="Done", wait_before_read=1, wait_for_response=10)
+    ret = device.send(command="log Hello", expected_output="Done")
     assert ret != None and len(ret) > 1
     assert "CHIP:TOO: Hello" in ret[-2]
 
 @pytest.mark.smoketest
 def test_rand_check(device):
-    ret = device.send(command="rand", expected_output="Done", wait_before_read=1, wait_for_response=10)
+    ret = device.send(command="rand", expected_output="Done")
     assert ret != None and len(ret) > 1
     assert ret[-2].rstrip().isdigit()

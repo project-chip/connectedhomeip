@@ -24,6 +24,7 @@ from .device import Device
 
 from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
+from .utils import is_network_visible
 
 import logging
 log = logging.getLogger(__name__)
@@ -72,6 +73,22 @@ def command_delay(request):
     if request.config.getoption('command_delay'):
         return float(request.config.getoption('command_delay'))
     return float(0)
+
+@pytest.fixture(scope="session")
+def network(request):
+    if request.config.getoption('network'):
+        credentials = request.config.getoption('network')
+        params = credentials.split(':')
+        return (params[0], params[1])
+    return None
+
+@pytest.fixture(scope="session")
+def echo_server(request):
+    if request.config.getoption('echo_server'):
+        echo_server = request.config.getoption('echo_server')
+        params = echo_server.split(':')
+        return (params[0], params[1])
+    return None
 
 
 class BoardAllocation:
@@ -161,3 +178,45 @@ def device(board_allocator):
     device = board_allocator.allocate(name='DUT')
     yield device
     board_allocator.release(device)
+
+@pytest.fixture(scope="function")
+def connected_device(device, network):
+    network_ssid = network[0]
+    network_pass = network[1]
+
+    # Check connection status
+    ret = device.send(command="device sta connected", expected_output="Done")
+    assert ret != None and len(ret) > 1
+    device_connected = (ret[-2].rstrip().lower() == "true")
+
+    if not device_connected:
+        # Check if device support STA mode
+        ret = device.send(command="device sta mode", expected_output="Done")
+        assert ret != None and len(ret) > 1
+        assert "NotSupported" != ret[-2].rstrip()
+
+        # Check if network is visible
+        ret = device.send(command="device scan", expected_output="Done", wait_before_read=5)
+        assert ret != None and len(ret) > 1
+        assert is_network_visible(ret, network_ssid)
+
+        # Connect to network
+        ret = device.send(command="device connect {} {}".format(network_ssid, network_pass), expected_output="Done", wait_before_read=5)
+        assert ret != None
+
+        # Check connection status
+        ret = device.send(command="device sta connected", expected_output="Done")
+        assert ret != None and len(ret) > 1
+        assert ret[-2].rstrip().lower() == "true"
+
+    yield device
+
+    if not device_connected:
+        # Network disconnect
+        ret = device.send(command="device sta clear_provision", expected_output="Done", wait_before_read=5)
+        assert ret != None
+
+        # Check connection status
+        ret = device.send(command="device sta connected", expected_output="Done")
+        assert ret != None and len(ret) > 1
+        assert ret[-2].rstrip().lower() == "false"

@@ -18,9 +18,9 @@ import pytest
 @pytest.mark.smoketest
 def test_base64_encode_decode(device):
     hex_string = "1234"
-    ret = device.send(command="base64 encode {}".format(hex_string), expected_output="Done", wait_before_read=1, wait_for_response=10)
+    ret = device.send(command="base64 encode {}".format(hex_string), expected_output="Done")
     assert ret != None and len(ret) > 1
     base64code = ret[-2]
-    ret = device.send(command="base64 decode {}".format(base64code), expected_output="Done", wait_before_read=1, wait_for_response=10)
+    ret = device.send(command="base64 decode {}".format(base64code), expected_output="Done")
     assert ret != None and len(ret) > 1
     assert ret[-2].rstrip() == hex_string
