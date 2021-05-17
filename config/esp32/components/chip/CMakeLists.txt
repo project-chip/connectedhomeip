@@ -72,7 +72,7 @@ if (NOT CONFIG_USE_MINIMAL_MDNS)
 endif()
 
 if (CONFIG_ENABLE_CHIP_SHELL)
-    chip_gn_arg_append("chip_build_shell_lib"                   "true")
+    chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
 

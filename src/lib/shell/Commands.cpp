@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,17 +15,27 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      Header that defines default shell commands for CHIP examples
- */
-
-#pragma once
-
-#include "shell_core.h"
+#include <lib/shell/Commands.h>
+#include <lib/shell/Engine.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace Shell {
+
+void Shell::RegisterDefaultCommands()
+{
+    RegisterBase64Commands();
+    RegisterMetaCommands();
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    RegisterBLECommands();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    RegisterWiFiCommands();
+#endif
+#if CONFIG_DEVICE_LAYER
+    RegisterConfigCommands();
+#endif
+}
 
 } // namespace Shell
 } // namespace chip
