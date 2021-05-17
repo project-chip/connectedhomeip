@@ -332,11 +332,11 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     NodeId localNodeId;
     FabricId fabricId;
 
-    VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
+    VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport discarding, received NULL packet"));
 
     if (state == nullptr)
     {
-        ChipLogError(Inet, "Data received on an unknown connection (%d). Dropping it!!", packetHeader.GetEncryptionKeyID());
+        ChipLogError(Inet, "Secure transport discarding message, unknown connection (%d)", packetHeader.GetEncryptionKeyID());
         ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
     }
 
@@ -365,7 +365,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
             }
             else
             {
-                ChipLogDetail(Inet, "Received message have been queued due to peer counter is not synced");
+                ChipLogDetail(Inet, "Queuing message, peer counter is not synced");
             }
 
             return;
@@ -384,24 +384,27 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     }
 
     admin = mAdmins->FindAdminWithId(state->GetAdminId());
-    VerifyOrExit(admin != nullptr,
-                 ChipLogError(Inet, "Secure transport received packet for unknown admin (%p, %d) pairing, discarding", state,
-                              state->GetAdminId()));
+    VerifyOrExit(
+        admin != nullptr,
+        ChipLogError(Inet, "Secure transport discarding message, unknown admin (%p, %u) pairing", state, state->GetAdminId()));
     if (packetHeader.GetDestinationNodeId().HasValue() && admin->GetNodeId() != kUndefinedNodeId)
     {
-        VerifyOrExit(
-            admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(
-                Inet,
-                "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
-                packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
+        VerifyOrExit(admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
+                     ChipLogError(Inet,
+                                  "Secure transport discarding message, destination node ID (0x%08" PRIx32 "%08" PRIx32
+                                  ") <> our node ID (0x%08" PRIx32 "%08" PRIx32 ")",
+                                  static_cast<uint32_t>(packetHeader.GetDestinationNodeId().Value() >> 32),
+                                  static_cast<uint32_t>(packetHeader.GetDestinationNodeId().Value()),
+                                  static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId())));
     }
-    ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
+    ChipLogError(Inet, "Secure transport received message destined to node ID (0x%08" PRIx32 "%08" PRIx32 ")",
+                 static_cast<uint32_t>(packetHeader.GetDestinationNodeId().Value() >> 32),
+                 static_cast<uint32_t>(packetHeader.GetDestinationNodeId().Value()));
     mPeerConnections.MarkConnectionActive(state);
 
     // Decode the message
     VerifyOrExit(CHIP_NO_ERROR == SecureMessageCodec::Decode(state, payloadHeader, packetHeader, msg),
-                 ChipLogError(Inet, "Secure transport received message, but failed to decode it, discarding"));
+                 ChipLogError(Inet, "Secure transport discarding message, failed to decode it"));
 
     if (packetHeader.GetFlags().Has(Header::FlagValues::kSecureSessionControlMessage))
     {
@@ -431,7 +434,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         if (localNodeId != kUndefinedNodeId && admin->GetNodeId() != localNodeId)
         {
             admin->SetNodeId(localNodeId);
-            ChipLogProgress(Inet, "Setting nodeID %" PRIX64 " on admin.", admin->GetNodeId());
+            ChipLogProgress(Inet, "Setting nodeID 0x%08" PRIx32 "%08" PRIx32 " on admin.",
+                            static_cast<uint32_t>(admin->GetNodeId()), static_cast<uint32_t>(admin->GetNodeId()));
             modifiedAdmin = true;
         }
     }
@@ -443,7 +447,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
         if (fabricId != kUndefinedFabricId && admin->GetFabricId() != fabricId)
         {
             admin->SetFabricId(packetHeader.GetSourceNodeId().Value());
-            ChipLogProgress(Inet, "Setting fabricID %" PRIX64 " on admin.", admin->GetFabricId());
+            ChipLogProgress(Inet, "Setting fabricID 0x%08" PRIx32 "%08" PRIx32 " on admin.",
+                            static_cast<uint32_t>(admin->GetFabricId() >> 32), static_cast<uint32_t>(admin->GetFabricId()));
             modifiedAdmin = true;
         }
     }
@@ -451,7 +456,7 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     // TODO: Remove temporary code once AddOptCert is implemented
     if (modifiedAdmin)
     {
-        ChipLogProgress(Inet, "Since admin was modified, persisting changes to KVS");
+        ChipLogProgress(Inet, "Admin modified, persisting changes to KVS");
         mAdmins->Store(admin->GetAdminId());
     }
 
