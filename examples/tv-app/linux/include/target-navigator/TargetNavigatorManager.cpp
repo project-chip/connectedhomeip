@@ -24,6 +24,8 @@
 
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <lib/core/CHIPSafeCasts.h>
+#include <support/CodeUtils.h>
 
 #include <map>
 #include <string>
@@ -34,20 +36,26 @@ CHIP_ERROR TargetNavigatorManager::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: Update once storing a list attribute is supported
-    // std::list<EmberAfNavigateTargetTargetInfo> list = TargetNavigatorManager().proxyGetTargetInfoList();
-    // emberAfWriteServerAttribute(endpoint, ZCL_TARGET_NAVIGATOR_CLUSTER_ID, ZCL_TARGET_NAVIGATOR_LIST_ATTRIBUTE_ID,
-    //                             (uint8_t *) &list, ZCL_STRUCT_ATTRIBUTE_TYPE);
-
     SuccessOrExit(err);
 exit:
     return err;
 }
 
-std::list<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTargetInfoList()
+std::vector<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTargetInfoList()
 {
     // TODO: Insert code here
-    std::list<EmberAfNavigateTargetTargetInfo> targets;
+    std::vector<EmberAfNavigateTargetTargetInfo> targets;
+    int maximumVectorSize = 2;
+    char name[]           = "exampleName";
+
+    for (uint8_t i = 0; i < maximumVectorSize; ++i)
+    {
+        EmberAfNavigateTargetTargetInfo targetInfo;
+        targetInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
+        targetInfo.identifier = 1 + i;
+        targets.push_back(targetInfo);
+    }
+
     return targets;
 }
 

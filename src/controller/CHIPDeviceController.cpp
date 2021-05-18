@@ -1221,8 +1221,6 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(Device * device, const
     Callback::Cancelable * successCallback = mOpCertResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCertFailureCallback.Cancel();
 
-    device->GetCommandSender()->Reset();
-
     // TODO - Update ZAP to use 16 bit length for OCTET_STRING. This is a temporary hack, as OCTET_STRING only supports 8 bit
     // strings.
     if (opCertBuf.size() >= UINT8_MAX)
@@ -1271,7 +1269,6 @@ void DeviceCommissioner::OnOperationalCertificateAddResponse(void * context, uin
     VerifyOrExit(commissioner->mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
     device = &commissioner->mActiveDevices[commissioner->mDeviceBeingPaired];
-    device->GetCommandSender()->Reset();
 
     err = commissioner->SendTrustedRootCertificate(device);
 
@@ -1349,7 +1346,6 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(De
 {
     ChipLogProgress(Controller, "Operational credentials provisioned on device %p", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    device->GetCommandSender()->Reset();
 
     mPairingSession.ToSerializable(device->GetPairing());
     mSystemLayer->CancelTimer(OnSessionEstablishmentTimeoutCallback, this);

@@ -39,6 +39,7 @@
 | ContentLaunch                                                       | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
+| EthernetNetworkDiagnostics                                          | 0x0037 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -1615,6 +1616,78 @@ chip::System::PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribu
  */
 chip::System::PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum,
                                                                                    chip::EndpointId destinationEndpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster EthernetNetworkDiagnostics                                  | 0x0037 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * PacketRxCount                                                     | 0x0002 |
+| * PacketTxCount                                                     | 0x0003 |
+| * TxErrCount                                                        | 0x0004 |
+| * CollisionCount                                                    | 0x0005 |
+| * OverrunCount                                                      | 0x0006 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an ResetCounts command for Ethernet Network Diagnostics server into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterResetCountsCommand(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server discover command into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum,
+                                                                                           chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server read command for the PacketRxCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeEthernetNetworkDiagnosticsClusterReadPacketRxCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server read command for the PacketTxCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeEthernetNetworkDiagnosticsClusterReadPacketTxCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server read command for the TxErrCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeEthernetNetworkDiagnosticsClusterReadTxErrCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server read command for the CollisionCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeEthernetNetworkDiagnosticsClusterReadCollisionCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server read command for the OverrunCount attribute into buffer including the APS frame
+ */
+chip::System::PacketBufferHandle
+encodeEthernetNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
+
+/**
+ * @brief
+ *    Encode a Ethernet Network Diagnostics server read command for the cluster revision attribute into buffer including the APS
+ * frame
+ */
+chip::System::PacketBufferHandle
+encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, chip::EndpointId destinationEndpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster GeneralCommissioning                                        | 0x0030 |

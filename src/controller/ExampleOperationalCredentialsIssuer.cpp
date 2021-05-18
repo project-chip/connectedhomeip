@@ -37,6 +37,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
         ReturnErrorOnFailure(mIssuer.Initialize());
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
+
+        keySize = static_cast<uint16_t>(sizeof(serializedKey));
         ReturnErrorOnFailure(storage.SyncSetKeyValue(kOperationalCredentialsIssuerKeypairStorage, &serializedKey, keySize));
     }
     else

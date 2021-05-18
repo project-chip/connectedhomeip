@@ -597,8 +597,8 @@ private:
 - (void){{asCamelCased name}}:(ResponseHandler)responseHandler
 {{/if}}
 {
-{{#if (hasSpecificResponse name)}}
-    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}ResponseCallbackBridge(responseHandler, [self callbackQueue]);
+{{#if hasSpecificResponse}}
+    CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}CallbackBridge * onSuccess = new CHIP{{asCamelCased parent.name false}}Cluster{{asCamelCased responseName false}}CallbackBridge(responseHandler, [self callbackQueue]);
 {{else}}
     CHIPDefaultSuccessCallbackBridge * onSuccess = new CHIPDefaultSuccessCallbackBridge(responseHandler, [self callbackQueue]);
 {{/if}}

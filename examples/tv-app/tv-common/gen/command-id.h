@@ -271,6 +271,9 @@
 // Commands for cluster: WiFi Network Diagnostics
 #define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
+// Commands for cluster: Ethernet Network Diagnostics
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
+
 // Commands for cluster: Operational Credentials
 #define ZCL_SET_FABRIC_COMMAND_ID (0x00)
 #define ZCL_SET_FABRIC_RESPONSE_COMMAND_ID (0x01)

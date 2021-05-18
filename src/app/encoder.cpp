@@ -110,6 +110,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 | ContentLaunch                                                       | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
+| EthernetNetworkDiagnostics                                          | 0x0037 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
@@ -234,6 +235,9 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_SET_YEARDAY_SCHEDULE_COMMAND_ID (0x0E)
 #define ZCL_UNLOCK_DOOR_COMMAND_ID (0x01)
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
+
+#define ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0037
+#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
 
 #define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
 #define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x00)
@@ -2900,6 +2904,100 @@ PacketBufferHandle encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t seq
 PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadDoorLockClusterRevision", DOOR_LOCK_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster EthernetNetworkDiagnostics                                  | 0x0037 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetCounts                                                       |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * PacketRxCount                                                     | 0x0002 |
+| * PacketTxCount                                                     | 0x0003 |
+| * TxErrCount                                                        | 0x0004 |
+| * CollisionCount                                                    | 0x0005 |
+| * OverrunCount                                                      | 0x0006 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetCounts
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterResetCountsCommand(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ResetCounts", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlClusterSpecificCommand).Put8(seqNum).Put8(ZCL_RESET_COUNTS_COMMAND_ID);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverEthernetNetworkDiagnosticsAttributes", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PacketRxCount
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketRxCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsPacketRxCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PacketTxCount
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketTxCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsPacketTxCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute TxErrCount
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadTxErrCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsTxErrCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute CollisionCount
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadCollisionCountAttribute(uint8_t seqNum,
+                                                                                      EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsCollisionCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OverrunCount
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsOverrunCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum,
+                                                                                       EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsClusterRevision", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }

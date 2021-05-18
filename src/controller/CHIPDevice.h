@@ -96,12 +96,6 @@ public:
             // point.
             mExchangeMgr->CloseAllContextsForDelegate(this);
         }
-
-        if (mCommandSender != nullptr)
-        {
-            mCommandSender->Shutdown();
-            mCommandSender = nullptr;
-        }
     }
 
     enum class PairingWindowOption
@@ -149,9 +143,7 @@ public:
      * @brief
      *   Send the command in internal command sender.
      */
-    CHIP_ERROR SendCommands();
-
-    app::CommandSender * GetCommandSender() { return mCommandSender; }
+    CHIP_ERROR SendCommands(app::CommandSender * commandObj);
 
     /**
      * @brief Get the IP address and port assigned to the device.
@@ -191,8 +183,6 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
-
-        InitCommandSender();
     }
 
     /**
@@ -356,8 +346,9 @@ public:
     // the app side instead of register callbacks here. The IM delegate can provide more infomation then callback and it is
     // type-safe.
     // TODO: Implement interaction model delegate in the application.
-    void AddIMResponseHandler(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    void CancelIMResponseHandler();
+    void AddIMResponseHandler(app::Command * commandObj, Callback::Cancelable * onSuccessCallback,
+                              Callback::Cancelable * onFailureCallback);
+    void CancelIMResponseHandler(app::Command * commandObj);
 
     void ProvisioningComplete(uint16_t caseKeyId)
     {
@@ -411,8 +402,6 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    app::CommandSender * mCommandSender = nullptr;
-
     SecureSessionHandle mSecureSession = {};
 
     uint8_t mSequenceNumber = 0;
@@ -438,13 +427,6 @@ private:
      * @param[out] didLoad   Were the secure session params loaded by the call to this function.
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
-
-    /**
-     * @brief
-     *   Initialize internal command sender, required for sending commands over interaction model.
-     *   It's safe to call InitCommandSender multiple times, but only one will be available.
-     */
-    void InitCommandSender();
 
     CHIP_ERROR EstablishCASESession();
 
