@@ -57,6 +57,8 @@ static_library("framework") {
     "gen/CHIPClusters.h",
     "gen/CHIPClustersObjc.h",
     "gen/CHIPClustersObjc.mm",
+    "gen/chip-zcl-zpro-codec-api.h",
+    "gen/encoder.cpp",
   ]
 
   public_deps = [

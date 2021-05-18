@@ -2,6 +2,7 @@
     "name": "CHIP Application templates",
     "version": "chip-v1",
     "helpers": [
+        "partials/helper.js",
         "common/ListHelper.js",
         "common/StringHelper.js",
         "templates/app/helper.js",
@@ -80,6 +81,16 @@
             "path": "templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
+        },
+        {
+            "path": "templates/app/chip-zcl-zpro-codec-api.zapt",
+            "name": "CHIP ZCL API Header",
+            "output": "chip-zcl-zpro-codec-api.h"
+        },
+        {
+            "path": "templates/app/encoder-src.zapt",
+            "name": "CHIP ZCL API",
+            "output": "encoder.cpp"
         },
         {
             "path": "templates/app/client-command-macro.zapt",

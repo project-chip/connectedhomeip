@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1E1F24982636F84000FA0EA9 /* CHIPClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E1F24962636F84000FA0EA9 /* CHIPClusters.h */; };
 		1E1F24992636F84000FA0EA9 /* CHIPClusters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E1F24972636F84000FA0EA9 /* CHIPClusters.cpp */; };
+		1E20D3F42654310C008AEC53 /* encoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E20D3F32654310C008AEC53 /* encoder.cpp */; };
+		1E20D3F62654311F008AEC53 /* chip-zcl-zpro-codec-api.h in Headers */ = {isa = PBXBuildFile; fileRef = 1E20D3F52654311F008AEC53 /* chip-zcl-zpro-codec-api.h */; };
 		1E9BD1C72621AFF100FC3246 /* attribute-size.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */; };
 		1EB2248A264AE268008B5B83 /* attribute-list-byte-span.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EB22489264AE268008B5B83 /* attribute-list-byte-span.cpp */; };
 		1EB41B7B263C4CC60048E4C1 /* CHIPClustersTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */; };
@@ -80,6 +82,8 @@
 /* Begin PBXFileReference section */
 		1E1F24962636F84000FA0EA9 /* CHIPClusters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CHIPClusters.h; path = gen/CHIPClusters.h; sourceTree = "<group>"; };
 		1E1F24972636F84000FA0EA9 /* CHIPClusters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClusters.cpp; path = gen/CHIPClusters.cpp; sourceTree = "<group>"; };
+		1E20D3F32654310C008AEC53 /* encoder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = encoder.cpp; path = gen/encoder.cpp; sourceTree = "<group>"; };
+		1E20D3F52654311F008AEC53 /* chip-zcl-zpro-codec-api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "chip-zcl-zpro-codec-api.h"; path = "gen/chip-zcl-zpro-codec-api.h"; sourceTree = "<group>"; };
 		1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "gen/attribute-size.cpp"; sourceTree = "<group>"; };
 		1EB22489264AE268008B5B83 /* attribute-list-byte-span.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-list-byte-span.cpp"; path = "../../../app/util/attribute-list-byte-span.cpp"; sourceTree = "<group>"; };
 		1EB41B7A263C4CC60048E4C1 /* CHIPClustersTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPClustersTests.m; sourceTree = "<group>"; };
@@ -192,7 +196,9 @@
 		1EC4CE5825CC26AB00D7304F /* CHIPGeneratedFiles */ = {
 			isa = PBXGroup;
 			children = (
+				1E20D3F52654311F008AEC53 /* chip-zcl-zpro-codec-api.h */,
 				1E1F24972636F84000FA0EA9 /* CHIPClusters.cpp */,
+				1E20D3F32654310C008AEC53 /* encoder.cpp */,
 				1E1F24962636F84000FA0EA9 /* CHIPClusters.h */,
 				1EBCAE972632D69F007415A3 /* IMClusterCommandHandler.cpp */,
 				1E9BD1C62621AFF100FC3246 /* attribute-size.cpp */,
@@ -303,6 +309,7 @@
 				2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */,
 				1E1F24982636F84000FA0EA9 /* CHIPClusters.h in Headers */,
 				2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */,
+				1E20D3F62654311F008AEC53 /* chip-zcl-zpro-codec-api.h in Headers */,
 				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */,
 			);
@@ -436,6 +443,7 @@
 				2C222AD1255C620600E446B9 /* CHIPDevice.mm in Sources */,
 				1EC4CE4C25CC267700D7304F /* ember-print.cpp in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
+				1E20D3F42654310C008AEC53 /* encoder.cpp in Sources */,
 				1EC4CE3A25CC263E00D7304F /* reporting.cpp in Sources */,
 				1EC4CE5325CC267700D7304F /* chip-message-send.cpp in Sources */,
 				1E1F24992636F84000FA0EA9 /* CHIPClusters.cpp in Sources */,
