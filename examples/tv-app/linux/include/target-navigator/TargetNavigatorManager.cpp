@@ -52,7 +52,7 @@ std::vector<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTar
     {
         EmberAfNavigateTargetTargetInfo targetInfo;
         targetInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        targetInfo.identifier = ++i;
+        targetInfo.identifier = static_cast<uint8_t>(1 + i);
         targets.push_back(targetInfo);
     }
 
