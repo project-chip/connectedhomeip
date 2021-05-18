@@ -75,7 +75,7 @@ std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
     char callSign[]          = "exampleCSign";
     char name[]              = "exampleName";
 
-    for (uint16_t i = 0; i < maximumVectorSize; ++i)
+    for (int i = 0; i < maximumVectorSize; ++i)
     {
         EmberAfTvChannelInfo channelInfo;
         channelInfo.affiliateCallSign = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign));

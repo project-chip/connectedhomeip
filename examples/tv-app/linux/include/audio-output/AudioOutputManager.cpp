@@ -52,7 +52,7 @@ vector<EmberAfAudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo
     int maximumVectorSize = 3;
     char name[]           = "exampleName";
 
-    for (uint8_t i = 0; i < maximumVectorSize; ++i)
+    for (int i = 0; i < maximumVectorSize; ++i)
     {
         EmberAfAudioOutputInfo audioOutputInfo;
         audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
