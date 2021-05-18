@@ -273,9 +273,10 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     if (params.GetDeviceType().HasValue())
     {
         if MakeServiceSubtype (deviceTypeSubType, sizeof(deviceTypeSubType),
-                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDevceType().Value())).ok()){
-            subTypes[subTypeSize++] = deviceTypeSubType;
-        }
+                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDevceType().Value())).ok())
+            {
+                subTypes[subTypeSize++] = deviceTypeSubType;
+            }
     }
 
     service.mTextEntries   = textEntries;
