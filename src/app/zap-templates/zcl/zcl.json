@@ -1,6 +1,9 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [".", "./data-model/silabs/"],
+    "xmlRoot": [
+        ".",
+        "./data-model/silabs/"
+    ],
     "xmlFile": [
         "test-cluster.xml",
         "account-login-cluster.xml",
@@ -33,6 +36,8 @@
         "ha.xml",
         "ha-devices.xml",
         "pump-configuration-and-control-cluster.xml",
+        "pump-device.xml",
+        "pump-controller-device.xml",
         "cba.xml",
         "cba-devices.xml",
         "ota.xml",
@@ -59,9 +64,15 @@
     "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
+            "defaultResponsePolicy": [
+                "Always",
+                "Conditional",
+                "Never"
+            ]
         },
-        "bool": ["commandDiscovery"]
+        "bool": [
+            "commandDiscovery"
+        ]
     },
     "defaults": {
         "text": {

@@ -710,62 +710,6 @@ limitations under the License.
     </clusters>
   </deviceType>
   <deviceType>
-    <name>HA-pump</name>
-    <domain>HA</domain>
-    <typeName>HA Pump</typeName>
-    <zigbeeType>Coordinator</zigbeeType>
-    <profileId editable="false">0x0104</profileId>
-    <deviceId editable="false">0x0303</deviceId>
-    <clusters lockOthers="true">
-      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
-      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
-      <include client="false" server="true" clientLocked="true" serverLocked="true">Pump Configuration and Control</include>
-      <include client="false" server="true" clientLocked="true" serverLocked="true">On/off</include>
-      <include client="false" server="true" clientLocked="true" serverLocked="true">Scenes</include>
-      <include client="false" server="true" clientLocked="true" serverLocked="true">Groups</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Level control</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Pressure measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Temperature measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Flow measurement</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
-    </clusters>
-  </deviceType>
-  <deviceType>
-    <name>HA-pumpcontroller</name>
-    <domain>HA</domain>
-    <typeName>HA Pump Controller</typeName>
-    <zigbeeType>Coordinator</zigbeeType>
-    <profileId editable="false">0x0104</profileId>
-    <deviceId editable="false">0x0304</deviceId>
-    <clusters lockOthers="true">
-      <include client="false" server="true" clientLocked="true" serverLocked="true">Basic</include>
-      <include client="true" server="true" clientLocked="true" serverLocked="true">Identify</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Power Configuration</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Device Temperature Configuration</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Alarms</include>
-      <include client="true" server="false" clientLocked="true" serverLocked="true">Pump Configuration and Control</include>
-      <include client="true" server="false" clientLocked="true" serverLocked="true">On/off</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Scenes</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Groups</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Pressure measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Temperature measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Flow measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Level control</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Poll Control</include>
-      <include client="false" server="false" clientLocked="true" serverLocked="false">Electrical Measurement</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="true">Time</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Over the Air Bootloading</include>
-      <include client="false" server="false" clientLocked="false" serverLocked="false">Partition</include>
-    </clusters>
-  </deviceType>
-  <deviceType>
     <name>HA-pressuresensor</name>
     <domain>HA</domain>
     <typeName>HA Pressure Sensor</typeName>
