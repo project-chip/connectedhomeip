@@ -19,7 +19,6 @@ import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${dir_pw_unit_test}/test.gni")
 
@@ -29,14 +28,6 @@ if (current_os == "mac") {
 
 config("controller_wno_deprecate") {
   cflags = [ "-Wno-deprecated-declarations" ]
-}
-
-chip_data_model("python_data_model") {
-  cluster_sources = []
-
-  zap_pregenerated_dir = "gen"
-
-  use_default_client_callbacks = true
 }
 
 shared_library("ChipDeviceCtrl") {
@@ -78,9 +69,8 @@ shared_library("ChipDeviceCtrl") {
   }
 
   public_deps = [
-    ":python_data_model",
     "${chip_root}/src/app",
-    "${chip_root}/src/controller",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns",
@@ -89,7 +79,6 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
-  allow_circular_includes_from = [ "${chip_root}/src/controller" ]
   configs += [ ":controller_wno_deprecate" ]
 }
 

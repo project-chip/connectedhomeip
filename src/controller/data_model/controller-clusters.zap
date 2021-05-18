@@ -18,13 +18,13 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../app/zap-templates/zcl/zcl.json",
+      "path": "../../app/zap-templates/zcl/zcl.json",
       "version": "ZCL Test Data",
       "type": "zcl-properties"
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../app/zap-templates/app-templates.json",
+      "path": "../../app/zap-templates/app-templates.json",
       "version": "chip-v1",
       "type": "gen-templates-json"
     }
@@ -42,7 +42,7 @@
           "mfgCode": null,
           "define": "IDENTIFY_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "Identify",
@@ -135,7 +135,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroup",
@@ -284,7 +284,7 @@
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddScene",
@@ -517,7 +517,7 @@
           "mfgCode": null,
           "define": "ON_OFF_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "Off",
@@ -609,7 +609,7 @@
           "mfgCode": null,
           "define": "LEVEL_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "MoveToLevel",
@@ -741,7 +741,7 @@
           "mfgCode": null,
           "define": "DESCRIPTOR_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -860,8 +860,8 @@
               "code": 0,
               "mfgCode": 4098,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -895,24 +895,24 @@
               "code": 0,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
-              "outgoing": 1
+              "incoming": 0,
+              "outgoing": 0
             },
             {
               "name": "ShutDown",
               "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
-              "outgoing": 1
+              "incoming": 0,
+              "outgoing": 0
             },
             {
               "name": "Leave",
               "code": 2,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
-              "outgoing": 1
+              "incoming": 0,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1217,8 +1217,8 @@
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -1268,8 +1268,8 @@
               "code": 5,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
-              "outgoing": 1
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1333,7 +1333,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1341,39 +1341,39 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "UpdateWiFiNetwork",
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "AddThreadNetwork",
               "code": 6,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "UpdateThreadNetwork",
               "code": 8,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "RemoveNetwork",
               "code": 10,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1381,7 +1381,7 @@
               "code": 12,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1389,7 +1389,7 @@
               "code": 14,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1397,7 +1397,7 @@
               "code": 16,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -1433,39 +1433,39 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "AddWiFiNetworkResponse",
               "code": 3,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
-              "outgoing": 1
+              "incoming": 1,
+              "outgoing": 0
             },
             {
               "name": "UpdateWiFiNetworkResponse",
               "code": 5,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
-              "outgoing": 1
+              "incoming": 1,
+              "outgoing": 0
             },
             {
               "name": "AddThreadNetworkResponse",
               "code": 7,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
-              "outgoing": 1
+              "incoming": 1,
+              "outgoing": 0
             },
             {
               "name": "UpdateThreadNetworkResponse",
               "code": 9,
               "mfgCode": null,
               "source": "server",
-              "incoming": 0,
-              "outgoing": 1
+              "incoming": 1,
+              "outgoing": 0
             },
             {
               "name": "RemoveNetworkResponse",
@@ -1473,7 +1473,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "EnableNetworkResponse",
@@ -1481,7 +1481,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "DisableNetworkResponse",
@@ -1489,7 +1489,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1516,7 +1516,7 @@
           "mfgCode": null,
           "define": "GENERAL_DIAGNOSTICS_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -1598,7 +1598,7 @@
           "mfgCode": null,
           "define": "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "ResetCounts",
@@ -1734,7 +1734,7 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -1838,7 +1838,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1846,7 +1846,7 @@
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1854,7 +1854,7 @@
               "code": 6,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1862,7 +1862,7 @@
               "code": 9,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1870,7 +1870,7 @@
               "code": 10,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -1878,7 +1878,7 @@
               "code": 11,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -1914,7 +1914,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "OpCSRResponse",
@@ -1922,7 +1922,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "OpCertResponse",
@@ -1930,7 +1930,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -2041,7 +2041,7 @@
           "mfgCode": null,
           "define": "DOOR_LOCK_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "LockDoor",
@@ -2269,6 +2269,190 @@
               "source": "server",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "UnlockWithTimeoutResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetLogRecordResponse",
+              "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetPinResponse",
+              "code": 5,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetPinResponse",
+              "code": 6,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearPinResponse",
+              "code": 7,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearAllPinsResponse",
+              "code": 8,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetUserStatusResponse",
+              "code": 9,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "GetUserStatusResponse",
+              "code": 10,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "SetWeekdayScheduleResponse",
+              "code": 11,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetWeekdayScheduleResponse",
+              "code": 12,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearWeekdayScheduleResponse",
+              "code": 13,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetYeardayScheduleResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetYeardayScheduleResponse",
+              "code": 15,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearYeardayScheduleResponse",
+              "code": 16,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetHolidayScheduleResponse",
+              "code": 17,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetHolidayScheduleResponse",
+              "code": 18,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearHolidayScheduleResponse",
+              "code": 19,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetUserTypeResponse",
+              "code": 20,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetUserTypeResponse",
+              "code": 21,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "SetRfidResponse",
+              "code": 22,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "GetRfidResponse",
+              "code": 23,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearRfidResponse",
+              "code": 24,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearAllRfidsResponse",
+              "code": 25,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -2281,7 +2465,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2715,14 +2899,14 @@
           "mfgCode": null,
           "define": "WINDOW_COVERING_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "WindowCoveringUpOpen",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -2730,7 +2914,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -2738,7 +2922,7 @@
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -2746,32 +2930,32 @@
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "WindowCoveringGoToLiftPercentage",
               "code": 5,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "WindowCoveringGoToTiltValue",
               "code": 7,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "WindowCoveringGoToTiltPercentage",
               "code": 8,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -2959,7 +3143,7 @@
           "mfgCode": null,
           "define": "BARRIER_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "BarrierControlGoToPercent",
@@ -3088,7 +3272,7 @@
           "mfgCode": null,
           "define": "PUMP_CONFIG_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -3260,7 +3444,7 @@
           "mfgCode": null,
           "define": "THERMOSTAT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "SetpointRaiseLower",
@@ -3334,7 +3518,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             },
             {
@@ -3342,7 +3526,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 0
             }
           ],
@@ -3475,7 +3659,7 @@
           "mfgCode": null,
           "define": "COLOR_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "MoveToHue",
@@ -4390,7 +4574,7 @@
           "mfgCode": null,
           "define": "TEMP_MEASUREMENT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4510,7 +4694,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -4544,7 +4728,7 @@
               "code": 0,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -4552,7 +4736,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -4655,7 +4839,7 @@
           "mfgCode": null,
           "define": "WAKE_ON_LAN_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -4722,7 +4906,7 @@
           "mfgCode": null,
           "define": "TV_CHANNEL_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "ChangeChannel",
@@ -4853,7 +5037,7 @@
           "mfgCode": null,
           "define": "TARGET_NAVIGATOR_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "NavigateTarget",
@@ -4938,7 +5122,7 @@
           "mfgCode": null,
           "define": "MEDIA_PLAYBACK_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "MediaPlay",
@@ -5168,7 +5352,7 @@
           "mfgCode": null,
           "define": "MEDIA_INPUT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "SelectInput",
@@ -5268,14 +5452,14 @@
           "mfgCode": null,
           "define": "LOW_POWER_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "Sleep",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 0,
+              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -5329,14 +5513,14 @@
           "mfgCode": null,
           "define": "KEYPAD_INPUT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "SendKey",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -5372,7 +5556,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -5399,14 +5583,14 @@
           "mfgCode": null,
           "define": "CONTENT_LAUNCH_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "LaunchContent",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -5414,7 +5598,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -5450,7 +5634,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "LaunchURLResponse",
@@ -5458,7 +5642,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -5515,14 +5699,14 @@
           "mfgCode": null,
           "define": "AUDIO_OUTPUT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "SelectOutput",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -5530,7 +5714,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -5599,14 +5783,14 @@
           "mfgCode": null,
           "define": "APPLICATION_LAUNCHER_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "LaunchApp",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -5642,7 +5826,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -5656,36 +5840,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "catalog vendor id",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 0,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 0,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "application id",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 0,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -5714,7 +5868,7 @@
           "mfgCode": null,
           "define": "APPLICATION_BASIC_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
@@ -5871,14 +6025,14 @@
           "mfgCode": null,
           "define": "ACCOUNT_LOGIN_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "GetSetupPIN",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -5886,7 +6040,7 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -5922,7 +6076,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -5949,14 +6103,14 @@
           "mfgCode": null,
           "define": "TEST_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "Test",
               "code": 0,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -5964,15 +6118,15 @@
               "code": 1,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
-              "outgoing": 0
+              "incoming": 0,
+              "outgoing": 1
             },
             {
               "name": "TestSpecific",
               "code": 2,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -6008,7 +6162,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -6320,7 +6474,7 @@
           "mfgCode": null,
           "define": "BINDING_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "Bind",
@@ -6389,7 +6543,7 @@
           "mfgCode": null,
           "define": "GROUP_KEY_MANAGEMENT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
             {
