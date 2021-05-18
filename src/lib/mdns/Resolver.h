@@ -65,7 +65,7 @@ struct CommissionableNodeData
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
 };
 
-enum class DiscoveryFilterType
+enum class DiscoveryFilterType : uint8_t
 {
     kNone,
     kShort,
