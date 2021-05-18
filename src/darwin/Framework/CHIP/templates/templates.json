@@ -13,6 +13,10 @@
         {
             "name": "header",
             "path": "../../../../../src/app/zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "test_cluster",
+            "path": "partials/test_cluster.zapt"
         }
     ],
     "templates": [
