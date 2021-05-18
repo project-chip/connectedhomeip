@@ -10,7 +10,7 @@ ot-ctl ifconfig up
 ot-ctl thread start
 
 if [ "$1" = "responder" ]; then
-    chip-echo-responder
+    gdb -return-child-result -q -ex run -ex bt chip-echo-responder
 else
     sleep infinity
 fi
