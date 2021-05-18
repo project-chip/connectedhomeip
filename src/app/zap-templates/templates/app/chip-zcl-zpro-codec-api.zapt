@@ -1,5 +1,6 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 // Prevent multiple inclusion
 #pragma once
 
@@ -10,17 +11,9 @@
 
 {{> clusters_header}}
 
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
 {{> cluster_header}}
 
-{{#chip_server_cluster_commands}}
-/**
- * @brief
- *    Encode an {{asType name}} command for {{clusterName}} server into buffer including the APS frame
- */
-chip::System::PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(uint8_t seqNum, chip::EndpointId destinationEndpoint{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
-
-{{/chip_server_cluster_commands}}
 /**
  * @brief
  *    Encode a {{name}} server discover command into buffer including the APS frame
@@ -51,4 +44,5 @@ chip::System::PacketBufferHandle encode{{asCamelCased parent.name false}}Cluster
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
+{{/if}}
