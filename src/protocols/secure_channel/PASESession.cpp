@@ -99,7 +99,11 @@ void PASESession::Clear()
     mPairingComplete = false;
     mComputeVerifier = true;
     mConnectionState.Reset();
+    CloseExchange();
+}
 
+void PASESession::CloseExchange()
+{
     if (mExchangeCtxt != nullptr)
     {
         mExchangeCtxt->Close();
@@ -639,11 +643,7 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(const System::PacketBufferHandle
     mPairingComplete = true;
 
     // Close the exchange, as no additional messages are expected from the peer
-    if (mExchangeCtxt != nullptr)
-    {
-        mExchangeCtxt->Close();
-        mExchangeCtxt = nullptr;
-    }
+    CloseExchange();
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -685,11 +685,7 @@ CHIP_ERROR PASESession::HandleMsg3(const System::PacketBufferHandle & msg)
     mPairingComplete = true;
 
     // Close the exchange, as no additional messages are expected from the peer
-    if (mExchangeCtxt != nullptr)
-    {
-        mExchangeCtxt->Close();
-        mExchangeCtxt = nullptr;
-    }
+    CloseExchange();
 
     // Call delegate to indicate pairing completion
     mDelegate->OnSessionEstablished();
@@ -765,7 +761,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
 void PASESession::OnMessageReceived(ExchangeContext * exchange, const PacketHeader & packetHeader,
                                     const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg)
 {
-    CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, msg);
+    CHIP_ERROR err = ValidateReceivedMessage(exchange, packetHeader, payloadHeader, std::move(msg));
     SuccessOrExit(err);
 
     mConnectionState.SetPeerAddress(mMessageDispatch.GetPeerAddress());

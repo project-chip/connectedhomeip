@@ -244,7 +244,7 @@ private:
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);
+                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle && msg);
 
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
@@ -265,6 +265,8 @@ private:
 
     void SendErrorMsg(Spake2pErrorType errorCode);
     CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+
+    void CloseExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
