@@ -19,4 +19,3 @@
  * @file
  * @brief Implementation for the Fixed Label Server Cluster
  ***************************************************************************/
-
