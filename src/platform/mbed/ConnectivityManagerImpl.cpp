@@ -71,8 +71,8 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (mWiFiStationMode != val)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
-                        WiFiStationModeToStr(val));
+        ChipLogDetail(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                      WiFiStationModeToStr(val));
     }
 
     mWiFiStationMode = val;
@@ -195,7 +195,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
     // Validate the interface is available
     if (!_interface)
     {
-        ChipLogDetail(DeviceLayer, "No WiFiInterface found ");
+        ChipLogError(DeviceLayer, "No WiFiInterface found ");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -209,7 +209,7 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
 
     mIsProvisioned = true;
     auto status    = _interface->get_connection_status();
-    ChipLogError(DeviceLayer, "Connection result %d status: %s", error, status2str(status));
+    ChipLogDetail(DeviceLayer, "Connection result %d status: %s", error, status2str(status));
     _ProcessInterfaceChange(status);
     return CHIP_NO_ERROR;
 #endif
@@ -310,7 +310,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
         event.Type                          = DeviceEventType::kWiFiConnectivityChange;
         event.WiFiConnectivityChange.Result = kConnectivity_Established;
         PlatformMgr().PostEvent(&event);
-        ChipLogProgress(DeviceLayer, "Event - StationConnected");
+        ChipLogDetail(DeviceLayer, "Event - StationConnected");
     }
 
     // Update IPv4 address
@@ -341,7 +341,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             event.InternetConnectivityChange.IPv4 = kConnectivity_Established;
             event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
             PlatformMgr().PostEvent(&event);
-            ChipLogProgress(DeviceLayer, "New Ip4 address set");
+            ChipLogDetail(DeviceLayer, "New Ip4 address set");
         }
     }
 
@@ -372,7 +372,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
             event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
             event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
             PlatformMgr().PostEvent(&event);
-            ChipLogProgress(DeviceLayer, "New Ip6 address set");
+            ChipLogDetail(DeviceLayer, "New Ip6 address set");
         }
     }
     return CHIP_NO_ERROR;
@@ -388,7 +388,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
         event.Type                          = DeviceEventType::kWiFiConnectivityChange;
         event.WiFiConnectivityChange.Result = kConnectivity_Lost;
         PlatformMgr().PostEvent(&event);
-        ChipLogProgress(DeviceLayer, "Event - StationDisconnected");
+        ChipLogDetail(DeviceLayer, "Event - StationDisconnected");
     }
 
     // Update IPv4 address
@@ -401,7 +401,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
         event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
         PlatformMgr().PostEvent(&event);
-        ChipLogError(DeviceLayer, "Loss of Ip4 address");
+        ChipLogDetail(DeviceLayer, "Loss of Ip4 address");
     }
 
     if (mIp6Address != IPAddress::Any)
@@ -413,7 +413,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
         event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
         event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
         PlatformMgr().PostEvent(&event);
-        ChipLogError(DeviceLayer, "Loss of Ip6 address");
+        ChipLogDetail(DeviceLayer, "Loss of Ip6 address");
     }
 
     return CHIP_NO_ERROR;
@@ -421,7 +421,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationDisconnected()
 
 CHIP_ERROR ConnectivityManagerImpl::OnStationConnecting()
 {
-    ChipLogProgress(DeviceLayer, "Event - StationConnecting");
+    ChipLogDetail(DeviceLayer, "Event - StationConnecting");
 
     // Update WiFi station state and propagate it if necessary
     if (mWiFiStationState == kWiFiStationState_Connected)
@@ -444,7 +444,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnecting()
         event.InternetConnectivityChange.IPv4 = kConnectivity_Lost;
         event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
         PlatformMgr().PostEvent(&event);
-        ChipLogError(DeviceLayer, "Loss of Ip4 address");
+        ChipLogDetail(DeviceLayer, "Loss of Ip4 address");
     }
 
     if (mIp6Address != IPAddress::Any)
@@ -456,7 +456,7 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnecting()
         event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
         event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
         PlatformMgr().PostEvent(&event);
-        ChipLogError(DeviceLayer, "Loss of Ip6 address");
+        ChipLogDetail(DeviceLayer, "Loss of Ip6 address");
     }
 
     return CHIP_NO_ERROR;

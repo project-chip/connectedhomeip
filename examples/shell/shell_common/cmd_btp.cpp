@@ -67,11 +67,11 @@ int cmd_btp_adv(int argc, char ** argv)
     {
         if (adv_enabled)
         {
-            streamer_printf(sout, "BLE advertising already enabled");
+            streamer_printf(sout, "BLE advertising already enabled\r\n");
         }
         else
         {
-            streamer_printf(sout, "Starting BLE advertising");
+            streamer_printf(sout, "Starting BLE advertising\r\n");
             ConnectivityMgr().SetBLEAdvertisingEnabled(true);
         }
     }
@@ -79,12 +79,12 @@ int cmd_btp_adv(int argc, char ** argv)
     {
         if (adv_enabled)
         {
-            streamer_printf(sout, "Stopping BLE advertising");
+            streamer_printf(sout, "Stopping BLE advertising\r\n");
             ConnectivityMgr().SetBLEAdvertisingEnabled(false);
         }
         else
         {
-            streamer_printf(sout, "BLE advertising already stopped");
+            streamer_printf(sout, "BLE advertising already stopped\r\n");
         }
     }
     else
@@ -108,12 +108,12 @@ int cmd_btp_scan(int argc, char ** argv)
 
     if (strcmp(argv[0], "start") == 0)
     {
-        streamer_printf(sout, "Starting scanning over BLE");
+        streamer_printf(sout, "Starting scanning over BLE\r\n");
         // TODO: start scanning
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
-        streamer_printf(sout, "Stopping scanning over BLE");
+        streamer_printf(sout, "Stopping scanning over BLE\r\n");
         // TODO: stop scanning
     }
     else
@@ -137,12 +137,12 @@ int cmd_btp_connect(int argc, char ** argv)
 
     if (strcmp(argv[0], "start") == 0)
     {
-        streamer_printf(sout, "Connecting to the device over BLE");
+        streamer_printf(sout, "Connecting to the device over BLE\r\n");
         // connecting
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
-        streamer_printf(sout, "Disconnecting from the device");
+        streamer_printf(sout, "Disconnecting from the device\r\n");
         // disconnecting
     }
     else
