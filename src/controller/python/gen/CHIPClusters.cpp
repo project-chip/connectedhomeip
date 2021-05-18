@@ -20,7 +20,7 @@
 
 #include <cstdint>
 
-#include <app/chip-zcl-zpro-codec-api.h>
+#include "chip-zcl-zpro-codec-api.h"
 #include <lib/support/Span.h>
 
 namespace chip {
