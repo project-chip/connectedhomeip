@@ -11,4 +11,4 @@ ninja -C $CHIP_SDK_ROOT/out/debug
 cp $CHIP_SDK_ROOT/out/debug/controller/python/*.whl $TEST_CLIENT_ROOT/
 
 # Build Docker image
-source $TEST_CLIENT_ROOT/scripts/build_container.sh
+$TEST_CLIENT_ROOT/scripts/build_container.sh

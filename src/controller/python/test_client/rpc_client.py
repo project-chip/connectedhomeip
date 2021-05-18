@@ -77,11 +77,12 @@ async def main():
     
     print("List of containers: " + str(client.containers.list()))
 
-    # Create an RPC server
-    server_1 = xmlrpc.client.ServerProxy("http://localhost:5050/")
-    
     # Wait for the controller to start the rpc server
     time.sleep(1)
+    
+    # Create an RPC server
+    server_1 = xmlrpc.client.ServerProxy("http://localhost:5050/")
+
 
     # Invoke RPCs
     try: 
