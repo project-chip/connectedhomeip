@@ -119,5 +119,38 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
+{
+    size_t requiredSize;
+    switch (subtype.type)
+    {
+    case DiscoveryFilterType::kShort:
+        requiredSize = snprintf(buffer, bufferLen, "_S%03u", subtype.code);
+        break;
+    case DiscoveryFilterType::kLong:
+        requiredSize = snprintf(buffer, bufferLen, "_L%04u", subtype.code);
+        break;
+    case DiscoveryFilterType::kVendor:
+        requiredSize = snprintf(buffer, bufferLen, "_V%03u", subtype.code);
+        break;
+    case DiscoveryFilterType::kDeviceType:
+        requiredSize = snprintf(buffer, bufferLen, "_T%03u", subtype.code);
+        break;
+    case DiscoveryFilterType::kCommissioningMode:
+        if (subtype.code > 1)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        requiredSize = snprintf(buffer, bufferLen, "C%u", subtype.code);
+        break;
+    case DiscoveryFilterType::kCommissioningModeFromCommand:
+        // 1 is the only valid value
+        requiredSize = snprintf(buffer, bufferLen, "_A1");
+    case DiscoveryFilterType::kNone:
+        break;
+    }
+    return (requiredSize < (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
 } // namespace Mdns
 } // namespace chip

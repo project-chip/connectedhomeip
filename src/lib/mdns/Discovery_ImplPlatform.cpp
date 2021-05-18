@@ -235,28 +235,47 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
                                              strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
         }
 
-        snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
-        subTypes[subTypeSize++] = shortDiscriminatorSubtype;
-        snprintf(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype), "_L%04u", params.GetLongDiscriminator());
-        subTypes[subTypeSize++] = longDiscriminatorSubtype;
-        snprintf(commissioningModeSubType, sizeof(commissioningModeSubType), "_C%u", params.GetCommissioningMode() ? 1 : 0);
-        subTypes[subTypeSize++] = commissioningModeSubType;
+        if (MakeServiceSubtype(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator))).ok()) {
+            subTypes[subTypeSize++] = shortDiscriminatorSubtype;
+        }
+        if (MakeServiceSubtype(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator))).ok()) {
+            subTypes[subTypeSize++] = longDiscriminatorSubtype;
+        }
+        if (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubtype),
+                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode), params.GetCommissioningMode() ? 1 : 0)
+                .ok())
+        {
+            subTypes[subTypeSize++] = commissioningModeSubType;
+        }
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
-            snprintf(openWindowSubType, sizeof(openWindowSubType), "_A1");
-            subTypes[subTypeSize++] = openWindowSubType;
+            if (MakeServiceSubtype(openWindowSubType, sizeof(openWindowSubType),
+                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1))
+                    .ok())
+            {
+                subTypes[subTypeSize++] = openWindowSubType;
+            }
         }
     }
 
     if (params.GetVendorId().HasValue())
     {
-        snprintf(vendorSubType, sizeof(vendorSubType), "_V%u", params.GetVendorId().Value());
-        subTypes[subTypeSize++] = vendorSubType;
+        if (MakeServiceSubtype(vendorSubType, sizeof(vendorSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value()))
+                .ok())
+        {
+
+            subTypes[subTypeSize++] = vendorSubType;
+        }
     }
     if (params.GetDeviceType().HasValue())
     {
-        snprintf(deviceTypeSubType, sizeof(deviceTypeSubType), "_T%u", params.GetDeviceType().Value());
-        subTypes[subTypeSize++] = deviceTypeSubType;
+        if MakeServiceSubtype (deviceTypeSubType, sizeof(deviceTypeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDevceType().Value())).ok()){
+            subTypes[subTypeSize++] = deviceTypeSubType;
+        }
     }
 
     service.mTextEntries   = textEntries;

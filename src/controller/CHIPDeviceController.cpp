@@ -1435,7 +1435,7 @@ CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t l
     {
         mCommissionableNodes[i].Reset();
     }
-    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::kLong, long_discriminator);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
