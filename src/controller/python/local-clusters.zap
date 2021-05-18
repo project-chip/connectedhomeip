@@ -1592,6 +1592,7 @@
             }
           ]
         },
+        {
           "name": "Bridged Device Basic",
           "code": 57,
           "mfgCode": null,
