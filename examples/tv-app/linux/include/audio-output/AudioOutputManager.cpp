@@ -57,7 +57,7 @@ vector<EmberAfAudioOutputInfo> AudioOutputManager::proxyGetListOfAudioOutputInfo
         EmberAfAudioOutputInfo audioOutputInfo;
         audioOutputInfo.outputType = EMBER_ZCL_AUDIO_OUTPUT_TYPE_HDMI;
         audioOutputInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        audioOutputInfo.index      = ++i;
+        audioOutputInfo.index      = static_cast<uint8_t>(1 + i);
         audioOutputInfos.push_back(audioOutputInfo);
     }
 
