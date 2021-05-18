@@ -111,10 +111,10 @@ public:
                           chip::Inet::InterfaceId interface);
 
     /// Send a specific packet broadcast to all interfaces
-    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port);
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port);
 
     /// Send a specific packet broadcast to a specific interface
-    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port, chip::Inet::InterfaceId interface);
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {
@@ -138,7 +138,7 @@ public:
     bool IsListening() const;
 
 private:
-    static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
+    static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
     EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces

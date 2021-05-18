@@ -217,7 +217,7 @@ public:
      *  @param[in]    payload       A handle to the PacketBuffer object holding the message payload.
      */
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override;
+                           System::PacketBufferHandle && payload) override;
 
     /**
      * @brief
@@ -243,9 +243,6 @@ private:
 
     CHIP_ERROR Init(uint16_t myKeyId, uint32_t setupCode, SessionEstablishmentDelegate * delegate);
 
-    CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * exchange, const PacketHeader & packetHeader,
-                                       const PayloadHeader & payloadHeader, System::PacketBufferHandle & msg);
-
     static CHIP_ERROR ComputePASEVerifier(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                                           PASEVerifier & verifier);
 
@@ -264,7 +261,7 @@ private:
     CHIP_ERROR HandleMsg3(const System::PacketBufferHandle & msg);
 
     void SendErrorMsg(Spake2pErrorType errorCode);
-    CHIP_ERROR HandleErrorMsg(const System::PacketBufferHandle & msg);
+    void HandleErrorMsg(const System::PacketBufferHandle & msg);
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

@@ -94,7 +94,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
+CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
     ReturnErrorCodeIf(address.GetTransportType() != Type::kBle, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(mState == State::kNotReady, CHIP_ERROR_INCORRECT_STATE);
@@ -111,7 +111,7 @@ CHIP_ERROR BLEBase::SendMessage(const Transport::PeerAddress & address, System::
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEBase::SendAfterConnect(System::PacketBufferHandle msg)
+CHIP_ERROR BLEBase::SendAfterConnect(System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
 
@@ -158,7 +158,7 @@ void BLEBase::OnBleConnectionError(BLE_ERROR err)
     ChipLogDetail(Inet, "BleConnection Error: %s", ErrorStr(err));
 }
 
-void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle buffer)
+void BLEBase::OnEndPointMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle && buffer)
 {
     HandleMessageReceived(Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
 }

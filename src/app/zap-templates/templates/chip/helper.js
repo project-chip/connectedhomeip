@@ -319,13 +319,6 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
-function hasSpecificResponse(commandName)
-{
-  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this.parent, 'has_specific_response');
-  const filter = response => response.name == (commandName + 'Response');
-  return asPromise.call(this, Clusters.getServerResponses(clusterName).then(responses => responses.find(filter)));
-}
-
 function asCallbackAttributeType(attributeType)
 {
   switch (parseInt(attributeType)) {
@@ -432,4 +425,3 @@ exports.isWritableAttribute                   = isWritableAttribute;
 exports.isReportableAttribute                 = isReportableAttribute;
 exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
 exports.asCallbackAttributeType               = asCallbackAttributeType;
-exports.hasSpecificResponse                   = hasSpecificResponse;

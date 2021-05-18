@@ -106,15 +106,15 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                     return 0;
                 }
 
-                chip::ByteSpan * {{name}}Span   = reinterpret_cast<chip::ByteSpan *>(write ? src : dest); // {{type}}
-                uint16_t {{name}}RemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
-                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{name}}RemainingSpace, {{name}}Span) : ReadByteSpan(src + entryOffset, {{name}}RemainingSpace, {{name}}Span)))
+                chip::ByteSpan * {{asCamelCased name}}Span   = reinterpret_cast<chip::ByteSpan *>(write ? src : dest); // {{type}}
+                uint16_t {{asCamelCased name}}RemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+                if (CHIP_NO_ERROR != (write ? WriteByteSpan(dest + entryOffset, {{asCamelCased name}}RemainingSpace, {{asCamelCased name}}Span) : ReadByteSpan(src + entryOffset, {{asCamelCased name}}RemainingSpace, {{asCamelCased name}}Span)))
                 {
                     ChipLogError(Zcl, "Index %l is invalid. Not enough remaining space", index);
                     return 0;
                 }
 
-                entryLength = {{name}}Span->size();
+                entryLength = {{asCamelCased name}}Span->size();
                 {{else}}
                 copyListMember(dest, src, write, &entryOffset, entryLength); // {{type}}
                 {{/if}}

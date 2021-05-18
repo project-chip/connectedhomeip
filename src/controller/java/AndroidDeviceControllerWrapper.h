@@ -48,7 +48,7 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     // DeviceStatusDelegate implementation
-    void OnMessage(chip::System::PacketBufferHandle msg) override;
+    void OnMessage(chip::System::PacketBufferHandle && msg) override;
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation

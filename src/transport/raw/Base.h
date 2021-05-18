@@ -37,7 +37,7 @@ class RawTransportDelegate
 {
 public:
     virtual ~RawTransportDelegate() {}
-    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg) = 0;
+    virtual void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) = 0;
 };
 
 /**
@@ -63,7 +63,7 @@ public:
      *
      * On connection-oriented transports, sending a message implies connecting to the target first.
      */
-    virtual CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.

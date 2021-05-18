@@ -65,7 +65,7 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
 #endif
 }
 
-void HandleDataModelMessage(Messaging::ExchangeContext * exchange, System::PacketBufferHandle buffer)
+void HandleDataModelMessage(Messaging::ExchangeContext * exchange, System::PacketBufferHandle && buffer)
 {
 #ifdef USE_ZAP_CONFIG
     EmberApsFrame frame;
