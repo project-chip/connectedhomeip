@@ -147,7 +147,11 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
     if (delayMs <= EMBER_MAX_EVENT_CONTROL_DELAY_MS)
     {
         control->status = EMBER_EVENT_MS_TIME;
+// TODO: figure out how to handle events on platforms without the device layer (Android)
+// or split this file into client and server parts.
+#if !CHIP_DEVICE_LAYER_NONE
         chip::DeviceLayer::SystemLayer.StartTimer(delayMs, EventControlHandler, control);
+#endif
     }
     else
     {
@@ -161,7 +165,9 @@ void emberEventControlSetInactive(EmberEventControl * control)
     if (control->status != EMBER_EVENT_INACTIVE)
     {
         control->status = EMBER_EVENT_INACTIVE;
+#if !CHIP_DEVICE_LAYER_NONE
         chip::DeviceLayer::SystemLayer.CancelTimer(EventControlHandler, control);
+#endif
     }
 }
 
@@ -173,7 +179,9 @@ bool emberEventControlGetActive(EmberEventControl * control)
 void emberEventControlSetActive(EmberEventControl * control)
 {
     control->status = EMBER_EVENT_ZERO_DELAY;
+#if !CHIP_DEVICE_LAYER_NONE
     chip::DeviceLayer::SystemLayer.ScheduleWork(EventControlHandler, control);
+#endif
 }
 
 EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t delayQs)
