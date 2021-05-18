@@ -136,7 +136,7 @@ def test_device_connection_check(device, network):
     # Check provisioned status
     ret = device.send(command="device sta provisioned", expected_output="Done")
     assert ret != None and len(ret) > 1
-    #assert ret[-2].rstrip().lower() == "false"
+    assert ret[-2].rstrip().lower() == "false"
 
 
 pytest.mark.networktest

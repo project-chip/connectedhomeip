@@ -14,28 +14,30 @@
 # limitations under the License.
 
 import pytest
-import bluetooth
+
+from chip import ChipDeviceCtrl
+from chip.ChipBluezMgr import BluezManager as BleManager
 
 import logging
 log = logging.getLogger(__name__)
 
-DEVICE_BLE_NAME = "CHIP-3840"
+def scan_chip_ble_devices():
+    devices = []
+    bleMgr = BleManager(devMgr=ChipDeviceCtrl.ChipDeviceController())
+    bleMgr.scan("-t 5")
 
-def is_ble_device_visible(device_name):
-    nearby_devices = bluetooth.discover_devices(duration=20, lookup_names=True,
-                                            flush_cache=True, lookup_class=False)
+    for device in bleMgr.peripheral_list:
+        devIdInfo = bleMgr.get_peripheral_devIdInfo(device)
+        if devIdInfo:
+            log.info("Found CHIP device {}".format(device.Name))
+            devices.append(device)
 
-    log.info("Found {} devices".format(len(nearby_devices)))
+    return devices
 
-    for addr, name in nearby_devices:
-        try:
-            log.info("Device:   {} - {}".format(addr, name))
-        except UnicodeEncodeError:
-            log.info("Device:   {} - {}".format(addr, name.encode("utf-8", "replace")))
-        if name == device_name:
-            return True
-
-    return False
+@pytest.mark.smoketest
+def test_btp_device_visiable(device):
+    # Check if device is visible
+    assert len(scan_chip_ble_devices()) != 0
 
 @pytest.mark.bletest
 def test_btp_adv_check(device):
@@ -44,11 +46,11 @@ def test_btp_adv_check(device):
     assert ret != None
 
     # Check if device is visible
-    assert is_ble_device_visible(DEVICE_BLE_NAME) == True
+    assert len(scan_chip_ble_devices()) != 0
 
     # Disable advertisement
     ret = device.send(command="btp adv stop", expected_output="Done")
     assert ret != None
 
     # Check if device is not visible
-    assert is_ble_device_visible(DEVICE_BLE_NAME) == False
+    assert len(scan_chip_ble_devices()) == 0

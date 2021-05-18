@@ -22,9 +22,9 @@
 # See docs/BUILDING.md for more details
 
 AP_NAME=WIFI_AP
-AP_SSID=CHIPnet
-AP_PASSWORD="CHIPnet123"
-AP_DHCP_SERVER=192.168.4.1/24
+export AP_SSID=CHIPnet
+export AP_PASSWORD=CHIPnet123
+export AP_DHCP_SERVER=192.168.4.1/24
 
 set -ex
 
@@ -32,7 +32,6 @@ sudo apt-get install -fy \
     network-manager \
     net-tools \
     openbsd-inetd \
-    tcpdump \
     python3-virtualenv &&
     true
 
@@ -57,20 +56,21 @@ sudo service openbsd-inetd restart
 
 netstat -a | less | grep "echo"
 
-# Build chip tools for network testing
+# Build chip tools for functional testing
 mkdir -p $HOME/FunctionalTests
 
-source scripts/bootstrap.sh
+export FUNCTIONAL_TESTS_DIR=${HOME}/FunctionalTests
+
+source $HOME/CHIP/scripts/bootstrap.sh
 
 # Build CHIP main
-scripts/build/default.sh
+$HOME/CHIP/scripts/build/default.sh
 
-# Copy CLI tools to output directory (FunctionalTests)
-cp out/default/chip-echo-requester out/default/chip-echo-responder out/default/chip-tool $HOME/FunctionalTests
+export CHIP_TOOLS_DIR=${HOME}/CHIP/out/default
 
 # Install Python Chip Device Controller
 virtualenv $HOME/FunctionalTests/.venv
 source $HOME/FunctionalTests/.venv/bin/activate
-pip install out/default/controller/python/chip*.whl
-pip install -r src/test_driver/mbed-functional/requirements.txt
+pip install $HOME/CHIP/out/default/controller/python/chip*.whl
+pip install -r $HOME/CHIP/src/test_driver/mbed-functional/requirements.txt
 deactivate

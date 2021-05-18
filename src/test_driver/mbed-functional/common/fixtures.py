@@ -90,6 +90,13 @@ def echo_server(request):
         return (params[0], params[1])
     return None
 
+@pytest.fixture(scope="session")
+def chip_tools_dir(request):
+    if request.config.getoption('chip_tools_dir'):
+        chip_tools_dir = request.config.getoption('chip_tools_dir')
+        return chip_tools_dir
+    return None
+
 
 class BoardAllocation:
     def __init__(self, description: Mapping[str, Any]):
