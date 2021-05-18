@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/app/chip_data_model.gni")
 
-chip_data_model("tv-common") {
-  zap_file = "tv-app.zap"
+chip_data_model("data_model") {
+  zap_file = "controller-clusters.zap"
 
   zap_pregenerated_dir = "gen"
-  is_server = true
+
+  use_default_client_callbacks = true
 }

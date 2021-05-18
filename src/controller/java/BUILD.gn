@@ -28,7 +28,6 @@ shared_library("jni") {
     "AndroidBleConnectionDelegate.h",
     "AndroidBlePlatformDelegate.cpp",
     "AndroidBlePlatformDelegate.h",
-    "AndroidCommandHandler.cpp",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
     "AndroidKeyValueStoreManagerImpl.cpp",
@@ -40,7 +39,10 @@ shared_library("jni") {
     "JniTypeWrappers.h",
   ]
 
-  deps = [ "//src/lib" ]
+  deps = [
+     "${chip_root}/src/controller/data_model",
+     "${chip_root}/src/lib",
+   ]
 
   output_dir = "${root_out_dir}/lib/jni/${android_abi}"
 }
