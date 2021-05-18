@@ -15,40 +15,40 @@
 name: OnOff Tests
 
 config:
-  cluster: 'OnOff'
-  endpoint: 1
+    cluster: "OnOff"
+    endpoint: 1
 
 tests:
-  - label: 'Check on/off attribute value'
-    type: 'readAttribute'
-    name: 'onOff'
-    response:
-      error: 0
-      value: 0
-      type: 'bool'
+    - label: "Check on/off attribute value"
+      type: "readAttribute"
+      name: "onOff"
+      response:
+          error: 0
+          value: 0
+          type: "bool"
 
-  - label: 'Send On Command'
-    name: 'on'
-    response:
-      error: 0
+    - label: "Send On Command"
+      name: "on"
+      response:
+          error: 0
 
-  - label: 'Check on/off attribute value'
-    type: 'readAttribute'
-    name: 'onOff'
-    response:
-      error: 0
-      value: 1
-      type: 'bool'
+    - label: "Check on/off attribute value"
+      type: "readAttribute"
+      name: "onOff"
+      response:
+          error: 0
+          value: 1
+          type: "bool"
 
-  - label: 'Send Off Command'
-    name: 'off'
-    response:
-      error: 0
+    - label: "Send Off Command"
+      name: "off"
+      response:
+          error: 0
 
-  - label: 'Check on/off attribute value'
-    type: 'readAttribute'
-    name: 'onOff'
-    response:
-      error: 0
-      value: 0
-      type: 'bool'
+    - label: "Check on/off attribute value"
+      type: "readAttribute"
+      name: "onOff"
+      response:
+          error: 0
+          value: 0
+          type: "bool"

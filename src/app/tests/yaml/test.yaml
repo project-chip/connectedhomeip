@@ -15,25 +15,25 @@
 name: Test Cluster Tests
 
 config:
-  cluster: 'TestCluster'
-  endpoint: 1
+    cluster: "TestCluster"
+    endpoint: 1
 
 tests:
-  - label: 'Send Test Command'
-    name: 'test'
-    response:
-      error: 0
+    - label: "Send Test Command"
+      name: "test"
+      response:
+          error: 0
 
-  - label: 'Send Test Not Handled Command'
-    name: 'testNotHandled'
-    response:
-      error: 1
+    - label: "Send Test Not Handled Command"
+      name: "testNotHandled"
+      response:
+          error: 1
 
-  - label: 'Send Test Specific Command'
-    name: 'testSpecificCommand'
-    response:
-      error: 0
-      values:
-         - name: 'returnValue'
-           value: 7
-           type: 'int8u'
+    - label: "Send Test Specific Command"
+      name: "testSpecificCommand"
+      response:
+          error: 0
+          values:
+              - name: "returnValue"
+                value: 7
+                type: "int8u"
