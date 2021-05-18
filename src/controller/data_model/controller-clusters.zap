@@ -1593,6 +1593,7 @@
           ]
         },
         {
+<<<<<<< HEAD:src/controller/data_model/controller-clusters.zap
           "name": "Software Diagnostics",
           "code": 52,
           "mfgCode": null,

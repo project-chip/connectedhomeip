@@ -24,7 +24,7 @@ limitations under the License.
         <define>BRIDGED_DEVICE_BASIC_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <globalAttribute side="either" code="0xFFFD" value="3"/>
+        <globalAttribute side="either" code="0xFFFD" value="1"/>
 
         <attribute side="server" code="0x0001" define="VENDOR_NAME" type="CHAR_STRING" length="32" writable="false" default="" optional="true">VendorName</attribute>
         <attribute side="server" code="0x0002" define="VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true">VendorID</attribute>
