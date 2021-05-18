@@ -98,6 +98,12 @@
 // Definitions for cluster: Network Commissioning
 #define ZCL_NETWORK_COMMISSIONING_CLUSTER_ID (0x0031)
 
+// Definitions for cluster: General Diagnostics
+#define ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID (0x0033)
+
+// Definitions for cluster: Thread Network Diagnostics
+#define ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0035)
+
 // Definitions for cluster: WiFi Network Diagnostics
 #define ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0036)
 

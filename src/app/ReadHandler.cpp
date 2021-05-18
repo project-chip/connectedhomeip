@@ -52,7 +52,7 @@ void ReadHandler::Shutdown()
 {
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpAttributeClusterInfoList);
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(mpEventClusterInfoList);
-    ClearExistingExchangeContext();
+    AbortExistingExchangeContext();
     MoveToState(HandlerState::Uninitialized);
     mpDelegate                 = nullptr;
     mpAttributeClusterInfoList = nullptr;
@@ -60,7 +60,7 @@ void ReadHandler::Shutdown()
     mCurrentPriority           = PriorityLevel::Invalid;
 }
 
-CHIP_ERROR ReadHandler::ClearExistingExchangeContext()
+CHIP_ERROR ReadHandler::AbortExistingExchangeContext()
 {
     if (mpExchangeCtx != nullptr)
     {

@@ -101,8 +101,7 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         params.inetLayer       = &chip::DeviceLayer::InetLayer;
         params.pairingDelegate = &gPairingDelegate;
 
-        err = gOperationalCredentialsIssuer.Initialize();
-
+        err = gOperationalCredentialsIssuer.Initialize(gServerStorage);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Operational credentials issuer initialization failed: %s", chip::ErrorStr(err));

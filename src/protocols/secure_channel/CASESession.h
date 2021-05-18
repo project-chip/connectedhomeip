@@ -93,8 +93,8 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR WaitForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
-                                           SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR ListenForSessionEstablishment(OperationalCredentialSet * operationalCredentialSet, uint16_t myKeyId,
+                                             SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief

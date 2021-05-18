@@ -30,10 +30,13 @@
 
 #include <app/InteractionModelDelegate.h>
 #include <controller/CHIPDevice.h>
+#include <controller/CHIPOperationalCredentialsProvisioner.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPTLV.h>
+#include <credentials/CHIPOperationalCredentials.h>
+#include <lib/support/Span.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ExchangeMgrDelegate.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -77,6 +80,7 @@ struct ControllerInitParams
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
     DeviceAddressUpdateDelegate * mDeviceAddressUpdateDelegate = nullptr;
 #endif
+    OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -118,8 +122,6 @@ public:
 struct CommissionerInitParams : public ControllerInitParams
 {
     DevicePairingDelegate * pairingDelegate = nullptr;
-
-    OperationalCredentialsDelegate * operationalCredentialsDelegate = nullptr;
 };
 
 /**
@@ -270,11 +272,21 @@ protected:
     void ReleaseDevice(uint16_t index);
     void ReleaseDeviceById(NodeId remoteDeviceId);
     CHIP_ERROR InitializePairedDeviceList();
-    CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+    CHIP_ERROR SetPairedDeviceList(ByteSpan pairedDeviceSerializedSet);
     ControllerDeviceInitParams GetControllerDeviceInitParams();
+
+    void PersistNextKeyId();
 
     Transport::AdminId mAdminId = 0;
     Transport::AdminPairingTable mAdmins;
+
+    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
+
+    Credentials::ChipCertificateSet mCertificates;
+    Credentials::OperationalCredentialSet mCredentials;
+    Credentials::CertificateKeyId mRootKeyId;
+
+    uint16_t mNextKeyId = 0;
 
 private:
     //////////// ExchangeDelegate Implementation ///////////////
@@ -294,6 +306,8 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_MDNS
 
     void ReleaseAllDevices();
+
+    CHIP_ERROR LoadLocalCredentials(Transport::AdminPairingInfo * admin);
 };
 
 /**
@@ -427,7 +441,6 @@ public:
 #endif
 
 private:
-    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
     DevicePairingDelegate * mPairingDelegate;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
@@ -450,8 +463,6 @@ private:
 
     void PersistDeviceList();
 
-    void PersistNextKeyId();
-
     void FreeRendezvousSession();
 
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
@@ -460,12 +471,75 @@ private:
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(NodeId remoteDeviceId);
-    CHIP_ERROR OnOperationalCertificateSigningRequest(NodeId node, const ByteSpan & csr);
-    CHIP_ERROR SendOperationalCertificate(NodeId remoteDeviceId, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
-    CHIP_ERROR SendTrustedRootCertificate(NodeId remoteDeviceId, const ByteSpan & certBuf);
+    /* This function sends an OpCSR request to the device.
+       The function does not hold a refernce to the device object.
+     */
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(Device * device);
+    /* This function sends the operational credentials to the device.
+       The function does not hold a refernce to the device object.
+     */
+    CHIP_ERROR SendOperationalCertificate(Device * device, const ByteSpan & opCertBuf, const ByteSpan & icaCertBuf);
+    /* This function sends the trusted root certificate to the device.
+       The function does not hold a refernce to the device object.
+     */
+    CHIP_ERROR SendTrustedRootCertificate(Device * device);
 
-    uint16_t mNextKeyId = 0;
+    /* This function is called by the commissioner code when the device completes
+       the operational credential provisioning process.
+       The function does not hold a refernce to the device object.
+       */
+    CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(Device * device);
+
+    /* Callback when the previously sent CSR request results in failure */
+    static void OnCSRFailureResponse(void * context, uint8_t status);
+
+    /**
+     * @brief
+     *   This function is called by the IM layer when the commissioner receives the CSR from the device.
+     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *
+     * @param[in] context         The context provided while registering the callback.
+     * @param[in] CSR             The Certificate Signing Request.
+     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
+     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
+     * @param[in] Signature       Cryptographic signature generated for the fields in the response message.
+     */
+    static void OnOperationalCertificateSigningRequest(void * context, ByteSpan CSR, ByteSpan CSRNonce, ByteSpan VendorReserved1,
+                                                       ByteSpan VendorReserved2, ByteSpan VendorReserved3, ByteSpan Signature);
+
+    /* Callback when adding operational certs to device results in failure */
+    static void OnAddOpCertFailureResponse(void * context, uint8_t status);
+    /* Callback when the device confirms that it has added the operational certificates */
+    static void OnOperationalCertificateAddResponse(void * context, uint8_t StatusCode, uint64_t FabricIndex, uint8_t * DebugText);
+
+    /* Callback when the device confirms that it has added the root certificate */
+    static void OnRootCertSuccessResponse(void * context);
+    /* Callback called when adding root cert to device results in failure */
+    static void OnRootCertFailureResponse(void * context, uint8_t status);
+
+    /**
+     * @brief
+     *   This function processes the CSR sent by the device.
+     *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
+     *
+     * @param[in] CSR             The Certificate Signing Request.
+     * @param[in] CSRNonce        The Nonce sent by us when we requested the CSR.
+     * @param[in] VendorReserved1 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved2 vendor-specific information that may aid in device commissioning.
+     * @param[in] VendorReserved3 vendor-specific information that may aid in device commissioning.
+     * @param[in] Signature       Cryptographic signature generated for all the above fields.
+     */
+    CHIP_ERROR ProcessOpCSR(const ByteSpan & CSR, const ByteSpan & CSRNonce, const ByteSpan & VendorReserved1,
+                            const ByteSpan & VendorReserved2, const ByteSpan & VendorReserved3, const ByteSpan & Signature);
+
+    Callback::Callback<OperationalCredentialsClusterOpCSRResponseCallback> mOpCSRResponseCallback;
+    Callback::Callback<OperationalCredentialsClusterOpCertResponseCallback> mOpCertResponseCallback;
+    Callback::Callback<DefaultSuccessCallback> mRootCertResponseCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCSRFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnCertFailureCallback;
+    Callback::Callback<DefaultFailureCallback> mOnRootCertFailureCallback;
 
     PASESession mPairingSession;
 };

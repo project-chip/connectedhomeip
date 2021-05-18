@@ -49,7 +49,9 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::init(CHIPPersistentStorageDelegat
 
     if (err == CHIP_NO_ERROR) {
         // If keys were loaded, or generated, let's get the certificate issuer ID
-        err = SetIssuerID(storage);
+
+        // TODO - enable generating a random issuer ID and saving it in persistent storage
+        // err = SetIssuerID(storage);
     }
 
     CHIP_LOG_ERROR("CHIPOperationalCredentialsDelegate::init returning %d", err);

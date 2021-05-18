@@ -31,16 +31,6 @@
             "path": "templates/chip/encoder-src.zapt",
             "name": "CHIP ZCL API",
             "output": "src/app/encoder.cpp"
-        },
-        {
-            "path": "templates/chip/python-CHIPClusters-cpp.zapt",
-            "name": "CHIP ZCL API for Python (native code)",
-            "output": "src/controller/python/chip/clusters/CHIPClusters.cpp"
-        },
-        {
-            "path": "templates/chip/python-CHIPClusters-py.zapt",
-            "name": "CHIP ZCL API for Python",
-            "output": "src/controller/python/chip/clusters/CHIPClusters.py"
         }
     ]
 }

@@ -23,7 +23,11 @@
 
 #include <app/util/basic-types.h>
 #include <core/CHIPPersistentStorageDelegate.h>
+#include <credentials/CHIPOperationalCredentials.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <support/CHIPMem.h>
 #include <support/DLLUtil.h>
+#include <support/Span.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -37,10 +41,7 @@ static constexpr AdminId kUndefinedAdminId = UINT16_MAX;
 constexpr char kAdminTableKeyPrefix[] = "CHIPAdmin";
 constexpr char kAdminTableCountKey[]  = "CHIPAdminNextId";
 
-struct OperationalCredentials
-{
-    uint32_t placeholder;
-};
+constexpr uint16_t kMaxChipCertSize = 600;
 
 struct AccessControlList
 {
@@ -65,6 +66,16 @@ class DLL_EXPORT AdminPairingInfo
 public:
     AdminPairingInfo() { Reset(); }
 
+    ~AdminPairingInfo()
+    {
+        if (mOperationalKey != nullptr)
+        {
+            chip::Platform::Delete(mOperationalKey);
+        }
+        ReleaseRootCert();
+        ReleaseOperationalCert();
+    }
+
     NodeId GetNodeId() const { return mNodeId; }
     void SetNodeId(NodeId nodeId) { mNodeId = nodeId; }
 
@@ -77,9 +88,35 @@ public:
     uint16_t GetVendorId() const { return mVendorId; }
     void SetVendorId(uint16_t vendorId) { mVendorId = vendorId; }
 
-    const OperationalCredentials & GetOperationalCreds() const { return mOpCred; }
-    OperationalCredentials & GetOperationalCreds() { return mOpCred; }
-    void SetOperationalCreds(const OperationalCredentials & creds) { mOpCred = creds; }
+    Crypto::P256Keypair * GetOperationalKey()
+    {
+        if (mOperationalKey == nullptr)
+        {
+            mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
+            mOperationalKey->Initialize();
+        }
+        return mOperationalKey;
+    }
+    CHIP_ERROR SetOperationalKey(const Crypto::P256Keypair & key);
+
+    bool AreCredentialsAvailable() const
+    {
+        return (mRootCert != nullptr && mOperationalCert != nullptr && mRootCertLen != 0 && mOpCertLen != 0);
+    }
+
+    CHIP_ERROR GetCredentials(Credentials::OperationalCredentialSet & credentials, Credentials::ChipCertificateSet & certSet,
+                              Credentials::CertificateKeyId & rootKeyId);
+
+    const uint8_t * GetTrustedRoot(uint16_t & size)
+    {
+        size = mRootCertLen;
+        return mRootCert;
+    }
+
+    // TODO - Update these APIs to take ownership of the buffer, instead of copying
+    //        internally.
+    CHIP_ERROR SetOperationalCert(const chip::ByteSpan & cert);
+    CHIP_ERROR SetRootCert(const chip::ByteSpan & cert);
 
     const AccessControlList & GetACL() const { return mACL; }
     AccessControlList & GetACL() { return mACL; }
@@ -96,18 +133,33 @@ public:
         mAdmin    = kUndefinedAdminId;
         mFabricId = kUndefinedFabricId;
         mVendorId = kUndefinedVendorId;
+
+        if (mOperationalKey != nullptr)
+        {
+            mOperationalKey->Initialize();
+        }
+        ReleaseRootCert();
+        ReleaseOperationalCert();
     }
 
     friend class AdminPairingTable;
 
 private:
-    AdminId mAdmin     = kUndefinedAdminId;
     NodeId mNodeId     = kUndefinedNodeId;
     FabricId mFabricId = kUndefinedFabricId;
+    AdminId mAdmin     = kUndefinedAdminId;
     uint16_t mVendorId = kUndefinedVendorId;
 
-    OperationalCredentials mOpCred;
     AccessControlList mACL;
+
+    Crypto::P256Keypair * mOperationalKey = nullptr;
+
+    uint8_t * mRootCert            = nullptr;
+    uint16_t mRootCertLen          = 0;
+    uint16_t mRootCertAllocatedLen = 0;
+    uint8_t * mOperationalCert     = nullptr;
+    uint16_t mOpCertLen            = 0;
+    uint16_t mOpCertAllocatedLen   = 0;
 
     static constexpr size_t KeySize();
 
@@ -117,12 +169,22 @@ private:
     CHIP_ERROR FetchFromKVS(PersistentStorageDelegate * kvs);
     static CHIP_ERROR DeleteFromKVS(PersistentStorageDelegate * kvs, AdminId id);
 
+    void ReleaseOperationalCert();
+    void ReleaseRootCert();
+
     struct StorableAdminPairingInfo
     {
         uint16_t mAdmin;    /* This field is serialized in LittleEndian byte order */
         uint64_t mNodeId;   /* This field is serialized in LittleEndian byte order */
         uint64_t mFabricId; /* This field is serialized in LittleEndian byte order */
         uint16_t mVendorId; /* This field is serialized in LittleEndian byte order */
+
+        uint16_t mRootCertLen; /* This field is serialized in LittleEndian byte order */
+        uint16_t mOpCertLen;   /* This field is serialized in LittleEndian byte order */
+
+        Crypto::P256SerializedKeypair mOperationalKey;
+        uint8_t mRootCert[kMaxChipCertSize];
+        uint8_t mOperationalCert[kMaxChipCertSize];
     };
 };
 

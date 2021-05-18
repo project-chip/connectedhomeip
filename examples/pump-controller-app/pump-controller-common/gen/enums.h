@@ -347,6 +347,18 @@ typedef enum
     EMBER_ZCL_BLOCK_PERIOD_DURATION_TYPE_TIMEBASE_MONTHS  = 3,
 } EmberAfBlockPeriodDurationTypeTimebase;
 
+// Enum for BootReasonType
+typedef enum
+{
+    EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED               = 0,
+    EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT           = 1,
+    EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET           = 2,
+    EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET   = 3,
+    EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET   = 4,
+    EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED = 5,
+    EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET            = 6,
+} EmberAfBootReasonType;
+
 // Enum for CO2Unit
 typedef enum
 {
@@ -1471,6 +1483,22 @@ typedef enum
     EMBER_ZCL_GROUP_KEY_SECURITY_POLICY_LOW_LATENCY = 1,
 } EmberAfGroupKeySecurityPolicy;
 
+// Enum for HardwareFaultType
+typedef enum
+{
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_UNSPECIFIED               = 0,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO                     = 1,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR                    = 2,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_RESETTABLE_OVER_TEMP      = 3,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_NON_RESETTABLE_OVER_TEMP  = 4,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE              = 5,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_VISUAL_DISPLAY_FAULT      = 6,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_AUDIO_OUTPUT_FAULT        = 7,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT      = 8,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_NON_VOLATILE_MEMORY_ERROR = 9,
+    EMBER_ZCL_HARDWARE_FAULT_TYPE_TAMPER_DETECTED           = 10,
+} EmberAfHardwareFaultType;
+
 // Enum for HeatAndCoolingSpecificAlarmGroups
 typedef enum
 {
@@ -1622,6 +1650,16 @@ typedef enum
 {
     EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT = 0,
 } EmberAfIdentifyEffectVariant;
+
+// Enum for InterfaceType
+typedef enum
+{
+    EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED = 0,
+    EMBER_ZCL_INTERFACE_TYPE_WI_FI       = 1,
+    EMBER_ZCL_INTERFACE_TYPE_ETHERNET    = 2,
+    EMBER_ZCL_INTERFACE_TYPE_CELLULAR    = 3,
+    EMBER_ZCL_INTERFACE_TYPE_THREAD      = 4,
+} EmberAfInterfaceType;
 
 // Enum for KeyIndex
 typedef enum
@@ -2123,6 +2161,24 @@ typedef enum
     EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR            = 19,
 } EmberAfNetworkCommissioningError;
 
+// Enum for NetworkFault
+typedef enum
+{
+    EMBER_ZCL_NETWORK_FAULT_UNSPECIFIED      = 0,
+    EMBER_ZCL_NETWORK_FAULT_LINK_DOWN        = 1,
+    EMBER_ZCL_NETWORK_FAULT_HARDWARE_FAILURE = 2,
+    EMBER_ZCL_NETWORK_FAULT_NETWORK_JAMMED   = 3,
+} EmberAfNetworkFault;
+
+// Enum for NetworkFaultType
+typedef enum
+{
+    EMBER_ZCL_NETWORK_FAULT_TYPE_UNSPECIFIED       = 0,
+    EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE  = 1,
+    EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED    = 2,
+    EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED = 3,
+} EmberAfNetworkFaultType;
+
 // Enum for NotificationScheme
 typedef enum
 {
@@ -2429,6 +2485,18 @@ typedef enum
     EMBER_ZCL_PUSH_HISTORICAL_PAYMENT_DATA_YEAR  = 3584,
 } EmberAfPushHistoricalPaymentData;
 
+// Enum for RadioFaultType
+typedef enum
+{
+    EMBER_ZCL_RADIO_FAULT_TYPE_UNSPECIFIED    = 0,
+    EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT    = 1,
+    EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT = 2,
+    EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT   = 3,
+    EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT      = 4,
+    EMBER_ZCL_RADIO_FAULT_TYPE_BLE_FAULT      = 5,
+    EMBER_ZCL_RADIO_FAULT_TYPE_ETHERNET_FAULT = 6,
+} EmberAfRadioFaultType;
+
 // Enum for RegisterTier
 typedef enum
 {
@@ -2505,6 +2573,18 @@ typedef enum
     EMBER_ZCL_RESULT_TYPE_ACCEPTED_SUPPLY_DISABLED        = 17,
     EMBER_ZCL_RESULT_TYPE_ACCEPTED_SUPPLY_ARMED           = 18,
 } EmberAfResultType;
+
+// Enum for RoutingRole
+typedef enum
+{
+    EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED       = 0,
+    EMBER_ZCL_ROUTING_ROLE_UNASSIGNED        = 1,
+    EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE = 2,
+    EMBER_ZCL_ROUTING_ROLE_END_DEVICE        = 3,
+    EMBER_ZCL_ROUTING_ROLE_REED              = 4,
+    EMBER_ZCL_ROUTING_ROLE_ROUTER            = 5,
+    EMBER_ZCL_ROUTING_ROLE_LEADER            = 6,
+} EmberAfRoutingRole;
 
 // Enum for SampleType
 typedef enum
