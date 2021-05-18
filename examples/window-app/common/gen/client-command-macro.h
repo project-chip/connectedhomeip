@@ -2215,6 +2215,15 @@
                                                                                                                                    \
                                                                       ZCL_RESET_COUNTS_COMMAND_ID, "", );
 
+/** @brief Command description for ResetCounts
+ *
+ * Command: ResetCounts
+ */
+#define emberAfFillCommandEthernet                                                                                                 \
+    Network DiagnosticsClusterResetCounts() emberAfFillExternalBuffer(mask,                                                        \
+                                                                                                                                   \
+                                                                      ZCL_RESET_COUNTS_COMMAND_ID, "", );
+
 /** @brief Command description for SetFabric
  *
  * Command: SetFabric

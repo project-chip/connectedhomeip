@@ -523,6 +523,21 @@
 #define ZCL_CURRENT_MAX_RATE_ATTRIBUTE_ID (0x000B)
 #define ZCL_OVERRUN_COUNT_ATTRIBUTE_ID (0x000C)
 
+// Attribute ids for cluster: Ethernet Network Diagnostics
+
+// Client attributes
+
+// Server attributes
+#define ZCL_PHY_RATE_ATTRIBUTE_ID (0x0000)
+#define ZCL_FULL_DUPLEX_ATTRIBUTE_ID (0x0001)
+#define ZCL_PACKET_RX_COUNT_ATTRIBUTE_ID (0x0002)
+#define ZCL_PACKET_TX_COUNT_ATTRIBUTE_ID (0x0003)
+#define ZCL_TX_ERR_COUNT_ATTRIBUTE_ID (0x0004)
+#define ZCL_COLLISION_COUNT_ATTRIBUTE_ID (0x0005)
+#define ZCL_ETHERNET_OVERRUN_COUNT_ATTRIBUTE_ID (0x0006)
+#define ZCL_CARRIER_DETECT_ATTRIBUTE_ID (0x0007)
+#define ZCL_TIME_SINCE_RESET_ATTRIBUTE_ID (0x0008)
+
 // Attribute ids for cluster: Switch
 
 // Client attributes

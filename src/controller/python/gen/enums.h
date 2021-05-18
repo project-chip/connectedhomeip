@@ -2265,6 +2265,21 @@ typedef enum
     EMBER_ZCL_ORIGINATING_DEVICE_IN_HOME_DISPLAY_DEVICE   = 2,
 } EmberAfOriginatingDevice;
 
+// Enum for PHYRateType
+typedef enum
+{
+    EMBER_ZCL_PHY_RATE_TYPE_10_M   = 0,
+    EMBER_ZCL_PHY_RATE_TYPE_100_M  = 1,
+    EMBER_ZCL_PHY_RATE_TYPE_1000_M = 2,
+    EMBER_ZCL_PHY_RATE_TYPE_2__5_G = 3,
+    EMBER_ZCL_PHY_RATE_TYPE_5_G    = 4,
+    EMBER_ZCL_PHY_RATE_TYPE_10_G   = 5,
+    EMBER_ZCL_PHY_RATE_TYPE_40_G   = 6,
+    EMBER_ZCL_PHY_RATE_TYPE_100_G  = 7,
+    EMBER_ZCL_PHY_RATE_TYPE_200_G  = 8,
+    EMBER_ZCL_PHY_RATE_TYPE_400_G  = 9,
+} EmberAfPHYRateType;
+
 // Enum for PasswordType
 typedef enum
 {

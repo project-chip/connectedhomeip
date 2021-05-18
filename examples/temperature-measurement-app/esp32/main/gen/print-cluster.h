@@ -200,6 +200,13 @@
 #define CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_SERVER) || defined(ZCL_USING_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                     \
+    { ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID, 55, "Ethernet Network Diagnostics" },
+#else
+#define CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_SWITCH_CLUSTER_SERVER) || defined(ZCL_USING_SWITCH_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_SWITCH_CLUSTER { ZCL_SWITCH_CLUSTER_ID, 59, "Switch" },
 #else
@@ -936,6 +943,7 @@
     CHIP_PRINTCLUSTER_GENERAL_DIAGNOSTICS_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_THREAD_NETWORK_DIAGNOSTICS_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_TRUSTED_ROOT_CERTIFICATES_CLUSTER                                                                            \
