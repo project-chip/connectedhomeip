@@ -446,7 +446,8 @@ CHIP_ERROR GetAddrInfo(void * context, MdnsResolveCallback callback, uint32_t in
         sdCtx->textEntries.push_back(TextEntry{ strdup(key), reinterpret_cast<const uint8_t *>(strdup(value)), valueLen });
     }
 
-    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6, hostname, OnGetAddrInfo, sdCtx);
+    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, kDNSServiceProtocol_IPv4 | kDNSServiceProtocol_IPv6, hostname,
+                                OnGetAddrInfo, sdCtx);
     VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
     err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
