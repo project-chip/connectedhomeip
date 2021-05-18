@@ -246,7 +246,7 @@ combination with JLinkRTTClient as follows:
 
     \*\* Currently, chip-tool for Mac or Linux do not yet have the Thread
     provisioning feature
-    `chip-tool bypass <Global ipv6 address of the node> 11097`
+    `chip-tool bypass <Global ipv6 address of the node> 5540`
 
     You can provision the Chip device using Chip tool Android or iOS app or
     through CLI commands on your OT BR
