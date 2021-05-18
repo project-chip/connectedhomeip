@@ -52,7 +52,7 @@ typedef NS_ENUM(NSUInteger, CHIPOptionalQRCodeInfoType) {
 @property (nonatomic, strong) NSNumber * setUpPINCode;
 
 @property (nonatomic, strong) NSString * serialNumber;
-- (NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
+- (nullable NSArray<CHIPOptionalQRCodeInfo *> *)getAllOptionalVendorData:(NSError * __autoreleasing *)error;
 
 @end
 

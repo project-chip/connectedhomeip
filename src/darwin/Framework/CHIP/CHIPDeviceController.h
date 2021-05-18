@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * @param[in] storageDelegate The delegate for persistent storage
  */
-- (BOOL)startup:(_Nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
+- (BOOL)startup:(nullable id<CHIPPersistentStorageDelegate>)storageDelegate;
 
 /**
  * Shutdown the CHIP Stack. Repeated calls to shutdown without calls to startup in between are NO-OPs.
