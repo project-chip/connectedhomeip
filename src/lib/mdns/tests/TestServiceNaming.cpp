@@ -84,7 +84,7 @@ void TestExtractIdFromInstanceName(nlTestSuite * inSuite, void * inContext)
 void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
 {
     // TODO(cecille): These need to be changed to remove leading zeros
-    static constexpr size_t kSize = 16;
+    constexpr size_t kSize = 16;
     char buffer[kSize];
     DiscoveryFilter filter;
 

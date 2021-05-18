@@ -266,7 +266,6 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         if (MakeServiceSubtype(vendorSubType, sizeof(vendorSubType),
                                DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value())) == CHIP_NO_ERROR)
         {
-
             subTypes[subTypeSize++] = vendorSubType;
         }
     }

@@ -166,10 +166,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         break;
     case DiscoveryFilterType::kNone:
         requiredSize = 0;
-        if (bufferLen > 0)
-        {
-            buffer[0] = '\0';
-        }
+        buffer[0]    = '\0';
         break;
     }
     return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
