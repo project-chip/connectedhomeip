@@ -236,24 +236,25 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         }
 
         if (MakeServiceSubtype(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype),
-                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator()))).ok()) {
+                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator())) == CHIP_NO_ERROR)
+        {
             subTypes[subTypeSize++] = shortDiscriminatorSubtype;
         }
         if (MakeServiceSubtype(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype),
-                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator))).ok()) {
+                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator())) == CHIP_NO_ERROR)
+        {
             subTypes[subTypeSize++] = longDiscriminatorSubtype;
         }
-        if (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubtype),
-                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode), params.GetCommissioningMode() ? 1 : 0)
-                .ok())
+        if (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kCommissioningMode, params.GetCommissioningMode() ? 1 : 0)) ==
+            CHIP_NO_ERROR)
         {
             subTypes[subTypeSize++] = commissioningModeSubType;
         }
         if (params.GetCommissioningMode() && params.GetOpenWindowCommissioningMode())
         {
             if (MakeServiceSubtype(openWindowSubType, sizeof(openWindowSubType),
-                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1))
-                    .ok())
+                                   DiscoveryFilter(DiscoveryFilterType::kCommissioningModeFromCommand, 1)) == CHIP_NO_ERROR)
             {
                 subTypes[subTypeSize++] = openWindowSubType;
             }
@@ -263,8 +264,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     if (params.GetVendorId().HasValue())
     {
         if (MakeServiceSubtype(vendorSubType, sizeof(vendorSubType),
-                               DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value()))
-                .ok())
+                               DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value())) == CHIP_NO_ERROR)
         {
 
             subTypes[subTypeSize++] = vendorSubType;
@@ -272,8 +272,9 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
     }
     if (params.GetDeviceType().HasValue())
     {
-        if MakeServiceSubtype (deviceTypeSubType, sizeof(deviceTypeSubType),
-                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDevceType().Value())).ok()){
+        if (MakeServiceSubtype(deviceTypeSubType, sizeof(deviceTypeSubType),
+                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDeviceType().Value())) == CHIP_NO_ERROR)
+        {
             subTypes[subTypeSize++] = deviceTypeSubType;
         }
     }
