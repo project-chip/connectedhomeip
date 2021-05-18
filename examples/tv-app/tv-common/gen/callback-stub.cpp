@@ -44,6 +44,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_CONTENT_LAUNCH_CLUSTER_ID:
         emberAfContentLaunchClusterInitCallback(endpoint);
         break;
+    case ZCL_DESCRIPTOR_CLUSTER_ID:
+        emberAfDescriptorClusterInitCallback(endpoint);
+        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -68,6 +71,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_ON_OFF_CLUSTER_ID:
         emberAfOnOffClusterInitCallback(endpoint);
         break;
+    case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
+        emberAfOperationalCredentialsClusterInitCallback(endpoint);
+        break;
     case ZCL_TV_CHANNEL_CLUSTER_ID:
         emberAfTvChannelClusterInitCallback(endpoint);
         break;
@@ -77,8 +83,14 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
+    case ZCL_TRUSTED_ROOT_CERTIFICATES_CLUSTER_ID:
+        emberAfTrustedRootCertificatesClusterInitCallback(endpoint);
+        break;
     case ZCL_WAKE_ON_LAN_CLUSTER_ID:
         emberAfWakeOnLanClusterInitCallback(endpoint);
+        break;
+    case ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID:
+        emberAfWiFiNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
     default:
         // Unrecognized cluster ID
@@ -107,6 +119,11 @@ void __attribute__((weak)) emberAfAudioOutputClusterInitCallback(EndpointId endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfContentLaunchClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfDescriptorClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -151,6 +168,11 @@ void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfOperationalCredentialsClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfTvChannelClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -166,7 +188,17 @@ void __attribute__((weak)) emberAfThreadNetworkDiagnosticsClusterInitCallback(En
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfTrustedRootCertificatesClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfWakeOnLanClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

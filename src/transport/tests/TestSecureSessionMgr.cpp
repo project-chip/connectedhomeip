@@ -64,7 +64,7 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         HandleMessageReceived(address, std::move(msgBuf));
         return CHIP_NO_ERROR;
@@ -79,7 +79,7 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
         System::PacketBufferHandle recvdMsg = msgBuf.CloneData();
 
@@ -94,7 +94,7 @@ class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
-                           const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
+                           const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf,
                            SecureSessionMgr * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));

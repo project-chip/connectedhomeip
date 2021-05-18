@@ -317,7 +317,7 @@ class ServerCallback : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                           const PayloadHeader & payloadHeader, System::PacketBufferHandle buffer) override
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && buffer) override
     {
         // as soon as a client connects, assume it is connected
         VerifyOrExit(!buffer.IsNull(), ChipLogError(AppServer, "Received data but couldn't process it..."));

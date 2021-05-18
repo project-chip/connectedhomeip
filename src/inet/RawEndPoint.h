@@ -78,7 +78,7 @@ public:
                       IPEndPointBasis::OnReceiveErrorFunct onReceiveError, void * appState = nullptr);
     INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close();
     void Free();

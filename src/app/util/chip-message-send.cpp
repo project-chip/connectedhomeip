@@ -44,7 +44,7 @@ namespace chip {
 class DeviceExchangeDelegate : public Messaging::ExchangeDelegate
 {
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload) override
+                           System::PacketBufferHandle && payload) override
     {}
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };

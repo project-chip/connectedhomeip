@@ -50,7 +50,7 @@ void TransportMgrBase::Close()
     mTransport        = nullptr;
 }
 
-void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msg)
+void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     if (mSecureSessionMgr != nullptr)
     {

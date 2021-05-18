@@ -43,7 +43,7 @@ class CommandHandler : public Command
 {
 public:
     void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           System::PacketBufferHandle payload);
+                           System::PacketBufferHandle && payload);
     CHIP_ERROR AddStatusCode(const CommandPathParams * apCommandPathParams,
                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const Protocols::Id aProtocolId,
                              const uint16_t aProtocolCode) override;

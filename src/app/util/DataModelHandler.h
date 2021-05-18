@@ -43,4 +43,4 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr);
  *                    that it will free the buffer before returning.
  *
  */
-void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange, chip::System::PacketBufferHandle buffer);
+void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange, chip::System::PacketBufferHandle && buffer);
