@@ -43,6 +43,10 @@
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace chip::System;
@@ -94,6 +98,10 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
 CHIP_ERROR ExchangeManager::Shutdown()
 {
+// TODO(#6931): Lock guard is a temporary solution. Proper solution should be post chip shutdown function into chip thread
+#if CONFIG_DEVICE_LAYER
+    DeviceLayer::PlatformMgr().LockChipStack();
+#endif
     mReliableMessageMgr.Shutdown();
 
     mContextPool.ForEachActiveObject([](auto * ec) {
@@ -109,6 +117,9 @@ CHIP_ERROR ExchangeManager::Shutdown()
     }
 
     mState = State::kState_NotInitialized;
+#if CONFIG_DEVICE_LAYER
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+#endif
 
     return CHIP_NO_ERROR;
 }
