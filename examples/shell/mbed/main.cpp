@@ -36,6 +36,8 @@ using namespace chip::Shell;
 
 int main()
 {
+    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
+
     // Initialize the default streamer that was linked.
     const int rc = streamer_init(streamer_get());
 
