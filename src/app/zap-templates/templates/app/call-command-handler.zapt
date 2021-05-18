@@ -1,6 +1,0 @@
-{{> header}}
-
-// Prevent multiple inclusion
-#pragma once
-
-#include <app/util/af-types.h>

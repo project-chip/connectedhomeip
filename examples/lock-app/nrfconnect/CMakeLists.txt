@@ -49,7 +49,6 @@ target_sources(app PRIVATE
                main/main.cpp
                main/ZclCallbacks.cpp
                ${LOCK_COMMON}/gen/attribute-size.cpp
-               ${LOCK_COMMON}/gen/call-command-handler.cpp
                ${LOCK_COMMON}/gen/callback-stub.cpp
                ${LOCK_COMMON}/gen/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
