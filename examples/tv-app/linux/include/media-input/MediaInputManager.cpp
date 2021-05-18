@@ -77,7 +77,7 @@ std::vector<EmberAfMediaInputInfo> MediaInputManager::proxyGetInputList()
         mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description));
         mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
         mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
-        mediaInput.index       = static_cast<uint8_t>(1 + i)i;
+        mediaInput.index       = static_cast<uint8_t>(1 + i) i;
         mediaInputList.push_back(mediaInput);
     }
 
