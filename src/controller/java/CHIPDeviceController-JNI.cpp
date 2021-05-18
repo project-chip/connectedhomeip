@@ -470,23 +470,8 @@ JNI_METHOD(void, sendCommand)(JNIEnv * env, jobject self, jlong handle, jlong de
         ScopedPthreadLock lock(&sStackLock);
         System::PacketBufferHandle buffer;
 
-        // Hardcode endpoint to 1 for now
-        uint8_t endpoint = 1;
-
         switch (commandID)
         {
-        case 0:
-            buffer = encodeOnOffClusterOffCommand(0, endpoint);
-            break;
-        case 1:
-            buffer = encodeOnOffClusterOnCommand(0, endpoint);
-            break;
-        case 2:
-            buffer = encodeOnOffClusterToggleCommand(0, endpoint);
-            break;
-        case 3:
-            buffer = encodeLevelControlClusterMoveToLevelCommand(0, endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
-            break;
         default:
             ChipLogError(Controller, "Unknown command: %d", commandID);
             return;

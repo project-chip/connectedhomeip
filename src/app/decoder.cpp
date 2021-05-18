@@ -22,15 +22,14 @@
 //                            EmberNodeId source,
 //                            InterPanHeader *interPanHeader)
 
-#include <app/chip-zcl-zpro-codec.h>
+#include "chip-zcl-zpro-codec.h"
+
 #include <app/message-reader.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <stdio.h>
 #include <string.h>
 #include <support/logging/CHIPLogging.h>
-
-extern "C" {
 
 uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * outApsFrame)
 {
@@ -87,5 +86,3 @@ uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg
     }
     return result;
 }
-
-} // extern C

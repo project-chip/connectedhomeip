@@ -31,14 +31,13 @@ def getGlobalTemplatesTargets():
     targets = []
     targets.extend([[str(filepath)] for filepath in Path('./examples').rglob('*.zap')])
     targets.extend([[str(filepath)] for filepath in Path('./src/darwin').rglob('*.zap')])
-    targets.extend([[str(filepath)] for filepath in Path('./src/controller/python').rglob('*.zap')])
+    targets.extend([[str(filepath)] for filepath in Path('./src/controller').rglob('*.zap')])
     return targets
 
 def getSpecificTemplatesTargets():
     targets = []
     targets.append(['examples/chip-tool/chip-tool.zap', '-t', 'examples/chip-tool/templates/templates.json'])
     targets.append(['src/controller/python/local-clusters.zap', '-t', 'src/controller/python/templates/templates.json'])
-    targets.append(['src/controller/controller-clusters.zap', '-t', 'src/app/zap-templates/chip-templates.json'])
     targets.append(['src/darwin/Framework/CHIP/chip-tool.zap', '-t', 'src/darwin/Framework/CHIP/templates/templates.json'])
     return targets
 

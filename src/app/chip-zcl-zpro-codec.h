@@ -15,11 +15,10 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_ZCL_ZPRO_CODEC_H
-#define CHIP_ZCL_ZPRO_CODEC_H
+#pragma once
 
-#include "chip-zcl-zpro-codec-api.h"
 #include <app/util/basic-types.h>
+#include <support/BufferWriter.h>
 
 typedef uint16_t EmberApsOption;
 
@@ -42,10 +41,6 @@ typedef struct
     uint8_t sequence;
     uint8_t radius;
 } EmberApsFrame;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /** @brief Extracts an aps frame from buffer into outApsFrame
  * @param buffer Buffer to read from
@@ -86,8 +81,15 @@ void printApsFrame(EmberApsFrame * frame);
  */
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif // CHIP_ZCL_ZPRO_CODEC_H
+/**
+ * @brief Encode the given informations into the given BufferWriter.
+ * Returns the number of bytes of buffer used by the encoding or 0 if
+ * the given buffer is not big enough.
+ *
+ * @return
+ *   - If the buffer length is not enough to hold the EmberApsFrame, 0.
+ *   - If the buffer length is large enough, the number of bytes placed in buffer.
+ */
+uint16_t doEncodeApsFrame(chip::Encoding::LittleEndian::BufferWriter & buf, chip::ClusterId clusterId,
+                          chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint, EmberApsOption options,
+                          chip::GroupId groupId, uint8_t sequence, uint8_t radius, bool isMeasuring);

@@ -1,5 +1,6 @@
 {{> header}}
 
+{{#if (chip_has_client_clusters)}}
 #include <app/chip-zcl-zpro-codec.h>
 
 #include <support/BufferWriter.h>
@@ -12,52 +13,6 @@
 using namespace chip;
 using namespace chip::System;
 using namespace chip::Encoding::LittleEndian;
-
-static uint16_t doEncodeApsFrame(BufferWriter & buf, ClusterId clusterId, EndpointId sourceEndpoint,
-                                 EndpointId destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
-                                 uint8_t radius, bool isMeasuring)
-{
-
-    uint8_t control_byte = 0;
-    buf.Put(control_byte) // Put in a control byte
-        .Put16(clusterId)
-        .Put8(sourceEndpoint)
-        .Put8(destinationEndpoint)
-        .EndianPut(options, sizeof(EmberApsOption))
-        .Put16(groupId)
-        .Put8(sequence)
-        .Put8(radius);
-
-    size_t result = buf.Needed();
-    if (isMeasuring)
-    {
-        ChipLogDetail(Zcl, "Measured APS frame size %d", result);
-    }
-    else if (buf.Fit())
-    {
-        ChipLogDetail(Zcl, "Successfully encoded %d bytes", result);
-    }
-    else
-    {
-        ChipLogError(Zcl, "Error encoding APS Frame: Buffer too small");
-        result = 0;
-    }
-
-    if (!CanCastTo<uint16_t>(result))
-    {
-        ChipLogError(Zcl, "Can't fit our measured size in uint16_t");
-        result = 0;
-    }
-
-    return static_cast<uint16_t>(result);
-}
-
-uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
-{
-    BufferWriter buf(buffer, buf_length);
-    return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint,
-                            apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
-}
 
 #define COMMAND_HEADER(name, clusterId)                                                                                            \
     const char * kName = name;                                                                                                     \
@@ -89,22 +44,17 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
 #define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
 {{/zcl_global_commands}}
 
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
 #define {{define}}_ID {{asHex code 4}}
 {{#chip_server_cluster_commands}}
 #define ZCL_{{asDelimitedMacro name}}_COMMAND_ID ({{asHex code 2}})
 {{/chip_server_cluster_commands}}
 
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
 
 // TODO: Find a way to calculate maximum message length for clusters
 //       https://github.com/project-chip/connectedhomeip/issues/965
 constexpr uint16_t kMaxBufferSize = 1024;
-
-// This is a cluster-specific command so low two bits are 0b01.  The command
-// is standard, so does not need a manufacturer code, and we're sending
-// client to server, so all the remaining bits are 0.
-constexpr uint8_t kFrameControlClusterSpecificCommand = 0x01;
 
 // This is a global command, so the low bits are 0b00.  The command is
 // standard, so does not need a manufacturer code, and we're sending client
@@ -114,51 +64,9 @@ constexpr uint8_t kFrameControlGlobalCommand = 0x00;
 // Pick source endpoint as 1 for now
 constexpr EndpointId kSourceEndpoint = 1;
 
-{{#chip_server_clusters}}
+{{#chip_client_clusters}}
 {{> cluster_header}}
 
-{{#chip_server_cluster_commands}}
-/*
- * Command {{asCamelCased name false}}
- */
-PacketBufferHandle encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(uint8_t seqNum, EndpointId destinationEndpoint{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
-{
-    COMMAND_HEADER("{{asType name}}", {{parent.define}}_ID);
-    {{#chip_server_cluster_command_arguments}}
-    {{#if (isString type)}}
-    size_t {{asCamelCased label}}StrLen = {{asCamelCased label}}.size();
-    if (!CanCastTo<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased label}}StrLen))
-    {
-        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", kName, {{asCamelCased label}}StrLen);
-        return PacketBufferHandle();
-    }
-    {{/if}}
-
-    {{/chip_server_cluster_command_arguments}}
-      buf
-    {{#if (isManufacturerSpecificCommand)}}
-        .Put8(kFrameControlClusterSpecificCommand | (1u << 2))
-        .Put16({{asHex mfgCode 4}})
-    {{else}}
-        .Put8(kFrameControlClusterSpecificCommand)
-    {{/if}}
-       .Put8(seqNum)
-       .Put8(ZCL_{{asDelimitedMacro name}}_COMMAND_ID)
-    {{#chip_server_cluster_command_arguments}}
-    {{#if (isString type)}}
-       .Put(static_cast<{{#if (isShortString type)}}uint8_t{{else}}uint16_t{{/if}}>({{asCamelCased label}}StrLen))
-       .Put({{asCamelCased label}}.data(), {{asCamelCased label}}.size())
-    {{else if (isSignedType)}}
-       .Put{{chipTypePutLength}}(static_cast<{{chipTypePutCastType}}>({{asCamelCased label}}))
-    {{else}}
-       .Put{{chipTypePutLength}}({{asCamelCased label}})
-    {{/if}}
-    {{/chip_server_cluster_command_arguments}}
-    ;
-    COMMAND_FOOTER();
-}
-
-{{/chip_server_cluster_commands}}
 PacketBufferHandle encode{{asCamelCased name false}}ClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("Discover{{asCamelCased name false}}Attributes", {{define}}_ID);
@@ -233,4 +141,5 @@ PacketBufferHandle encode{{asCamelCased parent.name false}}ClusterConfigure{{asC
 
 {{/if}}
 {{/chip_server_cluster_attributes}}
-{{/chip_server_clusters}}
+{{/chip_client_clusters}}
+{{/if}}
