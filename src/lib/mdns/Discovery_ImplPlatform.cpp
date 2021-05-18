@@ -236,7 +236,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
         }
 
         if (MakeServiceSubtype(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype),
-                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator))).ok()) {
+                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator()))).ok()) {
             subTypes[subTypeSize++] = shortDiscriminatorSubtype;
         }
         if (MakeServiceSubtype(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype),

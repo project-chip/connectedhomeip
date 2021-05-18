@@ -146,7 +146,9 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
     case DiscoveryFilterType::kCommissioningModeFromCommand:
         // 1 is the only valid value
         requiredSize = snprintf(buffer, bufferLen, "_A1");
+        break;
     case DiscoveryFilterType::kNone:
+        requiredSize = 0;
         break;
     }
     return (requiredSize < (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
