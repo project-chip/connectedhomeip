@@ -32,8 +32,7 @@ void emberAfPumpConfigurationAndControlClusterServerInitCallback(EndpointId endp
     // TODO
 }
 
-void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(EndpointId endpoint,
-                                                                             AttributeId attributeId)
+void emberAfPumpConfigurationAndControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
     // TODO
 }
