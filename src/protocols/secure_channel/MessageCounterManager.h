@@ -49,7 +49,7 @@ public:
     CHIP_ERROR StartSync(SecureSessionHandle session, Transport::PeerConnectionState * state) override;
     CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
                                                 const Transport::PeerAddress & peerAddress,
-                                                System::PacketBufferHandle msgBuf) override;
+                                                System::PacketBufferHandle && msgBuf) override;
 
     /**
      * Send peer message counter synchronization request.
@@ -74,7 +74,8 @@ public:
      *  @retval  #CHIP_ERROR_NO_MEMORY If there is no empty slot left in the table for addition.
      *  @retval  #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
+                                 System::PacketBufferHandle && msgBuf);
 
 private:
     /**
@@ -107,13 +108,13 @@ private:
     CHIP_ERROR SendMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, FixedByteSpan<kChallengeSize> challenge);
 
     void HandleMsgCounterSyncReq(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                 System::PacketBufferHandle msgBuf);
+                                 System::PacketBufferHandle && msgBuf);
 
     void HandleMsgCounterSyncResp(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                                  System::PacketBufferHandle msgBuf);
+                                  System::PacketBufferHandle && msgBuf);
 
     void OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PacketHeader & packetHeader,
-                           const PayloadHeader & payloadHeader, System::PacketBufferHandle payload) override;
+                           const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload) override;
 
     void OnResponseTimeout(Messaging::ExchangeContext * exchangeContext) override;
 };

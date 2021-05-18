@@ -39,7 +39,7 @@ public:
      */
     virtual CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
                                                         const Transport::PeerAddress & peerAddress,
-                                                        System::PacketBufferHandle msgBuf) = 0;
+                                                        System::PacketBufferHandle && msgBuf) = 0;
 };
 
 } // namespace Transport

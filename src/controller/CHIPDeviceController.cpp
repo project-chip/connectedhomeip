@@ -526,7 +526,7 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 }
 
 void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
     bool needClose = true;
