@@ -53,7 +53,7 @@
     void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
-                           1);                                                                                                     \
+                           0);                                                                                                     \
     }
 
 // EmberEventData structs used to populate the EmberEventData table
@@ -67,6 +67,6 @@
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },
+    { 0x0, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },
 
 #endif // __AF_GEN_EVENT__
