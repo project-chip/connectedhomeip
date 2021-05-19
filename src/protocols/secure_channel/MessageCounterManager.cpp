@@ -69,13 +69,13 @@ CHIP_ERROR MessageCounterManager::StartSync(SecureSessionHandle session, Transpo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(SecureSessionHandle session,
+CHIP_ERROR MessageCounterManager::QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SecureSessionHandle session,
                                                                    Transport::PeerConnectionState * state,
                                                                    const Transport::PeerAddress & peerAddress,
                                                                    System::PacketBufferHandle && msgBuf)
 {
     // Queue the message to be reprocessed when sync completes.
-    ReturnErrorOnFailure(AddToReceiveTable(state->GetPeerNodeId(), peerAddress, std::move(msgBuf)));
+    ReturnErrorOnFailure(AddToReceiveTable(packetHeader, peerAddress, std::move(msgBuf)));
     ReturnErrorOnFailure(StartSync(session, state));
 
     // After the message that triggers message counter synchronization is stored, and a message counter
@@ -115,32 +115,24 @@ void MessageCounterManager::OnResponseTimeout(Messaging::ExchangeContext * excha
     exchangeContext->Close();
 }
 
-CHIP_ERROR MessageCounterManager::AddToReceiveTable(NodeId peerNodeId, const Transport::PeerAddress & peerAddress,
+CHIP_ERROR MessageCounterManager::AddToReceiveTable(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                                     System::PacketBufferHandle && msgBuf)
 {
-    bool added     = false;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReturnErrorOnFailure(packetHeader.EncodeBeforeData(msgBuf));
 
     for (ReceiveTableEntry & entry : mReceiveTable)
     {
-        if (entry.peerNodeId == kUndefinedNodeId)
+        if (entry.msgBuf.IsNull())
         {
-            entry.peerNodeId  = peerNodeId;
             entry.peerAddress = peerAddress;
             entry.msgBuf      = std::move(msgBuf);
-            added             = true;
 
-            break;
+            return CHIP_NO_ERROR;
         }
     }
 
-    if (!added)
-    {
-        ChipLogError(SecureChannel, "MCSP ReceiveTable Already Full");
-        err = CHIP_ERROR_NO_MEMORY;
-    }
-
-    return err;
+    ChipLogError(SecureChannel, "MCSP ReceiveTable Already Full");
+    return CHIP_ERROR_NO_MEMORY;
 }
 
 /**
@@ -158,14 +150,26 @@ void MessageCounterManager::ProcessPendingMessages(NodeId peerNodeId)
     // this table was using an application group key; that's why it was added.
     for (ReceiveTableEntry & entry : mReceiveTable)
     {
-        if (entry.peerNodeId == peerNodeId)
+        if (!entry.msgBuf.IsNull())
         {
-            // Reprocess message.
-            secureSessionMgr->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));
+            PacketHeader packetHeader;
+            uint16_t headerSize = 0;
 
-            // Explicitly free any buffer owned by this handle.
-            entry.msgBuf     = nullptr;
-            entry.peerNodeId = kUndefinedNodeId;
+            if (packetHeader.Decode((entry.msgBuf)->Start(), (entry.msgBuf)->DataLength(), &headerSize) != CHIP_NO_ERROR)
+            {
+                ChipLogError(SecureChannel, "MessageCounterManager::ProcessPendingMessages: Failed to decode PacketHeader");
+                entry.msgBuf = nullptr;
+                continue;
+            }
+
+            if (packetHeader.GetSourceNodeId().HasValue() && packetHeader.GetSourceNodeId().Value() == peerNodeId)
+            {
+                // Reprocess message.
+                secureSessionMgr->OnMessageReceived(entry.peerAddress, std::move(entry.msgBuf));
+
+                // Explicitly free any buffer owned by this handle.
+                entry.msgBuf = nullptr;
+            }
         }
     }
 }
