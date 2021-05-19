@@ -394,7 +394,16 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                 "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
                 packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
     }
-    ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
+
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
+    }
+    else
+    {
+        ChipLogError(Inet, "Secure transport received message without node ID with key ID (%d)", packetHeader.GetEncryptionKeyID());
+    }
+
     mPeerConnections.MarkConnectionActive(state);
 
     // Decode the message
