@@ -4276,6 +4276,129 @@ CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::C
     return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
 }
 
+// OtaSoftwareUpdateServer Cluster Commands
+CHIP_ERROR OtaSoftwareUpdateServerCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
+                                                              uint32_t newVersion)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kApplyUpdateRequestCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // updateToken: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    // newVersion: int32u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), newVersion));
+
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands(mpCommandSender);
+}
+
+CHIP_ERROR OtaSoftwareUpdateServerCluster::NotifyUpdateApplied(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, chip::ByteSpan updateToken,
+                                                               uint32_t currentVersion)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kNotifyUpdateAppliedCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // updateToken: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), updateToken));
+    // currentVersion: int32u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands(mpCommandSender);
+}
+
+CHIP_ERROR OtaSoftwareUpdateServerCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t vendorId,
+                                                      uint16_t productId, uint16_t imageType, uint16_t hardwareVersion,
+                                                      uint32_t currentVersion, uint8_t protocolsSupported, chip::ByteSpan location,
+                                                      uint8_t clientCanConsent, chip::ByteSpan metadataForServer)
+{
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    if (mpCommandSender == nullptr)
+    {
+        ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mpCommandSender));
+    }
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kQueryImageCommandId,
+                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
+
+    TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
+    uint8_t argSeqNumber    = 0;
+    // vendorId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
+    // productId: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), productId));
+    // imageType: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), imageType));
+    // hardwareVersion: int16u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
+    // currentVersion: int32u
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), currentVersion));
+    // protocolsSupported: oTADownloadProtocol
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
+    // location: charString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), location));
+    // clientCanConsent: boolean
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), clientCanConsent));
+    // metadataForServer: octetString
+    ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), metadataForServer));
+
+    ReturnErrorOnFailure(mpCommandSender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(mpCommandSender, onSuccessCallback, onFailureCallback);
+
+    return mDevice->SendCommands(mpCommandSender);
+}
+
+// OtaSoftwareUpdateServer Cluster Attributes
+CHIP_ERROR OtaSoftwareUpdateServerCluster::DiscoverAttributes(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateServerClusterDiscoverAttributes(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+CHIP_ERROR OtaSoftwareUpdateServerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback)
+{
+    uint8_t seqNum                            = mDevice->GetNextSequenceNumber();
+    System::PacketBufferHandle encodedCommand = encodeOtaSoftwareUpdateServerClusterReadClusterRevisionAttribute(seqNum, mEndpoint);
+    return SendCommand(seqNum, std::move(encodedCommand), onSuccessCallback, onFailureCallback);
+}
+
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
