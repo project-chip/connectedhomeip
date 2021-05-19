@@ -1,15 +1,11 @@
-#!/usr/bin/env python3
-
 from chip import ChipDeviceCtrl
-from chip import exceptions
-from optparse import OptionParser, OptionValueError
 import threading
 import os
 import sys
 import logging
 import time
 
-logger = logging.getLogger('CHIPMobileDevice')
+logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
 
 sh = logging.StreamHandler()
@@ -18,22 +14,6 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 sh.setStream(sys.stdout)
 logger.addHandler(sh)
-
-# The thread network dataset tlv for testing, splited into T-L-V.
-TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
-                "000300000c" + \
-                "35060004001fffe0" + \
-                "0208fedcba9876543210" + \
-                "0708fd00000000001234" + \
-                "0510ffeeddccbbaa99887766554433221100" + \
-                "030e54657374696e674e6574776f726b" + \
-                "0102d252" + \
-                "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
-# Network id, for the thread network, current a const value, will be changed to XPANID of the thread network.
-TEST_THREAD_NETWORK_ID = "fedcba9876543210"
-
-ENDPOINT_ID = 0
-GROUP_ID = 0
 
 
 def TestFail(message):
@@ -71,7 +51,7 @@ class TestTimeout(threading.Thread):
             TestFail("Timeout")
 
 
-class MobileDeviceTests():
+class BaseTestHelper:
     def __init__(self, nodeid: int):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
             controllerNodeId=nodeid)
@@ -86,11 +66,11 @@ class MobileDeviceTests():
         self.logger.info("Device finished key exchange.")
         return True
 
-    def TestNetworkCommissioning(self, nodeid: int):
+    def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
         self.logger.info("Commissioning network to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, ENDPOINT_ID, GROUP_ID, {
-                "operationalDataset": bytes.fromhex(TEST_THREAD_NETWORK_DATASET_TLV),
+            self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, endpoint, group, {
+                "operationalDataset": bytes.fromhex(dataset),
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
         except Exception as ex:
@@ -98,8 +78,8 @@ class MobileDeviceTests():
             return False
         self.logger.info("Send EnableNetwork command to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, ENDPOINT_ID, GROUP_ID, {
-                "networkID": bytes.fromhex(TEST_THREAD_NETWORK_ID),
+            self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, endpoint, group, {
+                "networkID": bytes.fromhex(network_id),
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
         except Exception as ex:
@@ -107,64 +87,55 @@ class MobileDeviceTests():
             return False
         return True
 
-    def TestOnOffCluster(self, nodeid: int):
+    def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info("Sending On/Off commands to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("OnOff", "On", nodeid, ENDPOINT_ID, GROUP_ID, {}, blocking=True)
+            self.devCtrl.ZCLSend("OnOff", "On", nodeid, endpoint, group, {}, blocking=True)
         except Exception as ex:
             self.logger.exception("Failed to send On command")
             return False
         try:
-            self.devCtrl.ZCLSend("OnOff", "Off", nodeid, ENDPOINT_ID, GROUP_ID, {}, blocking=True)
+            self.devCtrl.ZCLSend("OnOff", "Off", nodeid, endpoint, group, {}, blocking=True)
         except Exception as ex:
             self.logger.exception("Failed to send Off command")
             return False
         return True
 
+    def TestResolve(self, fabricid, nodeid):
+        self.logger.info("Resolve {} with fabric id: {}".format(nodeid, fabricid))
+        try:
+            self.devCtrl.ResolveNode(fabricid=fabricid, nodeid=nodeid)
+        except Exception as ex:
+            self.logger.exception("Failed to resolve. {}".format(ex))
 
-def main():
-    optParser = OptionParser()
-    optParser.add_option(
-        "-t",
-        "--timeout",
-        action="store",
-        dest="testTimeout",
-        default=75,
-        type='int',
-        help="The program will return with timeout after specified seconds.",
-        metavar="<timeout-second>",
-    )
-    optParser.add_option(
-        "-a",
-        "--address",
-        action="store",
-        dest="deviceAddress",
-        default='',
-        type='str',
-        help="Address of the device",
-        metavar="<device-addr>",
-    )
-
-    (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
-
-    timeoutTicker = TestTimeout(options.testTimeout)
-    timeoutTicker.start()
-
-    test = MobileDeviceTests(112233)
-
-    FailIfNot(test.TestKeyExchange(options.deviceAddress,
-                                   20202021, 1), "Failed to finish key exchange")
-    FailIfNot(test.TestNetworkCommissioning(1), "Failed to finish network commissioning")
-    FailIfNot(test.TestOnOffCluster(1), "Failed to test on off cluster")
-
-    timeoutTicker.stop()
-
-    logger.info("Test finished")
-
-    # TODO: Python device controller cannot be shutdown clean sometimes and will block on AsyncDNSResolverSockets shutdown.
-    # Call os._exit(0) to force close it.
-    os._exit(0)
+    def TestReadBasicAttribiutes(self, nodeid: int, endpoint: int, group: int):
+        basic_cluster_attrs = [
+            "VendorName",
+            "VendorID",
+            "ProductName",
+            "ProductID",
+            "UserLabel",
+            "Location",
+            "HardwareVersion",
+            "HardwareVersionString",
+            "SoftwareVersion",
+            "SoftwareVersionString"
+        ]
+        failed_zcl = []
+        for basic_attr in basic_cluster_attrs:
+            try:
+                self.devCtrl.ZCLReadAttribute(cluster="Basic",
+                                              attribute=basic_attr,
+                                              nodeid=nodeid,
+                                              endpoint=endpoint,
+                                              groupid=group)
+                time.sleep(2)
+            except Exception:
+                failed_zcl.append(basic_attr)
+        if failed_zcl:
+            self.logger.exception(f"Following attributes failed: {failed_zcl}")
+            return False
+        return True
 
 
-if __name__ == "__main__":
-    main()
+
