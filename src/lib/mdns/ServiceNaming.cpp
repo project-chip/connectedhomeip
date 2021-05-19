@@ -119,5 +119,58 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
+{
+    size_t requiredSize;
+    switch (subtype.type)
+    {
+    case DiscoveryFilterType::kShort:
+        // 8-bit number
+        if (subtype.code >= 1 << 8)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        requiredSize = snprintf(buffer, bufferLen, "_S%03u", subtype.code);
+        break;
+    case DiscoveryFilterType::kLong:
+        // 12-bit number
+        if (subtype.code >= 1 << 12)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        requiredSize = snprintf(buffer, bufferLen, "_L%04u", subtype.code);
+        break;
+    case DiscoveryFilterType::kVendor:
+        // Vendor ID is 16-bit, so if it fits in the code, it's good.
+        // NOTE: size here is wrong, will be changed in upcming PR to remove leading zeros.
+        requiredSize = snprintf(buffer, bufferLen, "_V%03u", subtype.code);
+        break;
+    case DiscoveryFilterType::kDeviceType:
+        // TODO: Not totally clear the size required here: see spec issue #3226
+        requiredSize = snprintf(buffer, bufferLen, "_T%03u", subtype.code);
+        break;
+    case DiscoveryFilterType::kCommissioningMode:
+        if (subtype.code > 1)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        requiredSize = snprintf(buffer, bufferLen, "_C%u", subtype.code);
+        break;
+    case DiscoveryFilterType::kCommissioningModeFromCommand:
+        // 1 is the only valid value
+        if (subtype.code != 1)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        requiredSize = snprintf(buffer, bufferLen, "_A1");
+        break;
+    case DiscoveryFilterType::kNone:
+        requiredSize = 0;
+        buffer[0]    = '\0';
+        break;
+    }
+    return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+}
+
 } // namespace Mdns
 } // namespace chip
