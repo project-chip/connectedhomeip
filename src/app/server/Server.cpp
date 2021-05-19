@@ -151,7 +151,8 @@ public:
         );
     }
 
-    CHIP_ERROR Shutdown() {
+    CHIP_ERROR Shutdown()
+    {
         mTransportManager.Close();
         return CHIP_NO_ERROR;
     }
