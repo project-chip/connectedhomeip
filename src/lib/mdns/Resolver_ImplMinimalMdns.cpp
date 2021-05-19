@@ -22,6 +22,7 @@
 #include "MinimalMdnsServer.h"
 #include "ServiceNaming.h"
 
+#include <mdns/TxtFields.h>
 #include <mdns/minimal/Parser.h>
 #include <mdns/minimal/QueryBuilder.h>
 #include <mdns/minimal/RecordData.h>
@@ -55,34 +56,9 @@ private:
     CommissionableNodeData * mNodeData;
 };
 
-bool IsKey(const mdns::Minimal::BytesRange key, const char * desired)
+const ByteSpan GetSpan(const mdns::Minimal::BytesRange & range)
 {
-    if (key.Size() != strlen(desired))
-    {
-        return false;
-    }
-    return memcmp(key.Start(), desired, key.Size()) == 0;
-}
-
-uint16_t MakeU16(const mdns::Minimal::BytesRange & val)
-{
-    uint32_t u32          = 0;
-    const uint16_t errval = 0x0;
-    for (size_t i = 0; i < val.Size(); ++i)
-    {
-        char c = static_cast<char>(val.Start()[i]);
-        if (c < '0' || c > '9')
-        {
-            return errval;
-        }
-        u32 = u32 * 10;
-        u32 += val.Start()[i] - static_cast<uint8_t>('0');
-        if (u32 > std::numeric_limits<uint16_t>::max())
-        {
-            return errval;
-        }
-    }
-    return static_cast<uint16_t>(u32);
+    return ByteSpan(range.Start(), range.Size());
 }
 
 void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
@@ -91,33 +67,9 @@ void TxtRecordDelegateImpl::OnRecord(const mdns::Minimal::BytesRange & name, con
     {
         return;
     }
-
-    if (IsKey(name, "D"))
-    {
-        mNodeData->longDiscriminator = MakeU16(value);
-    }
-    else if (IsKey(name, "VP"))
-    {
-        // Fist value is the vendor id, second (after the +) is the product.
-        size_t plussign = value.Size();
-        for (size_t i = 0; i < value.Size(); ++i)
-        {
-            if (static_cast<char>(value.Start()[i]) == '+')
-            {
-                plussign = i;
-                break;
-            }
-        }
-        if (plussign > 0)
-        {
-            mNodeData->vendorId = MakeU16(mdns::Minimal::BytesRange(value.Start(), value.Start() + plussign));
-        }
-        if (plussign < value.Size() - 1)
-        {
-            mNodeData->productId = MakeU16(mdns::Minimal::BytesRange(value.Start() + plussign + 1, value.End()));
-        }
-    }
-    // TODO(cecille): Add the new stuff from 0.7 ballot 2.
+    ByteSpan key = GetSpan(name);
+    ByteSpan val = GetSpan(value);
+    FillNodeDataFromTxt(key, val, mNodeData);
 }
 
 constexpr size_t kMdnsMaxPacketSize = 1024;
