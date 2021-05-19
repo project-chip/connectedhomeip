@@ -79,7 +79,7 @@ CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 void CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
                                    const PayloadHeader & payloadHeader, System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(Inet, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
+    ChipLogProgress(SecureChannel, "CASE Server received SigmaR1 message. Starting handshake. EC %p", ec);
     ReturnOnFailure(InitCASEHandshake(ec));
 
     mPairingSession.OnMessageReceived(ec, packetHeader, payloadHeader, std::move(payload));
@@ -100,13 +100,13 @@ void CASEServer::Cleanup()
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
-    ChipLogProgress(Inet, "CASE Session establishment failed: %s", ErrorStr(err));
+    ChipLogProgress(SecureChannel, "CASE Session establishment failed: %s", ErrorStr(err));
     Cleanup();
 }
 
 void CASEServer::OnSessionEstablished()
 {
-    ChipLogProgress(Inet, "CASE Session established. Setting up the secure channel.");
+    ChipLogProgress(SecureChannel, "CASE Session established. Setting up the secure channel.");
     // TODO - enable use of secure session established via CASE
     // CHIP_ERROR err =
     //     mSessionMgr->NewPairing(Optional<Transport::PeerAddress>::Value(mPairingSession.PeerConnection().GetPeerAddress()),
@@ -114,12 +114,12 @@ void CASEServer::OnSessionEstablished()
     //                             SecureSession::SessionRole::kResponder, mAdminId, nullptr);
     // if (err != CHIP_NO_ERROR)
     // {
-    //     ChipLogError(Inet, "Failed in setting up secure channel: err %s", ErrorStr(err));
+    //     ChipLogError(SecureChannel, "Failed in setting up secure channel: err %s", ErrorStr(err));
     //     OnSessionEstablishmentError(err);
     //     return;
     // }
 
-    ChipLogProgress(Inet, "CASE secure channel is available now.");
+    ChipLogProgress(SecureChannel, "CASE secure channel is available now.");
     Cleanup();
 }
 } // namespace chip
