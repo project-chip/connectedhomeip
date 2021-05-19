@@ -36,19 +36,26 @@ public:
     using transport =
         chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>, chip::Transport::UDP>;
 
-    CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
+    CHIP_ERROR Init(const chip::StackParameters & parameters, chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
     {
-        return mTransportManager.Init(
-            chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort),
-            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort));
+        return mTransportManager.Init(chip::Transport::TcpListenParameters(&inetLayer)
+                                          .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                          .SetListenPort(parameters.GetListenPort()),
+                                      chip::Transport::UdpListenParameters(&inetLayer)
+                                          .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                          .SetListenPort(parameters.GetListenPort()));
+    }
+
+    CHIP_ERROR Shutdown()
+    {
+        mTransportManager.Close();
+        return CHIP_NO_ERROR;
     }
 
     chip::TransportMgrBase & Get() { return mTransportManager; }
-    void SetListenPort(uint16_t port) { mPort = port; }
 
 private:
     transport mTransportManager;
-    uint16_t mPort = CHIP_PORT;
 };
 
 extern const chip::NodeId gLocalDeviceId;

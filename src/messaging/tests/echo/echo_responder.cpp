@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
         disableEcho = true;
     }
 
-    GetChipStack().Init();
+    GetChipStack().Init(chip::StackParameters());
 
     adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);

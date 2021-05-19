@@ -342,6 +342,7 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     err = invokeCommandParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+    commandHandler.Shutdown();
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)
@@ -413,11 +414,6 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
 
 namespace {
 
-void InitializeChip(nlTestSuite * apSuite)
-{
-    NL_TEST_ASSERT(apSuite, chip::gStack.Init() == CHIP_NO_ERROR);
-}
-
 // clang-format off
 const nlTest sTests[] =
 {
@@ -450,11 +446,12 @@ int TestCommandInteraction()
     };
     // clang-format on
 
-    InitializeChip(&theSuite);
-
+    NL_TEST_ASSERT(&theSuite, chip::gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
     nlTestRunner(&theSuite, nullptr);
+    int result = nlTestRunnerStats(&theSuite);
+    NL_TEST_ASSERT(&theSuite, chip::gStack.Shutdown() == CHIP_NO_ERROR);
 
-    return (nlTestRunnerStats(&theSuite));
+    return result;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestCommandInteraction)

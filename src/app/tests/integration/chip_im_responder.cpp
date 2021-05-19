@@ -161,7 +161,7 @@ int main(int argc, char * argv[])
     const chip::Transport::AdminId gAdminId = 0;
     chip::Transport::AdminPairingInfo * adminInfo;
 
-    GetChipStack().Init();
+    GetChipStack().Init(chip::StackParameters());
 
     adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);

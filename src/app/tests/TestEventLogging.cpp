@@ -62,11 +62,6 @@ static uint8_t gInfoEventBuffer[128];
 static uint8_t gCritEventBuffer[128];
 static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
-void InitializeChip(nlTestSuite * apSuite)
-{
-    NL_TEST_ASSERT(apSuite, gStack.Init() == CHIP_NO_ERROR);
-}
-
 void InitializeEventLogging()
 {
     chip::app::LogStorageResources logStorageResources[] = {
@@ -275,11 +270,13 @@ int TestEventLogging()
     };
     // clang-format on
 
-    InitializeChip(&theSuite);
+    NL_TEST_ASSERT(&theSuite, gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
     InitializeEventLogging();
     nlTestRunner(&theSuite, nullptr);
+    int result = nlTestRunnerStats(&theSuite);
+    NL_TEST_ASSERT(&theSuite, gStack.Shutdown() == CHIP_NO_ERROR);
 
-    return (nlTestRunnerStats(&theSuite));
+    return result;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestEventLogging)

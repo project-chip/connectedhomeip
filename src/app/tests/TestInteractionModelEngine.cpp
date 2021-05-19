@@ -99,10 +99,6 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
 } // namespace chip
 
 namespace {
-void InitializeChip(nlTestSuite * apSuite)
-{
-    NL_TEST_ASSERT(apSuite, gStack.Init() == CHIP_NO_ERROR);
-}
 
 // clang-format off
 const nlTest sTests[] =
@@ -125,11 +121,12 @@ int TestInteractionModelEngine()
     };
     // clang-format on
 
-    InitializeChip(&theSuite);
-
+    NL_TEST_ASSERT(&theSuite, gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
     nlTestRunner(&theSuite, nullptr);
+    int result = nlTestRunnerStats(&theSuite);
+    NL_TEST_ASSERT(&theSuite, gStack.Shutdown() == CHIP_NO_ERROR);
 
-    return (nlTestRunnerStats(&theSuite));
+    return result;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestInteractionModelEngine)
