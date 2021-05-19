@@ -1179,7 +1179,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 250
+#define GENERATED_ATTRIBUTE_COUNT 254
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -1512,6 +1512,12 @@
             /* Endpoint: 2, Cluster: On/off (server) */                                                                            \
             { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* on/off */                                            \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },     /* cluster revision */                                  \
+                                                                                                                                   \
+            /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                                                                 \
+            { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* occupancy */                                             \
+            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* occupancy sensor type */                                 \
+            { 0x0002, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* occupancy sensor type bitmap */                          \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* cluster revision */                                      \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -1548,10 +1554,13 @@
         (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerInitCallback,                                                   \
         (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerMessageSentCallback,                                            \
         (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerPreAttributeChangedCallback,                                    \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayOccupancySensingServer[] = {                                                  \
+        (EmberAfGenericClusterFunction) emberAfOccupancySensingClusterServerInitCallback,                                          \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 33
+#define GENERATED_CLUSTER_COUNT 34
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -1684,6 +1693,12 @@
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/off (server) */                                              \
+            { 0x0406,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(250),                                                                                            \
+              4,                                                                                                                   \
+              5,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOccupancySensingServer }, /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                        \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -1691,7 +1706,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 3726 }, { ZAP_CLUSTER_INDEX(12), 20, 2130 }, { ZAP_CLUSTER_INDEX(32), 1, 3 },                  \
+        { ZAP_CLUSTER_INDEX(0), 12, 3726 }, { ZAP_CLUSTER_INDEX(12), 20, 2130 }, { ZAP_CLUSTER_INDEX(32), 2, 8 },                  \
     }
 
 // Largest attribute size is needed for various buffers
@@ -1701,7 +1716,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (875)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (5859)
+#define ATTRIBUTE_MAX_SIZE (5864)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)
@@ -1971,10 +1986,10 @@
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
 // User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (13)
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE (14)
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
 
-#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (13)
+#define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (14)
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
                                                                                                                                    \
@@ -2034,4 +2049,9 @@
             {                                                                                                                      \
                 ZAP_REPORT_DIRECTION(REPORTED), 0x0002, 0x0006, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
             }, /* on/off */                                                                                                        \
+                                                                                                                                   \
+            /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                                                                 \
+            {                                                                                                                      \
+                ZAP_REPORT_DIRECTION(REPORTED), 0x0002, 0x0406, 0x0000, ZAP_CLUSTER_MASK(SERVER), 0x0000, { { 0, 65344, 0 } }      \
+            }, /* occupancy */                                                                                                     \
     }
