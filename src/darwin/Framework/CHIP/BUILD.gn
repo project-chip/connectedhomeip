@@ -68,7 +68,5 @@ static_library("framework") {
 }
 
 group("CHIP") {
-  public_deps = [
-    ":framework",
-  ]
+  public_deps = [ ":framework" ]
 }
