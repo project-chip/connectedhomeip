@@ -397,7 +397,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
 
     if (packetHeader.GetDestinationNodeId().HasValue())
     {
-        ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
+        ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)",
+                     packetHeader.GetDestinationNodeId().Value());
     }
     else
     {
