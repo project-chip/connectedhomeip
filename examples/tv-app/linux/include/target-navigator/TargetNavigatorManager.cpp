@@ -48,11 +48,11 @@ std::vector<EmberAfNavigateTargetTargetInfo> TargetNavigatorManager::proxyGetTar
     int maximumVectorSize = 2;
     char name[]           = "exampleName";
 
-    for (uint8_t i = 0; i < maximumVectorSize; ++i)
+    for (int i = 0; i < maximumVectorSize; ++i)
     {
         EmberAfNavigateTargetTargetInfo targetInfo;
         targetInfo.name       = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
-        targetInfo.identifier = 1 + i;
+        targetInfo.identifier = static_cast<uint8_t>(1 + i);
         targets.push_back(targetInfo);
     }
 

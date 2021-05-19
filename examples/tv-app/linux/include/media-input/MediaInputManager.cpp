@@ -71,13 +71,13 @@ std::vector<EmberAfMediaInputInfo> MediaInputManager::proxyGetInputList()
     char description[]    = "exampleDescription";
     char name[]           = "exampleName";
 
-    for (uint8_t i = 0; i < maximumVectorSize; ++i)
+    for (int i = 0; i < maximumVectorSize; ++i)
     {
         EmberAfMediaInputInfo mediaInput;
         mediaInput.description = chip::ByteSpan(chip::Uint8::from_char(description), sizeof(description));
         mediaInput.name        = chip::ByteSpan(chip::Uint8::from_char(name), sizeof(name));
         mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
-        mediaInput.index       = 1 + i;
+        mediaInput.index       = static_cast<uint8_t>(1 + i);
         mediaInputList.push_back(mediaInput);
     }
 
