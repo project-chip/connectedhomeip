@@ -15,24 +15,10 @@
 
 import pytest
 
-from chip import ChipDeviceCtrl
-from chip.ChipBluezMgr import BluezManager as BleManager
+from common.utils import scan_chip_ble_devices
 
 import logging
 log = logging.getLogger(__name__)
-
-def scan_chip_ble_devices():
-    devices = []
-    bleMgr = BleManager(devMgr=ChipDeviceCtrl.ChipDeviceController())
-    bleMgr.scan("-t 5")
-
-    for device in bleMgr.peripheral_list:
-        devIdInfo = bleMgr.get_peripheral_devIdInfo(device)
-        if devIdInfo:
-            log.info("Found CHIP device {}".format(device.Name))
-            devices.append(device)
-
-    return devices
 
 @pytest.mark.smoketest
 def test_btp_device_visiable(device):

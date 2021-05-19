@@ -8,7 +8,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+import os
+import platform
+import random
 from ipaddress import ip_address, IPv4Address
+
+from chip import exceptions
+
+from chip import ChipDeviceCtrl
+if platform.system() == 'Darwin':
+    from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
+elif sys.platform.startswith('linux'):
+    from chip.ChipBluezMgr import BluezManager as BleManager
+
+import logging
+log = logging.getLogger(__name__)
 
 def validIPAddress(IP: str) -> str:
     try:
@@ -21,3 +36,33 @@ def is_network_visible(net_list, net_ssid):
         if "Network:" in line and net_ssid in line:
             return True
     return False
+
+def scan_chip_ble_devices():
+    devices = []
+    bleMgr = BleManager(devMgr=ChipDeviceCtrl.ChipDeviceController())
+    bleMgr.scan("-t 5")
+
+    for device in bleMgr.peripheral_list:
+        devIdInfo = bleMgr.get_peripheral_devIdInfo(device)
+        if devIdInfo:
+            log.info("Found CHIP device {}".format(device.Name))
+            devices.append(devIdInfo)
+
+    return devices
+
+def run_wifi_provisioning(ssid, password, discriminator, pinCode, nodeId=None):
+    devCtrl = ChipDeviceCtrl.ChipDeviceController()
+
+    if nodeId == None:
+        nodeId = random.randint(1, 1000000)
+
+    try:
+        devCtrl.SetWifiCredential(ssid, password)
+        devCtrl.ConnectBLE(discriminator, pinCode, nodeId)
+    except exceptions.ChipStackException as ex:
+        log.error("WiFi provisioning failed: {}".format(str(ex)))
+        return None
+
+    ip_details = devCtrl.GetAddressAndPort(nodeId)
+
+    return (nodeId, ip_details)
