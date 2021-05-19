@@ -37,7 +37,8 @@ public:
      * Called when have received a message but session message counter is not synced.  It will queue the message and start sync if
      * the sync procedure is not started yet.
      */
-    virtual CHIP_ERROR QueueReceivedMessageAndStartSync(SecureSessionHandle session, Transport::PeerConnectionState * state,
+    virtual CHIP_ERROR QueueReceivedMessageAndStartSync(const PacketHeader & packetHeader, SecureSessionHandle session,
+                                                        Transport::PeerConnectionState * state,
                                                         const Transport::PeerAddress & peerAddress,
                                                         System::PacketBufferHandle && msgBuf) = 0;
 };

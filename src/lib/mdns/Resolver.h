@@ -65,19 +65,22 @@ struct CommissionableNodeData
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
 };
 
-enum class CommissionableNodeFilterType
+enum class DiscoveryFilterType : uint8_t
 {
     kNone,
     kShort,
     kLong,
     kVendor,
+    kDeviceType,
+    kCommissioningMode,
+    kCommissioningModeFromCommand,
 };
-struct CommissionableNodeFilter
+struct DiscoveryFilter
 {
-    CommissionableNodeFilterType type;
+    DiscoveryFilterType type;
     uint16_t code;
-    CommissionableNodeFilter() : type(CommissionableNodeFilterType::kNone), code(0) {}
-    CommissionableNodeFilter(CommissionableNodeFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
+    DiscoveryFilter() : type(DiscoveryFilterType::kNone), code(0) {}
+    DiscoveryFilter(DiscoveryFilterType newType, uint16_t newCode) : type(newType), code(newCode) {}
 };
 /// Groups callbacks for CHIP service resolution requests
 class ResolverDelegate
@@ -114,7 +117,7 @@ public:
     virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
 
     // Finds all nodes with the given filter that are currently in commissioning mode.
-    virtual CHIP_ERROR FindCommissionableNodes(CommissionableNodeFilter filter = CommissionableNodeFilter()) = 0;
+    virtual CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /// Provides the system-wide implementation of the service resolver
     static Resolver & Instance();
