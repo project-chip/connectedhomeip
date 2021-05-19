@@ -45,3 +45,8 @@ appdirs
 coloredlogs
 watchdog
 protobuf
+
+# scripts/tools/memory
+anytree
+cxxfilt
+pandas
