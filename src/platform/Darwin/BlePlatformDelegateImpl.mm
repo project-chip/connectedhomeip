@@ -98,7 +98,15 @@ namespace DeviceLayer {
             return found;
         }
 
-        bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj) { return true; }
+        bool BlePlatformDelegateImpl::CloseConnection(BLE_CONNECTION_OBJECT connObj)
+        {
+            CBPeripheral * peripheral = (CBPeripheral *) connObj;
+            // CoreBluetooth API requires a CBCentralManager to close a connection which is a property of the peripheral.
+            CBCentralManager * manager = (CBCentralManager *) [peripheral valueForKey:@"manager"];
+            [manager cancelPeripheralConnection:peripheral];
+
+            return true;
+        }
 
         uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const { return 0; }
 
