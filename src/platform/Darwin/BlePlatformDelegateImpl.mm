@@ -103,7 +103,8 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
             // CoreBluetooth API requires a CBCentralManager to close a connection which is a property of the peripheral.
             CBCentralManager * manager = (CBCentralManager *) [peripheral valueForKey:@"manager"];
-            [manager cancelPeripheralConnection:peripheral];
+            if (manager != nil)
+                [manager cancelPeripheralConnection:peripheral];
 
             return true;
         }
