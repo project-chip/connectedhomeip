@@ -15,7 +15,7 @@ RUN dpkg --add-architecture i386 \
     && unzip ${TELINK_DIR}/telink_riscv_linux_toolchain.zip -d ${TELINK_DIR} \
     && rm ${TELINK_DIR}/telink_riscv_linux_toolchain.zip
 
-# Setup Zephyr 
+# Setup Zephyr
 ARG ZEPHYR_PROJECT_DIR=/opt/zephyrproject
 ENV PATH="/root/.local/bin:${PATH}"
 RUN DEBIAN_FRONTEND=noninteractive apt install -y \
