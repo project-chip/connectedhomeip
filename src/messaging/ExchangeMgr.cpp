@@ -141,7 +141,11 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols
 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
-    ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
+    char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
+
+    source.ToString(srcAddressStr);
+
+    ChipLogError(ExchangeManager, "Error receiving message from %s: %s", srcAddressStr, ErrorStr(error));
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate)
