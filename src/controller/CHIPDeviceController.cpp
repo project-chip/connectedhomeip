@@ -53,6 +53,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/PersistentStorageUtils.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 #include <support/TimeUtils.h>
@@ -89,10 +90,6 @@ namespace Controller {
 
 using namespace chip::Encoding;
 
-constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
-constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
-constexpr const char kNextAvailableKeyID[]        = "StartKeyID";
-
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS
 constexpr uint16_t kMdnsPort = 5353;
 #endif
@@ -102,20 +99,6 @@ constexpr uint32_t kSessionEstablishmentTimeout = 30 * kMillisecondPerSecond;
 constexpr uint32_t kMaxCHIPOpCertLength = 1024;
 constexpr uint32_t kMaxCHIPCSRLength    = 1024;
 constexpr uint32_t kOpCSRNonceLength    = 32;
-
-// This macro generates a key using node ID an key prefix, and performs the given action
-// on that key.
-#define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        constexpr size_t len = std::extent<decltype(keyPrefix)>::value;                                                            \
-        nlSTATIC_ASSERT_PRINT(len > 0, "keyPrefix length must be known at compile time");                                          \
-        /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
-        char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
-        nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
-        snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
-        action;                                                                                                                    \
-    } while (0)
 
 DeviceController::DeviceController()
 {
