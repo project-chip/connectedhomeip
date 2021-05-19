@@ -98,9 +98,11 @@ class ServerStorageDelegate : public PersistentStorageDelegate
     }
 };
 
-class ServerStorageConfig : public StorageConfiguration {
+class ServerStorageConfig : public StorageConfiguration
+{
 public:
-    CHIP_ERROR Init() {
+    CHIP_ERROR Init()
+    {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -116,6 +118,7 @@ public:
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     PersistentStorageDelegate * Get() { return &mServerStorage; }
+
 private:
     ServerStorageDelegate mServerStorage;
 };
@@ -125,27 +128,27 @@ class ServerTransportConfig : chip::TransportConfiguration
 public:
     using transport = chip::TransportMgr<chip::Transport::UDP
 #if INET_CONFIG_ENABLE_IPV4
-                                            ,
-                                            chip::Transport::UDP
+                                         ,
+                                         chip::Transport::UDP
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                                            ,
-                                            chip::Transport::BLE<kMaxBlePendingPackets>
+                                         ,
+                                         chip::Transport::BLE<kMaxBlePendingPackets>
 #endif
-                                            >;
+                                         >;
 
     CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
     {
         return mTransportManager.Init(UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv6)
 #if INET_CONFIG_ENABLE_IPV4
-            ,
-            UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4)
+                                          ,
+                                      UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-            ,
-            BleListenParameters(bleLayer)
+                                          ,
+                                      BleListenParameters(bleLayer)
 #endif
-            );
+        );
     }
 
     chip::TransportMgrBase & Get() { return mTransportManager; }
@@ -370,7 +373,8 @@ static CHIP_ERROR OpenPairingWindowUsingVerifier(uint16_t discriminator, PASEVer
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gStack.GetExchangeManager(), &gStack.GetTransportManager(), &gStack.GetSecureSessionManager(), adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gStack.GetExchangeManager(), &gStack.GetTransportManager(),
+                                            &gStack.GetSecureSessionManager(), adminInfo);
 }
 
 class ServerCallback : public ExchangeDelegate
@@ -501,7 +505,8 @@ CHIP_ERROR OpenDefaultPairingWindow(ResetAdmins resetAdmins, chip::PairingWindow
     VerifyOrReturnError(adminInfo != nullptr, CHIP_ERROR_NO_MEMORY);
     gNextAvailableAdminId++;
 
-    return gRendezvousServer.WaitForPairing(std::move(params), &gStack.GetExchangeManager(), &gStack.GetTransportManager(), &gStack.GetSecureSessionManager(), adminInfo);
+    return gRendezvousServer.WaitForPairing(std::move(params), &gStack.GetExchangeManager(), &gStack.GetTransportManager(),
+                                            &gStack.GetSecureSessionManager(), adminInfo);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_MDNS && !CHIP_DEVICE_LAYER_TARGET_ESP32
@@ -597,7 +602,8 @@ void InitServer(AppDelegate * delegate)
     err = gStack.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::ServiceProvisioning::Id, &gCallbacks);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER);
 
-    err = gCASEServer.ListenForSessionEstablishment(&gStack.GetExchangeManager(), &gStack.GetTransportManager(), &gStack.GetSecureSessionManager(), &GetGlobalAdminPairingTable());
+    err = gCASEServer.ListenForSessionEstablishment(&gStack.GetExchangeManager(), &gStack.GetTransportManager(),
+                                                    &gStack.GetSecureSessionManager(), &GetGlobalAdminPairingTable());
     SuccessOrExit(err);
 
 exit:
@@ -630,8 +636,9 @@ CHIP_ERROR AddTestPairing()
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = gStack.GetSecureSessionManager().NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
+    SuccessOrExit(err = gStack.GetSecureSessionManager().NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() },
+                                                                    chip::kTestControllerNodeId, testSession,
+                                                                    SecureSession::SessionRole::kResponder, gNextAvailableAdminId));
     ++gNextAvailableAdminId;
 
 exit:

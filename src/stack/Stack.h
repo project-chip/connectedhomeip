@@ -152,10 +152,9 @@ class DefaultTransport : TransportConfiguration
 public:
     using transport = TransportMgr<
 #if INET_CONFIG_ENABLE_IPV4
-    Transport::UDP, /* IPv4 */
+        Transport::UDP, /* IPv4 */
 #endif
-    Transport::UDP
-    >;
+        Transport::UDP>;
 
     CHIP_ERROR Init(Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
     {
@@ -163,8 +162,7 @@ public:
 #if INET_CONFIG_ENABLE_IPV4
             Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mPort),
 #endif
-            Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mPort)
-        );
+            Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mPort));
     }
 
     TransportMgrBase & Get() { return mTransportManager; }
@@ -183,7 +181,7 @@ private:
     using SystemLayerConfig =
         typename first_if_any_or_default<IsSystemLayerConfiguration, DefaultSystemLayer, Configurations...>::type;
     using InetLayerConfig = typename first_if_any_or_default<IsInetLayerConfiguration, DefaultInetLayer, Configurations...>::type;
-    using StorageConfig = typename first_if_any_or_default<IsStorageConfiguration, DefaultStorage, Configurations...>::type;
+    using StorageConfig   = typename first_if_any_or_default<IsStorageConfiguration, DefaultStorage, Configurations...>::type;
     using BleLayerConfig  = typename first_if_any_or_default<IsBleLayerConfiguration, DefaultBleLayer, Configurations...>::type;
     using TransportConfig = typename first_if_any_or_default<IsTransportConfiguration, DefaultTransport, Configurations...>::type;
 
@@ -204,10 +202,12 @@ public:
         ReturnErrorOnFailure(mBleLayer.Init(this));
         ReturnErrorOnFailure(mTransport.Init(GetInetLayer(), GetBleLayer()));
         auto * storage = mStorage.Get();
-        if (storage != nullptr) {
+        if (storage != nullptr)
+        {
             ReturnErrorOnFailure(mAdmins.Init(storage));
         }
-        ReturnErrorOnFailure(mSessionManager.Init(mLocalDeviceId, &GetSystemLayer(), &GetTransportManager(), &mAdmins, &mMessageCounterManager));
+        ReturnErrorOnFailure(
+            mSessionManager.Init(mLocalDeviceId, &GetSystemLayer(), &GetTransportManager(), &mAdmins, &mMessageCounterManager));
         ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
         ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
         return CHIP_NO_ERROR;
@@ -244,6 +244,7 @@ public:
     SecureSessionMgr & GetSecureSessionManager() { return mSessionManager; }
     Transport::AdminPairingTable & GetAdmins() { return mAdmins; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
+
 private:
     NodeId mLocalDeviceId;
 

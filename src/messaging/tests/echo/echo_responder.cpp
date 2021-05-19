@@ -87,7 +87,8 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = GetChipStack().GetSecureSessionManager().NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder, gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                                              chip::SecureSession::SessionRole::kResponder, gAdminId);
     SuccessOrExit(err);
 
     if (!disableEcho)

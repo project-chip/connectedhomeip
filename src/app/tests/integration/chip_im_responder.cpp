@@ -164,8 +164,8 @@ int main(int argc, char * argv[])
 
     InitializeEventLogging(&GetChipStack().GetExchangeManager());
 
-    err = GetChipStack().GetSecureSessionManager().NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::SecureSession::SessionRole::kResponder,
-                                     gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing,
+                                                              chip::SecureSession::SessionRole::kResponder, gAdminId);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");

@@ -29,7 +29,8 @@
 #include <core/CHIPCore.h>
 #include <stack/Stack.h>
 
-chip::Stack<TransportConfigurationWithTcp> & GetChipStack() {
+chip::Stack<TransportConfigurationWithTcp> & GetChipStack()
+{
     static chip::Stack<TransportConfigurationWithTcp> gStack(gLocalDeviceId);
     return gStack;
 }

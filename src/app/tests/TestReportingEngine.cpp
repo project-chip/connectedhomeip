@@ -46,12 +46,12 @@
 
 namespace chip {
 static Stack<> gStack(chip::kTestDeviceNodeId);
-constexpr ClusterId kTestClusterId       = 6;
-constexpr EndpointId kTestEndpointId     = 1;
-constexpr chip::FieldId kTestFieldId1    = 1;
-constexpr chip::FieldId kTestFieldId2    = 2;
-constexpr uint8_t kTestFieldValue1       = 1;
-constexpr uint8_t kTestFieldValue2       = 2;
+constexpr ClusterId kTestClusterId    = 6;
+constexpr EndpointId kTestEndpointId  = 1;
+constexpr chip::FieldId kTestFieldId1 = 1;
+constexpr chip::FieldId kTestFieldId2 = 2;
+constexpr uint8_t kTestFieldValue1    = 1;
+constexpr uint8_t kTestFieldValue2    = 2;
 
 namespace app {
 CHIP_ERROR ReadSingleClusterData(AttributePathParams & aAttributePathParams, TLV::TLVWriter & aWriter)

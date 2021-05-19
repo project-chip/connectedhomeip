@@ -75,8 +75,9 @@ void InitializeEventLogging()
         { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
     };
 
-    chip::app::EventManagement::CreateEventManagement(
-        &gStack.GetExchangeManager(), sizeof(logStorageResources) / sizeof(logStorageResources[0]), gCircularEventBuffer, logStorageResources);
+    chip::app::EventManagement::CreateEventManagement(&gStack.GetExchangeManager(),
+                                                      sizeof(logStorageResources) / sizeof(logStorageResources[0]),
+                                                      gCircularEventBuffer, logStorageResources);
 }
 
 void SimpleDumpWriter(const char * aFormat, ...)

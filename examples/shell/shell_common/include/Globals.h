@@ -21,8 +21,8 @@
 #include <stack/Stack.h>
 #include <transport/raw/TCP.h>
 
-constexpr size_t kMaxPayloadSize  = 1280;
-constexpr size_t kResponseTimeOut = 1000;
+constexpr size_t kMaxPayloadSize            = 1280;
+constexpr size_t kResponseTimeOut           = 1000;
 constexpr chip::Transport::AdminId gAdminId = 0;
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -35,12 +35,9 @@ public:
 
     using transport = chip::TransportMgr<
 #if INET_CONFIG_ENABLE_IPV4
-        chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>,
-        chip::Transport::UDP,
+        chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>, chip::Transport::UDP,
 #endif
-        chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>,
-        chip::Transport::UDP
-        >;
+        chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>, chip::Transport::UDP>;
 
     CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
     {
@@ -50,8 +47,7 @@ public:
             chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort),
 #endif
             chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6).SetListenPort(mPort),
-            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6).SetListenPort(mPort)
-        );
+            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6).SetListenPort(mPort));
     }
 
     chip::TransportMgrBase & Get() { return mTransportManager; }

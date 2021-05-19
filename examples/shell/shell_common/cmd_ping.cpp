@@ -203,7 +203,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gStack.GetSecureSessionManager().NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator, gAdminId);
+    err = gStack.GetSecureSessionManager().NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                                      SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)

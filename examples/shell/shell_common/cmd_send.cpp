@@ -205,8 +205,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gStack.GetSecureSessionManager().NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+    err = gStack.GetSecureSessionManager().NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                                      SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -239,7 +239,6 @@ void ProcessCommand(streamer_t * stream, char * destination)
     adminInfo = gStack.GetAdmins().AssignAdminId(gAdminId, kTestControllerNodeId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gSendArguments.IsUsingTCP())
     {
@@ -250,7 +249,6 @@ void ProcessCommand(streamer_t * stream, char * destination)
     {
         peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
     }
-
 
     // Start the CHIP connection to the CHIP server.
     err = EstablishSecureSession(stream, peerAddress);

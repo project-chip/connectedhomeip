@@ -33,17 +33,14 @@ public:
     static constexpr size_t kMaxTcpActiveConnectionCount = 4;
     static constexpr size_t kMaxTcpPendingPackets        = 4;
 
-    using transport = chip::TransportMgr<
-        chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>,
-        chip::Transport::UDP
-        >;
+    using transport =
+        chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>, chip::Transport::UDP>;
 
     CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
     {
         return mTransportManager.Init(
             chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort),
-            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort)
-        );
+            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(mPort));
     }
 
     chip::TransportMgrBase & Get() { return mTransportManager; }

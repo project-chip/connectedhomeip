@@ -30,7 +30,8 @@
 #include <core/CHIPTLVDebug.hpp>
 #include <support/ErrorStr.h>
 
-chip::Stack<> & GetChipStack() {
+chip::Stack<> & GetChipStack()
+{
     static chip::Stack<> gStack(gLocalDeviceId);
     return gStack;
 }

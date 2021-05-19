@@ -158,10 +158,10 @@ CHIP_ERROR EstablishSecureSession()
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
-    err = GetChipStack().GetSecureSessionManager().NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
-                                         chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-                                     chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator,
-                                     gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(
+        chip::Optional<chip::Transport::PeerAddress>::Value(
+            chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
+        chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)

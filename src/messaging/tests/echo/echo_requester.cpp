@@ -136,7 +136,8 @@ CHIP_ERROR EstablishSecureSession()
     }
 
     // Attempt to connect to the peer.
-    err = GetChipStack().GetSecureSessionManager().NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret, chip::SecureSession::SessionRole::kInitiator, gAdminId);
+    err = GetChipStack().GetSecureSessionManager().NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
+                                                              chip::SecureSession::SessionRole::kInitiator, gAdminId);
 
 exit:
     if (err != CHIP_NO_ERROR)
