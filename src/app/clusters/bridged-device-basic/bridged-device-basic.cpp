@@ -22,6 +22,4 @@
 
 using namespace chip;
 
-void emberAfPluginBridgedDeviceBasicServerInitCallback(void)
-{
-}
+void emberAfPluginBridgedDeviceBasicServerInitCallback(void) {}
