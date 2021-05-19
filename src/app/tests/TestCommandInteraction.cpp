@@ -298,7 +298,7 @@ namespace {
 
 void InitializeChip(nlTestSuite * apSuite)
 {
-    NL_TEST_ASSERT(apSuite, chip::gStack.Init() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, chip::gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
 }
 
 // clang-format off

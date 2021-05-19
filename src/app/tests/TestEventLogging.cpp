@@ -64,7 +64,7 @@ static chip::app::CircularEventBuffer gCircularEventBuffer[3];
 
 void InitializeChip(nlTestSuite * apSuite)
 {
-    NL_TEST_ASSERT(apSuite, gStack.Init() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
 }
 
 void InitializeEventLogging()

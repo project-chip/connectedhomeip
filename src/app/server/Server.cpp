@@ -101,7 +101,7 @@ class ServerStorageDelegate : public PersistentStorageDelegate
 class ServerStorageConfig : public StorageConfiguration
 {
 public:
-    CHIP_ERROR Init()
+    CHIP_ERROR Init(const StackParameters & parameters)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -137,12 +137,12 @@ public:
 #endif
                                          >;
 
-    CHIP_ERROR Init(chip::Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
+    CHIP_ERROR Init(const StackParameters & parameters, chip::Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
     {
-        return mTransportManager.Init(UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv6)
+        return mTransportManager.Init(UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(parameters.GetListenPort())
 #if INET_CONFIG_ENABLE_IPV4
                                           ,
-                                      UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4)
+                                      UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort())
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                                           ,
@@ -152,11 +152,9 @@ public:
     }
 
     chip::TransportMgrBase & Get() { return mTransportManager; }
-    void SetListenPort(uint16_t port) { mPort = port; }
 
 private:
     transport mTransportManager;
-    uint16_t mPort = CHIP_PORT;
 };
 
 static chip::Stack<ServerStorageConfig> gStack(chip::kTestDeviceNodeId);
@@ -542,7 +540,7 @@ void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = gStack.Init();
+    err = gStack.Init(StackParameters());
     SuccessOrExit(err);
 
     InitDataModelHandler(&gStack.GetExchangeManager());

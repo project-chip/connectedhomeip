@@ -101,7 +101,7 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
 namespace {
 void InitializeChip(nlTestSuite * apSuite)
 {
-    NL_TEST_ASSERT(apSuite, gStack.Init() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
 }
 
 // clang-format off

@@ -225,8 +225,7 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    GetChipStack().GetTransportConfig().SetListenPort(ECHO_CLIENT_PORT);
-    GetChipStack().Init();
+    GetChipStack().Init(chip::StackParameters().SetListenPort(ECHO_CLIENT_PORT));
 
     adminInfo = GetChipStack().GetAdmins().AssignAdminId(gAdminId, gLocalDeviceId);
     VerifyOrExit(adminInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
