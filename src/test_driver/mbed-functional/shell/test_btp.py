@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import pytest
+from time import sleep
 
 from common.utils import scan_chip_ble_devices
 
@@ -21,22 +22,26 @@ import logging
 log = logging.getLogger(__name__)
 
 @pytest.mark.smoketest
-def test_btp_device_visiable(device):
+def test_btp_device_visiable(device, device_controller):
     # Check if device is visible
-    assert len(scan_chip_ble_devices()) != 0
+    assert len(scan_chip_ble_devices(device_controller)) != 0
 
 @pytest.mark.bletest
-def test_btp_adv_check(device):
+def test_btp_adv_check(device, device_controller):
     # Enable advertisement
     ret = device.send(command="btp adv start", expected_output="Done")
     assert ret != None
 
+    sleep(1)
+
     # Check if device is visible
-    assert len(scan_chip_ble_devices()) != 0
+    assert len(scan_chip_ble_devices(device_controller)) != 0
 
     # Disable advertisement
     ret = device.send(command="btp adv stop", expected_output="Done")
     assert ret != None
 
+    sleep(1)
+
     # Check if device is not visible
-    assert len(scan_chip_ble_devices()) == 0
+    assert len(scan_chip_ble_devices(device_controller)) == 0

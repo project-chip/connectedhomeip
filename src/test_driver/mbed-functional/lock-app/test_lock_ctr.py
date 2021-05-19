@@ -24,13 +24,10 @@ log = logging.getLogger(__name__)
 
 DEVICE_NODE_ID=1234
 
-def test_wifi_provisioning(device, network, device_controller):
+def test_lock_ctrl(device, network, device_controller):
     network_ssid = network[0]
     network_pass = network[1]
     
-    ret = device.wait_for_output("SetupQRCode")
-    assert ret != None and len(ret) > 1
-
     qr_code = ret[-1].split('[', 1)[1].split(']')[0]
     device_details = dict(SetupPayload().ParseQrCode("VP:vendorpayload%{}".format(qr_code)).attributes)
     assert device_details != None and len(device_details) != 0
@@ -52,3 +49,15 @@ def test_wifi_provisioning(device, network, device_controller):
     nodeId, ip_details = run_wifi_provisioning(device_controller, network_ssid, network_pass, int(device_details["Discriminator"]), int(device_details["SetUpPINCode"]), DEVICE_NODE_ID)
     assert nodeId == DEVICE_NODE_ID
     assert ip_details != None
+
+    # Check on command
+    err, res = device_controller.ZCLSend("OnOff", "On", nodeId, 1, 0, None, blocking=True)
+    assert err == 0
+
+    # Check off command
+    err, res = device_controller.ZCLSend("OnOff", "Off", nodeId, 1, 0, None, blocking=True)
+    assert err == 0
+
+    # Check toggle command
+    err, res = device_controller.ZCLSend("OnOff", "Toggle", nodeId, 1, 0, None, blocking=True)
+    assert err == 0

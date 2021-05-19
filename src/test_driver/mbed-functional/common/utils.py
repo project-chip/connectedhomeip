@@ -16,7 +16,6 @@ from ipaddress import ip_address, IPv4Address
 
 from chip import exceptions
 
-from chip import ChipDeviceCtrl
 if platform.system() == 'Darwin':
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
@@ -37,9 +36,9 @@ def is_network_visible(net_list, net_ssid):
             return True
     return False
 
-def scan_chip_ble_devices():
+def scan_chip_ble_devices(devCtrl):
     devices = []
-    bleMgr = BleManager(devMgr=ChipDeviceCtrl.ChipDeviceController())
+    bleMgr = BleManager(devCtrl)
     bleMgr.scan("-t 5")
 
     for device in bleMgr.peripheral_list:
@@ -50,9 +49,7 @@ def scan_chip_ble_devices():
 
     return devices
 
-def run_wifi_provisioning(ssid, password, discriminator, pinCode, nodeId=None):
-    devCtrl = ChipDeviceCtrl.ChipDeviceController()
-
+def run_wifi_provisioning(devCtrl, ssid, password, discriminator, pinCode, nodeId=None):
     if nodeId == None:
         nodeId = random.randint(1, 1000000)
 

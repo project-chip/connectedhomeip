@@ -26,6 +26,8 @@ from .serial_connection import SerialConnection
 from .serial_device import SerialDevice
 from .utils import is_network_visible
 
+from chip import ChipDeviceCtrl
+
 import logging
 log = logging.getLogger(__name__)
 
@@ -227,3 +229,9 @@ def connected_device(device, network):
         ret = device.send(command="device sta connected", expected_output="Done")
         assert ret != None and len(ret) > 1
         assert ret[-2].rstrip().lower() == "false"
+
+
+@pytest.fixture(scope="function")
+def device_controller():
+    devCtrl = ChipDeviceCtrl.ChipDeviceController()
+    yield devCtrl
