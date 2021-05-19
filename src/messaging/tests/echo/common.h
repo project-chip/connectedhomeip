@@ -38,9 +38,12 @@ public:
 
     CHIP_ERROR Init(const chip::StackParameters & parameters, chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
     {
-        return mTransportManager.Init(
-            chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort()),
-            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort()));
+        return mTransportManager.Init(chip::Transport::TcpListenParameters(&inetLayer)
+                                          .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                          .SetListenPort(parameters.GetListenPort()),
+                                      chip::Transport::UdpListenParameters(&inetLayer)
+                                          .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                                          .SetListenPort(parameters.GetListenPort()));
     }
 
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }

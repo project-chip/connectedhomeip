@@ -139,14 +139,15 @@ public:
 
     CHIP_ERROR Init(const StackParameters & parameters, chip::Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
     {
-        return mTransportManager.Init(UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(parameters.GetListenPort())
+        return mTransportManager.Init(
+            UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(parameters.GetListenPort())
 #if INET_CONFIG_ENABLE_IPV4
-                                          ,
-                                      UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort())
+                ,
+            UdpListenParameters(&inetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort())
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-                                          ,
-                                      BleListenParameters(bleLayer)
+                ,
+            BleListenParameters(bleLayer)
 #endif
         );
     }

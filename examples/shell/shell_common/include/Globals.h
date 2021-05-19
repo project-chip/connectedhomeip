@@ -43,11 +43,19 @@ public:
     {
         return mTransportManager.Init(
 #if INET_CONFIG_ENABLE_IPV4
-            chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort()),
-            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort()),
+            chip::Transport::TcpListenParameters(&inetLayer)
+                .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                .SetListenPort(parameters.GetListenPort()),
+            chip::Transport::UdpListenParameters(&inetLayer)
+                .SetAddressType(chip::Inet::kIPAddressType_IPv4)
+                .SetListenPort(parameters.GetListenPort()),
 #endif
-            chip::Transport::TcpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6).SetListenPort(parameters.GetListenPort()),
-            chip::Transport::UdpListenParameters(&inetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv6).SetListenPort(parameters.GetListenPort()));
+            chip::Transport::TcpListenParameters(&inetLayer)
+                .SetAddressType(chip::Inet::kIPAddressType_IPv6)
+                .SetListenPort(parameters.GetListenPort()),
+            chip::Transport::UdpListenParameters(&inetLayer)
+                .SetAddressType(chip::Inet::kIPAddressType_IPv6)
+                .SetListenPort(parameters.GetListenPort()));
     }
 
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }

@@ -39,7 +39,12 @@ public:
     StackParameters() : mListenPort(CHIP_PORT) {}
 
     uint16_t GetListenPort() const { return mListenPort; }
-    StackParameters & SetListenPort(uint16_t listenPort) { mListenPort = listenPort; return *this; }
+    StackParameters & SetListenPort(uint16_t listenPort)
+    {
+        mListenPort = listenPort;
+        return *this;
+    }
+
 private:
     uint16_t mListenPort;
 };
@@ -70,6 +75,7 @@ public:
     CHIP_ERROR Shutdown() { return mSystemLayer.Shutdown(); }
 
     System::Layer & Get() { return mSystemLayer; }
+
 private:
     System::Layer mSystemLayer;
 };
@@ -97,10 +103,14 @@ public:
 class DefaultInetLayer : InetLayerConfiguration
 {
 public:
-    CHIP_ERROR Init(const StackParameters & parameters, System::Layer & aSystemLayer) { return mInetLayer.Init(aSystemLayer, nullptr); }
+    CHIP_ERROR Init(const StackParameters & parameters, System::Layer & aSystemLayer)
+    {
+        return mInetLayer.Init(aSystemLayer, nullptr);
+    }
     CHIP_ERROR Shutdown() { return mInetLayer.Shutdown(); }
 
     Inet::InetLayer & Get() { return mInetLayer; }
+
 private:
     Inet::InetLayer mInetLayer;
 };
@@ -164,9 +174,13 @@ public:
     {
         return mTransportManager.Init(
 #if INET_CONFIG_ENABLE_IPV4
-            Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(parameters.GetListenPort()),
+            Transport::UdpListenParameters(&inetLayer)
+                .SetAddressType(Inet::kIPAddressType_IPv4)
+                .SetListenPort(parameters.GetListenPort()),
 #endif
-            Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(parameters.GetListenPort()));
+            Transport::UdpListenParameters(&inetLayer)
+                .SetAddressType(Inet::kIPAddressType_IPv6)
+                .SetListenPort(parameters.GetListenPort()));
     }
 
     CHIP_ERROR Shutdown()
