@@ -38,7 +38,7 @@ for sdkconfig in "$root"/sdkconfig*.defaults; do
     sdkconfig_name=${sdkconfig#"$root"/}
     rm -f "$root"/sdkconfig
     SDKCONFIG_DEFAULTS=$sdkconfig_name idf make -j8 -C "$root" defconfig "$@"
-    cd $root
+    cd "$root"
     idf.py build "$@" || {
         cd -
         echo "build $sdkconfig_name failed"
