@@ -47,6 +47,7 @@ EmberAfStatus emberAfLowPowerClusterServerCommandParse(EmberAfClusterCommand * c
 EmberAfStatus emberAfNetworkCommissioningClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOtaSoftwareUpdateClientClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOtaSoftwareUpdateServerClusterServerCommandParse(EmberAfClusterCommand * cmd);
+EmberAfStatus emberAfOccupancySensingClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfOperationalCredentialsClusterServerCommandParse(EmberAfClusterCommand * cmd);
 EmberAfStatus emberAfPumpConfigurationAndControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -160,6 +161,10 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_OTA_SERVER_CLUSTER_ID:
             result = emberAfOtaSoftwareUpdateServerClusterServerCommandParse(cmd);
+            break;
+        case ZCL_OCCUPANCY_SENSING_CLUSTER_ID:
+            // No commands are enabled for cluster Occupancy Sensing
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_ON_OFF_CLUSTER_ID:
             result = emberAfOnOffClusterServerCommandParse(cmd);
