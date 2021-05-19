@@ -651,4 +651,3 @@ AdminPairingTable & GetGlobalAdminPairingTable()
 {
     return gStack.GetAdmins();
 }
-
