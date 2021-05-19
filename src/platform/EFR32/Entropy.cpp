@@ -67,13 +67,6 @@ int GetEntropy_EFR32(uint8_t * buf, size_t count)
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ThreadStackManagerImpl::IsInitialized())
-    {
-        ThreadStackMgr().LockThreadStack();
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-
     otError otErr = otPlatEntropyGet(buf, (uint16_t) count);
     if (otErr != OT_ERROR_NONE)
     {
