@@ -79,7 +79,7 @@ CHIP_ERROR AdminPairingInfo::StoreIntoKVS(PersistentStorageDelegate * kvs)
     err = kvs->SyncSetKeyValue(key, info, sizeof(StorableAdminPairingInfo));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue.");
+        ChipLogError(Discovery, "Error occurred calling SyncSetKeyValue: %s", chip::ErrorStr(err));
     }
 
 exit:

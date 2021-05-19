@@ -696,7 +696,7 @@ INET_ERROR TCPEndPoint::GetLocalInfo(IPAddress * retAddr, uint16_t * retPort)
     return res;
 }
 
-INET_ERROR TCPEndPoint::Send(System::PacketBufferHandle data, bool push)
+INET_ERROR TCPEndPoint::Send(System::PacketBufferHandle && data, bool push)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -1031,7 +1031,7 @@ INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
     return res;
 }
 
-INET_ERROR TCPEndPoint::SetReceivedDataForTesting(System::PacketBufferHandle data)
+INET_ERROR TCPEndPoint::SetReceivedDataForTesting(System::PacketBufferHandle && data)
 {
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
@@ -1993,7 +1993,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
     }
 }
 
-void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle buf)
+void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle && buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
     if (State == kState_Connected || State == kState_SendShutdown)

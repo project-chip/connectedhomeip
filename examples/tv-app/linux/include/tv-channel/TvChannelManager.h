@@ -21,6 +21,7 @@
 
 #include <core/CHIPError.h>
 #include <string>
+#include <vector>
 
 class TvChannelManager
 {

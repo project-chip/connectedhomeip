@@ -131,7 +131,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
                        EncryptionState::kPayloadIsUnencrypted);
 }
 
-CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && msgBuf,
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -147,7 +147,7 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                                         System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
+                                         System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
                                          EncryptionState encryptionState)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -290,7 +290,7 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
-void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle msg)
+void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     PacketHeader packetHeader;
 
@@ -307,7 +307,7 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
 }
 
 void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle msg)
+                                       System::PacketBufferHandle && msg)
 {
     if (mCB != nullptr)
     {
@@ -318,7 +318,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
 }
 
 void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBufferHandle msg)
+                                             System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -349,12 +349,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     {
         if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
         {
-            err = packetHeader.EncodeBeforeData(msg);
-            SuccessOrExit(err);
-
             // Queue and start message sync procedure
             err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
-                { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress, std::move(msg));
+                packetHeader, { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress,
+                std::move(msg));
 
             if (err != CHIP_NO_ERROR)
             {

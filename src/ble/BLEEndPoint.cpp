@@ -663,7 +663,7 @@ void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
     QueueTxUnlock();
 }
 
-BLE_ERROR BLEEndPoint::Send(PacketBufferHandle data)
+BLE_ERROR BLEEndPoint::Send(PacketBufferHandle && data)
 {
     ChipLogDebugBleEndPoint(Ble, "entered Send");
 
@@ -1090,7 +1090,7 @@ exit:
     return err;
 }
 
-BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle data)
+BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle && data)
 {
     BLE_ERROR err = BLE_NO_ERROR;
     BleTransportCapabilitiesRequestMessage req;
@@ -1179,7 +1179,7 @@ exit:
     return err;
 }
 
-BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle data)
+BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle && data)
 {
     BLE_ERROR err = BLE_NO_ERROR;
     BleTransportCapabilitiesResponseMessage resp;
@@ -1268,7 +1268,7 @@ SequenceNumber_t BLEEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t lastRec
     return static_cast<uint8_t>(newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
-BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
+BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle && data)
 {
     ChipLogDebugBleEndPoint(Ble, "+++++++++++++++++++++ entered receive");
     BLE_ERROR err                = BLE_NO_ERROR;
