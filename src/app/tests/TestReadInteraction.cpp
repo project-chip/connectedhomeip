@@ -142,11 +142,6 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
 
 namespace {
 
-void InitializeChip(nlTestSuite * apSuite)
-{
-    NL_TEST_ASSERT(apSuite, chip::gStack.Init() == CHIP_NO_ERROR);
-}
-
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -174,11 +169,12 @@ int TestReadInteraction()
     };
     // clang-format on
 
-    InitializeChip(&theSuite);
-
+    NL_TEST_ASSERT(&theSuite, chip::gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
     nlTestRunner(&theSuite, nullptr);
+    int result = nlTestRunnerStats(&theSuite);
+    NL_TEST_ASSERT(&theSuite, chip::gStack.Shutdown() == CHIP_NO_ERROR);
 
-    return (nlTestRunnerStats(&theSuite));
+    return result;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReadInteraction)

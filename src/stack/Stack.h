@@ -33,6 +33,22 @@
 
 namespace chip {
 
+class StackParameters
+{
+public:
+    StackParameters() : mListenPort(CHIP_PORT) {}
+
+    uint16_t GetListenPort() const { return mListenPort; }
+    StackParameters & SetListenPort(uint16_t listenPort)
+    {
+        mListenPort = listenPort;
+        return *this;
+    }
+
+private:
+    uint16_t mListenPort;
+};
+
 /* ========================== SystemLayer Configuration ========================== */
 struct SystemLayerConfiguration
 {
@@ -46,7 +62,7 @@ struct IsSystemLayerConfiguration : std::is_base_of<SystemLayerConfiguration, T>
 class DefaultSystemLayer : SystemLayerConfiguration
 {
 public:
-    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(const StackParameters & parameters) { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     System::Layer & Get() { return DeviceLayer::SystemLayer; }
@@ -55,8 +71,7 @@ public:
 class DefaultSystemLayer : SystemLayerConfiguration
 {
 public:
-    CHIP_ERROR Init() { return mSystemLayer.Init(nullptr); }
-
+    CHIP_ERROR Init(const StackParameters & parameters) { return mSystemLayer.Init(nullptr); }
     CHIP_ERROR Shutdown() { return mSystemLayer.Shutdown(); }
 
     System::Layer & Get() { return mSystemLayer; }
@@ -79,7 +94,7 @@ struct IsInetLayerConfiguration : std::is_base_of<InetLayerConfiguration, T>
 class DefaultInetLayer : InetLayerConfiguration
 {
 public:
-    CHIP_ERROR Init(System::Layer & aSystemLayer) { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(const StackParameters & parameters, System::Layer & aSystemLayer) { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     Inet::InetLayer & Get() { return DeviceLayer::InetLayer; }
@@ -88,8 +103,10 @@ public:
 class DefaultInetLayer : InetLayerConfiguration
 {
 public:
-    CHIP_ERROR Init(System::Layer & aSystemLayer) { return mInetLayer.Init(aSystemLayer, nullptr); }
-
+    CHIP_ERROR Init(const StackParameters & parameters, System::Layer & aSystemLayer)
+    {
+        return mInetLayer.Init(aSystemLayer, nullptr);
+    }
     CHIP_ERROR Shutdown() { return mInetLayer.Shutdown(); }
 
     Inet::InetLayer & Get() { return mInetLayer; }
@@ -111,7 +128,7 @@ struct IsStorageConfiguration : std::is_base_of<StorageConfiguration, T>
 class DefaultStorage : StorageConfiguration
 {
 public:
-    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(const StackParameters & parameters) { return CHIP_NO_ERROR; }
     CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     PersistentStorageDelegate * Get() { return nullptr; }
@@ -129,11 +146,8 @@ struct IsBleLayerConfiguration : std::is_base_of<BleLayerConfiguration, T>
 class DefaultBleLayer : BleLayerConfiguration
 {
 public:
-    template <typename T>
-    CHIP_ERROR Init(T * stack)
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR Init(const StackParameters & parameters) { return CHIP_NO_ERROR; }
+    CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
 
     Ble::BleLayer * Get() { return nullptr; }
 };
@@ -156,24 +170,39 @@ public:
 #endif
         Transport::UDP>;
 
-    CHIP_ERROR Init(Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
+    CHIP_ERROR Init(const StackParameters & parameters, Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
     {
         return mTransportManager.Init(
 #if INET_CONFIG_ENABLE_IPV4
-            Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mPort),
+            Transport::UdpListenParameters(&inetLayer)
+                .SetAddressType(Inet::kIPAddressType_IPv4)
+                .SetListenPort(parameters.GetListenPort()),
 #endif
-            Transport::UdpListenParameters(&inetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mPort));
+            Transport::UdpListenParameters(&inetLayer)
+                .SetAddressType(Inet::kIPAddressType_IPv6)
+                .SetListenPort(parameters.GetListenPort()));
+    }
+
+    CHIP_ERROR Shutdown()
+    {
+        mTransportManager.Close();
+        return CHIP_NO_ERROR;
     }
 
     TransportMgrBase & Get() { return mTransportManager; }
-    void SetListenPort(uint16_t port) { mPort = port; }
 
 private:
     transport mTransportManager;
-    uint16_t mPort = CHIP_PORT;
 };
 
 /* ========================== Stack ========================== */
+
+/**
+ * @brief
+ *   Chip Stack is an interface to manage all chip modules for applications.
+ *
+ *   This class should not be used inside CHIP SDK.
+ */
 template <typename... Configurations>
 class Stack
 {
@@ -189,18 +218,19 @@ public:
     Stack(NodeId localDeviceId) : mLocalDeviceId(localDeviceId) {}
     virtual ~Stack() {}
 
-    CHIP_ERROR Init()
+    // TODO(#6931): CHIP initialization should be posted to chip thread, in order to avoid racing problems
+    CHIP_ERROR Init(const StackParameters & parameters)
     {
         ReturnErrorOnFailure(chip::Platform::MemoryInit());
 #if CONFIG_DEVICE_LAYER
         // Initialize the CHIP stack.
         ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
 #endif
-        ReturnErrorOnFailure(mSystemLayer.Init());
-        ReturnErrorOnFailure(mInetLayer.Init(GetSystemLayer()));
-        ReturnErrorOnFailure(mStorage.Init());
-        ReturnErrorOnFailure(mBleLayer.Init(this));
-        ReturnErrorOnFailure(mTransport.Init(GetInetLayer(), GetBleLayer()));
+        ReturnErrorOnFailure(mSystemLayer.Init(parameters));
+        ReturnErrorOnFailure(mInetLayer.Init(parameters, GetSystemLayer()));
+        ReturnErrorOnFailure(mStorage.Init(parameters));
+        ReturnErrorOnFailure(mBleLayer.Init(parameters));
+        ReturnErrorOnFailure(mTransport.Init(parameters, GetInetLayer(), GetBleLayer()));
         auto * storage = mStorage.Get();
         if (storage != nullptr)
         {
@@ -213,15 +243,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    // TODO(#6931): CHIP shutdown should be posted to chip thread, in order to avoid racing problems
     CHIP_ERROR Shutdown()
     {
         mMessageCounterManager.Shutdown();
         mExchangeManager.Shutdown();
         mSessionManager.Shutdown();
-
-        Ble::BleLayer * ble = GetBleLayer();
-        if (ble != nullptr)
-            ble->Shutdown();
+        mTransport.Shutdown();
+        mBleLayer.Shutdown();
         mInetLayer.Shutdown();
         mSystemLayer.Shutdown();
 #if CONFIG_DEVICE_LAYER
@@ -230,16 +259,19 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR ResetTransport() { return mTransport.Init(mInetLayer.Get()); }
-
     TransportConfig & GetTransportConfig() { return mTransport; }
+    BleLayerConfig & GetBleLayerConfig() { return mBleLayer; }
 
     NodeId GetLocalNodeId() { return mLocalDeviceId; }
     System::Layer & GetSystemLayer() { return mSystemLayer.Get(); }
     Inet::InetLayer & GetInetLayer() { return mInetLayer.Get(); }
-    BleLayerConfig & GetBleLayerConfig() { return mBleLayer; }
+
+    // For platforms which have no BLE, this will return nullptr.
     Ble::BleLayer * GetBleLayer() { return mBleLayer.Get(); }
+
+    // For platforms without a persistent storage, this will return nullptr.
     PersistentStorageDelegate * GetStorage() { return mStorage.Get(); }
+
     TransportMgrBase & GetTransportManager() { return mTransport.Get(); }
     SecureSessionMgr & GetSecureSessionManager() { return mSessionManager; }
     Transport::AdminPairingTable & GetAdmins() { return mAdmins; }
@@ -252,13 +284,12 @@ private:
     InetLayerConfig mInetLayer;
     StorageConfig mStorage;
     BleLayerConfig mBleLayer;
-
-    Transport::AdminPairingTable mAdmins;
-
     TransportConfig mTransport;
+
     SecureSessionMgr mSessionManager;
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
+    Transport::AdminPairingTable mAdmins;
 };
 
 } // namespace chip

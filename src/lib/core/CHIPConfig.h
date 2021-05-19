@@ -87,19 +87,6 @@
 #endif // CHIP_CONFIG_ERROR_TYPE
 
 /**
- *  @def CHIP_CONFIG_CHIP_IS_SINGLETON
- *
- *  @brief
- *    This defines whether chip is singleton. If chip is singleton, all
- *    pointers to chip components like SecureSessionMgr, ExchangeManager, etc
- *    can be omitted, which saves memory on small platforms. For some situation
- *    where there can be multiple chip instances, define this to 0.
- */
-#ifndef CHIP_CONFIG_CHIP_IS_SINGLETON
-#define CHIP_CONFIG_CHIP_IS_SINGLETON 1
-#endif // CHIP_CONFIG_CHIP_IS_SINGLETON
-
-/**
  *  @def CHIP_CONFIG_NO_ERROR
  *
  *  @brief

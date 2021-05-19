@@ -137,10 +137,6 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
 } // namespace chip
 
 namespace {
-void InitializeChip(nlTestSuite * apSuite)
-{
-    NL_TEST_ASSERT(apSuite, chip::gStack.Init() == CHIP_NO_ERROR);
-}
 
 // clang-format off
 const nlTest sTests[] =
@@ -163,11 +159,12 @@ int TestReportingEngine()
     };
     // clang-format on
 
-    InitializeChip(&theSuite);
-
+    NL_TEST_ASSERT(&theSuite, chip::gStack.Init(chip::StackParameters()) == CHIP_NO_ERROR);
     nlTestRunner(&theSuite, nullptr);
+    int result = nlTestRunnerStats(&theSuite);
+    NL_TEST_ASSERT(&theSuite, chip::gStack.Shutdown() == CHIP_NO_ERROR);
 
-    return (nlTestRunnerStats(&theSuite));
+    return result;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestReportingEngine)
