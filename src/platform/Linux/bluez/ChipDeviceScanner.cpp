@@ -131,13 +131,13 @@ CHIP_ERROR ChipDeviceScanner::StartScan(unsigned timeoutMs)
         return CHIP_ERROR_INTERNAL;
     }
 
-    CHIP_ERROR err = chip::DeviceLayer::SystemLayer.StartTimer(timeoutMs, TimerExpiredCallback, static_cast<void *>(this));
+    System::Timer * lTimer = chip::DeviceLayer::SystemLayer.StartTimer(timeoutMs, TimerExpiredCallback, static_cast<void *>(this));
 
-    if (err != CHIP_NO_ERROR)
+    if (lTimer == nullptr)
     {
         ChipLogError(Ble, "Failed to schedule scan timeout.");
         StopScan();
-        return err;
+        return CHIP_ERROR_START_TIMER_FAILED;
     }
 
     return CHIP_NO_ERROR;

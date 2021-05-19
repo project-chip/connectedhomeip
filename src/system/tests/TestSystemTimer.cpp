@@ -223,8 +223,8 @@ static void CheckStartTimer(nlTestSuite * inSuite, void * aContext)
 
     sStartTimerHandled = false;
 
-    Error err = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
-    NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
+    Timer * lTimer = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
+    NL_TEST_ASSERT(lContext.mTestSuite, lTimer != nullptr);
 
     while (!sStartTimerHandled)
     {
@@ -235,7 +235,7 @@ static void CheckStartTimer(nlTestSuite * inSuite, void * aContext)
     }
 
     NL_TEST_ASSERT(lContext.mTestSuite, sStartTimerHandled == true);
-    lSys.CancelTimer(HandleStartTimer, aContext);
+    lSys.CancelTimer(lTimer);
 }
 
 static void CheckExtendTimer(nlTestSuite * inSuite, void * aContext)
@@ -253,8 +253,8 @@ static void CheckExtendTimer(nlTestSuite * inSuite, void * aContext)
     sleepTime.tv_sec  = 0;
     sleepTime.tv_usec = 1000; // 1 ms tick
 
-    err = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
-    NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
+    Timer * lTimer = lSys.StartTimer(timeout_100ms, HandleStartTimer, aContext);
+    NL_TEST_ASSERT(lContext.mTestSuite, lTimer != nullptr);
 
     // Sleep for 20ms before extending the timer
     for (int i = 0; i < 20; i++)
@@ -262,7 +262,7 @@ static void CheckExtendTimer(nlTestSuite * inSuite, void * aContext)
         ServiceEvents(lSys, sleepTime);
     }
 
-    err = lSys.ExtendTimer(timeout_50ms, HandleStartTimer, aContext);
+    err = lSys.ExtendTimer(timeout_50ms, lTimer);
     NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_NO_ERROR);
 
     while (!sStartTimerHandled)
@@ -271,6 +271,9 @@ static void CheckExtendTimer(nlTestSuite * inSuite, void * aContext)
     }
 
     NL_TEST_ASSERT(lContext.mTestSuite, sStartTimerHandled == true);
+
+    err = lSys.ExtendTimer(timeout_50ms, nullptr);
+    NL_TEST_ASSERT(lContext.mTestSuite, err == CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND);
 }
 
 // Test Suite

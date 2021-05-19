@@ -111,8 +111,8 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
-    err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
+    System::Timer * lTimer = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+    NL_TEST_ASSERT(inSuite, lTimer == nullptr);
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
     err = gInet.ResolveHostAddress(testHostName, 1, &testDestAddr, HandleDNSResolveComplete, nullptr);
@@ -506,16 +506,22 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         err = gInet.NewTCPEndPoint(&testTCPEP);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_NO_ENDPOINTS);
 
+    System::Timer * lTimer = nullptr;
+
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
-        err = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
-        NL_TEST_ASSERT(inSuite, err == CHIP_SYSTEM_NO_ERROR);
+        lTimer = gSystemLayer.StartTimer(10, HandleTimer, nullptr);
+        NL_TEST_ASSERT(inSuite, lTimer != nullptr);
     }
 
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
-        err = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
-    NL_TEST_ASSERT(inSuite, err == CHIP_SYSTEM_ERROR_NO_MEMORY);
+    {
+        lTimer = gSystemLayer.StartTimer(10, HandleTimer, &numTimersTest[i]);
+        if (lTimer == nullptr)
+            break;
+    }
+    NL_TEST_ASSERT(inSuite, lTimer == nullptr);
 
     ShutdownNetwork();
     ShutdownSystemLayer();

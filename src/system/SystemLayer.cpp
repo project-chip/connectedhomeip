@@ -282,52 +282,47 @@ void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCal
  *   @param[in]  aComplete     A pointer to the function called when timer expires.
  *   @param[in]  aAppState     A pointer to the application state object used when timer expires.
  *
- *   @return CHIP_SYSTEM_NO_ERROR On success.
- *   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
- *   @return Other Value indicating timer failed to start.
+ *   @return Timer object handle On success.
+ *   @return nullptr if a timer failed to start.
  *
  */
-Error Layer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState)
+Timer * Layer::StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState)
 {
     Error lReturn;
     Timer * lTimer;
 
     this->CancelTimer(aComplete, aAppState);
     lReturn = this->NewTimer(lTimer);
-    SuccessOrExit(lReturn);
+    if (lReturn != CHIP_SYSTEM_NO_ERROR)
+    {
+        return nullptr;
+    }
 
     lReturn = lTimer->Start(aMilliseconds, aComplete, aAppState);
     if (lReturn != CHIP_SYSTEM_NO_ERROR)
     {
         lTimer->Release();
+        return nullptr;
     }
 
-exit:
-    return lReturn;
+    return lTimer;
 }
 
 /**
  * @brief
  *   This method extends a one-shot timer.
  *
- *   @note
- *       Only a single timer is allowed to be started with the same @a aComplete and @a aAppState
- *       arguments. If called with @a aComplete and @a aAppState identical to an existing timer,
- *       the currently-running timer will be extended for a duration of specified period, otherwise,
- *       return error CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND.
- *
  *   @param[in]  aMilliseconds Extension time in milliseconds.
- *   @param[in]  aComplete     A pointer to the function called when timer expires.
- *   @param[in]  aAppState     A pointer to the application state object used when timer expires.
+ *   @param[in]  aTimerPtr     A handle to the existing Timer Object to extend.
  *
  *   @return CHIP_SYSTEM_NO_ERROR On success.
- *   @return CHIP_SYSTEM_ERROR_NO_MEMORY If a timer cannot be allocated.
- *   @return CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND If the timer cannot be found.
+ *   @return CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND If the existing timer cannot be found.
  *   @return CHIP_SYSTEM_ERROR_UNEXPECTED_STATE If System Layer is not initialized.
- *   @return Other Value indicating timer failed to start or extend.
+ *   @return CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT If the specified timer is overdue.
+ *   @return Other Value indicating timer failed to extend.
  *
  */
-Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aComplete, void * aAppState)
+Error Layer::ExtendTimer(uint32_t aMilliseconds, Timer * aTimerPtr)
 {
     VerifyOrReturnError(this->State() == kLayerState_Initialized, CHIP_SYSTEM_ERROR_UNEXPECTED_STATE);
 
@@ -336,7 +331,7 @@ Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aComp
     {
         Timer * timer = Timer::sPool.Get(*this, i);
 
-        if (timer != nullptr && timer->OnComplete == aComplete && timer->AppState == aAppState)
+        if (timer != nullptr && timer == aTimerPtr)
         {
             lTimer = timer;
             break;
@@ -347,13 +342,42 @@ Error Layer::ExtendTimer(uint32_t aMilliseconds, Layer::TimerCompleteFunct aComp
 
     Timer::Epoch currentEpoch = Timer::GetCurrentEpoch();
 
-    // Make sure the currently-running timer is not overdue. The platform timer API has MSEC resolution, we only extend
-    // the timer if it has more than 1 msec to expire.
+    // Make sure the currently-running timer is not overdue. The platform timer API has MSEC resolution, we
+    // only extend the timer if it has more than 1 msec to expire.
     VerifyOrReturnError(!Timer::IsEarlierEpoch(lTimer->mAwakenEpoch, currentEpoch + 1), CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
     aMilliseconds += static_cast<uint32_t>(lTimer->mAwakenEpoch - currentEpoch);
 
-    return StartTimer(aMilliseconds, aComplete, aAppState);
+    lTimer = StartTimer(aMilliseconds, lTimer->OnComplete, lTimer->AppState);
+
+    return (lTimer != nullptr) ? CHIP_SYSTEM_NO_ERROR : CHIP_SYSTEM_ERROR_TIMER_START_FAILED;
+}
+
+/**
+ * @brief
+ *   This method cancels a one-shot timer, started earlier through @p StartTimer().
+ *
+ *   @note
+ *       The cancellation could fail if the specified timer couldn't be found,
+ *
+ *   @param[in]  aTimerPtr   A handle to the existing Timer Object returned from calling @p StartTimer().
+ *
+ */
+void Layer::CancelTimer(Timer * aTimerPtr)
+{
+    if (this->State() != kLayerState_Initialized)
+        return;
+
+    for (size_t i = 0; i < Timer::sPool.Size(); ++i)
+    {
+        Timer * lTimer = Timer::sPool.Get(*this, i);
+
+        if (lTimer != nullptr && lTimer == aTimerPtr)
+        {
+            lTimer->Cancel();
+            break;
+        }
+    }
 }
 
 /**

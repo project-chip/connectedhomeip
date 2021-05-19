@@ -421,7 +421,6 @@ void ReliableMessageMgr::FailRetransTableEntries(ReliableMessageContext * rc, CH
 
 void ReliableMessageMgr::StartTimer()
 {
-    CHIP_ERROR res            = CHIP_NO_ERROR;
     uint64_t nextWakeTimeTick = UINT64_MAX;
     bool foundWake            = false;
 
@@ -475,9 +474,9 @@ void ReliableMessageMgr::StartTimer()
             ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer set timer for %" PRIu64, timerArmValue);
 #endif
             StopTimer();
-            res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
+            System::Timer * lTimer = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
 
-            VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start ReliableMessageMgr::Timeout\n");
+            VerifyOrDieWithMsg(lTimer != nullptr, ExchangeManager, "Cannot start ReliableMessageMgr::Timeout\n");
             mCurrentTimerExpiry = timerExpiryEpoch;
 #if defined(RMP_TICKLESS_DEBUG)
         }

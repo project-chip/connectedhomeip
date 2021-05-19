@@ -678,9 +678,9 @@ void ConnectivityManagerImpl::DriveAPState()
 
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
-                apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
-                SuccessOrExit(err);
+                apTimeout              = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
+                System::Timer * lTimer = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                VerifyOrExit(lTimer != nullptr, err = CHIP_ERROR_START_TIMER_FAILED);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
             }
             else

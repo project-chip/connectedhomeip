@@ -1786,6 +1786,14 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_INTERMEDIATE_CA_NOT_REQUIRED                      _CHIP_ERROR(190)
 
 /**
+ * @def CHIP_ERROR_START_TIMER_FAILED
+ *
+ * @brief
+ *   Failed to start a system timer
+ */
+#define CHIP_ERROR_START_TIMER_FAILED                             _CHIP_ERROR(191)
+
+/**
  *  @}
  */
 

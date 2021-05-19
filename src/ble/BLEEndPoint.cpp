@@ -1480,10 +1480,9 @@ bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 BLE_ERROR BLEEndPoint::StartConnectTimer()
 {
     BLE_ERROR err = BLE_NO_ERROR;
-    chip::System::Error timerErr;
 
-    timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleConnectTimeout, this);
-    VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
+    System::Timer * lTimer = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleConnectTimeout, this);
+    VerifyOrExit(lTimer != nullptr, err = BLE_ERROR_START_TIMER_FAILED);
     mTimerStateFlags.Set(TimerStateFlag::kConnectTimerRunning);
 
 exit:
@@ -1493,10 +1492,9 @@ exit:
 BLE_ERROR BLEEndPoint::StartReceiveConnectionTimer()
 {
     BLE_ERROR err = BLE_NO_ERROR;
-    chip::System::Error timerErr;
 
-    timerErr = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleReceiveConnectionTimeout, this);
-    VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
+    System::Timer * lTimer = mBle->mSystemLayer->StartTimer(BLE_CONNECT_TIMEOUT_MS, HandleReceiveConnectionTimeout, this);
+    VerifyOrExit(lTimer != nullptr, err = BLE_ERROR_START_TIMER_FAILED);
     mTimerStateFlags.Set(TimerStateFlag::kReceiveConnectionTimerRunning);
 
 exit:
@@ -1506,12 +1504,11 @@ exit:
 BLE_ERROR BLEEndPoint::StartAckReceivedTimer()
 {
     BLE_ERROR err = BLE_NO_ERROR;
-    chip::System::Error timerErr;
 
     if (!mTimerStateFlags.Has(TimerStateFlag::kAckReceivedTimerRunning))
     {
-        timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_RECEIVED_TIMEOUT_MS, HandleAckReceivedTimeout, this);
-        VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
+        System::Timer * lTimer = mBle->mSystemLayer->StartTimer(BTP_ACK_RECEIVED_TIMEOUT_MS, HandleAckReceivedTimeout, this);
+        VerifyOrExit(lTimer != nullptr, err = BLE_ERROR_START_TIMER_FAILED);
 
         mTimerStateFlags.Set(TimerStateFlag::kAckReceivedTimerRunning);
     }
@@ -1538,15 +1535,14 @@ exit:
 BLE_ERROR BLEEndPoint::StartSendAckTimer()
 {
     BLE_ERROR err = BLE_NO_ERROR;
-    chip::System::Error timerErr;
 
     ChipLogDebugBleEndPoint(Ble, "entered StartSendAckTimer");
 
     if (!mTimerStateFlags.Has(TimerStateFlag::kSendAckTimerRunning))
     {
         ChipLogDebugBleEndPoint(Ble, "starting new SendAckTimer");
-        timerErr = mBle->mSystemLayer->StartTimer(BTP_ACK_SEND_TIMEOUT_MS, HandleSendAckTimeout, this);
-        VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
+        System::Timer * lTimer = mBle->mSystemLayer->StartTimer(BTP_ACK_SEND_TIMEOUT_MS, HandleSendAckTimeout, this);
+        VerifyOrExit(lTimer != nullptr, err = BLE_ERROR_START_TIMER_FAILED);
 
         mTimerStateFlags.Set(TimerStateFlag::kSendAckTimerRunning);
     }
@@ -1558,10 +1554,9 @@ exit:
 BLE_ERROR BLEEndPoint::StartUnsubscribeTimer()
 {
     BLE_ERROR err = BLE_NO_ERROR;
-    chip::System::Error timerErr;
 
-    timerErr = mBle->mSystemLayer->StartTimer(BLE_UNSUBSCRIBE_TIMEOUT_MS, HandleUnsubscribeTimeout, this);
-    VerifyOrExit(timerErr == CHIP_SYSTEM_NO_ERROR, err = BLE_ERROR_START_TIMER_FAILED);
+    System::Timer * lTimer = mBle->mSystemLayer->StartTimer(BLE_UNSUBSCRIBE_TIMEOUT_MS, HandleUnsubscribeTimeout, this);
+    VerifyOrExit(lTimer != nullptr, err = BLE_ERROR_START_TIMER_FAILED);
     mTimerStateFlags.Set(TimerStateFlag::kUnsubscribeTimerRunning);
 
 exit:

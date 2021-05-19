@@ -276,10 +276,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 
 void SecureSessionMgr::ScheduleExpiryTimer()
 {
-    CHIP_ERROR err =
+    System::Timer * lTimer =
         mSystemLayer->StartTimer(CHIP_PEER_CONNECTION_TIMEOUT_CHECK_FREQUENCY_MS, SecureSessionMgr::ExpiryTimerCallback, this);
 
-    VerifyOrDie(err == CHIP_NO_ERROR);
+    VerifyOrDie(lTimer != nullptr);
 }
 
 void SecureSessionMgr::CancelExpiryTimer()

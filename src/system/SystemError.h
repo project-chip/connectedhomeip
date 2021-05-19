@@ -160,6 +160,14 @@
  */
 #define CHIP_SYSTEM_ERROR_TIMER_NOT_FOUND _CHIP_SYSTEM_ERROR(8)
 
+/**
+ *  @def CHIP_SYSTEM_ERROR_TIMER_START_FAILED
+ *
+ *  @brief
+ *      The armed fail-safe timer failed to start.
+ */
+#define CHIP_SYSTEM_ERROR_TIMER_START_FAILED _CHIP_SYSTEM_ERROR(9)
+
 //                        !!!!! IMPORTANT !!!!!
 //
 // If you add new CHIP System Layer errors, please update the translation of error
