@@ -3,6 +3,7 @@
     "xmlRoot": [".", "./data-model/silabs/"],
     "xmlFile": [
         "test-cluster.xml",
+        "air-pressure-measurement.xml",
         "account-login-cluster.xml",
         "application-launcher-cluster.xml",
         "audio-output-cluster.xml",

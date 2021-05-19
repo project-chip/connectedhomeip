@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <domain>Measurement &amp; Sensing</domain>
+    <name>Air Pressure Measurement</name>
+    <code>0x0407</code>
+    <define>AIR_PRESSURE_MEASUREMENT_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>Air pressure measurement cluster in hPA with 1 digit fixed point resolution</description>
+    <attribute side="server" code="0x0000" define="AIR_PRESSURE_MEASUREMENT_MEASURED_VALUE" type="INT16U" min="8700" max="11000" writable="false" default="10132" optional="false">measured value</attribute>
+    <attribute side="server" code="0x0001" define="AIR_PRESSURE_MEASUREMENT_ALTITUDE" type="INT16S" min="-32768" max="32767" writable="true" default="0" optional="false">altitude</attribute>
+    <command source="client" code="0x0000" name="altitude" optional="false">
+      <description>set altitud for air pressure measurements</description>
+      <arg name="altitude" type="INT16S"/>
+    </command>
+  </cluster>
+</configurator>
