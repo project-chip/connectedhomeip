@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <controller/data_model/gen/chip-zcl-zpro-codec-api.h>
 #include <controller/CHIPOperationalCredentialsProvisioner.h>
+#include <controller/data_model/gen/chip-zcl-zpro-codec-api.h>
 
 namespace chip {
 namespace Controller {
