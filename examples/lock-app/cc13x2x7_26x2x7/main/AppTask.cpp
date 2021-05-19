@@ -30,8 +30,6 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 
-#include <app/server/DataModelHandler.h>
-
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
 
