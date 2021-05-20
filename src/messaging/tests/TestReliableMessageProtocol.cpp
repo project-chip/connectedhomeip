@@ -57,25 +57,36 @@ TestContext sContext;
 
 const char PAYLOAD[] = "Hello!";
 
-int gSendMessageCount = 0;
-
 class OutgoingTransport : public Transport::Base
 {
 public:
-    /// Transports are required to have a constructor that takes exactly one argument
-    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
-
     CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override
     {
-        gSendMessageCount++;
+        mSendMessageCount++;
+
+        if (!mDropNextMessage)
+        {
+            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+            HandleMessageReceived(address, std::move(receivedMessage));
+        }
+        else
+        {
+            mDropNextMessage = false;
+            mDroppedMessageCount++;
+        }
 
         return CHIP_NO_ERROR;
     }
 
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
+
+    bool mDropNextMessage         = false;
+    uint32_t mDroppedMessageCount = 0;
+    uint32_t mSendMessageCount    = 0;
 };
 
-TransportMgr<OutgoingTransport> gTransportMgr;
+TransportMgrBase gTransportMgr;
+OutgoingTransport gLoopback;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -179,20 +190,30 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
-    gSendMessageCount = 0;
-
-    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    gLoopback.mSendMessageCount = 0;
+    gLoopback.mDropNextMessage  = true;
+    err                         = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
+    gLoopback.mDropNextMessage = true;
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
+
+    ChipLogProgress(ExchangeManager, "Checking that retransmit table is empty now");
+    test_os_sleep_ms(65);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     rm->ClearRetransTable(rc);
     exchange->Close();
@@ -257,9 +278,7 @@ int Initialize(void * aContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    err = gTransportMgr.Init("LOOPBACK");
-    if (err != CHIP_NO_ERROR)
-        return FAILURE;
+    gTransportMgr.Init(&gLoopback);
 
     auto * ctx = reinterpret_cast<TestContext *>(aContext);
     err        = ctx->Init(&sSuite, &gTransportMgr);
@@ -268,6 +287,7 @@ int Initialize(void * aContext)
         return FAILURE;
     }
 
+    gTransportMgr.SetSecureSessionMgr(&ctx->GetSecureSessionManager());
     return SUCCESS;
 }
 
