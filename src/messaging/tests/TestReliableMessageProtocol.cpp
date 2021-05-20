@@ -64,14 +64,14 @@ public:
     {
         mSendMessageCount++;
 
-        if (!mDropNextMessage)
+        if (mNumMessagesToDrop == 0)
         {
             System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
             HandleMessageReceived(address, std::move(receivedMessage));
         }
         else
         {
-            mDropNextMessage = false;
+            mNumMessagesToDrop--;
             mDroppedMessageCount++;
         }
 
@@ -80,7 +80,7 @@ public:
 
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 
-    bool mDropNextMessage         = false;
+    uint32_t mNumMessagesToDrop   = 0;
     uint32_t mDroppedMessageCount = 0;
     uint32_t mSendMessageCount    = 0;
 };
@@ -190,18 +190,20 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
-    gLoopback.mSendMessageCount = 0;
-    gLoopback.mDropNextMessage  = true;
-    err                         = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    gLoopback.mSendMessageCount  = 0;
+    gLoopback.mNumMessagesToDrop = 2;
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    gLoopback.mDropNextMessage = true;
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
