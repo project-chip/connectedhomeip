@@ -500,6 +500,65 @@ CHIP_ERROR chip_ime_ReadAttribute_Basic_ClusterRevision(chip::Controller::Device
 }
 
 // End of Cluster Basic
+// Cluster BinaryInputBasic
+
+CHIP_ERROR chip_ime_ReadAttribute_BinaryInputBasic_OutOfService(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BinaryInputBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeOutOfService(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_BinaryInputBasic_PresentValue(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BinaryInputBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributePresentValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_BinaryInputBasic_PresentValue(chip::Controller::Device * device,
+                                                                     chip::EndpointId ZCLendpointId, uint16_t minInterval,
+                                                                     uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BinaryInputBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributePresentValue(gBooleanAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                                  maxInterval);
+}
+CHIP_ERROR chip_ime_ReadAttribute_BinaryInputBasic_StatusFlags(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                               chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BinaryInputBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeStatusFlags(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ConfigureAttribute_BinaryInputBasic_StatusFlags(chip::Controller::Device * device,
+                                                                    chip::EndpointId ZCLendpointId, uint16_t minInterval,
+                                                                    uint16_t maxInterval)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BinaryInputBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ConfigureAttributeStatusFlags(gInt8uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel(), minInterval,
+                                                 maxInterval);
+}
+CHIP_ERROR chip_ime_ReadAttribute_BinaryInputBasic_ClusterRevision(chip::Controller::Device * device,
+                                                                   chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::BinaryInputBasicCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster BinaryInputBasic
 // Cluster Binding
 
 CHIP_ERROR chip_ime_AppendCommand_Binding_Bind(chip::Controller::Device * device, uint64_t command, chip::EndpointId ZCLendpointId,
@@ -1519,79 +1578,6 @@ CHIP_ERROR chip_ime_ReadAttribute_DoorLock_ClusterRevision(chip::Controller::Dev
 }
 
 // End of Cluster DoorLock
-// Cluster EthernetNetworkDiagnostics
-
-CHIP_ERROR chip_ime_AppendCommand_EthernetNetworkDiagnostics_ResetCounts(chip::Controller::Device * device, uint64_t command,
-                                                                         chip::EndpointId ZCLendpointId, chip::GroupId)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::app::CommandSender * commandSenderObj = reinterpret_cast<chip::app::CommandSender *>(command);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId, commandSenderObj);
-    return cluster.ResetCounts(nullptr, nullptr);
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketRxCount(chip::Controller::Device * device,
-                                                                           chip::EndpointId ZCLendpointId,
-                                                                           chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributePacketRxCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_EthernetNetworkDiagnostics_PacketTxCount(chip::Controller::Device * device,
-                                                                           chip::EndpointId ZCLendpointId,
-                                                                           chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributePacketTxCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_EthernetNetworkDiagnostics_TxErrCount(chip::Controller::Device * device,
-                                                                        chip::EndpointId ZCLendpointId,
-                                                                        chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeTxErrCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_EthernetNetworkDiagnostics_CollisionCount(chip::Controller::Device * device,
-                                                                            chip::EndpointId ZCLendpointId,
-                                                                            chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeCollisionCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_EthernetNetworkDiagnostics_OverrunCount(chip::Controller::Device * device,
-                                                                          chip::EndpointId ZCLendpointId,
-                                                                          chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeOverrunCount(gInt64uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_EthernetNetworkDiagnostics_ClusterRevision(chip::Controller::Device * device,
-                                                                             chip::EndpointId ZCLendpointId,
-                                                                             chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-// End of Cluster EthernetNetworkDiagnostics
 // Cluster GeneralCommissioning
 
 CHIP_ERROR chip_ime_AppendCommand_GeneralCommissioning_ArmFailSafe(chip::Controller::Device * device, uint64_t command,
@@ -1657,27 +1643,6 @@ CHIP_ERROR chip_ime_ReadAttribute_GeneralCommissioning_ClusterRevision(chip::Con
 }
 
 // End of Cluster GeneralCommissioning
-// Cluster GeneralDiagnostics
-
-CHIP_ERROR chip_ime_ReadAttribute_GeneralDiagnostics_RebootCount(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
-                                                                 chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::GeneralDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeRebootCount(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-CHIP_ERROR chip_ime_ReadAttribute_GeneralDiagnostics_ClusterRevision(chip::Controller::Device * device,
-                                                                     chip::EndpointId ZCLendpointId, chip::GroupId /* ZCLgroupId */)
-{
-    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    chip::Controller::GeneralDiagnosticsCluster cluster;
-    cluster.Associate(device, ZCLendpointId);
-    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
-}
-
-// End of Cluster GeneralDiagnostics
 // Cluster GroupKeyManagement
 
 CHIP_ERROR chip_ime_ReadAttribute_GroupKeyManagement_ClusterRevision(chip::Controller::Device * device,

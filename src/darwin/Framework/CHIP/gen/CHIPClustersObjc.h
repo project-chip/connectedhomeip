@@ -152,6 +152,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Binary Input (Basic)
+ *
+ */
+@interface CHIPBinaryInputBasic : CHIPCluster
+
+- (void)readAttributeOutOfServiceWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributeOutOfServiceWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttributePresentValueWithValue:(uint8_t)value responseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributePresentValueWithMinInterval:(uint16_t)minInterval
+                                          maxInterval:(uint16_t)maxInterval
+                                      responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributePresentValueWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)configureAttributeStatusFlagsWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeStatusFlagsWithResponseHandler:(ResponseHandler)responseHandler;
+- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
+
+@end
+
+/**
  * Cluster Binding
  *
  */
@@ -442,23 +465,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster Ethernet Network Diagnostics
- *
- */
-@interface CHIPEthernetNetworkDiagnostics : CHIPCluster
-
-- (void)resetCounts:(ResponseHandler)responseHandler;
-
-- (void)readAttributePacketRxCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributePacketTxCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeTxErrCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeCollisionCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeOverrunCountWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
-
-@end
-
-/**
  * Cluster General Commissioning
  *
  */
@@ -478,18 +484,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeFabricIdWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeBreadcrumbWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeBreadcrumbWithValue:(uint64_t)value responseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
-
-@end
-
-/**
- * Cluster General Diagnostics
- *
- */
-@interface CHIPGeneralDiagnostics : CHIPCluster
-
-- (void)readAttributeNetworkInterfacesWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeRebootCountWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end
@@ -901,8 +895,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData *)value responseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeListInt8uWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeListOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
-- (void)readAttributeListStructOctetStringWithResponseHandler:(ResponseHandler)responseHandler;
 - (void)readAttributeClusterRevisionWithResponseHandler:(ResponseHandler)responseHandler;
 
 @end

@@ -148,8 +148,6 @@ typedef void (*DescriptorDeviceListListAttributeCallback)(void * context, uint16
 typedef void (*DescriptorServerListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
 typedef void (*DescriptorClientListListAttributeCallback)(void * context, uint16_t count, chip::ClusterId * entries);
 typedef void (*DescriptorPartsListListAttributeCallback)(void * context, uint16_t count, chip::EndpointId * entries);
-typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(void * context, uint16_t count,
-                                                                         _NetworkInterfaceType * entries);
 typedef void (*GroupKeyManagementGroupsListAttributeCallback)(void * context, uint16_t count, _GroupState * entries);
 typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(void * context, uint16_t count, _GroupKey * entries);
 typedef void (*MediaInputMediaInputListListAttributeCallback)(void * context, uint16_t count, _MediaInputInfo * entries);
@@ -158,6 +156,3 @@ typedef void (*TvChannelTvChannelListListAttributeCallback)(void * context, uint
 typedef void (*TargetNavigatorTargetNavigatorListListAttributeCallback)(void * context, uint16_t count,
                                                                         _NavigateTargetTargetInfo * entries);
 typedef void (*TestClusterListInt8uListAttributeCallback)(void * context, uint16_t count, uint8_t * entries);
-typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context, uint16_t count, chip::ByteSpan * entries);
-typedef void (*TestClusterListStructOctetStringListAttributeCallback)(void * context, uint16_t count,
-                                                                      _TestListStructOctet * entries);

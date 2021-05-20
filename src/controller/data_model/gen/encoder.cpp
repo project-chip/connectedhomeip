@@ -60,14 +60,13 @@ using namespace chip::Encoding::LittleEndian;
 | AudioOutput                                                         | 0x050B |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
+| BinaryInputBasic                                                    | 0x000F |
 | Binding                                                             | 0xF000 |
 | ColorControl                                                        | 0x0300 |
 | ContentLaunch                                                       | 0x050A |
 | Descriptor                                                          | 0x001D |
 | DoorLock                                                            | 0x0101 |
-| EthernetNetworkDiagnostics                                          | 0x0037 |
 | GeneralCommissioning                                                | 0x0030 |
-| GeneralDiagnostics                                                  | 0x0033 |
 | GroupKeyManagement                                                  | 0xF004 |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
@@ -138,6 +137,8 @@ using namespace chip::Encoding::LittleEndian;
 #define BASIC_CLUSTER_ID 0x0028
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
 
+#define BINARY_INPUT_BASIC_CLUSTER_ID 0x000F
+
 #define BINDING_CLUSTER_ID 0xF000
 #define ZCL_BIND_COMMAND_ID (0x00)
 #define ZCL_UNBIND_COMMAND_ID (0x01)
@@ -189,15 +190,10 @@ using namespace chip::Encoding::LittleEndian;
 #define ZCL_UNLOCK_DOOR_COMMAND_ID (0x01)
 #define ZCL_UNLOCK_WITH_TIMEOUT_COMMAND_ID (0x03)
 
-#define ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID 0x0037
-#define ZCL_RESET_COUNTS_COMMAND_ID (0x00)
-
 #define GENERAL_COMMISSIONING_CLUSTER_ID 0x0030
 #define ZCL_ARM_FAIL_SAFE_COMMAND_ID (0x00)
 #define ZCL_COMMISSIONING_COMPLETE_COMMAND_ID (0x04)
 #define ZCL_SET_REGULATORY_CONFIG_COMMAND_ID (0x02)
-
-#define GENERAL_DIAGNOSTICS_CLUSTER_ID 0x0033
 
 #define GROUP_KEY_MANAGEMENT_CLUSTER_ID 0xF004
 
@@ -879,6 +875,121 @@ PacketBufferHandle encodeBasicClusterWriteLocalConfigDisabledAttribute(uint8_t s
 PacketBufferHandle encodeBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadBasicClusterRevision", BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
+    COMMAND_FOOTER();
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster BinaryInputBasic                                            | 0x000F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * OutOfService                                                      | 0x0051 |
+| * PresentValue                                                      | 0x0055 |
+| * StatusFlags                                                       | 0x006F |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+PacketBufferHandle encodeBinaryInputBasicClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("DiscoverBinaryInputBasicAttributes", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute OutOfService
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0051);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterWriteOutOfServiceAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                           uint8_t outOfService)
+{
+    COMMAND_HEADER("WriteBinaryInputBasicOutOfService", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0051)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(outOfService));
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute PresentValue
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadPresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0055);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterWritePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                           uint8_t presentValue)
+{
+    COMMAND_HEADER("WriteBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_WRITE_ATTRIBUTES_COMMAND_ID)
+        .Put16(0x0055)
+        .Put8(16)
+        .Put8(static_cast<uint8_t>(presentValue));
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterConfigurePresentValueAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                               uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportBinaryInputBasicPresentValue", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x0055)
+        .Put8(16)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute StatusFlags
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x006F);
+    COMMAND_FOOTER();
+}
+
+PacketBufferHandle encodeBinaryInputBasicClusterConfigureStatusFlagsAttribute(uint8_t seqNum, EndpointId destinationEndpoint,
+                                                                              uint16_t minInterval, uint16_t maxInterval)
+{
+    COMMAND_HEADER("ReportBinaryInputBasicStatusFlags", BINARY_INPUT_BASIC_CLUSTER_ID);
+    buf.Put8(kFrameControlGlobalCommand)
+        .Put8(seqNum)
+        .Put8(ZCL_CONFIGURE_REPORTING_COMMAND_ID)
+        .Put8(EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
+        .Put16(0x006F)
+        .Put8(24)
+        .Put16(minInterval)
+        .Put16(maxInterval);
+    COMMAND_FOOTER();
+}
+
+/*
+ * Attribute ClusterRevision
+ */
+PacketBufferHandle encodeBinaryInputBasicClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
+{
+    COMMAND_HEADER("ReadBinaryInputBasicClusterRevision", BINARY_INPUT_BASIC_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -1973,90 +2084,6 @@ PacketBufferHandle encodeDoorLockClusterReadClusterRevisionAttribute(uint8_t seq
 }
 
 /*----------------------------------------------------------------------------*\
-| Cluster EthernetNetworkDiagnostics                                  | 0x0037 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * ResetCounts                                                       |   0x00 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * PacketRxCount                                                     | 0x0002 |
-| * PacketTxCount                                                     | 0x0003 |
-| * TxErrCount                                                        | 0x0004 |
-| * CollisionCount                                                    | 0x0005 |
-| * OverrunCount                                                      | 0x0006 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("DiscoverEthernetNetworkDiagnosticsAttributes", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute PacketRxCount
- */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketRxCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsPacketRxCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0002);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute PacketTxCount
- */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadPacketTxCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsPacketTxCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0003);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute TxErrCount
- */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadTxErrCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsTxErrCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0004);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute CollisionCount
- */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadCollisionCountAttribute(uint8_t seqNum,
-                                                                                      EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsCollisionCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0005);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute OverrunCount
- */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadOverrunCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsOverrunCount", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0006);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ClusterRevision
- */
-PacketBufferHandle encodeEthernetNetworkDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum,
-                                                                                       EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadEthernetNetworkDiagnosticsClusterRevision", ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
-    COMMAND_FOOTER();
-}
-
-/*----------------------------------------------------------------------------*\
 | Cluster GeneralCommissioning                                        | 0x0030 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -2116,54 +2143,6 @@ PacketBufferHandle encodeGeneralCommissioningClusterWriteBreadcrumbAttribute(uin
 PacketBufferHandle encodeGeneralCommissioningClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
 {
     COMMAND_HEADER("ReadGeneralCommissioningClusterRevision", GENERAL_COMMISSIONING_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
-    COMMAND_FOOTER();
-}
-
-/*----------------------------------------------------------------------------*\
-| Cluster GeneralDiagnostics                                          | 0x0033 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * NetworkInterfaces                                                 | 0x0000 |
-| * RebootCount                                                       | 0x0001 |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-PacketBufferHandle encodeGeneralDiagnosticsClusterDiscoverAttributes(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("DiscoverGeneralDiagnosticsAttributes", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID).Put16(0x0000).Put8(0xFF);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute NetworkInterfaces
- */
-PacketBufferHandle encodeGeneralDiagnosticsClusterReadNetworkInterfacesAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadGeneralDiagnosticsNetworkInterfaces", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0000);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute RebootCount
- */
-PacketBufferHandle encodeGeneralDiagnosticsClusterReadRebootCountAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadGeneralDiagnosticsRebootCount", GENERAL_DIAGNOSTICS_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x0001);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ClusterRevision
- */
-PacketBufferHandle encodeGeneralDiagnosticsClusterReadClusterRevisionAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadGeneralDiagnosticsClusterRevision", GENERAL_DIAGNOSTICS_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0xFFFD);
     COMMAND_FOOTER();
 }
@@ -3132,8 +3111,6 @@ PacketBufferHandle encodeTemperatureMeasurementClusterReadClusterRevisionAttribu
 | * Enum16                                                            | 0x0016 |
 | * OctetString                                                       | 0x0019 |
 | * ListInt8u                                                         | 0x001A |
-| * ListOctetString                                                   | 0x001B |
-| * ListStructOctetString                                             | 0x001C |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3512,26 +3489,6 @@ PacketBufferHandle encodeTestClusterClusterReadListInt8uAttribute(uint8_t seqNum
 {
     COMMAND_HEADER("ReadTestClusterListInt8u", TEST_CLUSTER_ID);
     buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001A);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ListOctetString
- */
-PacketBufferHandle encodeTestClusterClusterReadListOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadTestClusterListOctetString", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001B);
-    COMMAND_FOOTER();
-}
-
-/*
- * Attribute ListStructOctetString
- */
-PacketBufferHandle encodeTestClusterClusterReadListStructOctetStringAttribute(uint8_t seqNum, EndpointId destinationEndpoint)
-{
-    COMMAND_HEADER("ReadTestClusterListStructOctetString", TEST_CLUSTER_ID);
-    buf.Put8(kFrameControlGlobalCommand).Put8(seqNum).Put8(ZCL_READ_ATTRIBUTES_COMMAND_ID).Put16(0x001C);
     COMMAND_FOOTER();
 }
 
