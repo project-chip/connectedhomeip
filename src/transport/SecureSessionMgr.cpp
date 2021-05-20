@@ -395,7 +395,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                 packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
     }
 
-    ChipLogProgress(Inet, "Secure transport received message destined to node ID (%llu)",
+    ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node %llu",
+                    static_cast<int>(state->GetAdminId()),
                     packetHeader.GetDestinationNodeId().Value());
     mPeerConnections.MarkConnectionActive(state);
 
