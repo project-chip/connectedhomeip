@@ -75,14 +75,14 @@ std::vector<EmberAfTvChannelInfo> TvChannelManager::proxyGetTvChannelList()
     char callSign[]          = "exampleCSign";
     char name[]              = "exampleName";
 
-    for (uint16_t i = 0; i < maximumVectorSize; ++i)
+    for (int i = 0; i < maximumVectorSize; ++i)
     {
         EmberAfTvChannelInfo channelInfo;
         channelInfo.affiliateCallSign = ByteSpan(Uint8::from_char(affiliateCallSign), sizeof(affiliateCallSign));
         channelInfo.callSign          = ByteSpan(Uint8::from_char(callSign), sizeof(callSign));
         channelInfo.name              = ByteSpan(Uint8::from_char(name), sizeof(name));
-        channelInfo.majorNumber       = 1 + i;
-        channelInfo.minorNumber       = 2 + i;
+        channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
+        channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
         tvChannels.push_back(channelInfo);
     }
 

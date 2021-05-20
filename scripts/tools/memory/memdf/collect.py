@@ -65,7 +65,7 @@ CONFIG: ConfigDescription = {
         'help': 'Method of input processing',
         'metavar': 'METHOD',
         'choices': ['elftools', 'readelf', 'bloaty', 'csv', 'tsv', 'su'],
-        'default': 'readelf',
+        'default': 'elftools',
         'argparse': {
             'alias': ['-f'],
         },
