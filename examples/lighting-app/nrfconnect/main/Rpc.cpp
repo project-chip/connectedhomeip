@@ -41,6 +41,16 @@ LOG_MODULE_DECLARE(app);
 namespace chip {
 namespace rpc {
 
+namespace {
+
+void reboot_timer_handler(struct k_timer * dummy)
+{
+    NVIC_SystemReset();
+}
+K_TIMER_DEFINE(reboot_timer, reboot_timer_handler, NULL);
+
+} // namespace
+
 class Lighting final : public generated::Lighting<Lighting>
 {
 public:
@@ -75,12 +85,13 @@ public:
     {
         // TODO: Clear data from KVS
         DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+        // Reboot device after clearing data
+        k_timer_start(&reboot_timer, K_SECONDS(1), K_FOREVER);
         return pw::OkStatus();
     }
     pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
-        NVIC_SystemReset();
-        // WILL NOT RETURN
+        k_timer_start(&reboot_timer, K_SECONDS(1), K_FOREVER);
         return pw::OkStatus();
     }
     pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
