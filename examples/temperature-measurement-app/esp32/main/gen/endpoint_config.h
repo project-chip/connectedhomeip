@@ -331,6 +331,9 @@
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
     const EmberAfGenericClusterFunction chipFuncArrayBasicServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfBasicClusterServerInitCallback,                                                     \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayTemperatureMeasurementServer[] = {                                            \
+        (EmberAfGenericClusterFunction) emberAfTemperatureMeasurementClusterServerInitCallback,                                    \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
@@ -364,9 +367,12 @@
             {                                                                                                                      \
                 0x003F, ZAP_ATTRIBUTE_INDEX(33), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 1, Cluster: Trusted Root Certificates (server) */                                                      \
-            {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(34), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
+            { 0x0402,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(34),                                                                                             \
+              4,                                                                                                                   \
+              8,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayTemperatureMeasurementServer }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */            \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
