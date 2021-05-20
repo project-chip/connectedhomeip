@@ -124,6 +124,48 @@ CHIP_ERROR chip_ime_ReadAttribute_AccountLogin_ClusterRevision(chip::Controller:
 }
 
 // End of Cluster AccountLogin
+// Cluster AirPressureMeasurement
+
+CHIP_ERROR chip_ime_AppendCommand_AirPressureMeasurement_Altitude(chip::Controller::Device * device, uint64_t command,
+                                                                  chip::EndpointId ZCLendpointId, chip::GroupId, int16_t altitude)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::app::CommandSender * commandSenderObj = reinterpret_cast<chip::app::CommandSender *>(command);
+    chip::Controller::AirPressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId, commandSenderObj);
+    return cluster.Altitude(nullptr, nullptr, altitude);
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_AirPressureMeasurement_MeasuredValue(chip::Controller::Device * device,
+                                                                       chip::EndpointId ZCLendpointId,
+                                                                       chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AirPressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeMeasuredValue(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_AirPressureMeasurement_Altitude(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
+                                                                  chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AirPressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeAltitude(gInt16sAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+CHIP_ERROR chip_ime_ReadAttribute_AirPressureMeasurement_ClusterRevision(chip::Controller::Device * device,
+                                                                         chip::EndpointId ZCLendpointId,
+                                                                         chip::GroupId /* ZCLgroupId */)
+{
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    chip::Controller::AirPressureMeasurementCluster cluster;
+    cluster.Associate(device, ZCLendpointId);
+    return cluster.ReadAttributeClusterRevision(gInt16uAttributeCallback.Cancel(), gDefaultFailureCallback.Cancel());
+}
+
+// End of Cluster AirPressureMeasurement
 // Cluster ApplicationBasic
 
 CHIP_ERROR chip_ime_ReadAttribute_ApplicationBasic_VendorName(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,

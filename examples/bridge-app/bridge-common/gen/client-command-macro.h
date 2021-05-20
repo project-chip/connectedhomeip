@@ -3190,6 +3190,16 @@
                                   ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID, "uuuuuuu", stepMode, stepSize, transitionTime,            \
                                   colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
 
+/** @brief Command description for altitude
+ *
+ * Command: altitude
+ * @param altitude INT16S
+ */
+#define emberAfFillCommandAir                                                                                                      \
+    Pressure MeasurementClusteraltitude(altitude) emberAfFillExternalBuffer(mask,                                                  \
+                                                                                                                                   \
+                                                                            ZCL_ALTITUDE_COMMAND_ID, "u", altitude);
+
 /** @brief Command description for ZoneEnrollResponse
  *
  * Command: ZoneEnrollResponse

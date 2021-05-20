@@ -30,6 +30,7 @@
 
 /**** Cluster endpoint counts ****/
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_AIR_PRESSURE_MEASUREMENT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_AUDIO_OUTPUT_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -71,6 +72,10 @@
 // Use this macro to check if the client side of the Account Login cluster is included
 #define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_ACCOUNT_LOGIN_CLIENT
+
+// Use this macro to check if the client side of the Air Pressure Measurement cluster is included
+#define ZCL_USING_AIR_PRESSURE_MEASUREMENT_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_AIR_PRESSURE_MEASUREMENT_CLIENT
 
 // Use this macro to check if the client side of the Application Basic cluster is included
 #define ZCL_USING_APPLICATION_BASIC_CLUSTER_CLIENT

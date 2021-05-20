@@ -28,6 +28,7 @@ namespace chip {
 namespace Controller {
 
 constexpr ClusterId kAccountLoginClusterId                = 0x050E;
+constexpr ClusterId kAirPressureMeasurementClusterId      = 0x0407;
 constexpr ClusterId kApplicationBasicClusterId            = 0x050D;
 constexpr ClusterId kApplicationLauncherClusterId         = 0x050C;
 constexpr ClusterId kAudioOutputClusterId                 = 0x050B;
@@ -83,6 +84,27 @@ public:
 private:
     static constexpr CommandId kGetSetupPINCommandId = 0x00;
     static constexpr CommandId kLoginCommandId       = 0x01;
+};
+
+class DLL_EXPORT AirPressureMeasurementCluster : public ClusterBase
+{
+public:
+    AirPressureMeasurementCluster() : ClusterBase(kAirPressureMeasurementClusterId) {}
+    ~AirPressureMeasurementCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR Altitude(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, int16_t altitude);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeAltitude(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeAltitude(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      int16_t value);
+
+private:
+    static constexpr CommandId kAltitudeCommandId = 0x00;
 };
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase

@@ -337,6 +337,13 @@
 #define CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER
 #endif
 
+#if defined(ZCL_USING_AIR_PRESSURE_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_AIR_PRESSURE_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_AIR_PRESSURE_MEASUREMENT_CLUSTER                                                                         \
+    { ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID, 1031, "Air Pressure Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_AIR_PRESSURE_MEASUREMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_SERVER) ||                                                 \
     defined(ZCL_USING_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                        \
@@ -965,6 +972,7 @@
     CHIP_PRINTCLUSTER_FLOW_MEASUREMENT_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_OCCUPANCY_SENSING_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_AIR_PRESSURE_MEASUREMENT_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                            \
     CHIP_PRINTCLUSTER_CARBON_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER                                                             \
     CHIP_PRINTCLUSTER_ETHYLENE_CONCENTRATION_MEASUREMENT_CLUSTER                                                                   \

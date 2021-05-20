@@ -388,6 +388,9 @@
 #define ZCL_MOVE_COLOR_TEMPERATURE_COMMAND_ID (0x4B)
 #define ZCL_STEP_COLOR_TEMPERATURE_COMMAND_ID (0x4C)
 
+// Commands for cluster: Air Pressure Measurement
+#define ZCL_ALTITUDE_COMMAND_ID (0x00)
+
 // Commands for cluster: IAS Zone
 #define ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID (0x00)
 #define ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID (0x00)

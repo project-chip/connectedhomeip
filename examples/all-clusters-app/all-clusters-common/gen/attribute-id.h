@@ -935,6 +935,14 @@
 #define ZCL_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY_ATTRIBUTE_ID (0x0031)
 #define ZCL_PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_THRESHOLD_ATTRIBUTE_ID (0x0032)
 
+// Attribute ids for cluster: Air Pressure Measurement
+
+// Client attributes
+
+// Server attributes
+#define ZCL_AIR_PRESSURE_MEASUREMENT_MEASURED_VALUE_ATTRIBUTE_ID (0x0000)
+#define ZCL_AIR_PRESSURE_MEASUREMENT_ALTITUDE_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Carbon Monoxide Concentration Measurement
 
 // Client attributes

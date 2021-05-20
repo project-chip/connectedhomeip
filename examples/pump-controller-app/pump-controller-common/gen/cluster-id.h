@@ -173,6 +173,9 @@
 // Definitions for cluster: Occupancy Sensing
 #define ZCL_OCCUPANCY_SENSING_CLUSTER_ID (0x0406)
 
+// Definitions for cluster: Air Pressure Measurement
+#define ZCL_AIR_PRESSURE_MEASUREMENT_CLUSTER_ID (0x0407)
+
 // Definitions for cluster: Carbon Monoxide Concentration Measurement
 #define ZCL_CARBON_MONOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER_ID (0x040C)
 
