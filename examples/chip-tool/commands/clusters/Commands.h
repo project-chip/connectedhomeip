@@ -975,6 +975,7 @@ static void OnTestClusterListStructOctetStringListAttributeResponse(void * conte
 | OperationalCredentials                                              | 0x003E |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | Scenes                                                              | 0x0005 |
+| SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
 | TvChannel                                                           | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
@@ -1013,6 +1014,7 @@ constexpr chip::ClusterId kOnOffClusterId                       = 0x0006;
 constexpr chip::ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr chip::ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
 constexpr chip::ClusterId kScenesClusterId                      = 0x0005;
+constexpr chip::ClusterId kSoftwareDiagnosticsClusterId         = 0x0034;
 constexpr chip::ClusterId kSwitchClusterId                      = 0x003B;
 constexpr chip::ClusterId kTvChannelClusterId                   = 0x0504;
 constexpr chip::ClusterId kTargetNavigatorClusterId             = 0x0505;
@@ -12351,6 +12353,144 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster SoftwareDiagnostics                                         | 0x0034 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ResetWatermarks                                                   |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CurrentHeapHighWatermark                                          | 0x0003 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ResetWatermarks
+ */
+class SoftwareDiagnosticsResetWatermarks : public ModelCommand
+{
+public:
+    SoftwareDiagnosticsResetWatermarks() : ModelCommand("reset-watermarks") { ModelCommand::AddArguments(); }
+    ~SoftwareDiagnosticsResetWatermarks()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ResetWatermarks(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Discover Attributes
+ */
+class DiscoverSoftwareDiagnosticsAttributes : public ModelCommand
+{
+public:
+    DiscoverSoftwareDiagnosticsAttributes() : ModelCommand("discover") { ModelCommand::AddArguments(); }
+
+    ~DiscoverSoftwareDiagnosticsAttributes()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000) command (0x0C) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.DiscoverAttributes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute CurrentHeapHighWatermark
+ */
+class ReadSoftwareDiagnosticsCurrentHeapHighWatermark : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsCurrentHeapHighWatermark() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-heap-high-watermark");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsCurrentHeapHighWatermark()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeCurrentHeapHighWatermark(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadSoftwareDiagnosticsClusterRevision : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsClusterRevision()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu16, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster Switch                                                      | 0x003B |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -16773,6 +16913,19 @@ void registerClusterScenes(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterSoftwareDiagnostics(Commands & commands)
+{
+    const char * clusterName = "SoftwareDiagnostics";
+
+    commands_list clusterCommands = {
+        make_unique<SoftwareDiagnosticsResetWatermarks>(),
+        make_unique<DiscoverSoftwareDiagnosticsAttributes>(),
+        make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(),
+        make_unique<ReadSoftwareDiagnosticsClusterRevision>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterSwitch(Commands & commands)
 {
     const char * clusterName = "Switch";
@@ -16985,6 +17138,7 @@ void registerClusters(Commands & commands)
     registerClusterOperationalCredentials(commands);
     registerClusterPumpConfigurationAndControl(commands);
     registerClusterScenes(commands);
+    registerClusterSoftwareDiagnostics(commands);
     registerClusterSwitch(commands);
     registerClusterTvChannel(commands);
     registerClusterTargetNavigator(commands);
