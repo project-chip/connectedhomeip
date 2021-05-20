@@ -1,7 +1,7 @@
 #### Problem
 What is being fixed?  Examples:
 * Fix crash on startup
-* Fixes #12345 12345 Frobnozzle is leaky (exactly like that, so GitHub will auto-close the issue).
+* Fixes #12345 Frobnozzle is leaky (exactly like that, so GitHub will auto-close the issue).
 
 #### Change overview
 What's in this PR
