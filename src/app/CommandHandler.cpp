@@ -90,6 +90,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     err = commandPath.GetEndpointId(&endpointId);
     SuccessOrExit(err);
 
+    SuccessOrExit(err = CheckIfClusterCommandExists(clusterId, commandId, endpointId));
+
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
