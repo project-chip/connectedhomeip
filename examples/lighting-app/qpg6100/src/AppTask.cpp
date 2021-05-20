@@ -434,7 +434,7 @@ void AppTask::UpdateClusterState(void)
 {
     uint8_t newValue = !LightingMgr().IsTurnedOn();
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+    EmberAfStatus status = emberAfWriteAttribute(0, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                                  (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -444,7 +444,7 @@ void AppTask::UpdateClusterState(void)
     ChipLogProgress(NotSpecified, "UpdateClusterState");
     newValue = LightingMgr().GetLevel();
     // TODO understand well enough to implement the level cluster ZCL_CURRENT_LEVEL_ATTRIBUTE_ID
-    status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+    status = emberAfWriteAttribute(0, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                    (uint8_t *) &newValue, ZCL_DATA8_ATTRIBUTE_TYPE);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
