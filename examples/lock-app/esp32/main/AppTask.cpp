@@ -195,16 +195,16 @@ void AppTask::AppTaskMain(void * pvParameter)
             mLastChangeTimeUS = nowUS;
         }
 
-        if(lockButton.Poll())
+        if (lockButton.Poll())
         {
-            if(lockButton.IsPressed())
+            if (lockButton.IsPressed())
             {
                 GetAppTask().ButtonEventHandler(APP_LOCK_BUTTON, APP_BUTTON_PRESSED);
             }
         }
-        if(resetButton.Poll())
+        if (resetButton.Poll())
         {
-            if(resetButton.IsPressed())
+            if (resetButton.IsPressed())
             {
                 GetAppTask().ButtonEventHandler(APP_FUNCTION_BUTTON, APP_BUTTON_PRESSED);
             }
