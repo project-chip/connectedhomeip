@@ -39,10 +39,10 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/reporting/reporting.h>
 #include <app/common/gen/attribute-type.h>
 #include <app/common/gen/cluster-id.h>
 #include <app/common/gen/command-id.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
