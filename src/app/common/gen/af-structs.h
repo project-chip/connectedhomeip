@@ -20,7 +20,7 @@
 // Prevent multiple inclusion
 #pragma once
 
-#include "enums.h"
+#include "gen/enums.h"
 #include <app/util/basic-types.h>
 #include <stdint.h>
 #include <support/Span.h>

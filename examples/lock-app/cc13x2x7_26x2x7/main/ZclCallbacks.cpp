@@ -20,9 +20,9 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
