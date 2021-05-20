@@ -434,6 +434,21 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     /* -------------------------------------------------------------------------------------------*/
     state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
 
+    // Change Source Node ID
+    EncryptedPacketBufferHandle noDstNodeIdMsg = msgBuf.CloneData();
+    NL_TEST_ASSERT(inSuite, noDstNodeIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);
+
+    packetHeader.ClearDestinationNodeId();
+    NL_TEST_ASSERT(inSuite, noDstNodeIdMsg.InsertPacketHeader(packetHeader) == CHIP_NO_ERROR);
+
+    err = secureSessionMgr.SendEncryptedMessage(localToRemoteSession, std::move(noDstNodeIdMsg), nullptr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
+
+    /* -------------------------------------------------------------------------------------------*/
+    state->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(1);
+
     // Change Message ID
     EncryptedPacketBufferHandle badMessageIdMsg = msgBuf.CloneData();
     NL_TEST_ASSERT(inSuite, badMessageIdMsg.ExtractPacketHeader(packetHeader) == CHIP_NO_ERROR);

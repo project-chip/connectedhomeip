@@ -38,7 +38,7 @@
 
 // EFR32MG21A020F1024IM32 has 96k of RAM. Reduce the number of buffers to
 // conserve RAM for this Series 2 part.
-#if defined(EFR32MG21A020F1024IM32)
+#if defined(EFR32MG21)
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
 #endif
 

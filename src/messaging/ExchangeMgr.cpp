@@ -150,19 +150,18 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegateBase * delegate)
 {
-    UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
 
-    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    for (auto & umh : UMHandlerPool)
     {
-        if (!umh->IsInUse())
+        if (!umh.IsInUse())
         {
             if (selected == nullptr)
-                selected = umh;
+                selected = &umh;
         }
-        else if (umh->Matches(protocolId, msgType))
+        else if (umh.Matches(protocolId, msgType))
         {
-            umh->Delegate = delegate;
+            umh.Delegate = delegate;
             return CHIP_NO_ERROR;
         }
     }
@@ -181,13 +180,11 @@ CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgTyp
 
 CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgType)
 {
-    UnsolicitedMessageHandler * umh = UMHandlerPool;
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+    for (auto & umh : UMHandlerPool)
     {
-        if (umh->IsInUse() && umh->Matches(protocolId, msgType))
+        if (umh.IsInUse() && umh.Matches(protocolId, msgType))
         {
-            umh->Reset();
+            umh.Reset();
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
@@ -201,7 +198,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                                         System::PacketBufferHandle && msgBuf, SecureSessionMgr * msgLayer)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
-    UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     bool sendAckAndCloseExchange            = false;
 
@@ -240,22 +236,20 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
-        umh = (UnsolicitedMessageHandler *) UMHandlerPool;
-
         matchingUMH = nullptr;
 
-        for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
+        for (auto & umh : UMHandlerPool)
         {
-            if (umh->IsInUse() && payloadHeader.HasProtocol(umh->ProtocolId))
+            if (umh.IsInUse() && payloadHeader.HasProtocol(umh.ProtocolId))
             {
-                if (umh->MessageType == payloadHeader.GetMessageType())
+                if (umh.MessageType == payloadHeader.GetMessageType())
                 {
-                    matchingUMH = umh;
+                    matchingUMH = &umh;
                     break;
                 }
 
-                if (umh->MessageType == kAnyMessageType)
-                    matchingUMH = umh;
+                if (umh.MessageType == kAnyMessageType)
+                    matchingUMH = &umh;
             }
         }
     }
