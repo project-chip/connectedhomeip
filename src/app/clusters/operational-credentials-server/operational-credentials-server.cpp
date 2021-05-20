@@ -89,7 +89,7 @@ EmberAfStatus writeFabric(FabricId fabricId, NodeId nodeId, uint16_t vendorId, i
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                    "OpCreds: Writing admin into attribute store at index %d: fabricId 0x" ChipLogFormatX64
-                   ", nodeId 0x" ChipLogFormatX64 " vendorId %" PRIX16,
+                   ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                    index, ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
     status = writeFabricAttribute((uint8_t *) &fabricDescriptor, index);
     return status;
@@ -101,7 +101,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Loop through admins
-    int32_t fabricIndex = 0;
+    uint32_t fabricIndex = 0;
     for (auto & pairing : GetGlobalAdminPairingTable())
     {
         NodeId nodeId     = pairing.GetNodeId();
@@ -113,7 +113,7 @@ CHIP_ERROR writeAdminsIntoFabricsListAttribute()
         {
             emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                            "OpCreds: Skipping over unitialized admin with fabricId 0x" ChipLogFormatX64
-                           ", nodeId 0x" ChipLogFormatX64 " vendorId %" PRIX16,
+                           ", nodeId 0x" ChipLogFormatX64 " vendorId 0x%04" PRIX16,
                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
             continue;
         }
@@ -167,7 +167,7 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     // Gets called when a fabric is deleted from KVS store
     void OnAdminDeletedFromStorage(AdminId adminId) override
     {
-        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin %" PRIX16 " was deleted from admin storage.", adminId);
+        emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Admin 0x%" PRIX16 " was deleted from admin storage.", adminId);
         writeAdminsIntoFabricsListAttribute();
     }
 
@@ -175,8 +175,8 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     void OnAdminRetrievedFromStorage(AdminPairingInfo * admin) override
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
-                       "OpCreds: Admin %" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
-                       ", NodeId 0x" ChipLogFormatX64 ", VendorId %" PRIX16,
+                       "OpCreds: Admin 0x%" PRIX16 " was retrieved from storage. FabricId 0x" ChipLogFormatX64
+                       ", NodeId 0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        admin->GetAdminId(), ChipLogValueX64(admin->GetFabricId()), ChipLogValueX64(admin->GetNodeId()),
                        admin->GetVendorId());
         writeAdminsIntoFabricsListAttribute();
@@ -187,7 +187,7 @@ class OpCredsAdminPairingTableDelegate : public AdminPairingTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG,
                        "OpCreds: Admin %" PRIX16 " was persisted to storage. FabricId %0x" ChipLogFormatX64
-                       ", NodeId %0x" ChipLogFormatX64 ", VendorId %" PRIX16,
+                       ", NodeId %0x" ChipLogFormatX64 ", VendorId 0x%04" PRIX16,
                        admin->GetAdminId(), ChipLogValueX64(admin->GetFabricId()), ChipLogValueX64(admin->GetNodeId()),
                        admin->GetVendorId());
         writeAdminsIntoFabricsListAttribute();

@@ -40,6 +40,7 @@
 
 #include <support/logging/Constants.h>
 
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdint.h>
 
@@ -296,10 +297,9 @@ bool IsCategoryEnabled(uint8_t category);
 
 #endif // CHIP_CONFIG_ENABLE_FUNCT_ERROR_LOGGING
 
-/*  @def ChipLogFormatX64
- *
+/*
  *  @brief
- * 	Macro for use in a string formatter for a 64-bit hex print.
+ *      Macro for use in a string formatter for a 64-bit hex print.
  *      Will split into 2x 32-bit prints to support small printf libraries
  *
  *  Example Usage:
@@ -307,17 +307,16 @@ bool IsCategoryEnabled(uint8_t category);
  *  @code
  *  void foo() {
  *      uint64_t value = 0x1122334455667788;
- *  	ChipLogProgress(Foo, "A 64-bit value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
+ *      ChipLogProgress(Foo, "A 64-bit value: 0x" ChipLogFormatX64, ChipLogValueX64(value));
  *  }
  *  @endcode
  *
  */
 #define ChipLogFormatX64 "%08" PRIX32 "%08" PRIX32
 
-/*  @def ChipLogValueX64
- *
+/*
  *  @brief
- * 	Macro for use in a printf parameter list for a 64-bit value.
+ *      Macro for use in a printf parameter list for a 64-bit value.
  *      Will split into MSB/LSB 32-bit values to use only 32-bit formatting.
  *
  *  Example Usage:
@@ -329,7 +328,7 @@ bool IsCategoryEnabled(uint8_t category);
  *  }
  *  @endcode
  *
- *  @param[in]  aValue	64-bit value that will be split in 32-bit MSB/LSB part
+ *  @param[in]  aValue    64-bit value that will be split in 32-bit MSB/LSB part
  */
 #define ChipLogValueX64(aValue) static_cast<uint32_t>(aValue >> 32), static_cast<uint32_t>(aValue)
 
