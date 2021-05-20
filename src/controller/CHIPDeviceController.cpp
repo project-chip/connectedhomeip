@@ -659,7 +659,7 @@ CHIP_ERROR DeviceController::InitializePairedDeviceList()
     if (!mPairedDevicesInitialized)
     {
         constexpr uint16_t max_size = sizeof(uint64_t) * kNumMaxPairedDevices;
-        buffer                      = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(max_size));
+        buffer                      = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(max_size, 1));
         uint16_t size               = max_size;
 
         VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
