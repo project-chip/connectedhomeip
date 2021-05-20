@@ -46,3 +46,6 @@ RUN rm -rf ${ZEPHYR_PROJECT_DIR}/zephyr \
 
 ENV ZEPHYR_BASE=${ZEPHYR_PROJECT_DIR}/zephyr
 ENV TELINK_TOOLCHAIN_PATH=${TELINK_DIR}/telink_riscv_linux_toolchain/nds32le-elf-mculib-v5f/bin
+
+# Required for west flash command
+ENV TELINK_TOOLCHAIN_BASE=${TELINK_DIR}/telink_riscv_linux_toolchain
