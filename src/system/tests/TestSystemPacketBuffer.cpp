@@ -44,6 +44,10 @@
 #include <lwip/tcpip.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -1962,10 +1966,16 @@ int TestSystemPacketBuffer(void)
     };
     // clang-format on
 
-    // Run test suit againt one context.
+#if CONFIG_DEVICE_LAYER
+    NL_TEST_ASSERT(&theSuite, chip::DeviceLayer::PlatformMgr().InitChipStack() == CHIP_NO_ERROR);
+#endif // CONFIG_DEVICE_LAYER
     nlTestRunner(&theSuite, &sContext);
+    int result = nlTestRunnerStats(&theSuite);
+#if CONFIG_DEVICE_LAYER
+    NL_TEST_ASSERT(&theSuite, chip::DeviceLayer::PlatformMgr().Shutdown() == CHIP_NO_ERROR);
+#endif // CONFIG_DEVICE_LAYER
 
-    return (nlTestRunnerStats(&theSuite));
+    return result;
 }
 
 CHIP_REGISTER_TEST_SUITE(TestSystemPacketBuffer)

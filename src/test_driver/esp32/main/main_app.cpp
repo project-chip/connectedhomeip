@@ -38,13 +38,6 @@ using namespace ::chip::DeviceLayer;
 
 const char * TAG = "CHIP-tests";
 
-static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
-{
-    esp_fill_random(output, len);
-    *olen = len;
-    return 0;
-}
-
 static void tester_task(void * pvParameters)
 {
     ESP_LOGI(TAG, "Starting CHIP tests!");
@@ -78,52 +71,6 @@ extern "C" void app_main()
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", ErrorStr(err));
-        exit(err);
-    }
-
-    // Initialize the LwIP core lock.  This must be done before the ESP
-    // tcpip_adapter layer is initialized.
-    err = PlatformMgrImpl().InitLwIPCoreLock();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "PlatformMgr().InitLocks() failed: %s", ErrorStr(err));
-        exit(err);
-    }
-
-    err = esp_netif_init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "esp_netif_init() failed: %s", ErrorStr(err));
-        exit(err);
-    }
-
-    // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
-    err = esp_event_loop_create_default();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", ErrorStr(err));
-        exit(err);
-    }
-    esp_netif_create_default_wifi_ap();
-    esp_netif_create_default_wifi_sta();
-
-    err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "esp_event_handler_register() failed for WIFI_EVENT: %s", ErrorStr(err));
-        exit(err);
-    }
-    err = esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "esp_event_handler_register() failed for IP_EVENT: %s", ErrorStr(err));
-        exit(err);
-    }
-
-    err = Crypto::add_entropy_source(app_entropy_source, NULL, 16);
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "add_entropy_source() failed: %s", ErrorStr(err));
         exit(err);
     }
 

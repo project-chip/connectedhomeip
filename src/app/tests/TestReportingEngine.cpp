@@ -45,6 +45,7 @@
 #include <nlunit-test.h>
 
 namespace chip {
+
 static Stack<> gStack(chip::kTestDeviceNodeId);
 constexpr ClusterId kTestClusterId    = 6;
 constexpr EndpointId kTestEndpointId  = 1;

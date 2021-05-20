@@ -221,10 +221,10 @@ public:
     // TODO(#6931): CHIP initialization should be posted to chip thread, in order to avoid racing problems
     CHIP_ERROR Init(const StackParameters & parameters)
     {
-        ReturnErrorOnFailure(chip::Platform::MemoryInit());
+        ReturnErrorOnFailure(Platform::MemoryInit());
 #if CONFIG_DEVICE_LAYER
         // Initialize the CHIP stack.
-        ReturnErrorOnFailure(chip::DeviceLayer::PlatformMgr().InitChipStack());
+        ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 #endif
         ReturnErrorOnFailure(mSystemLayer.Init(parameters));
         ReturnErrorOnFailure(mInetLayer.Init(parameters, GetSystemLayer()));

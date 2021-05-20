@@ -47,7 +47,25 @@
 #include <nlunit-test.h>
 
 namespace chip {
-static Stack<> gStack(kTestControllerNodeId);
+
+class NoopTransportConfig : TransportConfiguration
+{
+public:
+    using transport = TransportMgr<>;
+
+    CHIP_ERROR Init(const StackParameters & parameters, Inet::InetLayer & inetLayer, Ble::BleLayer * bleLayer)
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+
+    TransportMgrBase & Get() { return mTransportManager; }
+
+private:
+    transport mTransportManager;
+};
+
+static Stack<NoopTransportConfig> gStack(kTestControllerNodeId);
 static Transport::AdminId gAdminId = 0;
 static bool isCommandDispatched    = false;
 

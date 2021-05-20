@@ -55,10 +55,16 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_init_config_t cfg;
     uint8_t ap_mac[6];
     wifi_mode_t mode;
+
+    if (mInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+    mInitialized = true;
 
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
@@ -104,6 +110,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown(void)
+{
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)

@@ -49,7 +49,24 @@
 
 namespace {
 
-static chip::Stack<> gStack(chip::kTestDeviceNodeId);
+class NoopTransportConfig : chip::TransportConfiguration
+{
+public:
+    using transport = chip::TransportMgr<>;
+
+    CHIP_ERROR Init(const chip::StackParameters & parameters, chip::Inet::InetLayer & inetLayer, chip::Ble::BleLayer * bleLayer)
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+
+    chip::TransportMgrBase & Get() { return mTransportManager; }
+
+private:
+    transport mTransportManager;
+};
+
+static chip::Stack<NoopTransportConfig> gStack(chip::kTestDeviceNodeId);
 
 static const chip::NodeId kTestDeviceNodeId     = 0x18B4300000000001ULL;
 static const chip::ClusterId kLivenessClusterId = 0x00000022;
