@@ -18,7 +18,7 @@
 
 #include <stdlib.h>
 
-/* Basic implementation of psudo-random number generation to override the
+/* Basic implementation of pseudo-random number generation to override the
  * default newlib-nano implementation.
  */
 
