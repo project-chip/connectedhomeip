@@ -226,11 +226,11 @@ void ProcessCommand(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Inet::IPAddress gDestAddr;
+    Inet::IPAddress destAddr;
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
 
-    if (!chip::Inet::IPAddress::FromString(destination, gDestAddr))
+    if (!chip::Inet::IPAddress::FromString(destination, destAddr))
     {
         streamer_printf(stream, "Invalid CHIP Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -242,12 +242,12 @@ void ProcessCommand(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gSendArguments.IsUsingTCP())
     {
-        peerAddress = Transport::PeerAddress::TCP(gDestAddr, gSendArguments.GetPort());
+        peerAddress = Transport::PeerAddress::TCP(destAddr, gSendArguments.GetPort());
     }
     else
 #endif
     {
-        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
+        peerAddress = Transport::PeerAddress::UDP(destAddr, gSendArguments.GetPort(), INET_NULL_INTERFACEID);
     }
 
     // Start the CHIP connection to the CHIP server.
@@ -264,7 +264,6 @@ void ProcessCommand(streamer_t * stream, char * destination)
     gStack.GetTransportManager().Disconnect(peerAddress);
 #endif
 
-    gStack.GetTransportManager().Close();
     gStack.Shutdown();
 
 exit:

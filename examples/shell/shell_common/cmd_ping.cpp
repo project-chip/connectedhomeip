@@ -239,12 +239,12 @@ void StartPinging(streamer_t * stream, char * destination)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Inet::IPAddress gDestAddr;
+    Inet::IPAddress destAddr;
     Transport::PeerAddress peerAddress;
     Transport::AdminPairingInfo * adminInfo = nullptr;
     uint32_t maxEchoCount                   = 0;
 
-    if (!IPAddress::FromString(destination, gDestAddr))
+    if (!IPAddress::FromString(destination, destAddr))
     {
         streamer_printf(stream, "Invalid Echo Server IP address: %s\n", destination);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -258,12 +258,12 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        peerAddress = Transport::PeerAddress::TCP(gDestAddr, gPingArguments.GetEchoPort());
+        peerAddress = Transport::PeerAddress::TCP(destAddr, gPingArguments.GetEchoPort());
     }
     else
 #endif
     {
-        peerAddress = Transport::PeerAddress::UDP(gDestAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
+        peerAddress = Transport::PeerAddress::UDP(destAddr, gPingArguments.GetEchoPort(), INET_NULL_INTERFACEID);
     }
 
     // Start the CHIP connection to the CHIP echo responder.
@@ -309,10 +309,7 @@ void StartPinging(streamer_t * stream, char * destination)
     gStack.GetTransportManager().Disconnect(peerAddress);
 #endif
 
-    gStack.GetTransportManager().Close();
-
     gEchoClient.Shutdown();
-
     gStack.Shutdown();
 
 exit:
