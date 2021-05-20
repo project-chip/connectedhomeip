@@ -40,7 +40,7 @@
                 "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
                 "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG"
             ],
-            "led-active-state": 1,
+            "led-active-state": 0,
             "system-state-led": "LED1",
             "lighting-state-led": "P9_6",
             "lighting-button": "USER_BUTTON",
