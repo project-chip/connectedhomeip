@@ -87,8 +87,7 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
 
     mGlobalEncryptedMessageCounter.Init();
 
-    ChipLogProgress(Inet, "local node id is 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(mLocalNodeId >> 32),
-                    static_cast<uint32_t>(mLocalNodeId));
+    ChipLogProgress(Inet, "local node id is 0x" ChipLogFormatX64, ChipLogValueX64(mLocalNodeId));
 
     ScheduleExpiryTimer();
 
@@ -191,11 +190,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         (*bufferRetainSlot) = msgBuf.Retain();
     }
 
-    ChipLogProgress(Inet,
-                    "Sending msg from 0x%08" PRIx32 "%08" PRIx32 " to 0x%08" PRIx32 "%08" PRIx32 " at utc time: %" PRId64 " msec",
-                    static_cast<uint32_t>(localNodeId >> 32), static_cast<uint32_t>(localNodeId),
-                    static_cast<uint32_t>(state->GetPeerNodeId() >> 32), static_cast<uint32_t>(state->GetPeerNodeId()),
-                    System::Layer::GetClock_MonotonicMS());
+    ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",
+                    ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()), System::Layer::GetClock_MonotonicMS());
 
     if (state->GetTransport() != nullptr)
     {
@@ -387,18 +383,18 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                               state->GetAdminId()));
     if (packetHeader.GetDestinationNodeId().HasValue() && admin->GetNodeId() != kUndefinedNodeId)
     {
-        VerifyOrExit(
-            admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(
-                Inet,
-                "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
-                packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
+        VerifyOrExit(admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
+                     ChipLogError(Inet,
+                                  "Secure transport received message, but destination node ID (0x" ChipLogFormatX64
+                                  ") doesn't match our node ID (0x" ChipLogFormatX64 "), discarding",
+                                  ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()),
+                                  ChipLogValueX64(admin->GetNodeId())));
     }
 
     if (packetHeader.GetDestinationNodeId().HasValue())
     {
-        ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)",
-                     packetHeader.GetDestinationNodeId().Value());
+        ChipLogError(Inet, "Secure transport received message destined to node ID (0x" ChipLogFormatX64 ")",
+                     ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()));
     }
     else
     {

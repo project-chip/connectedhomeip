@@ -333,9 +333,10 @@ AdminPairingInfo * AdminPairingTable::FindAdminForNode(FabricId fabricId, NodeId
         if (state.IsInitialized())
         {
             ChipLogProgress(Discovery,
-                            "Looking at index %d with fabricID %llu nodeID %llu vendorId %d to see if it matches fabricId %llu "
-                            "nodeId %llu vendorId %d.",
-                            index, state.GetFabricId(), state.GetNodeId(), state.GetVendorId(), fabricId, nodeId, vendorId);
+                            "Checking ind:%d [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d] vs"
+                            " [fabricId 0x" ChipLogFormatX64 " nodeId 0x" ChipLogFormatX64 " vendorId %d]",
+                            index, ChipLogValueX64(state.GetFabricId()), ChipLogValueX64(state.GetNodeId()), state.GetVendorId(),
+                            ChipLogValueX64(fabricId), ChipLogValueX64(nodeId), vendorId);
         }
         if (state.IsInitialized() && state.GetFabricId() == fabricId &&
             (nodeId == kUndefinedNodeId || state.GetNodeId() == nodeId) &&
@@ -372,7 +373,7 @@ CHIP_ERROR AdminPairingTable::Store(AdminId id)
 exit:
     if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Admin (%d) persisted to storage. Calling OnAdminPersistedToStorage.", id);
+        ChipLogProgress(Discovery, "Admin (%d) persisted to storage. Calling OnAdminPersistedToStorage", id);
         mDelegate->OnAdminPersistedToStorage(admin);
     }
     return err;
@@ -401,7 +402,7 @@ exit:
     }
     else if (err == CHIP_NO_ERROR && mDelegate != nullptr)
     {
-        ChipLogProgress(Discovery, "Admin (%d) loaded from storage. Calling OnAdminRetrievedFromStorage.", id);
+        ChipLogProgress(Discovery, "Admin (%d) loaded from storage. Calling OnAdminRetrievedFromStorage", id);
         mDelegate->OnAdminRetrievedFromStorage(admin);
     }
     return err;
@@ -424,7 +425,7 @@ exit:
         ReleaseAdminId(id);
         if (mDelegate != nullptr && adminIsInitialized)
         {
-            ChipLogProgress(Discovery, "Admin (%d) deleted. Calling OnAdminDeletedFromStorage.", id);
+            ChipLogProgress(Discovery, "Admin (%d) deleted. Calling OnAdminDeletedFromStorage", id);
             mDelegate->OnAdminDeletedFromStorage(id);
         }
     }
@@ -435,7 +436,7 @@ CHIP_ERROR AdminPairingTable::Init(PersistentStorageDelegate * storage)
 {
     VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mStorage = storage;
-    ChipLogProgress(Discovery, "Init admin pairing table with server storage.");
+    ChipLogDetail(Discovery, "Init admin pairing table with server storage");
     return CHIP_NO_ERROR;
 }
 
@@ -443,7 +444,7 @@ CHIP_ERROR AdminPairingTable::SetAdminPairingDelegate(AdminPairingTableDelegate 
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mDelegate = delegate;
-    ChipLogProgress(Discovery, "Set the admin pairing table delegate");
+    ChipLogDetail(Discovery, "Set the admin pairing table delegate");
     return CHIP_NO_ERROR;
 }
 
