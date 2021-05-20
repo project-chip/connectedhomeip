@@ -47,7 +47,7 @@ static inline EmberAfStatus emberAfBinaryInputBasicClusterGetOutOfServiceCallbac
                                 NULL);
 }
 
-void emberAfBinaryInputBasicServerClusterInitCallback(chip::EndpointId endpoint)
+void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
     bool presentValue = false;
     EmberAfStatus status = emberAfBinaryInputBasicClusterGetPresentValueCallback(endpoint, &presentValue);
