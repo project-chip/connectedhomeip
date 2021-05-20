@@ -17,165 +17,102 @@
  *    limitations under the License.
  */
 
-#include "AppTask.h"
 #include "LightingManager.h"
+#include "AppTask.h"
 
 #include <support/logging/CHIPLogging.h>
 
 // mbed-os headers
-#include "drivers/Timeout.h"
 #include "platform/Callback.h"
 
-static mbed::Timeout sLockTimer;
+LightingManager LightingManager::sLight;
 
-LightingManager LightingManager::sLock;
-
-void LightingManager::Init()
+void LightingManager::Init(PinName pwmPinName)
 {
-    mState              = kState_LockingCompleted;
-    mAutoLockTimerArmed = false;
-    mAutoRelock         = false;
-    mAutoLockDuration   = 0;
+    mState     = kState_On;
+    mLevel     = kMaxLevel;
+    mPwmDevice = new mbed::PwmOut(pwmPinName);
+
+    Set(false);
 }
 
-void LightingManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
+void LightingManager::SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;
     mActionCompleted_CB = aActionCompleted_CB;
 }
 
-bool LightingManager::IsActionInProgress()
-{
-    return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated) ? true : false;
-}
-
-bool LightingManager::IsUnlocked()
-{
-    return (mState == kState_UnlockingCompleted) ? true : false;
-}
-
-void LightingManager::EnableAutoRelock(bool aOn)
-{
-    mAutoRelock = aOn;
-}
-
-void LightingManager::SetAutoLockDuration(uint32_t aDurationInSecs)
-{
-    mAutoLockDuration = aDurationInSecs;
-}
-
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value)
 {
     bool action_initiated = false;
     State_t new_state;
 
-    // Initiate Lock/Unlock Action only when the previous one is complete.
-    if (mState == kState_LockingCompleted && aAction == UNLOCK_ACTION)
+    // Initiate On/Off Action only when the previous one is complete.
+    if (mState == kState_Off && aAction == ON_ACTION)
     {
         action_initiated = true;
-        mCurrentActor    = aActor;
-        new_state        = kState_UnlockingInitiated;
+        new_state        = kState_On;
     }
-    else if (mState == kState_UnlockingCompleted && aAction == LOCK_ACTION)
+    else if (mState == kState_On && aAction == OFF_ACTION)
     {
         action_initiated = true;
-        mCurrentActor    = aActor;
-        new_state        = kState_LockingInitiated;
+        new_state        = kState_Off;
+    }
+    else if (aAction == LEVEL_ACTION && *value != mLevel)
+    {
+        action_initiated = true;
+        if (*value == 0)
+        {
+            new_state = kState_Off;
+        }
+        else
+        {
+            new_state = kState_On;
+        }
     }
 
     if (action_initiated)
     {
-        if (mAutoLockTimerArmed && new_state == kState_LockingInitiated)
-        {
-            // If auto lock timer has been armed and someone initiates locking,
-            // cancel the timer and continue as normal.
-            mAutoLockTimerArmed = false;
-
-            CancelTimer();
-        }
-
-        StartTimer(MBED_CONF_APP_ACTUATOR_MOVEMENT_PERIOD_MS);
-
-        // Since the timer started successfully, update the state and trigger callback
-        mState = new_state;
-
         if (mActionInitiated_CB)
         {
             mActionInitiated_CB(aAction, aActor);
+        }
+
+        if (aAction == ON_ACTION || aAction == OFF_ACTION)
+        {
+            Set(new_state == kState_On);
+        }
+        else if (aAction == LEVEL_ACTION)
+        {
+            SetLevel(*value);
+        }
+
+        if (mActionCompleted_CB)
+        {
+            mActionCompleted_CB(aAction, aActor);
         }
     }
 
     return action_initiated;
 }
 
-void LightingManager::StartTimer(uint32_t aTimeoutMs)
+void LightingManager::SetLevel(uint8_t aLevel)
 {
-    auto chronoTimeoutMs = std::chrono::duration<uint32_t, std::milli>(aTimeoutMs);
-    sLockTimer.attach(mbed::callback(this, &LightingManager::TimerEventHandler), chronoTimeoutMs);
+    ChipLogProgress(NotSpecified, "Setting brightness level to %u", aLevel);
+    mLevel = aLevel;
+    UpdateLight();
 }
 
-void LightingManager::CancelTimer(void)
+void LightingManager::Set(bool aOn)
 {
-    sLockTimer.detach();
+    mState = aOn ? kState_On : kState_Off;
+    UpdateLight();
 }
 
-void LightingManager::TimerEventHandler(void)
+void LightingManager::UpdateLight()
 {
-    AppEvent event;
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = this;
-    event.Handler            = mAutoLockTimerArmed ? AutoReLockTimerEventHandler : ActuatorMovementTimerEventHandler;
-    GetAppTask().PostEvent(&event);
-}
-
-void LightingManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
-{
-    LightingManager * lock = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
-    int32_t actor          = 0;
-
-    // Make sure auto lock timer is still armed.
-    if (!lock->mAutoLockTimerArmed)
-        return;
-
-    lock->mAutoLockTimerArmed = false;
-
-    ChipLogProgress(NotSpecified, "Auto Re-Lock has been triggered!");
-
-    lock->InitiateAction(actor, LOCK_ACTION);
-}
-
-void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
-{
-    Action_t actionCompleted = INVALID_ACTION;
-
-    LightingManager * lock = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
-
-    if (lock->mState == kState_LockingInitiated)
-    {
-        lock->mState    = kState_LockingCompleted;
-        actionCompleted = LOCK_ACTION;
-    }
-    else if (lock->mState == kState_UnlockingInitiated)
-    {
-        lock->mState    = kState_UnlockingCompleted;
-        actionCompleted = UNLOCK_ACTION;
-    }
-
-    if (actionCompleted != INVALID_ACTION)
-    {
-        if (lock->mActionCompleted_CB)
-        {
-            lock->mActionCompleted_CB(actionCompleted, lock->mCurrentActor);
-        }
-
-        if (lock->mAutoRelock && actionCompleted == UNLOCK_ACTION)
-        {
-            // Start the timer for auto relock
-            lock->StartTimer(lock->mAutoLockDuration * 1000);
-
-            lock->mAutoLockTimerArmed = true;
-
-            ChipLogProgress(NotSpecified, "Auto Re-lock enabled. Will be triggered in %u seconds", lock->mAutoLockDuration);
-        }
-    }
+    constexpr uint32_t kPwmWidthUs = 20000u;
+    const uint8_t level            = mState == kState_On ? mLevel : 0;
+    mPwmDevice->period_us(kPwmWidthUs);
+    mPwmDevice->write((float) level / kMaxLevel);
 }

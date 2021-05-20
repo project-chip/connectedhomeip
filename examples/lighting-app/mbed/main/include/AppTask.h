@@ -27,6 +27,7 @@ class AppTask
 public:
     int StartApp();
 
+    void PostLightingActionRequest(LightingManager::Action_t aAction);
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
 
@@ -44,9 +45,9 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
-    static void LockActionEventHandler(AppEvent * aEvent);
+    static void LightingActionEventHandler(AppEvent * aEvent);
 
-    void LockButtonPressEventHandler(void);
+    void LightingButtonPressEventHandler(void);
     void FunctionButtonPressEventHandler(void);
     void FunctionButtonReleaseEventHandler(void);
     void TimerEventHandler(void);

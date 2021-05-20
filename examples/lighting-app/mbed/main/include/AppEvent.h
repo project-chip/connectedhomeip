@@ -30,7 +30,7 @@ struct AppEvent
     {
         kEventType_Button = 0,
         kEventType_Timer,
-        kEventType_Lock,
+        kEventType_Lighting,
         kEventType_Install,
     };
 
@@ -40,7 +40,7 @@ struct AppEvent
     {
         struct
         {
-            int Pin;
+            uint8_t Pin;
             uint8_t Action;
         } ButtonEvent;
         struct
@@ -51,7 +51,7 @@ struct AppEvent
         {
             uint8_t Action;
             int32_t Actor;
-        } LockEvent;
+        } LightingEvent;
     };
 
     EventHandler Handler;

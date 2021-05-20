@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,33 +18,56 @@
 
 #include <support/logging/CHIPLogging.h>
 
-#include "AppTask.h"
-#include "LightingManager.h"
-
 #include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 #include <app/util/af-types.h>
 
-using namespace ::chip;
+#include "AppTask.h"
+#include "LightingManager.h"
+
+using namespace chip;
 
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
-    if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
+    ChipLogProgress(Zcl, "Cluster callback: %d", clusterId);
+
+    if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+    {
+        if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
+        {
+            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            return;
+        }
+
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
+                                     AppEvent::kEventType_Lighting, size, value);
+    }
+    else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    {
+        if (attributeId != ZCL_MOVE_TO_LEVEL_COMMAND_ID)
+        {
+            ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
+            return;
+        }
+
+        ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
+        if (size == 1)
+        {
+            LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
+        }
+        else
+        {
+            ChipLogError(Zcl, "wrong length for level: %d", size);
+        }
+    }
+    else
     {
         ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
         return;
     }
-
-    if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
-    {
-        ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
-        return;
-    }
-
-    BoltLockMgr().InitiateAction(0, *value ? LightingManager::LOCK_ACTION : LightingManager::UNLOCK_ACTION);
 }
 
 /** @brief OnOff Cluster Init

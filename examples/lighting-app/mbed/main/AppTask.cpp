@@ -45,7 +45,7 @@
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_TRIGGER_TIMEOUT)
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_CANCEL_WINDOW_TIMEOUT)
-#define LOCK_BUTTON (MBED_CONF_APP_LOCK_BUTTON)
+#define LIGHTING_BUTTON (MBED_CONF_APP_LIGHTING_BUTTON)
 #define FUNCTION_BUTTON (MBED_CONF_APP_FUNCTION_BUTTON)
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
@@ -53,9 +53,8 @@
 constexpr uint32_t kPublishServicePeriodUs = 5000000;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
-static LEDWidget sLockLED(MBED_CONF_APP_LOCK_STATE_LED);
 
-static mbed::InterruptIn sLockButton(LOCK_BUTTON);
+static mbed::InterruptIn sLightingButton(LIGHTING_BUTTON);
 static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
 
 static bool sIsWiFiStationProvisioned = false;
@@ -76,17 +75,15 @@ AppTask AppTask::sAppTask;
 
 int AppTask::Init()
 {
-    // Initialize LEDs
-    sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
-    // Initialize buttons
-    sLockButton.fall(mbed::callback(this, &AppTask::LockButtonPressEventHandler));
+    //-------------
+    // Initialize button
+    sLightingButton.fall(mbed::callback(this, &AppTask::LightingButtonPressEventHandler));
     sFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
     sFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
-
-    // Initialize lock manager
-    BoltLockMgr().Init();
-    BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    //----------------
+    // Initialize lighting manager
+    LightingMgr().Init(MBED_CONF_APP_LIGHTING_STATE_LED);
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Start BLE advertising if needed
     if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
@@ -178,7 +175,6 @@ int AppTask::StartApp()
         }
 
         sStatusLED.Animate();
-        sLockLED.Animate();
 
         uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
         uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
@@ -192,33 +188,33 @@ int AppTask::StartApp()
     }
 }
 
-void AppTask::LockActionEventHandler(AppEvent * aEvent)
+void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
     LightingManager::Action_t action = LightingManager::INVALID_ACTION;
     int32_t actor                    = 0;
 
-    if (aEvent->Type == AppEvent::kEventType_Lock)
+    if (aEvent->Type == AppEvent::kEventType_Lighting)
     {
-        action = static_cast<LightingManager::Action_t>(aEvent->LockEvent.Action);
-        actor  = aEvent->LockEvent.Actor;
+        action = static_cast<LightingManager::Action_t>(aEvent->LightingEvent.Action);
+        actor  = aEvent->LightingEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = BoltLockMgr().IsUnlocked() ? LightingManager::LOCK_ACTION : LightingManager::UNLOCK_ACTION;
+        action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
 
-    if (action != LightingManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
+    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, NULL))
         ChipLogProgress(NotSpecified, "Action is already in progress or active.");
 }
 
-void AppTask::LockButtonPressEventHandler()
+void AppTask::LightingButtonPressEventHandler()
 {
     AppEvent button_event;
     button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Pin    = LOCK_BUTTON;
+    button_event.ButtonEvent.Pin    = LIGHTING_BUTTON;
     button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
-    button_event.Handler            = LockActionEventHandler;
+    button_event.Handler            = LightingActionEventHandler;
     sAppTask.PostEvent(&button_event);
 }
 
@@ -244,34 +240,33 @@ void AppTask::FunctionButtonReleaseEventHandler()
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
-    // If the action has been initiated by the lock, update the bolt lock trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == LightingManager::LOCK_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        ChipLogProgress(NotSpecified, "Lock Action has been initiated");
+        ChipLogProgress(NotSpecified, "Turn On Action has been initiated");
     }
-    else if (aAction == LightingManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        ChipLogProgress(NotSpecified, "Unlock Action has been initiated");
+        ChipLogProgress(NotSpecified, "Turn Off Action has been initiated");
     }
-
-    sLockLED.Blink(50, 50);
+    else if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Level Action has been initiated");
+    }
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
 {
-    // if the action has been completed by the lock, update the bolt lock trait.
-    // Turn on the lock LED if in a LOCKED state OR
-    // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == LightingManager::LOCK_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        ChipLogProgress(NotSpecified, "Lock Action has been completed");
-        sLockLED.Set(true);
+        ChipLogProgress(NotSpecified, "Turn On Action has been completed");
     }
-    else if (aAction == LightingManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        ChipLogProgress(NotSpecified, "Unlock Action has been completed");
-        sLockLED.Set(false);
+        ChipLogProgress(NotSpecified, "Turn Off Action has been completed");
+    }
+    else if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        ChipLogProgress(NotSpecified, "Level Action has been completed");
     }
 
     if (aActor == AppEvent::kEventType_Button)
@@ -340,18 +335,11 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
         sAppTask.mFunction = kFunction_FactoryReset;
 
-        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
         sStatusLED.Set(false);
-        sLockLED.Set(false);
-
         sStatusLED.Blink(500);
-        sLockLED.Blink(500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
-        // Set lock status LED back to show state of lock.
-        sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
         // Actually trigger Factory Reset
         ChipLogProgress(NotSpecified, "Factory Reset initiated");
         sAppTask.mFunction = kFunction_NoneSelected;
@@ -389,9 +377,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
-            // Set lock status LED back to show state of lock.
-            sLockLED.Set(!BoltLockMgr().IsUnlocked());
-
             sAppTask.CancelTimer();
 
             // Change the function to none selected since factory reset has been canceled.
@@ -404,13 +389,23 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+    uint8_t onoff = LightingMgr().IsTurnedOn();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &onoff,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(NotSpecified, "ZCL update failed: %x", status);
+        ChipLogError(NotSpecified, "Updating on/off cluster failed: %x", status);
+    }
+
+    uint8_t level = LightingMgr().GetLevel();
+
+    status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
+                                   ZCL_DATA8_ATTRIBUTE_TYPE);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "Updating level cluster failed: %x", status);
     }
 }

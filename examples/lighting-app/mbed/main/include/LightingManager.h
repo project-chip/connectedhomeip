@@ -23,59 +23,53 @@
 
 #include "AppEvent.h"
 
+#include "drivers/PwmOut.h"
+
 class LightingManager
 {
 public:
-    enum Action_t
+    enum Action_t : uint8_t
     {
-        LOCK_ACTION = 0,
-        UNLOCK_ACTION,
+        ON_ACTION = 0,
+        OFF_ACTION,
+        LEVEL_ACTION,
 
         INVALID_ACTION
     };
 
-    enum State_t
+    enum State_t : uint8_t
     {
-        kState_LockingInitiated = 0,
-        kState_LockingCompleted,
-        kState_UnlockingInitiated,
-        kState_UnlockingCompleted,
+        kState_On = 0,
+        kState_Off,
     };
 
-    void Init();
-    bool IsUnlocked();
-    void EnableAutoRelock(bool aOn);
-    void SetAutoLockDuration(uint32_t aDurationInSecs);
-    bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
+    using LightingCallback_fn = void (*)(Action_t, int32_t);
 
-    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action_t, int32_t aActor);
-    void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
+    void Init(PinName pwmPinName);
+    bool IsTurnedOn() const { return mState == kState_On; }
+    uint8_t GetLevel() const { return mLevel; }
+    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
+    void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
-    friend LightingManager & BoltLockMgr(void);
+    static constexpr uint8_t kMaxLevel = 255;
+
+    friend LightingManager & LightingMgr();
     State_t mState;
+    uint8_t mLevel;
+    mbed::PwmOut * mPwmDevice;
 
-    Callback_fn_initiated mActionInitiated_CB;
-    Callback_fn_completed mActionCompleted_CB;
+    LightingCallback_fn mActionInitiated_CB;
+    LightingCallback_fn mActionCompleted_CB;
 
-    bool mAutoRelock;
-    uint32_t mAutoLockDuration;
-    bool mAutoLockTimerArmed;
-    int32_t mCurrentActor;
+    void Set(bool aOn);
+    void SetLevel(uint8_t aLevel);
+    void UpdateLight();
 
-    void CancelTimer(void);
-    void StartTimer(uint32_t aTimeoutMs);
-
-    void TimerEventHandler(void);
-    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
-    static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
-
-    static LightingManager sLock;
+    static LightingManager sLight;
 };
 
-inline LightingManager & BoltLockMgr(void)
+inline LightingManager & LightingMgr(void)
 {
-    return LightingManager::sLock;
+    return LightingManager::sLight;
 }
