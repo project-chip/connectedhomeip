@@ -9,6 +9,7 @@ import sys
 
 # List of directories in src/app/clusters to build for server clusters.
 SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
+    'AIR_PRESSURE_MEASUREMENT_CLUSTER': ['air-pressure-measurement-server'],
     'ALARM_CLUSTER': [],
     'APPLICATION_BASIC_CLUSTER': [],
     'ACCOUNT_LOGIN_CLUSTER': [],
@@ -16,6 +17,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'AUDIO_OUTPUT_CLUSTER': [],
     'BARRIER_CONTROL_CLUSTER': ['barrier-control-server'],
     'BASIC_CLUSTER': ['basic'],
+    'BINARY_INPUT_BASIC_CLUSTER': ['binary-input-server'],
     'BINDING_CLUSTER': ['bindings'],
     'BRIDGED_DEVICE_BASIC_CLUSTER': [],
     'COLOR_CONTROL_CLUSTER': ['color-control-server'],
@@ -64,6 +66,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
 
 # List of directories in src/app/clusters to build for client clusters.
 CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
+    'AIR_PRESSURE_MEASUREMENT_CLUSTER': [],
     'ALARM_CLUSTER': [],
     'ACCOUNT_LOGIN_CLUSTER': [],
     'APPLICATION_LAUNCHER_CLUSTER': [],
@@ -71,6 +74,7 @@ CLIENT_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'APPLICATION_BASIC_CLUSTER': [],
     'BARRIER_CONTROL_CLUSTER': [],
     'BASIC_CLUSTER': [],
+    'BINARY_INPUT_BASIC_CLUSTER': [],
     'BINDING_CLUSTER': [],
     'BRIDGED_DEVICE_BASIC_CLUSTER': [],
     'COLOR_CONTROL_CLUSTER': [],
