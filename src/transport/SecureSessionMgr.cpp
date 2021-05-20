@@ -395,9 +395,16 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                 packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
     }
 
-    ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node %llu",
-                    static_cast<int>(state->GetAdminId()),
-                    packetHeader.GetDestinationNodeId().Value());
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node %llu",
+                        static_cast<int>(state->GetAdminId()), packetHeader.GetDestinationNodeId().Value());
+    }
+    else
+    {
+        ChipLogProgress(Inet, "Secure transport received message destined to fabric %d, node id NOT SET",
+                        static_cast<int>(state->GetAdminId()));
+    }
     mPeerConnections.MarkConnectionActive(state);
 
     // Decode the message
