@@ -22,7 +22,5 @@ chip_data_model("data_model") {
   zap_pregenerated_dir = "gen"
 
   use_default_client_callbacks = true
-  allow_circular_includes_from = [
-      "${chip_root}/src/controller",
-  ]
+  allow_circular_includes_from = [ "${chip_root}/src/controller" ]
 }
