@@ -195,7 +195,7 @@ public:
             if (name == "Temperature")
             {
                 // update the temp attribute here for hardcoded endpoint 1
-                emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(n * 100));
+                emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(1, static_cast<int16_t>(n * 100));
             }
             value = buffer;
         }
@@ -389,7 +389,7 @@ void SetupPretendDevices()
     AddCluster("Thermometer");
     AddAttribute("Temperature", "21");
     // write the temp attribute
-    emberAfPluginTemperatureMeasurementSetValueCallback(1, static_cast<int16_t>(21 * 100));
+    emberAfTemperatureMeasurementClusterSetMeasuredValueCallback(1, static_cast<int16_t>(21 * 100));
 
     AddDevice("Door Lock");
     AddEndpoint("Default");
