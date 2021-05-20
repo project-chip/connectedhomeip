@@ -196,6 +196,7 @@ function asChipUnderlyingType(label, type)
 
 // List of all cluster with generated functions
 var endpointClusterWithInit = [ 'Basic',
+                                'Binary Input (Basic)',
                                 'Identify',
                                 'Groups',
                                 'Scenes',
