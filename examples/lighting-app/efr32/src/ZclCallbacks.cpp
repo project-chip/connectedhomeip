@@ -23,9 +23,8 @@
 #include "AppConfig.h"
 #include "LightingManager.h"
 
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/cluster-id.h>
 #include <app/util/af-types.h>
 
 using namespace ::chip;

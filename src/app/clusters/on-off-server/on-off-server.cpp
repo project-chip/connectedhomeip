@@ -40,13 +40,12 @@
  ******************************************************************************/
 #include "on-off-server.h"
 
+#include <app/common/gen/attribute-id.h>
+#include <app/common/gen/att-storage.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af.h>
-
-#include "gen/att-storage.h"
-#include "gen/attribute-id.h"
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 #include <app/Command.h>
 #include <app/reporting/reporting.h>

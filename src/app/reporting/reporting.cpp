@@ -40,6 +40,9 @@
  ******************************************************************************/
 
 #include <app/reporting/reporting.h>
+#include <app/common/gen/attribute-type.h>
+#include <app/common/gen/cluster-id.h>
+#include <app/common/gen/command-id.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -47,10 +50,6 @@
 #include <app/util/common.h>
 #include <support/SafeInt.h>
 #include <system/SystemLayer.h>
-
-#include "gen/attribute-type.h"
-#include "gen/cluster-id.h"
-#include "gen/command-id.h"
 
 using namespace chip;
 
