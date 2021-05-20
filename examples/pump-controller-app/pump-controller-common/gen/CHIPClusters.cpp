@@ -42,9 +42,8 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -65,9 +64,8 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -88,9 +86,8 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 

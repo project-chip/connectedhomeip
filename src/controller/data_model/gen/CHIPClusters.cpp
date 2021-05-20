@@ -44,7 +44,6 @@ CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCall
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSetupPINCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // tempAccountIdentifier: charString
@@ -71,7 +70,6 @@ CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLoginCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // tempAccountIdentifier: charString
@@ -190,7 +188,6 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchAppCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // data: charString
@@ -247,7 +244,6 @@ CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCall
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRenameOutputCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // index: int8u
@@ -276,7 +272,6 @@ CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCall
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSelectOutputCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // index: int8u
@@ -328,7 +323,6 @@ CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlGoToPercentCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // percentOpen: int8u
@@ -354,9 +348,8 @@ CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Cancelable * onSu
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBarrierControlStopCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -426,9 +419,8 @@ CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallbac
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMfgSpecificPingCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -620,7 +612,6 @@ CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kBindCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // nodeId: nodeId
@@ -654,7 +645,6 @@ CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Call
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnbindCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // nodeId: nodeId
@@ -703,7 +693,6 @@ CHIP_ERROR ColorControlCluster::MoveColor(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // rateX: int16s
@@ -738,7 +727,6 @@ CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveColorTemperatureCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // moveMode: hueMoveMode
@@ -775,7 +763,6 @@ CHIP_ERROR ColorControlCluster::MoveHue(Callback::Cancelable * onSuccessCallback
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveHueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // moveMode: hueMoveMode
@@ -808,7 +795,6 @@ CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveSaturationCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // moveMode: saturationMoveMode
@@ -842,7 +828,6 @@ CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Cancelable * onSuccessCall
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // colorX: int16u
@@ -878,7 +863,6 @@ CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Cancelable * on
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToColorTemperatureCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // colorTemperature: int16u
@@ -912,7 +896,6 @@ CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // hue: int8u
@@ -948,7 +931,6 @@ CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Cancelable * on
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToHueAndSaturationCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // hue: int8u
@@ -984,7 +966,6 @@ CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToSaturationCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // saturation: int8u
@@ -1018,7 +999,6 @@ CHIP_ERROR ColorControlCluster::StepColor(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // stepX: int16s
@@ -1055,7 +1035,6 @@ CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepColorTemperatureCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // stepMode: hueStepMode
@@ -1095,7 +1074,6 @@ CHIP_ERROR ColorControlCluster::StepHue(Callback::Cancelable * onSuccessCallback
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepHueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // stepMode: hueStepMode
@@ -1131,7 +1109,6 @@ CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepSaturationCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // stepMode: saturationStepMode
@@ -1166,7 +1143,6 @@ CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Cancelable * onSuccessCal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopMoveStepCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // optionsMask: bitmap8
@@ -1799,7 +1775,6 @@ CHIP_ERROR ContentLaunchCluster::LaunchContent(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchContentCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // autoPlay: boolean
@@ -1828,7 +1803,6 @@ CHIP_ERROR ContentLaunchCluster::LaunchURL(Callback::Cancelable * onSuccessCallb
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLaunchURLCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // contentURL: charString
@@ -1936,9 +1910,8 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllPinsCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -1959,9 +1932,8 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallba
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearAllRfidsCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -1984,7 +1956,6 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearHolidayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2011,7 +1982,6 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearPinCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2038,7 +2008,6 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearRfidCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2065,7 +2034,6 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeekdayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2094,7 +2062,6 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearYeardayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2123,7 +2090,6 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetHolidayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2150,7 +2116,6 @@ CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallbac
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLogRecordCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // logIndex: int16u
@@ -2177,7 +2142,6 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Cal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetPinCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2204,7 +2168,6 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRfidCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2231,7 +2194,6 @@ CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetUserTypeCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2258,7 +2220,6 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeekdayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2287,7 +2248,6 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetYeardayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2316,7 +2276,6 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kLockDoorCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // pin: charString
@@ -2344,7 +2303,6 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetHolidayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2377,7 +2335,6 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetPinCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2410,7 +2367,6 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRfidCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2443,7 +2399,6 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetUserTypeCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // userId: int16u
@@ -2473,7 +2428,6 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeekdayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2512,7 +2466,6 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetYeardayScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // scheduleId: int8u
@@ -2545,7 +2498,6 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockDoorCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // pin: charString
@@ -2572,7 +2524,6 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUnlockWithTimeoutCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // timeoutInSeconds: int16u
@@ -2655,9 +2606,8 @@ CHIP_ERROR EthernetNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable *
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kResetCountsCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -2742,7 +2692,6 @@ CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kArmFailSafeCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // expiryLengthSeconds: int16u
@@ -2772,9 +2721,8 @@ CHIP_ERROR GeneralCommissioningCluster::CommissioningComplete(Callback::Cancelab
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kCommissioningCompleteCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -2798,7 +2746,6 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetRegulatoryConfigCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // location: regulatoryLocationType
@@ -2938,7 +2885,6 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -2967,7 +2913,6 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddGroupIfIdentifyingCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -2996,7 +2941,6 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetGroupMembershipCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupCount: int8u
@@ -3023,9 +2967,8 @@ CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Cancelable * onSuccessCallba
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllGroupsCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3048,7 +2991,6 @@ CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Cancelable * onSuccessCallback, 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveGroupCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -3075,7 +3017,6 @@ CHIP_ERROR GroupsCluster::ViewGroup(Callback::Cancelable * onSuccessCallback, Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewGroupCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -3126,7 +3067,6 @@ CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // identifyTime: int16u
@@ -3151,9 +3091,8 @@ CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Cancelable * onSuccessCallba
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kIdentifyQueryCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3208,7 +3147,6 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSendKeyCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // keyCode: keypadInputCecKeyCode
@@ -3252,7 +3190,6 @@ CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // moveMode: moveMode
@@ -3285,7 +3222,6 @@ CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Cancelable * onSuccessCall
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // level: int8u
@@ -3319,7 +3255,6 @@ CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveToLevelWithOnOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // level: int8u
@@ -3348,7 +3283,6 @@ CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Cancelable * onSuccessCa
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMoveWithOnOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // moveMode: moveMode
@@ -3378,7 +3312,6 @@ CHIP_ERROR LevelControlCluster::Step(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // stepMode: stepMode
@@ -3413,7 +3346,6 @@ CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Cancelable * onSuccessCa
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStepWithOnOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // stepMode: stepMode
@@ -3444,7 +3376,6 @@ CHIP_ERROR LevelControlCluster::Stop(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // optionMask: bitmap8
@@ -3471,9 +3402,8 @@ CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Cancelable * onSuccessCa
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStopWithOnOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3534,9 +3464,8 @@ CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Call
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSleepCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3573,9 +3502,8 @@ CHIP_ERROR MediaInputCluster::HideInputStatus(Callback::Cancelable * onSuccessCa
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kHideInputStatusCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3598,7 +3526,6 @@ CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRenameInputCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // index: int8u
@@ -3627,7 +3554,6 @@ CHIP_ERROR MediaInputCluster::SelectInput(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSelectInputCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // index: int8u
@@ -3652,9 +3578,8 @@ CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCa
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kShowInputStatusCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3700,9 +3625,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaFastForward(Callback::Cancelable * onSucce
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaFastForwardCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3723,9 +3647,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaNext(Callback::Cancelable * onSuccessCallb
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaNextCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3746,9 +3669,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaPause(Callback::Cancelable * onSuccessCall
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaPauseCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3769,9 +3691,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaPlay(Callback::Cancelable * onSuccessCallb
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaPlayCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3792,9 +3713,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaPrevious(Callback::Cancelable * onSuccessC
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaPreviousCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3815,9 +3735,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaRewind(Callback::Cancelable * onSuccessCal
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaRewindCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3840,7 +3759,6 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipBackward(Callback::Cancelable * onSucc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaSkipBackwardCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // deltaPositionMilliseconds: int64u
@@ -3867,7 +3785,6 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipForward(Callback::Cancelable * onSucce
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaSkipForwardCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // deltaPositionMilliseconds: int64u
@@ -3894,7 +3811,6 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipSeek(Callback::Cancelable * onSuccessC
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaSkipSeekCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // position: int64u
@@ -3919,9 +3835,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaStartOver(Callback::Cancelable * onSuccess
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaStartOverCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3942,9 +3857,8 @@ CHIP_ERROR MediaPlaybackCluster::MediaStop(Callback::Cancelable * onSuccessCallb
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kMediaStopCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -3985,7 +3899,6 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddThreadNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // operationalDataset: octetString
@@ -4017,7 +3930,6 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddWiFiNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // ssid: octetString
@@ -4051,7 +3963,6 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kDisableNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // networkID: octetString
@@ -4083,7 +3994,6 @@ CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onS
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kEnableNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // networkID: octetString
@@ -4115,7 +4025,6 @@ CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetLastNetworkCommissioningResultCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // timeoutMs: int32u
@@ -4143,7 +4052,6 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // networkID: octetString
@@ -4175,7 +4083,6 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kScanNetworksCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // ssid: octetString
@@ -4208,7 +4115,6 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateThreadNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // operationalDataset: octetString
@@ -4240,7 +4146,6 @@ CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable *
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateWiFiNetworkCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // ssid: octetString
@@ -4288,9 +4193,8 @@ CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback:
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOffCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -4311,9 +4215,8 @@ CHIP_ERROR OnOffCluster::On(Callback::Cancelable * onSuccessCallback, Callback::
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOnCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -4334,9 +4237,8 @@ CHIP_ERROR OnOffCluster::Toggle(Callback::Cancelable * onSuccessCallback, Callba
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kToggleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -4398,7 +4300,6 @@ CHIP_ERROR OperationalCredentialsCluster::AddOpCert(Callback::Cancelable * onSuc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddOpCertCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // noc: octetString
@@ -4433,7 +4334,6 @@ CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * on
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kOpCSRRequestCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // cSRNonce: octetString
@@ -4459,9 +4359,8 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveAllFabrics(Callback::Cancelable 
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllFabricsCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -4485,7 +4384,6 @@ CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * on
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveFabricCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // fabricId: fabricId
@@ -4516,7 +4414,6 @@ CHIP_ERROR OperationalCredentialsCluster::SetFabric(Callback::Cancelable * onSuc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetFabricCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // vendorId: int16u
@@ -4543,7 +4440,6 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kUpdateFabricLabelCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // label: charString
@@ -4698,7 +4594,6 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddSceneCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -4737,7 +4632,6 @@ CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Cancelable * onSuccessCal
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetSceneMembershipCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -4764,7 +4658,6 @@ CHIP_ERROR ScenesCluster::RecallScene(Callback::Cancelable * onSuccessCallback, 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRecallSceneCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -4795,7 +4688,6 @@ CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Cancelable * onSuccessCallba
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveAllScenesCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -4822,7 +4714,6 @@ CHIP_ERROR ScenesCluster::RemoveScene(Callback::Cancelable * onSuccessCallback, 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveSceneCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -4851,7 +4742,6 @@ CHIP_ERROR ScenesCluster::StoreScene(Callback::Cancelable * onSuccessCallback, C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kStoreSceneCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -4880,7 +4770,6 @@ CHIP_ERROR ScenesCluster::ViewScene(Callback::Cancelable * onSuccessCallback, Ca
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kViewSceneCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // groupId: int16u
@@ -5012,7 +4901,6 @@ CHIP_ERROR TvChannelCluster::ChangeChannel(Callback::Cancelable * onSuccessCallb
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kChangeChannelCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // match: charString
@@ -5040,7 +4928,6 @@ CHIP_ERROR TvChannelCluster::ChangeChannelByNumber(Callback::Cancelable * onSucc
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kChangeChannelByNumberCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // majorNumber: int16u
@@ -5069,7 +4956,6 @@ CHIP_ERROR TvChannelCluster::SkipChannel(Callback::Cancelable * onSuccessCallbac
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSkipChannelCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // count: int16u
@@ -5136,7 +5022,6 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSucce
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kNavigateTargetCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // target: int8u
@@ -5245,9 +5130,8 @@ CHIP_ERROR TestClusterCluster::Test(Callback::Cancelable * onSuccessCallback, Ca
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kTestCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -5268,9 +5152,8 @@ CHIP_ERROR TestClusterCluster::TestNotHandled(Callback::Cancelable * onSuccessCa
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kTestNotHandledCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -5291,9 +5174,8 @@ CHIP_ERROR TestClusterCluster::TestSpecific(Callback::Cancelable * onSuccessCall
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kTestSpecificCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -5612,9 +5494,8 @@ CHIP_ERROR ThermostatCluster::ClearWeeklySchedule(Callback::Cancelable * onSucce
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kClearWeeklyScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -5635,9 +5516,8 @@ CHIP_ERROR ThermostatCluster::GetRelayStatusLog(Callback::Cancelable * onSuccess
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetRelayStatusLogCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -5660,7 +5540,6 @@ CHIP_ERROR ThermostatCluster::GetWeeklySchedule(Callback::Cancelable * onSuccess
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kGetWeeklyScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // daysToReturn: dayOfWeek
@@ -5690,7 +5569,6 @@ CHIP_ERROR ThermostatCluster::SetWeeklySchedule(Callback::Cancelable * onSuccess
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetWeeklyScheduleCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // numberOfTransitionsForSequence: enum8
@@ -5723,7 +5601,6 @@ CHIP_ERROR ThermostatCluster::SetpointRaiseLower(Callback::Cancelable * onSucces
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kSetpointRaiseLowerCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // mode: setpointAdjustMode
@@ -5859,7 +5736,6 @@ CHIP_ERROR TrustedRootCertificatesCluster::AddTrustedRootCertificate(Callback::C
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kAddTrustedRootCertificateCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // rootCertificate: octetString
@@ -5887,7 +5763,6 @@ CHIP_ERROR TrustedRootCertificatesCluster::RemoveTrustedRootCertificate(Callback
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kRemoveTrustedRootCertificateCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // trustedRootIdentifier: octetString
@@ -5954,9 +5829,8 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringDownClose(Callback::Cancelable *
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringDownCloseCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -5980,7 +5854,6 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftPercentage(Callback::Can
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftPercentageCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // percentageLiftValue: int8u
@@ -6007,7 +5880,6 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToLiftValue(Callback::Cancelab
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToLiftValueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // liftValue: int16u
@@ -6035,7 +5907,6 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltPercentage(Callback::Can
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltPercentageCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // percentageTiltValue: int8u
@@ -6062,7 +5933,6 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringGoToTiltValue(Callback::Cancelab
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringGoToTiltValueCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
     ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber    = 0;
     // tiltValue: int16u
@@ -6088,9 +5958,8 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringStop(Callback::Cancelable * onSu
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringStopCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
@@ -6112,9 +5981,8 @@ CHIP_ERROR WindowCoveringCluster::WindowCoveringUpOpen(Callback::Cancelable * on
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, kWindowCoveringUpOpenCommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());
 
