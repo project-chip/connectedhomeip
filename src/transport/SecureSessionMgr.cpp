@@ -403,9 +403,8 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     }
     else
     {
-        ChipLogError(Inet, "Secure transport received message for fabrid %d without node ID. Key ID %d", 
-                        static_cast<int>(state->GetAdminId()),
-                        packetHeader.GetEncryptionKeyID());
+        ChipLogProgress(Inet, "Secure transport received message for fabrid %d without node ID. Key ID %d",
+                        static_cast<int>(state->GetAdminId()), packetHeader.GetEncryptionKeyID());
     }
 
     mPeerConnections.MarkConnectionActive(state);
