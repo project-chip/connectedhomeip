@@ -76,10 +76,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPath;
-    chip::TLV::TLVReader commandDataReader;
-    chip::ClusterId clusterId;
-    chip::CommandId commandId;
-    chip::EndpointId endpointId;
+    TLV::TLVReader commandDataReader;
+    ClusterId clusterId;
+    CommandId commandId;
+    EndpointId endpointId;
 
     err = aCommandElement.GetCommandPath(&commandPath);
     SuccessOrExit(err);
@@ -96,13 +96,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
-        ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        // The Path is not present when the CommandDataElement is used with an empty response, ResponseCommandElement would only
-        // have status code,
-        AddStatusCode(nullptr, GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeSuccess);
+        ChipLogDetail(DataManagement, "Received empty command for cluster %d", clusterId);
     }
-    else if (CHIP_NO_ERROR == err)
+
+    if (CHIP_NO_ERROR == err)
     {
         DispatchSingleClusterCommand(clusterId, commandId, endpointId, commandDataReader, this);
     }
@@ -126,7 +123,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPath
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Builder statusElementBuilder;
 
-    err = PrepareCommand(apCommandPathParams, true /* isStatus */);
+    err = PrepareCommand(apCommandPathParams, app::Command::CommandType::kEmpty);
     SuccessOrExit(err);
 
     statusElementBuilder =
@@ -136,7 +133,7 @@ CHIP_ERROR CommandHandler::AddStatusCode(const CommandPathParams * apCommandPath
     err = statusElementBuilder.GetError();
     SuccessOrExit(err);
 
-    err = FinishCommand(true /* isStatus */);
+    err = FinishCommand();
 
 exit:
     ChipLogFunctError(err);

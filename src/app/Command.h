@@ -61,6 +61,13 @@ public:
         Sending,           ///< The invoke command message has sent out the invoke command
     };
 
+    enum class CommandType
+    {
+        kInvalid = 0, ///< Invalid, we are not encoding a command.
+        kEmpty,       ///< A command without command data, or it is a status code.
+        kHasData,     ///< A command with command data.
+    };
+
     /**
      *  Initialize the Command object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -92,9 +99,10 @@ public:
      */
     CHIP_ERROR FinalizeCommandsMessage();
 
-    CHIP_ERROR PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus = false);
+    CHIP_ERROR PrepareCommand(const CommandPathParams * const apCommandPathParams,
+                              CommandType containsData = CommandType::kHasData);
     TLV::TLVWriter * GetCommandDataElementTLVWriter();
-    CHIP_ERROR FinishCommand(bool aIsStatus = false);
+    CHIP_ERROR FinishCommand();
     virtual CHIP_ERROR AddStatusCode(const CommandPathParams * apCommandPathParams,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                      const Protocols::Id aProtocolId, const uint16_t aProtocolCode)
@@ -137,6 +145,7 @@ private:
     friend class TestCommandInteraction;
     CommandState mState                    = CommandState::Uninitialized;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    CommandType mCurrentCommandType        = CommandType::kInvalid;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 };
 } // namespace app

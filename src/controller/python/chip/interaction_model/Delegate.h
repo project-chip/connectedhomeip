@@ -27,11 +27,9 @@ namespace Controller {
 // use packed attribute so we can unpack it from python and no need to worry about padding.
 struct __attribute__((packed)) CommandStatus
 {
+    uint16_t GeneralCode;
     uint32_t ProtocolId;
     uint16_t ProtocolCode;
-    chip::EndpointId EndpointId;
-    chip::ClusterId ClusterId;
-    chip::CommandId CommandId;
     uint8_t CommandIndex;
 };
 
@@ -54,8 +52,7 @@ class PythonInteractionModelDelegate : public chip::Controller::DeviceController
 public:
     CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
+                                     const uint16_t aProtocolCode, uint8_t aCommandIndex) override;
 
     CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
 

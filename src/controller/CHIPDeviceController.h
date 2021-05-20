@@ -134,8 +134,7 @@ class DeviceControllerInteractionModelDelegate : public chip::app::InteractionMo
 public:
     CHIP_ERROR CommandResponseStatus(const app::CommandSender * apCommandSender,
                                      const Protocols::SecureChannel::GeneralStatusCode aGeneralCode, const uint32_t aProtocolId,
-                                     const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                     chip::CommandId aCommandId, uint8_t aCommandIndex) override;
+                                     const uint16_t aProtocolCode, uint8_t aCommandIndex) override;
 
     CHIP_ERROR CommandResponseProtocolError(const app::CommandSender * apCommandSender, uint8_t aCommandIndex) override;
 

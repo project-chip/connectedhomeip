@@ -93,8 +93,7 @@ public:
      */
     virtual CHIP_ERROR CommandResponseStatus(const CommandSender * apCommandSender,
                                              const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId,
-                                             const chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t aCommandIndex)
+                                             const uint32_t aProtocolId, const uint16_t aProtocolCode, uint8_t aCommandIndex)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

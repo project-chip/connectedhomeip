@@ -28,10 +28,9 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, k{{asCamelCased name false}}CommandId,
                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
-
 {{#chip_server_cluster_command_arguments}}
 {{#first}}
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams));
     TLV::TLVWriter * writer = mpCommandSender->GetCommandDataElementTLVWriter();
     uint8_t argSeqNumber = 0;
 {{/first}}
@@ -39,6 +38,7 @@ CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
 {{else}}
     // Command takes no arguments.
+    ReturnErrorOnFailure(mpCommandSender->PrepareCommand(&cmdParams, app::Command::CommandType::kEmpty));
 {{/chip_server_cluster_command_arguments}}
 
     ReturnErrorOnFailure(mpCommandSender->FinishCommand());

@@ -1452,8 +1452,7 @@ const Mdns::CommissionableNodeData * DeviceCommissioner::GetDiscoveredDevice(int
 
 CHIP_ERROR DeviceControllerInteractionModelDelegate::CommandResponseStatus(
     const app::CommandSender * apCommandSender, const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-    const uint32_t aProtocolId, const uint16_t aProtocolCode, chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-    chip::CommandId aCommandId, uint8_t aCommandIndex)
+    const uint32_t aProtocolId, const uint16_t aProtocolCode, uint8_t aCommandIndex)
 {
     // #6308, #6559: Invoking success Callbacks in `CommandResponseProcessed` is not desired, but this is used to met current
     // requirement of current callback framework that we should be able to send another command once ResponseCallback is called. By

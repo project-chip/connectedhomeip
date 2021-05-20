@@ -22,11 +22,9 @@ import threading
 import chip.exceptions
 
 IMCommandStatus = Struct(
+    "GeneralCode" / Int16ul,
     "ProtocolId" /  Int32ul,
     "ProtocolCode" / Int16ul,
-    "EndpointId" / Int8ul,
-    "ClusterId" / Int16ul,
-    "CommandId" / Int8ul,
     "CommandIndex" / Int8ul,
 )
 

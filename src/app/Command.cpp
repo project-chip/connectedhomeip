@@ -143,12 +143,14 @@ exit:
     return;
 }
 
-CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
+CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, CommandType commandType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommandDataElement::Builder commandDataElement =
         mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    VerifyOrExit(commandType != CommandType::kInvalid, err = CHIP_ERROR_INVALID_ARGUMENT);
+
     err = commandDataElement.GetError();
     SuccessOrExit(err);
 
@@ -158,11 +160,12 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
         SuccessOrExit(err);
     }
 
-    if (!aIsStatus)
+    if (commandType == CommandType::kHasData)
     {
         err = commandDataElement.GetWriter()->StartContainer(TLV::ContextTag(CommandDataElement::kCsTag_Data),
                                                              TLV::kTLVType_Structure, mDataElementContainerType);
     }
+    mCurrentCommandType = commandType;
 exit:
     ChipLogFunctError(err);
     return err;
@@ -173,12 +176,15 @@ TLV::TLVWriter * Command::GetCommandDataElementTLVWriter()
     return mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder().GetWriter();
 }
 
-CHIP_ERROR Command::FinishCommand(bool aIsStatus)
+CHIP_ERROR Command::FinishCommand()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     CommandDataElement::Builder commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().GetCommandDataElementBuilder();
-    if (!aIsStatus)
+
+    VerifyOrExit(mCurrentCommandType != CommandType::kInvalid, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mCurrentCommandType == CommandType::kHasData)
     {
         err = commandDataElement.GetWriter()->EndContainer(mDataElementContainerType);
         SuccessOrExit(err);
@@ -187,6 +193,7 @@ CHIP_ERROR Command::FinishCommand(bool aIsStatus)
     err = commandDataElement.GetError();
     SuccessOrExit(err);
     MoveToState(CommandState::AddCommand);
+    mCurrentCommandType = CommandType::kInvalid;
 
 exit:
     ChipLogFunctError(err);

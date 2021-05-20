@@ -34,17 +34,16 @@ PythonInteractionModelDelegate gPythonInteractionModelDelegate;
 CHIP_ERROR PythonInteractionModelDelegate::CommandResponseStatus(const CommandSender * apCommandSender,
                                                                  const Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
                                                                  const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                                                 chip::EndpointId aEndpointId, const chip::ClusterId aClusterId,
-                                                                 chip::CommandId aCommandId, uint8_t aCommandIndex)
+                                                                 uint8_t aCommandIndex)
 {
-    CommandStatus status{ aProtocolId, aProtocolCode, aEndpointId, aClusterId, aCommandId, aCommandIndex };
+    CommandStatus status{ static_cast<uint16_t>(aGeneralCode), aProtocolId, aProtocolCode, aCommandIndex };
     if (commandResponseStatusFunct != nullptr)
     {
         commandResponseStatusFunct(reinterpret_cast<uint64_t>(apCommandSender), &status, sizeof(status));
     }
     // For OpCred callbacks.
     DeviceControllerInteractionModelDelegate::CommandResponseStatus(apCommandSender, aGeneralCode, aProtocolId, aProtocolCode,
-                                                                    aEndpointId, aClusterId, aCommandId, aCommandIndex);
+                                                                    aCommandIndex);
     return CHIP_NO_ERROR;
 }
 

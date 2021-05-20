@@ -213,13 +213,10 @@ public:
     }
     CHIP_ERROR CommandResponseStatus(const chip::app::CommandSender * apCommandSender,
                                      const chip::Protocols::SecureChannel::GeneralStatusCode aGeneralCode,
-                                     const uint32_t aProtocolId, const uint16_t aProtocolCode, const chip::EndpointId aEndpointId,
-                                     const chip::ClusterId aClusterId, const chip::CommandId aCommandId,
-                                     uint8_t aCommandIndex) override
+                                     const uint32_t aProtocolId, const uint16_t aProtocolCode, uint8_t aCommandIndex) override
     {
-        printf("CommandResponseStatus with GeneralCode %d, ProtocolId %d, ProtocolCode %d, EndpointId %d, ClusterId %d, CommandId "
-               "%d, CommandIndex %d",
-               static_cast<uint16_t>(aGeneralCode), aProtocolId, aProtocolCode, aEndpointId, aClusterId, aCommandId, aCommandIndex);
+        printf("CommandResponseStatus with GeneralCode %d, ProtocolId %d, ProtocolCode %d, CommandIndex %d",
+               static_cast<uint16_t>(aGeneralCode), aProtocolId, aProtocolCode, aCommandIndex);
         return CHIP_NO_ERROR;
     }
 

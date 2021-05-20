@@ -125,28 +125,17 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR commandPathErr = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
     CommandPath::Parser commandPath;
-    chip::TLV::TLVReader commandDataReader;
-    chip::ClusterId clusterId;
-    chip::CommandId commandId;
-    chip::EndpointId endpointId;
+    TLV::TLVReader commandDataReader;
     Protocols::SecureChannel::GeneralStatusCode generalCode = Protocols::SecureChannel::GeneralStatusCode::kSuccess;
     uint32_t protocolId                                     = 0;
     uint16_t protocolCode                                   = 0;
     StatusElement::Parser statusElementParser;
 
     mCommandIndex++;
-    err = aCommandElement.GetCommandPath(&commandPath);
-    SuccessOrExit(err);
-
-    err = commandPath.GetClusterId(&clusterId);
-    SuccessOrExit(err);
-    err = commandPath.GetCommandId(&commandId);
-    SuccessOrExit(err);
-
-    err = commandPath.GetEndpointId(&endpointId);
-    SuccessOrExit(err);
+    commandPathErr = aCommandElement.GetCommandPath(&commandPath);
 
     err = aCommandElement.GetStatusElement(&statusElementParser);
     if (CHIP_NO_ERROR == err)
@@ -155,12 +144,22 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         SuccessOrExit(err);
         if (mpDelegate != nullptr)
         {
-            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, endpointId, clusterId, commandId,
-                                              mCommandIndex);
+            mpDelegate->CommandResponseStatus(this, generalCode, protocolId, protocolCode, mCommandIndex);
         }
     }
     else if (CHIP_END_OF_TLV == err)
     {
+        ClusterId clusterId;
+        CommandId commandId;
+        EndpointId endpointId;
+        SuccessOrExit(err = commandPathErr);
+        err = commandPath.GetClusterId(&clusterId);
+        SuccessOrExit(err);
+        err = commandPath.GetCommandId(&commandId);
+        SuccessOrExit(err);
+        err = commandPath.GetEndpointId(&endpointId);
+        SuccessOrExit(err);
+
         err = aCommandElement.GetData(&commandDataReader);
         SuccessOrExit(err);
         // TODO(#4503): Should call callbacks of cluster that sends the command.
