@@ -335,6 +335,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         ]
       }
     } else if (chip_device_platform == "darwin") {
+      cflags += [ "-fobjc-arc" ]
+
       sources += [
         "Darwin/BLEManagerImpl.cpp",
         "Darwin/BLEManagerImpl.h",
