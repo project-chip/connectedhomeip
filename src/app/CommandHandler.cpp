@@ -90,6 +90,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
     err = commandPath.GetEndpointId(&endpointId);
     SuccessOrExit(err);
 
+    SuccessOrExit(err = CheckIfClusterCommandExists(clusterId, commandId, endpointId));
+
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
@@ -108,10 +110,15 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
 exit:
     if (err != CHIP_NO_ERROR)
     {
+        chip::app::CommandPathParams returnStatusParam = { endpointId,
+                                                           0, // GroupId
+                                                           clusterId, commandId, (chip::app::CommandPathFlags::kEndpointIdValid) };
+
         // The Path is not present when there is an error to be conveyed back. ResponseCommandElement would only have status code,
         // set the error with CHIP_NO_ERROR, then continue to process rest of commands
-        AddStatusCode(nullptr, GeneralStatusCode::kInvalidArgument, Protocols::SecureChannel::Id,
-                      Protocols::SecureChannel::kProtocolCodeGeneralFailure);
+        AddStatusCode(&returnStatusParam,
+                      err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
+                      Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);
         err = CHIP_NO_ERROR;
     }
     return err;
