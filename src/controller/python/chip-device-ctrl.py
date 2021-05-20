@@ -698,7 +698,11 @@ def ip_connect(ip_address: string, pin_code: int, node_id: int) -> Dict[str, any
         return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
 def qr_code_parse(qr_code):
-    return SetupPayload().ParseQrCode(qr_code).Dictionary()
+    try:
+        result = SetupPayload().ParseQrCode(qr_code).Dictionary()
+        return __get_response_dict(status = StatusCodeEnum.SUCCESS, result = result)
+    except Exception as e:
+        return __get_response_dict(status = StatusCodeEnum.FAILED, error = str(e))
 
 def start_rpc_server():
 
