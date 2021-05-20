@@ -227,7 +227,7 @@ function chip_endpoint_generated_functions()
   let alreadySetCluster = [];
   let ret               = '\\\n';
   this.clusterList.forEach((c) => {
-    let clusterName  = extract_cluster_name(c.comment);
+    let clusterName  = c.clusterName;
     let functionList = '';
     if (alreadySetCluster.includes(clusterName)) {
       // Only one array of Generated functions per cluster across all endpoints
