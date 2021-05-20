@@ -74,14 +74,14 @@ void emberAfTemperatureMeasurementClusterServerInitCallback(chip::EndpointId end
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void)emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(endpoint, UINT16_MAX);
+        (void)emberAfTemperatureMeasurementClusterSetMinMeasuredValueCallback(endpoint, INT16_MIN);
     }
 
     status = emberAfTemperatureMeasurementClusterGetMaxMeasuredValue(endpoint, &value);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        (void)emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(endpoint, UINT16_MAX);
+        (void)emberAfTemperatureMeasurementClusterSetMaxMeasuredValueCallback(endpoint, INT16_MIN);
     }
 }
 
