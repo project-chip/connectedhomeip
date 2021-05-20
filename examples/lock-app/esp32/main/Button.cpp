@@ -62,4 +62,4 @@ bool Button::Poll()
 uint32_t Button::GetStateDuration()
 {
     return (xTaskGetTickCount() - mStateStartTime) * portTICK_PERIOD_MS;
-} 
+}

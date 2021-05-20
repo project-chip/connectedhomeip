@@ -194,7 +194,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             mLastChangeTimeUS = nowUS;
         }
-        
+
         if(lockButton.Poll())
         {
             if(lockButton.IsPressed())
