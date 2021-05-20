@@ -146,11 +146,11 @@ function cirquetest_run_test() {
     # Start Cirque flash server
     export CURRENT_TEST="$1"
     export DEVICE_LOG_DIR="$LOG_DIR/$CURRENT_TEST"/device_logs
+    shift
     mkdir -p "$DEVICE_LOG_DIR"
     __cirquetest_start_flask &
     sleep 5
-    cd "$TEST_DIR"
-    ./"$1.sh"
+    "$TEST_DIR/$CURRENT_TEST.sh" "$@"
     exitcode=$?
     __cirquetest_clean_flask
     # TODO: Do docker system prune, we cannot filter which container

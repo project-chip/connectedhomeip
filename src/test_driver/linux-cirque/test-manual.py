@@ -19,6 +19,8 @@ import logging
 import os
 import time
 import sys
+import json
+from optparse import OptionParser, OptionValueError
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -30,20 +32,7 @@ from helper.CHIPTestBase import CHIPVirtualHome
 # base_image: The image of the container.
 # capability: A list of capability of the container, Thread+Interactive should fit in most cases.
 # rcp_mode: This is used for Thread network setup, set it to True for CHIP.
-DEVICE_CONFIG = {
-    'device0': {
-        'type': 'CHIP-Server',
-        'base_image': 'chip_server',
-        'capability': ['Thread', 'Interactive'],
-        'rcp_mode': True,
-    },
-    'device1': {
-        'type': 'CHIP-Tool',
-        'base_image': 'chip_tool',
-        'capability': ['Thread', 'Interactive'],
-        'rcp_mode': True,
-    }
-}
+DEVICE_CONFIG = {}
 
 # Set this to True to set up a test thread network if you don't want to test network commissioning.
 # Note: If you enable this, all devices MUST have Thread capability or the script may fail.
@@ -57,6 +46,7 @@ CHIP_PORT = 11097
 #############################################################
 
 CIRQUE_URL = "http://localhost:5000"
+CHIP_REPO = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "..", "..")
 
 logger = logging.getLogger('CHIPCirqueTest')
 logger.setLevel(logging.INFO)
@@ -92,6 +82,48 @@ class TestManually(CHIPVirtualHome):
         except KeyboardInterrupt:
             self.logger.info("KeyboardInterrupt received, quit now")
 
+def _parse_mount_dir(config):
+    for v in config.values():
+        if "Mount" not in v.get("capability", {}):
+            continue
+        _mount_pairs = v.get("mount_pairs", [])
+        for mount in _mount_pairs:
+            mount[0] = mount[0].format(chip_repo = CHIP_REPO)
+            mount[1] = mount[1].format(chip_repo = CHIP_REPO)
+        v["mount_pairs"] = _mount_pairs
+    return config
 
 if __name__ == "__main__":
+    optParser = OptionParser()
+    optParser.add_option(
+        "-t",
+        "--topology",
+        action="store",
+        dest="topologyFile",
+        type='str',
+        default=None,
+        help="The topology to be set up by cirque framework.",
+        metavar="<timeout-second>",
+    )
+    optParser.add_option(
+        "--default-thread-network",
+        action="store_true",
+        dest="setupDefaultThreadNetwork",
+        default=False,
+        help="Setup default thread network to nodes that supports thread."
+    )
+
+    (options, remainingArgs) = optParser.parse_args(sys.argv[1:])
+
+    if not options.topologyFile:
+        raise Exception("Must specify a topology file!")
+
+    with open(options.topologyFile, "r") as fp:
+        config_operations = [_parse_mount_dir]
+        DEVICE_CONFIG = json.load(fp)
+        for op in config_operations:
+            DEVICE_CONFIG = op(DEVICE_CONFIG)
+
+    SETUP_TEST_THREAD_NETWORK = options.setupDefaultThreadNetwork
+
     sys.exit(TestManually(DEVICE_CONFIG).run_test())

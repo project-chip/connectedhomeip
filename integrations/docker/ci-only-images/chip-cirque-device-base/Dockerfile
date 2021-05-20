@@ -15,6 +15,7 @@ WORKDIR /app
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y sudo git ca-certificates psmisc dhcpcd5 wpasupplicant wireless-tools \
+                                                gdb python3 python3-pip libcairo2-dev libjpeg-dev libgif-dev python3-dev \
   && apt-get install -y libglib2.0 avahi-daemon libavahi-client3 \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
   && git clone https://github.com/openthread/ot-br-posix . \
@@ -23,14 +24,8 @@ RUN apt-get update \
   && ./script/bootstrap \
   && ./script/setup \
   && chmod 644 /etc/bind/named.conf.options \
-  && mv ./script /tmp \
-  && mv ./etc /tmp \
-  && find . -delete \
-  && rm -rf /usr/include \
-  && mv /tmp/script . \
-  && mv /tmp/etc . \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false git ca-certificates \
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false apt-utils build-essential psmisc ninja-build cmake wget ca-certificates \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false git psmisc \
+  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false psmisc ninja-build cmake wget \
                           libreadline-dev libncurses-dev libcpputest-dev libdbus-1-dev libavahi-common-dev \
                           libavahi-client-dev libboost-dev libboost-filesystem-dev libboost-system-dev libjsoncpp-dev \
                           libnetfilter-queue-dev \
