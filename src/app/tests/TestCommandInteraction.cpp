@@ -59,15 +59,15 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
     chip::app::CommandPathParams commandPathParams = { aEndPointId, // Endpoint
-                                                       0,    // GroupId
+                                                       0,           // GroupId
                                                        aClusterId,  // ClusterId
                                                        aCommandId,  // CommandId
                                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
     ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
                   aCommandId, aEndPointId);
 
-    apCommandObj->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess, Protocols::SecureChannel::Id,
-                  -                      Protocols::SecureChannel::kProtocolCodeSuccess);
+    apCommandObj->AddStatusCode(&commandPathParams, Protocols::SecureChannel::GeneralStatusCode::kSuccess,
+                                Protocols::SecureChannel::Id, -Protocols::SecureChannel::kProtocolCodeSuccess);
 }
 
 class TestCommandInteraction
@@ -81,8 +81,10 @@ public:
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext);
+
 private:
-    static void GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload, bool aNeedCommandData);
+    static void GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                        bool aNeedCommandData);
     static void AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand, bool aNeedStatusCode,
                                       bool aIsEmptyResponse);
     static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode,
@@ -98,7 +100,8 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload, bool aNeedCommandData)
+void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                                     bool aNeedCommandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     InvokeCommand::Builder invokeCommandBuilder;
@@ -120,10 +123,10 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
 
     if (aNeedCommandData)
     {
-        chip::TLV::TLVWriter *pWriter = commandDataElementBuilder.GetWriter();
-        chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
-        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data),
-                                      chip::TLV::kTLVType_Structure, dummyType);
+        chip::TLV::TLVWriter * pWriter = commandDataElementBuilder.GetWriter();
+        chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
+        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
+                                      dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
