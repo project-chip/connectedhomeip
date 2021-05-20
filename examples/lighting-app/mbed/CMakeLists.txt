@@ -39,7 +39,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${LIGHTING_COMMON}/gen/attribute-size.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
-               ${CMAKE_CURRENT_SOURCE_DIR}/main/BoltLockManager.cpp
+               ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
                ${APP_ROOT}/lighting-common/gen/call-command-handler.cpp
                ${APP_ROOT}/lighting-common/gen/callback-stub.cpp

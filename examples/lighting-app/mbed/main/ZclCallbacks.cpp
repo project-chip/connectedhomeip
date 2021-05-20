@@ -19,7 +19,7 @@
 #include <support/logging/CHIPLogging.h>
 
 #include "AppTask.h"
-#include "BoltLockManager.h"
+#include "LightingManager.h"
 
 #include "af.h"
 #include "gen/attribute-id.h"
@@ -44,7 +44,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         return;
     }
 
-    BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
+    BoltLockMgr().InitiateAction(0, *value ? LightingManager::LOCK_ACTION : LightingManager::UNLOCK_ACTION);
 }
 
 /** @brief OnOff Cluster Init

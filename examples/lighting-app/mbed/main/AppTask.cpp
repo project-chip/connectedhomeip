@@ -17,8 +17,8 @@
  */
 
 #include "AppTask.h"
-#include "BoltLockManager.h"
 #include "LEDWidget.h"
+#include "LightingManager.h"
 #include "OnboardingCodesUtil.h"
 
 // FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
@@ -194,21 +194,21 @@ int AppTask::StartApp()
 
 void AppTask::LockActionEventHandler(AppEvent * aEvent)
 {
-    BoltLockManager::Action_t action = BoltLockManager::INVALID_ACTION;
+    LightingManager::Action_t action = LightingManager::INVALID_ACTION;
     int32_t actor                    = 0;
 
     if (aEvent->Type == AppEvent::kEventType_Lock)
     {
-        action = static_cast<BoltLockManager::Action_t>(aEvent->LockEvent.Action);
+        action = static_cast<LightingManager::Action_t>(aEvent->LockEvent.Action);
         actor  = aEvent->LockEvent.Actor;
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        action = BoltLockMgr().IsUnlocked() ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION;
+        action = BoltLockMgr().IsUnlocked() ? LightingManager::LOCK_ACTION : LightingManager::UNLOCK_ACTION;
         actor  = AppEvent::kEventType_Button;
     }
 
-    if (action != BoltLockManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
+    if (action != LightingManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
         ChipLogProgress(NotSpecified, "Action is already in progress or active.");
 }
 
@@ -242,15 +242,15 @@ void AppTask::FunctionButtonReleaseEventHandler()
     sAppTask.PostEvent(&button_event);
 }
 
-void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // If the action has been initiated by the lock, update the bolt lock trait
     // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LightingManager::LOCK_ACTION)
     {
         ChipLogProgress(NotSpecified, "Lock Action has been initiated");
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::UNLOCK_ACTION)
     {
         ChipLogProgress(NotSpecified, "Unlock Action has been initiated");
     }
@@ -258,17 +258,17 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     sLockLED.Blink(50, 50);
 }
 
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
 {
     // if the action has been completed by the lock, update the bolt lock trait.
     // Turn on the lock LED if in a LOCKED state OR
     // Turn off the lock LED if in an UNLOCKED state.
-    if (aAction == BoltLockManager::LOCK_ACTION)
+    if (aAction == LightingManager::LOCK_ACTION)
     {
         ChipLogProgress(NotSpecified, "Lock Action has been completed");
         sLockLED.Set(true);
     }
-    else if (aAction == BoltLockManager::UNLOCK_ACTION)
+    else if (aAction == LightingManager::UNLOCK_ACTION)
     {
         ChipLogProgress(NotSpecified, "Unlock Action has been completed");
         sLockLED.Set(false);

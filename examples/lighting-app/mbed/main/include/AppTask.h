@@ -20,7 +20,7 @@
 #pragma once
 
 #include "AppEvent.h"
-#include "BoltLockManager.h"
+#include "LightingManager.h"
 
 class AppTask
 {
@@ -35,8 +35,8 @@ private:
 
     int Init();
 
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);
+    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);
 
     void CancelTimer(void);
 

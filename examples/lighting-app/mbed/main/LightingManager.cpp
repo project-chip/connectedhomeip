@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include "BoltLockManager.h"
 #include "AppTask.h"
+#include "LightingManager.h"
 
 #include <support/logging/CHIPLogging.h>
 
@@ -28,9 +28,9 @@
 
 static mbed::Timeout sLockTimer;
 
-BoltLockManager BoltLockManager::sLock;
+LightingManager LightingManager::sLock;
 
-void BoltLockManager::Init()
+void LightingManager::Init()
 {
     mState              = kState_LockingCompleted;
     mAutoLockTimerArmed = false;
@@ -38,33 +38,33 @@ void BoltLockManager::Init()
     mAutoLockDuration   = 0;
 }
 
-void BoltLockManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
+void LightingManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB)
 {
     mActionInitiated_CB = aActionInitiated_CB;
     mActionCompleted_CB = aActionCompleted_CB;
 }
 
-bool BoltLockManager::IsActionInProgress()
+bool LightingManager::IsActionInProgress()
 {
     return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated) ? true : false;
 }
 
-bool BoltLockManager::IsUnlocked()
+bool LightingManager::IsUnlocked()
 {
     return (mState == kState_UnlockingCompleted) ? true : false;
 }
 
-void BoltLockManager::EnableAutoRelock(bool aOn)
+void LightingManager::EnableAutoRelock(bool aOn)
 {
     mAutoRelock = aOn;
 }
 
-void BoltLockManager::SetAutoLockDuration(uint32_t aDurationInSecs)
+void LightingManager::SetAutoLockDuration(uint32_t aDurationInSecs)
 {
     mAutoLockDuration = aDurationInSecs;
 }
 
-bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 {
     bool action_initiated = false;
     State_t new_state;
@@ -108,18 +108,18 @@ bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
     return action_initiated;
 }
 
-void BoltLockManager::StartTimer(uint32_t aTimeoutMs)
+void LightingManager::StartTimer(uint32_t aTimeoutMs)
 {
     auto chronoTimeoutMs = std::chrono::duration<uint32_t, std::milli>(aTimeoutMs);
-    sLockTimer.attach(mbed::callback(this, &BoltLockManager::TimerEventHandler), chronoTimeoutMs);
+    sLockTimer.attach(mbed::callback(this, &LightingManager::TimerEventHandler), chronoTimeoutMs);
 }
 
-void BoltLockManager::CancelTimer(void)
+void LightingManager::CancelTimer(void)
 {
     sLockTimer.detach();
 }
 
-void BoltLockManager::TimerEventHandler(void)
+void LightingManager::TimerEventHandler(void)
 {
     AppEvent event;
     event.Type               = AppEvent::kEventType_Timer;
@@ -128,9 +128,9 @@ void BoltLockManager::TimerEventHandler(void)
     GetAppTask().PostEvent(&event);
 }
 
-void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
+void LightingManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
 {
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
+    LightingManager * lock = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor          = 0;
 
     // Make sure auto lock timer is still armed.
@@ -144,11 +144,11 @@ void BoltLockManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
     lock->InitiateAction(actor, LOCK_ACTION);
 }
 
-void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
+void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    BoltLockManager * lock = static_cast<BoltLockManager *>(aEvent->TimerEvent.Context);
+    LightingManager * lock = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
 
     if (lock->mState == kState_LockingInitiated)
     {

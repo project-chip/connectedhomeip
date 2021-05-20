@@ -23,7 +23,7 @@
 
 #include "AppEvent.h"
 
-class BoltLockManager
+class LightingManager
 {
 public:
     enum Action_t
@@ -54,7 +54,7 @@ public:
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
 private:
-    friend BoltLockManager & BoltLockMgr(void);
+    friend LightingManager & BoltLockMgr(void);
     State_t mState;
 
     Callback_fn_initiated mActionInitiated_CB;
@@ -72,10 +72,10 @@ private:
     static void AutoReLockTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
-    static BoltLockManager sLock;
+    static LightingManager sLock;
 };
 
-inline BoltLockManager & BoltLockMgr(void)
+inline LightingManager & BoltLockMgr(void)
 {
-    return BoltLockManager::sLock;
+    return LightingManager::sLock;
 }
