@@ -108,6 +108,12 @@ public class ChipDeviceController {
     }
   }
 
+  public void onNetworkCommissioningComplete(int errorCode) {
+    if (completionListener != null) {
+      completionListener.onNetworkCommissioningComplete(errorCode);
+    }
+  }
+
   public void onNotifyChipConnectionClosed(int connId) {
     // Clear connection state.
     AndroidChipStack.getInstance().removeConnection(connId);
@@ -164,6 +170,11 @@ public class ChipDeviceController {
     sendCommand(deviceControllerPtr, deviceId, command, value);
   }
 
+  public void enableThreadNetwork(
+      long deviceId, int channel, int panId, byte[] extPanId, byte[] masterKey) {
+    enableThreadNetwork(deviceControllerPtr, deviceId, channel, panId, extPanId, masterKey);
+  }
+
   public boolean openPairingWindow(long deviceId, int duration) {
     return openPairingWindow(deviceControllerPtr, deviceId, duration);
   }
@@ -191,6 +202,14 @@ public class ChipDeviceController {
 
   private native void sendCommand(
       long deviceControllerPtr, long deviceId, ChipCommandType command, int value);
+
+  private native void enableThreadNetwork(
+      long deviceControllerPtr,
+      long deviceId,
+      int channel,
+      int panId,
+      byte[] extPanId,
+      byte[] masterKey);
 
   private native boolean openPairingWindow(long deviceControllerPtr, long deviceId, int duration);
 
@@ -227,6 +246,9 @@ public class ChipDeviceController {
 
     /** Notifies the deletion of pairing session. */
     void onPairingDeleted(int errorCode);
+
+    /** Notifies the completion of network commissioning */
+    void onNetworkCommissioningComplete(int errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

@@ -67,9 +67,14 @@ static void _log_mbedTLS_error(int error_code)
 {
     if (error_code != 0)
     {
+#if defined(MBEDTLS_ERROR_C)
         char error_str[MAX_ERROR_STR_LEN];
         mbedtls_strerror(error_code, error_str, sizeof(error_str));
-        ChipLogError(Crypto, "mbedTLS error: %s\n", error_str);
+        ChipLogError(Crypto, "mbedTLS error: %s", error_str);
+#else
+        // Error codes defined in 16-bit negative hex numbers. Ease lookup by printing likewise
+        ChipLogError(Crypto, "mbedTLS error: -0x%04X", -static_cast<uint16_t>(error_code));
+#endif
     }
 }
 

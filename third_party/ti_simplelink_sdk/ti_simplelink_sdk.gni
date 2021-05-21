@@ -309,6 +309,9 @@ template("ti_simplelink_sdk") {
       # DMM/BLE:
       "${ti_simplelink_sdk_root}/source",
 
+      # Eclipse the SDK config header from DMM
+      "${chip_root}/src/platform/cc13x2_26x2",
+
       # CHIPoBLE Added include dirs
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/",
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/itm",

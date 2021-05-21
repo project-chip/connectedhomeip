@@ -20,6 +20,8 @@ import json
 import logging
 import os
 import re
+from typing import Union, List
+
 import requests
 import sys
 import time
@@ -127,6 +129,66 @@ class CHIPVirtualHome:
             self.logger.info("Found at index={}".format(this_find))
             last_find = this_find + len(s)
         return True
+
+    def reset_thread_devices(self, devices: Union[List[str], str]):
+        """
+        Reset device's thread settings and verify state.
+        """
+        if isinstance(devices, str):
+            devices = [devices]
+        for device_id in devices:
+            # Wait for otbr-agent and CHIP server start
+            self.assertTrue(self.wait_for_device_output(device_id, "Border router agent started.", 10))
+            self.assertTrue(self.wait_for_device_output(device_id, "CHIP:SVR: Server Listening...", 10))
+            # Clear default Thread network commissioning data
+            self.logger.info("Resetting thread network on {}".format(
+                self.get_device_pretty_id(device_id)))
+            self.execute_device_cmd(device_id, 'ot-ctl factoryreset')
+            self.check_device_thread_state(device_id=device_id, expected_role="disabled", timeout=10)
+
+    def check_device_thread_state(self, device_id, expected_role, timeout):
+        if isinstance(expected_role, str):
+            expected_role = [expected_role]
+        self.logger.info(f"Waiting for expected role. {self.get_device_pretty_id(device_id)}: {expected_role}")
+        start = time.time()
+        while time.time() < (start + timeout):
+            reply = self.execute_device_cmd(device_id, 'ot-ctl state')
+            if reply['output'].split()[0] in expected_role:
+                return
+            time.sleep(0.5)
+
+        self.logger.error(f"Device {self.get_device_pretty_id(device_id)} does not reach expected role")
+        raise AssertionError
+
+    def form_thread_network(self, device_id: str, expected_role: Union[str, List[str]], timeout: int = 15,
+                            dataset: str = ""):
+        """
+        Start Thread Network with provided dataset. If dataset is not provided then default will be set.
+        Function that will be also verifying if device start in expected role.
+        """
+        if not dataset:
+            dataset = "0e080000000000010000" + \
+                      "000300000c" + \
+                      "35060004001fffe0" + \
+                      "0208fedcba9876543210" + \
+                      "0708fd00000000001234" + \
+                      "0510ffeeddccbbaa99887766554433221100" + \
+                      "030e54657374696e674e6574776f726b" + \
+                      "0102d252" + \
+                      "041081cb3b2efa781cc778397497ff520fa50c0302a0ff"
+
+        ot_init_commands = [
+            "ot-ctl thread stop",
+            "ot-ctl ifconfig down",
+            f"ot-ctl dataset set active {dataset}",
+            "ot-ctl ifconfig up",
+            "ot-ctl thread start",
+            "ot-ctl dataset active",
+        ]
+        self.logger.info(f"Setting Thread dataset for {self.get_device_pretty_id(device_id)}: {dataset}")
+        for cmd in ot_init_commands:
+            self.execute_device_cmd(device_id, cmd)
+        self.check_device_thread_state(device_id=device_id, expected_role=expected_role, timeout=timeout)
 
     def connect_to_thread_network(self):
         '''

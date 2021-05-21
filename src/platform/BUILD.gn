@@ -301,6 +301,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
+        "cc13x2_26x2/Random.c",
         "cc13x2_26x2/SystemPlatformConfig.h",
       ]
 
