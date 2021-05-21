@@ -55,6 +55,8 @@
         "wwah-silabs-devices.xml",
         "sample-extensions.xml",
         "commissioning.xml",
+        "bridged-device-basic.xml",
+        "fixed-label-cluster.xml",
         "chip-ota.xml"
     ],
     "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
