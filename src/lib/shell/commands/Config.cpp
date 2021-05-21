@@ -82,7 +82,7 @@ static CHIP_ERROR ConfigGetDeviceId(bool printHeader)
         streamer_printf(sout, "DeviceId:        ");
     }
     ReturnErrorOnFailure(ConfigurationMgr().GetDeviceId(value64));
-    streamer_printf(sout, "%" PRIu64 " (0x%" PRIX64 ")\r\n", value64, value64);
+    streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
     return CHIP_NO_ERROR;
 }
 
@@ -124,7 +124,7 @@ static CHIP_ERROR ConfigGetFabricId(bool printHeader)
         streamer_printf(sout, "FabricId:        ");
     }
     ReturnErrorOnFailure(ConfigurationMgr().GetFabricId(value64));
-    streamer_printf(sout, "%" PRIu64 " (0x%" PRIX64 ")\r\n", value64, value64);
+    streamer_printf(sout, "%" PRIu64 " (0x" ChipLogFormatX64 ")\r\n", value64, ChipLogValueX64(value64));
     return CHIP_NO_ERROR;
 }
 

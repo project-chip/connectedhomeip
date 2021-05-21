@@ -129,8 +129,8 @@ CHIP_ERROR RestoreAllAdminPairingsFromKVS(AdminPairingTable & adminPairings, Adm
             AdminPairingInfo * admin = adminPairings.FindAdminWithId(id);
             if (admin != nullptr)
             {
-                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x%08" PRIx32 "%08" PRIx32, admin->GetAdminId(),
-                                static_cast<uint32_t>(admin->GetNodeId() >> 32), static_cast<uint32_t>(admin->GetNodeId()));
+                ChipLogProgress(AppServer, "Found admin pairing for %d, node ID 0x" ChipLogFormatX64, admin->GetAdminId(),
+                                ChipLogValueX64(admin->GetNodeId()));
             }
         }
     }
@@ -168,9 +168,8 @@ static CHIP_ERROR RestoreAllSessionsFromKVS(SecureSessionMgr & sessionMgr, Rende
         {
             connection.GetPASESession(session);
 
-            ChipLogProgress(AppServer, "Fetched the session information: from 0x%08" PRIx32 "%08" PRIx32,
-                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId() >> 32),
-                            static_cast<uint32_t>(session->PeerConnection().GetPeerNodeId()));
+            ChipLogProgress(AppServer, "Fetched the session information: from 0x" ChipLogFormatX64,
+                            ChipLogValueX64(session->PeerConnection().GetPeerNodeId()));
             sessionMgr.NewPairing(Optional<Transport::PeerAddress>::Value(session->PeerConnection().GetPeerAddress()),
                                   session->PeerConnection().GetPeerNodeId(), session, SecureSession::SessionRole::kResponder,
                                   connection.GetAdminId(), nullptr);

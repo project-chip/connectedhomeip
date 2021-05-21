@@ -101,6 +101,9 @@
 // Definitions for cluster: General Diagnostics
 #define ZCL_GENERAL_DIAGNOSTICS_CLUSTER_ID (0x0033)
 
+// Definitions for cluster: Software Diagnostics
+#define ZCL_SOFTWARE_DIAGNOSTICS_CLUSTER_ID (0x0034)
+
 // Definitions for cluster: Thread Network Diagnostics
 #define ZCL_THREAD_NETWORK_DIAGNOSTICS_CLUSTER_ID (0x0035)
 

@@ -54,6 +54,7 @@ constexpr ClusterId kOnOffClusterId                       = 0x0006;
 constexpr ClusterId kOperationalCredentialsClusterId      = 0x003E;
 constexpr ClusterId kPumpConfigurationAndControlClusterId = 0x0200;
 constexpr ClusterId kScenesClusterId                      = 0x0005;
+constexpr ClusterId kSoftwareDiagnosticsClusterId         = 0x0034;
 constexpr ClusterId kSwitchClusterId                      = 0x003B;
 constexpr ClusterId kTvChannelClusterId                   = 0x0504;
 constexpr ClusterId kTargetNavigatorClusterId             = 0x0505;
@@ -947,6 +948,25 @@ private:
     static constexpr CommandId kRemoveSceneCommandId        = 0x02;
     static constexpr CommandId kStoreSceneCommandId         = 0x04;
     static constexpr CommandId kViewSceneCommandId          = 0x01;
+};
+
+class DLL_EXPORT SoftwareDiagnosticsCluster : public ClusterBase
+{
+public:
+    SoftwareDiagnosticsCluster() : ClusterBase(kSoftwareDiagnosticsClusterId) {}
+    ~SoftwareDiagnosticsCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ResetWatermarks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+
+private:
+    static constexpr CommandId kResetWatermarksCommandId = 0x00;
 };
 
 class DLL_EXPORT SwitchCluster : public ClusterBase
