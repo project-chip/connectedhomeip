@@ -35,7 +35,7 @@ cd "$IDF_PATH"
 ./install.sh
 . ./export.sh
 
-cd $work_dir
+cd "$work_dir"
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
 
