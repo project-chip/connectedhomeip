@@ -1,8 +1,6 @@
 # CHIP All Clusters Example
 
-A prototype application that uses CHIP to setup WiFi on the ESP32 and runs an
-Echo Server. This example will evolve as more complex messaging is supported in
-CHIP.
+A prototype application that demonstrate the device commissioning and cluster control. This example will evolve as more complex messaging is supported in CHIP.
 
 ---
 
@@ -10,17 +8,18 @@ CHIP.
     -   [Supported Devices](#supported-devices)
     -   [Building the Example Application](#building-the-example-application)
         -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
-    -   [Using the Echo Server](#using-the-echo-server)
+    -   [Device controller](#using-the-controller)
         -   [Connect the ESP32 to a 2.4GHz Network of your choice](#connect-the-esp32-to-a-24ghz-network-of-your-choice)
-        -   [Use the ESP32's Network](#use-the-esp32s-network)
+        -   [Use the configurable Network](#use-the-configurable-network)
 
 ---
 
 ## Supported Devices
 
-The CHIP demo application is intended to work on two categories of ESP32
+The CHIP demo application is intended to work on the categories of ESP32
 devices: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
+the [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
 and the [M5Stack](http://m5stack.com). On the [M5Stack](http://m5stack.com) this
 example displays a CHIP QRCode with the device's Soft-AP SSID encoded in the TLV
 section.
@@ -120,13 +119,16 @@ If packages are already installed then simply activate it.
 
           $ idf.py monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
-## Using the Echo Server
+## Using the Controller
 
-There are two ways to use the Echo Server running on the device.
+Controller is used to commission the device(connect to WiFi Network) and control the clusters.
 
 ### Connect the ESP32 to a 2.4GHz Network of your choice
 
-1.  If the `WiFi Station Options` mentioned above are populated through
+1.  Choose Rendezvous mode as bypass `idf.py menuconfig -> Demo -> Rendezvous Mode -> ByPass.`
+    Populate the `WiFi SSID` and `WiFi Password` of AP from menuconfig 
+    `idf.py menuconfig -> Component config -> CHIP Device Layer -> WiFi Station Options`
+    If the `WiFi Station Options` mentioned above are populated through
     menuconfig, then ESP32 connects to the AP with those credentials (STA mode).
 
 2.  Now flash the device with the same command as before. (Use the right `/dev`
@@ -144,9 +146,13 @@ There are two ways to use the Echo Server running on the device.
     Address if it successfully connects to the configured 2.4GHz Network.
 
 4.  Use
+    [python based device controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
+    or
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     or
-    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
+    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
+    or
+    [Android chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
     to communicate with the device.
 
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
@@ -154,11 +160,13 @@ your network configuration. To erase it, simply run.
 
           $ idf.py erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
 
-### Use the ESP32's Network
+### Use the configurable network
 
-Alternatively, you can connect to the ESP32's Soft-AP directly.
+Configure the network using BLE or SoftAP.
+Set this mode using menuconfig `idf.py menuconfig -> Demo -> Rendezvous Mode`
 
-1.  After the application has been flashed, connect to the ESP32's Soft-AP. If
+1.  Flash the application.
+    If Rendezvous mode is SoftAP then connect to the ESP32's Soft-AP. If
     you use the M5Stack, the Soft-AP's SSID is encoded in the TLV section of the
     QRCode on screen. It's usually something like `CHIP-XXX` where the last 3
     digits are from the setup payload discriminator.
@@ -166,13 +174,16 @@ Alternatively, you can connect to the ESP32's Soft-AP directly.
 2.  Once you're connected, the server's IP can be found at the gateway address.
 
 3.  Use
+    [python controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
+    or
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     or
-    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
+    [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
+    or
+    [Android chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
     to communicate with the device.
 
-In addition to the echo server, this demo also supports controlling OnOff
-cluster (Server) attributes of an endpoint. For `ESP32-DevKitC` and
+This demo application also supports controlling OnOff cluster (Server) attributes of an endpoint. For `ESP32-DevKitC` and
 `ESP32-WROVER-KIT_V4.1`, a GPIO (configurable through `STATUS_LED_GPIO_NUM` in
 `main/main.cpp`) is updated through the on/off/toggle commands from the
 `chip-tool`. For `M5Stack`, a virtual Green LED on the display is used for the
