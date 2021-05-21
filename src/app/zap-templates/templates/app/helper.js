@@ -195,16 +195,10 @@ function asChipUnderlyingType(label, type)
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-var endpointClusterWithInit = [ 'Basic',
-                                'Temperature Measurement',
-                                'Identify',
-                                'Groups',
-                                'Scenes',
-                                'Occupancy Sensing',
-                                'On/off',
-                                'Level Control',
-                                'Color Control',
-                                'IAS Zone' ];
+var endpointClusterWithInit = [
+  'Basic', 'Temperature Measurement', 'Identify', 'Groups', 'Scenes', 'Occupancy Sensing', 'On/off', 'Level Control',
+  'Color Control', 'IAS Zone'
+];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];

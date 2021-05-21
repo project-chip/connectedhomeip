@@ -45,8 +45,7 @@ void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeManager)
     emberAfEndpointConfigure();
     emberAfInit(exchangeManager);
 
-#if defined(EMBER_AF_PLUGIN_REPORTING_SERVER) ||                        \
-    defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
+#if defined(EMBER_AF_PLUGIN_REPORTING_SERVER) || defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
     EmberStatus status = EMBER_NETWORK_UP;
 #endif
 
