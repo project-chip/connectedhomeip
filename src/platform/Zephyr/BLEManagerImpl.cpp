@@ -68,7 +68,7 @@ _bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerIm
 BT_GATT_SERVICE_DEFINE(CHIPoBLE_Service,
     BT_GATT_PRIMARY_SERVICE(&UUID16_CHIPoBLEService.uuid),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
-                               BT_GATT_CHRC_WRITE_WITHOUT_RESP,
+                               BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                                BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
                                nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
