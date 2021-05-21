@@ -56,6 +56,7 @@
 #include <app/util/types_stub.h> // For various types.
 
 #include <messaging/ExchangeContext.h>
+#include <support/Variant.h>
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
@@ -1252,26 +1253,91 @@ typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::
 
 namespace chip {
 /**
- * @brief a type that represents where we are trying to send a message.  This
- *        must always be paired with an EmberOutgoingMessageType that identifies
- *        which arm of the union is in use.
+ * @brief a type that represents where we are trying to send a message.
+ *        The variant type identifies which arm of the union is in use.
  */
-union MessageSendDestination
+class MessageSendDestination
 {
-    explicit constexpr MessageSendDestination(uint8_t aBindingIndex) : mBindingIndex(aBindingIndex) {}
-    explicit constexpr MessageSendDestination(NodeId aNodeId) : mNodeId(aNodeId) {}
-    explicit constexpr MessageSendDestination(GroupId aGroupId) : mGroupId(aGroupId) {}
-    explicit constexpr MessageSendDestination(Messaging::ExchangeContext * aExchangeContext) : mExchangeContext(aExchangeContext) {}
+public:
+    struct OutGoingBinding
+    {
+        static constexpr const std::size_t VariantId = 1;
+        explicit OutGoingBinding(uint8_t bindingIndex) : mBindingIndex(bindingIndex) {}
+        uint8_t mBindingIndex;
+    };
 
-    // Used when the type is EMBER_OUTGOING_VIA_BINDING
-    uint8_t mBindingIndex;
-    // Used when the type is EMBER_OUTGOING_DIRECT
-    NodeId mNodeId;
-    // Used when the type is EMBER_OUTGOING_MULTICAST or
-    // EMBER_OUTGOING_MULTICAST_WITH_ALIAS
-    GroupId mGroupId;
-    // Used when the type is EMBER_OUTGOING_VIA_EXCHANGE
-    Messaging::ExchangeContext * mExchangeContext;
+    struct OutGoingAddressTable
+    {
+        static constexpr const std::size_t VariantId = 2;
+    };
+
+    struct OutGoingDirect
+    {
+        static constexpr const std::size_t VariantId = 3;
+        explicit OutGoingDirect(NodeId nodeId) : mNodeId(nodeId) {}
+        NodeId mNodeId;
+    };
+
+    struct OutGoingMulticast
+    {
+        static constexpr const std::size_t VariantId = 4;
+        explicit OutGoingMulticast(GroupId groupId) : mGroupId(groupId) {}
+        GroupId mGroupId;
+    };
+
+    struct OutGoingMulticastWithAlias
+    {
+        static constexpr const std::size_t VariantId = 5;
+        explicit OutGoingMulticastWithAlias(GroupId groupId) : mGroupId(groupId) {}
+        GroupId mGroupId;
+    };
+
+    struct OutGoingBroadcast
+    {
+        static constexpr const std::size_t VariantId = 6;
+    };
+
+    struct OutGoingBroadcastWithAlias
+    {
+        static constexpr const std::size_t VariantId = 7;
+    };
+
+    struct OutGoingExchange
+    {
+        static constexpr const std::size_t VariantId = 8;
+        explicit OutGoingExchange(Messaging::ExchangeContext * exchangeContext) : mExchangeContext(exchangeContext) {}
+        Messaging::ExchangeContext * mExchangeContext;
+    };
+
+    MessageSendDestination()                                    = default;
+    MessageSendDestination(MessageSendDestination & that)       = default;
+    MessageSendDestination(const MessageSendDestination & that) = default;
+    MessageSendDestination(MessageSendDestination && that)      = default;
+
+    template <typename OutGoing>
+    MessageSendDestination(OutGoing && destination)
+    {
+        mDestination.Set<OutGoing>(std::forward<OutGoing>(destination));
+    }
+
+    std::size_t GetType() { return mDestination.GetType(); }
+
+    template <typename OutGoing>
+    bool Is()
+    {
+        return mDestination.Is<OutGoing>();
+    }
+
+    template <typename OutGoing>
+    OutGoing & Get()
+    {
+        return mDestination.Get<OutGoing>();
+    }
+
+private:
+    Variant<OutGoingBinding, OutGoingAddressTable, OutGoingDirect, OutGoingMulticast, OutGoingMulticastWithAlias, OutGoingBroadcast,
+            OutGoingBroadcastWithAlias, OutGoingExchange>
+        mDestination;
 };
 } // namespace chip
 
@@ -1280,8 +1346,8 @@ union MessageSendDestination
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
-                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                           uint8_t * message, EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1295,7 +1361,6 @@ typedef struct
     uint8_t * message;
     chip::MessageSendDestination destination;
     uint16_t messageLength;
-    EmberOutgoingMessageType type;
     bool broadcast;
 } EmberAfMessageStruct;
 
