@@ -47,7 +47,9 @@ namespace app {
 
 CHIP_ERROR CheckIfClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
-    // Always return no error in test.
+    // The Mock cluster catalog -- only have one command on one cluster on one endpoint.
+    VerifyOrReturnError(aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestCommandId,
+                        CHIP_ERROR_INVALID_PROFILE_ID);
     return CHIP_NO_ERROR;
 }
 
