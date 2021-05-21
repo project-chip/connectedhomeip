@@ -146,9 +146,9 @@ exit:
 CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPathParams, bool aIsStatus)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    CommandDataElement::Builder commandDataElement =
-        mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
+    CommandDataElement::Builder commandDataElement;
+    VerifyOrExit(mState == CommandState::Initialized || mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+    commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
     err = commandDataElement.GetError();
     SuccessOrExit(err);
 

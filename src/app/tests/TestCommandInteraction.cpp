@@ -65,6 +65,8 @@ void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aC
 class TestCommandInteraction
 {
 public:
+    static void TestCommandSenderWithWrongState(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithSendCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
@@ -170,6 +172,53 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
         err = apCommand->FinishCommand();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
+}
+
+void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
+                                                       2, // GroupId
+                                                       3, // ClusterId
+                                                       4, // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandSender commandSender;
+
+    err = commandSender.PrepareCommand(&commandPathParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    commandSender.Shutdown();
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    err                            = commandSender.Init(&gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    err = commandSender.SendCommandRequest(kTestDeviceNodeId, gAdminId);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+}
+
+void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
+                                                       2, // GroupId
+                                                       3, // ClusterId
+                                                       4, // CommandId
+                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    app::CommandHandler commandHandler;
+
+    err = commandHandler.PrepareCommand(&commandPathParams);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    commandHandler.Shutdown();
+
+    err = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    commandHandler.mpExchangeCtx = gExchangeManager.NewContext({ 0, 0, 0 }, nullptr);
+    TestExchangeDelegate delegate;
+    commandHandler.mpExchangeCtx->SetDelegate(&delegate);
+    err = commandHandler.SendCommandResponse();
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    commandHandler.Shutdown();
 }
 
 void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSuite, void * apContext)
@@ -330,6 +379,8 @@ void InitializeChip(nlTestSuite * apSuite)
 // clang-format off
 const nlTest sTests[] =
 {
+    NL_TEST_DEF("TestCommandSenderWithWrongState", chip::app::TestCommandInteraction::TestCommandSenderWithWrongState),
+    NL_TEST_DEF("TestCommandHandlerWithWrongState", chip::app::TestCommandInteraction::TestCommandHandlerWithWrongState),
     NL_TEST_DEF("TestCommandSenderWithSendCommand", chip::app::TestCommandInteraction::TestCommandSenderWithSendCommand),
     NL_TEST_DEF("TestCommandHandlerWithSendEmptyCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand),
     NL_TEST_DEF("TestCommandSenderWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg),
