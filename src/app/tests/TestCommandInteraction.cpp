@@ -176,7 +176,7 @@ void TestCommandInteraction::AddCommandDataElement(nlTestSuite * apSuite, void *
 
 void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
     chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
                                                        2, // GroupId
                                                        3, // ClusterId
@@ -199,7 +199,7 @@ void TestCommandInteraction::TestCommandSenderWithWrongState(nlTestSuite * apSui
 
 void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
     chip::app::CommandPathParams commandPathParams = { 1, // Endpoint
                                                        2, // GroupId
                                                        3, // ClusterId

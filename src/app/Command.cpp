@@ -149,7 +149,7 @@ CHIP_ERROR Command::PrepareCommand(const CommandPathParams * const apCommandPath
     CommandDataElement::Builder commandDataElement;
     VerifyOrExit(mState == CommandState::Initialized || mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
     commandDataElement = mInvokeCommandBuilder.GetCommandListBuilder().CreateCommandDataElementBuilder();
-    err = commandDataElement.GetError();
+    err                = commandDataElement.GetError();
     SuccessOrExit(err);
 
     if (apCommandPathParams != nullptr)
