@@ -53,19 +53,30 @@ static TransportMgr<Transport::UDP> gTransportManager;
 static secure_channel::MessageCounterManager gMessageCounterManager;
 static Transport::AdminId gAdminId = 0;
 
+namespace {
+constexpr EndpointId kTestEndpointId = 1;
+constexpr ClusterId kTestClusterId   = 3;
+constexpr CommandId kTestCommandId   = 4;
+
+bool gCommandReachedDispatch = false;
+} // namespace
+
 namespace app {
 
 void DispatchSingleClusterCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId,
                                   chip::TLV::TLVReader & aReader, Command * apCommandObj)
 {
+    gCommandReachedDispatch = true;
     ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx16 " Command=%" PRIx8 " Endpoint=%" PRIx8, aClusterId,
                   aCommandId, aEndPointId);
 }
 
 CHIP_ERROR CheckIfClusterCommandExists(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::EndpointId aEndPointId)
 {
-    // Always return no error in test.
-    return CHIP_NO_ERROR;
+    // Mock cluster catalog, only support one command on one cluster on one endpoint.
+    return (aEndPointId == kTestEndpointId && aClusterId == kTestClusterId && aCommandId == kTestEndpointId)
+        ? CHIP_NO_ERROR
+        : CHIP_ERROR_INVALID_PROFILE_ID;
 }
 
 class TestCommandInteraction
@@ -74,13 +85,16 @@ public:
     static void TestCommandSenderWithSendCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
 
 private:
-    static void GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                        EndpointId aEndpointId = kTestEndpointId, ClusterId aClusterId = kTestClusterId,
+                                        CommandId aCommandId = kTestCommandId);
     static void AddCommandDataElement(nlTestSuite * apSuite, void * apContext, Command * apCommand, bool aNeedStatusCode,
                                       bool aIsEmptyResponse);
     static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode,
@@ -96,7 +110,8 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
+                                                     EndpointId aEndpointId, ClusterId aClusterId, CommandId aCommandId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     InvokeCommand::Builder invokeCommandBuilder;
@@ -113,7 +128,7 @@ void TestCommandInteraction::GenerateReceivedCommand(nlTestSuite * apSuite, void
     NL_TEST_ASSERT(apSuite, commandList.GetError() == CHIP_NO_ERROR);
     CommandPath::Builder commandPathBuilder = commandDataElementBuilder.CreateCommandPathBuilder();
     NL_TEST_ASSERT(apSuite, commandDataElementBuilder.GetError() == CHIP_NO_ERROR);
-    commandPathBuilder.EndpointId(1).ClusterId(3).CommandId(4).EndOfCommandPath();
+    commandPathBuilder.EndpointId(aEndpointId).ClusterId(aClusterId).CommandId(aCommandId).EndOfCommandPath();
     NL_TEST_ASSERT(apSuite, commandPathBuilder.GetError() == CHIP_NO_ERROR);
 
     chip::TLV::TLVWriter * pWriter = commandDataElementBuilder.GetWriter();
@@ -300,6 +315,24 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
     commandHandler.Shutdown();
 }
 
+void TestCommandInteraction::TestCommandSenderWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    app::CommandHandler commandHandler;
+    System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    err                                       = commandHandler.Init(&chip::gExchangeManager, nullptr);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Use some invalid endpoint / cluster / command.
+    GenerateReceivedCommand(apSuite, apContext, commandDatabuf, 0xDE /* endpoint */, 0xADBE /* cluster */, 0xEF /* command */);
+
+    // TODO: Need to find a way to get the response instead of only check if a function on key path is called.
+    // We should not reach CommandDispatch if requisted command does not exist.
+    gCommandReachedDispatch = false;
+    err                     = commandHandler.ProcessCommandMessage(std::move(commandDatabuf), Command::CommandRoleId::HandlerId);
+    NL_TEST_ASSERT(apSuite, !gCommandReachedDispatch);
+    commandHandler.Shutdown();
+}
+
 } // namespace app
 } // namespace chip
 
@@ -343,6 +376,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode),
     NL_TEST_DEF("TestCommandHandlerWithSendEmptyResponse", chip::app::TestCommandInteraction::TestCommandHandlerWithSendEmptyResponse),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg),
+    NL_TEST_DEF("TestCommandHandlerWithProcessReceivedInvalidCommand", chip::app::TestCommandInteraction::TestCommandSenderWithProcessReceivedNotExistCommand),
     NL_TEST_SENTINEL()
 };
 // clang-format on
