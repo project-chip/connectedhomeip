@@ -20,5 +20,5 @@
 #include <app/util/af-types.h>
 
 EmberAfStatus emberAfAirPressureMeasurementClusterSetMeasuredValueCallback(chip::EndpointId endpoint, uint16_t measuredValue);
-EmberAfStatus emberAfAirPressureMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, uint16_t* measuredValue);
-EmberAfStatus emberAfAirPressureMeasurementClusterGetAltitudeValue(chip::EndpointId endpoint, int16_t* altitude);
+EmberAfStatus emberAfAirPressureMeasurementClusterGetMeasuredValue(chip::EndpointId endpoint, uint16_t * measuredValue);
+EmberAfStatus emberAfAirPressureMeasurementClusterGetAltitudeValue(chip::EndpointId endpoint, int16_t * altitude);
