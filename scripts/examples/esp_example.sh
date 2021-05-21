@@ -38,7 +38,7 @@ if [ -z "$IDF_PATH" ]; then
     export IDF_PATH="$PWD/esp-idf"
 fi
 
-if [ -x $idf_was_installed ]; then
+if [ -x "$idf_was_installed" ]; then
     git -C "$IDF_PATH" submodule update --init --recursive
     cd "$IDF_PATH"
     ./install.sh
