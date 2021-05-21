@@ -34,7 +34,6 @@ die() {
 cd "$here" || die 'ack!, where am I?!?'
 
 # shellcheck source=/dev/null
-source idf.sh
 rm -f ./build/sdkconfig
-SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf make defconfig
-SDKCONFIG=./build/sdkconfig idf make -j8 esp32_elf_builder
+SDKCONFIG=./build/sdkconfig SDKCONFIG_DEFAULTS=sdkconfig_qemu.defaults idf.py build defconfig
+SDKCONFIG=./build/sdkconfig idf.py build esp32_elf_builder
