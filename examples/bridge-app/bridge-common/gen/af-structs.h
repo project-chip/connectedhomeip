@@ -566,6 +566,16 @@ typedef struct _ThreadInterfaceScanResult
     chip::ByteSpan DiscoveryResponse;
 } EmberAfThreadInterfaceScanResult;
 
+// Struct for ThreadMetrics
+typedef struct _ThreadMetrics
+{
+    uint64_t Id;
+    chip::ByteSpan Name;
+    uint32_t StackFreeCurrent;
+    uint32_t StackFreeMinimum;
+    uint32_t StackSize;
+} EmberAfThreadMetrics;
+
 // Struct for TierLabelsPayload
 typedef struct _TierLabelsPayload
 {

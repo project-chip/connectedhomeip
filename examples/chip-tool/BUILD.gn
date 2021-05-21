@@ -16,17 +16,8 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/src/app/chip_data_model.gni")
 
 assert(chip_build_tools)
-
-chip_data_model("data_model") {
-  zap_file = "chip-tool.zap"
-
-  zap_pregenerated_dir = "gen"
-
-  use_default_client_callbacks = true
-}
 
 executable("chip-tool") {
   sources = [
@@ -43,7 +34,7 @@ executable("chip-tool") {
   ]
 
   deps = [
-    ":data_model",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",

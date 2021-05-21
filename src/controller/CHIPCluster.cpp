@@ -50,7 +50,7 @@ void ClusterBase::Dissociate()
     mpCommandSender = nullptr;
 }
 
-CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle payload,
+CHIP_ERROR ClusterBase::SendCommand(uint8_t seqNum, chip::System::PacketBufferHandle && payload,
                                     Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

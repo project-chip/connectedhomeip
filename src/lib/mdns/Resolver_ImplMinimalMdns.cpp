@@ -366,14 +366,14 @@ public:
     CHIP_ERROR StartResolver(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
     CHIP_ERROR SetResolverDelegate(ResolverDelegate * delegate) override;
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
-    CHIP_ERROR FindCommissionableNodes(CommissionableNodeFilter filter = CommissionableNodeFilter()) override;
+    CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
 
 private:
     ResolverDelegate * mDelegate = nullptr;
     DiscoveryType mDiscoveryType = DiscoveryType::kUnknown;
 
     CHIP_ERROR SendQuery(mdns::Minimal::FullQName qname, mdns::Minimal::QType type);
-    CHIP_ERROR BrowseNodes(DiscoveryType type, CommissionableNodeFilter subtype);
+    CHIP_ERROR BrowseNodes(DiscoveryType type, DiscoveryFilter subtype);
     template <typename... Args>
     mdns::Minimal::FullQName CheckAndAllocateQName(Args &&... parts)
     {
@@ -446,33 +446,20 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
     return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
 }
 
-CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(CommissionableNodeFilter filter)
+CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
 {
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
 // TODO(cecille): Extend filter and use this for Resolve
-CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, CommissionableNodeFilter filter)
+CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filter)
 {
     mDiscoveryType    = type;
     char subtypeStr[] = "_Xdddddd";
 
     mdns::Minimal::FullQName qname;
 
-    switch (filter.type)
-    {
-    case CommissionableNodeFilterType::kShort:
-        snprintf(subtypeStr, strlen(subtypeStr), "_S%03u", filter.code);
-        break;
-    case CommissionableNodeFilterType::kLong:
-        snprintf(subtypeStr, strlen(subtypeStr), "_L%04u", filter.code);
-        break;
-    case CommissionableNodeFilterType::kVendor:
-        snprintf(subtypeStr, strlen(subtypeStr), "_V%03u", filter.code);
-        break;
-    case CommissionableNodeFilterType::kNone:
-        break;
-    }
+    MakeServiceSubtype(subtypeStr, sizeof(subtypeStr), filter);
 
     switch (type)
     {
@@ -480,7 +467,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, CommissionableNodeFi
         qname = CheckAndAllocateQName("_chip", "_tcp", "local");
         break;
     case DiscoveryType::kCommissionableNode:
-        if (filter.type == CommissionableNodeFilterType::kNone)
+        if (filter.type == DiscoveryFilterType::kNone)
         {
             qname = CheckAndAllocateQName("_chipc", "_udp", "local");
         }

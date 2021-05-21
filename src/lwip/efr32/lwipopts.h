@@ -120,7 +120,12 @@
 #define SUB_ETHERNET_HEADER_SPACE (0)
 #define PBUF_LINK_HLEN (0)
 
+#if defined(EFR32MG21)
+#define TCPIP_THREAD_STACKSIZE (1300)
+#else
 #define TCPIP_THREAD_STACKSIZE (2048)
+#endif
+
 #define TCPIP_THREAD_PRIO (2)
 
 #define NETIF_MAX_HWADDR_LEN 8U

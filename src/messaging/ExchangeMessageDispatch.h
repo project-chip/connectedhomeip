@@ -45,9 +45,9 @@ public:
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
-                           uint8_t type, System::PacketBufferHandle message);
+                           uint8_t type, System::PacketBufferHandle && message);
 
-    virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle message,
+    virtual CHIP_ERROR ResendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && message,
                                      EncryptedPacketBufferHandle * retainedMessage) const
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

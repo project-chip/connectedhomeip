@@ -293,11 +293,11 @@ public:
 
     /// Call when a GATT write request is received.
     bool HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                             System::PacketBufferHandle pBuf);
+                             System::PacketBufferHandle && pBuf);
 
     /// Call when a GATT indication is received.
     bool HandleIndicationReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                  System::PacketBufferHandle pBuf);
+                                  System::PacketBufferHandle && pBuf);
 
     /// Call when an outstanding GATT write request receives a positive receipt confirmation.
     bool HandleWriteConfirmation(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId);
@@ -342,7 +342,7 @@ private:
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
     void DriveSending();
-    BLE_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle pBuf);
+    BLE_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle && pBuf);
 
     static BleTransportProtocolVersion GetHighestSupportedProtocolVersion(const BleTransportCapabilitiesRequestMessage & reqMsg);
 

@@ -17,6 +17,7 @@ limitations under the License.
 
 import logging
 import os
+import pprint
 import time
 import sys
 
@@ -72,26 +73,7 @@ class TestPythonController(CHIPVirtualHome):
         req_ids = [device['id'] for device in self.non_ap_devices
                    if device['type'] == 'MobileDevice']
 
-        for device_id in server_ids:
-            # Wait for otbr-agent and CHIP server start
-            self.assertTrue(self.wait_for_device_output(device_id, "Border router agent started.", 5))
-            self.assertTrue(self.wait_for_device_output(device_id, "CHIP:SVR: Server Listening...", 5))
-            # Clear default Thread network commissioning data
-            self.logger.info("Resetting thread network on {}".format(
-                self.get_device_pretty_id(device_id)))
-            self.execute_device_cmd(device_id, 'ot-ctl factoryreset')
-            resetResult = False
-            for i in range(10):
-                # We can only check the status of ot-agent by query its state.
-                reply = self.execute_device_cmd(device_id, 'ot-ctl state')
-                if self.sequenceMatch(reply['output'], ('disabled',)):
-                    self.logger.info("Finished resetting Thread network on {}".format(
-                        self.get_device_pretty_id(device_id)))
-                    resetResult = True
-                    break
-                time.sleep(1)
-            self.assertTrue(resetResult, "Failed to do factoryreset thread network on {}.".format(
-                self.get_device_pretty_id(device_id)))
+        self.reset_thread_devices(server_ids)
 
         req_device_id = req_ids[0]
 
@@ -101,31 +83,100 @@ class TestPythonController(CHIPVirtualHome):
         self.assertEqual(ret['return_code'], '0',
                          "Test failed: non-zero return code")
 
-        roles = set()
-
-        for device_id in server_ids:
-            self.logger.info("Pending network join {}".format(
-                        self.get_device_pretty_id(device_id)))
-            # TODO: This checking should be removed after EnableNetwork is able to return after network attach.
-            for i in range(30):
-                # We can only check the status of ot-agent by query its state.
-                reply = self.execute_device_cmd(device_id, 'ot-ctl state')
-                if not (self.sequenceMatch(reply['output'], ('detached',)) or self.sequenceMatch(reply['output'], ('disabled',))):
-                    roles.add(reply['output'].split()[0])
-                    break
-                time.sleep(1)
-        self.assertTrue('leader' in roles)
+        # Check if the device is in thread network.
+        self.check_device_thread_state(server_ids[0], expected_role=['leader'], timeout=5)
 
         # Check if the device is attached to the correct thread network.
         for device_id in server_ids:
             reply = self.execute_device_cmd(device_id, 'ot-ctl extpanid')
             self.assertEqual(reply['output'].split()[0].strip(), TEST_EXTPANID)
 
+        # Check if device can be controlled by controller
         for device_id in server_ids:
             self.logger.info("checking device log for {}".format(
                 self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+
+        # Check if the device response proper Basic Cluster values to controller.
+        fmt = "CHIP:ZCL:   ClusterId: {cluster}\n" \
+              "CHIP:ZCL:   attributeId: {attr}\n" \
+              "CHIP:ZCL:   status: EMBER_ZCL_STATUS_SUCCESS (0x00)\n" \
+              "CHIP:ZCL:   attributeType: {attr_type}\n" \
+              "CHIP:ZCL:   value: {value}"
+
+        for device_id in server_ids:
+            # VendorName
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0001',
+                                                           attr_type='0x42',
+                                                           value='TEST_VENDOR')]),
+                            "Vendor Name was not found {}".format(device_id))
+
+            # VendorID
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0002',
+                                                           attr_type='0x21',
+                                                           value='0x235a')]),
+                            "Vendor ID was not found {}".format(device_id))
+            # ProductName
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0003',
+                                                           attr_type='0x42',
+                                                           value='TEST_PRODUCT')]),
+                            "Product Name was not found {}".format(device_id))
+            # ProductID
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0004',
+                                                           attr_type='0x21',
+                                                           value='0xfeff')]),
+                            "ProductID was not found {}".format(device_id))
+            # UserLabel
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0005',
+                                                           attr_type='0x42',
+                                                           value='')]),
+                            "UserLabel was not found {}".format(device_id))
+            # Location
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0006',
+                                                           attr_type='0x42',
+                                                           value='')]),
+                            "Location was not found {}".format(device_id))
+            # HardwareVersion
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0007',
+                                                           attr_type='0x21',
+                                                           value='0x0001')]),
+                            "HardwareVersion was not found {}".format(device_id))
+            # HardwareVersionString
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0008',
+                                                           attr_type='0x42',
+                                                           value='TEST_VERSION')]),
+                            "HardwareVersionString was not found {}".format(device_id))
+            # SoftwareVersion
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x0009',
+                                                           attr_type='0x23',
+                                                           value='0x00000001')]),
+                            "SoftwareVersion was not found {}".format(device_id))
+            # SoftwareVersionString
+            self.assertTrue(self.sequenceMatch(ret['output'],
+                                               [fmt.format(cluster='0x0028',
+                                                           attr='0x000a',
+                                                           attr_type='0x42',
+                                                           value='prerelease')]),
+                            "SoftwareVersionString was not found {}".format(device_id))
 
 
 if __name__ == "__main__":

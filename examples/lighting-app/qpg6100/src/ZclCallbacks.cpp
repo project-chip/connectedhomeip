@@ -48,7 +48,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
     }
     else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
     {
-        if (attributeId != ZCL_MOVE_TO_LEVEL_COMMAND_ID)
+        if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
             return;

@@ -41,6 +41,10 @@ public:
     chip::Controller::DeviceCommissioner * Controller() { return mController.get(); }
     chip::Controller::ExampleOperationalCredentialsIssuer & OpCredsIssuer() { return mOpCredsIssuer; }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
+    jobject JavaObjectRef() { return mJavaObjectRef; }
+    jlong ToJNIHandle();
+
+    void CallJavaMethod(const char * methodName, jint argument);
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -48,21 +52,13 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     // DeviceStatusDelegate implementation
-    void OnMessage(chip::System::PacketBufferHandle msg) override;
+    void OnMessage(chip::System::PacketBufferHandle && msg) override;
     void OnStatusChange(void) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
-
-    jlong ToJNIHandle()
-    {
-        static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
-        return reinterpret_cast<jlong>(this);
-    }
-
-    jobject JavaObjectRef() { return mJavaObjectRef; }
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -88,3 +84,9 @@ private:
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller)) {}
 };
+
+inline jlong AndroidDeviceControllerWrapper::ToJNIHandle()
+{
+    static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+    return reinterpret_cast<jlong>(this);
+}

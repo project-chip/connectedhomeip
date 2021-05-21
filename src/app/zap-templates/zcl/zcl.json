@@ -49,6 +49,7 @@
         "green-power.xml",
         "green-power-devices.xml",
         "silabs.xml",
+        "software-diagnostics-cluster.xml",
         "lo-devices.xml",
         "wwah-silabs.xml",
         "wwah-silabs-devices.xml",

@@ -87,8 +87,7 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
 
     mGlobalEncryptedMessageCounter.Init();
 
-    ChipLogProgress(Inet, "local node id is 0x%08" PRIx32 "%08" PRIx32, static_cast<uint32_t>(mLocalNodeId >> 32),
-                    static_cast<uint32_t>(mLocalNodeId));
+    ChipLogProgress(Inet, "local node id is 0x" ChipLogFormatX64, ChipLogValueX64(mLocalNodeId));
 
     ScheduleExpiryTimer();
 
@@ -131,7 +130,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
                        EncryptionState::kPayloadIsUnencrypted);
 }
 
-CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle && msgBuf,
                                                   EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -147,7 +146,7 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, E
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                                         System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
+                                         System::PacketBufferHandle && msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
                                          EncryptionState encryptionState)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
@@ -191,11 +190,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
         (*bufferRetainSlot) = msgBuf.Retain();
     }
 
-    ChipLogProgress(Inet,
-                    "Sending msg from 0x%08" PRIx32 "%08" PRIx32 " to 0x%08" PRIx32 "%08" PRIx32 " at utc time: %" PRId64 " msec",
-                    static_cast<uint32_t>(localNodeId >> 32), static_cast<uint32_t>(localNodeId),
-                    static_cast<uint32_t>(state->GetPeerNodeId() >> 32), static_cast<uint32_t>(state->GetPeerNodeId()),
-                    System::Layer::GetClock_MonotonicMS());
+    ChipLogProgress(Inet, "Sending msg from 0x" ChipLogFormatX64 " to 0x" ChipLogFormatX64 " at utc time: %" PRId64 " msec",
+                    ChipLogValueX64(localNodeId), ChipLogValueX64(state->GetPeerNodeId()), System::Layer::GetClock_MonotonicMS());
 
     if (state->GetTransport() != nullptr)
     {
@@ -290,7 +286,7 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
-void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle msg)
+void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System::PacketBufferHandle && msg)
 {
     PacketHeader packetHeader;
 
@@ -307,7 +303,7 @@ void SecureSessionMgr::OnMessageReceived(const PeerAddress & peerAddress, System
 }
 
 void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                       System::PacketBufferHandle msg)
+                                       System::PacketBufferHandle && msg)
 {
     if (mCB != nullptr)
     {
@@ -318,7 +314,7 @@ void SecureSessionMgr::MessageDispatch(const PacketHeader & packetHeader, const 
 }
 
 void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBufferHandle msg)
+                                             System::PacketBufferHandle && msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -349,12 +345,10 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
     {
         if (!state->GetSessionMessageCounter().GetPeerMessageCounter().IsSynchronized())
         {
-            err = packetHeader.EncodeBeforeData(msg);
-            SuccessOrExit(err);
-
             // Queue and start message sync procedure
             err = mMessageCounterManager->QueueReceivedMessageAndStartSync(
-                { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress, std::move(msg));
+                packetHeader, { state->GetPeerNodeId(), state->GetPeerKeyID(), state->GetAdminId() }, state, peerAddress,
+                std::move(msg));
 
             if (err != CHIP_NO_ERROR)
             {
@@ -389,14 +383,24 @@ void SecureSessionMgr::SecureMessageDispatch(const PacketHeader & packetHeader, 
                               state->GetAdminId()));
     if (packetHeader.GetDestinationNodeId().HasValue() && admin->GetNodeId() != kUndefinedNodeId)
     {
-        VerifyOrExit(
-            admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
-            ChipLogError(
-                Inet,
-                "Secure transport received message, but destination node ID (%llu) doesn't match our node ID (%llu), discarding",
-                packetHeader.GetDestinationNodeId().Value(), admin->GetNodeId()));
+        VerifyOrExit(admin->GetNodeId() == packetHeader.GetDestinationNodeId().Value(),
+                     ChipLogError(Inet,
+                                  "Secure transport received message, but destination node ID (0x" ChipLogFormatX64
+                                  ") doesn't match our node ID (0x" ChipLogFormatX64 "), discarding",
+                                  ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()),
+                                  ChipLogValueX64(admin->GetNodeId())));
     }
-    ChipLogError(Inet, "Secure transport received message destined to node ID (%llu)", packetHeader.GetDestinationNodeId().Value());
+
+    if (packetHeader.GetDestinationNodeId().HasValue())
+    {
+        ChipLogError(Inet, "Secure transport received message destined to node ID (0x" ChipLogFormatX64 ")",
+                     ChipLogValueX64(packetHeader.GetDestinationNodeId().Value()));
+    }
+    else
+    {
+        ChipLogError(Inet, "Secure transport received message without node ID with key ID (%d)", packetHeader.GetEncryptionKeyID());
+    }
+
     mPeerConnections.MarkConnectionActive(state);
 
     // Decode the message

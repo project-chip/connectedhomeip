@@ -85,6 +85,11 @@ void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
     mJavaObjectRef = GetJavaEnv()->NewGlobalRef(obj);
 }
 
+void AndroidDeviceControllerWrapper::CallJavaMethod(const char * methodName, jint argument)
+{
+    CallVoidInt(GetJavaEnv(), mJavaObjectRef, methodName, argument);
+}
+
 JNIEnv * AndroidDeviceControllerWrapper::GetJavaEnv()
 {
     if (mJavaVM == nullptr)
@@ -170,20 +175,20 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
-    CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onStatusUpdate", static_cast<jint>(status));
+    CallJavaMethod("onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
-    CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingComplete", static_cast<jint>(error));
+    CallJavaMethod("onPairingComplete", static_cast<jint>(error));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
-    CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
+    CallJavaMethod("onPairingDeleted", static_cast<jint>(error));
 }
 
-void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle msg) {}
+void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle && msg) {}
 
 void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 

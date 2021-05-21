@@ -526,7 +526,7 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 }
 
 void DeviceController::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader,
-                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+                                         const PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf)
 {
     uint16_t index;
     bool needClose = true;
@@ -659,7 +659,7 @@ CHIP_ERROR DeviceController::InitializePairedDeviceList()
     if (!mPairedDevicesInitialized)
     {
         constexpr uint16_t max_size = sizeof(uint64_t) * kNumMaxPairedDevices;
-        buffer                      = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(max_size));
+        buffer                      = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(max_size, 1));
         uint16_t size               = max_size;
 
         VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -847,13 +847,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
         params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
-#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+#if CONFIG_NETWORK_LAYER_BLE
         if (!params.HasBleLayer())
         {
             params.SetPeerAddress(Transport::PeerAddress::BLE());
         }
         peerAddress = Transport::PeerAddress::BLE();
-#endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+#endif // CONFIG_NETWORK_LAYER_BLE
     }
     else if (params.GetPeerAddress().GetTransportType() == Transport::Type::kTcp ||
              params.GetPeerAddress().GetTransportType() == Transport::Type::kUdp)
@@ -1435,7 +1435,7 @@ CHIP_ERROR DeviceCommissioner::DiscoverCommissioningLongDiscriminator(uint16_t l
     {
         mCommissionableNodes[i].Reset();
     }
-    Mdns::CommissionableNodeFilter filter(Mdns::CommissionableNodeFilterType::kLong, long_discriminator);
+    Mdns::DiscoveryFilter filter(Mdns::DiscoveryFilterType::kLong, long_discriminator);
     return Mdns::Resolver::Instance().FindCommissionableNodes(filter);
 }
 

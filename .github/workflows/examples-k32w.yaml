@@ -66,8 +66,6 @@ jobs:
                   path: |
                       out/lock_app_debug/chip-k32w061-lock-example.out
                       out/lock_app_debug/chip-k32w061-lock-example.out.map
-                      out/lighting_app_debug/chip-k32w061-light-example
-                      out/lighting_app_debug/chip-k32w061-light-example.map
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
 #            - name: Perform CodeQL Analysis

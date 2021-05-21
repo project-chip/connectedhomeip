@@ -26,5 +26,5 @@
 
 __attribute__((weak)) void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
 __attribute__((weak)) void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange,
-                                                  chip::System::PacketBufferHandle buffer)
+                                                  chip::System::PacketBufferHandle && buffer)
 {}
