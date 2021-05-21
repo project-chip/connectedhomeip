@@ -52,7 +52,7 @@ static Messaging::ExchangeManager gExchangeManager;
 static TransportMgr<Transport::UDP> gTransportManager;
 static secure_channel::MessageCounterManager gMessageCounterManager;
 static Transport::AdminId gAdminId = 0;
-static bool isCommandDispatched = false;
+static bool isCommandDispatched    = false;
 
 namespace app {
 
