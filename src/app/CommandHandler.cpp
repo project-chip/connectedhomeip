@@ -57,6 +57,8 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(mState == CommandState::AddCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
     err = FinalizeCommandsMessage();
     SuccessOrExit(err);
 
