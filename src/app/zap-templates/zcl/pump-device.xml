@@ -32,6 +32,7 @@ limitations under the License.
         <requireAttribute>IDENTIFY_TIME</requireAttribute>
         <requireCommand>Identify</requireCommand>
         <requireCommand>IdentifyQuery</requireCommand>
+        <requireCommand>IdentifyQueryResponse</requireCommand>
       </include>
       <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
         <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
@@ -76,17 +77,12 @@ limitations under the License.
         <requireAttribute>MAX_PRESSURE</requireAttribute>
         <requireAttribute>MAX_SPEED</requireAttribute>
         <requireAttribute>MAX_FLOW</requireAttribute>
+        <requireAttribute>EffectiveOperationMode</requireAttribute>
+        <requireAttribute>EffectiveControlMode</requireAttribute>
+        <requireAttribute>Capasity</requireAttribute>
+        <requireAttribute>OperationMode</requireAttribute>
       </include>
       <include cluster="Level Control" client="false" server="true" clientLocked="true" serverLocked="true">
-        <!-- <requireAttribute>CURRENT_LEVEL</requireAttribute> -->
-        <requireCommand>MoveToLevel</requireCommand>
-        <requireCommand>Move</requireCommand>
-        <requireCommand>Step</requireCommand>
-        <requireCommand>Stop</requireCommand>
-        <requireCommand>MoveToLevelWithOnOff</requireCommand>
-        <requireCommand>MoveWithOnOff</requireCommand>
-        <requireCommand>StepWithOnOff</requireCommand>
-        <requireCommand>StopWithOnOff</requireCommand>
       </include>
       <include cluster="Temperature Measurement" client="true" server="true" clientLocked="true" serverLocked="true">
       </include>
