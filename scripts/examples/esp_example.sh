@@ -21,6 +21,7 @@ env
 
 app="$1"
 root=examples/$app/esp32/
+work_dir="$PWD"
 
 shift 1
 
@@ -29,18 +30,25 @@ if [ -z "$app" ]; then
     exit 1
 fi
 
+
 source "scripts/activate.sh"
 # shellcheck source=/dev/null
-source "$root"/idf.sh
+git -C "$IDF_PATH" submodule update --init --recursive
+cd "$IDF_PATH"
+. ./export.sh
 
+cd "$work_dir"
 for sdkconfig in "$root"/sdkconfig*.defaults; do
     # remove root path to get sdkconfig*.defaults name
     sdkconfig_name=${sdkconfig#"$root"/}
     rm -f "$root"/sdkconfig
-    SDKCONFIG_DEFAULTS=$sdkconfig_name idf make -j8 -C "$root" defconfig "$@"
-    idf make -j8 -C "$root" "$@" || {
+    cd "$root"
+    idf.py -D SDKCONFIG_DEFAULTS=$sdkconfig_name build
+    idf.py build "$@" || {
+        cd -
         echo "build $sdkconfig_name failed"
         exit 1
     }
+    cd -
     cp "$root"/build/chip-"$app".elf "$root"/build/"${sdkconfig_name%".defaults"}"-chip-"$app".elf
 done
