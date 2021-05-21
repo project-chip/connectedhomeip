@@ -33,6 +33,8 @@
         "ha.xml",
         "ha-devices.xml",
         "pump-configuration-and-control-cluster.xml",
+        "pump-device.xml",
+        "pump-controller-device.xml",
         "cba.xml",
         "cba-devices.xml",
         "ota.xml",
