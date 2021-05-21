@@ -25,6 +25,12 @@
 // mbed-os headers
 #include "platform/Callback.h"
 
+#ifdef MBED_CONF_APP_LED_ACTIVE_STATE
+#define LED_ACTIVE_STATE (MBED_CONF_APP_LED_ACTIVE_STATE)
+#else
+#define LED_ACTIVE_STATE 0
+#endif
+
 LightingManager LightingManager::sLight;
 
 void LightingManager::Init(PinName pwmPinName)
@@ -114,5 +120,6 @@ void LightingManager::UpdateLight()
     constexpr uint32_t kPwmWidthUs = 20000u;
     const uint8_t level            = mState == kState_On ? mLevel : 0;
     mPwmDevice->period_us(kPwmWidthUs);
-    mPwmDevice->write((float) level / kMaxLevel);
+
+    mPwmDevice->write((float) (LED_ACTIVE_STATE ? level : kMaxLevel - level) / kMaxLevel);
 }
