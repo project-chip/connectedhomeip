@@ -1649,7 +1649,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
     uint64_t breadcrumb = static_cast<uint64_t>(nextStage);
 
     // TODO(cecille): This should be customized per command.
-    uint32_t commandTimeoutMs = 3000;
+    constexpr uint32_t kCommandTimeoutMs = 3000;
 
     switch (nextStage)
     {
@@ -1662,7 +1662,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         uint16_t commissioningExpirySeconds = 5;
         // TODO: should get the endpoint information from the descriptor cluster.
         genCom.Associate(device, 0);
-        genCom.ArmFailSafe(success->Cancel(), failure->Cancel(), commissioningExpirySeconds, breadcrumb, commandTimeoutMs);
+        genCom.ArmFailSafe(success->Cancel(), failure->Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
@@ -1704,7 +1704,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         GeneralCommissioningCluster genCom;
         genCom.Associate(device, 0);
         genCom.SetRegulatoryConfig(success->Cancel(), failure->Cancel(), static_cast<uint8_t>(regulatoryLocation), countryCode,
-                                   breadcrumb, commandTimeoutMs);
+                                   breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kCheckCertificates: {
@@ -1741,7 +1741,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         char magicNetworkEnableCode[] = "ETH0";
         netCom.EnableNetwork(success->Cancel(), failure->Cancel(),
                              ByteSpan(reinterpret_cast<uint8_t *>(&magicNetworkEnableCode), sizeof(magicNetworkEnableCode)),
-                             breadcrumb, commandTimeoutMs);
+                             breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kFindOperational: {

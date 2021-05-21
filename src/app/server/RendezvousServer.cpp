@@ -55,7 +55,7 @@ void RendezvousServer::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * even
         }
         else
         {
-            ChipLogError(Discovery, "Commissioning timed out");
+            ChipLogError(Discovery, "Commissioning errored out with error %u", event->CommissioningComplete.status);
         }
         // TODO: Commissioning complete means we can finalize the admin in our storage
     }
