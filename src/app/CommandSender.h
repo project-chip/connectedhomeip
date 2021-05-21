@@ -46,6 +46,8 @@ class CommandSender : public Command, public Messaging::ExchangeDelegate
 {
 public:
     // TODO: issue #6792 - the secure session parameter should be made non-optional and passed by reference.
+    // If SendCommandRequest finished with success, the caller should drop the reference of the CommandSender, and no longer holds
+    // the ownership of CommandSender.
     CHIP_ERROR SendCommandRequest(NodeId aNodeId, Transport::AdminId aAdminId, SecureSessionHandle * secureSession = nullptr);
 
     void OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PacketHeader & aPacketHeader,
