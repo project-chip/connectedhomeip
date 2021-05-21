@@ -25,8 +25,6 @@ static_library("controller") {
     "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
-    "CHIPOperationalCredentialsProvisioner.cpp",
-    "CHIPOperationalCredentialsProvisioner.h",
     "DeviceAddressUpdateDelegate.h",
     "EmptyDataModelHandler.cpp",
     "ExampleOperationalCredentialsIssuer.cpp",
@@ -49,4 +47,5 @@ static_library("controller") {
   ]
 
   defines = []
+  include_dirs = [ "${chip_root}/src/controller/data_model" ]
 }
