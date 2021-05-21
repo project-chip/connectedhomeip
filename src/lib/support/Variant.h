@@ -70,6 +70,15 @@ struct VariantCurry<>
     inline static void Copy(std::size_t that_t, const void * that_v, void * this_v) {}
 };
 
+// Using assert inside template will encoded template name into the assert
+// error message, which cost lots of flash space, this function can strip the
+// type name, and the function name should be as short as possible to save
+// space.
+inline void AssertStrip(bool exp)
+{
+    assert(exp);
+}
+
 } // namespace Internal
 
 /**
@@ -96,8 +105,8 @@ template <typename... Ts>
 struct Variant
 {
 private:
-    static constexpr std::size_t kDataSize    = std::max(sizeof(Ts)...);
-    static constexpr std::size_t kDataAlign   = std::max(alignof(Ts)...);
+    static constexpr std::size_t kDataSize    = std::max({ sizeof(Ts)... });
+    static constexpr std::size_t kDataAlign   = std::max({ alignof(Ts)... });
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
     using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
@@ -137,12 +146,14 @@ public:
     }
 
     template <typename T>
-    bool Is()
+    bool Is() const
     {
         return (mTypeId == T::VariantId);
     }
 
-    bool Valid() { return (mTypeId != kInvalidType); }
+    std::size_t GetType() const { return mTypeId; }
+
+    bool Valid() const { return (mTypeId != kInvalidType); }
 
     template <typename T, typename... Args>
     void Set(Args &&... args)
@@ -155,29 +166,15 @@ public:
     template <typename T>
     T & Get()
     {
-        if (mTypeId == T::VariantId)
-        {
-            return *reinterpret_cast<T *>(&mData);
-        }
-        else
-        {
-            assert(false);
-            return *static_cast<T *>(nullptr);
-        }
+        Internal::AssertStrip(mTypeId == T::VariantId);
+        return *reinterpret_cast<T *>(&mData);
     }
 
     template <typename T>
     const T & Get() const
     {
-        if (mTypeId == T::VariantId)
-        {
-            return *reinterpret_cast<const T *>(&mData);
-        }
-        else
-        {
-            assert(false);
-            return *static_cast<const T *>(nullptr);
-        }
+        Internal::AssertStrip(mTypeId == T::VariantId);
+        return *reinterpret_cast<const T *>(&mData);
     }
 
     ~Variant() { Curry::Destroy(mTypeId, &mData); }

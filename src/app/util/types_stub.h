@@ -365,38 +365,6 @@ enum
     EMBER_INCOMING_BROADCAST_LOOPBACK
 };
 
-/**
- * @brief Defines the possible outgoing message types.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberOutgoingMessageType
-#else
-typedef uint8_t EmberOutgoingMessageType;
-enum
-#endif
-{
-    /** Unicast sent directly to an EmberNodeId. */
-    EMBER_OUTGOING_DIRECT,
-    /** Unicast sent using an entry in the address table. */
-    EMBER_OUTGOING_VIA_ADDRESS_TABLE,
-    /** Unicast sent using an entry in the binding table. */
-    EMBER_OUTGOING_VIA_BINDING,
-    /** Multicast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_MULTICAST,
-    /** An aliased multicast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_MULTICAST_WITH_ALIAS,
-    /** An aliased Broadcast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_BROADCAST_WITH_ALIAS,
-    /** A broadcast message.  This value is passed to emberMessageSentHandler() only.
-     * It may not be passed to emberSendUnicast(). */
-    EMBER_OUTGOING_BROADCAST,
-    /** A messaging going via some existing exchange. */
-    EMBER_OUTGOING_VIA_EXCHANGE,
-};
-
 /** @brief Endpoint information (a ZigBee Simple Descriptor).
  *
  * This is a ZigBee Simple Descriptor and contains information

@@ -1297,15 +1297,14 @@ EmberStatus emberAfSendMulticastWithCallback(chip::GroupId multicastId, EmberAps
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, chip::MessageSendDestination destination, EmberApsFrame * apsFrame,
-                               uint16_t messageLength, uint8_t * message);
+EmberStatus emberAfSendUnicast(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t messageLength,
+                               uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, chip::MessageSendDestination destination,
-                                           EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message,
-                                           EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendUnicastWithCallback(chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Unicasts the message to each remote node in the binding table that
@@ -1391,13 +1390,12 @@ EmberStatus emberAfSendCommandMulticastToBindings(void);
  * using the emberAfFill... macros from the client command API.
  * It will be sent as unicast.
  */
-EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination);
+EmberStatus emberAfSendCommandUnicast(chip::MessageSendDestination & destination);
 
 /**
  * @brief emberAfSendCommandUnicast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                  EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendCommandUnicastWithCallback(chip::MessageSendDestination & destination, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
