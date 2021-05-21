@@ -1163,6 +1163,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OperationalCredentialsCluster cluster;
+    ChipLogProgress(Controller, "device = %p", device);
     cluster.Associate(device, 0);
 
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
