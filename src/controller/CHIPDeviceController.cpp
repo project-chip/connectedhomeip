@@ -214,6 +214,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     {
         err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, params.imDelegate);
     }
+    else
+    {
+        mDefaultIMDelegate = chip::Platform::New<DeviceControllerInteractionModelDelegate>();
+        err                = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeMgr, mDefaultIMDelegate);
+    }
     SuccessOrExit(err);
 
     mExchangeMgr->SetDelegate(this);
