@@ -503,6 +503,7 @@ void ReliableMessageMgr::StopTimer()
     mSystemLayer->CancelTimer(Timeout, this);
 }
 
+#if CHIP_CONFIG_TEST
 int ReliableMessageMgr::TestGetCountRetransTable()
 {
     int count = 0;
@@ -516,6 +517,7 @@ int ReliableMessageMgr::TestGetCountRetransTable()
 
     return count;
 }
+#endif // CHIP_CONFIG_TEST
 
 } // namespace Messaging
 } // namespace chip
