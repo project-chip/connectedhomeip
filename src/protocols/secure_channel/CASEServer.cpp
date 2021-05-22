@@ -43,7 +43,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 
     ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(transportMgr));
 
-    ExchangeDelegateBase * delegate = this;
+    ExchangeDelegate * delegate = this;
     ReturnErrorOnFailure(
         mExchangeManager->RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_SigmaR1, delegate));
     return CHIP_NO_ERROR;

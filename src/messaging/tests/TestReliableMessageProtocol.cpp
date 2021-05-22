@@ -161,7 +161,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     exchange->Close();
 }
 
-void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
+void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -170,13 +170,10 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    IPAddress addr;
-    IPAddress::FromString("127.0.0.1", addr);
-
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockAppDelegate mockSender;
-    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
     ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -190,11 +187,18 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
         1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
     });
 
-    gLoopback.mSendMessageCount  = 0;
-    gLoopback.mNumMessagesToDrop = 2;
+    // Let's drop the initial message
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 2;
+    gLoopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
@@ -202,6 +206,8 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+
+    // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
@@ -210,15 +216,79 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     // sleep another 65 ms to trigger second re-transmit
     test_os_sleep_ms(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+
+    // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
-
-    ChipLogProgress(ExchangeManager, "Checking that retransmit table is empty now");
-    test_os_sleep_ms(65);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     rm->ClearRetransTable(rc);
     exchange->Close();
+}
+
+void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    MockAppDelegate mockSender;
+    // TODO: temporarily create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageMgr * rm     = ctx.GetExchangeManager().GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    rc->SetConfig({
+        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
+        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
+
+    // Let's drop the initial message
+    gLoopback.mSendMessageCount    = 0;
+    gLoopback.mNumMessagesToDrop   = 2;
+    gLoopback.mDroppedMessageCount = 0;
+
+    // Ensure the retransmit table is empty right now
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    exchange->Close();
+
+    // Ensure the message was dropped, and was added to retransmit table
+    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 1);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
+    test_os_sleep_ms(65);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+
+    // Ensure the retransmit message was dropped, and is still there in the retransmit table
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
+
+    // sleep another 65 ms to trigger second re-transmit
+    test_os_sleep_ms(65);
+    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+
+    // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
+    NL_TEST_ASSERT(inSuite, gLoopback.mSendMessageCount >= 3);
+    NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
+    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
+
+    rm->ClearRetransTable(rc);
 }
 
 void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
@@ -251,7 +321,8 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", CheckAddClearRetrans),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckFailRetrans", CheckFailRetrans),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendMessage", CheckResendMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessage", CheckResendApplicationMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckCloseExchangeAndResendApplicationMessage", CheckCloseExchangeAndResendApplicationMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", CheckSendStandaloneAckMessage),
 
     NL_TEST_SENTINEL()
