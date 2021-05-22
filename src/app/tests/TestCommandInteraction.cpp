@@ -85,7 +85,7 @@ public:
     static void TestCommandSenderWithSendCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandSenderWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
@@ -315,7 +315,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
     commandHandler.Shutdown();
 }
 
-void TestCommandInteraction::TestCommandSenderWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     app::CommandHandler commandHandler;
@@ -376,7 +376,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerWithSendSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode),
     NL_TEST_DEF("TestCommandHandlerWithSendEmptyResponse", chip::app::TestCommandInteraction::TestCommandHandlerWithSendEmptyResponse),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg),
-    NL_TEST_DEF("TestCommandHandlerWithProcessReceivedInvalidCommand", chip::app::TestCommandInteraction::TestCommandSenderWithProcessReceivedNotExistCommand),
+    NL_TEST_DEF("TestCommandHandlerWithProcessReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand),
     NL_TEST_SENTINEL()
 };
 // clang-format on

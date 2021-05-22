@@ -114,8 +114,9 @@ exit:
                                                            0, // GroupId
                                                            clusterId, commandId, (chip::app::CommandPathFlags::kEndpointIdValid) };
 
-        // The Path is not present when there is an error to be conveyed back. ResponseCommandElement would only have status code,
-        // set the error with CHIP_NO_ERROR, then continue to process rest of commands
+        // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
+        // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
+        // Set the error with CHIP_NO_ERROR, then continue to process rest of commands
         AddStatusCode(&returnStatusParam,
                       err == CHIP_ERROR_INVALID_PROFILE_ID ? GeneralStatusCode::kNotFound : GeneralStatusCode::kInvalidArgument,
                       Protocols::SecureChannel::Id, Protocols::SecureChannel::kProtocolCodeGeneralFailure);

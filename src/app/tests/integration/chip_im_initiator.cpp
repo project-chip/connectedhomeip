@@ -75,7 +75,7 @@ uint64_t gReadCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gReadRespCount = 0;
 
-// If the last command successed.
+// Whether the last command successed.
 enum class TestCommandResult : uint8_t
 {
     kUndefined,
