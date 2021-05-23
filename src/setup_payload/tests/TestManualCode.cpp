@@ -25,9 +25,8 @@
 #include <nlunit-test.h>
 #include <stdio.h>
 
-#include "ManualSetupPayloadGenerator.cpp"
+#include "ManualSetupPayloadGenerator.h"
 #include "ManualSetupPayloadParser.cpp"
-#include "SetupPayload.cpp"
 #include "SetupPayload.h"
 
 #include <support/UnitTestRegistration.h>

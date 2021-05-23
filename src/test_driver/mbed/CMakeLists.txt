@@ -73,8 +73,7 @@ set(CHIP_TESTS
     -lInetLayerTests
     -lMessagingLayerTests
     -lPlatformTests
-    # # TODO: raw transport tests fail by running out of TCP/UDP endpoints
-    # # -lRawTransportTests
+    #-lRawTransportTests
     -lRetransmitTests
     # -lSupportTests
     -lSystemLayerTests
@@ -84,7 +83,7 @@ set(CHIP_TESTS
     -lMinimalMdnsRecordsTests
     -lMinimalMdnsRespondersTests
     -lBDXTests
-    #-lSetupPayloadTests
+    -lSetupPayloadTests
 )
 
 # Link the *whole-archives* to keep the static test objects.

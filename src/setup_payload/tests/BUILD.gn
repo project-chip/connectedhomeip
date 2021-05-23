@@ -22,12 +22,10 @@ chip_test_suite("tests") {
   output_name = "libSetupPayloadTests"
 
   test_sources = [
-    "TestManualCode.cpp",
-    "TestQRCode.cpp",
-    "TestQRCodeTLV.cpp",
+  "TestManualCode.cpp",
+  "TestQRCode.cpp",
+  "TestQRCodeTLV.cpp",
   ]
-
-  sources = [ "TestHelpers.h" ]
 
   cflags = [ "-Wconversion" ]
 

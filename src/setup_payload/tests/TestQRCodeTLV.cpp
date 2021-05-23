@@ -19,6 +19,7 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
+#include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
 
 using namespace chip;

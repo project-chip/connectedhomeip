@@ -26,11 +26,13 @@
 #include <core/CHIPError.h>
 #include <core/CHIPTLV.h>
 
+#include <math.h>
+#include <string.h>
 #include <string>
 #include <utility>
 
 namespace chip {
-
+std::string extractPayload(std::string inString);
 /**
  * @class QRCodeSetupPayloadParser
  * A class that can be used to convert a base41 encoded payload to a SetupPayload object
