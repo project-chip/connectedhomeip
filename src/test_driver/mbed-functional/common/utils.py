@@ -60,6 +60,7 @@ def run_wifi_provisioning(devCtrl, ssid, password, discriminator, pinCode, nodeI
         log.error("WiFi provisioning failed: {}".format(str(ex)))
         return None
 
+    sleep(2)
     ip_details = devCtrl.GetAddressAndPort(nodeId)
 
     return (nodeId, ip_details)

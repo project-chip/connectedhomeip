@@ -69,13 +69,6 @@ def serial_baudrate(request):
         return int(request.config.getoption('serial_baudrate'))
     return 115200
 
-
-@pytest.fixture(scope="session")
-def command_delay(request):
-    if request.config.getoption('command_delay'):
-        return float(request.config.getoption('command_delay'))
-    return float(0)
-
 @pytest.fixture(scope="session")
 def network(request):
     if request.config.getoption('network'):
@@ -108,7 +101,7 @@ class BoardAllocation:
 
 
 class BoardAllocator:
-    def __init__(self, platforms_supported: List[str], binaries: Mapping[str, str], serial_inter_byte_delay: float, baudrate: int, command_delay: float):
+    def __init__(self, platforms_supported: List[str], binaries: Mapping[str, str], serial_inter_byte_delay: float, baudrate: int):
         mbed_ls = mbed_lstools.create()
         boards = mbed_ls.list_mbeds(filter_function=lambda m: m['platform_name'] in platforms_supported)
         self.board_description = boards
@@ -117,7 +110,6 @@ class BoardAllocator:
         self.flasher = None
         self.serial_inter_byte_delay = serial_inter_byte_delay
         self.baudrate = baudrate
-        self.command_delay = command_delay
         for desc in boards:
             self.allocation.append(BoardAllocation(desc))
 
@@ -177,9 +169,8 @@ def board_allocator(
         binaries: Mapping[str, str],
         serial_inter_byte_delay: float,
         serial_baudrate: int,
-        command_delay: float
 ):
-    yield BoardAllocator(platforms, binaries, serial_inter_byte_delay, serial_baudrate, command_delay)
+    yield BoardAllocator(platforms, binaries, serial_inter_byte_delay, serial_baudrate)
 
 
 @pytest.fixture(scope="function")

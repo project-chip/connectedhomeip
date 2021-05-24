@@ -24,7 +24,7 @@
 AP_NAME=WIFI_AP
 export AP_SSID=CHIPnet
 export AP_PASSWORD=CHIPnet123
-export AP_DHCP_SERVER=192.168.4.1/24
+export AP_GATEWAY=192.168.4.1
 
 set -ex
 
@@ -42,7 +42,7 @@ sudo nmcli con add type wifi ifname wlan0 mode ap con-name "$AP_NAME" autoconnec
 sudo nmcli con modify "$AP_NAME" 802-11-wireless.band bg 802-11-wireless.channel 7
 sudo nmcli con modify "$AP_NAME" 802-11-wireless-security.proto rsn 802-11-wireless-security.group ccmp 802-11-wireless-security.pairwise ccmp 802-11-wireless-security.key-mgmt wpa-psk 802-11-wireless-security.psk "$AP_PASSWORD"
 sudo nmcli con modify "$AP_NAME" ipv4.method shared
-sudo nmcli con modify "$AP_NAME" ipv4.addr "$AP_DHCP_SERVER"
+sudo nmcli con modify "$AP_NAME" ipv4.addr "$AP_GATEWAY"/24
 sudo nmcli con up "$AP_NAME"
 
 sudo nmcli -f GENERAL.STATE con show "$AP_NAME"
