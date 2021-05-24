@@ -86,8 +86,8 @@ case $3 in
 esac
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\"" 
- 
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\""
+
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
 
